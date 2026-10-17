@@ -1,5 +1,7 @@
 ﻿<Solution>
-  <Project Path="XRay.Importer.Core.csproj" />
   <Project Path="XRay.Importer.Editor.csproj" />
+  <Project Path="XRay.Importer.Sources.csproj" />
+  <Project Path="XRay.Importer.Core.csproj" />
+  <Project Path="XRay.Importer.Tests.Editor.csproj" />
   <Project Path="XRay.Importer.Runtime.csproj" />
 </Solution>

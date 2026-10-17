@@ -21,28 +21,46 @@ namespace XRay.Importer.Editor
         private readonly bool _searchByName;
         private readonly List<string> _warnings;
         private readonly Dictionary<string, Material> _materials = new Dictionary<string, Material>();
+        private readonly Dictionary<string, Material> _externalMaterials = new Dictionary<string, Material>();
         private Material _fallback;
         private bool _reportedMissingShader;
 
-        public XRayMaterialBuilder(AssetImportContext context, bool createMaterials, string texturesFolder, bool searchByName, List<string> warnings)
+        public XRayMaterialBuilder(AssetImportContext context, bool createMaterials, string texturesFolder, bool searchByName, List<string> warnings, Dictionary<AssetImporter.SourceAssetIdentifier, UnityEngine.Object> externalObjects)
         {
             _context = context;
             _createMaterials = createMaterials;
             _texturesFolder = string.IsNullOrEmpty(texturesFolder) ? null : texturesFolder.Replace('\\', '/').TrimEnd('/');
             _searchByName = searchByName;
             _warnings = warnings;
+            if (externalObjects == null)
+            {
+                return;
+            }
+
+            foreach (KeyValuePair<AssetImporter.SourceAssetIdentifier, UnityEngine.Object> pair in externalObjects)
+            {
+                if (pair.Key.type == typeof(Material) && pair.Value is Material external)
+                {
+                    _externalMaterials[pair.Key.name] = external;
+                }
+            }
         }
 
         public IEnumerable<Material> Materials => _materials.Values;
 
         public Material Get(string texture, string shader)
         {
+            string key = XRayMaterialSlot.MakeKey(texture, shader);
+            if (_externalMaterials.TryGetValue(key, out Material external))
+            {
+                return external;
+            }
+
             if (!_createMaterials)
             {
                 return GetFallback();
             }
 
-            string key = (texture ?? string.Empty) + "|" + (shader ?? string.Empty);
             if (_materials.TryGetValue(key, out Material material))
             {
                 return material;

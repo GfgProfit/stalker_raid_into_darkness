@@ -11,7 +11,7 @@ namespace XRay.Importer.Editor
     [ScriptedImporter(IMPORTER_VERSION, "ogf")]
     public sealed class XRayOgfImporter : ScriptedImporter
     {
-        public const int IMPORTER_VERSION = 1;
+        public const int IMPORTER_VERSION = 2;
 
         [Tooltip("Uniform scale applied to vertex positions, bone offsets and motion translations. X-Ray units are meters.")]
         [SerializeField] private float _scale = 1.0f;
@@ -25,8 +25,11 @@ namespace XRay.Importer.Editor
         [SerializeField] private bool _addAnimator = true;
         [SerializeField] private bool _readableMeshes;
         [SerializeField] private bool _updateWhenOffscreen;
+        [Tooltip("Resolve textures through the X-Ray asset sources (Tools > X-Ray > Asset Sources) and generate HDRP materials next to this model.")]
+        [SerializeField] private bool _autoResolveResources = true;
 
         public float Scale => _scale;
+        public bool AutoResolveResources => _autoResolveResources;
 
         public override void OnImportAsset(AssetImportContext ctx)
         {
@@ -76,7 +79,7 @@ namespace XRay.Importer.Editor
         private void Build(AssetImportContext ctx, OgfModel model, string fileName, string rootName)
         {
             var warnings = new List<string>();
-            var materials = new XRayMaterialBuilder(ctx, _importMaterials, _texturesFolder, _searchTexturesByName, warnings);
+            var materials = new XRayMaterialBuilder(ctx, _importMaterials, _texturesFolder, _searchTexturesByName, warnings, GetExternalObjectMap());
             var settings = new XRayModelBuildSettings { Scale = _scale, AddAnimator = _addAnimator, ReadableMeshes = _readableMeshes, UpdateWhenOffscreen = _updateWhenOffscreen };
             XRayModelBuildResult result = XRayModelBuilder.Build(model, rootName, settings, materials, warnings);
 

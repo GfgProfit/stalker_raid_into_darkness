@@ -7,6 +7,7 @@ namespace XRay.Importer.Editor
     [CustomEditor(typeof(XRayOgfImporter))]
     public sealed class XRayOgfImporterEditor : ScriptedImporterEditor
     {
+        private readonly XRayResourceReportView _resources = new XRayResourceReportView();
         private bool _showBones;
         private bool _showTextures = true;
 
@@ -21,8 +22,9 @@ namespace XRay.Importer.Editor
 
             EditorGUILayout.Space();
             EditorGUILayout.LabelField("Materials", EditorStyles.boldLabel);
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("_autoResolveResources"), new GUIContent("Resolve X-Ray Resources", "Find textures through Tools > X-Ray > Asset Sources and generate HDRP materials next to the model."));
             SerializedProperty importMaterials = serializedObject.FindProperty("_importMaterials");
-            EditorGUILayout.PropertyField(importMaterials, new GUIContent("Generate HDRP Materials"));
+            EditorGUILayout.PropertyField(importMaterials, new GUIContent("Embedded Fallback Materials", "Embedded HDRP materials used until generated materials are assigned."));
             using (new EditorGUI.DisabledScope(!importMaterials.boolValue))
             {
                 DrawFolderField(serializedObject.FindProperty("_texturesFolder"));
@@ -36,6 +38,7 @@ namespace XRay.Importer.Editor
             serializedObject.ApplyModifiedProperties();
 
             DrawInfo();
+            _resources.Draw((XRayOgfImporter)target, HasModified());
             ApplyRevertGUI();
         }
 

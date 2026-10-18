@@ -129,6 +129,12 @@ namespace XRay.Importer.Editor
                 return false;
             }
 
+            // Unity rejects DDS files whose mip chain is neither single-level nor complete.
+            if (header.MipCount > 1 && header.MipCount != GetFullMipCount(header.Width, header.Height))
+            {
+                return false;
+            }
+
             switch (header.Format)
             {
                 case DdsFormat.BC1:
@@ -141,6 +147,19 @@ namespace XRay.Importer.Editor
                 default:
                     return false;
             }
+        }
+
+        private static int GetFullMipCount(int width, int height)
+        {
+            int size = Math.Max(width, height);
+            int count = 1;
+            while (size > 1)
+            {
+                size >>= 1;
+                count++;
+            }
+
+            return count;
         }
 
         private XRayTextureAssetResult Store(XRayAssetMarker marker, string relativePath, string nameSuffix, string extension, string folder, XRayTextureRole role, string format, Func<byte[]> produce, string note)

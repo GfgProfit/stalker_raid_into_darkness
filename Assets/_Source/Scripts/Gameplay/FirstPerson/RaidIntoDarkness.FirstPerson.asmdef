@@ -1,0 +1,16 @@
+{
+    "name": "RaidIntoDarkness.FirstPerson",
+    "rootNamespace": "RaidIntoDarkness.FirstPerson",
+    "references": [
+        "XRay.Importer.Runtime"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

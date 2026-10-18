@@ -1,5 +1,16 @@
 # Changelog
 
+## 2.2.0 — 2026-10-18
+
+### Added
+
+- `XRayLtxDatabase` (Sources): чтение `system.ltx` с `#include` и DLTX `mod_system_*.ltx` (`!![sec]`, `>key`, `<key`, `!key`), наследование секций, источник секции.
+- `XRayStringTable` (Sources): строковые таблицы `configs/text/<язык>/*.xml`.
+
+### Fixed
+
+- DDS с неполной цепочкой mip-уровней конвертируются в PNG вместо копирования: Unity не импортирует такие файлы.
+
 ## 2.1.0 — 2026-10-18
 
 ### Added

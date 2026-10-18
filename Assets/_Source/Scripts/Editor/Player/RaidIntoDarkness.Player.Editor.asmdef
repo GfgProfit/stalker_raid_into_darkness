@@ -1,0 +1,24 @@
+{
+    "name": "RaidIntoDarkness.Player.Editor",
+    "rootNamespace": "RaidIntoDarkness.Player.Editor",
+    "references": [
+        "RaidIntoDarkness.Player",
+        "RaidIntoDarkness.FirstPerson",
+        "XRay.Importer.Core",
+        "XRay.Importer.Runtime",
+        "XRay.Importer.Editor",
+        "XRay.Importer.Sources",
+        "Unity.InputSystem"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

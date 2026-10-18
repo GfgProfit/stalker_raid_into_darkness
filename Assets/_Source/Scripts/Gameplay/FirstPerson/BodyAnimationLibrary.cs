@@ -117,7 +117,6 @@ namespace RaidIntoDarkness.FirstPerson
             return false;
         }
 
-        // Mirrors swm_legs.get_anim_type: a table is used only when it has an entry for the flags.
         public BodyAnimationBinding Resolve(int movingState, bool isCalm, bool isSlowedDown)
         {
             int flags = movingState & ~_disabledFlags;

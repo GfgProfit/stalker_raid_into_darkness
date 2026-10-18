@@ -44,6 +44,7 @@ FORBIDDEN:
 - Sending progress updates
 - Sending intermediate messages
 - Sending partial summaries
+- Writing any comments or summaries in code
 
 REQUIRED:
 - Reply only once after the task is fully completed
@@ -260,15 +261,9 @@ public int MaxAmmo => _maxAmmo;
 
 Do not use expression-bodied members if surrounding code does not use them.
 
-Do not add comments that merely repeat the code.
+FORBIDDEN: writing any comments in code of any language, including `//`, `/* */`, `#`, XML documentation comments (`/// <summary>`), summaries, header blocks and commented-out code.
 
-Add comments only for:
-- Non-obvious Unity behavior
-- Serialization constraints
-- Asset pipeline assumptions
-- Editor tooling side effects
-- Architectural boundaries
-- Non-obvious performance or lifetime reasoning
+When editing a file that contains comments, do not add new ones.
 
 ## Formatting Restrictions
 
@@ -615,6 +610,7 @@ Do not:
 
 Before completing the task, verify:
 - Code style matches surrounding files
+- Code contains no comments or summaries
 - Private fields use `_`
 - Interfaces use `I` prefix
 - Constants use UPPER_CASE

@@ -56,7 +56,7 @@ Transform:
   m_GameObject: {fileID: 6457694589525271600}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.656, z: 0}
+  m_LocalPosition: {x: 0, y: 1.6559999, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -105,9 +105,10 @@ GameObject:
   m_Component:
   - component: {fileID: 1653321686631299020}
   - component: {fileID: 6243923892120857249}
+  - component: {fileID: 6544757681259984580}
   m_Layer: 0
   m_Name: Camera
-  m_TagString: Untagged
+  m_TagString: MainCamera
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -160,7 +161,7 @@ Camera:
     height: 1
   near clip plane: 0.05
   far clip plane: 1000
-  field of view: 60
+  field of view: 95
   orthographic: 0
   orthographic size: 5
   m_Depth: 0
@@ -178,6 +179,14 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
+--- !u!81 &6544757681259984580
+AudioListener:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8866253854981146002}
+  m_Enabled: 1
 --- !u!1 &9095947929063771272
 GameObject:
   m_ObjectHideFlags: 0
@@ -188,6 +197,16 @@ GameObject:
   m_Component:
   - component: {fileID: 4506691865267215982}
   - component: {fileID: 1844661020335746395}
+  - component: {fileID: 6634809658367128514}
+  - component: {fileID: 5022778083328754539}
+  - component: {fileID: 5917588425433027955}
+  - component: {fileID: 2180938966655364631}
+  - component: {fileID: 5296497837016955254}
+  - component: {fileID: 4431073648799198191}
+  - component: {fileID: 8362631657092042833}
+  - component: {fileID: 1434901721949175874}
+  - component: {fileID: 334293385447183373}
+  - component: {fileID: 5170115981608553266}
   m_Layer: 0
   m_Name: FPS_Player
   m_TagString: Untagged
@@ -228,3 +247,171 @@ MonoBehaviour:
   _handsRoot: {fileID: 7536706216107034830}
   _bodyRoot: {fileID: 6104158516176760372}
   _initialOutfit: actor
+  _driveBodyAnimation: 0
+--- !u!143 &6634809658367128514
+CharacterController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9095947929063771272}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Height: 1.8
+  m_Radius: 0.3
+  m_SlopeLimit: 45
+  m_StepOffset: 0.3
+  m_SkinWidth: 0.02
+  m_MinMoveDistance: 0
+  m_Center: {x: 0, y: 0.91999996, z: 0}
+--- !u!114 &5022778083328754539
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9095947929063771272}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dbc8797ce45eee742a335486e737bc69, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: RaidIntoDarkness.Player::RaidIntoDarkness.Player.StalkerStanceController
+  _profile: {fileID: 11400000, guid: 07c6249f5233a9247823cc3638c99187, type: 2}
+--- !u!114 &5917588425433027955
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9095947929063771272}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c04a461b409d89f409c6e5d42f9c24ae, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: RaidIntoDarkness.Player::RaidIntoDarkness.Player.StalkerActorCondition
+  _profile: {fileID: 11400000, guid: 07c6249f5233a9247823cc3638c99187, type: 2}
+  _carryWeightSource: {fileID: 0}
+  _powerLossSource: {fileID: 0}
+  _healthSource: {fileID: 0}
+  _satietySource: {fileID: 0}
+  _power: 1
+  _neutralHealth: 1
+  _neutralSatiety: 1
+  _neutralWeight: 0
+--- !u!114 &2180938966655364631
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9095947929063771272}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cdd8245bf4d11c34bb93b1e328c16792, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: RaidIntoDarkness.Player::RaidIntoDarkness.Player.StalkerMovementMotor
+  _profile: {fileID: 11400000, guid: 07c6249f5233a9247823cc3638c99187, type: 2}
+--- !u!114 &5296497837016955254
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9095947929063771272}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 070c7b55bdd18e14a8a1e59e5fa1eb42, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: RaidIntoDarkness.Player::RaidIntoDarkness.Player.StalkerPlayerInput
+  _actions: {fileID: -944628639613478452, guid: 0259a467712c04343a8d48b8353c3e82, type: 3}
+--- !u!114 &4431073648799198191
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9095947929063771272}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a4868094a9cfab645bca95408f0716a7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: RaidIntoDarkness.Player::RaidIntoDarkness.Player.StalkerCameraController
+  _cameraRoot: {fileID: 1853972464879935931}
+  _camera: {fileID: 6243923892120857249}
+  _lockCursorOnStart: 1
+--- !u!114 &8362631657092042833
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9095947929063771272}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4e6cf84c996a6c4189f58efdafcae3f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: RaidIntoDarkness.Player::RaidIntoDarkness.Player.StalkerBodyAnimationPlayer
+  _blendRateScale: 1
+  _fallbackBlendRate: 5
+  _playbackSpeed: 1
+  _syncLocomotionPhase: 1
+--- !u!114 &1434901721949175874
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9095947929063771272}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 82841c50405902a4cb6082e38409693d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: RaidIntoDarkness.Player::RaidIntoDarkness.Player.StalkerVisibleBody
+  _bodyRoot: {fileID: 6104158516176760372}
+  _player: {fileID: 8362631657092042833}
+  _combat: 0
+--- !u!114 &334293385447183373
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9095947929063771272}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cff9808b9d4b80044b6f7110695c3fb2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: RaidIntoDarkness.Player::RaidIntoDarkness.Player.StalkerPlayerController
+  _profile: {fileID: 11400000, guid: 07c6249f5233a9247823cc3638c99187, type: 2}
+  _motor: {fileID: 2180938966655364631}
+  _input: {fileID: 5296497837016955254}
+  _camera: {fileID: 4431073648799198191}
+  _visibleBody: {fileID: 1434901721949175874}
+  _bodyPlayer: {fileID: 8362631657092042833}
+  _rig: {fileID: 1844661020335746395}
+  _outfitSection: actor
+--- !u!114 &5170115981608553266
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9095947929063771272}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4d03e9ce79ce9f4d92816790209805a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: RaidIntoDarkness.Player::RaidIntoDarkness.Player.StalkerPlayerDebugOverlay
+  _controller: {fileID: 334293385447183373}
+  _input: {fileID: 5296497837016955254}
+  _visible: 1
+  _showProfile: 0

@@ -1,4 +1,6 @@
+using System;
 using UnityEngine;
+using UnityEngine.Rendering;
 using XRay.Importer;
 
 namespace RaidIntoDarkness.FirstPerson
@@ -10,6 +12,9 @@ namespace RaidIntoDarkness.FirstPerson
         [SerializeField] private Transform _handsRoot;
         [SerializeField] private Transform _bodyRoot;
         [SerializeField] private string _initialOutfit = FirstPersonOutfitCatalog.NO_OUTFIT_SECTION;
+        [Tooltip("When off, another component animates the body and no XRayRigPlayer is added to it.")]
+        [SerializeField] private bool _driveBodyAnimation = true;
+        [SerializeField] private bool _castShadows;
 
         private GameObject _hands;
         private GameObject _body;
@@ -20,6 +25,9 @@ namespace RaidIntoDarkness.FirstPerson
         public GameObject Hands => _hands;
         public GameObject Body => _body;
         public XRayRigPlayer BodyPlayer => _bodyPlayer;
+        public FirstPersonOutfitCatalog Catalog => _catalog;
+
+        public event Action<FirstPersonOutfitEntry, bool> OutfitApplied;
 
         private void Start()
         {
@@ -49,14 +57,16 @@ namespace RaidIntoDarkness.FirstPerson
                 Replace(ref _hands, entry.HandsModel, _handsRoot);
             }
 
-            if (_current == null || _current.BodyModel != entry.BodyModel)
+            bool bodyChanged = _current == null || _current.BodyModel != entry.BodyModel;
+            if (bodyChanged)
             {
                 Replace(ref _body, entry.BodyModel, _bodyRoot);
-                _bodyPlayer = _body != null ? GetOrAddPlayer(_body) : null;
+                _bodyPlayer = _body != null && _driveBodyAnimation ? GetOrAddPlayer(_body) : null;
             }
 
             _current = entry;
             PlayBody(0, true, false, 0.0f);
+            OutfitApplied?.Invoke(entry, bodyChanged);
             return true;
         }
 
@@ -74,7 +84,7 @@ namespace RaidIntoDarkness.FirstPerson
             }
         }
 
-        private static void Replace(ref GameObject instance, GameObject model, Transform root)
+        private void Replace(ref GameObject instance, GameObject model, Transform root)
         {
             if (instance != null)
             {
@@ -82,6 +92,13 @@ namespace RaidIntoDarkness.FirstPerson
             }
 
             instance = model != null && root != null ? Instantiate(model, root, false) : null;
+            if (instance != null && !_castShadows)
+            {
+                foreach (Renderer renderer in instance.GetComponentsInChildren<Renderer>(true))
+                {
+                    renderer.shadowCastingMode = ShadowCastingMode.Off;
+                }
+            }
         }
 
         private static XRayRigPlayer GetOrAddPlayer(GameObject body)

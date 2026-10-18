@@ -1,0 +1,302 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 02cfbead6d921a74f8dd115e4a8c15e3, type: 3}
+  m_Name: StalkerMovementProfile
+  m_EditorClassIdentifier: RaidIntoDarkness.Player::RaidIntoDarkness.Player.StalkerMovementProfile
+  _actor:
+    _walkAccel: 11.5
+    _jumpSpeed: 6.85
+    _runCoef: 2.41
+    _runBackCoef: 1.33
+    _walkBackCoef: 0.61
+    _sprintKoef: 2.08
+    _crouchCoef: 0.45
+    _climbCoef: 0.5
+    _walkStrafeCoef: 1
+    _runStrafeCoef: 1
+    _sprintStrafeCoef: 0.8
+    _airControlParam: 0.02
+    _cameraHeightFactor: 0.92
+    _box0Center: {x: 0, y: 0.9, z: 0}
+    _box0Size: {x: 0.3, y: 0.9, z: 0.3}
+    _box1Center: {x: 0, y: 0.67, z: 0}
+    _box1Size: {x: 0.35, y: 0.67, z: 0.3}
+    _box2Center: {x: 0, y: 0.22, z: 0}
+    _box2Size: {x: 0.35, y: 0.22, z: 0.35}
+    _mass: 94
+    _crashSpeedMin: 15
+    _crashSpeedMax: 41
+    _maxItemMass: 50
+    _material: creatures\actor
+  _engine:
+    _pullForce: 25
+    _sideDamping: 500
+    _groundStickAcceleration: 50
+    _gravity: 19.62
+    _fixedStep: 0.01
+    _maxVelocityDivider: 10
+    _loseControlDistance: 0.5
+    _jumpIncreaseVelocityRate: 1.2
+    _jumpDirectionalVelocity: 0.2
+    _jumpAirForce: 1000
+    _jumpAirBrakeForce: 3000
+    _jumpAirDistance: 0.3
+    _sprintAirStrafeInput: 0.5
+    _landingContactSpeed: 4
+    _landingTime1: 0.1
+    _landingTime2: 0.3
+    _jumpTime: 0.3
+    _jumpGroundTime: 0.1
+    _fallTime: 0.2
+    _stuckVelocity: 0.2
+    _actorFriction: 0.8
+    _groundFriction: 1
+    _cameraIntoCollisionShift: 0.05
+    _cameraHeightInterpolationSpeed: 4
+    _climbPullMultiplier: 2
+    _ladderLookAngleCosine: 0.9238795
+    _ladderLookUpSine: 0.34202015
+    _ladderJumpVelocity: 3
+  _condition:
+    _jumpPower: 0.018
+    _standPower: -0.005
+    _walkPower: 0.0002
+    _jumpWeightPower: 0.2
+    _walkWeightPower: 0.0044
+    _overweightWalkK: 2.5
+    _overweightJumpK: 1.03
+    _accelK: 1.3
+    _sprintK: 4
+    _limpingHealthBegin: 0.09
+    _limpingHealthEnd: 0.12
+    _limpingPowerBegin: 0.18
+    _limpingPowerEnd: 0.29
+    _cantWalkPowerBegin: 0.0015
+    _cantWalkPowerEnd: 0.007
+    _cantSprintPowerBegin: 0.08
+    _cantSprintPowerEnd: 0.1
+    _maxPowerLeakSpeed: 0.000001
+    _maxWalkWeight: 70
+    _satietyPowerV: 0.00325
+    _timeFactor: 6
+    _powerLossBias: 0.4
+    _powerLossFactor: 0.5
+    _progressiveStaminaCost: 0
+  _staminaMod:
+    _enableStaminaSpeedModifier: 1
+    _staminaSpeedModifierModifier: 0.6
+    _powerSpeedMax: 0.55
+    _powerSpeedMin: -0.5
+    _enableUphillSpeedModifier: 1
+    _uphillSpeedModifierModifier: 0.6
+    _uphillSpeedCoeff: 2.3
+    _uphillSpeedDownhillReduction: 0.45
+    _enableUphillDrain: 1
+    _uphillDrainModifier: 0.6
+    _uphillDrainCoeff: 0.033
+    _uphillDrainDownhillReduction: 0.43
+    _updateInterval: 0.06
+    _speedCoefMin: 1
+    _speedCoefMax: 10
+  _visibleBody:
+    _legsOffset: -0.65
+    _legsOffsetNonCombat: -0.5
+    _legsOffsetSide: 0
+    _useSpecialNonCombatShift: 0
+    _hideLegsLowCrouch: 1
+    _height: 0
+    _heightLadder: -0.1
+    _headToBodyDistance: 1.7
+    _fallShiftStand: 1.5
+    _fallShiftCrouch: 1.23
+    _fallShiftLowCrouch: 0.95
+    _lookDownThreshold: -0.65
+    _turnThreshold: 0.2
+    _turnThresholdLookDown: 0.08
+    _turnDuration: 0.5
+    _enableIdleAnimations: 1
+    _idleCooldownMin: 6
+    _idleCooldownMax: 30
+    _slowedRunCoef: 1.4
+    _slowedSprintKoef: 1.8
+    _motionShifts:
+    - _motion: lancew_legs_ladder_idle
+      _forward: -0.3
+      _right: 0
+    - _motion: lancew_legs_ladder_down
+      _forward: -0.3
+      _right: 0
+    - _motion: lancew_legs_ladder_up
+      _forward: -0.3
+      _right: 0
+    - _motion: leg_ladder_idle
+      _forward: -0.15
+      _right: 0
+    - _motion: leg_ladder_up
+      _forward: -0.15
+      _right: 0
+    - _motion: leg_ladder_down
+      _forward: -0.15
+      _right: 0
+    - _motion: lancew_legs_sprint
+      _forward: -0.65
+      _right: 0
+    _lowCrouchShifts:
+    - _motion: lancew_legs_idle_sc
+      _forward: -1.5
+      _right: 0
+    - _motion: lancew_legs_jump_start_sc
+      _forward: -1.5
+      _right: 0
+    - _motion: lancew_legs_jump_idle_sc
+      _forward: -1.5
+      _right: 0
+    - _motion: lancew_legs_walk_sc
+      _forward: -1.5
+      _right: 0
+    - _motion: lancew_legs_walk_fl_sc
+      _forward: -1.5
+      _right: 0
+    - _motion: lancew_legs_walk_fr_sc
+      _forward: -1.5
+      _right: 0
+    - _motion: lancew_legs_walk_fr_sc
+      _forward: -1.5
+      _right: 0
+    - _motion: lancew_legs_walk_b_sc
+      _forward: -1.5
+      _right: 0
+    - _motion: lancew_legs_walk_bl_sc
+      _forward: -1.5
+      _right: 0
+    - _motion: lancew_legs_walk_l_sc
+      _forward: -1.5
+      _right: 0
+    - _motion: lancew_legs_walk_r_sc
+      _forward: -1.5
+      _right: 0
+  _input:
+    _sprintToggle: 0
+    _crouchToggle: 0
+    _walkToggle: 0
+  _unity:
+    _skinWidth: 0.02
+    _stepOffset: 0.3
+    _slopeLimit: 45
+    _sleepVelocity: 0.15
+    _enableLedgeClimb: 1
+    _ledgeProbeShift: 0.05
+    _ledgeProbeForward: 0.4
+    _ledgeForbidHeight: 1.5
+    _ledgeClimbMultiplier: 4
+    _collisionMask:
+      serializedVersion: 2
+      m_Bits: 4294967295
+  _camera:
+    _fieldOfView: 95
+    _nearClip: 0.05
+    _mouseSensitivity: 0.061
+    _mouseSensitivityVertical: 1
+    _invertMouse: 0
+    _mouseScaleDivider: 50
+    _verticalScale: 0.75
+    _pitchLimits: {x: -1.5, y: 1.5}
+    _ladderYawLimits: {x: -1, y: 1}
+  _sourceReport: "MO2 profile: 1v2(DX11) (v_12gb) 2.5, \u0412\u0441\u0435 \u0432\u043A\u043B\u044E\u0447\u0435\u043D\u043E
+    (168), active mods: 173, LTX sections: 21271, DLTX files: 440\r\n[actor] origin:
+    [\u0413\u0435\u0439\u043C\u043F\u043B\u0435\u0439_S] HeatVision_v1.3 :: configs/mod_system_heatvision.ltx\r\n_actor._walkAccel
+    = 11.5  <- [actor] walk_accel\r\n_actor._jumpSpeed = 6.85  <- [actor] jump_speed\r\n_actor._runCoef
+    = 2.41  <- [actor] run_coef\r\n_actor._runBackCoef = 1.33  <- [actor] run_back_coef\r\n_actor._walkBackCoef
+    = 0.61  <- [actor] walk_back_coef\r\n_actor._sprintKoef = 2.08  <- [actor] sprint_koef\r\n_actor._crouchCoef
+    = 0.45  <- [actor] crouch_coef\r\n_actor._climbCoef = 0.5  <- [actor] climb_coef\r\n_actor._walkStrafeCoef
+    = 1  <- [actor] walk_strafe_coef (READ_IF_EXISTS default 1.0) (absent)\r\n_actor._runStrafeCoef
+    = 1  <- [actor] run_strafe_coef (READ_IF_EXISTS default 1.0) (absent)\r\n_actor._sprintStrafeCoef
+    = 0.8  <- [actor] sprint_strafe_coef (READ_IF_EXISTS default 1.0)\r\n_actor._airControlParam
+    = 0.02  <- [actor] air_control_param\r\n_actor._cameraHeightFactor = 0.92  <-
+    [actor] camera_height_factor\r\n_actor._box0Center = 0.0, 0.90, 0.0  <- [actor]
+    ph_box0_center\r\n_actor._box0Size = 0.30, 0.90, 0.30  <- [actor] ph_box0_size\r\n_actor._box1Center
+    = 0.0, 0.67, 0.0  <- [actor] ph_box1_center\r\n_actor._box1Size = 0.35, 0.67,
+    0.30  <- [actor] ph_box1_size\r\n_actor._box2Center = 0.0, 0.22, 0.0  <- [actor]
+    ph_box2_center\r\n_actor._box2Size = 0.35, 0.22, 0.35  <- [actor] ph_box2_size\r\n_actor._mass
+    = 94  <- [actor] ph_mass\r\n_actor._crashSpeedMin = 15  <- [actor] ph_crash_speed_min\r\n_actor._crashSpeedMax
+    = 41  <- [actor] ph_crash_speed_max\r\n_actor._maxItemMass = 50  <- [actor] max_item_mass\r\n_actor._material
+    = creatures\\actor  <- [actor] material\r\n_condition._jumpPower = 0.018  <-
+    [actor_condition] jump_power\r\n_condition._standPower = -0.005  <- [actor_condition]
+    stand_power\r\n_condition._walkPower = 0.0002  <- [actor_condition] walk_power\r\n_condition._jumpWeightPower
+    = 0.2  <- [actor_condition] jump_weight_power\r\n_condition._walkWeightPower
+    = 0.0044  <- [actor_condition] walk_weight_power\r\n_condition._overweightWalkK
+    = 2.5  <- [actor_condition] overweight_walk_k\r\n_condition._overweightJumpK
+    = 1.03  <- [actor_condition] overweight_jump_k\r\n_condition._accelK = 1.3  <-
+    [actor_condition] accel_k\r\n_condition._sprintK = 4  <- [actor_condition] sprint_k\r\n_condition._limpingHealthBegin
+    = 0.09  <- [actor_condition] limping_health_begin\r\n_condition._limpingHealthEnd
+    = 0.12  <- [actor_condition] limping_health_end\r\n_condition._limpingPowerBegin
+    = 0.18  <- [actor_condition] limping_power_begin\r\n_condition._limpingPowerEnd
+    = 0.29  <- [actor_condition] limping_power_end\r\n_condition._cantWalkPowerBegin
+    = 0.0015  <- [actor_condition] cant_walk_power_begin\r\n_condition._cantWalkPowerEnd
+    = 0.007  <- [actor_condition] cant_walk_power_end\r\n_condition._cantSprintPowerBegin
+    = 0.08  <- [actor_condition] cant_sprint_power_begin\r\n_condition._cantSprintPowerEnd
+    = 0.1  <- [actor_condition] cant_sprint_power_end\r\n_condition._maxPowerLeakSpeed
+    = 1E-06  <- [actor_condition] max_power_leak_speed\r\n_condition._maxWalkWeight
+    = 70  <- [actor_condition] max_walk_weight\r\n_condition._satietyPowerV = 0.00325 
+    <- [actor_condition] satiety_power_v\r\n_condition._timeFactor = 6  <- [alife]
+    time_factor\r\n_camera._pitchLimits = -1.5, 1.5  <- [actor_firsteye_cam] lim_pitch\r\n_camera._ladderYawLimits
+    = -1.0, 1.0  <- [actor_ladder_cam] lim_yaw\r\n_camera._fieldOfView = 95  <- user.ltx
+    fov\r\n_camera._mouseSensitivity = 0.061  <- user.ltx mouse_sens\r\n_camera._mouseSensitivityVertical
+    = 1  <- user.ltx mouse_sens_vertical\r\n_camera._invertMouse = False  <- user.ltx
+    mouse_invert\r\nuser.ltx g_sprint_toggle = on is not applied: sprint is held.\r\n_input._crouchToggle
+    = False  <- user.ltx g_crouch_toggle\r\n_input._walkToggle = False  <- user.ltx
+    g_walk_toggle\r\n_condition._powerLossBias = 0.4  <- user.ltx power_loss_bias\r\n_condition._powerLossFactor
+    = 0.5  <- user.ltx power_loss_factor\r\n_condition._progressiveStaminaCost =
+    False  <- user.ltx g_progressive_stamina_cost\r\n_engine._fixedStep = 0.01  <-
+    user.ltx ph_frequency 100.00000\r\n_engine._gravity = 19.62  <- default_world_gravity
+    = 2 * 9.81 (Physics.cpp), ph_gravity not set (absent)\r\n_engine._actorFriction
+    = 0.8  <- gamemtl.xr 'creatures\\actor' fPHFriction (Base Anomaly)\r\n_engine._groundFriction
+    = 1  <- gamemtl.xr 'materials\\earth' fPHFriction\r\n_visibleBody._legsOffset
+    = -0.65  <- axr_options.ltx swm_legs/legs_offset\r\n_visibleBody._legsOffsetNonCombat
+    = -0.5  <- axr_options.ltx swm_legs/legs_offset_noncombat\r\n_visibleBody._legsOffsetSide
+    = 0  <- axr_options.ltx swm_legs/legs_offset_side\r\n_visibleBody._useSpecialNonCombatShift
+    = False  <- axr_options.ltx swm_legs/use_special_noncombat_shift\r\n_visibleBody._hideLegsLowCrouch
+    = True  <- axr_options.ltx swm_legs/hide_legs_low_crouch\r\n_visibleBody._enableIdleAnimations
+    = True  <- axr_options.ltx swm_legs/enable_idle_anims\r\n_visibleBody._idleCooldownMin
+    = 6  <- axr_options.ltx swm_legs/idle_anim_min_cooldown\r\n_visibleBody._idleCooldownMax
+    = 30  <- axr_options.ltx swm_legs/idle_anim_max_cooldown\r\n_staminaMod._enableStaminaSpeedModifier
+    = True  <- axr_options.ltx advanced_stamina_system/enable_stamina_speed_modifier\r\n_staminaMod._staminaSpeedModifierModifier
+    = 0.6  <- axr_options.ltx advanced_stamina_system/stamina_speed_modifier_modifier\r\n_staminaMod._enableUphillSpeedModifier
+    = True  <- axr_options.ltx advanced_stamina_system/enable_uphill_speed_modifier\r\n_staminaMod._uphillSpeedModifierModifier
+    = 0.6  <- axr_options.ltx advanced_stamina_system/uphill_speed_modifier_modifier\r\n_staminaMod._enableUphillDrain
+    = True  <- axr_options.ltx advanced_stamina_system/enable_uphill_drain\r\n_staminaMod._uphillDrainModifier
+    = 0.6  <- axr_options.ltx advanced_stamina_system/uphill_drain_modifier\r\nscripts/swm_legs.script:
+    [\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body\r\n_visibleBody._height
+    = 0  <- swm_legs.script HEIGHT\r\n_visibleBody._heightLadder = -0.1  <- swm_legs.script
+    HEIGHT_ladder\r\n_visibleBody._slowedRunCoef = 1.4  <- swm_legs.script jog_to_walk_thresold\r\n_visibleBody._slowedSprintKoef
+    = 1.8  <- swm_legs.script sprint_to_jog_thresold\r\n_visibleBody._lookDownThreshold
+    = -0.65  <- swm_legs.script angle_down threshold\r\n_visibleBody._headToBodyDistance
+    = 1.7  <- swm_legs.script distance_H2B\r\n_visibleBody._turnThreshold = 0.2 
+    <- swm_legs.script turn_threshold\r\n_visibleBody._turnThresholdLookDown = 0.08 
+    <- swm_legs.script turn_threshold while looking down\r\n_visibleBody._turnDuration
+    = 0.5  <- swm_legs.script lastTurnTime interval (ms)\r\n_visibleBody._fallShiftStand
+    = 1.5  <- swm_legs.script shift (stand)\r\n_visibleBody._fallShiftLowCrouch =
+    0.95  <- swm_legs.script shift (crouch + shift)\r\n_visibleBody._fallShiftCrouch
+    = 1.23  <- swm_legs.script shift (crouch)\r\n_visibleBody._motionShifts: 7 entries 
+    <- swm_legs.script SPEC_SHIFT\r\n_visibleBody._lowCrouchShifts: 11 entries  <-
+    swm_legs.script SPEC_SHIFT_PRONE\r\nscripts/advanced_stamina_system_ass.script:
+    [\u0413\u0435\u0439\u043C\u043F\u043B\u0435\u0439] Advanced_Stamina_System\r\n_staminaMod._powerSpeedMax
+    = 0.55  <- advanced_stamina_system_ass.script power_speed_max\r\n_staminaMod._powerSpeedMin
+    = -0.5  <- advanced_stamina_system_ass.script normalize(power, min, power_speed_max)\r\n_staminaMod._updateInterval
+    = 0.06  <- advanced_stamina_system_ass.script tg_interval (ms)\r\n_staminaMod._uphillDrainCoeff
+    = 0.033  <- advanced_stamina_system_ass.script climb coeff (drain)\r\n_staminaMod._uphillDrainDownhillReduction
+    = 0.43  <- advanced_stamina_system_ass.script coeff_downhill_reduction (drain)\r\n_staminaMod._uphillSpeedCoeff
+    = 2.3  <- advanced_stamina_system_ass.script climb coeff (speed)\r\n_staminaMod._uphillSpeedDownhillReduction
+    = 0.45  <- advanced_stamina_system_ass.script coeff_downhill_reduction (speed)\r\nscripts/speed.script:
+    [\u0413\u0435\u0439\u043C\u043F\u043B\u0435\u0439] Advanced_Stamina_System\r\n_staminaMod._speedCoefMin
+    = 1  <- speed.script clamp min\r\n_staminaMod._speedCoefMax = 10  <- speed.script
+    clamp max\r\n"

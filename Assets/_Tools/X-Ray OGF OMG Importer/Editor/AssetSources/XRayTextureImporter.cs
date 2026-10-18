@@ -129,7 +129,6 @@ namespace XRay.Importer.Editor
                 return false;
             }
 
-            // Unity rejects DDS files whose mip chain is neither single-level nor complete.
             if (header.MipCount > 1 && header.MipCount != GetFullMipCount(header.Width, header.Height))
             {
                 return false;

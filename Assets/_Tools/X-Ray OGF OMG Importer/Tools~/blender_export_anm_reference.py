@@ -1,17 +1,3 @@
-# Development tool: exports reference transforms of *.anm files from Blender + blender-xray.
-# Not required by the Unity importer.
-#
-# Usage (Blender 3.6 with io_scene_xray in the user addons folder):
-#   blender -b --factory-startup --python blender_export_anm_reference.py -- <output_folder> <file.anm> [<file.anm> ...]
-#
-# Writes <output_folder>/<file name>.json with, per sample:
-#   fcurves      raw values of the six blender-xray fcurves (location xyz, rotation_euler xyz, Blender axes)
-#   basis        object matrix_basis (row-major 4x4, Blender axes)
-#   world        object matrix_world
-#   camera_world matrix_world of the linked camera created with camera_animation=True
-# Integer frames are where blender-xray bakes non-linear shapes; sub-frames show Blender's own
-# interpolation between those baked keys.
-
 import json
 import os
 import sys
@@ -39,8 +25,6 @@ def export(path, output_folder):
     try:
         result = bpy.ops.xray_import.anm(directory=os.path.dirname(path), files=[{'name': os.path.basename(path)}], camera_animation=True)
     except RuntimeError as error:
-        # blender-xray reads the frame range as unsigned; a negative start frame fails only when
-        # it is assigned to the scene, after the object and its action were created.
         result = {'FAILED_AFTER_IMPORT: ' + str(error).splitlines()[-1]}
     motion = next(obj for obj in bpy.data.objects if obj.parent is None)
     camera = next((obj for obj in bpy.data.objects if obj.parent == motion), None)

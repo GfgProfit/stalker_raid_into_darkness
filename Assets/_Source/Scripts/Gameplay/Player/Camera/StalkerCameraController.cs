@@ -1,0 +1,94 @@
+using UnityEngine;
+
+namespace RaidIntoDarkness.Player
+{
+    [DisallowMultipleComponent]
+    public sealed class StalkerCameraController : MonoBehaviour
+    {
+        [SerializeField] private Transform _cameraRoot;
+        [SerializeField] private Camera _camera;
+        [SerializeField] private bool _lockCursorOnStart = true;
+
+        private StalkerMovementProfile _profile;
+        private float _yaw;
+        private float _pitch;
+        private bool _ladderClamp;
+        private float _ladderYaw;
+
+        public Transform CameraRoot => _cameraRoot;
+        public Camera Camera => _camera;
+        public float YawDegrees => _yaw * Mathf.Rad2Deg;
+        public float PitchDegrees => _pitch * Mathf.Rad2Deg;
+        public Vector3 Direction => _cameraRoot != null ? _cameraRoot.forward : transform.forward;
+        public bool CursorLocked => Cursor.lockState == CursorLockMode.Locked;
+
+        public void Initialize(StalkerMovementProfile profile)
+        {
+            _profile = profile;
+            _yaw = transform.eulerAngles.y * Mathf.Deg2Rad;
+            _pitch = 0.0f;
+            if (_camera != null)
+            {
+                _camera.fieldOfView = profile.Camera.FieldOfView;
+                _camera.nearClipPlane = profile.Camera.NearClip;
+            }
+
+            if (_lockCursorOnStart && Application.isPlaying)
+            {
+                SetCursorLocked(true);
+            }
+        }
+
+        public void SetCursorLocked(bool locked)
+        {
+            Cursor.lockState = locked ? CursorLockMode.Locked : CursorLockMode.None;
+            Cursor.visible = !locked;
+        }
+
+        public void Look(Vector2 mouseDelta)
+        {
+            if (!CursorLocked)
+            {
+                return;
+            }
+
+            StalkerCameraSettings settings = _profile.Camera;
+            float scale = settings.MouseSensitivity / settings.MouseScaleDivider;
+            float vertical = mouseDelta.y * scale * settings.MouseSensitivityVertical * settings.VerticalScale * (settings.InvertMouse ? -1.0f : 1.0f);
+            _yaw += mouseDelta.x * scale;
+            _pitch = Mathf.Clamp(_pitch - vertical, settings.PitchLimits.x, settings.PitchLimits.y);
+            if (_ladderClamp)
+            {
+                float relative = Mathf.DeltaAngle(_ladderYaw * Mathf.Rad2Deg, _yaw * Mathf.Rad2Deg) * Mathf.Deg2Rad;
+                _yaw = _ladderYaw + Mathf.Clamp(relative, settings.LadderYawLimits.x, settings.LadderYawLimits.y);
+            }
+        }
+
+        public void SetLook(float yawDegrees, float pitchDegrees)
+        {
+            StalkerCameraSettings settings = _profile.Camera;
+            _yaw = yawDegrees * Mathf.Deg2Rad;
+            _pitch = Mathf.Clamp(pitchDegrees * Mathf.Deg2Rad, settings.PitchLimits.x, settings.PitchLimits.y);
+        }
+
+        public void SetLadder(StalkerLadder ladder)
+        {
+            _ladderClamp = ladder != null;
+            if (ladder != null)
+            {
+                Vector3 facing = -ladder.Normal;
+                _ladderYaw = Mathf.Atan2(facing.x, facing.z);
+            }
+        }
+
+        public void Apply(float cameraHeight)
+        {
+            transform.rotation = Quaternion.Euler(0.0f, _yaw * Mathf.Rad2Deg, 0.0f);
+            if (_cameraRoot != null)
+            {
+                _cameraRoot.localPosition = new Vector3(0.0f, cameraHeight, 0.0f);
+                _cameraRoot.localRotation = Quaternion.Euler(_pitch * Mathf.Rad2Deg, 0.0f, 0.0f);
+            }
+        }
+    }
+}

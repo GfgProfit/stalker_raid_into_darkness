@@ -17,7 +17,6 @@ namespace RaidIntoDarkness.FirstPerson.Editor
         public string Motion { get; }
     }
 
-    // Reads the animation tables of swm_legs.script as data; the Lua code itself is never executed.
     public sealed class FirstPersonSwmScript
     {
         public const string NON_COMBAT_TABLE = "AnimTable_NonCombat";
@@ -132,7 +131,6 @@ namespace RaidIntoDarkness.FirstPerson.Editor
 
         private static void AddUnique(FirstPersonSwmScript script, string table, List<FirstPersonSwmEntry> entries, FirstPersonSwmEntry entry)
         {
-            // Lua table constructors keep the last value assigned to a key.
             int existing = entries.FindIndex(item => item.Flags == entry.Flags);
             if (existing >= 0)
             {

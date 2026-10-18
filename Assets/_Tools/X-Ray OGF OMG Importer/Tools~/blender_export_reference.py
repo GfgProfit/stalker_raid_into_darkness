@@ -1,16 +1,3 @@
-# Development tool: exports independent reference data from Blender + blender-xray.
-# Not required by the Unity importer at runtime or import time.
-#
-# Usage (Blender 3.6 with io_scene_xray installed in the user addons folder):
-#   blender -b --factory-startup --python blender_export_reference.py -- \
-#       <model.ogf> <motions.omf> <output_prefix> <motion[:f1,f2,...]> [<motion[:frames]> ...]
-#
-# Frames default to "all keys" when omitted. Writes <output_prefix>.json (metadata, bone matrices)
-# and <output_prefix>.bin (float32 little-endian vertex positions, armature space, Blender axes).
-#
-# Every action is evaluated from a clean pose (all pose bone channels reset), without constraints,
-# so the reference contains only what blender-xray derives from the OGF/OMF data.
-
 import json
 import os
 import struct

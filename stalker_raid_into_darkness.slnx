@@ -4,6 +4,10 @@
   <Project Path="RaidIntoDarkness.FirstPerson.csproj" />
   <Project Path="XRay.Importer.Core.csproj" />
   <Project Path="XRay.Importer.Tests.Editor.csproj" />
+  <Project Path="RaidIntoDarkness.Player.csproj" />
+  <Project Path="RaidIntoDarkness.Player.Editor.csproj" />
   <Project Path="XRay.Importer.Runtime.csproj" />
   <Project Path="RaidIntoDarkness.FirstPerson.Editor.csproj" />
+  <Project Path="RaidIntoDarkness.Player.Tests.PlayMode.csproj" />
+  <Project Path="RaidIntoDarkness.Player.Tests.Editor.csproj" />
 </Solution>

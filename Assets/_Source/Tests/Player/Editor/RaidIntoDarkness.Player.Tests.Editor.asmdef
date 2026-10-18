@@ -1,0 +1,26 @@
+{
+    "name": "RaidIntoDarkness.Player.Tests.Editor",
+    "rootNamespace": "RaidIntoDarkness.Player.Tests",
+    "references": [
+        "UnityEngine.TestRunner",
+        "UnityEditor.TestRunner",
+        "RaidIntoDarkness.Player",
+        "RaidIntoDarkness.FirstPerson",
+        "XRay.Importer.Runtime"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "nunit.framework.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

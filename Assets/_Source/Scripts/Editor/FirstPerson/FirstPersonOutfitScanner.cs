@@ -132,7 +132,6 @@ namespace RaidIntoDarkness.FirstPerson.Editor
             record.IsExoskeleton = string.Equals(record.RepairType, EXO_REPAIR_TYPE, StringComparison.OrdinalIgnoreCase);
             record.Resolution = FirstPersonOutfitResolution.Resolved;
 
-            // Same decision as swm_legs.actor_item_to_slot with use_hd_models = false.
             string legs = section + LEGS_SUFFIX;
             string legsVisual = isActor ? null : XRayLtxDatabase.Unquote(system.GetValue(legs, "visual"));
             FirstPersonModelSource body = string.IsNullOrEmpty(legsVisual) ? null : CreateSource(index, legsVisual);
@@ -220,7 +219,6 @@ namespace RaidIntoDarkness.FirstPerson.Editor
             scan.Warnings.AddRange(scan.Script.Warnings);
         }
 
-        // CActor::CameraHeight: camera_height_factor * height of the standing movement box (ph_box0_size holds half extents).
         private static void ReadCameraHeight(XRayLtxDatabase system, FirstPersonOutfitScan scan)
         {
             string factor = system.GetValue(ACTOR_SECTION, "camera_height_factor");

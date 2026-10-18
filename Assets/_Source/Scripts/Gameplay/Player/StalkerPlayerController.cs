@@ -1,0 +1,173 @@
+using RaidIntoDarkness.FirstPerson;
+using UnityEngine;
+
+namespace RaidIntoDarkness.Player
+{
+    [RequireComponent(typeof(StalkerMovementMotor))]
+    [DisallowMultipleComponent]
+    public sealed class StalkerPlayerController : MonoBehaviour
+    {
+        private const float MAX_FRAME_DELTA = 0.1f;
+
+        [SerializeField] private StalkerMovementProfile _profile;
+        [SerializeField] private StalkerMovementMotor _motor;
+        [SerializeField] private StalkerPlayerInput _input;
+        [SerializeField] private StalkerCameraController _camera;
+        [SerializeField] private StalkerVisibleBody _visibleBody;
+        [SerializeField] private StalkerBodyAnimationPlayer _bodyPlayer;
+        [SerializeField] private FirstPersonRig _rig;
+        [SerializeField] private string _outfitSection = FirstPersonOutfitCatalog.NO_OUTFIT_SECTION;
+
+        private string _appliedSection;
+        private int _outfitIndex = -1;
+
+        public StalkerMovementProfile Profile => _profile;
+        public StalkerMovementMotor Motor => _motor;
+        public StalkerCameraController CameraController => _camera;
+        public StalkerVisibleBody VisibleBody => _visibleBody;
+        public StalkerBodyAnimationPlayer BodyPlayer => _bodyPlayer;
+        public FirstPersonRig Rig => _rig;
+        public StalkerMovementState State => _motor.State;
+        public string OutfitSection => _appliedSection;
+
+        public StalkerMoveFlags ScriptedWish { get; set; }
+
+        public bool Combat
+        {
+            get => _visibleBody != null && _visibleBody.Combat;
+            set
+            {
+                if (_visibleBody != null)
+                {
+                    _visibleBody.Combat = value;
+                }
+            }
+        }
+
+        private void Awake()
+        {
+            if (_profile == null)
+            {
+                Debug.LogError($"{nameof(StalkerPlayerController)} on '{name}': no {nameof(StalkerMovementProfile)} assigned.", this);
+                enabled = false;
+                return;
+            }
+
+            _motor.Initialize(_profile);
+            _camera.Initialize(_profile);
+            _visibleBody.Initialize(_profile);
+            if (_rig != null)
+            {
+                _rig.OutfitApplied += OnOutfitApplied;
+            }
+        }
+
+        private void Start()
+        {
+            ApplyOutfit(_outfitSection);
+        }
+
+        private void OnDestroy()
+        {
+            if (_rig != null)
+            {
+                _rig.OutfitApplied -= OnOutfitApplied;
+            }
+        }
+
+        public bool ApplyOutfit(string section)
+        {
+            _outfitSection = section;
+            bool applied = _rig != null && _rig.ApplyOutfit(section);
+            if (!applied)
+            {
+                _appliedSection = section;
+            }
+
+            return applied;
+        }
+
+        private void Update()
+        {
+            float deltaTime = Mathf.Min(Time.deltaTime, MAX_FRAME_DELTA);
+            HandleDebugInput();
+            if (_outfitSection != _appliedSection && _rig != null && _rig.Catalog != null)
+            {
+                ApplyOutfit(_outfitSection);
+            }
+
+            if (_input != null)
+            {
+                if (_input.ReleaseCursorPressed)
+                {
+                    _camera.SetCursorLocked(false);
+                }
+                else if (_input.CaptureCursorPressed && !_camera.CursorLocked)
+                {
+                    _camera.SetCursorLocked(true);
+                }
+
+                _camera.Look(_input.LookDelta);
+                _motor.Wish = _input.Apply(_motor.Wish, _profile.Input);
+            }
+
+            _motor.Wish |= ScriptedWish;
+            _camera.SetLadder(_motor.RealFlags.Has(StalkerMoveFlags.Climb) ? _motor.Ladder : null);
+            _camera.Apply(_motor.Stance.CameraHeight);
+            _motor.SetView(_camera.YawDegrees, _camera.Direction);
+            _motor.Tick(deltaTime);
+            _motor.ClearHeldCommands();
+            _camera.Apply(_motor.Stance.CameraHeight);
+            _visibleBody.Tick(_motor.State, _camera, deltaTime);
+        }
+
+        private void HandleDebugInput()
+        {
+            if (_input == null)
+            {
+                return;
+            }
+
+            if (_input.ToggleCombatPressed)
+            {
+                Combat = !Combat;
+            }
+
+            if ((_input.NextOutfitPressed || _input.PreviousOutfitPressed) && _rig != null && _rig.Catalog != null && _rig.Catalog.Entries.Count > 0)
+            {
+                int count = _rig.Catalog.Entries.Count;
+                _outfitIndex = (_outfitIndex + (_input.NextOutfitPressed ? 1 : count - 1)) % count;
+                ApplyOutfit(_rig.Catalog.Entries[_outfitIndex].Section);
+            }
+        }
+
+        private void OnOutfitApplied(FirstPersonOutfitEntry entry, bool bodyChanged)
+        {
+            _appliedSection = entry.Section;
+            _outfitSection = entry.Section;
+            if (_rig.Catalog != null)
+            {
+                _outfitIndex = IndexOf(entry);
+            }
+
+            _visibleBody.SetLibrary(entry.BodyAnimations);
+            if (bodyChanged || !_bodyPlayer.IsBound || _bodyPlayer.Body != _rig.Body)
+            {
+                _bodyPlayer.Bind(_rig.Body, entry.BodyAnimations);
+            }
+        }
+
+        private int IndexOf(FirstPersonOutfitEntry entry)
+        {
+            for (int i = 0; i < _rig.Catalog.Entries.Count; i++)
+            {
+                if (_rig.Catalog.Entries[i] == entry)
+                {
+                    return i;
+                }
+            }
+
+            return -1;
+        }
+    }
+}

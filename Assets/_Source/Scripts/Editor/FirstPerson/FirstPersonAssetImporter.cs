@@ -285,7 +285,6 @@ namespace RaidIntoDarkness.FirstPerson.Editor
             }
         }
 
-        // Sources stay read-only: files are only read and copied into the project.
         private static string CopyFile(string sourcePath, string assetPath)
         {
             string fullPath = Path.GetFullPath(assetPath);
@@ -555,7 +554,6 @@ namespace RaidIntoDarkness.FirstPerson.Editor
             return ordered;
         }
 
-        // X-Ray searches motions in the order of the model motion references; the first match wins.
         private static BodyAnimationBinding Bind(string table, int flags, string motion, List<XRayMotionLibrary> libraries, FirstPersonImportReportData report)
         {
             if (string.IsNullOrEmpty(motion))
@@ -794,7 +792,6 @@ namespace RaidIntoDarkness.FirstPerson.Editor
             return catalog;
         }
 
-        // The rig prefab is created once; later runs keep manual edits and only refresh the catalog reference.
         private static void CreateRigPrefab(FirstPersonOutfitCatalog catalog, FirstPersonOutfitScan scan)
         {
             if (AssetDatabase.LoadAssetAtPath<GameObject>(RIG_PREFAB_PATH) != null)
@@ -848,7 +845,6 @@ namespace RaidIntoDarkness.FirstPerson.Editor
             return scan.SwmOptions.TryGetValue(key, out string value) && float.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out float result) ? result : fallback;
         }
 
-        // The preview scene is created once and only references imported model assets.
         private static void CreatePreviewScene(IEnumerable<string> hands, IEnumerable<string> bodies)
         {
             if (File.Exists(PREVIEW_SCENE_PATH))

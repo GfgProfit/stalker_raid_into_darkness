@@ -1,0 +1,30 @@
+fileFormatVersion: 2
+guid: 15d559b5787c3f742a527bff3213a09a
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: act\act_arm_homefront_black|models\model
+    second: {fileID: 2100000, guid: 481a363e66ceb2244851096d5ad956e3, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: act\exos\act_arm_exo_wood|models\model
+    second: {fileID: 2100000, guid: e3cedf6cf5a6d6c48ae226b6015b71fc, type: 2}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 61e536e21e96f284493f2969a9250cdf, type: 3}
+  _scale: 1
+  _importMaterials: 1
+  _texturesFolder: 
+  _searchTexturesByName: 1
+  _importEmbeddedMotions: 0
+  _embeddedLoopMode: 0
+  _addAnimator: 1
+  _readableMeshes: 0
+  _updateWhenOffscreen: 0
+  _autoResolveResources: 1

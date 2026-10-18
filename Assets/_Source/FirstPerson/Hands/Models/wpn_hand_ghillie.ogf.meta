@@ -1,0 +1,40 @@
+fileFormatVersion: 2
+guid: ff080b74935d7db44a18d1e7b67f5643
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: act\act_arm_bandages|models\model
+    second: {fileID: 2100000, guid: 6d5e994e22d4a104582c20dd242e78cb, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: act\act_arm_bush_monster|models\model_fur
+    second: {fileID: 2100000, guid: e1046844d125e544496c592ef7d86d12, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: act\act_arm_ghillie|models\model
+    second: {fileID: 2100000, guid: 9ef1045c44f4dc64f90f7fdcd8bf9a2f, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: act\new_hands\bare_hands\hand|models\model
+    second: {fileID: 2100000, guid: bdf405c162b788240b4e374f5f0c8294, type: 2}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 61e536e21e96f284493f2969a9250cdf, type: 3}
+  _scale: 1
+  _importMaterials: 1
+  _texturesFolder: 
+  _searchTexturesByName: 1
+  _importEmbeddedMotions: 0
+  _embeddedLoopMode: 0
+  _addAnimator: 1
+  _readableMeshes: 0
+  _updateWhenOffscreen: 0
+  _autoResolveResources: 1

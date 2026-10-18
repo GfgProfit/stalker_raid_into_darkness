@@ -1,0 +1,30 @@
+fileFormatVersion: 2
+guid: 300618049102ca64c963a5f14b7a8ead
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: act\bf4_ru_sleeves_mil|models\model
+    second: {fileID: 2100000, guid: f58e6b1e8cf209c489ada719b02de1f5, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: act\bf4alpha_gloves_mil|models\model
+    second: {fileID: 2100000, guid: 8667a57327fe7ef4ca5b02cf2ad60992, type: 2}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 61e536e21e96f284493f2969a9250cdf, type: 3}
+  _scale: 1
+  _importMaterials: 1
+  _texturesFolder: 
+  _searchTexturesByName: 1
+  _importEmbeddedMotions: 0
+  _embeddedLoopMode: 0
+  _addAnimator: 1
+  _readableMeshes: 0
+  _updateWhenOffscreen: 0
+  _autoResolveResources: 1

@@ -1,0 +1,45 @@
+fileFormatVersion: 2
+guid: 9b43588a67211594ea25d0c7529f709f
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: act\New_hands\bare_hands\hand|models\model
+    second: {fileID: 2100000, guid: 60b9f5433765444419269b78bba1d92d, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: act\New_hands\dmc\dmc|models\model
+    second: {fileID: 2100000, guid: e1e33e40975404c4b9e66f6cc0457c4e, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: act\act_arm_sviter_1|models\model
+    second: {fileID: 2100000, guid: caa674d5a366eb344a66f6221acb643b, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: act\cod_bo2_stalker_sleeves|models\model
+    second: {fileID: 2100000, guid: 0b593f142c9b68449a6b00b2f4e78079, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: act\exos\act_arm_1_exo|models\model
+    second: {fileID: 2100000, guid: f6c1778652f090240a1873246d47e50f, type: 2}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 61e536e21e96f284493f2969a9250cdf, type: 3}
+  _scale: 1
+  _importMaterials: 1
+  _texturesFolder: 
+  _searchTexturesByName: 1
+  _importEmbeddedMotions: 0
+  _embeddedLoopMode: 0
+  _addAnimator: 1
+  _readableMeshes: 0
+  _updateWhenOffscreen: 0
+  _autoResolveResources: 1

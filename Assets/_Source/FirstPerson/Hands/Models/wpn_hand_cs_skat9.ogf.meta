@@ -1,0 +1,40 @@
+fileFormatVersion: 2
+guid: 9cbf8cad48d3fe745a11a696569eeb6e
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: act\New_hands\Skat9\Rukav_cs|models\model
+    second: {fileID: 2100000, guid: 5c155d8073761544e9ff061211c8f075, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: act\New_hands\Skat9\lokti|models\model
+    second: {fileID: 2100000, guid: eccdfc4c7b65ac94c904fd14725fadae, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: act\New_hands\Skat9\perchatki|models\model
+    second: {fileID: 2100000, guid: 3365de548c957414894e7c3b7c7ea256, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: act\New_hands\Skat9\podrukav|models\model
+    second: {fileID: 2100000, guid: 344e2b16a77f8cc458e8d4ecb4900eb0, type: 2}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 61e536e21e96f284493f2969a9250cdf, type: 3}
+  _scale: 1
+  _importMaterials: 1
+  _texturesFolder: 
+  _searchTexturesByName: 1
+  _importEmbeddedMotions: 0
+  _embeddedLoopMode: 0
+  _addAnimator: 1
+  _readableMeshes: 0
+  _updateWhenOffscreen: 0
+  _autoResolveResources: 1

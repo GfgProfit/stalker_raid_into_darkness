@@ -1,0 +1,30 @@
+fileFormatVersion: 2
+guid: b0cc78f8f1224e64a8635d5700f62f68
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: act\act_stalker_merc_2|models\selflight_det_3
+    second: {fileID: 2100000, guid: 1b80b860c22fe1c41b20d040e497da4e, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: act\act_stalker_nebo_2|models\selflight_det_3
+    second: {fileID: 2100000, guid: 456073a37c665e14bb190662c2a39bb8, type: 2}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 61e536e21e96f284493f2969a9250cdf, type: 3}
+  _scale: 1
+  _importMaterials: 1
+  _texturesFolder: 
+  _searchTexturesByName: 1
+  _importEmbeddedMotions: 1
+  _embeddedLoopMode: 0
+  _addAnimator: 1
+  _readableMeshes: 0
+  _updateWhenOffscreen: 0
+  _autoResolveResources: 1

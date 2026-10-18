@@ -1,0 +1,30 @@
+fileFormatVersion: 2
+guid: d5483d4691192174da7c9f20bfa49948
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: act\act_ryukzak|models\selflight_det_3
+    second: {fileID: 2100000, guid: b87c677a3bfbd9f4bb28feafa9bbba5a, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: act\act_stalker_specnaz_1|models\selflight_det_3
+    second: {fileID: 2100000, guid: 26232e9e56ed5584ca3e2d817d3cb136, type: 2}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 61e536e21e96f284493f2969a9250cdf, type: 3}
+  _scale: 1
+  _importMaterials: 1
+  _texturesFolder: 
+  _searchTexturesByName: 1
+  _importEmbeddedMotions: 1
+  _embeddedLoopMode: 0
+  _addAnimator: 1
+  _readableMeshes: 0
+  _updateWhenOffscreen: 0
+  _autoResolveResources: 1

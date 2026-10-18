@@ -1,0 +1,30 @@
+fileFormatVersion: 2
+guid: 53813f760e474254dab4f28eca20dc42
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: act\New_hands\bare_hands\hand|models\model
+    second: {fileID: 2100000, guid: 60b9f5433765444419269b78bba1d92d, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: act\cod_bo2_tactical_hands_salamander|models\model
+    second: {fileID: 2100000, guid: 9949ac58e9c4bea42b3da373b50e0d07, type: 2}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 61e536e21e96f284493f2969a9250cdf, type: 3}
+  _scale: 1
+  _importMaterials: 1
+  _texturesFolder: 
+  _searchTexturesByName: 1
+  _importEmbeddedMotions: 0
+  _embeddedLoopMode: 0
+  _addAnimator: 1
+  _readableMeshes: 0
+  _updateWhenOffscreen: 0
+  _autoResolveResources: 1

@@ -1,0 +1,35 @@
+fileFormatVersion: 2
+guid: 8ed9c404181b4df458bbeabaf1207caf
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: act\moh2010_ratnik_sleeves|models\model
+    second: {fileID: 2100000, guid: 2a1946d42db04a8499cbba1e2aee8664, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: act\pla_bandit_sleeves|models\model
+    second: {fileID: 2100000, guid: f144f8cb2cb737748865ad54c012aec1, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: act\pla_mechanix_gloves|models\model
+    second: {fileID: 2100000, guid: ddee2f4a43f58134d97b5c947487c252, type: 2}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 61e536e21e96f284493f2969a9250cdf, type: 3}
+  _scale: 1
+  _importMaterials: 1
+  _texturesFolder: 
+  _searchTexturesByName: 1
+  _importEmbeddedMotions: 0
+  _embeddedLoopMode: 0
+  _addAnimator: 1
+  _readableMeshes: 0
+  _updateWhenOffscreen: 0
+  _autoResolveResources: 1

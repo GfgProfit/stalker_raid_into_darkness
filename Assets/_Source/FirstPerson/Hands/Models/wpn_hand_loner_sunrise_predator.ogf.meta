@@ -1,0 +1,35 @@
+fileFormatVersion: 2
+guid: 540b6349995923140becb918ce283894
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: act\cod_bo2_stalker_sleeves|models\model
+    second: {fileID: 2100000, guid: 0b593f142c9b68449a6b00b2f4e78079, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: act\new_hands\bare_hands\hand|models\model
+    second: {fileID: 2100000, guid: bdf405c162b788240b4e374f5f0c8294, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: act\pla_swat_gloves|models\model
+    second: {fileID: 2100000, guid: 2d29f52b2c5a253408c4eb59387f524c, type: 2}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 61e536e21e96f284493f2969a9250cdf, type: 3}
+  _scale: 1
+  _importMaterials: 1
+  _texturesFolder: 
+  _searchTexturesByName: 1
+  _importEmbeddedMotions: 0
+  _embeddedLoopMode: 0
+  _addAnimator: 1
+  _readableMeshes: 0
+  _updateWhenOffscreen: 0
+  _autoResolveResources: 1

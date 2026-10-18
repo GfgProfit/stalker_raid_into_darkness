@@ -1,0 +1,30 @@
+fileFormatVersion: 2
+guid: 1150ea29960e7c64ab70ecbce9e3c5e4
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: act\act_arm_plash|models\model
+    second: {fileID: 2100000, guid: 4786e926628f92148b03183235ed9973, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: act\cod_ghosts_oakley_gloves_black|models\model
+    second: {fileID: 2100000, guid: 679dbd6e8518eda49aa5f8519a67dc02, type: 2}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 61e536e21e96f284493f2969a9250cdf, type: 3}
+  _scale: 1
+  _importMaterials: 1
+  _texturesFolder: 
+  _searchTexturesByName: 1
+  _importEmbeddedMotions: 0
+  _embeddedLoopMode: 0
+  _addAnimator: 1
+  _readableMeshes: 0
+  _updateWhenOffscreen: 0
+  _autoResolveResources: 1

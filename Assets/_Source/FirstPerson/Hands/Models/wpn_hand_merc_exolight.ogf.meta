@@ -1,0 +1,30 @@
+fileFormatVersion: 2
+guid: dbcac6d9d4b0afc46893c3332c7922aa
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: act\act_arm_homefront_blue|models\model
+    second: {fileID: 2100000, guid: 94972bb7dc2fec54393115b2a1664989, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: act\exos\act_arm_exo_merc|models\model
+    second: {fileID: 2100000, guid: 805a4c19b0382f3428dbb1817d84c375, type: 2}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 61e536e21e96f284493f2969a9250cdf, type: 3}
+  _scale: 1
+  _importMaterials: 1
+  _texturesFolder: 
+  _searchTexturesByName: 1
+  _importEmbeddedMotions: 0
+  _embeddedLoopMode: 0
+  _addAnimator: 1
+  _readableMeshes: 0
+  _updateWhenOffscreen: 0
+  _autoResolveResources: 1

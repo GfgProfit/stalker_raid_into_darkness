@@ -1,0 +1,45 @@
+fileFormatVersion: 2
+guid: f36bb7ee25c1c9b4e97bf4b3814b3e48
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: act\New_hands\bare_hands\hand|models\model
+    second: {fileID: 2100000, guid: 60b9f5433765444419269b78bba1d92d, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: act\act_arm_plash_red|models\model
+    second: {fileID: 2100000, guid: babb2d806cb7c084aacf2630706d9f8e, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: act\act_arm_watch_linza|models\window
+    second: {fileID: 2100000, guid: d203a56eec8ab754f94d4ec257435221, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: act\act_arm_watch_remeshok|models\model
+    second: {fileID: 2100000, guid: 2478adcb0ffc6404f80d077abfdfc6c5, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: act\act_arm_watch|models\model
+    second: {fileID: 2100000, guid: f2b44f52d64b56b42aa85eb77c959cb7, type: 2}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 61e536e21e96f284493f2969a9250cdf, type: 3}
+  _scale: 1
+  _importMaterials: 1
+  _texturesFolder: 
+  _searchTexturesByName: 1
+  _importEmbeddedMotions: 0
+  _embeddedLoopMode: 0
+  _addAnimator: 1
+  _readableMeshes: 0
+  _updateWhenOffscreen: 0
+  _autoResolveResources: 1

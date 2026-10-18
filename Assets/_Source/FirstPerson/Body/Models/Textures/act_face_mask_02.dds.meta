@@ -1,0 +1,22 @@
+fileFormatVersion: 2
+guid: d86fe17ec23e6db449bbeb2026994315
+IHVImageFormatImporter:
+  externalObjects: {}
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 0
+    wrapV: 0
+    wrapW: 0
+  isReadable: 0
+  sRGBTexture: 1
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  ignoreMipmapLimit: 0
+  mipmapLimitGroupName: 
+  userData: xray-asset:{"_key":"textures/act/act_face_mask_02.dds#albedo","_role":"Albedo","_source":"Base
+    Anomaly","_sourcePath":"D:\\GRA2.5\\Anomaly 1.5.3 up\\tools\\_unpacked\\textures\\act\\act_face_mask_02.dds","_stamp":"349672:639278671864164674"}
+  assetBundleName: 
+  assetBundleVariant: 

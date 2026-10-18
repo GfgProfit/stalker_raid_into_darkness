@@ -1,0 +1,2224 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6ee7a2ff34d2ef4a9524069e99b3f9b, type: 3}
+  m_Name: OutfitCatalog
+  m_EditorClassIdentifier: RaidIntoDarkness.FirstPerson::RaidIntoDarkness.FirstPerson.FirstPersonOutfitCatalog
+  _entries:
+  - _section: actor
+    _displayName: "\u0411\u0435\u0437 \u043A\u043E\u0441\u0442\u044E\u043C\u0430"
+    _hudSection: actor_hud
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_01
+    _handsModel: {fileID: -271045869822288009, guid: 475a6b96ee587c842bb5357963a962aa, type: 3}
+    _handsSource: Base Anomaly
+    _legsSection: actor_legs
+    _bodyVirtualPath: sm\actor_legs\no_outfit
+    _bodyModel: {fileID: 8558179593526729441, guid: 5dd07f9c4df451a4380ce5fb661a480f, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: army_nosorog_outfit
+    _displayName: "\u0410\u0440\u043C\u0435\u0439\u0441\u043A\u0438\u0439 \u044D\u043A\u0437\u043E\u0441\u043A\u0435\u043B\u0435\u0442
+      \xAB\u041D\u043E\u0441\u043E\u0440\u043E\u0433\xBB"
+    _hudSection: actor_hud_military_exo_nosorog
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_military_exo_nosorog
+    _handsModel: {fileID: 1474376616933502885, guid: 068606d915f1c7649945325633cd1a68, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] I.W.P. exos and animations"
+    _legsSection: army_nosorog_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\exo_army_outfit
+    _bodyModel: {fileID: -1214755585831147196, guid: 06e034f32d2eaaa4d8d9cecde8498fb5, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 1
+    _resolution: 0
+  - _section: army_outfit
+    _displayName: "\u0410\u0440\u043C\u0435\u0439\u0441\u043A\u0438\u0439 \u0431\u0440\u043E\u043D\u0435\u0436\u0438\u043B\u0435\u0442"
+    _hudSection: actor_hud_military_novice
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_military_novice
+    _handsModel: {fileID: -8537893079340256474, guid: 6adfc878e2e0fd446a62f4901e2438c9, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: army_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\army_basic
+    _bodyModel: {fileID: -4271543489581661748, guid: d7f2754a72a21f147a1484c6af8f446f, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: bandit_exo_outfit
+    _displayName: "\u0423\u043A\u0440\u0430\u0434\u0435\u043D\u043D\u044B\u0439 \u044D\u043A\u0437\u043E\u0441\u043A\u0435\u043B\u0435\u0442"
+    _hudSection: actor_hud_bandit_exo
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_bandit_exo
+    _handsModel: {fileID: 5459461153460131608, guid: eaf498d15a0e6d34b98b14851180f21e, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] I.W.P. exos and animations"
+    _legsSection: bandit_exo_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\exo_bandit_outfit
+    _bodyModel: {fileID: 8613997307721571612, guid: cff02f27b30c3ed42be0e68c385aa0c2, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 1
+    _resolution: 0
+  - _section: bandit_exolight_outfit
+    _displayName: "\u0422\u0440\u043E\u0444\u0435\u0439\u043D\u044B\u0439 \u0442\u044F\u0436\u0451\u043B\u044B\u0439
+      \u0431\u0440\u043E\u043D\u0435\u043A\u043E\u0441\u0442\u044E\u043C"
+    _hudSection: actor_hud_bandit_exolight
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_bandit_exolight
+    _handsModel: {fileID: -8566320892079345425, guid: 108b60756e9445641ac0e3909e57604c, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: bandit_exolight_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\heavy_exo_noservo_bandit
+    _bodyModel: {fileID: -4556141184763548754, guid: 0f273b148de3b0840b2fe6771436cb2c, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: bandit_nbc_outfit
+    _displayName: "\u0422\u0440\u043E\u0444\u0435\u0439\u043D\u044B\u0439 \u043A\u043E\u043C\u0431\u0438\u043D\u0435\u0437\u043E\u043D
+      \u0420\u0425\u0411\u0417"
+    _hudSection: actor_hud_bandit_nbc
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_bandit_nbc_suit
+    _handsModel: {fileID: -3010796952674786077, guid: c82815dc67aa8f24f848a2aaac0b8c91, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: bandit_nbc_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\seva_bandit
+    _bodyModel: {fileID: -7994084304845902504, guid: 6c0f30b32ca90e84ba0d88ce250a082d, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: bandit_novice_outfit
+    _displayName: "\u0427\u0451\u0440\u043D\u0430\u044F \u043A\u043E\u0436\u0430\u043D\u0430\u044F
+      \u043A\u0443\u0440\u0442\u043A\u0430"
+    _hudSection: actor_hud_bandit_novice
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_bandit_novice
+    _handsModel: {fileID: -7378972455168380336, guid: 7b08b3ad690603a4ebea389abf4961b3, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: bandit_novice_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\jacket_bandit
+    _bodyModel: {fileID: 576695152827056978, guid: aa4805a1a68f88a4192d401013add879, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: bandit_novice_outfit_alt
+    _displayName: "\u041A\u043E\u043B\u044C\u0447\u0443\u0436\u043D\u0430\u044F \u043A\u0443\u0440\u0442\u043A\u0430"
+    _hudSection: actor_hud_bandit_novice_alt
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_bandit_novice_alt
+    _handsModel: {fileID: 4370346567981697268, guid: a744e6cace4bd654aa219c998cf5f03c, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: bandit_novice_outfit_alt_legs
+    _bodyVirtualPath: sm\actor_legs\jacket_bandit
+    _bodyModel: {fileID: 576695152827056978, guid: aa4805a1a68f88a4192d401013add879, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: bandit_ps5_outfit
+    _displayName: "\u0411\u0430\u043D\u0434\u0438\u0442\u0441\u043A\u0438\u0439 \u041F\u04215-\u041C"
+    _hudSection: actor_hud_bandit_ps5
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_bandit_ps5
+    _handsModel: {fileID: -4846823557061769331, guid: 71edee016954cda4b974e6b053c09872, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: bandit_ps5_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\ps5_bandit
+    _bodyModel: {fileID: -33635192406682737, guid: 4789e2f791429e443b811221513e332b, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: bandit_scientific_dark_outfit
+    _displayName: "\u041A\u0443\u0441\u0442\u0430\u0440\u043D\u044B\u0439 \u043A\u043E\u043C\u0431\u0438\u043D\u0435\u0437\u043E\u043D
+      \u0441 \u0417\u0421\u0414"
+    _hudSection: actor_hud_bandit_seva_dark
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_bandit_seva_dark
+    _handsModel: {fileID: 2672982990663602484, guid: d62d370ed6ee14f4a9555f6253b3e1bc, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: bandit_scientific_dark_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\seva_bandit
+    _bodyModel: {fileID: -7994084304845902504, guid: 6c0f30b32ca90e84ba0d88ce250a082d, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: bandit_scientific_outfit
+    _displayName: "\u0422\u0440\u043E\u0444\u0435\u0439\u043D\u0430\u044F \xAB\u0421\u0415\u0412\u0410\xBB"
+    _hudSection: actor_hud_bandit_seva
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_bandit_seva
+    _handsModel: {fileID: -1724868436758982987, guid: e8aa7af1617f59e4b8c07e6edfe2ee87, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: bandit_scientific_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\seva_bandit
+    _bodyModel: {fileID: -7994084304845902504, guid: 6c0f30b32ca90e84ba0d88ce250a082d, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: bandit_sun_outfit
+    _displayName: "\u0422\u0430\u043A\u0442\u0438\u0447\u0435\u0441\u043A\u0438\u0439
+      \u043A\u043E\u043C\u0431\u0438\u043D\u0435\u0437\u043E\u043D \xAB\u0412\u0435\u0447\u0435\u0440\u043D\u044F\u044F
+      \u0437\u0430\u0440\u044F\xBB"
+    _hudSection: actor_hud_bandit_sun
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_bandit_sun
+    _handsModel: {fileID: -5055430981385494324, guid: d817c689604b12448a5cfc75f9d9aaed, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: bandit_sun_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\sts_bandit
+    _bodyModel: {fileID: 6028574690542308453, guid: ada2ae344f460284589509f7b3a59706, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: banditmerc_outfit
+    _displayName: "\u041B\u0451\u0433\u043A\u0438\u0439 \u0431\u0430\u043D\u0434\u0438\u0442\u0441\u043A\u0438\u0439
+      \u043A\u043E\u043C\u0431\u0438\u043D\u0435\u0437\u043E\u043D"
+    _hudSection: actor_hud_bandit_merc
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_bandit_merc
+    _handsModel: {fileID: 2883034447200138319, guid: c5ce028b735eadf4f9d61f16a4d6ace6, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: banditmerc_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\bandit_merc_outfit
+    _bodyModel: {fileID: -48274141400760765, guid: 04f35c3936a1a054ca62051535312496, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: cs_exo_outfit
+    _displayName: "\u042D\u043A\u0437\u043E\u0441\u043A\u0435\u043B\u0435\u0442 \u0427\u041D-5"
+    _hudSection: actor_hud_cs_exo
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_cs_exo
+    _handsModel: {fileID: -8830108145437108710, guid: 1bfe6bfee5eaad646bc7a1b04221140d, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] I.W.P. exos and animations"
+    _legsSection: cs_exo_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\exo_csky_outfit
+    _bodyModel: {fileID: 3132897969513939608, guid: e74bd50ea32448f4b98ab18cc487ba0e, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 1
+    _resolution: 0
+  - _section: cs_exolight_outfit
+    _displayName: "\u0422\u044F\u0436\u0451\u043B\u044B\u0439 \u0431\u0440\u043E\u043D\u0435\u043A\u043E\u0441\u0442\u044E\u043C
+      \u0427\u041D-5"
+    _hudSection: actor_hud_cs_exolight
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_cs_exolight
+    _handsModel: {fileID: -9012052083705965549, guid: 744353f2296c4cf449ba25d4900eb04d, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: cs_exolight_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\heavy_exo_noservo_csky
+    _bodyModel: {fileID: 6137052349982961230, guid: e1d479479f418404387d588811e3c24b, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: cs_heavy_outfit
+    _displayName: "\u0411\u0440\u043E\u043D\u0435\u0436\u0438\u043B\u0435\u0442 \u0427\u041D-3\u0431"
+    _hudSection: actor_hud_cs3b
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_cs3b
+    _handsModel: {fileID: 9181737119245647012, guid: c293a2e3a5a8122409cab5bcef2d93e2, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: cs_heavy_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\cs3_hard
+    _bodyModel: {fileID: -8692677602134473615, guid: 857dcba3713cc0c43b8d7bca1c66ffa1, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: cs_light_novice_outfit
+    _displayName: "\u0411\u0440\u043E\u043D\u0435\u0436\u0438\u043B\u0435\u0442 \u0427\u041D-1\u0430"
+    _hudSection: actor_hud_cs1
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_cs1
+    _handsModel: {fileID: 5419421098471091477, guid: 75dbc7c6bb0cc3c4f8d1dd7d29c005a4, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: cs_light_novice_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\csky_light
+    _bodyModel: {fileID: 6187817701053672049, guid: 9e6c8eed18da55048bb8b4edf5823bef, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: cs_light_outfit
+    _displayName: "\u0411\u0440\u043E\u043D\u0435\u0436\u0438\u043B\u0435\u0442 \u0427\u041D-2\u0430"
+    _hudSection: actor_hud_cs2
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_cs2
+    _handsModel: {fileID: 7360694572206747326, guid: becc8dbb806248d41a148c3da4f4d55d, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: cs_light_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\csky_med
+    _bodyModel: {fileID: 8381957369411843584, guid: 62d6e0381f1db7c4ca192b3e6a423db3, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: cs_medium_outfit
+    _displayName: "\u0411\u0440\u043E\u043D\u0435\u0436\u0438\u043B\u0435\u0442 \u0427\u041D-3\u0430"
+    _hudSection: actor_hud_cs3a
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_cs3a
+    _handsModel: {fileID: 472503350827918761, guid: 23f60721163c024498682d1ba95bd027, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: cs_medium_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\cs_hard
+    _bodyModel: {fileID: 2673793970778261254, guid: 436ffa6f8f6bd6d4f9f12a1b478fe678, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: cs_nbc_outfit
+    _displayName: "\u041A\u043E\u043C\u0431\u0438\u043D\u0435\u0437\u043E\u043D \u0427\u041D-3
+      \xAB\u0420\u0425\u0411\u0417\xBB"
+    _hudSection: actor_hud_cs_nbc
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_cs_nbc_suit
+    _handsModel: {fileID: 3032049196266959801, guid: bc5cb1f137e079347be6c1dc943ac7ba, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: cs_nbc_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\seva_cs
+    _bodyModel: {fileID: -8517118344394574142, guid: 1dada43a209bf2d49b07d2564544e3b9, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: cs_novice_outfit
+    _displayName: "\u041A\u043E\u0436\u0430\u043D\u0430\u044F \u043A\u0443\u0440\u0442\u043A\u0430
+      \xAB\u0427\u0438\u0441\u0442\u043E\u0433\u043E \u043D\u0435\u0431\u0430\xBB"
+    _hudSection: actor_hud_cs_novice
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_cs_novice
+    _handsModel: {fileID: 1380056248953992307, guid: 9490e6b8d2c16754db21cf5572c26b8c, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: cs_novice_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\jacket_csky
+    _bodyModel: {fileID: 8726907292321431099, guid: b1ec41316bf37da42b483bfe07ff95c7, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: cs_scientific_outfit
+    _displayName: "\u041D\u0430\u0443\u0447\u043D\u044B\u0439 \u043A\u043E\u043C\u0431\u0438\u043D\u0435\u0437\u043E\u043D
+      \u0427\u041D-4\u0430"
+    _hudSection: actor_hud_cs_seva
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_cs_seva
+    _handsModel: {fileID: 7892848220429506524, guid: 7c050bcb6587d31458f636bb3f4574fd, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: cs_scientific_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\seva_cs
+    _bodyModel: {fileID: -8517118344394574142, guid: 1dada43a209bf2d49b07d2564544e3b9, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: cs_scientific_outfit_good
+    _displayName: "\u041D\u0430\u0443\u0447\u043D\u044B\u0439 \u043A\u043E\u043C\u0431\u0438\u043D\u0435\u0437\u043E\u043D
+      \u0427\u041D-4\u0430 \xAB\u0418\u0441\u0441\u043B\u0435\u0434\u043E\u0432\u0430\u0442\u0435\u043B\u044C\xBB"
+    _hudSection: actor_hud_cs_seva_good
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_cs_seva_good
+    _handsModel: {fileID: 3750360145855524838, guid: 98d244294b0225c43aaed74cd930f93d, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: cs_scientific_outfit_good_legs
+    _bodyVirtualPath: sm\actor_legs\seva_cs
+    _bodyModel: {fileID: -8517118344394574142, guid: 1dada43a209bf2d49b07d2564544e3b9, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: cs_stalker_outfit
+    _displayName: "\u041A\u043E\u043C\u0431\u0438\u043D\u0435\u0437\u043E\u043D \u0427\u041D-2\u0431"
+    _hudSection: actor_hud_cs_stalker_outfit
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_cs_stalker_outfit
+    _handsModel: {fileID: 110221862436735614, guid: 5e6526cb4c8ed9149b804eaed7080c39, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: cs_stalker_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\stalker_outfit_csky
+    _bodyModel: {fileID: 1647098930237246290, guid: d3104b7b23a95224ea413ab5b4f8098b, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: cs_stalker_proto_exo_outfit
+    _displayName: "\u041A\u043E\u043C\u0431\u0438\u043D\u0435\u0437\u043E\u043D \u0427\u041D-2\u0431
+      \u0441 \u043F\u0440\u043E\u0442\u043E\u044D\u043A\u0437\u043E\u0441\u043A\u0435\u043B\u0435\u0442\u043E\u043C"
+    _hudSection: actor_hud_cs_proto
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_cs_proto
+    _handsModel: {fileID: -5940835184988478446, guid: d136316950f50174cbcd552e7de1a3e2, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: cs_stalker_proto_exo_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\exo_proto_csky
+    _bodyModel: {fileID: -2277996876040473169, guid: 73d2dea07e11eaf4c8ad5fa458a3ad4b, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 1
+    _resolution: 0
+  - _section: dolg_exo_outfit
+    _displayName: "\u041F\u0421\u0417-10\u0414 \xAB\u041C\u0435\u0445\u0430\u043D\u0438\u0437\u0438\u0440\u043E\u0432\u0430\u043D\u043D\u0430\u044F
+      \u0437\u0430\u0449\u0438\u0442\u0430\xBB"
+    _hudSection: actor_hud_dolg_exo
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_duty_exo
+    _handsModel: {fileID: 2989474594620225040, guid: 8193fc2c5a14ca24ab9089e6ce69a92e, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] I.W.P. exos and animations"
+    _legsSection: dolg_exo_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\exo_duty_outfit
+    _bodyModel: {fileID: 3657821280679488859, guid: 2e39d5b46deb735459fb917d2b229818, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 1
+    _resolution: 0
+  - _section: dolg_exolight_outfit
+    _displayName: "\u041F\u0421\u0417-10\u0414 \xAB\u0422\u044F\u0436\u0451\u043B\u0430\u044F
+      \u0437\u0430\u0449\u0438\u0442\u0430\xBB"
+    _hudSection: actor_hud_dolg_exolight
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_duty_exolight
+    _handsModel: {fileID: 4003818505314778069, guid: 109e7fe1cd689f0429c7942973f1961d, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: dolg_exolight_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\heavy_exo_noservo_duty
+    _bodyModel: {fileID: 6056333153850497778, guid: ab67ef3c549deee45ab0c1b787b6b414, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: dolg_heavy_outfit
+    _displayName: "\u041F\u0421\u0417-9\u0434 \xAB\u0411\u0440\u043E\u043D\u044F
+      \"\u0414\u043E\u043B\u0433\u0430\"\xBB"
+    _hudSection: actor_hud_duty_skat9
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_duty_skat9
+    _handsModel: {fileID: -1971448508107761643, guid: 8b6aa7e3d96322f4c9c46d45375a64ef, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: dolg_heavy_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\skat_duty
+    _bodyModel: {fileID: -2144269440980390556, guid: 5373b22c54bfc73479002e501837ba88, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: dolg_heavy_proto_exo_outfit
+    _displayName: "\u041F\u0421\u0417-9\u0434 \xAB\u0411\u0440\u043E\u043D\u044F
+      \"\u0414\u043E\u043B\u0433\u0430\"\xBB \u0441 \u043F\u0440\u043E\u0442\u043E\u044D\u043A\u0437\u043E\u0441\u043A\u0435\u043B\u0435\u0442\u043E\u043C"
+    _hudSection: actor_hud_duty_heavy_proto_exo
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_duty_proto_heavy
+    _handsModel: {fileID: -5464459606259464389, guid: 2f1d8c2e2c58222469373c8fbabdcd49, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: dolg_heavy_proto_exo_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\exo_proto_duty
+    _bodyModel: {fileID: 1946224132825103825, guid: 2182d7f9b1a222645b4ef473e0fceaf6, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 1
+    _resolution: 0
+  - _section: dolg_heavy_redline_outfit
+    _displayName: "\u041F\u0421\u0417-9\u041A\u043B \xAB\u0429\u0438\u0442 \"\u0414\u043E\u043B\u0433\u0430\"\xBB"
+    _hudSection: actor_hud_duty_psz9d
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_duty_psz9d
+    _handsModel: {fileID: 5373576473800564450, guid: bd9da6aebb649a3469df6f402d4ca4cc, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: dolg_heavy_redline_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\skat_duty_redline
+    _bodyModel: {fileID: 1893262780220959326, guid: 6a6cd45f0cbe2ac4f91f7154e2583735, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: dolg_nosorog_outfit
+    _displayName: "\u041F\u0421\u0417-10\u0414 \xAB\u041D\u043E\u0441\u043E\u0440\u043E\u0433\xBB"
+    _hudSection: actor_hud_duty_exo_nosorog
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_duty_exo_nosorog
+    _handsModel: {fileID: 1249744099876349084, guid: e5c7901f06799114e9d61a5db3731c90, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] I.W.P. exos and animations"
+    _legsSection: dolg_nosorog_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\exo_duty_outfit
+    _bodyModel: {fileID: 3657821280679488859, guid: 2e39d5b46deb735459fb917d2b229818, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 1
+    _resolution: 0
+  - _section: dolg_novice_outfit
+    _displayName: "\u041A\u0443\u0440\u0442\u043A\u0430 \xAB\u0414\u043E\u043B\u0433\u0430\xBB"
+    _hudSection: actor_hud_duty_novice
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_duty_novice
+    _handsModel: {fileID: -2144272781070950046, guid: ece343efb356d714ba52b60ffe080359, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: dolg_novice_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\jacket_duty
+    _bodyModel: {fileID: 9060094594251220300, guid: b92de5ac70d44d04ca13f014e35fbdfb, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: dolg_outfit
+    _displayName: "\u041F\u04215-\u041C \xAB\u0423\u043D\u0438\u0432\u0435\u0440\u0441\u0430\u043B\u044C\u043D\u0430\u044F
+      \u0437\u0430\u0449\u0438\u0442\u0430\xBB"
+    _hudSection: actor_hud_duty_ps5m
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_duty_ps5m
+    _handsModel: {fileID: -6659851424472786237, guid: c6dd2fae1d3405245bf52ca8f0323577, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: dolg_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\ps5_duty
+    _bodyModel: {fileID: -4197938407189921987, guid: 2a0059cfb42cb2447975f2f16b33a5cb, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: dolg_pantsir_outfit
+    _displayName: "\u041F\u0421\u0417-7\u043F \xAB\u041F\u0430\u043D\u0446\u0438\u0440\u044C\xBB"
+    _hudSection: actor_hud_duty_pantsir
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_duty_pantsir
+    _handsModel: {fileID: -1103981894205567165, guid: 8e56147597e12ad40886e6e422ec0589, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: dolg_pantsir_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\skat_duty
+    _bodyModel: {fileID: -2144269440980390556, guid: 5373b22c54bfc73479002e501837ba88, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: dolg_proto_exo_outfit
+    _displayName: "\u041A\u043E\u043C\u0431\u0438\u043D\u0435\u0437\u043E\u043D \u041F\u04215-\u041C
+      \u0441 \u043F\u0440\u043E\u0442\u043E\u044D\u043A\u0437\u043E\u0441\u043A\u0435\u043B\u0435\u0442\u043E\u043C"
+    _hudSection: actor_hud_duty_proto
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_duty_proto
+    _handsModel: {fileID: 4897594359843213381, guid: a9678c44fc854cf41a0799ecdebd24e2, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: dolg_proto_exo_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\exo_proto_duty
+    _bodyModel: {fileID: 1946224132825103825, guid: 2182d7f9b1a222645b4ef473e0fceaf6, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 1
+    _resolution: 0
+  - _section: dolg_red_outfit
+    _displayName: "\u041F\u04215-\u041C \xAB\u0412\u0438\u0442\u044F\u0437\u044C\xBB"
+    _hudSection: actor_hud_duty_ps5m_red
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_duty_ps5m_red
+    _handsModel: {fileID: -2163230625739660048, guid: dfb4e3c29a2f82a4ebdff4f1397f4482, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: dolg_red_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\ps5_duty_red
+    _bodyModel: {fileID: -2158379193923267960, guid: 99c8ed5eb4a5dc64f8ffa506a3240bc3, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: dolg_scientific_outfit
+    _displayName: "\u041F\u04215-9\u041C\u0434 \xAB\u0423\u043D\u0438\u0432\u0435\u0440\u0441\u0430\u043B\u044C\u043D\u0430\u044F
+      \u0437\u0430\u0449\u0438\u0442\u0430\xBB"
+    _hudSection: actor_hud_duty_seva
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_duty_seva
+    _handsModel: {fileID: -1920808833638135593, guid: d1356925c1e9e8c4898a6f6e46291985, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: dolg_scientific_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\seva_duty
+    _bodyModel: {fileID: -436683442328998955, guid: 80d31bc276b9e6048a361af9a46c5ebb, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: dolg_scientific_red_outfit
+    _displayName: "\u041F\u04215-9\u041C\u0434 \xAB\u0415\u0433\u0435\u0440\u044C\xBB"
+    _hudSection: actor_hud_duty_scientific_red
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_duty_scientific_red
+    _handsModel: {fileID: 6910164408566322623, guid: 1bfdc54e689ff694fb54087dd7a970d6, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: dolg_scientific_red_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\seva_duty
+    _bodyModel: {fileID: -436683442328998955, guid: 80d31bc276b9e6048a361af9a46c5ebb, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: dolg_scientific_wood_outfit
+    _displayName: "\u041F\u04215-9\u041C\u0434 \xAB\u0418\u0441\u0441\u043B\u0435\u0434\u043E\u0432\u0430\u0442\u0435\u043B\u044C\xBB"
+    _hudSection: actor_hud_duty_seva_wood
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_duty_wood_seva
+    _handsModel: {fileID: 5318192585335084811, guid: 0dd3ceb65b14f3544ab14903c9da5cd6, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: dolg_scientific_wood_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\seva_duty
+    _bodyModel: {fileID: -436683442328998955, guid: 80d31bc276b9e6048a361af9a46c5ebb, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: dolg_scout_outfit
+    _displayName: "\u041F\u04215-\u0420 \xAB\u0420\u0430\u0437\u0432\u0435\u0434\u0447\u0438\u043A\xBB"
+    _hudSection: actor_hud_duty_ps5m_scout
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_duty_ps5m_razved
+    _handsModel: {fileID: -8800975621547829908, guid: 7cfca7121e05b8c4c9509c8f8bb97afe, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: dolg_scout_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\ps5_duty_red
+    _bodyModel: {fileID: -2158379193923267960, guid: 99c8ed5eb4a5dc64f8ffa506a3240bc3, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: dolg_specops_red_outfit
+    _displayName: "\u041F\u0421\u0417-\u04112 \xAB\u0412\u0438\u0442\u044F\u0437\u044C\xBB"
+    _hudSection: actor_hud_spec_ops_outfit
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_spec_ops
+    _handsModel: {fileID: 6651816515734139912, guid: 81ad9b11fc818fd4790548efc07b48ce, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: dolg_specops_red_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\berill_duty
+    _bodyModel: {fileID: -3796437441579791355, guid: 722f838282e33a44087b0c85e8472c54, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: dolg_voin_outfit
+    _displayName: "\u041F\u04216-\u0412 \xAB\u0423\u043D\u0438\u0432\u0435\u0440\u0441\u0430\u043B\u044C\u043D\u0430\u044F
+      \u0437\u0430\u0449\u0438\u0442\u0430\xBB"
+    _hudSection: actor_hud_duty_voin_outfit
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_duty_voin
+    _handsModel: {fileID: 3062698020414024605, guid: 97e9cea09bff8244cacb80f78b030fac, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: dolg_voin_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\skat_duty
+    _bodyModel: {fileID: -2144269440980390556, guid: 5373b22c54bfc73479002e501837ba88, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: ecolog_exo_outfit
+    _displayName: "\u041D\u0430\u0443\u0447\u043D\u044B\u0439 \u044D\u043A\u0437\u043E\u0441\u043A\u0435\u043B\u0435\u0442"
+    _hudSection: actor_hud_ecolog_exo
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_ecolog_exo
+    _handsModel: {fileID: -5707705393097775302, guid: 12574e9a31c192f47894dab08608326f, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] I.W.P. exos and animations"
+    _legsSection: ecolog_exo_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\exo_eco_outfit
+    _bodyModel: {fileID: 1253517294563116977, guid: 62f1f37596749a540bbd34873eef4ae2, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 1
+    _resolution: 0
+  - _section: ecolog_guard_outfit
+    _displayName: "\u041A\u043E\u043C\u0431\u0438\u043D\u0435\u0437\u043E\u043D \xAB\u0418\u0441\u043A\u0440\u0430\xBB"
+    _hudSection: actor_hud_ecologist_guard
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_ecologist_guard
+    _handsModel: {fileID: 3627073317197027355, guid: 71740da8b77474c47b9b291e7c2f5b49, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: ecolog_guard_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\stalker_outfit_ecoguard
+    _bodyModel: {fileID: -9052341712958500535, guid: dee7e6825d43589428ad858d05fc0cca, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: ecolog_outfit_blue
+    _displayName: "\u0421\u0421\u041F-99\u041C \xAB\u0421\u0430\u043F\u0444\u0438\u0440\xBB"
+    _hudSection: actor_hud_ecologist_blue
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_ecologist_blue
+    _handsModel: {fileID: -7932541283909093273, guid: 85cdedb49e77e9040b22bd265fb98671, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: ecolog_outfit_blue_legs
+    _bodyVirtualPath: sm\actor_legs\eco_outfit_blue
+    _bodyModel: {fileID: 1064795590492089861, guid: ff8a7cc6968b92043a4b2a270ee16d02, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: ecolog_outfit_green
+    _displayName: "\u0421\u0421\u041F-99\u041C \xAB\u042D\u043A\u043E\u043B\u043E\u0433\xBB"
+    _hudSection: actor_hud_ecologist_ssp99m
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_ecologist_ssp99m
+    _handsModel: {fileID: 3887616972599326811, guid: ac7b6fd436d1446458b2ba3e69d89bd6, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: ecolog_outfit_green_legs
+    _bodyVirtualPath: sm\actor_legs\eco_outfit_green
+    _bodyModel: {fileID: -7465182424192447900, guid: 1960507afd8c48846ba2da6373d680d6, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: ecolog_outfit_orange
+    _displayName: "\u0421\u0421\u041F-99 \xAB\u042D\u043A\u043E\u043B\u043E\u0433\xBB"
+    _hudSection: actor_hud_ecologist_ssp99
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_ecologist_ssp99
+    _handsModel: {fileID: -878320012443749907, guid: 110e3309148c4bd45b4dfda8ecd0abc7, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: ecolog_outfit_orange_legs
+    _bodyVirtualPath: sm\actor_legs\eco_outfit_orange
+    _bodyModel: {fileID: -7152970989838672315, guid: 84927c5a400cb754f8efa0f88bba5711, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: ecolog_outfit_red
+    _displayName: "\u0421\u0421\u041F-99\u041C \xAB\u0420\u0443\u0431\u0438\u043D\xBB"
+    _hudSection: actor_hud_ecologist_red
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_ecologist_red
+    _handsModel: {fileID: -4952917854238760419, guid: 2a17de1a6fe00d94689e8e6d50a49a29, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: ecolog_outfit_red_legs
+    _bodyVirtualPath: sm\actor_legs\eco_outfit_red
+    _bodyModel: {fileID: 8769811141847834620, guid: 94426864ff14ef44a82140d3f35ca067, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: ecolog_outfit_white
+    _displayName: "\u0421\u0421\u041F-99 \xAB\u0410\u043B\u043C\u0430\u0437\xBB"
+    _hudSection: actor_hud_ecologist_white
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_ecologist_white
+    _handsModel: {fileID: 9745826433334089, guid: 8a5a5b460b4da8a4fbc49c6d52e0fd90, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: ecolog_outfit_white_legs
+    _bodyVirtualPath: sm\actor_legs\eco_outfit_white
+    _bodyModel: {fileID: 6625230499593480414, guid: c53d70b4266fbd44b9f274522a14ce30, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: ecolog_outfit_yello
+    _displayName: "\u0421\u0421\u041F-99 \xAB\u0422\u043E\u043F\u0430\u0437\xBB"
+    _hudSection: actor_hud_ecologist_yello
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_ecologist_yello
+    _handsModel: {fileID: -5409340153495171576, guid: 86c9f111ef357b944a04096de34c187b, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: ecolog_outfit_yello_legs
+    _bodyVirtualPath: sm\actor_legs\eco_outfit_yellow
+    _bodyModel: {fileID: 2816216726401521538, guid: 9ef477df79e40994fa11b5832de0f098, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: ecolog_proto_exo_outfit
+    _displayName: "\u041A\u043E\u043C\u0431\u0438\u043D\u0435\u0437\u043E\u043D \u043D\u0430\u0443\u0447\u043D\u043E\u0439
+      \u043E\u0445\u0440\u0430\u043D\u044B \u0441 \u043F\u0440\u043E\u0442\u043E\u044D\u043A\u0437\u043E\u0441\u043A\u0435\u043B\u0435\u0442\u043E\u043C"
+    _hudSection: actor_hud_ecolog_proto
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_ecolog_proto
+    _handsModel: {fileID: -8241093486348053910, guid: 22af6de4c45d83d4bafcc1e03a1c628f, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: ecolog_proto_exo_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\exo_proto_ecolog
+    _bodyModel: {fileID: 3151126550042885984, guid: 800e028c52986284cbbdd4a87d273bbe, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 1
+    _resolution: 0
+  - _section: exo_dolg_outfit
+    _displayName: "\u041F\u0421\u0417-10\u0414\u043C \xAB\u0422\u044F\u0436\u0451\u043B\u0430\u044F
+      \u0437\u0430\u0449\u0438\u0442\u0430\xBB"
+    _hudSection: actor_hud_duty_exolight_alt
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_duty_exolight_alt
+    _handsModel: {fileID: -8015001133878098230, guid: c2bd05f1e6f09314a92f6d8ca752dd19, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: exo_dolg_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\heavy_exo_noservo_duty
+    _bodyModel: {fileID: 6056333153850497778, guid: ab67ef3c549deee45ab0c1b787b6b414, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: exo_dolg_red_outfit
+    _displayName: "\u041F\u0421\u0417-10\u0414\u043C \xAB\u0417\u0432\u0435\u0440\u043E\u0431\u043E\u0440\u0435\u0446\xBB"
+    _hudSection: actor_hud_duty_exolight_red
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_duty_exolight_red
+    _handsModel: {fileID: -3125870331903872740, guid: 78598395ab57a6a45a20cef517d531a8, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: exo_dolg_red_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\heavy_exo_noservo_duty
+    _bodyModel: {fileID: 6056333153850497778, guid: ab67ef3c549deee45ab0c1b787b6b414, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: exo_dolg_urban_outfit
+    _displayName: "\u041F\u0421\u0417-10\u0433 \xAB\u0411\u043E\u0435\u0432\u0430\u044F
+      \u0437\u0430\u0449\u0438\u0442\u0430\xBB"
+    _hudSection: actor_hud_duty_exolight_urban
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_duty_exolight_urban
+    _handsModel: {fileID: -6555401890989234172, guid: 23c73cc1b5df6f2498f5d645171671d0, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: exo_dolg_urban_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\heavy_exo_noservo_duty_urban
+    _bodyModel: {fileID: -4691665950948505576, guid: 959845b29f6b7f64daffe5e4044f6fc6, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: exo_dolg_wood_outfit
+    _displayName: "\u041F\u0421\u0417-101 \xAB\u041B\u0435\u0441\u043D\u0438\u043A\xBB"
+    _hudSection: actor_hud_duty_exolight_wood
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_duty_exolight_wood
+    _handsModel: {fileID: -1434584986650192756, guid: 050151b30cd9eb343a65e2e1bb783dc5, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: exo_dolg_wood_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\heavy_exo_noservo_duty_wood
+    _bodyModel: {fileID: -8523925976792497951, guid: 9b667d165eb84074e8ed959708cae7db, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: exo_merc_grass_outfit
+    _displayName: "\u0422\u0411-1 \u043D\u0430\u0451\u043C\u043D\u0438\u043A\u043E\u0432
+      \xAB\u0421\u0430\u0432\u0430\u043D\u043D\u0430\xBB"
+    _hudSection: actor_hud_merc_exolight_grass
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_merc_exolight_grass
+    _handsModel: {fileID: 887711484143120653, guid: a73c6945b1fff6f45b69f567b04b505f, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: exo_merc_grass_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\heavy_exo_noservo_merc_grass
+    _bodyModel: {fileID: 4561717397464085041, guid: 6d7707bf06e4125488067d4f0131a9ad, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: exo_merc_urban_outfit
+    _displayName: "\u0422\u0411-1 \u043D\u0430\u0451\u043C\u043D\u0438\u043A\u043E\u0432
+      \xAB\u0413\u043E\u0440\u043E\u0434\xBB"
+    _hudSection: actor_hud_merc_exolight_urban
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_merc_exolight_urban
+    _handsModel: {fileID: -1991024838333106053, guid: 918f3899587619547b412b1f11e3893c, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: exo_merc_urban_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\heavy_exo_noservo_merc_urban
+    _bodyModel: {fileID: 1685113360864853016, guid: 4d8d20f636058de4ea62c4e68b66aef2, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: exo_merc_wood_outfit
+    _displayName: "\u0422\u0411-1 \u043D\u0430\u0451\u043C\u043D\u0438\u043A\u043E\u0432
+      \xAB\u041B\u0435\u0441\xBB"
+    _hudSection: actor_hud_merc_exolight_wood
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_merc_exolight_wood
+    _handsModel: {fileID: 7575491668316053639, guid: b676dcba1679fa74db2e753598c4c4ce, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: exo_merc_wood_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\heavy_exo_noservo_merc_wood
+    _bodyModel: {fileID: -3731215167141058164, guid: a468474adc0e21b42b3b1de33be37acc, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: exo_outfit
+    _displayName: "\u042D\u043A\u0437\u043E\u0441\u043A\u0435\u043B\u0435\u0442"
+    _hudSection: actor_hud_exo
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_exo
+    _handsModel: {fileID: -8453269584828700377, guid: 19d8b5a8286ad4b4791dee7490172427, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] I.W.P. exos and animations"
+    _legsSection: exo_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\exo_outfit
+    _bodyModel: {fileID: 5340864193651187434, guid: de03e417d5181d5458da389da1f9108d, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 1
+    _resolution: 0
+  - _section: exo_wood_outfit
+    _displayName: "\u0422\u0411-1 \xAB\u041B\u0435\u0441\xBB"
+    _hudSection: actor_hud_exolight_wood
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_exolight_wood
+    _handsModel: {fileID: -8275423780376088190, guid: 15d559b5787c3f742a527bff3213a09a, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: exo_wood_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\heavy_exo_noservo_loner
+    _bodyModel: {fileID: -6849450166177074537, guid: c9283737b4a9e0344936af947f211c28, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: exolight_outfit
+    _displayName: "\u0422\u044F\u0436\u0451\u043B\u044B\u0439 \u0431\u0440\u043E\u043D\u0435\u043A\u043E\u0441\u0442\u044E\u043C"
+    _hudSection: actor_hud_exolight
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_exolight
+    _handsModel: {fileID: -4530841571309434934, guid: 8f39b5628657aec46a815748d5f3d282, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: exolight_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\heavy_exo_noservo_loner
+    _bodyModel: {fileID: -6849450166177074537, guid: c9283737b4a9e0344936af947f211c28, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: freedom_exo_vineleaf_outfit
+    _displayName: "\u0422\u044F\u0436\u0451\u043B\u044B\u0439 \u0431\u0440\u043E\u043D\u0435\u043A\u043E\u0441\u0442\u044E\u043C
+      \xAB\u0414\u0443\u0445 \u0441\u0432\u043E\u0431\u043E\u0434\u044B\xBB"
+    _hudSection: actor_hud_freedom_exolight_vineleaf
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_freedom_exolight_vineleaf
+    _handsModel: {fileID: -5146370373250849633, guid: b7173db793d60b0459bb55bf85bb74ef, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: freedom_exo_vineleaf_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\heavy_exo_noservo_freedom_vineleaf
+    _bodyModel: {fileID: 3868551380731290922, guid: d8abeb7d80d043941af539690618f07e, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: freedom_nosorog_outfit
+    _displayName: "\u042D\u043A\u0437\u043E\u0441\u043A\u0435\u043B\u0435\u0442 \xAB\u0427\u0435\u043C\u043F\u0438\u043E\u043D
+      \u0441\u0432\u043E\u0431\u043E\u0434\u044B\xBB"
+    _hudSection: actor_hud_freedom_exo_nosorog
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_freedom_exo_nosorog
+    _handsModel: {fileID: 7819822378965097756, guid: 30d9b6c7886c8a541a6d9429b1683e46, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] I.W.P. exos and animations"
+    _legsSection: freedom_nosorog_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\exo_freedom_outfit
+    _bodyModel: {fileID: -5204187161046711898, guid: 5d210aa54f20e8940a3362853defe713, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 1
+    _resolution: 0
+  - _section: ghillie_outfit
+    _displayName: "\u041C\u0430\u0441\u043A\u0438\u0440\u043E\u0432\u043E\u0447\u043D\u044B\u0439
+      \u043A\u043E\u0441\u0442\u044E\u043C"
+    _hudSection: actor_hud_ghillie
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_ghillie
+    _handsModel: {fileID: -7395496863473916184, guid: ff080b74935d7db44a18d1e7b67f5643, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: ghillie_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\ghillie_outfit
+    _bodyModel: {fileID: 6988239448715591372, guid: 0b47083bb583c8f43b937a945a334fca, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: greh_armored_camo_outfit
+    _displayName: "\u041F\u0440\u043E\u0442\u0438\u0432\u043E\u043E\u0441\u043A\u043E\u043B\u043E\u0447\u043D\u0430\u044F
+      \u0431\u0440\u043E\u043D\u044F \xAB\u0418\u0440\u0438\u0439\xBB"
+    _hudSection: actor_hud_greh_armored_camo
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_sin_armored_camo
+    _handsModel: {fileID: -830066814262717540, guid: 94e4f7edb73e53248bcaf3385e97b324, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: greh_armored_camo_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\sin_merc_outfit
+    _bodyModel: {fileID: -8305713340658525606, guid: ed7cac3a504c2f349a7edc2088850a97, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: greh_armored_outfit
+    _displayName: "\u041F\u0440\u043E\u0442\u0438\u0432\u043E\u043E\u0441\u043A\u043E\u043B\u043E\u0447\u043D\u0430\u044F
+      \u0431\u0440\u043E\u043D\u044F \xAB\u0413\u0440\u0435\u0445\u0430\xBB"
+    _hudSection: actor_hud_greh_armored
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_sin_armored
+    _handsModel: {fileID: 2572145090399790518, guid: e97a210d82853824d9268ddd6b8f978e, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: greh_armored_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\sin_merc_outfit
+    _bodyModel: {fileID: -8305713340658525606, guid: ed7cac3a504c2f349a7edc2088850a97, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: greh_exo_outfit
+    _displayName: "\u042D\u043A\u0437\u043E\u0441\u043A\u0435\u043B\u0435\u0442 \xAB\u0418\u0440\u0438\u0439\xBB"
+    _hudSection: actor_hud_sin_exo
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_sin_exo
+    _handsModel: {fileID: 5401777111063324956, guid: 45220483de432fe42804fa3d80d2ec99, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] I.W.P. exos and animations"
+    _legsSection: greh_exo_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\exo_bandit_outfit
+    _bodyModel: {fileID: 8613997307721571612, guid: cff02f27b30c3ed42be0e68c385aa0c2, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 1
+    _resolution: 0
+  - _section: greh_ps5_outfit
+    _displayName: "\u041F\u0440\u043E\u0442\u0438\u0432\u043E\u043E\u0441\u043A\u043E\u043B\u043E\u0447\u043D\u0430\u044F
+      \u0431\u0440\u043E\u043D\u044F \xAB\u0412\u0435\u043B\u0435\u0441\xBB"
+    _hudSection: actor_hud_sin_ps5_veles
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_sin_ps5_veles
+    _handsModel: {fileID: -4363436936043693387, guid: 71bf394fecd43de4b844bbcacc5f6df0, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: greh_ps5_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\ps5_sin
+    _bodyModel: {fileID: 8524637681868872205, guid: 1bd208bdb9afb4f40bb165ba4167cacd, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: greh_trenchcoat_outfit
+    _displayName: "\u0422\u044F\u0436\u0451\u043B\u044B\u0439 \u043F\u043B\u0430\u0449
+      \xAB\u0413\u0440\u0435\u0445\u0430\xBB"
+    _hudSection: actor_hud_sin_trenchcoat
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_sin_trench
+    _handsModel: {fileID: -5985402807766192219, guid: 1150ea29960e7c64ab70ecbce9e3c5e4, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: greh_trenchcoat_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\plash_outfit_black
+    _bodyModel: {fileID: -914924563520002778, guid: e8a4135f8de75e247b4b4557015fd26f, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: hybrid_outfit
+    _displayName: "\u0413\u0438\u0431\u0440\u0438\u0434\u043D\u044B\u0439 \u0431\u0440\u043E\u043D\u0435\u043A\u043E\u0441\u0442\u044E\u043C"
+    _hudSection: actor_hud_scientific_heavy
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_heavy_seva
+    _handsModel: {fileID: -2822732490733665846, guid: b623fb4d9c0049244a43e1dacd2ca9d9, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: hybrid_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\seva_outfit
+    _bodyModel: {fileID: -1009552130342892039, guid: a5cd19b9e808f7f4286f7d51de9fc4c1, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: isg_camo_outfit
+    _displayName: "\u0422\u0430\u043A\u0442\u0438\u0447\u0435\u0441\u043A\u0438\u0439
+      \u0431\u0440\u043E\u043D\u0435\u0436\u0438\u043B\u0435\u0442 \u0418\u0418\u0413
+      Mk.2"
+    _hudSection: actor_hud_isg_camo_mk2
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_isg_camo_mk2
+    _handsModel: {fileID: 513058897101208758, guid: e5261ee157ea44349bb47d231bf4137e, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: isg_camo_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\sts_isg_camo
+    _bodyModel: {fileID: 6763441235843978782, guid: d5483d4691192174da7c9f20bfa49948, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: isg_exo_outfit
+    _displayName: "\u042D\u043A\u0437\u043E\u0441\u043A\u0435\u043B\u0435\u0442 \u0418\u0418\u0413"
+    _hudSection: actor_hud_isg_exo
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_isg_exo
+    _handsModel: {fileID: -8806440487319276460, guid: e8ccbc9de5d51164aab068151297747e, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] I.W.P. exos and animations"
+    _legsSection: isg_exo_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\exo_isg_outfit
+    _bodyModel: {fileID: -7261946760129568818, guid: 787c3ede02a2c8240b6fdb58bba17f9a, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 1
+    _resolution: 0
+  - _section: isg_exolight_outfit
+    _displayName: "\u0422\u044F\u0436\u0451\u043B\u044B\u0439 \u0431\u0440\u043E\u043D\u0435\u043A\u043E\u0441\u0442\u044E\u043C
+      \u0418\u0418\u0413"
+    _hudSection: actor_hud_isg_exolight
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_isg_exolight
+    _handsModel: {fileID: 14491719904604362, guid: 6ae23334027e6ed4da78196d7e1a55ee, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: isg_exolight_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\heavy_exo_noservo_isg
+    _bodyModel: {fileID: -2769853786474925262, guid: 55eb29f10905abb4a888226bc1e60ecf, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: isg_lcs_camo_outfit
+    _displayName: "\u041A\u0430\u043C\u0443\u0444\u043B\u0438\u0440\u043E\u0432\u0430\u043D\u043D\u044B\u0439
+      \u043A\u043E\u043C\u0431\u0438\u043D\u0435\u0437\u043E\u043D \u0418\u0418\u0413"
+    _hudSection: actor_hud_isg_lcs_camo_outfit
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_merc_camo
+    _handsModel: {fileID: -8872735768916699486, guid: 4a7011ef90738f64baed0263c48dedc5, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: isg_lcs_camo_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\isg_merc_outfit_2
+    _bodyModel: {fileID: -8192482221181785441, guid: 47084b83db8fd0a42a7504c57667c649, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: isg_lcs_outfit
+    _displayName: "\u041B\u0451\u0433\u043A\u0438\u0439 \u0431\u043E\u0435\u0432\u043E\u0439
+      \u043A\u043E\u043C\u0431\u0438\u043D\u0435\u0437\u043E\u043D \u0418\u0418\u0413"
+    _hudSection: actor_hud_isg_suit
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_isg_suit
+    _handsModel: {fileID: -8111796326203991574, guid: 52bd882d8025ad24aac7fd603e427227, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: isg_lcs_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\isg_merc_outfit_3
+    _bodyModel: {fileID: 6582772367034241863, guid: 9402817b9e89ec5479a7505d8dbfdbbc, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: isg_lcs_urban_outfit
+    _displayName: "\u041A\u043E\u043C\u0431\u0438\u043D\u0435\u0437\u043E\u043D \u0418\u0418\u0413
+      \u0441 \xAB\u0433\u043E\u0440\u043E\u0434\u0441\u043A\u0438\u043C \u043A\u0430\u043C\u0443\u0444\u043B\u044F\u0436\u0435\u043C\xBB"
+    _hudSection: actor_hud_isg_lcs_urban_outfit
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_merc_urban
+    _handsModel: {fileID: -5140069731770916242, guid: 2bd309697b8ad0d438bf22dba4565b9c, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: isg_lcs_urban_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\isg_merc_outfit_1
+    _bodyModel: {fileID: -9062539613371568444, guid: bc82d636470b953489e80bef16933383, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: isg_nosorog_outfit
+    _displayName: "\u042D\u043A\u0437\u043E\u0441\u043A\u0435\u043B\u0435\u0442 \xAB\u041D\u043E\u0441\u043E\u0440\u043E\u0433\xBB
+      \u0418\u0418\u0413"
+    _hudSection: actor_hud_isg_exo_nosorog
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_isg_exo_nosorog
+    _handsModel: {fileID: 7014363898404064644, guid: 906d276f7d093b44c8330df7a19ec950, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] I.W.P. exos and animations"
+    _legsSection: isg_nosorog_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\exo_isg_outfit
+    _bodyModel: {fileID: -7261946760129568818, guid: 787c3ede02a2c8240b6fdb58bba17f9a, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 1
+    _resolution: 0
+  - _section: isg_outfit
+    _displayName: "\u0422\u0430\u043A\u0442\u0438\u0447\u0435\u0441\u043A\u0438\u0439
+      \u0431\u0440\u043E\u043D\u0435\u0436\u0438\u043B\u0435\u0442 \u0418\u0418\u0413
+      Mk.1"
+    _hudSection: actor_hud_isg_suit
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_isg_suit
+    _handsModel: {fileID: -8111796326203991574, guid: 52bd882d8025ad24aac7fd603e427227, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: isg_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\sts_isg
+    _bodyModel: {fileID: 4871498947231285390, guid: 2190cecfca31ced44b3b756b48fef8c2, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: isg_proto_exo_outfit
+    _displayName: "\u041A\u043E\u043C\u0431\u0438\u043D\u0435\u0437\u043E\u043D \u0418\u0418\u0413
+      \u0441 \u043F\u0440\u043E\u0442\u043E\u044D\u043A\u0437\u043E\u0441\u043A\u0435\u043B\u0435\u0442\u043E\u043C"
+    _hudSection: actor_hud_isg_proto
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_isg_proto
+    _handsModel: {fileID: -1481656599290646479, guid: aec4bf389b833bb41aded3a86aad8ce2, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: isg_proto_exo_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\exo_proto_isg
+    _bodyModel: {fileID: 642006610903990965, guid: e90dd7111407f70498b0de047565a81f, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 1
+    _resolution: 0
+  - _section: isg_scientific_outfit
+    _displayName: "\u041D\u0430\u0443\u0447\u043D\u044B\u0439 \u043A\u043E\u043C\u0431\u0438\u043D\u0435\u0437\u043E\u043D
+      \u0418\u0418\u0413"
+    _hudSection: actor_hud_isg_seva
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_isg_seva
+    _handsModel: {fileID: 3784624411018763348, guid: 1b39ae0777107844cacd4daed7872f18, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: isg_scientific_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\seva_isg
+    _bodyModel: {fileID: 1685418061533437445, guid: e902f27535696fc49899dd18fadfcd9c, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: light_dolg_outfit
+    _displayName: "\u0411\u0440\u043E\u043D\u0435\u0436\u0438\u043B\u0435\u0442 IBA-\u0417
+      \xAB\u0414\u043E\u043B\u0433\u0430\xBB"
+    _hudSection: actor_hud_duty_metro
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_duty_metro
+    _handsModel: {fileID: -3690717803132639450, guid: 722e976a0adbaa44fac4d72c5f00e8ac, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: light_dolg_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\iba_duty
+    _bodyModel: {fileID: 226725838818287954, guid: 5ca33ea7030c32346b598adfb4912e5e, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: light_freedom_outfit
+    _displayName: "\u0411\u0440\u043E\u043D\u0435\u0436\u0438\u043B\u0435\u0442 \xAB\u0417\u0430\u0449\u0438\u0442\u043D\u0438\u043A
+      \u0441\u0432\u043E\u0431\u043E\u0434\u044B\xBB"
+    _hudSection: actor_hud_freedom_metro
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_freedom_metro
+    _handsModel: {fileID: 7334187102595802180, guid: af316e2190c157b449c073f41b3cf9f3, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: light_freedom_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\iba_freedom
+    _bodyModel: {fileID: -6753863818085609545, guid: 49d17c89f1e6a18429e74e90a19dd5ac, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: light_isg_outfit
+    _displayName: "\u0411\u0440\u043E\u043D\u0435\u0436\u0438\u043B\u0435\u0442 IBA-\u0417
+      \u0418\u0418\u0413"
+    _hudSection: actor_hud_monolith_metro
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_monolith_metro
+    _handsModel: {fileID: -7444619689857393003, guid: 77a49fdb257fa6942ac8c352e2b4921a, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: light_isg_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\iba_isg
+    _bodyModel: {fileID: 1788618217016212988, guid: dbda7a1d9e709c648a40681f3620e3bd, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: light_loner_outfit
+    _displayName: "\u0411\u0440\u043E\u043D\u0435\u0436\u0438\u043B\u0435\u0442 \xAB\u041F\u0435\u0440\u0435\u0445\u0432\u0430\u0442\u0447\u0438\u043A\xBB"
+    _hudSection: actor_hud_loner_metro
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_loner_metro
+    _handsModel: {fileID: 696720976439539351, guid: 47e067a368bb0d9478ec18fe9e7ec57f, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: light_loner_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\iba_stalker
+    _bodyModel: {fileID: 4301017161717138300, guid: 05311e43b45338d49ac298b815adbcd7, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: light_merc_outfit
+    _displayName: "\u0411\u0440\u043E\u043D\u0435\u0436\u0438\u043B\u0435\u0442 IBA-\u0417
+      \u043D\u0430\u0451\u043C\u043D\u0438\u043A\u043E\u0432"
+    _hudSection: actor_hud_merc_metro
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_merc_metro
+    _handsModel: {fileID: 8622548822896155919, guid: 78011743631d8394fab02174e0f7e5dc, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: light_merc_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\iba_merc
+    _bodyModel: {fileID: 5427485005429485199, guid: 05e0a5c3a22dc0c4eb0f25763280746c, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: light_monolit_outfit
+    _displayName: "\u0411\u0440\u043E\u043D\u0435\u0436\u0438\u043B\u0435\u0442 IBA-\u0417
+      \xAB\u041C\u043E\u043D\u043E\u043B\u0438\u0442\u0430\xBB"
+    _hudSection: actor_hud_monolith_metro
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_monolith_metro
+    _handsModel: {fileID: -7444619689857393003, guid: 77a49fdb257fa6942ac8c352e2b4921a, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: light_monolit_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\iba_monolith
+    _bodyModel: {fileID: 4140513254360936376, guid: 4442bcbf657b2e7448bda6dd2d263cfa, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: light_voen_outfit
+    _displayName: "\u0410\u0440\u043C\u0435\u0439\u0441\u043A\u0438\u0439 \u0431\u0440\u043E\u043D\u0435\u0436\u0438\u043B\u0435\u0442
+      IBA-\u0417"
+    _hudSection: actor_hud_military_metro
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_military_metro
+    _handsModel: {fileID: -2707393062359731426, guid: 11dbd716e01a29843a092074d55d72c3, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: light_voen_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\iba_army
+    _bodyModel: {fileID: 608059121907215068, guid: cb6d3b5be50308949bd1c27ef103cad4, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: merc_ace_outfit
+    _displayName: "\u0411\u0440\u043E\u043D\u0435\u043A\u043E\u0441\u0442\u044E\u043C
+      \u0441 \u0417\u0421\u0414 \xAB\u0410\u0441\xBB"
+    _hudSection: actor_hud_seva_ace
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_merc_ace_seva
+    _handsModel: {fileID: 6406305727122633013, guid: 6a4363439c76ede4386811742b4f7e5c, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: merc_ace_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\seva_merc
+    _bodyModel: {fileID: -5453812925586159665, guid: 9a65bbdb98e24f040be41ced447eaf7e, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: merc_combat_scientific_outfit
+    _displayName: "\u041A\u043E\u043C\u0431\u0438\u043D\u0435\u0437\u043E\u043D \u043D\u0430\u0451\u043C\u043D\u0438\u043A\u043E\u0432
+      \xAB\u0418\u0441\u0441\u043B\u0435\u0434\u043E\u0432\u0430\u0442\u0435\u043B\u044C\xBB"
+    _hudSection: actor_hud_merc_combat_scientific
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_merc_combat_scientific
+    _handsModel: {fileID: 9065856653161777355, guid: 1e598b051d08c394dae035b51081504f, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: merc_combat_scientific_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\seva_merc
+    _bodyModel: {fileID: -5453812925586159665, guid: 9a65bbdb98e24f040be41ced447eaf7e, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: merc_coyote_outfit
+    _displayName: "\u0421\u0440\u0435\u0434\u043D\u0438\u0439 \u0442\u0430\u043A\u0442\u0438\u0447\u0435\u0441\u043A\u0438\u0439
+      \u043A\u043E\u0441\u0442\u044E\u043C \xAB\u041A\u043E\u0439\u043E\u0442\xBB"
+    _hudSection: actor_hud_merc_novice
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_merc_novice
+    _handsModel: {fileID: -4881147230063124550, guid: 625208c513bcc274bbece5a7eefc0732, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: merc_coyote_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\merc_outfit_scout
+    _bodyModel: {fileID: 9036640628674957299, guid: 1d4cf5e3720b016479409a99c82f5b02, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: merc_exo_outfit
+    _displayName: "\u042D\u043A\u0437\u043E\u0441\u043A\u0435\u043B\u0435\u0442 \u043D\u0430\u0451\u043C\u043D\u0438\u043A\u043E\u0432"
+    _hudSection: actor_hud_merc_exo
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_merc_exo
+    _handsModel: {fileID: 4429043981814742256, guid: b566ce2fca733a7499f09f90efcaf81a, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] I.W.P. exos and animations"
+    _legsSection: merc_exo_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\exo_merc_outfit
+    _bodyModel: {fileID: 4655814998164929503, guid: 2e321503e6e35fd48b21a9403fc4f22a, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 1
+    _resolution: 0
+  - _section: merc_exolight_outfit
+    _displayName: "\u0422\u044F\u0436\u0451\u043B\u044B\u0439 \u0431\u0440\u043E\u043D\u0435\u043A\u043E\u0441\u0442\u044E\u043C
+      \u043D\u0430\u0451\u043C\u043D\u0438\u043A\u043E\u0432"
+    _hudSection: actor_hud_merc_exolight
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_merc_exolight
+    _handsModel: {fileID: -2598046303613916731, guid: dbcac6d9d4b0afc46893c3332c7922aa, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: merc_exolight_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\heavy_exo_noservo_merc
+    _bodyModel: {fileID: 5159691585489004952, guid: 7ecd1b213ba593949a8c337eb1ce2a8e, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: merc_fighter_outfit
+    _displayName: "\u041B\u0451\u0433\u043A\u0438\u0439 \u043A\u043E\u043C\u0431\u0438\u043D\u0435\u0437\u043E\u043D
+      \xAB\u0418\u0441\u0442\u0440\u0435\u0431\u0438\u0442\u0435\u043B\u044C\xBB"
+    _hudSection: actor_hud_merc_fighter
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_merc_fighter
+    _handsModel: {fileID: 2745679400570911286, guid: 431ac10cda13d284bb88dee44f11a8c5, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: merc_fighter_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\merc_outfit_fighter
+    _bodyModel: {fileID: -7663921446337430178, guid: 2eed2b10fd4842c47a2147c7d842352c, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: merc_jackal_outfit
+    _displayName: "\u041B\u0451\u0433\u043A\u0438\u0439 \u0442\u0430\u043A\u0442\u0438\u0447\u0435\u0441\u043A\u0438\u0439
+      \u043A\u043E\u0441\u0442\u044E\u043C \xAB\u0428\u0430\u043A\u0430\u043B\xBB"
+    _hudSection: actor_hud_merc_jackal
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_merc_jackal
+    _handsModel: {fileID: -3543597745536968357, guid: 3d35d064ca0f34d479c4bb463b08f1fd, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: merc_jackal_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\merc_outfit_scout
+    _bodyModel: {fileID: 9036640628674957299, guid: 1d4cf5e3720b016479409a99c82f5b02, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: merc_nighthunter_outfit
+    _displayName: "\u0411\u0440\u043E\u043D\u0435\u0436\u0438\u043B\u0435\u0442 \u043D\u0430\u0451\u043C\u043D\u0438\u043A\u043E\u0432
+      \xAB\u041D\u043E\u0447\u043D\u043E\u0439 \u0445\u0438\u0449\u043D\u0438\u043A\xBB"
+    _hudSection: actor_hud_nighthunter_outfit
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_merc_nighthunter
+    _handsModel: {fileID: 2801805004381560409, guid: 82cbb779b1776214cb8ebb4c19d94995, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: merc_nighthunter_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\sts_merc_night
+    _bodyModel: {fileID: 3793708658315835713, guid: 805a4a741d772fd43a1dad3957797975, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: merc_nosorog_outfit
+    _displayName: "\u042D\u043A\u0437\u043E\u0441\u043A\u0435\u043B\u0435\u0442 \xAB\u041D\u043E\u0441\u043E\u0440\u043E\u0433\xBB
+      \u043D\u0430\u0451\u043C\u043D\u0438\u043A\u043E\u0432"
+    _hudSection: actor_hud_merc_exo_nosorog
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_merc_exo_nosorog
+    _handsModel: {fileID: -4311767064067376472, guid: 001dd6b8a2339d24593b333e3564a7e7, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] I.W.P. exos and animations"
+    _legsSection: merc_nosorog_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\exo_merc_outfit
+    _bodyModel: {fileID: 4655814998164929503, guid: 2e321503e6e35fd48b21a9403fc4f22a, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 1
+    _resolution: 0
+  - _section: merc_outfit
+    _displayName: "\u041B\u0451\u0433\u043A\u0438\u0439 \u043A\u043E\u043C\u0431\u0438\u043D\u0435\u0437\u043E\u043D
+      \u043D\u0430\u0451\u043C\u043D\u0438\u043A\u043E\u0432"
+    _hudSection: actor_hud_merc_suit
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_merc_suit
+    _handsModel: {fileID: -8996535384846951807, guid: 028e04b0c4d6d8f4daba471dc6aadf2a, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: merc_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\merc_outfit
+    _bodyModel: {fileID: -7412829526601026845, guid: b0cc78f8f1224e64a8635d5700f62f68, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: merc_scientific_armored_outfit
+    _displayName: "\u0411\u043E\u0435\u0432\u0430\u044F \xAB\u0421\u0415\u0412\u0410\xBB
+      \u043D\u0430\u0451\u043C\u043D\u0438\u043A\u043E\u0432"
+    _hudSection: actor_hud_merc_armored_seva
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_merc_armored_seva
+    _handsModel: {fileID: 71633651540779609, guid: 73a2bd12b50944740920ca00c2613b37, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: merc_scientific_armored_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\seva_merc
+    _bodyModel: {fileID: -5453812925586159665, guid: 9a65bbdb98e24f040be41ced447eaf7e, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: merc_scientific_outfit
+    _displayName: "\u041D\u0430\u0443\u0447\u043D\u044B\u0439 \u043A\u043E\u043C\u0431\u0438\u043D\u0435\u0437\u043E\u043D
+      \u043D\u0430\u0451\u043C\u043D\u0438\u043A\u043E\u0432"
+    _hudSection: actor_hud_merc_seva
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_merc_seva
+    _handsModel: {fileID: -2569222487471604630, guid: c419755e81d1e164bab1e82730c731dc, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: merc_scientific_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\seva_merc
+    _bodyModel: {fileID: -5453812925586159665, guid: 9a65bbdb98e24f040be41ced447eaf7e, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: merc_scout_outfit
+    _displayName: "\u041B\u0451\u0433\u043A\u0438\u0439 \u043A\u043E\u043C\u0431\u0438\u043D\u0435\u0437\u043E\u043D
+      \xAB\u0421\u043A\u0430\u0443\u0442\xBB"
+    _hudSection: actor_hud_merc_scout
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_merc_scout
+    _handsModel: {fileID: 6376017282474098773, guid: 8ab42a25de5ca464eb9f3c85d5b7c66a, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: merc_scout_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\merc_outfit_scout
+    _bodyModel: {fileID: 9036640628674957299, guid: 1d4cf5e3720b016479409a99c82f5b02, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: merc_sun_outfit
+    _displayName: "\u0422\u0430\u043A\u0442\u0438\u0447\u0435\u0441\u043A\u0438\u0439
+      \u043A\u043E\u043C\u0431\u0438\u043D\u0435\u0437\u043E\u043D \xAB\u0421\u0443\u043C\u0440\u0430\u043A\xBB"
+    _hudSection: actor_hud_merc_sun
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_merc_sun
+    _handsModel: {fileID: 3569799206557210650, guid: 54decfabc1df1e0458875c982751c369, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: merc_sun_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\sts_merc_sun
+    _bodyModel: {fileID: -405072187627425270, guid: 7f5823ec2c3773340b8ea7eaf55f89ff, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: merc_sunset_outfit
+    _displayName: "\u041B\u0451\u0433\u043A\u0438\u0439 \u043A\u043E\u043C\u0431\u0438\u043D\u0435\u0437\u043E\u043D
+      \xAB\u0417\u0430\u043A\u0430\u0442\xBB"
+    _hudSection: actor_hud_merc_sunset_outfit
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_merc_sunset
+    _handsModel: {fileID: 5133996593747497352, guid: 1aa86ef288210264fb01834fb825700e, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: merc_sunset_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\merc_outfit_sunset
+    _bodyModel: {fileID: -3418617715400181028, guid: 2dfdf0c0cd0a9f64fb180003c396e038, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: merc_wolven_outfit
+    _displayName: "\u0411\u0440\u043E\u043D\u0435\u0436\u0438\u043B\u0435\u0442 \u043D\u0430\u0451\u043C\u043D\u0438\u043A\u043E\u0432
+      \xAB\u0413\u0438\u0435\u043D\u0430\xBB"
+    _hudSection: actor_hud_merc_wolven_outfit
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_merc_wolven
+    _handsModel: {fileID: 2439157632657076768, guid: 5e9f841c463480042afe0297760da164, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: merc_wolven_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\sts_merc_wolven
+    _bodyModel: {fileID: 6106007080273169058, guid: aec3601e1c7d2e847a32d205f49b5e50, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: military_bandit_outfit
+    _displayName: "\u0422\u0440\u043E\u0444\u0435\u0439\u043D\u044B\u0439 \u0431\u0440\u043E\u043D\u0435\u043A\u043E\u0441\u0442\u044E\u043C
+      \xAB\u0421\u041A\u0410\u0422-9\xBB"
+    _hudSection: actor_hud_bandit_skat9
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_bandit_skat9
+    _handsModel: {fileID: -1345131713098305638, guid: 58ee79021b5ce6247a91b8c99fea4ae7, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: military_bandit_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\skat_bandit
+    _bodyModel: {fileID: 7885684714876754067, guid: 873c73848f850ea48a0b3f5449a7e4e9, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: military_exo_outfit
+    _displayName: "\u0410\u0440\u043C\u0435\u0439\u0441\u043A\u0438\u0439 \u044D\u043A\u0437\u043E\u0441\u043A\u0435\u043B\u0435\u0442"
+    _hudSection: actor_hud_military_exo
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_military_exo
+    _handsModel: {fileID: 7358024963232269203, guid: 2eeae1b079f4cfe40b04ac6f225b8711, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] I.W.P. exos and animations"
+    _legsSection: military_exo_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\exo_army_outfit
+    _bodyModel: {fileID: -1214755585831147196, guid: 06e034f32d2eaaa4d8d9cecde8498fb5, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 1
+    _resolution: 0
+  - _section: military_exolight_outfit
+    _displayName: "\u0422\u044F\u0436\u0451\u043B\u044B\u0439 \u0430\u0440\u043C\u0435\u0439\u0441\u043A\u0438\u0439
+      \u0431\u0440\u043E\u043D\u0435\u043A\u043E\u0441\u0442\u044E\u043C"
+    _hudSection: actor_hud_military_exolight
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_military_exolight
+    _handsModel: {fileID: -3716741477643416132, guid: 69d9bbe725d303d479f85dd855a8059a, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: military_exolight_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\heavy_exo_noservo_army
+    _bodyModel: {fileID: -2812662575478797437, guid: 84ad22b583c26174cb724d1434b840b7, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: military_freedom_outfit
+    _displayName: "\u0411\u0440\u043E\u043D\u0435\u043A\u043E\u0441\u0442\u044E\u043C
+      \xAB\u0421\u041A\u0410\u0422-9\xBB \xAB\u0421\u0432\u043E\u0431\u043E\u0434\u044B\xBB"
+    _hudSection: actor_hud_freedom_skat9
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_freedom_skat9
+    _handsModel: {fileID: -1484154693120566078, guid: 541d812282d2d6541b376d340661ec6e, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: military_freedom_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\skat_freedom
+    _bodyModel: {fileID: -5853503486067442542, guid: 9faa32781391f4643abe091a314920e6, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: military_merc_outfit
+    _displayName: "\u0411\u0440\u043E\u043D\u0435\u043A\u043E\u0441\u0442\u044E\u043C
+      \xAB\u0421\u041A\u0410\u0422-9\xBB \u043D\u0430\u0451\u043C\u043D\u0438\u043A\u043E\u0432"
+    _hudSection: actor_hud_merc_skat9
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_merc_skat9
+    _handsModel: {fileID: -8864033998230700825, guid: 01bbbb1ec688de44ab0703391b3845a0, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: military_merc_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\skat_merc
+    _bodyModel: {fileID: 5701789173457672841, guid: 7941ceb8d8be53e4c81bd8afe4db7c0a, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: military_monolit_outfit
+    _displayName: "\u0411\u0440\u043E\u043D\u0435\u043A\u043E\u0441\u0442\u044E\u043C
+      \xAB\u0421\u041A\u0410\u0422-9\xBB \xAB\u041C\u043E\u043D\u043E\u043B\u0438\u0442\u0430\xBB"
+    _hudSection: actor_hud_monolith_skat9
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_monolith_skat9
+    _handsModel: {fileID: -1308124112776905077, guid: 63c3caa8e57af244884822460374bb30, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: military_monolit_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\skat_monolith
+    _bodyModel: {fileID: 854448972880795714, guid: b4d3a00c39f479a4e801cc8e697b66de, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: military_outfit
+    _displayName: "\u0411\u0440\u043E\u043D\u0435\u043A\u043E\u0441\u0442\u044E\u043C
+      \xAB\u0421\u041A\u0410\u0422-9\xBB"
+    _hudSection: actor_hud_military_skat9
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_military_skat9
+    _handsModel: {fileID: -3158987099719640364, guid: ce30ed0e608123d4ea89a88965358acd, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: military_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\skat_army
+    _bodyModel: {fileID: -2032159106817469190, guid: 03227f4d1e774f64eb7af7768029d29f, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: military_proto_exo_outfit
+    _displayName: "\u0411\u0440\u043E\u043D\u0435\u043A\u043E\u0441\u0442\u044E\u043C
+      \xAB\u0421\u041A\u0410\u0422-9\xBB \u0441 \u043F\u0440\u043E\u0442\u043E\u044D\u043A\u0437\u043E\u0441\u043A\u0435\u043B\u0435\u0442\u043E\u043C"
+    _hudSection: actor_hud_military_proto
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_military_proto
+    _handsModel: {fileID: -3467464396941652793, guid: 67b0b400016f7414e851b736f4247ab8, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: military_proto_exo_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\exo_proto_army
+    _bodyModel: {fileID: 7411172901115040272, guid: 25bb38b54b829244d94b1eaf116a0287, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 1
+    _resolution: 0
+  - _section: military_sky_outfit
+    _displayName: "\u0411\u0440\u043E\u043D\u0435\u043A\u043E\u0441\u0442\u044E\u043C
+      \u0427\u041D-4\u0431"
+    _hudSection: actor_hud_cs_skat9
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_cs_skat9
+    _handsModel: {fileID: -4051681213334345801, guid: 9cbf8cad48d3fe745a11a696569eeb6e, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: military_sky_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\skat_csky
+    _bodyModel: {fileID: 5257956810277482277, guid: 3b91662b5b96ce4419dc664d8bd7fd49, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: monolith_exo_outfit
+    _displayName: "\u042D\u043A\u0437\u043E\u0441\u043A\u0435\u043B\u0435\u0442 \xAB\u041C\u043E\u043D\u043E\u043B\u0438\u0442\u0430\xBB"
+    _hudSection: actor_hud_monolith_exo
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_monolith_exo
+    _handsModel: {fileID: 6653561928324121151, guid: 18fd7f89afde0a94a8b17b14e7b33c0e, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] I.W.P. exos and animations"
+    _legsSection: monolith_exo_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\exo_monolith_outfit
+    _bodyModel: {fileID: -5977233892423420013, guid: 3b2a5e13bf34aa3499fd34828f8a4a24, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 1
+    _resolution: 0
+  - _section: monolith_exolight_outfit
+    _displayName: "\u0422\u044F\u0436\u0451\u043B\u044B\u0439 \u0431\u0440\u043E\u043D\u0435\u043A\u043E\u0441\u0442\u044E\u043C
+      \xAB\u041C\u043E\u043D\u043E\u043B\u0438\u0442\u0430\xBB"
+    _hudSection: actor_hud_monolith_exolight
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_monolith_exolight
+    _handsModel: {fileID: -1854544992165121601, guid: a157429e68a54f349a3e6b2bfeacc3cd, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: monolith_exolight_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\heavy_exo_noservo_monolith
+    _bodyModel: {fileID: 8882243167691076769, guid: 147ea85fbae6c5f428e67a5dd8d073cf, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: monolith_nbc_outfit
+    _displayName: "\u041A\u043E\u043C\u0431\u0438\u043D\u0435\u0437\u043E\u043D \u0420\u0425\u0411\u0417
+      \xAB\u0427\u0435\u0440\u043D\u043E\u0431\u044B\u043B\u044C\xBB"
+    _hudSection: actor_hud_monolith_nbc
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_monolith_nbc_suit
+    _handsModel: {fileID: -8367229240659671651, guid: 21e9f319f9ac41a4694e856c7254918f, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: monolith_nbc_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\seva_monolith
+    _bodyModel: {fileID: -2189911927502154468, guid: bda9dc5a00a00be4fb916a508a9f5611, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: monolith_nosorog_outfit
+    _displayName: "\u042D\u043A\u0437\u043E\u0441\u043A\u0435\u043B\u0435\u0442 \xAB\u041D\u043E\u0441\u043E\u0440\u043E\u0433\xBB
+      \xAB\u041C\u043E\u043D\u043E\u043B\u0438\u0442\u0430\xBB"
+    _hudSection: actor_hud_monolith_exo_nosorog
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_monolith_exo_nosorog
+    _handsModel: {fileID: 2591178568776474313, guid: 0dca9147a9fcb524baa3dbf58f87bb6e, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] I.W.P. exos and animations"
+    _legsSection: monolith_nosorog_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\exo_monolith_outfit
+    _bodyModel: {fileID: -5977233892423420013, guid: 3b2a5e13bf34aa3499fd34828f8a4a24, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 1
+    _resolution: 0
+  - _section: monolith_outfit
+    _displayName: "\u041A\u043E\u043C\u0431\u0438\u043D\u0435\u0437\u043E\u043D \xAB\u041C\u043E\u043D\u043E\u043B\u0438\u0442\u0430\xBB"
+    _hudSection: actor_hud_monolith_suit
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_monolith_suit
+    _handsModel: {fileID: 1883621139989040309, guid: 67ee00295b03d4749810b2b52669b7a3, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: monolith_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\sts_monolith
+    _bodyModel: {fileID: -2927632442686631402, guid: 1dafacfc6739200438d90acaa7932238, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: monolith_proto_exo_outfit
+    _displayName: "\u041A\u043E\u043C\u0431\u0438\u043D\u0435\u0437\u043E\u043D \xAB\u041C\u043E\u043D\u043E\u043B\u0438\u0442\u0430\xBB
+      \u0441 \u043F\u0440\u043E\u0442\u043E\u044D\u043A\u0437\u043E\u0441\u043A\u0435\u043B\u0435\u0442\u043E\u043C"
+    _hudSection: actor_hud_monolith_proto
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_monolith_proto
+    _handsModel: {fileID: -1120594047803070038, guid: c962a958556c61a458aebc2c7df1d192, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: monolith_proto_exo_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\exo_proto_monolith
+    _bodyModel: {fileID: 1134416769989914905, guid: 8659b6fceef1a74448f23b0f29dc0874, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 1
+    _resolution: 0
+  - _section: monolith_scientific_light_outfit
+    _displayName: "\u041A\u0443\u0441\u0442\u0430\u0440\u043D\u044B\u0439 \u043A\u043E\u043C\u0431\u0438\u043D\u0435\u0437\u043E\u043D
+      \xAB\u041C\u043E\u043D\u043E\u043B\u0438\u0442\u0430\xBB"
+    _hudSection: actor_hud_monolith_light_seva
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_monolith_light_seva
+    _handsModel: {fileID: -7206546834354790184, guid: 8e41845b5d01b1949903eb60c3dd63fa, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: monolith_scientific_light_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\seva_monolith
+    _bodyModel: {fileID: -2189911927502154468, guid: bda9dc5a00a00be4fb916a508a9f5611, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: monolith_scientific_outfit
+    _displayName: "\u041D\u0430\u0443\u0447\u043D\u044B\u0439 \u043A\u043E\u043C\u0431\u0438\u043D\u0435\u0437\u043E\u043D
+      \xAB\u041C\u043E\u043D\u043E\u043B\u0438\u0442\u0430\xBB"
+    _hudSection: actor_hud_monolith_seva
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_monolith_seva
+    _handsModel: {fileID: 1252679804858061476, guid: dc1f05c144b2a284c998c0abc42e5b22, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: monolith_scientific_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\seva_monolith
+    _bodyModel: {fileID: -2189911927502154468, guid: bda9dc5a00a00be4fb916a508a9f5611, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: monolith_trenchcoat_outfit
+    _displayName: "\u041F\u043B\u0430\u0449 \xAB\u041C\u043E\u043D\u043E\u043B\u0438\u0442\u0430\xBB"
+    _hudSection: actor_hud_mono_trenchcoat
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_mono_trench
+    _handsModel: {fileID: 5885876668074343045, guid: 5fcb4c6af151a1241a3155ffbf6714c1, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: monolith_trenchcoat_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\plash_outfit_monolith
+    _bodyModel: {fileID: 3969713128849835551, guid: 0364677eb7615f14cade28aeb8e742b9, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: nbc_dolg_outfit
+    _displayName: "\u041F\u04215-\u041C\u0434 \xAB\u0420\u0425\u0411 \u0437\u0430\u0449\u0438\u0442\u0430\xBB"
+    _hudSection: actor_hud_duty_nbc
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_duty_nbc_suit
+    _handsModel: {fileID: -222950424173967006, guid: 83f93656d0f7ee044a69685697d15310, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: nbc_dolg_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\seva_duty
+    _bodyModel: {fileID: -436683442328998955, guid: 80d31bc276b9e6048a361af9a46c5ebb, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: nbc_freedom_outfit
+    _displayName: "\u041A\u043E\u043C\u0431\u0438\u043D\u0435\u0437\u043E\u043D \xAB\u0425\u0440\u0430\u043D\u0438\u0442\u0435\u043B\u044C
+      \u0441\u0432\u043E\u0431\u043E\u0434\u044B\xBB"
+    _hudSection: actor_hud_freedom_nbc
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_freedom_nbc_suit
+    _handsModel: {fileID: 6954722834938346827, guid: 0a34ec7f39c8bef43bc49ff257440702, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: nbc_freedom_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\seva_freedom
+    _bodyModel: {fileID: 4338396277785615, guid: 13f24334fe4181a4aa5502391a5eeb7a, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: nbc_merc_outfit
+    _displayName: "\u041A\u043E\u043C\u0431\u0438\u043D\u0435\u0437\u043E\u043D \u0420\u0425\u0411\u0417
+      \u041D\u0430\u0451\u043C\u043D\u0438\u043A\u043E\u0432"
+    _hudSection: actor_hud_merc_nbc
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_merc_nbc_suit
+    _handsModel: {fileID: 181540706942887081, guid: 926c4dd42f1c78c47bc7e0d17630351f, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: nbc_merc_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\seva_merc
+    _bodyModel: {fileID: -5453812925586159665, guid: 9a65bbdb98e24f040be41ced447eaf7e, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: nbc_outfit
+    _displayName: "\u041A\u043E\u043C\u0431\u0438\u043D\u0435\u0437\u043E\u043D \u0420\u0425\u0411\u0417"
+    _hudSection: actor_hud_loner_nbc
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_loner_nbc_suit
+    _handsModel: {fileID: -9108575486286556522, guid: 2f60d88aac6321247bebefd6975c8ba1, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: nbc_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\seva_outfit
+    _bodyModel: {fileID: -1009552130342892039, guid: a5cd19b9e808f7f4286f7d51de9fc4c1, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: nomad_outfit
+    _displayName: "\u041A\u043E\u043C\u0431\u0438\u043D\u0435\u0437\u043E\u043D \xAB\u041A\u043E\u0447\u0435\u0432\u043D\u0438\u043A\xBB"
+    _hudSection: actor_hud_nomad
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_nomad
+    _handsModel: {fileID: -5861236781623179170, guid: 9fdb0ab8b25a93646aa4686b5f82e6df, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: nomad_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\nomad_outfit
+    _bodyModel: {fileID: -4271500049818598640, guid: 2785306d973a35b408e9b28480d144ed, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: novice_outfit
+    _displayName: "\u041A\u043E\u0436\u0430\u043D\u0430\u044F \u043A\u0443\u0440\u0442\u043A\u0430"
+    _hudSection: actor_hud_loner_novice
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_loner_novice
+    _handsModel: {fileID: 4918060560076097566, guid: 06f27aa7248674840bbf02b5c4bf9449, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: novice_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\jacket_loner
+    _bodyModel: {fileID: 1186274839728687749, guid: 9ce547afdae7f67449b07a582492c501, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: novice_outfit_camo
+    _displayName: "\u041A\u0443\u0440\u0442\u043A\u0430 \u0441\u0442\u0440\u0435\u043B\u043A\u0430"
+    _hudSection: actor_hud_loner_novice_camo
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_loner_novice_camo
+    _handsModel: {fileID: 5031049969313246177, guid: a213d0b9974765c43bc264c5d8c5aea0, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: novice_outfit_camo_legs
+    _bodyVirtualPath: sm\actor_legs\jacket_camo
+    _bodyModel: {fileID: 7565756873555541191, guid: 88c80decf6f850340b8940083c46bb49, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: novice_outfit_tourist
+    _displayName: "\u041A\u0443\u0440\u0442\u043A\u0430 \u0442\u0443\u0440\u0438\u0441\u0442\u0430"
+    _hudSection: actor_hud_loner_novice_tourist
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_loner_novice_tourist
+    _handsModel: {fileID: 5978672882651291622, guid: f74f7f12e8552514ba9cfebdad03cb5d, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: novice_outfit_tourist_legs
+    _bodyVirtualPath: sm\actor_legs\jacket_tourist
+    _bodyModel: {fileID: -7009952813046527790, guid: 5f0b1a5cbd907c3408a633cd3e67c077, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: redline_novice_outfit
+    _displayName: "\u041A\u0440\u0430\u0441\u043D\u0430\u044F \u043A\u043E\u0436\u0430\u043D\u0430\u044F
+      \u043A\u0443\u0440\u0442\u043A\u0430"
+    _hudSection: actor_hud_redline_novice
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_redline_novice
+    _handsModel: {fileID: -5821225933992629689, guid: f36bb7ee25c1c9b4e97bf4b3814b3e48, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: redline_novice_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\jacket_duty
+    _bodyModel: {fileID: 9060094594251220300, guid: b92de5ac70d44d04ca13f014e35fbdfb, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: renegade_exo_outfit
+    _displayName: "\u042D\u043A\u0437\u043E\u0441\u043A\u0435\u043B\u0435\u0442 \u0440\u0435\u043D\u0435\u0433\u0430\u0442\u043E\u0432"
+    _hudSection: actor_hud_bandit_exo
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_bandit_exo
+    _handsModel: {fileID: 5459461153460131608, guid: eaf498d15a0e6d34b98b14851180f21e, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] I.W.P. exos and animations"
+    _legsSection: renegade_exo_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\exo_bandit_outfit
+    _bodyModel: {fileID: 8613997307721571612, guid: cff02f27b30c3ed42be0e68c385aa0c2, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 1
+    _resolution: 0
+  - _section: renegade_scientific_outfit
+    _displayName: "\xAB\u0421\u0415\u0412\u0410\xBB \u0440\u0435\u043D\u0435\u0433\u0430\u0442\u043E\u0432"
+    _hudSection: actor_hud_renegade_seva
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_renegade_seva
+    _handsModel: {fileID: -3805245843734143306, guid: 608538c57cc83ed4c943555bbd30dfca, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: renegade_scientific_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\seva_bandit
+    _bodyModel: {fileID: -7994084304845902504, guid: 6c0f30b32ca90e84ba0d88ce250a082d, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: renegademerc_outfit
+    _displayName: "\u041B\u0451\u0433\u043A\u0438\u0439 \u043A\u043E\u043C\u0431\u0438\u043D\u0435\u0437\u043E\u043D
+      \u0440\u0435\u043D\u0435\u0433\u0430\u0442\u043E\u0432"
+    _hudSection: actor_hud_renegademerc_outfit
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_merc_rg
+    _handsModel: {fileID: -3159678324748901595, guid: 6594cb78d123ef6459d551121019db11, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: renegademerc_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\renegade_merc_outfit
+    _bodyModel: {fileID: -8471352429509535312, guid: b882c72060b14b845b5e97845722cb1f, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: scientific_outfit
+    _displayName: "\u041A\u043E\u043C\u0431\u0438\u043D\u0435\u0437\u043E\u043D \xAB\u0421\u0415\u0412\u0410\xBB"
+    _hudSection: actor_hud_loner_seva
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_loner_seva
+    _handsModel: {fileID: -2291152244710113079, guid: e41fcc327fc103a4184af04d26e0915c, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: scientific_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\seva_outfit
+    _bodyModel: {fileID: -1009552130342892039, guid: a5cd19b9e808f7f4286f7d51de9fc4c1, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: specops_bandit_outfit
+    _displayName: "\xAB\u0411\u0435\u0440\u0438\u043B\u043B-5\u041C\xBB \u0434\u0435\u0437\u0435\u0440\u0442\u0438\u0440\u0430"
+    _hudSection: actor_hud_bandit_military
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_bandit_military
+    _handsModel: {fileID: 8220955737153026350, guid: 300618049102ca64c963a5f14b7a8ead, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: specops_bandit_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\berill_bandit
+    _bodyModel: {fileID: -3935539702157685260, guid: 6ae21e9f326f99447ba8dee85e47d35b, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: specops_dolg_outfit
+    _displayName: "\u041F\u04215-\u0411 \xAB\u0411\u0435\u0440\u0438\u043B\u043B\u0438\u0435\u0432\u0430\u044F
+      \u0437\u0430\u0449\u0438\u0442\u0430\xBB"
+    _hudSection: actor_hud_duty_military
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_duty_military
+    _handsModel: {fileID: -1615570422543582831, guid: e43a9881e95fb4c45bb9f81eca4aaa72, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: specops_dolg_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\berill_duty
+    _bodyModel: {fileID: -3796437441579791355, guid: 722f838282e33a44087b0c85e8472c54, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: specops_merc_outfit
+    _displayName: "\u0411\u0440\u043E\u043D\u0435\u043A\u043E\u0441\u0442\u044E\u043C
+      \xAB\u0411\u0435\u0440\u0438\u043B\u043B-5\u041C\xBB \u043D\u0430\u0451\u043C\u043D\u0438\u043A\u043E\u0432"
+    _hudSection: actor_hud_merc_military
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_merc_military
+    _handsModel: {fileID: 3655670713074943476, guid: 84316c827e54423459e7cd35b59948c9, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: specops_merc_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\berill_merc
+    _bodyModel: {fileID: 4635114326342246555, guid: f9fa11c80b460914db0fb6765e7b4630, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: specops_outfit
+    _displayName: "\u0411\u0440\u043E\u043D\u0435\u043A\u043E\u0441\u0442\u044E\u043C
+      \xAB\u0411\u0435\u0440\u0438\u043B\u043B-5\u041C\xBB"
+    _hudSection: actor_hud_military_berill
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_military_berill
+    _handsModel: {fileID: -6129055974572405174, guid: d501ab89f7ebbeb42b56e37f9f23de88, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: specops_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\berill_army
+    _bodyModel: {fileID: -4249946950994499916, guid: 5f1f13a494aaa544293e927230bd50d8, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: stalker_autumn_outfit
+    _displayName: "\u041A\u043E\u043C\u0431\u0438\u043D\u0435\u0437\u043E\u043D \xAB\u041B\u0435\u0441\u043D\u0430\u044F
+      \u0437\u0430\u0440\u044F\xBB"
+    _hudSection: actor_hud_loner_autumn
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_loner_sunrise_autumn
+    _handsModel: {fileID: 3273256082128109883, guid: a55f18367f00c88449dbb2378b76ce82, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: stalker_autumn_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\stalker_outfit_autumn
+    _bodyModel: {fileID: -2653753943320542500, guid: 82306d9713240ee43a8c257abd4e137e, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: stalker_bear_outfit
+    _displayName: "\u041A\u043E\u043C\u0431\u0438\u043D\u0435\u0437\u043E\u043D \xAB\u041C\u0435\u0434\u0432\u0435\u0434\u044C\xBB"
+    _hudSection: actor_hud_loner_graphite
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_loner_sunrise_graphite
+    _handsModel: {fileID: 6883249697335237917, guid: 75fd72c4423341b459ca69ba02596eda, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: stalker_bear_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\stalker_outfit_bear
+    _bodyModel: {fileID: -7434423535886447466, guid: df2c898274f78db44852ee8e67508d65, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: stalker_drought_outfit
+    _displayName: "\u041A\u043E\u043C\u0431\u0438\u043D\u0435\u0437\u043E\u043D \xAB\u0421\u043A\u0438\u0442\u0430\u043B\u0435\u0446\xBB"
+    _hudSection: actor_hud_loner_drought
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_loner_sunrise_drought
+    _handsModel: {fileID: -7807450387055733587, guid: 8ff7f3a51925e604283b7f4b7c79976a, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: stalker_drought_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\stalker_outfit_drought
+    _bodyModel: {fileID: 316330722387207958, guid: c7f34d6394e3bf848a380d52f63f306a, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: stalker_graphite_outfit
+    _displayName: "\u041A\u043E\u043C\u0431\u0438\u043D\u0435\u0437\u043E\u043D \xAB\u0413\u0440\u0430\u0444\u0438\u0442\xBB"
+    _hudSection: actor_hud_loner_graphite
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_loner_sunrise_graphite
+    _handsModel: {fileID: 6883249697335237917, guid: 75fd72c4423341b459ca69ba02596eda, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: stalker_graphite_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\stalker_outfit_graphite
+    _bodyModel: {fileID: 3029676045424182907, guid: ab2c97d427005ac42b1447be44411da5, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: stalker_outfit
+    _displayName: "\u041A\u043E\u043C\u0431\u0438\u043D\u0435\u0437\u043E\u043D \xAB\u0417\u0430\u0440\u044F\xBB"
+    _hudSection: actor_hud_loner_sunrise
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_loner_sunrise
+    _handsModel: {fileID: 5842150276257697712, guid: 3a7dba4268412394d8b512fb5a90d812, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: stalker_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\stalker_outfit
+    _bodyModel: {fileID: 9193538156750292212, guid: cc59360da0fb35648b1fbf0a6f08c793, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: stalker_predator_outfit
+    _displayName: "\u041A\u043E\u043C\u0431\u0438\u043D\u0435\u0437\u043E\u043D \xAB\u041E\u0445\u043E\u0442\u043D\u0438\u043A\xBB"
+    _hudSection: actor_hud_loner_predator
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_loner_sunrise_predator
+    _handsModel: {fileID: 9215282680948492231, guid: 540b6349995923140becb918ce283894, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: stalker_predator_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\stalker_outfit_predator
+    _bodyModel: {fileID: 322677283718261259, guid: a19971bd5116a6941aabe300cca6f597, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: stalker_proto_exo_outfit
+    _displayName: "\u041A\u043E\u043C\u0431\u0438\u043D\u0435\u0437\u043E\u043D \xAB\u0417\u0430\u0440\u044F\xBB
+      \u0441 \u043F\u0440\u043E\u0442\u043E\u044D\u043A\u0437\u043E\u0441\u043A\u0435\u043B\u0435\u0442\u043E\u043C"
+    _hudSection: actor_hud_loner_proto
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_loner_proto
+    _handsModel: {fileID: -1952312971768204248, guid: 9b43588a67211594ea25d0c7529f709f, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: stalker_proto_exo_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\exo_proto_stalker
+    _bodyModel: {fileID: 4047255450916359657, guid: c66a14e2783ca4143958f4433b41d254, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 1
+    _resolution: 0
+  - _section: stalker_salamander_outfit
+    _displayName: "\u041A\u043E\u043C\u0431\u0438\u043D\u0435\u0437\u043E\u043D \xAB\u042F\u0449\u0435\u0440\xBB"
+    _hudSection: actor_hud_loner_salamander
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_loner_sunrise_salamander
+    _handsModel: {fileID: -8918064050167957348, guid: 53813f760e474254dab4f28eca20dc42, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: stalker_salamander_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\stalker_outfit_salamander
+    _bodyModel: {fileID: 4502676147563849972, guid: 87f19865b18d37840be93066b8b25da8, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: stalker_tigerstripe_outfit
+    _displayName: "\u041A\u043E\u043C\u0431\u0438\u043D\u0435\u0437\u043E\u043D \u0441
+      \u0442\u0438\u0433\u0440\u043E\u0432\u044B\u043C\u0438 \u043F\u043E\u043B\u043E\u0441\u0430\u043C\u0438"
+    _hudSection: actor_hud_loner_tigerstripe
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_loner_sunrise_Tigerstripe
+    _handsModel: {fileID: -1203388092777428417, guid: 5496564b68c9ce549a3d3703dcd636af, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: stalker_tigerstripe_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\stalker_outfit_tiger
+    _bodyModel: {fileID: -1963515236702802797, guid: 99ca77a765feda34787fea2e29cf3c44, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: svoboda_exo_outfit
+    _displayName: "\u042D\u043A\u0437\u043E\u0441\u043A\u0435\u043B\u0435\u0442 \xAB\u0411\u0430\u0441\u0442\u0438\u043E\u043D
+      \u0441\u0432\u043E\u0431\u043E\u0434\u044B\xBB"
+    _hudSection: actor_hud_freedom_exo
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_freedom_exo
+    _handsModel: {fileID: 1508147156278768601, guid: 595ec9a80b31aba458b1d3a391425ed3, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] I.W.P. exos and animations"
+    _legsSection: svoboda_exo_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\exo_freedom_outfit
+    _bodyModel: {fileID: -5204187161046711898, guid: 5d210aa54f20e8940a3362853defe713, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 1
+    _resolution: 0
+  - _section: svoboda_exolight_outfit
+    _displayName: "\u0422\u044F\u0436\u0451\u043B\u044B\u0439 \u0431\u0440\u043E\u043D\u0435\u043A\u043E\u0441\u0442\u044E\u043C
+      \xAB\u0412\u043E\u0438\u043D \u0441\u0432\u043E\u0431\u043E\u0434\u044B\xBB"
+    _hudSection: actor_hud_freedom_exolight
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_freedom_exolight
+    _handsModel: {fileID: -5001029688154625912, guid: 501d048c51b47ea4cbca7d2c4c210042, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: svoboda_exolight_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\heavy_exo_noservo_freedom
+    _bodyModel: {fileID: -2369208420656227109, guid: b870237d39656ae48a5ad0e1e7c518d3, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: svoboda_heavy_outfit
+    _displayName: "\u041A\u043E\u043C\u0431\u0438\u043D\u0435\u0437\u043E\u043D \xAB\u0421\u0442\u0440\u0430\u0436
+      \u0441\u0432\u043E\u0431\u043E\u0434\u044B\xBB"
+    _hudSection: actor_hud_freedom_guard
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_freedom_guard
+    _handsModel: {fileID: 6555699364021120925, guid: 25cf360a823c9844eaa04bee01d2bb5e, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: svoboda_heavy_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\berill_freedom
+    _bodyModel: {fileID: -3544838283555194713, guid: ee61c7fbe65e8e14a91211bf50572ffc, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: svoboda_heavy_outfit_2
+    _displayName: "\u041A\u043E\u043C\u0431\u0438\u043D\u0435\u0437\u043E\u043D \xAB\u0421\u0442\u0440\u0430\u0436
+      \u0441\u0432\u043E\u0431\u043E\u0434\u044B\xBB \u041C2"
+    _hudSection: actor_hud_freedom_guardian
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_freedom_guardian
+    _handsModel: {fileID: 4743208128447996969, guid: 8ed9c404181b4df458bbeabaf1207caf, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: svoboda_heavy_outfit_2_legs
+    _bodyVirtualPath: sm\actor_legs\ps5_freedom
+    _bodyModel: {fileID: -284098040462690999, guid: 314b16462b1b2234a90c2f67337d8d07, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: svoboda_light_outfit
+    _displayName: "\u041A\u043E\u043C\u0431\u0438\u043D\u0435\u0437\u043E\u043D \xAB\u0412\u0435\u0442\u0435\u0440
+      \u0441\u0432\u043E\u0431\u043E\u0434\u044B\xBB"
+    _hudSection: actor_hud_freedom_wind
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_freedom_wind
+    _handsModel: {fileID: -5492206691442018546, guid: eef2f077a73ce0a47b369ad511972926, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: svoboda_light_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\sts_freedom
+    _bodyModel: {fileID: -931539073924401512, guid: f26ffd906f097c7418777af59e259adf, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: svoboda_light_proto_exo_outfit
+    _displayName: "\u041A\u043E\u043C\u0431\u0438\u043D\u0435\u0437\u043E\u043D \xAB\u0412\u0435\u0442\u0435\u0440
+      \u0441\u0432\u043E\u0431\u043E\u0434\u044B\xBB \u0441 \u043F\u0440\u043E\u0442\u043E\u044D\u043A\u0437\u043E\u0441\u043A\u0435\u043B\u0435\u0442\u043E\u043C"
+    _hudSection: actor_hud_freedom_proto
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_freedom_proto
+    _handsModel: {fileID: -4676007896318110965, guid: 4c9e7e31b3b166744858d02203ceebdc, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: svoboda_light_proto_exo_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\exo_proto_freedom
+    _bodyModel: {fileID: -542329117507403468, guid: d10da4f84761fca4ba7b29027d039cb2, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 1
+    _resolution: 0
+  - _section: svoboda_novice_outfit
+    _displayName: "\u041A\u0443\u0440\u0442\u043A\u0430 \xAB\u0421\u0432\u043E\u0431\u043E\u0434\u044B\xBB"
+    _hudSection: actor_hud_freedom_novice
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_freedom_novice
+    _handsModel: {fileID: -468970251532474909, guid: ac8ecc36ae1bad2429f37167a7dc2ec7, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: svoboda_novice_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\jacket_freedom
+    _bodyModel: {fileID: 7900434397022214373, guid: 11772ff3ba599e14883321f5b26cac56, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: svoboda_scientific_outfit
+    _displayName: "\u041A\u043E\u043C\u0431\u0438\u043D\u0435\u0437\u043E\u043D \xAB\u0418\u0441\u043A\u0430\u0442\u0435\u043B\u044C
+      \u0441\u0432\u043E\u0431\u043E\u0434\u044B\xBB"
+    _hudSection: actor_hud_freedom_seva
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_freedom_seva
+    _handsModel: {fileID: 5536107966375038141, guid: adf76895d671ee44bbb32aa597f7bbf5, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: svoboda_scientific_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\seva_freedom
+    _bodyModel: {fileID: 4338396277785615, guid: 13f24334fe4181a4aa5502391a5eeb7a, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: travel_outfit
+    _displayName: "\u041A\u043E\u043C\u0431\u0438\u043D\u0435\u0437\u043E\u043D \u0431\u0430\u0440\u0430\u0445\u043E\u043B\u044C\u0449\u0438\u043A\u0430"
+    _hudSection: actor_hud_travel
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_travel
+    _handsModel: {fileID: 4382526727170748522, guid: 1600a0620be344040b10f0e3a1f2d55e, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: travel_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\stalker_outfit_salamander
+    _bodyModel: {fileID: 4502676147563849972, guid: 87f19865b18d37840be93066b8b25da8, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: trenchcoat_brown_outfit
+    _displayName: "\u0422\u044F\u0436\u0451\u043B\u044B\u0439 \u043A\u043E\u0440\u0438\u0447\u043D\u0435\u0432\u044B\u0439
+      \u043F\u043B\u0430\u0449"
+    _hudSection: actor_hud_brown_trenchcoat
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_brown_trench
+    _handsModel: {fileID: 3755374458427302271, guid: b496dd92183e2b94aa60a6f0ed286800, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: trenchcoat_brown_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\plash_outfit_brown
+    _bodyModel: {fileID: 6754982184294095633, guid: c3a1f01fca5855f4db4c6c757a0172ee, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: trenchcoat_dolg_brown_outfit
+    _displayName: "\u041F\u043B\u043E\u0442\u043D\u044B\u0439 \u043F\u043B\u0430\u0449
+      \xAB\u0414\u043E\u043B\u0433\u0430\xBB"
+    _hudSection: actor_hud_duty_trench
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_duty_trench
+    _handsModel: {fileID: -1041191300936207838, guid: 24718d5418a275945a45ffdcf30bde6e, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: trenchcoat_dolg_brown_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\plash_outfit_black
+    _bodyModel: {fileID: -914924563520002778, guid: e8a4135f8de75e247b4b4557015fd26f, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: trenchcoat_freedom_brown_outfit
+    _displayName: "\u041F\u043B\u043E\u0442\u043D\u044B\u0439 \u043F\u043B\u0430\u0449
+      \xAB\u0421\u0432\u043E\u0431\u043E\u0434\u044B\xBB"
+    _hudSection: actor_hud_freedom_trench
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_freedom_trench
+    _handsModel: {fileID: 437818077132462590, guid: bd63141890eec7e42be56da3172d3ac6, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: trenchcoat_freedom_brown_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\plash_outfit_green
+    _bodyModel: {fileID: 5444053635338275760, guid: 844492473f9ee8e40818a23c163632fa, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: trenchcoat_green_outfit
+    _displayName: "\u0422\u044F\u0436\u0451\u043B\u044B\u0439 \u0437\u0435\u043B\u0451\u043D\u044B\u0439
+      \u043F\u043B\u0430\u0449"
+    _hudSection: actor_hud_green_trenchcoat
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_green_trench
+    _handsModel: {fileID: -3108873835881608588, guid: 4f0a7e2334b612e41b94058deb31586b, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: trenchcoat_green_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\plash_outfit_green
+    _bodyModel: {fileID: 5444053635338275760, guid: 844492473f9ee8e40818a23c163632fa, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: trenchcoat_outfit
+    _displayName: "\u041F\u043B\u0430\u0449"
+    _hudSection: actor_hud_bandit_trench
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_bandit_trench
+    _handsModel: {fileID: 2936194586699892319, guid: f55d0e25b56a1904b8a7a33e8a790fd1, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: trenchcoat_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\plash_outfit_black
+    _bodyModel: {fileID: -914924563520002778, guid: e8a4135f8de75e247b4b4557015fd26f, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0
+  - _section: wastelander_outfit
+    _displayName: "\u0417\u0430\u0449\u0438\u0442\u043D\u044B\u0439 \u043A\u043E\u043C\u0431\u0438\u043D\u0435\u0437\u043E\u043D
+      \xAB\u041F\u043E\u0438\u0441\u043A\u043E\u0432\u0438\u043A\xBB"
+    _hudSection: actor_hud_wastelander
+    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_wastelander
+    _handsModel: {fileID: -23039816747047498, guid: 18b788002c9507f49bb88e1c75b9c8ea, type: 3}
+    _handsSource: "[\u0420\u0443\u043A\u0438] T.H.A.P. Rework 2.3.0 (Light)"
+    _legsSection: wastelander_outfit_legs
+    _bodyVirtualPath: sm\actor_legs\stalker_outfit_autumn
+    _bodyModel: {fileID: -2653753943320542500, guid: 82306d9713240ee43a8c257abd4e137e, type: 3}
+    _bodySource: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body"
+    _bodyAnimations: {fileID: 11400000, guid: 21bba6e271abf6642a6b2c8e12d2af32, type: 2}
+    _isExoskeleton: 0
+    _resolution: 0

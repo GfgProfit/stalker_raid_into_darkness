@@ -1,0 +1,40 @@
+fileFormatVersion: 2
+guid: aec4bf389b833bb41aded3a86aad8ce2
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: act\act_arm_sviter_1|models\model
+    second: {fileID: 2100000, guid: caa674d5a366eb344a66f6221acb643b, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: act\cod_bo2_nano_gloves|models\model
+    second: {fileID: 2100000, guid: 9721aae5a9ec30b49aedf3512cddb274, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: act\cod_bo2_tactical_hands_isg|models\model
+    second: {fileID: 2100000, guid: e07509bdc610fcd4a8c5a126fe091b2a, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: act\exos\act_arm_exo_isg|models\model
+    second: {fileID: 2100000, guid: 79d9eadb7626df245a1f963dc7d00101, type: 2}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 61e536e21e96f284493f2969a9250cdf, type: 3}
+  _scale: 1
+  _importMaterials: 1
+  _texturesFolder: 
+  _searchTexturesByName: 1
+  _importEmbeddedMotions: 0
+  _embeddedLoopMode: 0
+  _addAnimator: 1
+  _readableMeshes: 0
+  _updateWhenOffscreen: 0
+  _autoResolveResources: 1

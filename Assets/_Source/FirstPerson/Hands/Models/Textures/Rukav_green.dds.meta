@@ -1,0 +1,23 @@
+fileFormatVersion: 2
+guid: b8ee26655190d044fa8044e436f71c97
+IHVImageFormatImporter:
+  externalObjects: {}
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 0
+    wrapV: 0
+    wrapW: 0
+  isReadable: 0
+  sRGBTexture: 1
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  ignoreMipmapLimit: 0
+  mipmapLimitGroupName: 
+  userData: "xray-asset:{\"_key\":\"textures/act/new_hands/skat9/rukav_green.dds#albedo\",\"_role\":\"Albedo\",\"_source\":\"[\u0420\u0443\u043A\u0438]
+    T.H.A.P. Rework 2.3.0 (Light)\",\"_sourcePath\":\"D:\\\\GRA2.5\\\\MO2\\\\mods\\\\[\u0420\u0443\u043A\u0438]
+    T.H.A.P. Rework 2.3.0 (Light)\\\\gamedata\\\\textures\\\\act\\\\New_hands\\\\Skat9\\\\Rukav_green.dds\",\"_stamp\":\"5592560:638556961220000000\"}"
+  assetBundleName: 
+  assetBundleVariant: 

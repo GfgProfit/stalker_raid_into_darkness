@@ -1,0 +1,22 @@
+fileFormatVersion: 2
+guid: 6bcfd34a0ccb7074bb3e66de2290b1bf
+IHVImageFormatImporter:
+  externalObjects: {}
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 0
+    wrapV: 0
+    wrapW: 0
+  isReadable: 0
+  sRGBTexture: 1
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  ignoreMipmapLimit: 0
+  mipmapLimitGroupName: 
+  userData: xray-asset:{"_key":"textures/act/act_dol2aold.dds#albedo","_role":"Albedo","_source":"Base
+    Anomaly","_sourcePath":"D:\\GRA2.5\\Anomaly 1.5.3 up\\tools\\_unpacked\\textures\\act\\act_dol2aold.dds","_stamp":"699192:639278671863089743"}
+  assetBundleName: 
+  assetBundleVariant: 

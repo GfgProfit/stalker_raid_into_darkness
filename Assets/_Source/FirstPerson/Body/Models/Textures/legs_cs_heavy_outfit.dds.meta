@@ -1,0 +1,23 @@
+fileFormatVersion: 2
+guid: 6d9a9315dc17deb49bf96749ae285931
+IHVImageFormatImporter:
+  externalObjects: {}
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 0
+    wrapV: 0
+    wrapW: 0
+  isReadable: 0
+  sRGBTexture: 1
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  ignoreMipmapLimit: 0
+  mipmapLimitGroupName: 
+  userData: "xray-asset:{\"_key\":\"textures/shoker_mod/act/legs/legs_cs_heavy_outfit.dds#albedo\",\"_role\":\"Albedo\",\"_source\":\"[\u041C\u043E\u0434\u0435\u043B\u0438]
+    Swm_Visible_Body\",\"_sourcePath\":\"D:\\\\GRA2.5\\\\MO2\\\\mods\\\\[\u041C\u043E\u0434\u0435\u043B\u0438]
+    Swm_Visible_Body\\\\gamedata\\\\textures\\\\shoker_mod\\\\act\\\\legs\\\\legs_cs_heavy_outfit.dds\",\"_stamp\":\"2097280:635263188180000000\"}"
+  assetBundleName: 
+  assetBundleVariant: 

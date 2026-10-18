@@ -1,0 +1,35 @@
+fileFormatVersion: 2
+guid: 4f0a7e2334b612e41b94058deb31586b
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: act\act_arm_cloak_brown_g|models\model
+    second: {fileID: 2100000, guid: 1cfde9eeb0e56ba4fad13e9fbe771411, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: act\homefront_dolg_gloves|models\model
+    second: {fileID: 2100000, guid: 21eb39c567facbf41b11e296473723b6, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: act\new_hands\bare_hands\hand|models\model
+    second: {fileID: 2100000, guid: bdf405c162b788240b4e374f5f0c8294, type: 2}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 61e536e21e96f284493f2969a9250cdf, type: 3}
+  _scale: 1
+  _importMaterials: 1
+  _texturesFolder: 
+  _searchTexturesByName: 1
+  _importEmbeddedMotions: 0
+  _embeddedLoopMode: 0
+  _addAnimator: 1
+  _readableMeshes: 0
+  _updateWhenOffscreen: 0
+  _autoResolveResources: 1

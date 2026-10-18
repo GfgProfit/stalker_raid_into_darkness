@@ -1,0 +1,30 @@
+fileFormatVersion: 2
+guid: b7173db793d60b0459bb55bf85bb74ef
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: act\act_arm_homefront_green|models\model
+    second: {fileID: 2100000, guid: b5e764f4839d8ba4088af5113d04596a, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: act\exos\act_arm_exo_freedom_vineleaf|models\model
+    second: {fileID: 2100000, guid: ad4eb7decb2d7374db075234c1d4bd47, type: 2}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 61e536e21e96f284493f2969a9250cdf, type: 3}
+  _scale: 1
+  _importMaterials: 1
+  _texturesFolder: 
+  _searchTexturesByName: 1
+  _importEmbeddedMotions: 0
+  _embeddedLoopMode: 0
+  _addAnimator: 1
+  _readableMeshes: 0
+  _updateWhenOffscreen: 0
+  _autoResolveResources: 1

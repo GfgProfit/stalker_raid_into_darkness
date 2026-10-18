@@ -1,0 +1,35 @@
+fileFormatVersion: 2
+guid: e5261ee157ea44349bb47d231bf4137e
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: act\New_hands\bare_hands\hand|models\model
+    second: {fileID: 2100000, guid: 60b9f5433765444419269b78bba1d92d, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: act\act_arm_bo2_pmc|models\model
+    second: {fileID: 2100000, guid: 7d7dd6f623aa25445a0bbff9b9208b43, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: act\cod_mwr_isg|models\model
+    second: {fileID: 2100000, guid: 1396d378223d48744950f816e1c3a35f, type: 2}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 61e536e21e96f284493f2969a9250cdf, type: 3}
+  _scale: 1
+  _importMaterials: 1
+  _texturesFolder: 
+  _searchTexturesByName: 1
+  _importEmbeddedMotions: 0
+  _embeddedLoopMode: 0
+  _addAnimator: 1
+  _readableMeshes: 0
+  _updateWhenOffscreen: 0
+  _autoResolveResources: 1

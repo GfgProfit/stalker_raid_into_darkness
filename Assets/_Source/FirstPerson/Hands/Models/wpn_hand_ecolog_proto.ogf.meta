@@ -1,0 +1,40 @@
+fileFormatVersion: 2
+guid: 22af6de4c45d83d4bafcc1e03a1c628f
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: act\act_arm_ecologist_merc|models\model
+    second: {fileID: 2100000, guid: 2e1eaf7c2edce784cae8e2c407f8516b, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: act\act_arm_sviter_1|models\model
+    second: {fileID: 2100000, guid: caa674d5a366eb344a66f6221acb643b, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: act\cod_bo2_nano_gloves|models\model
+    second: {fileID: 2100000, guid: 9721aae5a9ec30b49aedf3512cddb274, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: act\exos\act_arm_exo_eco|models\model
+    second: {fileID: 2100000, guid: 5debfe1a6c4686f4dafcfa91f75d12a6, type: 2}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 61e536e21e96f284493f2969a9250cdf, type: 3}
+  _scale: 1
+  _importMaterials: 1
+  _texturesFolder: 
+  _searchTexturesByName: 1
+  _importEmbeddedMotions: 0
+  _embeddedLoopMode: 0
+  _addAnimator: 1
+  _readableMeshes: 0
+  _updateWhenOffscreen: 0
+  _autoResolveResources: 1

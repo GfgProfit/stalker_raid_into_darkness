@@ -1,0 +1,35 @@
+fileFormatVersion: 2
+guid: 0b47083bb583c8f43b937a945a334fca
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: act\act_ghillie|models\selflight_det_3
+    second: {fileID: 2100000, guid: 89799c1fa5399504f83f80d3f1a6997f, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: act\act_sold_bandan_head_3|models\selflight_det_3
+    second: {fileID: 2100000, guid: 1ceb679f88999f14fb6026c34048c6ce, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: majordolg\ghill|models\selflight_det_3
+    second: {fileID: 2100000, guid: 079aaa36d0d080441bc78a8591c11055, type: 2}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 61e536e21e96f284493f2969a9250cdf, type: 3}
+  _scale: 1
+  _importMaterials: 1
+  _texturesFolder: 
+  _searchTexturesByName: 1
+  _importEmbeddedMotions: 1
+  _embeddedLoopMode: 0
+  _addAnimator: 1
+  _readableMeshes: 0
+  _updateWhenOffscreen: 0
+  _autoResolveResources: 1

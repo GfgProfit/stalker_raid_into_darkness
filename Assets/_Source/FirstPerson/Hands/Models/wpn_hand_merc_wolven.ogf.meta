@@ -1,0 +1,30 @@
+fileFormatVersion: 2
+guid: 5e9f841c463480042afe0297760da164
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: act\cod_ghosts_oakley_gloves_black|models\model
+    second: {fileID: 2100000, guid: 679dbd6e8518eda49aa5f8519a67dc02, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: act\cod_mwr_merc_camo|models\model
+    second: {fileID: 2100000, guid: 32a63a9da6878bd49bc53c1ffd324a06, type: 2}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 61e536e21e96f284493f2969a9250cdf, type: 3}
+  _scale: 1
+  _importMaterials: 1
+  _texturesFolder: 
+  _searchTexturesByName: 1
+  _importEmbeddedMotions: 0
+  _embeddedLoopMode: 0
+  _addAnimator: 1
+  _readableMeshes: 0
+  _updateWhenOffscreen: 0
+  _autoResolveResources: 1

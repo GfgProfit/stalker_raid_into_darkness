@@ -1,0 +1,45 @@
+fileFormatVersion: 2
+guid: 45220483de432fe42804fa3d80d2ec99
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: act\cod_bo2_exo_gloves|models\model
+    second: {fileID: 2100000, guid: 53b53f50e0f62964f9a86d57231f5da6, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: act\cod_bo2_nano_gloves|models\model
+    second: {fileID: 2100000, guid: 9721aae5a9ec30b49aedf3512cddb274, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: act\cod_ghosts_exo_computer_glass|models\model
+    second: {fileID: 2100000, guid: 00674026f11e8e94ea59d31d4ddd7f5e, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: act\cod_ghosts_exo_computer|models\weapons
+    second: {fileID: 2100000, guid: f75709826e4bd4245b5cea56438561ad, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: act\exos\act_arm_1_exo|models\model
+    second: {fileID: 2100000, guid: f6c1778652f090240a1873246d47e50f, type: 2}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 61e536e21e96f284493f2969a9250cdf, type: 3}
+  _scale: 1
+  _importMaterials: 1
+  _texturesFolder: 
+  _searchTexturesByName: 1
+  _importEmbeddedMotions: 0
+  _embeddedLoopMode: 0
+  _addAnimator: 1
+  _readableMeshes: 0
+  _updateWhenOffscreen: 0
+  _autoResolveResources: 1

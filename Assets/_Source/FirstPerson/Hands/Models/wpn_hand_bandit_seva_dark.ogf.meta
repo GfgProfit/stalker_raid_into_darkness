@@ -1,0 +1,30 @@
+fileFormatVersion: 2
+guid: d62d370ed6ee14f4a9555f6253b3e1bc
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: act\cod_bo2_stalker_sleeves|models\model
+    second: {fileID: 2100000, guid: 0b593f142c9b68449a6b00b2f4e78079, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: act\cod_mwr_bandit|models\model
+    second: {fileID: 2100000, guid: 74172d1bf3cbd7140bae3eeb01338a9f, type: 2}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 61e536e21e96f284493f2969a9250cdf, type: 3}
+  _scale: 1
+  _importMaterials: 1
+  _texturesFolder: 
+  _searchTexturesByName: 1
+  _importEmbeddedMotions: 0
+  _embeddedLoopMode: 0
+  _addAnimator: 1
+  _readableMeshes: 0
+  _updateWhenOffscreen: 0
+  _autoResolveResources: 1

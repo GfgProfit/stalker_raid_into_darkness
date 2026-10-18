@@ -1,0 +1,862 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5dbbb1c8ec5ef524792647df9aa61c77, type: 3}
+  m_Name: BodyAnimationLibrary
+  m_EditorClassIdentifier: RaidIntoDarkness.FirstPerson::RaidIntoDarkness.FirstPerson.BodyAnimationLibrary
+  _sourceScript: "[\u041C\u043E\u0434\u0435\u043B\u0438] Swm_Visible_Body :: scripts/swm_legs.script"
+  _motionLibraries:
+  - {fileID: 8815230551390286010, guid: ad4fe755f3a2fb64a8c4fd0645c6e33b, type: 3}
+  - {fileID: 8815230551390286010, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+  _nonCombat:
+  - _flags: 0
+    _motion: leg_stand_idle
+    _clip: {fileID: -7465242720750695351, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 32
+    _motion: leg_stand_idle
+    _clip: {fileID: -7465242720750695351, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 33
+    _motion: leg_stand_walk_fwd_shift
+    _clip: {fileID: -4884037004228166015, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 37
+    _motion: leg_stand_walk_fwd_left_shift
+    _clip: {fileID: 1411514545008003035, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 41
+    _motion: leg_stand_walk_fwd_right_shift
+    _clip: {fileID: -2244794067321833941, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 34
+    _motion: leg_stand_walk_back_shift
+    _clip: {fileID: -1464960680801399043, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 38
+    _motion: leg_stand_walk_back_left_shift
+    _clip: {fileID: 7191468801090644767, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 42
+    _motion: leg_stand_walk_back_right_shift
+    _clip: {fileID: -1648316007584727121, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 40
+    _motion: leg_stand_walk_right_shift
+    _clip: {fileID: 7273831461671412778, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 36
+    _motion: leg_stand_walk_left_shift
+    _clip: {fileID: -2367907820917158366, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 16
+    _motion: leg_crouch_idle
+    _clip: {fileID: 7091325097746540251, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 17
+    _motion: leg_crouch_walk_fwd
+    _clip: {fileID: 6265894994251454734, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 21
+    _motion: lancew_legs_moving_fl_c
+    _clip: {fileID: 1560465670150584297, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 25
+    _motion: lancew_legs_moving_fr_c
+    _clip: {fileID: -6428463774632881500, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 18
+    _motion: leg_crouch_walk_back
+    _clip: {fileID: -2201098771575646033, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 22
+    _motion: lancew_legs_moving_bl_c
+    _clip: {fileID: 9031743039601790012, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 26
+    _motion: lancew_legs_moving_br_c
+    _clip: {fileID: 8551994030827199291, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 20
+    _motion: leg_crouch_walk_left
+    _clip: {fileID: 7808721192707975290, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 24
+    _motion: leg_crouch_walk_right
+    _clip: {fileID: 2096042720772133497, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  _slowedDown:
+  - _flags: 4097
+    _motion: lancew_legs_moving
+    _clip: {fileID: -6880402639993475763, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 4101
+    _motion: lancew_legs_moving_fl
+    _clip: {fileID: 1779266633477690700, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 4105
+    _motion: lancew_legs_moving_fr
+    _clip: {fileID: 4844932069063418986, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 1
+    _motion: leg_stand_walk_fwd
+    _clip: {fileID: -6591572613829653715, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 5
+    _motion: leg_stand_walk_fwd_left
+    _clip: {fileID: -4932958360401025061, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 9
+    _motion: leg_stand_walk_fwd_right
+    _clip: {fileID: -5824370207633174986, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 17
+    _motion: lancew_legs_moving_c
+    _clip: {fileID: -3598085683224841694, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 21
+    _motion: lancew_legs_moving_fl_c
+    _clip: {fileID: 1560465670150584297, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 25
+    _motion: lancew_legs_moving_fr_c
+    _clip: {fileID: -6428463774632881500, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 2
+    _motion: leg_stand_walk_back_shift
+    _clip: {fileID: -1464960680801399043, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 6
+    _motion: leg_stand_walk_back_left_shift
+    _clip: {fileID: 7191468801090644767, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 10
+    _motion: leg_stand_walk_back_right_shift
+    _clip: {fileID: -1648316007584727121, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 18
+    _motion: lancew_legs_moving_b_c
+    _clip: {fileID: -6528952299725728844, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 22
+    _motion: lancew_legs_moving_bl_c
+    _clip: {fileID: 9031743039601790012, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 26
+    _motion: lancew_legs_moving_br_c
+    _clip: {fileID: 8551994030827199291, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 4
+    _motion: leg_stand_walk_left_shift
+    _clip: {fileID: -2367907820917158366, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 20
+    _motion: lancew_legs_moving_l_c
+    _clip: {fileID: 2988836347128297940, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 8
+    _motion: leg_stand_walk_right_shift
+    _clip: {fileID: 7273831461671412778, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 24
+    _motion: lancew_legs_moving_r_c
+    _clip: {fileID: -5649685828708974736, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  _basic:
+  - _flags: 0
+    _motion: lancew_legs_idle
+    _clip: {fileID: 3339031967465149789, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 16
+    _motion: lancew_legs_idle_c
+    _clip: {fileID: -7369152412508752671, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 32
+    _motion: lancew_legs_idle
+    _clip: {fileID: 3339031967465149789, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 48
+    _motion: lancew_legs_idle_sc
+    _clip: {fileID: 484322871140162138, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 4097
+    _motion: lancew_legs_sprint
+    _clip: {fileID: 2279151472944552395, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 4101
+    _motion: lancew_legs_moving_fl
+    _clip: {fileID: 1779266633477690700, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 4105
+    _motion: lancew_legs_moving_fr
+    _clip: {fileID: 4844932069063418986, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 128
+    _motion: lancew_legs_jump_start
+    _clip: {fileID: -8830408081737591292, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 256
+    _motion: lancew_legs_jump_idle
+    _clip: {fileID: -3400316982062796189, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 512
+    _motion: lancew_legs_jump_end
+    _clip: {fileID: -2570986726033060484, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 144
+    _motion: lancew_legs_jump_start
+    _clip: {fileID: -8830408081737591292, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 272
+    _motion: lancew_legs_jump_idle_c
+    _clip: {fileID: 1553523742747049958, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 528
+    _motion: lancew_legs_jump_end
+    _clip: {fileID: -2570986726033060484, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 160
+    _motion: lancew_legs_jump_start
+    _clip: {fileID: -8830408081737591292, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 288
+    _motion: lancew_legs_jump_idle_c
+    _clip: {fileID: 1553523742747049958, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 544
+    _motion: lancew_legs_jump_end
+    _clip: {fileID: -2570986726033060484, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 176
+    _motion: lancew_legs_jump_start_sc
+    _clip: {fileID: 1918546999159535049, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 304
+    _motion: lancew_legs_jump_idle_sc
+    _clip: {fileID: 7648265364567954727, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 560
+    _motion: lancew_legs_jump_end
+    _clip: {fileID: -2570986726033060484, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 129
+    _motion: lancew_legs_jump_start
+    _clip: {fileID: -8830408081737591292, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 257
+    _motion: lancew_legs_jump_idle
+    _clip: {fileID: -3400316982062796189, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 513
+    _motion: lancew_legs_jump_end
+    _clip: {fileID: -2570986726033060484, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 145
+    _motion: lancew_legs_jump_start
+    _clip: {fileID: -8830408081737591292, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 273
+    _motion: lancew_legs_jump_idle_c
+    _clip: {fileID: 1553523742747049958, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 529
+    _motion: lancew_legs_jump_end
+    _clip: {fileID: -2570986726033060484, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 161
+    _motion: lancew_legs_jump_start
+    _clip: {fileID: -8830408081737591292, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 289
+    _motion: lancew_legs_jump_idle_c
+    _clip: {fileID: 1553523742747049958, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 545
+    _motion: lancew_legs_jump_end
+    _clip: {fileID: -2570986726033060484, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 177
+    _motion: lancew_legs_jump_start_sc
+    _clip: {fileID: 1918546999159535049, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 305
+    _motion: lancew_legs_jump_idle_sc
+    _clip: {fileID: 7648265364567954727, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 561
+    _motion: lancew_legs_jump_end
+    _clip: {fileID: -2570986726033060484, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 130
+    _motion: lancew_legs_jump_start
+    _clip: {fileID: -8830408081737591292, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 258
+    _motion: lancew_legs_jump_idle
+    _clip: {fileID: -3400316982062796189, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 514
+    _motion: lancew_legs_jump_end
+    _clip: {fileID: -2570986726033060484, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 146
+    _motion: lancew_legs_jump_start
+    _clip: {fileID: -8830408081737591292, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 274
+    _motion: lancew_legs_jump_idle_c
+    _clip: {fileID: 1553523742747049958, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 530
+    _motion: lancew_legs_jump_end
+    _clip: {fileID: -2570986726033060484, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 162
+    _motion: lancew_legs_jump_start
+    _clip: {fileID: -8830408081737591292, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 290
+    _motion: lancew_legs_jump_idle_c
+    _clip: {fileID: 1553523742747049958, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 546
+    _motion: lancew_legs_jump_end
+    _clip: {fileID: -2570986726033060484, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 178
+    _motion: lancew_legs_jump_start_sc
+    _clip: {fileID: 1918546999159535049, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 306
+    _motion: lancew_legs_jump_idle_sc
+    _clip: {fileID: 7648265364567954727, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 562
+    _motion: lancew_legs_jump_end
+    _clip: {fileID: -2570986726033060484, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 132
+    _motion: lancew_legs_jump_start
+    _clip: {fileID: -8830408081737591292, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 260
+    _motion: lancew_legs_jump_idle
+    _clip: {fileID: -3400316982062796189, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 516
+    _motion: lancew_legs_jump_end
+    _clip: {fileID: -2570986726033060484, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 148
+    _motion: lancew_legs_jump_start
+    _clip: {fileID: -8830408081737591292, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 276
+    _motion: lancew_legs_jump_idle_c
+    _clip: {fileID: 1553523742747049958, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 532
+    _motion: lancew_legs_jump_end
+    _clip: {fileID: -2570986726033060484, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 164
+    _motion: lancew_legs_jump_start
+    _clip: {fileID: -8830408081737591292, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 292
+    _motion: lancew_legs_jump_idle_c
+    _clip: {fileID: 1553523742747049958, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 548
+    _motion: lancew_legs_jump_end
+    _clip: {fileID: -2570986726033060484, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 180
+    _motion: lancew_legs_jump_start_sc
+    _clip: {fileID: 1918546999159535049, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 308
+    _motion: lancew_legs_jump_idle_sc
+    _clip: {fileID: 7648265364567954727, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 564
+    _motion: lancew_legs_jump_end
+    _clip: {fileID: -2570986726033060484, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 136
+    _motion: lancew_legs_jump_start
+    _clip: {fileID: -8830408081737591292, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 264
+    _motion: lancew_legs_jump_idle
+    _clip: {fileID: -3400316982062796189, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 520
+    _motion: lancew_legs_jump_end
+    _clip: {fileID: -2570986726033060484, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 152
+    _motion: lancew_legs_jump_start
+    _clip: {fileID: -8830408081737591292, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 280
+    _motion: lancew_legs_jump_idle_c
+    _clip: {fileID: 1553523742747049958, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 536
+    _motion: lancew_legs_jump_end
+    _clip: {fileID: -2570986726033060484, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 168
+    _motion: lancew_legs_jump_start
+    _clip: {fileID: -8830408081737591292, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 296
+    _motion: lancew_legs_jump_idle_c
+    _clip: {fileID: 1553523742747049958, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 552
+    _motion: lancew_legs_jump_end
+    _clip: {fileID: -2570986726033060484, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 184
+    _motion: lancew_legs_jump_start
+    _clip: {fileID: -8830408081737591292, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 312
+    _motion: lancew_legs_jump_idle_sc
+    _clip: {fileID: 7648265364567954727, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 568
+    _motion: lancew_legs_jump_end
+    _clip: {fileID: -2570986726033060484, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 133
+    _motion: lancew_legs_jump_start
+    _clip: {fileID: -8830408081737591292, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 261
+    _motion: lancew_legs_jump_idle
+    _clip: {fileID: -3400316982062796189, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 517
+    _motion: lancew_legs_jump_end
+    _clip: {fileID: -2570986726033060484, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 149
+    _motion: lancew_legs_jump_start
+    _clip: {fileID: -8830408081737591292, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 277
+    _motion: lancew_legs_jump_idle_c
+    _clip: {fileID: 1553523742747049958, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 533
+    _motion: lancew_legs_jump_end
+    _clip: {fileID: -2570986726033060484, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 165
+    _motion: lancew_legs_jump_start
+    _clip: {fileID: -8830408081737591292, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 293
+    _motion: lancew_legs_jump_idle_c
+    _clip: {fileID: 1553523742747049958, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 549
+    _motion: lancew_legs_jump_end
+    _clip: {fileID: -2570986726033060484, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 181
+    _motion: lancew_legs_jump_start_sc
+    _clip: {fileID: 1918546999159535049, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 309
+    _motion: lancew_legs_jump_idle_sc
+    _clip: {fileID: 7648265364567954727, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 565
+    _motion: lancew_legs_jump_end
+    _clip: {fileID: -2570986726033060484, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 137
+    _motion: lancew_legs_jump_start
+    _clip: {fileID: -8830408081737591292, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 265
+    _motion: lancew_legs_jump_idle
+    _clip: {fileID: -3400316982062796189, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 521
+    _motion: lancew_legs_jump_end
+    _clip: {fileID: -2570986726033060484, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 153
+    _motion: lancew_legs_jump_start
+    _clip: {fileID: -8830408081737591292, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 281
+    _motion: lancew_legs_jump_idle_c
+    _clip: {fileID: 1553523742747049958, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 537
+    _motion: lancew_legs_jump_end
+    _clip: {fileID: -2570986726033060484, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 169
+    _motion: lancew_legs_jump_start
+    _clip: {fileID: -8830408081737591292, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 297
+    _motion: lancew_legs_jump_idle_c
+    _clip: {fileID: 1553523742747049958, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 553
+    _motion: lancew_legs_jump_end
+    _clip: {fileID: -2570986726033060484, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 185
+    _motion: lancew_legs_jump_start_sc
+    _clip: {fileID: 1918546999159535049, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 313
+    _motion: lancew_legs_jump_idle_sc
+    _clip: {fileID: 7648265364567954727, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 569
+    _motion: lancew_legs_jump_end
+    _clip: {fileID: -2570986726033060484, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 134
+    _motion: lancew_legs_jump_start
+    _clip: {fileID: -8830408081737591292, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 262
+    _motion: lancew_legs_jump_idle
+    _clip: {fileID: -3400316982062796189, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 518
+    _motion: lancew_legs_jump_end
+    _clip: {fileID: -2570986726033060484, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 150
+    _motion: lancew_legs_jump_start
+    _clip: {fileID: -8830408081737591292, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 278
+    _motion: lancew_legs_jump_idle_c
+    _clip: {fileID: 1553523742747049958, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 534
+    _motion: lancew_legs_jump_end
+    _clip: {fileID: -2570986726033060484, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 166
+    _motion: lancew_legs_jump_start
+    _clip: {fileID: -8830408081737591292, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 294
+    _motion: lancew_legs_jump_idle_c
+    _clip: {fileID: 1553523742747049958, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 550
+    _motion: lancew_legs_jump_end
+    _clip: {fileID: -2570986726033060484, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 182
+    _motion: lancew_legs_jump_start_sc
+    _clip: {fileID: 1918546999159535049, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 310
+    _motion: lancew_legs_jump_idle_sc
+    _clip: {fileID: 7648265364567954727, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 566
+    _motion: lancew_legs_jump_end
+    _clip: {fileID: -2570986726033060484, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 138
+    _motion: lancew_legs_jump_start
+    _clip: {fileID: -8830408081737591292, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 266
+    _motion: lancew_legs_jump_idle
+    _clip: {fileID: -3400316982062796189, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 522
+    _motion: lancew_legs_jump_end
+    _clip: {fileID: -2570986726033060484, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 154
+    _motion: lancew_legs_jump_start
+    _clip: {fileID: -8830408081737591292, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 282
+    _motion: lancew_legs_jump_idle_c
+    _clip: {fileID: 1553523742747049958, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 538
+    _motion: lancew_legs_jump_end
+    _clip: {fileID: -2570986726033060484, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 170
+    _motion: lancew_legs_jump_start
+    _clip: {fileID: -8830408081737591292, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 298
+    _motion: lancew_legs_jump_idle_c
+    _clip: {fileID: 1553523742747049958, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 554
+    _motion: lancew_legs_jump_end
+    _clip: {fileID: -2570986726033060484, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 186
+    _motion: lancew_legs_jump_start_sc
+    _clip: {fileID: 1918546999159535049, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 314
+    _motion: lancew_legs_jump_idle_sc
+    _clip: {fileID: 7648265364567954727, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 570
+    _motion: lancew_legs_jump_end
+    _clip: {fileID: -2570986726033060484, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 4224
+    _motion: lancew_legs_jump_start
+    _clip: {fileID: -8830408081737591292, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 4352
+    _motion: lancew_legs_jump_idle
+    _clip: {fileID: -3400316982062796189, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 4608
+    _motion: lancew_legs_jump_end
+    _clip: {fileID: -2570986726033060484, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 4225
+    _motion: lancew_legs_jump_start
+    _clip: {fileID: -8830408081737591292, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 4353
+    _motion: lancew_legs_jump_idle
+    _clip: {fileID: -3400316982062796189, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 4609
+    _motion: lancew_legs_jump_end
+    _clip: {fileID: -2570986726033060484, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 1
+    _motion: lancew_legs_moving
+    _clip: {fileID: -6880402639993475763, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 5
+    _motion: lancew_legs_moving_fl
+    _clip: {fileID: 1779266633477690700, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 9
+    _motion: lancew_legs_moving_fr
+    _clip: {fileID: 4844932069063418986, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 17
+    _motion: lancew_legs_moving_c
+    _clip: {fileID: -3598085683224841694, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 21
+    _motion: lancew_legs_moving_fl_c
+    _clip: {fileID: 1560465670150584297, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 25
+    _motion: lancew_legs_moving_fr_c
+    _clip: {fileID: -6428463774632881500, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 33
+    _motion: lancew_legs_walk
+    _clip: {fileID: 6938243147463489497, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 37
+    _motion: lancew_legs_walk_l
+    _clip: {fileID: -4582909448675387579, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 41
+    _motion: lancew_legs_walk_r
+    _clip: {fileID: 1096836042805521882, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 49
+    _motion: lancew_legs_walk_sc
+    _clip: {fileID: 4433181501406799149, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 53
+    _motion: lancew_legs_walk_fl_sc
+    _clip: {fileID: 1455273137515296408, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 57
+    _motion: lancew_legs_walk_fr_sc
+    _clip: {fileID: -3472289639490919228, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 2
+    _motion: lancew_legs_moving_b
+    _clip: {fileID: 1769851068877961237, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 6
+    _motion: lancew_legs_moving_bl
+    _clip: {fileID: -47187759930186648, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 10
+    _motion: lancew_legs_moving_br
+    _clip: {fileID: -4526950959557467155, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 18
+    _motion: lancew_legs_moving_b_c
+    _clip: {fileID: -6528952299725728844, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 22
+    _motion: lancew_legs_moving_bl_c
+    _clip: {fileID: 9031743039601790012, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 26
+    _motion: lancew_legs_moving_br_c
+    _clip: {fileID: 8551994030827199291, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 34
+    _motion: lancew_legs_walk_b
+    _clip: {fileID: 5789604605864713005, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 38
+    _motion: lancew_legs_walk_bl
+    _clip: {fileID: 3876104884395317687, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 42
+    _motion: lancew_legs_walk_br
+    _clip: {fileID: 1258184429369252057, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 50
+    _motion: lancew_legs_walk_b_sc
+    _clip: {fileID: 5688829204625223017, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 54
+    _motion: lancew_legs_walk_bl_sc
+    _clip: {fileID: 1859599805040590413, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 58
+    _motion: lancew_legs_walk_br_sc
+    _clip: {fileID: -48037154718768913, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 4
+    _motion: lancew_legs_moving_l
+    _clip: {fileID: 6283395903642594442, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 20
+    _motion: lancew_legs_moving_l_c
+    _clip: {fileID: 2988836347128297940, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 36
+    _motion: lancew_legs_walk_l
+    _clip: {fileID: -4582909448675387579, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 52
+    _motion: lancew_legs_walk_l_sc
+    _clip: {fileID: -3215553864178953378, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 8
+    _motion: lancew_legs_moving_r
+    _clip: {fileID: -6870201439340544389, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 24
+    _motion: lancew_legs_moving_r_c
+    _clip: {fileID: -5649685828708974736, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 40
+    _motion: lancew_legs_walk_r
+    _clip: {fileID: 1096836042805521882, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 56
+    _motion: lancew_legs_walk_r_sc
+    _clip: {fileID: -856457707025349810, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 2048
+    _motion: leg_ladder_idle
+    _clip: {fileID: 6256075772902650306, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 2049
+    _motion: leg_ladder_up
+    _clip: {fileID: -7143440252536634613, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 2050
+    _motion: leg_ladder_up
+    _clip: {fileID: -7143440252536634613, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 2080
+    _motion: leg_ladder_idle
+    _clip: {fileID: 6256075772902650306, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 2081
+    _motion: leg_ladder_up
+    _clip: {fileID: -7143440252536634613, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  - _flags: 2082
+    _motion: leg_ladder_up
+    _clip: {fileID: -7143440252536634613, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  _basicFallback:
+    _flags: 0
+    _motion: lancew_legs_idle
+    _clip: {fileID: 3339031967465149789, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  _ladderIdle:
+    _flags: 2048
+    _motion: leg_ladder_idle
+    _clip: {fileID: 6256075772902650306, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  _ladderUp:
+    _flags: 2049
+    _motion: leg_ladder_up
+    _clip: {fileID: -7143440252536634613, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  _ladderDown:
+    _flags: 2050
+    _motion: leg_ladder_up
+    _clip: {fileID: -7143440252536634613, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  _turnLeft:
+    _flags: 0
+    _motion: lancew_legs_turn_left
+    _clip: {fileID: -1094123049232819244, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  _turnRight:
+    _flags: 0
+    _motion: lancew_legs_turn_right
+    _clip: {fileID: 5393487068580148684, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _sourceFile: lancew_legs_krovosos.omf
+  _idles:
+  - _binding:
+      _flags: 0
+      _motion: legs_stand_1
+      _clip: {fileID: 3162203209440074481, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+      _sourceFile: lancew_legs_krovosos.omf
+    _durationMilliseconds: 900
+  - _binding:
+      _flags: 0
+      _motion: legs_stand_2
+      _clip: {fileID: 4684976657927259279, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+      _sourceFile: lancew_legs_krovosos.omf
+    _durationMilliseconds: 1900
+  - _binding:
+      _flags: 0
+      _motion: legs_stand_3
+      _clip: {fileID: -8316536654320623211, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+      _sourceFile: lancew_legs_krovosos.omf
+    _durationMilliseconds: 1200
+  _disabledFlags: 24640
+  _useCombatState: 1
+  _useSlowDownState: 1
+  _enableIdleAnimations: 1

@@ -1,0 +1,40 @@
+fileFormatVersion: 2
+guid: 75dbc7c6bb0cc3c4f8d1dd7d29c005a4
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: act\act_arm_novic_clearsky|models\model
+    second: {fileID: 2100000, guid: 95d5d5d84dec15946b8d0fe3c85b99f3, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: act\new_hands\bare_hands\hand|models\model
+    second: {fileID: 2100000, guid: bdf405c162b788240b4e374f5f0c8294, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: act\pla_bandit_sleeves|models\model
+    second: {fileID: 2100000, guid: f144f8cb2cb737748865ad54c012aec1, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: act\pla_dolg_gloves|models\model
+    second: {fileID: 2100000, guid: c022e500f1bb6ec4ea821e5fbeaa5502, type: 2}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 61e536e21e96f284493f2969a9250cdf, type: 3}
+  _scale: 1
+  _importMaterials: 1
+  _texturesFolder: 
+  _searchTexturesByName: 1
+  _importEmbeddedMotions: 0
+  _embeddedLoopMode: 0
+  _addAnimator: 1
+  _readableMeshes: 0
+  _updateWhenOffscreen: 0
+  _autoResolveResources: 1

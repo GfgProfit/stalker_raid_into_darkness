@@ -1,0 +1,35 @@
+fileFormatVersion: 2
+guid: 3d35d064ca0f34d479c4bb463b08f1fd
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: act\New_hands\bare_hands\hand|models\model
+    second: {fileID: 2100000, guid: 60b9f5433765444419269b78bba1d92d, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: act\cod_ghosts_fed_gloves_merc|models\model
+    second: {fileID: 2100000, guid: f50173535550ab34e8e336db2868b50a, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: act\moh2010_merc_sleeve|models\model
+    second: {fileID: 2100000, guid: f63edde6f111b5e4fa8a12b5c7193179, type: 2}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 61e536e21e96f284493f2969a9250cdf, type: 3}
+  _scale: 1
+  _importMaterials: 1
+  _texturesFolder: 
+  _searchTexturesByName: 1
+  _importEmbeddedMotions: 0
+  _embeddedLoopMode: 0
+  _addAnimator: 1
+  _readableMeshes: 0
+  _updateWhenOffscreen: 0
+  _autoResolveResources: 1

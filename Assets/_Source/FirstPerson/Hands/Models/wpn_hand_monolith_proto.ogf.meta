@@ -1,0 +1,40 @@
+fileFormatVersion: 2
+guid: c962a958556c61a458aebc2c7df1d192
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: act\act_arm_sviter_1|models\model
+    second: {fileID: 2100000, guid: caa674d5a366eb344a66f6221acb643b, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: act\cod_mwr_bandit|models\model
+    second: {fileID: 2100000, guid: 74172d1bf3cbd7140bae3eeb01338a9f, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: act\exos\act_arm_exo_mono|models\model
+    second: {fileID: 2100000, guid: 28ab7ca60585f7e44918c1604d41ec9e, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: act\new_hands\skat9\rukav_mono|models\model
+    second: {fileID: 2100000, guid: b603909f77a66d24baf153b3ef156324, type: 2}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 61e536e21e96f284493f2969a9250cdf, type: 3}
+  _scale: 1
+  _importMaterials: 1
+  _texturesFolder: 
+  _searchTexturesByName: 1
+  _importEmbeddedMotions: 0
+  _embeddedLoopMode: 0
+  _addAnimator: 1
+  _readableMeshes: 0
+  _updateWhenOffscreen: 0
+  _autoResolveResources: 1

@@ -1,0 +1,40 @@
+fileFormatVersion: 2
+guid: 67b0b400016f7414e851b736f4247ab8
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: act\cod_ghosts_oakley_gloves|models\model
+    second: {fileID: 2100000, guid: d09fe255b66f54d40b94e95383f9d474, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: act\cod_mwr_military|models\model
+    second: {fileID: 2100000, guid: 197f0755421dc0044a0462b800d81072, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: act\exos\act_arm_exo_military|models\model
+    second: {fileID: 2100000, guid: 729aa57085a8f0143b462a24c69da007, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: act\new_hands\sviter\sviter|models\model
+    second: {fileID: 2100000, guid: 174fd858f4c0121468230136876ebf29, type: 2}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 61e536e21e96f284493f2969a9250cdf, type: 3}
+  _scale: 1
+  _importMaterials: 1
+  _texturesFolder: 
+  _searchTexturesByName: 1
+  _importEmbeddedMotions: 0
+  _embeddedLoopMode: 0
+  _addAnimator: 1
+  _readableMeshes: 0
+  _updateWhenOffscreen: 0
+  _autoResolveResources: 1

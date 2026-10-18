@@ -223,6 +223,27 @@ namespace RaidIntoDarkness.Player
             _graph.Evaluate(deltaTime);
         }
 
+        public AnimationClip GetSlotClip(int index)
+        {
+            return _slots[index].Clip;
+        }
+
+        public string GetSlotMotion(int index)
+        {
+            return _slots[index].Motion;
+        }
+
+        public float GetSlotWeight(int index)
+        {
+            return _slots[index].Weight;
+        }
+
+        public float GetSlotNormalizedTime(int index)
+        {
+            Slot slot = _slots[index];
+            return slot.Clip != null && slot.Clip.length > 0.0f ? (float)(slot.Playable.GetTime() / slot.Clip.length) : 0.0f;
+        }
+
         public float GetWeight(AnimationClip clip)
         {
             Slot slot = _slots.Find(item => item.Clip == clip);

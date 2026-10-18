@@ -1,0 +1,96 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62ff3535af7c4c744934a0f2444c6a2a, type: 3}
+  m_Name: StalkerCameraEffectsProfile
+  m_EditorClassIdentifier: RaidIntoDarkness.Player::RaidIntoDarkness.Player.StalkerCameraEffectsProfile
+  _bobbing:
+    _walkAmplitude: 0.005
+    _runAmplitude: 0.0075
+    _limpAmplitude: 0.011
+    _walkSpeed: 6.26
+    _runSpeed: 6.74
+    _limpSpeed: 4.6
+    _crouchFactor: 0.75
+    _speedReminder: 5
+    _headBobFactor: 1
+  _fall:
+    _speed: 3.5
+    _maxDistance: 0.15
+    _crashSpeedMax: 41
+  _anm:
+    _sprintStep: {fileID: 4908183818744415850, guid: 1413923e408fd704b8950e1f42671167, type: 3}
+    _moveStep: {fileID: 4908183818744415850, guid: 30543ceab570d214f8b18d31d70c4683, type: 3}
+    _tiredStep: {fileID: 4908183818744415850, guid: 8340e3d8a1833954c99fed16186c28e2, type: 3}
+    _tiredPower: 0.25
+    _jump: {fileID: 4908183818744415850, guid: 3987ec9f00279b8409e12f84f25374ea, type: 3}
+    _landing:
+    - {fileID: 4908183818744415850, guid: 82abe562c65fd244cbdef307a3d7ff65, type: 3}
+    - {fileID: 4908183818744415850, guid: 3ca29973b18485d478e39f0063d1e46b, type: 3}
+    _landingSpeed: 5
+    _landingCooldown: 1
+    _crouch: {fileID: 4908183818744415850, guid: 1bc3d180ebd519146b952ca56b7d900e, type: 3}
+    _stand: {fileID: 4908183818744415850, guid: 3cd6328a599594b48ba9bc3a03fe4924, type: 3}
+    _strafeLeft: {fileID: 4908183818744415850, guid: ce5ff0c1f3e267f4486ff2001267c0df, type: 3}
+    _strafeRight: {fileID: 4908183818744415850, guid: a5f83b14415a27545961651a7802097e, type: 3}
+    _moveEffectMaxScale: 70
+  _enabled: 1
+  _bobbingEnabled: 1
+  _fallEnabled: 1
+  _anmEffectsEnabled: 1
+  _stepEffectsEnabled: 1
+  _jumpLandEffectsEnabled: 1
+  _crouchEffectsEnabled: 1
+  _moveEffectsEnabled: 1
+  _bobRequiresGround: 1
+  _intensity: 1
+  _bobbingScale: 1
+  _landingScale: 1
+  _jumpScale: 1
+  _bobPhaseSource: 1
+  _sourceReport: "MO2 profile: 1v2(DX11) (v_12gb) 2.5, \u0412\u0441\u0435 \u0432\u043A\u043B\u044E\u0447\u0435\u043D\u043E
+    (168), active mods: 173, indexed files: 13898\r\n[bobbing_effector] <- Base Anomaly
+    :: configs/misc/effectors.ltx\r\n_bobbing._walkAmplitude = 0.005  <- [bobbing_effector]
+    walk_amplitude\r\n_bobbing._runAmplitude = 0.0075  <- [bobbing_effector] run_amplitude\r\n_bobbing._limpAmplitude
+    = 0.011  <- [bobbing_effector] limp_amplitude\r\n_bobbing._walkSpeed = 6.26 
+    <- [bobbing_effector] walk_speed\r\n_bobbing._runSpeed = 6.74  <- [bobbing_effector]
+    run_speed\r\n_bobbing._limpSpeed = 4.6  <- [bobbing_effector] limp_speed\r\n_bobbing._crouchFactor
+    = 0.75  <- EffectorBobbing.cpp CROUCH_FACTOR (hardcoded)\r\n_bobbing._speedReminder
+    = 5  <- EffectorBobbing.cpp SPEED_REMINDER (hardcoded)\r\n_bobbing._headBobFactor
+    = 1  <- user.ltx head_bob_factor (engine default 1)\r\n_fall._speed = 3.5  <-
+    EffectorFall.cpp FALL_SPEED (hardcoded)\r\n_fall._maxDistance = 0.15  <- EffectorFall.cpp
+    FALL_MAXDIST (hardcoded)\r\n_fall._crashSpeedMax = 41  <- [actor] ph_crash_speed_max
+    (gcontact_Power = contact speed / max)\r\nscripts/camera_reanim_project.script
+    <- [\u041A\u0430\u043C\u0435\u0440\u0430] ReanimationProject INERTIA_V1.2\r\n_anm._tiredPower
+    = 0.25  <- camera_reanim_project.script db.actor.power threshold\r\n_anm._landingSpeed
+    = 5  <- camera_reanim_project.script actor_on_land fall_speed threshold\r\n_anm._landingCooldown
+    = 1  <- camera_reanim_project.script tg_anim1_delay (ms)\r\n_anm._sprintStep
+    <- anims\\camera_effects\\sprint_crp.anm ([\u041A\u0430\u043C\u0435\u0440\u0430]
+    ReanimationProject INERTIA_V1.2)\r\n_anm._moveStep <- anims\\camera_effects\\move_crp.anm
+    ([\u041A\u0430\u043C\u0435\u0440\u0430] ReanimationProject INERTIA_V1.2)\r\n_anm._tiredStep
+    <- anims\\camera_effects\\tired_crp.anm ([\u041A\u0430\u043C\u0435\u0440\u0430]
+    ReanimationProject INERTIA_V1.2)\r\n_anm._jump <- anims\\camera_effects\\jump_crp.anm
+    ([\u041A\u0430\u043C\u0435\u0440\u0430] ReanimationProject INERTIA_V1.2)\r\n_anm._crouch
+    <- anims\\camera_effects\\crouch_crp.anm ([\u041A\u0430\u043C\u0435\u0440\u0430]
+    ReanimationProject INERTIA_V1.2)\r\n_anm._stand <- anims\\camera_effects\\stand_crp.anm
+    ([\u041A\u0430\u043C\u0435\u0440\u0430] ReanimationProject INERTIA_V1.2)\r\n_anm._landing
+    <- anims\\camera_effects\\landing_crp1.anm ([\u041A\u0430\u043C\u0435\u0440\u0430]
+    ReanimationProject INERTIA_V1.2)\r\n_anm._landing <- anims\\camera_effects\\landing_crp2.anm
+    ([\u041A\u0430\u043C\u0435\u0440\u0430] ReanimationProject INERTIA_V1.2)\r\n_anm._strafeLeft
+    <- anims\\camera_effects\\actor_move\\strafe_left.anm (Base Anomaly)\r\n_anm._strafeRight
+    <- anims\\camera_effects\\actor_move\\strafe_right.anm (Base Anomaly)\r\naxr_options.ltx
+    crpmcm/moving = True, crpmcm/jump_land = True, crpmcm/crouch = True\r\nUnity
+    adaptation: bob phase follows the body locomotion cycle (BodyAnimation) instead
+    of the global CEffectorBobbing timer; frequency then follows the Swm legs clips,
+    amplitude stays X-Ray.\r\nUnity adaptation: bobbing fades out while the actor
+    has no ground contact; X-Ray keeps it while mcAnyMove is set in the air.\r\nX-Ray:
+    mcAnyMove is cleared when actual velocity < 0.2 m/s (Actor_Movement.cpp), so
+    pushing into a wall stops the bob and the legs steps.\r\n"

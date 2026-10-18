@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace RaidIntoDarkness.Player
@@ -16,6 +17,7 @@ namespace RaidIntoDarkness.Player
         private const float WALL_PROBE_DISTANCE = 0.01f;
         private const float NEAR_UP_TIME = 0.75f;
         private const float NEAR_UP_CLEARANCE = 0.02f;
+        private const float LEFT_GROUND_DELAY = 0.05f;
 
         private static readonly Collider[] QUERY_BUFFER = new Collider[16];
 
@@ -38,9 +40,17 @@ namespace RaidIntoDarkness.Player
         private float _yaw;
         private Vector3 _cameraDirection = Vector3.forward;
         private float _actualVelocity;
+        private float _airTime;
+        private bool _leftGroundRaised;
         private float _lastContactSpeed;
         private StalkerLadder _ladder;
         private bool _climbingUp;
+
+        public event Action JumpStarted;
+        public event Action LeftGround;
+        public event Action StartedFalling;
+        public event Action<float> Landed;
+        public event Action<float> ContactRestored;
 
         public StalkerMovementProfile Profile => _profile;
         public StalkerMoveFlags RealFlags => _real;
@@ -126,6 +136,21 @@ namespace RaidIntoDarkness.Player
             }
 
             _actualVelocity = _physics.Velocity.magnitude;
+            if (_physics.Contacts.Ground || _physics.Climbing)
+            {
+                _airTime = 0.0f;
+                _leftGroundRaised = false;
+            }
+            else
+            {
+                _airTime += deltaTime;
+                if (!_leftGroundRaised && _airTime >= LEFT_GROUND_DELAY)
+                {
+                    _leftGroundRaised = true;
+                    LeftGround?.Invoke();
+                }
+            }
+
             ValidateState(_wish, deltaTime);
             _condition.Tick(_real, _physics.Environment == StalkerEnvironment.InAir, transform.position.y, deltaTime);
             _stance.UpdateCameraHeight(deltaTime);
@@ -233,6 +258,7 @@ namespace RaidIntoDarkness.Player
                     _fallTime = engine.FallTime;
                     _real |= StalkerMoveFlags.Fall;
                     _real &= ~StalkerMoveFlags.Jump;
+                    StartedFalling?.Invoke();
                 }
             }
 
@@ -286,6 +312,7 @@ namespace RaidIntoDarkness.Player
                     _jump = actor.JumpSpeed;
                     _jumpTime = engine.JumpTime;
                     _condition.ConditionJump();
+                    JumpStarted?.Invoke();
                 }
 
                 StalkerMoveFlags move = StalkerMoveFlags.AnyMove | StalkerMoveFlags.Accel;
@@ -413,6 +440,7 @@ namespace RaidIntoDarkness.Player
             if (_physics.ConsumeContactWas(out float contactSpeed))
             {
                 _lastContactSpeed = contactSpeed;
+                bool wasFalling = _real.Has(StalkerMoveFlags.Fall);
                 if (_real.Has(StalkerMoveFlags.Fall) && contactSpeed > engine.LandingContactSpeed)
                 {
                     bool healthLost = contactSpeed > _profile.Actor.CrashSpeedMin;
@@ -423,6 +451,11 @@ namespace RaidIntoDarkness.Player
                 _jumpKeyPressed = true;
                 _jumpTime = engine.JumpTime;
                 _real &= ~(StalkerMoveFlags.Fall | StalkerMoveFlags.Jump);
+                ContactRestored?.Invoke(contactSpeed);
+                if (wasFalling)
+                {
+                    Landed?.Invoke(contactSpeed);
+                }
             }
 
             if (!wish.Has(StalkerMoveFlags.Jump))

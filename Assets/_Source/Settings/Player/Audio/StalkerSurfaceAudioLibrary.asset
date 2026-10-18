@@ -1,0 +1,2310 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 01eb2e2aaf532f74987461c8ea6ea1e6, type: 3}
+  m_Name: StalkerSurfaceAudioLibrary
+  m_EditorClassIdentifier: RaidIntoDarkness.Player::RaidIntoDarkness.Player.StalkerSurfaceAudioLibrary
+  _surfaces:
+  - _type: 0
+    _materialName: default
+    _pairStepClips:
+    - {fileID: 8300000, guid: b1c15e7673d72204ea70848734f30383, type: 3}
+    - {fileID: 8300000, guid: 942f63c8b235db645b7623d4617beae0, type: 3}
+    - {fileID: 8300000, guid: c363437d3ab092c4abc206a655fbed6f, type: 3}
+    - {fileID: 8300000, guid: 60e7a688b4159514e8337569369f4575, type: 3}
+    - {fileID: 8300000, guid: 3b01feb095b2ca6479ba10c0b875c1a5, type: 3}
+    - {fileID: 8300000, guid: 4e5866f438b120a4aa3fe03d6b77c5b2, type: 3}
+    - {fileID: 8300000, guid: 0beb67c0db56fca4894d10d32b9ba599, type: 3}
+    - {fileID: 8300000, guid: 9fde8d051bb3c344da7a514f2ecc2876, type: 3}
+    - {fileID: 8300000, guid: 1bfc6a4fa93545c459b4a4067bb14044, type: 3}
+    - {fileID: 8300000, guid: 41d033cc6a1108246a8e50c8b995255e, type: 3}
+    - {fileID: 8300000, guid: 1a2321e5d22808f4fa62b048d6957665, type: 3}
+    - {fileID: 8300000, guid: 76936c0eb8ffd2e4386f311042f3826f, type: 3}
+    _walkClips: []
+    _runClips: []
+    _crouchClips: []
+    _jumpClips:
+    - {fileID: 8300000, guid: 55091721d7aafd34e896ed192cd69aa6, type: 3}
+    - {fileID: 8300000, guid: 3e731c6789f9b5b47b632592a7b8f060, type: 3}
+    - {fileID: 8300000, guid: b1b9843cb4d0c564f96f5f444f9c845c, type: 3}
+    - {fileID: 8300000, guid: f1c08d1c2ea94854baaf0eaf08cfd40a, type: 3}
+    - {fileID: 8300000, guid: 8f811f6b434151045a6ceb1d0c72778d, type: 3}
+    _landClips:
+    - {fileID: 8300000, guid: 21f885eb8d4f84242bd0717e27e23bdb, type: 3}
+    - {fileID: 8300000, guid: 73caf1f17489f874fa60f4c188ff8f29, type: 3}
+    - {fileID: 8300000, guid: 34ab9c4a27220a54796fdf9e634fb400, type: 3}
+    - {fileID: 8300000, guid: 948d55b830112394d931e759b70ae07c, type: 3}
+    - {fileID: 8300000, guid: d1ec1594a46d98b43943f204cf9cd5d4, type: 3}
+  - _type: 1
+    _materialName: materials\earth
+    _pairStepClips: []
+    _walkClips:
+    - {fileID: 8300000, guid: 243ee8f6059ab9d4d8f4d8fa0456c636, type: 3}
+    - {fileID: 8300000, guid: c36e9949658ffb046965b38c7928b0d6, type: 3}
+    - {fileID: 8300000, guid: f81775507583e1341ad3f880571c928f, type: 3}
+    - {fileID: 8300000, guid: ab5b7daba7d3bb0489f8a53c90919ffe, type: 3}
+    - {fileID: 8300000, guid: e4a5446a2815e284e8bd5874df5f4a49, type: 3}
+    - {fileID: 8300000, guid: 15a11c364a66b5c4fb99dd880ac7fffa, type: 3}
+    - {fileID: 8300000, guid: 1c1872e9a8a29124f96cba87323270d0, type: 3}
+    - {fileID: 8300000, guid: bfb9440615f2c0645a86646c08bef172, type: 3}
+    - {fileID: 8300000, guid: d59a1c55853e71f479de1c5fedb37952, type: 3}
+    - {fileID: 8300000, guid: b7f79e174d24dd6419187488bf040f28, type: 3}
+    - {fileID: 8300000, guid: 66f87b7e1a85b134bad77d25c2f2351a, type: 3}
+    - {fileID: 8300000, guid: dca1ac22f63fece43832cc13ff4ccfe2, type: 3}
+    _runClips:
+    - {fileID: 8300000, guid: e6bf24e5cac480144872ea8003385d88, type: 3}
+    - {fileID: 8300000, guid: a9582612f9150574394f70bfdf0371f5, type: 3}
+    - {fileID: 8300000, guid: b3d9dc4c484ced74880c6559a0aaf690, type: 3}
+    - {fileID: 8300000, guid: d5e7a3d1390bc4347bfcd7a4490275ff, type: 3}
+    - {fileID: 8300000, guid: 26c6ae67b6827b046bcf68211c489850, type: 3}
+    - {fileID: 8300000, guid: f4961e387fb125f439e48e9b2bdb2f67, type: 3}
+    - {fileID: 8300000, guid: 0480e91c3cbe5fd449ea6ef1001f5ab6, type: 3}
+    - {fileID: 8300000, guid: 814a192686ce94f47985862b9ccd913e, type: 3}
+    - {fileID: 8300000, guid: 4f872e07554c9cb4bb0998f290111905, type: 3}
+    - {fileID: 8300000, guid: 19fface76b7aea34687cf05b802706e9, type: 3}
+    - {fileID: 8300000, guid: 1152336f36a02bc43a3eb3593ac6016a, type: 3}
+    - {fileID: 8300000, guid: 4240a54368353754999672972435a16b, type: 3}
+    _crouchClips: []
+    _jumpClips:
+    - {fileID: 8300000, guid: 9165124078519d9468a0da12161848f5, type: 3}
+    - {fileID: 8300000, guid: 242c08b4c96310e4dbe02e4564d34ffa, type: 3}
+    - {fileID: 8300000, guid: f175807f720b55c4ba30ed6aebbcb149, type: 3}
+    - {fileID: 8300000, guid: 013f3cab9b55a564cb29df22d5f0df94, type: 3}
+    - {fileID: 8300000, guid: fe3190631ebedd74690a053fd74ea169, type: 3}
+    _landClips:
+    - {fileID: 8300000, guid: a0ec22bff405eca409ded81be7d7f31c, type: 3}
+    - {fileID: 8300000, guid: 996fe952ba040ec4fabb266ea5a661f0, type: 3}
+    - {fileID: 8300000, guid: e066c67c796db7047a5ea8c4e4ee81de, type: 3}
+    - {fileID: 8300000, guid: 15adc54fe2d653d478eef7486d6f288b, type: 3}
+    - {fileID: 8300000, guid: b20e18e02fd01b646bf2b1c4087c2472, type: 3}
+  - _type: 2
+    _materialName: materials\grass
+    _pairStepClips: []
+    _walkClips:
+    - {fileID: 8300000, guid: bbb194938796a6e4795cf7c1a0547570, type: 3}
+    - {fileID: 8300000, guid: fd2c9434fd1e0eb4eae7970eac9dd71e, type: 3}
+    - {fileID: 8300000, guid: 627e462a29cf1754697e13e97200e286, type: 3}
+    - {fileID: 8300000, guid: 0f552475c38298f4d84ec0afa09363ee, type: 3}
+    - {fileID: 8300000, guid: ff8e43ae38141704f905f160c0f75614, type: 3}
+    - {fileID: 8300000, guid: b6bb8647be700c14d96e5451cedbb451, type: 3}
+    - {fileID: 8300000, guid: 69698f7e75ed13b49ae977068f02fa07, type: 3}
+    - {fileID: 8300000, guid: 45e9e76fcc1e274438c35418837774e8, type: 3}
+    - {fileID: 8300000, guid: 4402be29a9d5aa54eb1000b72b1661eb, type: 3}
+    - {fileID: 8300000, guid: a087bdf3f32e4a14eafcc1ce406d7297, type: 3}
+    - {fileID: 8300000, guid: d213cdfbb4e3af74d80859dc51025c7a, type: 3}
+    - {fileID: 8300000, guid: 7e580412d84d28841aa8c11cc07f4c1d, type: 3}
+    - {fileID: 8300000, guid: e08aff3527cc07e4fafd056560c31955, type: 3}
+    - {fileID: 8300000, guid: 5525600e0bf963c44aff3d97240feac0, type: 3}
+    - {fileID: 8300000, guid: 77e0d5acde8449c46afebc148984b67a, type: 3}
+    - {fileID: 8300000, guid: db7bc817f5f84e24db6a648339501aa6, type: 3}
+    - {fileID: 8300000, guid: 82e5f938f097d7741a5c7ee84d31ea95, type: 3}
+    - {fileID: 8300000, guid: 15864af222528d24ca19c3866a4b34da, type: 3}
+    - {fileID: 8300000, guid: 92cd13974519fa542a510e66ee7598be, type: 3}
+    - {fileID: 8300000, guid: fbba3adbf5eb1f74ab9437c23a873413, type: 3}
+    _runClips:
+    - {fileID: 8300000, guid: b80f2cc0683e0574f8678f973b074e5d, type: 3}
+    - {fileID: 8300000, guid: 1fcea8d6681cc414cb1c69d812722926, type: 3}
+    - {fileID: 8300000, guid: 77d6bd0ff40ec804f9065a3a9bdbb42f, type: 3}
+    - {fileID: 8300000, guid: f3225d34d592596459b7601af23aa9a0, type: 3}
+    - {fileID: 8300000, guid: e9f01aba23025664d9af67ee2a752c3f, type: 3}
+    - {fileID: 8300000, guid: 240425529f4151947a48e32cf2d54bc1, type: 3}
+    - {fileID: 8300000, guid: c6bbecc1be3310a4693f2e66afd44309, type: 3}
+    - {fileID: 8300000, guid: 9358e60d21f54b54a9adf929d9896742, type: 3}
+    - {fileID: 8300000, guid: 07cd42eceba735245b0edded49024af2, type: 3}
+    - {fileID: 8300000, guid: c25a42050871ba448b7a46df47df2a49, type: 3}
+    - {fileID: 8300000, guid: e53ad8b2ae2231c459c907841d9cd535, type: 3}
+    - {fileID: 8300000, guid: 71e4c7e30ee440542b6ab576d05625aa, type: 3}
+    - {fileID: 8300000, guid: 680fcb29fc1e53848bc31483932b62d2, type: 3}
+    - {fileID: 8300000, guid: c05ea362c21a60d4c879c4dbac8af8f5, type: 3}
+    - {fileID: 8300000, guid: a22b3dc92a38f134c8b2eab5527de3a6, type: 3}
+    - {fileID: 8300000, guid: 8df7bee068f0ee243ac7aef60c1e7a99, type: 3}
+    - {fileID: 8300000, guid: 7e961ceb4fc94374482cf0c2a3c7ec10, type: 3}
+    - {fileID: 8300000, guid: fc81e220e77a3ce43bf69b78a340e6c8, type: 3}
+    - {fileID: 8300000, guid: f2561fd0e32c23546bb7cb8fa82c9720, type: 3}
+    - {fileID: 8300000, guid: 1d58ee716ed0cc44983ed6121130ad21, type: 3}
+    _crouchClips: []
+    _jumpClips:
+    - {fileID: 8300000, guid: 9fa1e65f269ba3c4fa1421acf61bd29a, type: 3}
+    - {fileID: 8300000, guid: e1ad86869cd6ffb47812f9eb28715d01, type: 3}
+    - {fileID: 8300000, guid: 41d9f157263eb3c4d8b1cc76bc7c8fce, type: 3}
+    - {fileID: 8300000, guid: f021a82883e77844993f0f33df68cf95, type: 3}
+    - {fileID: 8300000, guid: 03bfbabbe22ced147aa2481400e4fe17, type: 3}
+    _landClips:
+    - {fileID: 8300000, guid: de4a8a8fc61956644b4169758d0775a8, type: 3}
+    - {fileID: 8300000, guid: ed434e6737ce90d4aa8944947ae132a6, type: 3}
+    - {fileID: 8300000, guid: 27123bc8abad654439bed22c4d6031f8, type: 3}
+    - {fileID: 8300000, guid: 314d85bede0391147b6f8b6684c1df59, type: 3}
+    - {fileID: 8300000, guid: 6263a9cd4702d3b42af2d55c3e46d04f, type: 3}
+  - _type: 3
+    _materialName: materials\gravel
+    _pairStepClips: []
+    _walkClips:
+    - {fileID: 8300000, guid: a0d78b4e56c743941be49662db75f4ad, type: 3}
+    - {fileID: 8300000, guid: 5c827c9a07e04b2469d208e50bbc7076, type: 3}
+    - {fileID: 8300000, guid: b51d51e72a032bf4eb90cfa7395b6227, type: 3}
+    - {fileID: 8300000, guid: 500b9e2d096f35345b49199b1f464ace, type: 3}
+    - {fileID: 8300000, guid: ed62581892f29df4f833c03d50278492, type: 3}
+    - {fileID: 8300000, guid: 75e1d4c538804e345b1eb6f60e6f00ef, type: 3}
+    - {fileID: 8300000, guid: a0eda8e6aa0de464d8e201f3e8e6a834, type: 3}
+    - {fileID: 8300000, guid: 74c90c9232ef8944b844044d3ec6d79b, type: 3}
+    - {fileID: 8300000, guid: 68930c32ef4ce78458273d037f235fac, type: 3}
+    - {fileID: 8300000, guid: 99d4b174b59df8240a870b7029e6188d, type: 3}
+    - {fileID: 8300000, guid: de58344ff6efde7498a00c36abcc7e4f, type: 3}
+    - {fileID: 8300000, guid: 1024f3b3b086241459e9a21f9d2da343, type: 3}
+    _runClips:
+    - {fileID: 8300000, guid: b1204b7acd2b2f04e83096791f1076fa, type: 3}
+    - {fileID: 8300000, guid: b269216cd7b799a4ebf9fe98cf4465bb, type: 3}
+    - {fileID: 8300000, guid: 41715103fea2abe49b55bcc7cf98932f, type: 3}
+    - {fileID: 8300000, guid: da9b29149d85caa4893662c6f4a4ca2d, type: 3}
+    - {fileID: 8300000, guid: ceb955560f289d34ebdaa82907353e22, type: 3}
+    - {fileID: 8300000, guid: bd901d1289d0e1549b8bc47ce8c996aa, type: 3}
+    - {fileID: 8300000, guid: d654ee07e5146a640860e02c045bd1c1, type: 3}
+    - {fileID: 8300000, guid: 1326b9521f8cd024aa952afcf0b6a2b1, type: 3}
+    - {fileID: 8300000, guid: c0f4d5cb29b4c7d4da9cad3b2718d236, type: 3}
+    - {fileID: 8300000, guid: 52e47481a0f33d541bbc6e1cb62199ed, type: 3}
+    - {fileID: 8300000, guid: 06b45f50951a9ad40967624f7afc67b3, type: 3}
+    - {fileID: 8300000, guid: 56536d75a59108c43bca7f968d404038, type: 3}
+    _crouchClips: []
+    _jumpClips:
+    - {fileID: 8300000, guid: b2429345098b819478efd81319e5ceae, type: 3}
+    - {fileID: 8300000, guid: f1114175be2837b4d8a885b04e32f5d6, type: 3}
+    - {fileID: 8300000, guid: 6874d157590bb2c4ebb1ae0a74a7e1c7, type: 3}
+    - {fileID: 8300000, guid: 500ed05842ac6ea4eaf65125f614fa70, type: 3}
+    - {fileID: 8300000, guid: 215221f8648c52e44bd680bb21623ab8, type: 3}
+    _landClips:
+    - {fileID: 8300000, guid: 7c71866c51d7bc946abbfceca804cbea, type: 3}
+    - {fileID: 8300000, guid: c261b54c78b14804fb5f74938e25a4d0, type: 3}
+    - {fileID: 8300000, guid: afdbd7934189f544cbe5df04909177b1, type: 3}
+    - {fileID: 8300000, guid: b803e8c8dbd53084fa9e784220339e9f, type: 3}
+    - {fileID: 8300000, guid: 2f514d1b170652442ba2d336f0ccb9d8, type: 3}
+  - _type: 4
+    _materialName: materials\sand
+    _pairStepClips: []
+    _walkClips: []
+    _runClips: []
+    _crouchClips: []
+    _jumpClips: []
+    _landClips: []
+  - _type: 5
+    _materialName: materials\dirt
+    _pairStepClips: []
+    _walkClips: []
+    _runClips: []
+    _crouchClips: []
+    _jumpClips: []
+    _landClips: []
+  - _type: 6
+    _materialName: materials\asphalt
+    _pairStepClips: []
+    _walkClips:
+    - {fileID: 8300000, guid: 464c92d20e859c14187dca7e1887d6ca, type: 3}
+    - {fileID: 8300000, guid: a2ddd5bb33fb7da45a404fded3a4313b, type: 3}
+    - {fileID: 8300000, guid: 50803c734d156124e94ba5ede022641b, type: 3}
+    - {fileID: 8300000, guid: 7c3156b862efd034ab16700c70e9ba6b, type: 3}
+    - {fileID: 8300000, guid: 404a3fecab749b44a8f7b39a80e42582, type: 3}
+    - {fileID: 8300000, guid: 6d00d545af04d0243ab5a547fe8a938a, type: 3}
+    - {fileID: 8300000, guid: 815a6f6748c63624cb3b67158a4816ac, type: 3}
+    - {fileID: 8300000, guid: 307e251a8efc5c241a17cbe133f1a064, type: 3}
+    - {fileID: 8300000, guid: e4dd0e83cd2d89c418b0a5a576853e68, type: 3}
+    - {fileID: 8300000, guid: 896ba25f8031e894288e626470d27eff, type: 3}
+    - {fileID: 8300000, guid: 0bf2b2e3818cbdc43bc6345588ac2bd2, type: 3}
+    - {fileID: 8300000, guid: 4ddf4c50c2ee22141964d26b8faed658, type: 3}
+    - {fileID: 8300000, guid: 076e30f415f850c4989ef035bbed1700, type: 3}
+    - {fileID: 8300000, guid: 04026be0e28b7004f90ad1d713843d61, type: 3}
+    - {fileID: 8300000, guid: 4d6f49a5075bcfe42a225e0e8bf1c3f7, type: 3}
+    _runClips:
+    - {fileID: 8300000, guid: 880bfaf7937b1de4ab3dff6e7f0acf1c, type: 3}
+    - {fileID: 8300000, guid: 0587d51fa03c12a49970a1d182bd8354, type: 3}
+    - {fileID: 8300000, guid: a8183c9a0a9232f4a825c00826224f02, type: 3}
+    - {fileID: 8300000, guid: 1696d3df3fb4dee4cab55caf5318d45d, type: 3}
+    - {fileID: 8300000, guid: 99b1f28f93206d94bb7cb2cba16663f6, type: 3}
+    - {fileID: 8300000, guid: 74eb2d7687a0be54a888e67d578bb323, type: 3}
+    - {fileID: 8300000, guid: d2946bf7dfc1e8f4dbf4b8d2fab85ba3, type: 3}
+    - {fileID: 8300000, guid: aa0a63068f48c214f96e03a283b8d754, type: 3}
+    - {fileID: 8300000, guid: a1d1475f39c9e2e4593269f4adeb19e1, type: 3}
+    - {fileID: 8300000, guid: 0f8bee5f7c5743a45b4702afa06764ee, type: 3}
+    - {fileID: 8300000, guid: ca04f825d92ba6f4fad702b54be248ab, type: 3}
+    - {fileID: 8300000, guid: aff2dc793141eea4290870ee1f72b868, type: 3}
+    - {fileID: 8300000, guid: 5d12ecbd8e80d7a4eb210a78b5b61b82, type: 3}
+    - {fileID: 8300000, guid: a7e50e39369d1bb44bd1cbca19dd9d00, type: 3}
+    - {fileID: 8300000, guid: 273d9c9cce522f149a4387b6ffe2ebbe, type: 3}
+    _crouchClips: []
+    _jumpClips:
+    - {fileID: 8300000, guid: 38c4f62c31f2bfe4381d4cf93a54d1ae, type: 3}
+    - {fileID: 8300000, guid: df4cceb8e9737d7429c20e6c5ef770b6, type: 3}
+    - {fileID: 8300000, guid: 066e04ce3cecb094d9609ac55118e6cb, type: 3}
+    - {fileID: 8300000, guid: 9d833f7331a185649a5cb722e365a7e9, type: 3}
+    - {fileID: 8300000, guid: 70e9992f7d5647b41ab0d90bd7eac255, type: 3}
+    _landClips:
+    - {fileID: 8300000, guid: d25776b72488fc74e84ed7a7a56dfdd9, type: 3}
+    - {fileID: 8300000, guid: 1660f99cdc3bbdb48befc1b48d0e63b2, type: 3}
+    - {fileID: 8300000, guid: c77f43fa675e72e47b714e40e085740f, type: 3}
+    - {fileID: 8300000, guid: fc0fe469293a540458dc72513484d297, type: 3}
+    - {fileID: 8300000, guid: edd45381c7ca91445ab48ca02bb0ed04, type: 3}
+  - _type: 7
+    _materialName: materials\concrete
+    _pairStepClips: []
+    _walkClips:
+    - {fileID: 8300000, guid: 63ceb3e369c90924f890d83c7c26f7af, type: 3}
+    - {fileID: 8300000, guid: b2a7d14bb4037334c8a51f9d1e9b2e8c, type: 3}
+    - {fileID: 8300000, guid: 8a53818e2bf6c0844a14196d809faa67, type: 3}
+    - {fileID: 8300000, guid: 475bf6a09067a5247a121cbbe91540db, type: 3}
+    - {fileID: 8300000, guid: 2c6774d1ba848004cb53287410e0c372, type: 3}
+    - {fileID: 8300000, guid: a97bf1d2e55b7ea47963aef2456352c1, type: 3}
+    - {fileID: 8300000, guid: 4152a0a872752504bbc86f6738f7577f, type: 3}
+    - {fileID: 8300000, guid: f341598d089a37d42a29f2a338515b16, type: 3}
+    - {fileID: 8300000, guid: ae4e4c1d5df4c8f4ba59f74835a2ce3b, type: 3}
+    - {fileID: 8300000, guid: 9b1cb1a19a8d7a74a943fe8e1c683379, type: 3}
+    - {fileID: 8300000, guid: 1bce6dd0af19b774ca722f3ca6977ec0, type: 3}
+    - {fileID: 8300000, guid: 34733a028922af2469c88db3d227447a, type: 3}
+    _runClips:
+    - {fileID: 8300000, guid: f40f55b5255d6d54182caf447bf9ed45, type: 3}
+    - {fileID: 8300000, guid: 54d853aa4dccbb74783fb7b9e5d1370f, type: 3}
+    - {fileID: 8300000, guid: 2c6f7fa6353e8784d89f69b8cb8a7a45, type: 3}
+    - {fileID: 8300000, guid: ae123d0ee59f4a14cba69032b1c609c0, type: 3}
+    - {fileID: 8300000, guid: 6c7b6b3786af7ae439b6dc5dd49b9f6d, type: 3}
+    - {fileID: 8300000, guid: 3fb87ee34b3e1a742bd21a8be8ca94b7, type: 3}
+    - {fileID: 8300000, guid: 691256d3a3b2da549ae885888c44007f, type: 3}
+    - {fileID: 8300000, guid: b6947c19ef9981944af89499a55dbad3, type: 3}
+    - {fileID: 8300000, guid: 958f7aa4c6939864e86088cfebeefe67, type: 3}
+    - {fileID: 8300000, guid: aaf61550eb307494e8093832346c19d1, type: 3}
+    - {fileID: 8300000, guid: 0975a90b11dcf6044a0ea70bc77d68c6, type: 3}
+    - {fileID: 8300000, guid: b25600759bd294145a342af26e14aba3, type: 3}
+    _crouchClips: []
+    _jumpClips:
+    - {fileID: 8300000, guid: 9235d1083ea6b9049b30758f410a295d, type: 3}
+    - {fileID: 8300000, guid: 16521573546700049b9b1a6935ae85c9, type: 3}
+    - {fileID: 8300000, guid: 24c3b54482d67b34d80803af1f8e2d09, type: 3}
+    - {fileID: 8300000, guid: 646916be81f455c4b91de22730807da8, type: 3}
+    - {fileID: 8300000, guid: 4444385328858c445bebb4370042f9ab, type: 3}
+    _landClips:
+    - {fileID: 8300000, guid: 96a97304c5f0fcb44b7e573c3db326e0, type: 3}
+    - {fileID: 8300000, guid: 283189de23c56174da72a4559f3dbdd8, type: 3}
+    - {fileID: 8300000, guid: 9b4d89567b2cb9d4cbf02a068c4c7682, type: 3}
+    - {fileID: 8300000, guid: 93abd3634f5568344897c9d8ad86b9e9, type: 3}
+    - {fileID: 8300000, guid: bc244c45e36291044a15f7ad04d4691b, type: 3}
+  - _type: 8
+    _materialName: materials\bricks
+    _pairStepClips: []
+    _walkClips:
+    - {fileID: 8300000, guid: 00940b5da2e99aa4d9d3575d89884764, type: 3}
+    - {fileID: 8300000, guid: d5a2cab27a173ec4fae2a12144900a17, type: 3}
+    - {fileID: 8300000, guid: eb7b019cf768f084db85c3fe51215d71, type: 3}
+    - {fileID: 8300000, guid: c4ded82491652b046b67f7d5a4a4c8e9, type: 3}
+    - {fileID: 8300000, guid: 35e063602795557468fcd0827307b220, type: 3}
+    - {fileID: 8300000, guid: ecbb588193929cd49b006746f40c4794, type: 3}
+    _runClips:
+    - {fileID: 8300000, guid: 6eed256cfc0b7ba479aeee2f4eee78ed, type: 3}
+    - {fileID: 8300000, guid: 61144744efd04a6499779a6432f90eef, type: 3}
+    - {fileID: 8300000, guid: 562053ba02445ed4c8892341727d223e, type: 3}
+    - {fileID: 8300000, guid: 5e0b9f7b894f6b341948809e88b4bfaf, type: 3}
+    - {fileID: 8300000, guid: 4f4c2b18435cf3947991605c0c3a6509, type: 3}
+    - {fileID: 8300000, guid: 6c4a016d08029dd4ebf3ce59f74fe7bc, type: 3}
+    _crouchClips: []
+    _jumpClips:
+    - {fileID: 8300000, guid: 143014d303675394cad1c96dce8aad6e, type: 3}
+    - {fileID: 8300000, guid: 9f3dc6dce26ab964c9ce3ca7ff6501ed, type: 3}
+    - {fileID: 8300000, guid: 28fa94ce78da1c2499abe014e3df8437, type: 3}
+    - {fileID: 8300000, guid: 653d170478cce924b9fb9b8b8748d9d3, type: 3}
+    - {fileID: 8300000, guid: 6a739e68c995b204b9c5fbfedd5aa1b9, type: 3}
+    _landClips:
+    - {fileID: 8300000, guid: beac9ea968d700d4295e47c33cd99fae, type: 3}
+    - {fileID: 8300000, guid: c68091792884d2d47b3e93b38ba632b0, type: 3}
+    - {fileID: 8300000, guid: fd6f3a05f430ba641b31a5819f97d254, type: 3}
+    - {fileID: 8300000, guid: 6649e05777ebcf94ca857b6ab4ab424c, type: 3}
+    - {fileID: 8300000, guid: 6b3b35864075bfa49b7f57588212a324, type: 3}
+  - _type: 9
+    _materialName: materials\stucco
+    _pairStepClips:
+    - {fileID: 8300000, guid: b1c15e7673d72204ea70848734f30383, type: 3}
+    - {fileID: 8300000, guid: 942f63c8b235db645b7623d4617beae0, type: 3}
+    - {fileID: 8300000, guid: c363437d3ab092c4abc206a655fbed6f, type: 3}
+    - {fileID: 8300000, guid: 60e7a688b4159514e8337569369f4575, type: 3}
+    - {fileID: 8300000, guid: 3b01feb095b2ca6479ba10c0b875c1a5, type: 3}
+    - {fileID: 8300000, guid: 4e5866f438b120a4aa3fe03d6b77c5b2, type: 3}
+    - {fileID: 8300000, guid: 0beb67c0db56fca4894d10d32b9ba599, type: 3}
+    - {fileID: 8300000, guid: 9fde8d051bb3c344da7a514f2ecc2876, type: 3}
+    - {fileID: 8300000, guid: 1bfc6a4fa93545c459b4a4067bb14044, type: 3}
+    - {fileID: 8300000, guid: 41d033cc6a1108246a8e50c8b995255e, type: 3}
+    - {fileID: 8300000, guid: 1a2321e5d22808f4fa62b048d6957665, type: 3}
+    - {fileID: 8300000, guid: 76936c0eb8ffd2e4386f311042f3826f, type: 3}
+    _walkClips: []
+    _runClips: []
+    _crouchClips: []
+    _jumpClips: []
+    _landClips: []
+  - _type: 10
+    _materialName: materials\flooring_tile
+    _pairStepClips: []
+    _walkClips:
+    - {fileID: 8300000, guid: eabddce3414ff5643a724bd4541e880d, type: 3}
+    - {fileID: 8300000, guid: 2f75dbbd06e5f57469f735f6453af058, type: 3}
+    - {fileID: 8300000, guid: cd141317b6775a34b942eb74519c3ab2, type: 3}
+    - {fileID: 8300000, guid: acee3a1e30ee98c489a5f9e2900b772c, type: 3}
+    - {fileID: 8300000, guid: 9420dbbc70bf93f48a05e401642f83cb, type: 3}
+    - {fileID: 8300000, guid: d6eac1cd2f3669047b441ab466ae0d0c, type: 3}
+    - {fileID: 8300000, guid: bfd20c576b291fc4c9bf211e33d1e788, type: 3}
+    - {fileID: 8300000, guid: 7b97dc5e8dc9dbd40a1250a61da7888d, type: 3}
+    - {fileID: 8300000, guid: 2769788866dd55b41bb6c2c89933a66f, type: 3}
+    - {fileID: 8300000, guid: 5f81bda1d44540947a7aa91716756890, type: 3}
+    - {fileID: 8300000, guid: 0ed75b05f60fe6747beb1bb3cd6e0945, type: 3}
+    - {fileID: 8300000, guid: 38f1bb70e0e77d6498ddbb4c10e0ed6d, type: 3}
+    _runClips:
+    - {fileID: 8300000, guid: d7af5b36daffeef488e36896268f3a4d, type: 3}
+    - {fileID: 8300000, guid: 64f2743e6a236044e939928b5ae86e72, type: 3}
+    - {fileID: 8300000, guid: ad85deb07c18a3443a483bfcb1bbc35c, type: 3}
+    - {fileID: 8300000, guid: e7cafa379b950644f88e08a72d5faf24, type: 3}
+    - {fileID: 8300000, guid: 95f6f804e5463d642819558be4d06877, type: 3}
+    - {fileID: 8300000, guid: 91b3fee377172004295c932a317a458a, type: 3}
+    - {fileID: 8300000, guid: 4359b6d2214e6b24083ed18998fff5a1, type: 3}
+    - {fileID: 8300000, guid: c67515d3ab9da8242bf7fef2355b0a0c, type: 3}
+    - {fileID: 8300000, guid: 913d7ec3ab51a404f8c6af0df9e99cf9, type: 3}
+    - {fileID: 8300000, guid: 99b8d464a32823c478515d7e2a5b23d3, type: 3}
+    - {fileID: 8300000, guid: ac5f8398530092f4cb9c34680ab6a785, type: 3}
+    - {fileID: 8300000, guid: f86ee9042a9e84b4d8631b0ff44b6a40, type: 3}
+    _crouchClips: []
+    _jumpClips:
+    - {fileID: 8300000, guid: 008a8d6c48361304498539b90d92ffd1, type: 3}
+    - {fileID: 8300000, guid: 7230147f54320e043b689d84d20583b5, type: 3}
+    - {fileID: 8300000, guid: 2d3d2e0bf043d4640b6f7e8190aca4e7, type: 3}
+    - {fileID: 8300000, guid: 9fbd474f5ebff4c48832d071201d4585, type: 3}
+    - {fileID: 8300000, guid: d608a2140c6724c4686ae43a99d42e60, type: 3}
+    _landClips:
+    - {fileID: 8300000, guid: 7dd00efa268dd1941985aedf1da882f6, type: 3}
+    - {fileID: 8300000, guid: 4d7cb4a1d01e89e429dc93c66f0e54e2, type: 3}
+    - {fileID: 8300000, guid: 49baf6407e5350341988482a4b9c81e9, type: 3}
+    - {fileID: 8300000, guid: 05d448ef847ec3041a7c027c8b9bfbb4, type: 3}
+    - {fileID: 8300000, guid: 922b32dfdf459424684c06874c526592, type: 3}
+  - _type: 11
+    _materialName: materials\metal
+    _pairStepClips: []
+    _walkClips:
+    - {fileID: 8300000, guid: 5301403ba43d7d64ab9d6ee3aeb4fc5a, type: 3}
+    - {fileID: 8300000, guid: 644663d52b3bf874ab50f273efd57bb2, type: 3}
+    - {fileID: 8300000, guid: be0b09f8e8c60c14fb625a3d54a9616e, type: 3}
+    - {fileID: 8300000, guid: 8610cefae7ac81a43bf22c927ad856c3, type: 3}
+    - {fileID: 8300000, guid: d7bda00cac387c542affabb1dcfe765c, type: 3}
+    - {fileID: 8300000, guid: 854aa3834a805e147b0b07b196ae6ac9, type: 3}
+    - {fileID: 8300000, guid: 67d963e3af41d1747a0f606934b850a5, type: 3}
+    - {fileID: 8300000, guid: e8a79613fc4bd1846828b0676046f8db, type: 3}
+    - {fileID: 8300000, guid: 5b8fae738caa9234bb18f6a01439d3fa, type: 3}
+    - {fileID: 8300000, guid: 380ecb73a41701f4da6ee6582461b617, type: 3}
+    - {fileID: 8300000, guid: 5c1f1cc230c9cb641a82fc369066e9d8, type: 3}
+    - {fileID: 8300000, guid: 26544da213660ec448443d3112a3b3ba, type: 3}
+    _runClips:
+    - {fileID: 8300000, guid: c28fc3439d3669445b32640b15054c3a, type: 3}
+    - {fileID: 8300000, guid: c5b82f8d84f4eb24eb7984f2dff565e7, type: 3}
+    - {fileID: 8300000, guid: eb57bb599b8bf5447a27434f8a60ad42, type: 3}
+    - {fileID: 8300000, guid: 2e0da571794989c4789816fdeaea5160, type: 3}
+    - {fileID: 8300000, guid: 326aef75a14998a4fbf34ee7df2db122, type: 3}
+    - {fileID: 8300000, guid: ea45ffa66a04b9447a2f94bd995378f0, type: 3}
+    - {fileID: 8300000, guid: 673324d968027424a836971022f0f765, type: 3}
+    - {fileID: 8300000, guid: 244a9fb5c79198e4ca42e808e531c862, type: 3}
+    - {fileID: 8300000, guid: 640e14453d69f12409a57c8c5ed74271, type: 3}
+    - {fileID: 8300000, guid: 97262e7cce3a98d47a5998cd92972dcd, type: 3}
+    - {fileID: 8300000, guid: 37e1af24adeb4bd42b2608560fd7830a, type: 3}
+    - {fileID: 8300000, guid: b08377d7ee46f7246903db9389d155eb, type: 3}
+    _crouchClips: []
+    _jumpClips:
+    - {fileID: 8300000, guid: fe6cb45dd38056448b2716f06fc87304, type: 3}
+    - {fileID: 8300000, guid: dd7f735ea4afa3941bf6b57dafde8b5e, type: 3}
+    - {fileID: 8300000, guid: d3d4814dae5c1274dab6e033709244ec, type: 3}
+    - {fileID: 8300000, guid: a8658e259a7c0e14f8970dbcfe0aa2e8, type: 3}
+    - {fileID: 8300000, guid: 900f32c0835c6ff4a9977216cef16164, type: 3}
+    _landClips:
+    - {fileID: 8300000, guid: fa2da6e4ff1712340b59b9dc4ba77b2e, type: 3}
+    - {fileID: 8300000, guid: 89ee50bf2aa82f44d8e35d75976d3d70, type: 3}
+    - {fileID: 8300000, guid: 18789e34a887a35469b862de0a358ec7, type: 3}
+    - {fileID: 8300000, guid: ba4de42699d80b047aca69c4d0726e17, type: 3}
+    - {fileID: 8300000, guid: c32bf8515ed71204f9e8edadb60eb2d5, type: 3}
+  - _type: 12
+    _materialName: materials\metal_pipe
+    _pairStepClips: []
+    _walkClips:
+    - {fileID: 8300000, guid: dcfb350c0de851a41bb68dc3aa30df1f, type: 3}
+    - {fileID: 8300000, guid: de8116f63c36d3a4db46f397de9cbaed, type: 3}
+    - {fileID: 8300000, guid: 849d842cac2c01e4c8e2feae741ad86e, type: 3}
+    - {fileID: 8300000, guid: 2ef8782b97c4f1d458de67bef2bb2ee0, type: 3}
+    - {fileID: 8300000, guid: 8811282feb6b6144b802e3084c4b5d8b, type: 3}
+    - {fileID: 8300000, guid: 9d33029c05f31b64ab65a21e2a9be144, type: 3}
+    - {fileID: 8300000, guid: eba1effafec898e4b9d95165012a9b32, type: 3}
+    - {fileID: 8300000, guid: 2f46910bd47fa5349ba84d508fd7ee8d, type: 3}
+    - {fileID: 8300000, guid: 9a39ecd5f7438ba4aa15b704f70b5466, type: 3}
+    - {fileID: 8300000, guid: 5e2c4bfa077ba57428ba737d13f40552, type: 3}
+    - {fileID: 8300000, guid: 1fbe96b4b710ada4484dc696bc3fac20, type: 3}
+    - {fileID: 8300000, guid: 16dab25deded4f449bda5c82f89a9e01, type: 3}
+    _runClips:
+    - {fileID: 8300000, guid: 97c37077047c2134f8cadad901f49837, type: 3}
+    - {fileID: 8300000, guid: e70c6181a1b671d4aa1c8ca4bb7d06d3, type: 3}
+    - {fileID: 8300000, guid: a0ab9f31ababbc0458c010f5e8b286da, type: 3}
+    - {fileID: 8300000, guid: c87b391e1241a0f4b8d2f97bac80d93f, type: 3}
+    - {fileID: 8300000, guid: 32a473da2b35da747bb5c1de42a231a9, type: 3}
+    - {fileID: 8300000, guid: 26df67790e487fc40bbe6e94b2a7ef63, type: 3}
+    - {fileID: 8300000, guid: 5e5c9a11567cdf241ae330f1631d9570, type: 3}
+    - {fileID: 8300000, guid: 9c20567cb3c14c7419ec29a367b9f1a5, type: 3}
+    - {fileID: 8300000, guid: 6d54e62c8ddfd8c4c8d147af52643c68, type: 3}
+    - {fileID: 8300000, guid: bd10e928006b1054ba881b0a939d5f22, type: 3}
+    - {fileID: 8300000, guid: 600d029873d251a47b8dfb35ffaa326a, type: 3}
+    - {fileID: 8300000, guid: 204258be3ac95f24eac0609544f98708, type: 3}
+    _crouchClips: []
+    _jumpClips:
+    - {fileID: 8300000, guid: 22676d4ea660db1489585958b1bd1a86, type: 3}
+    - {fileID: 8300000, guid: b557800a8076561428ed5ac298bb2334, type: 3}
+    - {fileID: 8300000, guid: 201a3260e886b784b84383bdb14775d6, type: 3}
+    - {fileID: 8300000, guid: 093939c84c09c5046b50ebfb1afd7209, type: 3}
+    - {fileID: 8300000, guid: 2dfe6d819716e714aa84167ffb81d0c5, type: 3}
+    _landClips:
+    - {fileID: 8300000, guid: ddc906fea06607a4c82107d1ea8c3596, type: 3}
+    - {fileID: 8300000, guid: c5d46123f5a96584a9aab798988404ef, type: 3}
+    - {fileID: 8300000, guid: b2b224a14dd6fa244a3b90eaad6500b8, type: 3}
+    - {fileID: 8300000, guid: 90c0ec6a1989ac646a7ea8129971575d, type: 3}
+    - {fileID: 8300000, guid: d6c414ae99b9d1e47a6f85e28586603d, type: 3}
+  - _type: 13
+    _materialName: materials\metal_plate
+    _pairStepClips: []
+    _walkClips:
+    - {fileID: 8300000, guid: c6c21b0c22c8d154db654db8a12834ed, type: 3}
+    - {fileID: 8300000, guid: 2bfe19a66b752ec48ac06cb8ce2f8756, type: 3}
+    - {fileID: 8300000, guid: 6b0e24208ee6cfd43ac5370ace3913d6, type: 3}
+    - {fileID: 8300000, guid: 40a0a809b8e0d17459a1f79c2b6861ad, type: 3}
+    - {fileID: 8300000, guid: 3946b66d1573b6c4fbf52c4609149601, type: 3}
+    - {fileID: 8300000, guid: 1728e439d6928304ab32f0fc5a2e80f0, type: 3}
+    - {fileID: 8300000, guid: ff756a0a638eb194aa703ba1ab340dc4, type: 3}
+    - {fileID: 8300000, guid: 940cd6aec1e9afa4e84e13c0b82219ce, type: 3}
+    - {fileID: 8300000, guid: 3532785255c26ae4ba08b98db47f4dbf, type: 3}
+    - {fileID: 8300000, guid: 7b43f391a95ca7c4a9d0f875cd7b0409, type: 3}
+    - {fileID: 8300000, guid: 8f24b4b296f4e0d46b428e5ee0236745, type: 3}
+    - {fileID: 8300000, guid: 4e207b20778b58b45bc0615138605600, type: 3}
+    _runClips:
+    - {fileID: 8300000, guid: 99859c742e62ece42ab3202cb0810182, type: 3}
+    - {fileID: 8300000, guid: 3a02dd61dacaba94a81779030d5f5b8f, type: 3}
+    - {fileID: 8300000, guid: 0b74346e531b89a43b815978d3f5a700, type: 3}
+    - {fileID: 8300000, guid: 437f4627093f3fd45aaa57b1e84f7a93, type: 3}
+    - {fileID: 8300000, guid: 47648e44fd5ed4545b1b1b6637e0f921, type: 3}
+    - {fileID: 8300000, guid: 0d80764ab64bc794f94c6301ac828eb7, type: 3}
+    - {fileID: 8300000, guid: 795f8ef24b9d671479384b4df5a6fd03, type: 3}
+    - {fileID: 8300000, guid: 49fba423310a3d8428cc7858b2b95e48, type: 3}
+    - {fileID: 8300000, guid: 3022ecf38fad8fa4185f893d6bf5b8cf, type: 3}
+    - {fileID: 8300000, guid: 91297d2b4db698d489716af309bc1318, type: 3}
+    - {fileID: 8300000, guid: 9673b29949a060c4ea28d38d607240c1, type: 3}
+    - {fileID: 8300000, guid: 32290cc046ffd734fa7f2db0843834d4, type: 3}
+    _crouchClips: []
+    _jumpClips:
+    - {fileID: 8300000, guid: 431f2f55447f32b44a9d02ea57130411, type: 3}
+    - {fileID: 8300000, guid: 586354aece36a8343a6c9ea232a10006, type: 3}
+    - {fileID: 8300000, guid: b75d056cf2fb24e4c84f7c46927f680c, type: 3}
+    - {fileID: 8300000, guid: 3ebf50f404b613d4a8d2429ae48d86a8, type: 3}
+    - {fileID: 8300000, guid: 6039f4a48002d6e4b895808e02317ef3, type: 3}
+    _landClips:
+    - {fileID: 8300000, guid: 23a643ed82073134986e696727461e57, type: 3}
+    - {fileID: 8300000, guid: a78aa5216a377004d909837cf6afc89c, type: 3}
+    - {fileID: 8300000, guid: fab82abe22e9d8e45a63b536e3f02000, type: 3}
+    - {fileID: 8300000, guid: 5f92112d9cf89e342a01d6b8c1055d0d, type: 3}
+    - {fileID: 8300000, guid: d3b240e4cf8fc664aaccbafaf50e85f0, type: 3}
+  - _type: 14
+    _materialName: materials\tin
+    _pairStepClips: []
+    _walkClips:
+    - {fileID: 8300000, guid: 3d29339ff1db7824780d5bac17db12db, type: 3}
+    - {fileID: 8300000, guid: 27bd7b6bfc837754f91d489bbe110ef2, type: 3}
+    - {fileID: 8300000, guid: c60df1a3bb3bdef40887025d204480e9, type: 3}
+    - {fileID: 8300000, guid: cec9257acfd579b41af1b55cc1cc07a3, type: 3}
+    - {fileID: 8300000, guid: 214f93b3da02c234a83601bb9c2e4888, type: 3}
+    - {fileID: 8300000, guid: b2388f8a1e00d534facd6fde33e0f1c4, type: 3}
+    - {fileID: 8300000, guid: a0d03bf8ba72a33419e035637b9857ae, type: 3}
+    - {fileID: 8300000, guid: de9710c7e3a76df4bae87f4df4f8e480, type: 3}
+    - {fileID: 8300000, guid: bd273c98cfee72946a19e7fa954ec232, type: 3}
+    - {fileID: 8300000, guid: 7cab68a940c999e46b2926c676c7eab3, type: 3}
+    - {fileID: 8300000, guid: 2eb18511de0d5614fb636ce0125d7a00, type: 3}
+    - {fileID: 8300000, guid: a0020e36905bedb40aefc8f2f4354c5b, type: 3}
+    _runClips:
+    - {fileID: 8300000, guid: d90a92a47749c6b40a31311b40d8bfd3, type: 3}
+    - {fileID: 8300000, guid: 7664338a6e1723b4f843bd4fb000710b, type: 3}
+    - {fileID: 8300000, guid: 3e1fe0d1521f3fb42b1032d996aab56b, type: 3}
+    - {fileID: 8300000, guid: 91d5149ef8fdc3f4fa58ef2e14c9a005, type: 3}
+    - {fileID: 8300000, guid: 5acab0f6ee66f064c874f66697c145d6, type: 3}
+    - {fileID: 8300000, guid: 11ecaace84a3884469a28c7e4506a29a, type: 3}
+    - {fileID: 8300000, guid: 009ffd98cb4817f4bbbb195fc269bc57, type: 3}
+    - {fileID: 8300000, guid: 623cb67d8a929f843af0651ecf8bd089, type: 3}
+    - {fileID: 8300000, guid: d36728c5015122b428f92d877adf7bea, type: 3}
+    - {fileID: 8300000, guid: d99a03f78c711df42b35a46608e6b15c, type: 3}
+    - {fileID: 8300000, guid: 2253305021e46254a9a60e16e42f5cd6, type: 3}
+    - {fileID: 8300000, guid: 17bcbec3c92c6f741a790f2588ee7b0b, type: 3}
+    _crouchClips: []
+    _jumpClips:
+    - {fileID: 8300000, guid: 933c9f672ca1dea4b8a780fecf618abb, type: 3}
+    - {fileID: 8300000, guid: 34a27718f62b1814ea0fdad16da8ce18, type: 3}
+    - {fileID: 8300000, guid: a1b53e96cf4c73845a1c9ee730b82bb9, type: 3}
+    - {fileID: 8300000, guid: bc64144f866cf094f899f10aedde9913, type: 3}
+    - {fileID: 8300000, guid: b58a89aadc363db46a27a1da96164371, type: 3}
+    _landClips:
+    - {fileID: 8300000, guid: 3787e86c8db008043a12277389be90b7, type: 3}
+    - {fileID: 8300000, guid: fc4c85f87cee090408918280bbb85fe4, type: 3}
+    - {fileID: 8300000, guid: 5a66c10a1b2a0c64889907f0ea673caa, type: 3}
+    - {fileID: 8300000, guid: 068f73b6d184bbd4a8f9ae6c26bee564, type: 3}
+    - {fileID: 8300000, guid: 43bd3c3300c39a64db1c11f6b1a1eb80, type: 3}
+  - _type: 15
+    _materialName: materials\shifer
+    _pairStepClips:
+    - {fileID: 8300000, guid: b1c15e7673d72204ea70848734f30383, type: 3}
+    - {fileID: 8300000, guid: 942f63c8b235db645b7623d4617beae0, type: 3}
+    - {fileID: 8300000, guid: c363437d3ab092c4abc206a655fbed6f, type: 3}
+    - {fileID: 8300000, guid: 60e7a688b4159514e8337569369f4575, type: 3}
+    - {fileID: 8300000, guid: 3b01feb095b2ca6479ba10c0b875c1a5, type: 3}
+    - {fileID: 8300000, guid: 4e5866f438b120a4aa3fe03d6b77c5b2, type: 3}
+    - {fileID: 8300000, guid: 0beb67c0db56fca4894d10d32b9ba599, type: 3}
+    - {fileID: 8300000, guid: 9fde8d051bb3c344da7a514f2ecc2876, type: 3}
+    - {fileID: 8300000, guid: 1bfc6a4fa93545c459b4a4067bb14044, type: 3}
+    - {fileID: 8300000, guid: 41d033cc6a1108246a8e50c8b995255e, type: 3}
+    - {fileID: 8300000, guid: 1a2321e5d22808f4fa62b048d6957665, type: 3}
+    - {fileID: 8300000, guid: 76936c0eb8ffd2e4386f311042f3826f, type: 3}
+    _walkClips: []
+    _runClips: []
+    _crouchClips: []
+    _jumpClips:
+    - {fileID: 8300000, guid: 62afedab0c807c54e967b5c33dcee592, type: 3}
+    - {fileID: 8300000, guid: 5ae6940bea4bf42499326d9549bc0d8e, type: 3}
+    - {fileID: 8300000, guid: 998cd44946914a14382a3a517224ea72, type: 3}
+    - {fileID: 8300000, guid: 64f32f9265bf7df469a3608c657ffaab, type: 3}
+    - {fileID: 8300000, guid: 9b033507d1a5c9349bb6f08fcb48644b, type: 3}
+    _landClips:
+    - {fileID: 8300000, guid: 3c931afb16585214c8d38dbb1aaae9fa, type: 3}
+    - {fileID: 8300000, guid: 0ebd47deeed920c48bbf1b565dd59bb6, type: 3}
+    - {fileID: 8300000, guid: 0e455980850603340aee46a7c49161d4, type: 3}
+    - {fileID: 8300000, guid: ebd676bae295871418bfe07b5f7ed10d, type: 3}
+    - {fileID: 8300000, guid: c173f7f1a27ac8d4b9121926265b6ed6, type: 3}
+  - _type: 16
+    _materialName: materials\wood
+    _pairStepClips: []
+    _walkClips:
+    - {fileID: 8300000, guid: 7e31246e00243074fb6e0262128a32a8, type: 3}
+    - {fileID: 8300000, guid: 97d7e045195831c4a8ccac749f893484, type: 3}
+    - {fileID: 8300000, guid: f421dc903e3806647a00131d0e3bbdea, type: 3}
+    - {fileID: 8300000, guid: 5edeaf31b3e8f474a9cda1c365647382, type: 3}
+    - {fileID: 8300000, guid: 10178d2494a5c664ab23e73459a52899, type: 3}
+    - {fileID: 8300000, guid: 354298a514ce56e4b8dd11ba044916ec, type: 3}
+    - {fileID: 8300000, guid: 394fe7a9cdea3434c8c586043b56fd4d, type: 3}
+    - {fileID: 8300000, guid: b10722f2bdb4c8341985821f0802218f, type: 3}
+    - {fileID: 8300000, guid: 326ba4008b8188f45a51d1da916f15a5, type: 3}
+    - {fileID: 8300000, guid: 56a85d6053c448a4c8c4d70014f62b90, type: 3}
+    - {fileID: 8300000, guid: 712c215c40399ad489878e9874e7389a, type: 3}
+    - {fileID: 8300000, guid: 2249b5b0a9c7e434397ab8bf9c636109, type: 3}
+    _runClips:
+    - {fileID: 8300000, guid: 037070cd08ef53843a1296faef682c87, type: 3}
+    - {fileID: 8300000, guid: 9587014ea934fe14fb3ecdc4cce299b9, type: 3}
+    - {fileID: 8300000, guid: b749a9cc300d22e47a764e1a36bdf942, type: 3}
+    - {fileID: 8300000, guid: 8464cf7a650add14fb35368876ba108a, type: 3}
+    - {fileID: 8300000, guid: e19e3d6bd81907c4ba7523827af41494, type: 3}
+    - {fileID: 8300000, guid: b7f16d9e23b2e1a4aa27dff10f80b1fb, type: 3}
+    - {fileID: 8300000, guid: af0852da838edb94995eb62022620c60, type: 3}
+    - {fileID: 8300000, guid: bff0ad11704163d4690f3a145d58a6b2, type: 3}
+    - {fileID: 8300000, guid: 87552e4041e6b504490e4cff489aa169, type: 3}
+    - {fileID: 8300000, guid: f0ee1c446fa570d4a8c2a4c4bb34ac22, type: 3}
+    - {fileID: 8300000, guid: 679f5135d092dc74fbd177947869cdec, type: 3}
+    - {fileID: 8300000, guid: 27a28f15d2e1cee449797647d69e78f0, type: 3}
+    _crouchClips: []
+    _jumpClips:
+    - {fileID: 8300000, guid: 3afc43a57de3c334bac3e2aab18e5b5e, type: 3}
+    - {fileID: 8300000, guid: 2b2e9b4fee6af63409fa31868f6a28e8, type: 3}
+    - {fileID: 8300000, guid: 27a30c4ce89916344b70edf9c7d46a0e, type: 3}
+    - {fileID: 8300000, guid: 64a5886b7578ed443a816427725edc9e, type: 3}
+    - {fileID: 8300000, guid: 46da9f857f1d3cd43b6762e6cef62a0b, type: 3}
+    _landClips:
+    - {fileID: 8300000, guid: 55a97098b90084a47ae111ff16ea1ce0, type: 3}
+    - {fileID: 8300000, guid: 4d914a4becc162c44b3eebdfa23df3de, type: 3}
+    - {fileID: 8300000, guid: d95675baa52423048a211fb537897bfb, type: 3}
+    - {fileID: 8300000, guid: 3cedc8befcfe7aa4e9998bb4b9b4dd7b, type: 3}
+    - {fileID: 8300000, guid: 54ac7b187a310c149882354b20deefbd, type: 3}
+  - _type: 17
+    _materialName: materials\wooden_board
+    _pairStepClips: []
+    _walkClips:
+    - {fileID: 8300000, guid: 51c5865ca7deedd4286a0b00faeb32cb, type: 3}
+    - {fileID: 8300000, guid: bbc0cfd7e7ac0984597363ce92c43058, type: 3}
+    - {fileID: 8300000, guid: 77a1f7cfe6cb2e541828b97e775699b4, type: 3}
+    - {fileID: 8300000, guid: be61470ca6faac14aab452539499b1b8, type: 3}
+    - {fileID: 8300000, guid: 85ee146a0b435a04e9f6450c56ddbe3e, type: 3}
+    - {fileID: 8300000, guid: 5cb71d55219660d49b8dbec9d991e57f, type: 3}
+    - {fileID: 8300000, guid: 3589e3a37def1d947ad0ab4417078d7f, type: 3}
+    - {fileID: 8300000, guid: 19278309853283a4d997f4976dab28be, type: 3}
+    - {fileID: 8300000, guid: 82273b2b6de37b843bff1abc47f854ca, type: 3}
+    - {fileID: 8300000, guid: b068c1d713aa4ac418b9380dbbb0cba6, type: 3}
+    - {fileID: 8300000, guid: 4aeac885213f90945b85a8f28e6a5bab, type: 3}
+    - {fileID: 8300000, guid: c7971beeb51e89c43b165609017e988b, type: 3}
+    _runClips:
+    - {fileID: 8300000, guid: f14d0d6b27e4332458f00b4cb561086d, type: 3}
+    - {fileID: 8300000, guid: f8937aa522f6d354f8cbeadb8602d200, type: 3}
+    - {fileID: 8300000, guid: f62b5cefa8fe3b74db590976f6989a5d, type: 3}
+    - {fileID: 8300000, guid: 84227ba0ca4f0704da0192295e487da5, type: 3}
+    - {fileID: 8300000, guid: fcf3d1ce0b09d33468b4d65001e0e53d, type: 3}
+    - {fileID: 8300000, guid: 9f514f3f61851dc4c95670f6124995ff, type: 3}
+    - {fileID: 8300000, guid: b1dcad56a988e5345b0eed336580c42c, type: 3}
+    - {fileID: 8300000, guid: e550a9ddfcd1ac949861229247fe0756, type: 3}
+    - {fileID: 8300000, guid: 4615b8c20cf26114baf544c416a9bc92, type: 3}
+    - {fileID: 8300000, guid: 132338832aeaa5047ba7398250947969, type: 3}
+    - {fileID: 8300000, guid: f2bdff1ddbf448641a1016190cbbfa57, type: 3}
+    - {fileID: 8300000, guid: aff22ecf2e7a6ea42a350e605791aae7, type: 3}
+    _crouchClips: []
+    _jumpClips:
+    - {fileID: 8300000, guid: d9b39c63150117d48b73f0f7a3230b56, type: 3}
+    - {fileID: 8300000, guid: 1284a9cd02407784fb6345f9700158ad, type: 3}
+    - {fileID: 8300000, guid: e83d1c87af6ef67489cbd16deb94c78f, type: 3}
+    - {fileID: 8300000, guid: 4fb0b89ff73ae5043a61ae8175beb3ab, type: 3}
+    - {fileID: 8300000, guid: 2f89ff402de390b498c3c4c437f51433, type: 3}
+    _landClips:
+    - {fileID: 8300000, guid: b00cd0313d9426d4ca38087e03eb6dd9, type: 3}
+    - {fileID: 8300000, guid: 241cb32ac907eb040a9c23eabce5f671, type: 3}
+    - {fileID: 8300000, guid: e59a2b039b482a048bd7f49b61721e1c, type: 3}
+    - {fileID: 8300000, guid: f60def567e1a7ee4eb840571441da0ee, type: 3}
+    - {fileID: 8300000, guid: d673887eb3d85394e9568202f351963a, type: 3}
+  - _type: 18
+    _materialName: materials\tree_trunk
+    _pairStepClips: []
+    _walkClips:
+    - {fileID: 8300000, guid: 63845e47f9516164ba194844cc6fd7df, type: 3}
+    - {fileID: 8300000, guid: 76b3c6c03a349a94aa633abadd266654, type: 3}
+    - {fileID: 8300000, guid: b4aa25fb5304149409d972569216c9ac, type: 3}
+    - {fileID: 8300000, guid: acf077f3061aff94c80f7665601c606d, type: 3}
+    - {fileID: 8300000, guid: c3c8faf24fd9c4c45a242aa8585cef12, type: 3}
+    - {fileID: 8300000, guid: 5d8b3ae8710e546448d39109967dbde3, type: 3}
+    - {fileID: 8300000, guid: c1ffdeaec1e229749b73799fabc4efa1, type: 3}
+    - {fileID: 8300000, guid: 67c8ed6e34a6cdc49b5b33c084d95445, type: 3}
+    - {fileID: 8300000, guid: cda9b10601cc9994188b8d551d53adc7, type: 3}
+    - {fileID: 8300000, guid: e2d4d11b0f9f71f478f6c8b089a3dd1f, type: 3}
+    - {fileID: 8300000, guid: ffbdd4008abd48348ba07d7629aa5830, type: 3}
+    - {fileID: 8300000, guid: 327dec164c521ef44a21fe1dc73d0cf5, type: 3}
+    _runClips:
+    - {fileID: 8300000, guid: 93931d10ce680a64ca94c0d0733ce861, type: 3}
+    - {fileID: 8300000, guid: c2a417786f3a5f24e9c59ef0b56d8fb2, type: 3}
+    - {fileID: 8300000, guid: 7b09553859f168f41855d19f5feea098, type: 3}
+    - {fileID: 8300000, guid: 16199d0f1f995be4d807373cd8ad855a, type: 3}
+    - {fileID: 8300000, guid: 5743b6ced72f02c468275ae5e2079e89, type: 3}
+    - {fileID: 8300000, guid: de5d72e85557d8e48a5bdd76b6803049, type: 3}
+    - {fileID: 8300000, guid: 856f068d740fd8b428ad2b214f6805c9, type: 3}
+    - {fileID: 8300000, guid: 7f41bbafa8d335344b7cb98f47f54223, type: 3}
+    - {fileID: 8300000, guid: 0df12e650c6ef304abbfb5ca6aebcf4c, type: 3}
+    - {fileID: 8300000, guid: 68e966fb254c2c642816f51412d43097, type: 3}
+    - {fileID: 8300000, guid: 4363f310d32501c41a094e50e35724bb, type: 3}
+    - {fileID: 8300000, guid: 79dbb6b31c0612a4ebf57bee18cff964, type: 3}
+    _crouchClips: []
+    _jumpClips:
+    - {fileID: 8300000, guid: 40dcaec3d640f664cadab9dd9244bf94, type: 3}
+    - {fileID: 8300000, guid: f54b950131528f540a9e798507775783, type: 3}
+    - {fileID: 8300000, guid: 1648be558c72b2d419b352de50c635cc, type: 3}
+    - {fileID: 8300000, guid: 0ce0d776d20d96e44bc15cb3f3b0f168, type: 3}
+    - {fileID: 8300000, guid: b58af0781be04724296e25aa2fa184db, type: 3}
+    _landClips:
+    - {fileID: 8300000, guid: ce267b9bd0b93354e92d0a2db2e96864, type: 3}
+    - {fileID: 8300000, guid: 3bbb82b55c01c814c8ae8f7ef74a5d7d, type: 3}
+    - {fileID: 8300000, guid: 2fdcfab7eb9233a4a995635fc77e71fa, type: 3}
+    - {fileID: 8300000, guid: 35b9fd083903ff44180616f09ddfbecc, type: 3}
+    - {fileID: 8300000, guid: 923eba6e27923114a9b3a4b913b46950, type: 3}
+  - _type: 19
+    _materialName: materials\bush
+    _pairStepClips: []
+    _walkClips:
+    - {fileID: 8300000, guid: 81d8349a5a5d55f419e694bf6cf087ce, type: 3}
+    - {fileID: 8300000, guid: 280cad5b925ccba4ba14c9e7a58512f6, type: 3}
+    - {fileID: 8300000, guid: 4f4a42e86a95393429e830a7f965a32f, type: 3}
+    - {fileID: 8300000, guid: 9dd364dccb16bb44ebe21e9849c9f1e7, type: 3}
+    - {fileID: 8300000, guid: d5bffe3ead207cb489112f698329d007, type: 3}
+    - {fileID: 8300000, guid: bb5c9bb1bdff072428bafdc8751018f5, type: 3}
+    _runClips:
+    - {fileID: 8300000, guid: 4473f19a29dc94b41b68e7d3036e69f6, type: 3}
+    - {fileID: 8300000, guid: 3d2769d07fdee59458fc6767cbfc5ab0, type: 3}
+    - {fileID: 8300000, guid: 6a64ae382c29ed949835a54e4d51416c, type: 3}
+    - {fileID: 8300000, guid: 98c00d45cf925e447886ff588bcc90af, type: 3}
+    - {fileID: 8300000, guid: ca1cf3220e2349d4387d301f4ff9a681, type: 3}
+    - {fileID: 8300000, guid: f6db1c527d54a524eb8dee5222a4bb30, type: 3}
+    _crouchClips: []
+    _jumpClips:
+    - {fileID: 8300000, guid: 41b105824c049f340be77b23687abe33, type: 3}
+    - {fileID: 8300000, guid: 6343c13d20b4c724a8b723b0bd27f190, type: 3}
+    - {fileID: 8300000, guid: e76e0455aa488ce46a59d9f57e29d286, type: 3}
+    - {fileID: 8300000, guid: ff4f126f47c027b44a15b367eafa6983, type: 3}
+    - {fileID: 8300000, guid: 4c850c7939768d64cae49b6d80a3a451, type: 3}
+    _landClips:
+    - {fileID: 8300000, guid: 9579424e71722dd438d0fee50759eb4a, type: 3}
+    - {fileID: 8300000, guid: 2c6500b370a0fdf40be910477a21180e, type: 3}
+    - {fileID: 8300000, guid: 9f1b0ca666aad444583bf17f6927886e, type: 3}
+    - {fileID: 8300000, guid: 775ae0b4ea33e964cbbe0af8abb386ac, type: 3}
+    - {fileID: 8300000, guid: 38b16a5c63a0f5e4ba8649bc321b9558, type: 3}
+  - _type: 20
+    _materialName: materials\cloth
+    _pairStepClips: []
+    _walkClips:
+    - {fileID: 8300000, guid: 26f0d7d681379344fa7820fda019759e, type: 3}
+    - {fileID: 8300000, guid: 55d7049e5bca6df44b2dcd47849d41bf, type: 3}
+    - {fileID: 8300000, guid: 3a33e1c41079e0345b815dc08ff486be, type: 3}
+    - {fileID: 8300000, guid: 0581522e66f87154ba7ae4da225ec8a8, type: 3}
+    - {fileID: 8300000, guid: 312ca4bc4bbc1744c809f4f641cd8caa, type: 3}
+    - {fileID: 8300000, guid: 950e09d7022e12e4c98f9a7f3bd252ce, type: 3}
+    _runClips:
+    - {fileID: 8300000, guid: 3b1d82dcff65a7441adfe21d9fe71e36, type: 3}
+    - {fileID: 8300000, guid: 18644d4bad0649c4399f5adede0fc543, type: 3}
+    - {fileID: 8300000, guid: 2995de4748884ec40b9a34f14cada123, type: 3}
+    - {fileID: 8300000, guid: c2fb2c892461d4044a5c8ab7321380ea, type: 3}
+    - {fileID: 8300000, guid: 96915896140202b468e5871c4927f9f1, type: 3}
+    - {fileID: 8300000, guid: d88130a759ee0ac4db6277dc805b7bfc, type: 3}
+    _crouchClips: []
+    _jumpClips:
+    - {fileID: 8300000, guid: 6749c118fe17dd34db935cd2e7fb69ee, type: 3}
+    - {fileID: 8300000, guid: f99e43ae9def3d94c90ae5bb0e010a43, type: 3}
+    - {fileID: 8300000, guid: 6b2f221410b3ed849abc9a8deb268a2c, type: 3}
+    - {fileID: 8300000, guid: f1a10adec852126469b6b3cd33f987b3, type: 3}
+    - {fileID: 8300000, guid: d3d410dc077ee5d4f992bcf52eb6c32c, type: 3}
+    _landClips:
+    - {fileID: 8300000, guid: 52dad83d2a69aa24796fc24c3cd44d08, type: 3}
+    - {fileID: 8300000, guid: e2f3fef14c516874386f7fd74f62e049, type: 3}
+    - {fileID: 8300000, guid: 81283de262ea1af4eadb9bb95ee7aa54, type: 3}
+    - {fileID: 8300000, guid: fffe816a482e84d43bea712dd2d81abc, type: 3}
+    - {fileID: 8300000, guid: c0197a237d1eca141a1d4f51050688fd, type: 3}
+  - _type: 21
+    _materialName: materials\setka_rabica
+    _pairStepClips: []
+    _walkClips:
+    - {fileID: 8300000, guid: cb0e330df8d6db246a74e511a08cf0a9, type: 3}
+    - {fileID: 8300000, guid: f550efc34413ef54bafcb07bbcb00e11, type: 3}
+    - {fileID: 8300000, guid: b5d7b9f9539c86c40ba0de57c7080e6f, type: 3}
+    - {fileID: 8300000, guid: 3a43495ab429f0d47b96a3b629bf076c, type: 3}
+    - {fileID: 8300000, guid: e682965a67155e648b72c087ae8ad2b9, type: 3}
+    - {fileID: 8300000, guid: 901d87f1f6605be499f9bba06a12b814, type: 3}
+    _runClips:
+    - {fileID: 8300000, guid: 217886e64e2e7ce429e325b2a113cbbf, type: 3}
+    - {fileID: 8300000, guid: 8b5593601164c11409e291db6e1a4734, type: 3}
+    - {fileID: 8300000, guid: df93699913915a84197c6fed84c17b09, type: 3}
+    - {fileID: 8300000, guid: 0064321d6ed45c143a9d48b13081b886, type: 3}
+    - {fileID: 8300000, guid: 1ef21452e609d3c4c9287bee351e6f8a, type: 3}
+    - {fileID: 8300000, guid: 9a4bc23056eb50e45a990c34774ade82, type: 3}
+    _crouchClips: []
+    _jumpClips:
+    - {fileID: 8300000, guid: fb9c326f6aae4dc4b88ca5c26c952566, type: 3}
+    - {fileID: 8300000, guid: fe96caf4c150b7d479edb8924f8ae992, type: 3}
+    - {fileID: 8300000, guid: e87bd3df41c4c2b4f8518b808d47cca7, type: 3}
+    - {fileID: 8300000, guid: 5428ed90f892a2846a07046f1d056a04, type: 3}
+    - {fileID: 8300000, guid: 632a834922496784ea5794a0f51196bd, type: 3}
+    _landClips:
+    - {fileID: 8300000, guid: 2e94002f35651ec4781935d6935723a0, type: 3}
+    - {fileID: 8300000, guid: 26a83426c7baaa34283fc0f38f837d11, type: 3}
+    - {fileID: 8300000, guid: a07f9deecf8dcc845bf609db41eff1e1, type: 3}
+    - {fileID: 8300000, guid: ecaf2032fcbd45c449e151d11a418cf5, type: 3}
+    - {fileID: 8300000, guid: 34f3ae7571123f34d8a2dc1b661ed6f2, type: 3}
+  - _type: 22
+    _materialName: materials\glass
+    _pairStepClips: []
+    _walkClips: []
+    _runClips: []
+    _crouchClips: []
+    _jumpClips: []
+    _landClips: []
+  - _type: 23
+    _materialName: materials\water
+    _pairStepClips:
+    - {fileID: 8300000, guid: 574b7e7081bbe5a468df6c66078158aa, type: 3}
+    - {fileID: 8300000, guid: 3c8cc14b1ea8938459c16492b0c035a8, type: 3}
+    - {fileID: 8300000, guid: e68de7ea93bb50847bfedf3489297a91, type: 3}
+    - {fileID: 8300000, guid: 62a2d5616639ac149b931708f70dfce2, type: 3}
+    - {fileID: 8300000, guid: 0951d021ddc219b4db8fa8231c9c9440, type: 3}
+    - {fileID: 8300000, guid: 9fc920c150be7354788394518cd43518, type: 3}
+    _walkClips: []
+    _runClips: []
+    _crouchClips: []
+    _jumpClips:
+    - {fileID: 8300000, guid: 36b4940851c16884f8927c25efe20eff, type: 3}
+    - {fileID: 8300000, guid: 5b4f2efe06f1f5b48a171eb68054bcd0, type: 3}
+    - {fileID: 8300000, guid: f16db86b049d8cf44997cbf2edc778af, type: 3}
+    - {fileID: 8300000, guid: 7dfcee22700a6914487ee30a2f389315, type: 3}
+    - {fileID: 8300000, guid: fb8cd491e371eb4469adf57e59cc2d47, type: 3}
+    _landClips:
+    - {fileID: 8300000, guid: e43b98dd24d85bc44a751ed05c4f6e6c, type: 3}
+    - {fileID: 8300000, guid: 5756b25b73d641d43a14eb48cc6378ad, type: 3}
+    - {fileID: 8300000, guid: ec7ca558406c3d543acfb3ca3788d5f8, type: 3}
+    - {fileID: 8300000, guid: 7b52d52fa68abfa4d9645a3edb046cf8, type: 3}
+    - {fileID: 8300000, guid: cc0b219b79666fb4aacab6c260ae37c7, type: 3}
+  _fallbackSurface: 1
+  _physicsMaterials:
+  - _material: {fileID: 13400000, guid: 86a6b803ccbb6424590348be93ed6599, type: 2}
+    _type: 7
+  - _material: {fileID: 13400000, guid: 405a40858747ce24cad3e5d949885ad6, type: 2}
+    _type: 11
+  _terrainLayers:
+  - _layer: {fileID: 8574412962073106934, guid: 79b0755d536c6b6488ec37a4b8e2339c, type: 2}
+    _type: 2
+  - _layer: {fileID: 8574412962073106934, guid: 4a0a426a8bde9d24d889a6e852dfc5f7, type: 2}
+    _type: 3
+  _gearRustleClips:
+  - {fileID: 8300000, guid: e8e378d5ebfd1814bba1b71ace7567fd, type: 3}
+  - {fileID: 8300000, guid: 839c4cdc5519ca24c93cdc0f46912efc, type: 3}
+  - {fileID: 8300000, guid: b5690ee339dea0a40b4f2d5311a74a94, type: 3}
+  - {fileID: 8300000, guid: f1790b8c087db3f4dbe5c7ee9b7bc625, type: 3}
+  - {fileID: 8300000, guid: 83a8d4fe9287cee4da0d209684b2a352, type: 3}
+  - {fileID: 8300000, guid: 24bde0644476c9d43ade402fd45e8994, type: 3}
+  - {fileID: 8300000, guid: 87576a5f3be85be409ed03565356cecf, type: 3}
+  - {fileID: 8300000, guid: ee2d723727bc52d4aa6835b510114605, type: 3}
+  - {fileID: 8300000, guid: 3a77d0c469201e44094550f6d747535f, type: 3}
+  - {fileID: 8300000, guid: f62d58740100e894b85c5235de86f66e, type: 3}
+  - {fileID: 8300000, guid: d218b571908e4e5478f8754cb60d15a3, type: 3}
+  - {fileID: 8300000, guid: 031bb721c1272fd45b642b47a651bb88, type: 3}
+  - {fileID: 8300000, guid: 5ef9424750056374cae044b5b1039d5a, type: 3}
+  - {fileID: 8300000, guid: 3ae7a96b8fee0584bb16b830bb9ad4be, type: 3}
+  - {fileID: 8300000, guid: 2b75e2df463cfe64280149d72f59da29, type: 3}
+  - {fileID: 8300000, guid: f3e3b7d03d94df442851d682be13f872, type: 3}
+  - {fileID: 8300000, guid: 2af46e728f15cb349a139bebb0e884d4, type: 3}
+  - {fileID: 8300000, guid: 01bb2f3361cd51244a82544200cbc197, type: 3}
+  _crouchKeyClips:
+  - {fileID: 8300000, guid: 2527c223b362a41468b9623c34eba9aa, type: 3}
+  - {fileID: 8300000, guid: 46fc48352e728c845906cfced2a3ea32, type: 3}
+  - {fileID: 8300000, guid: cb302090a7289074ebd0319396ea7698, type: 3}
+  - {fileID: 8300000, guid: 5f4969fa7297e0045a8000ea7aad1cbe, type: 3}
+  - {fileID: 8300000, guid: 4f0f9a68aff1b684c9030910f8be1b9c, type: 3}
+  - {fileID: 8300000, guid: 30a28289e4038ad47897b672dc580c52, type: 3}
+  - {fileID: 8300000, guid: ebc8cbebe10122f40919027509941246, type: 3}
+  - {fileID: 8300000, guid: 1a033577a3fad9046922ca8233fe7d1d, type: 3}
+  - {fileID: 8300000, guid: 4b212a98a76da704db3d620262cd0e24, type: 3}
+  _hudStepVolume: 1
+  _effectsVolume: 1
+  _landSoundSpeed: 5
+  _landVolumeDivider: 5
+  _rayStartHeight: 1
+  _rayLength: 1.1
+  _crouchFallbackVolume: 0.5
+  _sourceReport: "MO2 profile: 1v2(DX11) (v_12gb) 2.5, \u0412\u0441\u0435 \u0432\u043A\u043B\u044E\u0447\u0435\u043D\u043E
+    (168), active mods: 173, indexed files: 13898\r\ngamemtl.xr <- Base Anomaly\r\ngamemtl.xr:
+    65 materials, 1550 pairs\r\nmaterials\\material_pairs.ltx comes from db/mods/00_modded_exes_gamedata.db0
+    (archive, not indexed); its body is '#include \"material_pairs_*.ltx\"', so the
+    loose includes are applied in name order.\r\nmaterials/material_pairs_footsteps.ltx
+    ([\u0428\u0430\u0433\u0438_\u04321] NPC Movement Sound [ RMS ]): 59 pair step_sounds
+    overrides\r\nmaterials/material_pairs_grenade.ltx ([\u0417\u0432\u0443\u043A]
+    Grenade_collision_sounds): unknown material in [default@objects\\grenade], skipped\r\nmaterials/material_pairs_grenade.ltx
+    ([\u0417\u0432\u0443\u043A] Grenade_collision_sounds): unknown material in [default_object@objects\\grenade],
+    skipped\r\nmaterials/material_pairs_grenade.ltx ([\u0417\u0432\u0443\u043A] Grenade_collision_sounds):
+    unknown material in [materials\\asphalt@objects\\grenade], skipped\r\nmaterials/material_pairs_grenade.ltx
+    ([\u0417\u0432\u0443\u043A] Grenade_collision_sounds): unknown material in [materials\\bricks@objects\\grenade],
+    skipped\r\nmaterials/material_pairs_grenade.ltx ([\u0417\u0432\u0443\u043A] Grenade_collision_sounds):
+    unknown material in [materials\\bush@objects\\grenade], skipped\r\nmaterials/material_pairs_grenade.ltx
+    ([\u0417\u0432\u0443\u043A] Grenade_collision_sounds): unknown material in [materials\\bush_sux@objects\\grenade],
+    skipped\r\nmaterials/material_pairs_grenade.ltx ([\u0417\u0432\u0443\u043A] Grenade_collision_sounds):
+    unknown material in [materials\\dirt@objects\\grenade], skipped\r\nmaterials/material_pairs_grenade.ltx
+    ([\u0417\u0432\u0443\u043A] Grenade_collision_sounds): unknown material in [materials\\cloth@objects\\grenade],
+    skipped\r\nmaterials/material_pairs_grenade.ltx ([\u0417\u0432\u0443\u043A] Grenade_collision_sounds):
+    unknown material in [materials\\concrete@objects\\grenade], skipped\r\nmaterials/material_pairs_grenade.ltx
+    ([\u0417\u0432\u0443\u043A] Grenade_collision_sounds): unknown material in [materials\\earth@objects\\grenade],
+    skipped\r\nmaterials/material_pairs_grenade.ltx ([\u0417\u0432\u0443\u043A] Grenade_collision_sounds):
+    unknown material in [materials\\earth_slide@objects\\grenade], skipped\r\nmaterials/material_pairs_grenade.ltx
+    ([\u0417\u0432\u0443\u043A] Grenade_collision_sounds): unknown material in [materials\\flooring_tile@objects\\grenade],
+    skipped\r\nmaterials/material_pairs_grenade.ltx ([\u0417\u0432\u0443\u043A] Grenade_collision_sounds):
+    unknown material in [materials\\glass@objects\\grenade], skipped\r\nmaterials/material_pairs_grenade.ltx
+    ([\u0417\u0432\u0443\u043A] Grenade_collision_sounds): unknown material in [materials\\grass@objects\\grenade],
+    skipped\r\nmaterials/material_pairs_grenade.ltx ([\u0417\u0432\u0443\u043A] Grenade_collision_sounds):
+    unknown material in [materials\\gravel@objects\\grenade], skipped\r\nmaterials/material_pairs_grenade.ltx
+    ([\u0417\u0432\u0443\u043A] Grenade_collision_sounds): unknown material in [materials\\metal@objects\\grenade],
+    skipped\r\nmaterials/material_pairs_grenade.ltx ([\u0417\u0432\u0443\u043A] Grenade_collision_sounds):
+    unknown material in [materials\\metal_pipe@objects\\grenade], skipped\r\nmaterials/material_pairs_grenade.ltx
+    ([\u0417\u0432\u0443\u043A] Grenade_collision_sounds): unknown material in [materials\\metal_plate@objects\\grenade],
+    skipped\r\nmaterials/material_pairs_grenade.ltx ([\u0417\u0432\u0443\u043A] Grenade_collision_sounds):
+    unknown material in [materials\\sand@objects\\grenade], skipped\r\nmaterials/material_pairs_grenade.ltx
+    ([\u0417\u0432\u0443\u043A] Grenade_collision_sounds): unknown material in [materials\\setka_rabica@objects\\grenade],
+    skipped\r\nmaterials/material_pairs_grenade.ltx ([\u0417\u0432\u0443\u043A] Grenade_collision_sounds):
+    unknown material in [materials\\shifer@objects\\grenade], skipped\r\nmaterials/material_pairs_grenade.ltx
+    ([\u0417\u0432\u0443\u043A] Grenade_collision_sounds): unknown material in [materials\\stucco@objects\\grenade],
+    skipped\r\nmaterials/material_pairs_grenade.ltx ([\u0417\u0432\u0443\u043A] Grenade_collision_sounds):
+    unknown material in [materials\\tin@objects\\grenade], skipped\r\nmaterials/material_pairs_grenade.ltx
+    ([\u0417\u0432\u0443\u043A] Grenade_collision_sounds): unknown material in [materials\\tree_trunk@objects\\grenade],
+    skipped\r\nmaterials/material_pairs_grenade.ltx ([\u0417\u0432\u0443\u043A] Grenade_collision_sounds):
+    unknown material in [materials\\water@objects\\grenade], skipped\r\nmaterials/material_pairs_grenade.ltx
+    ([\u0417\u0432\u0443\u043A] Grenade_collision_sounds): unknown material in [materials\\water_radiation@objects\\grenade],
+    skipped\r\nmaterials/material_pairs_grenade.ltx ([\u0417\u0432\u0443\u043A] Grenade_collision_sounds):
+    unknown material in [materials\\wood@objects\\grenade], skipped\r\nmaterials/material_pairs_grenade.ltx
+    ([\u0417\u0432\u0443\u043A] Grenade_collision_sounds): unknown material in [materials\\wooden_board@objects\\grenade],
+    skipped\r\nmaterials/material_pairs_grenade.ltx ([\u0417\u0432\u0443\u043A] Grenade_collision_sounds):
+    0 pair step_sounds overrides\r\nmaterials/mod_material_pairs_barefastmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\custombarefast@creatures\\human],
+    skipped\r\nmaterials/mod_material_pairs_barefastmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\custombarefast@default],
+    skipped\r\nmaterials/mod_material_pairs_barefastmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\custombarefast@materials\\wood],
+    skipped\r\nmaterials/mod_material_pairs_barefastmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\custombarefast@materials\\concrete],
+    skipped\r\nmaterials/mod_material_pairs_barefastmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\custombarefast@materials\\asphalt],
+    skipped\r\nmaterials/mod_material_pairs_barefastmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\custombarefast@materials\\metal],
+    skipped\r\nmaterials/mod_material_pairs_barefastmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\custombarefast@materials\\glass],
+    skipped\r\nmaterials/mod_material_pairs_barefastmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\custombarefast@materials\\earth],
+    skipped\r\nmaterials/mod_material_pairs_barefastmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\custombarefast@materials\\gravel],
+    skipped\r\nmaterials/mod_material_pairs_barefastmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\custombarefast@materials\\dirt],
+    skipped\r\nmaterials/mod_material_pairs_barefastmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\custombarefast@materials\\water],
+    skipped\r\nmaterials/mod_material_pairs_barefastmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\custombarefast@materials\\flooring_tile],
+    skipped\r\nmaterials/mod_material_pairs_barefastmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\custombarefast@materials\\metal_plate],
+    skipped\r\nmaterials/mod_material_pairs_barefastmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\custombarefast@materials\\grass],
+    skipped\r\nmaterials/mod_material_pairs_barefastmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\custombarefast@materials\\sand],
+    skipped\r\nmaterials/mod_material_pairs_barefastmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\custombarefast@objects\\tin_can],
+    skipped\r\nmaterials/mod_material_pairs_barefastmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\custombarefast@materials\\bricks],
+    skipped\r\nmaterials/mod_material_pairs_barefastmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\custombarefast@materials\\wooden_board],
+    skipped\r\nmaterials/mod_material_pairs_barefastmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\custombarefast@objects\\large_weapon],
+    skipped\r\nmaterials/mod_material_pairs_barefastmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\custombarefast@materials\\metal_pipe],
+    skipped\r\nmaterials/mod_material_pairs_barefastmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\custombarefast@materials\\bush],
+    skipped\r\nmaterials/mod_material_pairs_barefastmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\custombarefast@objects\\bullet],
+    skipped\r\nmaterials/mod_material_pairs_barefastmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\custombarefast@materials\\tree_trunk],
+    skipped\r\nmaterials/mod_material_pairs_barefastmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\custombarefast@materials\\setka_rabica],
+    skipped\r\nmaterials/mod_material_pairs_barefastmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\custombarefast@materials\\stucco],
+    skipped\r\nmaterials/mod_material_pairs_barefastmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\custombarefast@creatures\\large],
+    skipped\r\nmaterials/mod_material_pairs_barefastmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\custombarefast@materials\\tin],
+    skipped\r\nmaterials/mod_material_pairs_barefastmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\custombarefast@objects\\car_cabine],
+    skipped\r\nmaterials/mod_material_pairs_barefastmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\custombarefast@creatures\\small],
+    skipped\r\nmaterials/mod_material_pairs_barefastmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\custombarefast@objects\\clothes],
+    skipped\r\nmaterials/mod_material_pairs_barefastmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\custombarefast@objects\\small_box],
+    skipped\r\nmaterials/mod_material_pairs_barefastmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\custombarefast@objects\\small_weapon],
+    skipped\r\nmaterials/mod_material_pairs_barefastmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\custombarefast@objects\\dead_body],
+    skipped\r\nmaterials/mod_material_pairs_barefastmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\custombarefast@objects\\bottle],
+    skipped\r\nmaterials/mod_material_pairs_barefastmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\custombarefast@objects\\barrel],
+    skipped\r\nmaterials/mod_material_pairs_barefastmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\custombarefast@creatures\\medium],
+    skipped\r\nmaterials/mod_material_pairs_barefastmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\custombarefast@objects\\metal_box],
+    skipped\r\nmaterials/mod_material_pairs_barefastmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\custombarefast@objects\\small_metal_trash],
+    skipped\r\nmaterials/mod_material_pairs_barefastmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\custombarefast@objects\\large_metal_trash],
+    skipped\r\nmaterials/mod_material_pairs_barefastmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\custombarefast@objects\\car_wheel],
+    skipped\r\nmaterials/mod_material_pairs_barefastmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\custombarefast@objects\\large_furniture],
+    skipped\r\nmaterials/mod_material_pairs_barefastmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\custombarefast@objects\\fuel_can],
+    skipped\r\nmaterials/mod_material_pairs_barefastmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\custombarefast@objects\\concrete_box],
+    skipped\r\nmaterials/mod_material_pairs_barefastmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\custombarefast@materials\\fake],
+    skipped\r\nmaterials/mod_material_pairs_barefastmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\custombarefast@materials\\cloth],
+    skipped\r\nmaterials/mod_material_pairs_barefastmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\custombarefast@materials\\fake_ladders],
+    skipped\r\nmaterials/mod_material_pairs_barefastmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\custombarefast@default_object],
+    skipped\r\nmaterials/mod_material_pairs_barefastmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\custombarefast@objects\\monster_body],
+    skipped\r\nmaterials/mod_material_pairs_barefastmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\custombarefast@creatures\\hoof],
+    skipped\r\nmaterials/mod_material_pairs_barefastmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\custombarefast@objects\\glass],
+    skipped\r\nmaterials/mod_material_pairs_barefastmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\custombarefast@materials\\death],
+    skipped\r\nmaterials/mod_material_pairs_barefastmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\custombarefast@creatures\\actor],
+    skipped\r\nmaterials/mod_material_pairs_barefastmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\custombarefast@creatures\\human_head],
+    skipped\r\nmaterials/mod_material_pairs_barefastmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\custombarefast@creatures\\phantom],
+    skipped\r\nmaterials/mod_material_pairs_barefastmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\custombarefast@materials\\earth_death],
+    skipped\r\nmaterials/mod_material_pairs_barefastmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\custombarefast@materials\\earth_slide],
+    skipped\r\nmaterials/mod_material_pairs_barefastmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\custombarefast@materials\\bush_sux],
+    skipped\r\nmaterials/mod_material_pairs_barefastmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\custombarefast@materials\\water_radiation],
+    skipped\r\nmaterials/mod_material_pairs_barefastmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\custombarefast@materials\\occ],
+    skipped\r\nmaterials/mod_material_pairs_barefastmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\custombarefast@materials\\fake_ladders_woods],
+    skipped\r\nmaterials/mod_material_pairs_barefastmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\custombarefast@materials\\fake_slide],
+    skipped\r\nmaterials/mod_material_pairs_barefastmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\custombarefast@objects\\knife],
+    skipped\r\nmaterials/mod_material_pairs_barefastmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\custombarefast@materials\\shifer],
+    skipped\r\nmaterials/mod_material_pairs_barefastmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\custombarefast@creatures\\custombarefast],
+    skipped\r\nmaterials/mod_material_pairs_barefastmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\custombarefast@creatures\\customcat],
+    skipped\r\nmaterials/mod_material_pairs_barefastmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\custombarefast@creatures\\customdog],
+    skipped\r\nmaterials/mod_material_pairs_barefastmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\custombarefast@creatures\\custombare],
+    skipped\r\nmaterials/mod_material_pairs_barefastmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\custombarefast@creatures\\customboar],
+    skipped\r\nmaterials/mod_material_pairs_barefastmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\custombarefast@creatures\\customflesh],
+    skipped\r\nmaterials/mod_material_pairs_barefastmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\custombarefast@creatures\\customleaper],
+    skipped\r\nmaterials/mod_material_pairs_barefastmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\custombarefast@creatures\\customgiant],
+    skipped\r\nmaterials/mod_material_pairs_barefastmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): 0 pair step_sounds overrides\r\nmaterials/mod_material_pairs_baremp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\custombare@creatures\\human], skipped\r\nmaterials/mod_material_pairs_baremp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\custombare@default], skipped\r\nmaterials/mod_material_pairs_baremp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\custombare@materials\\wood], skipped\r\nmaterials/mod_material_pairs_baremp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\custombare@materials\\concrete], skipped\r\nmaterials/mod_material_pairs_baremp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\custombare@materials\\asphalt], skipped\r\nmaterials/mod_material_pairs_baremp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\custombare@materials\\metal], skipped\r\nmaterials/mod_material_pairs_baremp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\custombare@materials\\glass], skipped\r\nmaterials/mod_material_pairs_baremp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\custombare@materials\\earth], skipped\r\nmaterials/mod_material_pairs_baremp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\custombare@materials\\gravel], skipped\r\nmaterials/mod_material_pairs_baremp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\custombare@materials\\dirt], skipped\r\nmaterials/mod_material_pairs_baremp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\custombare@materials\\water], skipped\r\nmaterials/mod_material_pairs_baremp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\custombare@materials\\flooring_tile], skipped\r\nmaterials/mod_material_pairs_baremp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\custombare@materials\\metal_plate], skipped\r\nmaterials/mod_material_pairs_baremp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\custombare@materials\\grass], skipped\r\nmaterials/mod_material_pairs_baremp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\custombare@materials\\sand], skipped\r\nmaterials/mod_material_pairs_baremp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\custombare@objects\\tin_can], skipped\r\nmaterials/mod_material_pairs_baremp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\custombare@materials\\bricks], skipped\r\nmaterials/mod_material_pairs_baremp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\custombare@materials\\wooden_board], skipped\r\nmaterials/mod_material_pairs_baremp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\custombare@objects\\large_weapon], skipped\r\nmaterials/mod_material_pairs_baremp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\custombare@materials\\metal_pipe], skipped\r\nmaterials/mod_material_pairs_baremp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\custombare@materials\\bush], skipped\r\nmaterials/mod_material_pairs_baremp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\custombare@objects\\bullet], skipped\r\nmaterials/mod_material_pairs_baremp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\custombare@materials\\tree_trunk], skipped\r\nmaterials/mod_material_pairs_baremp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\custombare@materials\\setka_rabica], skipped\r\nmaterials/mod_material_pairs_baremp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\custombare@materials\\stucco], skipped\r\nmaterials/mod_material_pairs_baremp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\custombare@creatures\\large], skipped\r\nmaterials/mod_material_pairs_baremp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\custombare@materials\\tin], skipped\r\nmaterials/mod_material_pairs_baremp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\custombare@objects\\car_cabine], skipped\r\nmaterials/mod_material_pairs_baremp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\custombare@creatures\\small], skipped\r\nmaterials/mod_material_pairs_baremp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\custombare@objects\\clothes], skipped\r\nmaterials/mod_material_pairs_baremp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\custombare@objects\\small_box], skipped\r\nmaterials/mod_material_pairs_baremp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\custombare@objects\\small_weapon], skipped\r\nmaterials/mod_material_pairs_baremp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\custombare@objects\\dead_body], skipped\r\nmaterials/mod_material_pairs_baremp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\custombare@objects\\bottle], skipped\r\nmaterials/mod_material_pairs_baremp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\custombare@objects\\barrel], skipped\r\nmaterials/mod_material_pairs_baremp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\custombare@creatures\\medium], skipped\r\nmaterials/mod_material_pairs_baremp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\custombare@objects\\metal_box], skipped\r\nmaterials/mod_material_pairs_baremp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\custombare@objects\\small_metal_trash], skipped\r\nmaterials/mod_material_pairs_baremp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\custombare@objects\\large_metal_trash], skipped\r\nmaterials/mod_material_pairs_baremp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\custombare@objects\\car_wheel], skipped\r\nmaterials/mod_material_pairs_baremp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\custombare@objects\\large_furniture], skipped\r\nmaterials/mod_material_pairs_baremp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\custombare@objects\\fuel_can], skipped\r\nmaterials/mod_material_pairs_baremp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\custombare@objects\\concrete_box], skipped\r\nmaterials/mod_material_pairs_baremp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\custombare@materials\\fake], skipped\r\nmaterials/mod_material_pairs_baremp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\custombare@materials\\cloth], skipped\r\nmaterials/mod_material_pairs_baremp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\custombare@materials\\fake_ladders], skipped\r\nmaterials/mod_material_pairs_baremp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\custombare@default_object], skipped\r\nmaterials/mod_material_pairs_baremp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\custombare@objects\\monster_body], skipped\r\nmaterials/mod_material_pairs_baremp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\custombare@creatures\\hoof], skipped\r\nmaterials/mod_material_pairs_baremp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\custombare@objects\\glass], skipped\r\nmaterials/mod_material_pairs_baremp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\custombare@materials\\death], skipped\r\nmaterials/mod_material_pairs_baremp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\custombare@creatures\\actor], skipped\r\nmaterials/mod_material_pairs_baremp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\custombare@creatures\\human_head], skipped\r\nmaterials/mod_material_pairs_baremp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\custombare@creatures\\phantom], skipped\r\nmaterials/mod_material_pairs_baremp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\custombare@materials\\earth_death], skipped\r\nmaterials/mod_material_pairs_baremp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\custombare@materials\\earth_slide], skipped\r\nmaterials/mod_material_pairs_baremp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\custombare@materials\\bush_sux], skipped\r\nmaterials/mod_material_pairs_baremp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\custombare@materials\\water_radiation], skipped\r\nmaterials/mod_material_pairs_baremp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\custombare@materials\\occ], skipped\r\nmaterials/mod_material_pairs_baremp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\custombare@materials\\fake_ladders_woods], skipped\r\nmaterials/mod_material_pairs_baremp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\custombare@materials\\fake_slide], skipped\r\nmaterials/mod_material_pairs_baremp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\custombare@objects\\knife], skipped\r\nmaterials/mod_material_pairs_baremp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\custombare@materials\\shifer], skipped\r\nmaterials/mod_material_pairs_baremp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\custombare@creatures\\custombare], skipped\r\nmaterials/mod_material_pairs_baremp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\custombare@creatures\\customcat], skipped\r\nmaterials/mod_material_pairs_baremp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\custombare@creatures\\customdog], skipped\r\nmaterials/mod_material_pairs_baremp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\custombare@creatures\\custombarefast], skipped\r\nmaterials/mod_material_pairs_baremp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\custombare@creatures\\customboar], skipped\r\nmaterials/mod_material_pairs_baremp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\custombare@creatures\\customflesh], skipped\r\nmaterials/mod_material_pairs_baremp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\custombare@creatures\\customleaper], skipped\r\nmaterials/mod_material_pairs_baremp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\custombare@creatures\\customgiant], skipped\r\nmaterials/mod_material_pairs_baremp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): 0 pair step_sounds
+    overrides\r\nmaterials/mod_material_pairs_boarmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customboar@creatures\\human],
+    skipped\r\nmaterials/mod_material_pairs_boarmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customboar@default], skipped\r\nmaterials/mod_material_pairs_boarmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customboar@materials\\wood], skipped\r\nmaterials/mod_material_pairs_boarmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customboar@materials\\concrete], skipped\r\nmaterials/mod_material_pairs_boarmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customboar@materials\\asphalt], skipped\r\nmaterials/mod_material_pairs_boarmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customboar@materials\\metal], skipped\r\nmaterials/mod_material_pairs_boarmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customboar@materials\\glass], skipped\r\nmaterials/mod_material_pairs_boarmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customboar@materials\\earth], skipped\r\nmaterials/mod_material_pairs_boarmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customboar@materials\\gravel], skipped\r\nmaterials/mod_material_pairs_boarmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customboar@materials\\dirt], skipped\r\nmaterials/mod_material_pairs_boarmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customboar@materials\\water], skipped\r\nmaterials/mod_material_pairs_boarmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customboar@materials\\flooring_tile], skipped\r\nmaterials/mod_material_pairs_boarmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customboar@materials\\metal_plate], skipped\r\nmaterials/mod_material_pairs_boarmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customboar@materials\\grass], skipped\r\nmaterials/mod_material_pairs_boarmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customboar@materials\\sand], skipped\r\nmaterials/mod_material_pairs_boarmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customboar@objects\\tin_can], skipped\r\nmaterials/mod_material_pairs_boarmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customboar@materials\\bricks], skipped\r\nmaterials/mod_material_pairs_boarmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customboar@materials\\wooden_board], skipped\r\nmaterials/mod_material_pairs_boarmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customboar@objects\\large_weapon], skipped\r\nmaterials/mod_material_pairs_boarmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customboar@materials\\metal_pipe], skipped\r\nmaterials/mod_material_pairs_boarmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customboar@materials\\bush], skipped\r\nmaterials/mod_material_pairs_boarmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customboar@objects\\bullet], skipped\r\nmaterials/mod_material_pairs_boarmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customboar@materials\\tree_trunk], skipped\r\nmaterials/mod_material_pairs_boarmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customboar@materials\\setka_rabica], skipped\r\nmaterials/mod_material_pairs_boarmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customboar@materials\\stucco], skipped\r\nmaterials/mod_material_pairs_boarmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customboar@creatures\\large], skipped\r\nmaterials/mod_material_pairs_boarmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customboar@materials\\tin], skipped\r\nmaterials/mod_material_pairs_boarmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customboar@objects\\car_cabine], skipped\r\nmaterials/mod_material_pairs_boarmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customboar@creatures\\small], skipped\r\nmaterials/mod_material_pairs_boarmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customboar@objects\\clothes], skipped\r\nmaterials/mod_material_pairs_boarmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customboar@objects\\small_box], skipped\r\nmaterials/mod_material_pairs_boarmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customboar@objects\\small_weapon], skipped\r\nmaterials/mod_material_pairs_boarmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customboar@objects\\dead_body], skipped\r\nmaterials/mod_material_pairs_boarmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customboar@objects\\bottle], skipped\r\nmaterials/mod_material_pairs_boarmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customboar@objects\\barrel], skipped\r\nmaterials/mod_material_pairs_boarmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customboar@creatures\\medium], skipped\r\nmaterials/mod_material_pairs_boarmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customboar@objects\\metal_box], skipped\r\nmaterials/mod_material_pairs_boarmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customboar@objects\\small_metal_trash], skipped\r\nmaterials/mod_material_pairs_boarmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customboar@objects\\large_metal_trash], skipped\r\nmaterials/mod_material_pairs_boarmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customboar@objects\\car_wheel], skipped\r\nmaterials/mod_material_pairs_boarmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customboar@objects\\large_furniture], skipped\r\nmaterials/mod_material_pairs_boarmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customboar@objects\\fuel_can], skipped\r\nmaterials/mod_material_pairs_boarmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customboar@objects\\concrete_box], skipped\r\nmaterials/mod_material_pairs_boarmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customboar@materials\\fake], skipped\r\nmaterials/mod_material_pairs_boarmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customboar@materials\\cloth], skipped\r\nmaterials/mod_material_pairs_boarmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customboar@materials\\fake_ladders], skipped\r\nmaterials/mod_material_pairs_boarmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customboar@default_object], skipped\r\nmaterials/mod_material_pairs_boarmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customboar@objects\\monster_body], skipped\r\nmaterials/mod_material_pairs_boarmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customboar@creatures\\hoof], skipped\r\nmaterials/mod_material_pairs_boarmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customboar@objects\\glass], skipped\r\nmaterials/mod_material_pairs_boarmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customboar@materials\\death], skipped\r\nmaterials/mod_material_pairs_boarmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customboar@creatures\\actor], skipped\r\nmaterials/mod_material_pairs_boarmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customboar@creatures\\human_head], skipped\r\nmaterials/mod_material_pairs_boarmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customboar@creatures\\phantom], skipped\r\nmaterials/mod_material_pairs_boarmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customboar@materials\\earth_death], skipped\r\nmaterials/mod_material_pairs_boarmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customboar@materials\\earth_slide], skipped\r\nmaterials/mod_material_pairs_boarmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customboar@materials\\bush_sux], skipped\r\nmaterials/mod_material_pairs_boarmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customboar@materials\\water_radiation], skipped\r\nmaterials/mod_material_pairs_boarmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customboar@materials\\occ], skipped\r\nmaterials/mod_material_pairs_boarmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customboar@materials\\fake_ladders_woods], skipped\r\nmaterials/mod_material_pairs_boarmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customboar@materials\\fake_slide], skipped\r\nmaterials/mod_material_pairs_boarmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customboar@objects\\knife], skipped\r\nmaterials/mod_material_pairs_boarmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customboar@materials\\shifer], skipped\r\nmaterials/mod_material_pairs_boarmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customboar@creatures\\customboar], skipped\r\nmaterials/mod_material_pairs_boarmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customboar@creatures\\customcat], skipped\r\nmaterials/mod_material_pairs_boarmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customboar@creatures\\customdog], skipped\r\nmaterials/mod_material_pairs_boarmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customboar@creatures\\custombarefast], skipped\r\nmaterials/mod_material_pairs_boarmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customboar@creatures\\custombare], skipped\r\nmaterials/mod_material_pairs_boarmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customboar@creatures\\customflesh], skipped\r\nmaterials/mod_material_pairs_boarmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customboar@creatures\\customleaper], skipped\r\nmaterials/mod_material_pairs_boarmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customboar@creatures\\customgiant], skipped\r\nmaterials/mod_material_pairs_boarmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): 0 pair step_sounds
+    overrides\r\nmaterials/mod_material_pairs_catmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customcat@creatures\\human],
+    skipped\r\nmaterials/mod_material_pairs_catmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customcat@default], skipped\r\nmaterials/mod_material_pairs_catmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customcat@materials\\wood], skipped\r\nmaterials/mod_material_pairs_catmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customcat@materials\\concrete], skipped\r\nmaterials/mod_material_pairs_catmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customcat@materials\\asphalt], skipped\r\nmaterials/mod_material_pairs_catmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customcat@materials\\metal], skipped\r\nmaterials/mod_material_pairs_catmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customcat@materials\\glass], skipped\r\nmaterials/mod_material_pairs_catmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customcat@materials\\earth], skipped\r\nmaterials/mod_material_pairs_catmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customcat@materials\\gravel], skipped\r\nmaterials/mod_material_pairs_catmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customcat@materials\\dirt], skipped\r\nmaterials/mod_material_pairs_catmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customcat@materials\\water], skipped\r\nmaterials/mod_material_pairs_catmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customcat@materials\\flooring_tile], skipped\r\nmaterials/mod_material_pairs_catmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customcat@materials\\metal_plate], skipped\r\nmaterials/mod_material_pairs_catmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customcat@materials\\grass], skipped\r\nmaterials/mod_material_pairs_catmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customcat@materials\\sand], skipped\r\nmaterials/mod_material_pairs_catmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customcat@objects\\tin_can], skipped\r\nmaterials/mod_material_pairs_catmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customcat@materials\\bricks], skipped\r\nmaterials/mod_material_pairs_catmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customcat@materials\\wooden_board], skipped\r\nmaterials/mod_material_pairs_catmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customcat@objects\\large_weapon], skipped\r\nmaterials/mod_material_pairs_catmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customcat@materials\\metal_pipe], skipped\r\nmaterials/mod_material_pairs_catmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customcat@materials\\bush], skipped\r\nmaterials/mod_material_pairs_catmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customcat@objects\\bullet], skipped\r\nmaterials/mod_material_pairs_catmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customcat@materials\\tree_trunk], skipped\r\nmaterials/mod_material_pairs_catmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customcat@materials\\setka_rabica], skipped\r\nmaterials/mod_material_pairs_catmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customcat@materials\\stucco], skipped\r\nmaterials/mod_material_pairs_catmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customcat@creatures\\large], skipped\r\nmaterials/mod_material_pairs_catmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customcat@materials\\tin], skipped\r\nmaterials/mod_material_pairs_catmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customcat@objects\\car_cabine], skipped\r\nmaterials/mod_material_pairs_catmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customcat@creatures\\small], skipped\r\nmaterials/mod_material_pairs_catmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customcat@objects\\clothes], skipped\r\nmaterials/mod_material_pairs_catmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customcat@objects\\small_box], skipped\r\nmaterials/mod_material_pairs_catmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customcat@objects\\small_weapon], skipped\r\nmaterials/mod_material_pairs_catmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customcat@objects\\dead_body], skipped\r\nmaterials/mod_material_pairs_catmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customcat@objects\\bottle], skipped\r\nmaterials/mod_material_pairs_catmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customcat@objects\\barrel], skipped\r\nmaterials/mod_material_pairs_catmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customcat@creatures\\medium], skipped\r\nmaterials/mod_material_pairs_catmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customcat@objects\\metal_box], skipped\r\nmaterials/mod_material_pairs_catmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customcat@objects\\small_metal_trash], skipped\r\nmaterials/mod_material_pairs_catmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customcat@objects\\large_metal_trash], skipped\r\nmaterials/mod_material_pairs_catmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customcat@objects\\car_wheel], skipped\r\nmaterials/mod_material_pairs_catmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customcat@objects\\large_furniture], skipped\r\nmaterials/mod_material_pairs_catmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customcat@objects\\fuel_can], skipped\r\nmaterials/mod_material_pairs_catmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customcat@objects\\concrete_box], skipped\r\nmaterials/mod_material_pairs_catmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customcat@materials\\fake], skipped\r\nmaterials/mod_material_pairs_catmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customcat@materials\\cloth], skipped\r\nmaterials/mod_material_pairs_catmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customcat@materials\\fake_ladders], skipped\r\nmaterials/mod_material_pairs_catmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customcat@default_object], skipped\r\nmaterials/mod_material_pairs_catmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customcat@objects\\monster_body], skipped\r\nmaterials/mod_material_pairs_catmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customcat@creatures\\hoof], skipped\r\nmaterials/mod_material_pairs_catmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customcat@objects\\glass], skipped\r\nmaterials/mod_material_pairs_catmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customcat@materials\\death], skipped\r\nmaterials/mod_material_pairs_catmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customcat@creatures\\actor], skipped\r\nmaterials/mod_material_pairs_catmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customcat@creatures\\human_head], skipped\r\nmaterials/mod_material_pairs_catmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customcat@creatures\\phantom], skipped\r\nmaterials/mod_material_pairs_catmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customcat@materials\\earth_death], skipped\r\nmaterials/mod_material_pairs_catmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customcat@materials\\earth_slide], skipped\r\nmaterials/mod_material_pairs_catmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customcat@materials\\bush_sux], skipped\r\nmaterials/mod_material_pairs_catmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customcat@materials\\water_radiation], skipped\r\nmaterials/mod_material_pairs_catmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customcat@materials\\occ], skipped\r\nmaterials/mod_material_pairs_catmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customcat@materials\\fake_ladders_woods], skipped\r\nmaterials/mod_material_pairs_catmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customcat@materials\\fake_slide], skipped\r\nmaterials/mod_material_pairs_catmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customcat@objects\\knife], skipped\r\nmaterials/mod_material_pairs_catmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customcat@materials\\shifer], skipped\r\nmaterials/mod_material_pairs_catmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customcat@creatures\\customcat], skipped\r\nmaterials/mod_material_pairs_catmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customcat@creatures\\customdog], skipped\r\nmaterials/mod_material_pairs_catmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customcat@creatures\\custombare], skipped\r\nmaterials/mod_material_pairs_catmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customcat@creatures\\custombarefast], skipped\r\nmaterials/mod_material_pairs_catmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customcat@creatures\\customboar], skipped\r\nmaterials/mod_material_pairs_catmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customcat@creatures\\customflesh], skipped\r\nmaterials/mod_material_pairs_catmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customcat@creatures\\customleaper], skipped\r\nmaterials/mod_material_pairs_catmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customcat@creatures\\customgiant], skipped\r\nmaterials/mod_material_pairs_catmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): 0 pair step_sounds
+    overrides\r\nmaterials/mod_material_pairs_dogmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customdog@creatures\\human],
+    skipped\r\nmaterials/mod_material_pairs_dogmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customdog@default], skipped\r\nmaterials/mod_material_pairs_dogmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customdog@materials\\wood], skipped\r\nmaterials/mod_material_pairs_dogmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customdog@materials\\concrete], skipped\r\nmaterials/mod_material_pairs_dogmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customdog@materials\\asphalt], skipped\r\nmaterials/mod_material_pairs_dogmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customdog@materials\\metal], skipped\r\nmaterials/mod_material_pairs_dogmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customdog@materials\\glass], skipped\r\nmaterials/mod_material_pairs_dogmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customdog@materials\\earth], skipped\r\nmaterials/mod_material_pairs_dogmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customdog@materials\\gravel], skipped\r\nmaterials/mod_material_pairs_dogmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customdog@materials\\dirt], skipped\r\nmaterials/mod_material_pairs_dogmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customdog@materials\\water], skipped\r\nmaterials/mod_material_pairs_dogmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customdog@materials\\flooring_tile], skipped\r\nmaterials/mod_material_pairs_dogmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customdog@materials\\metal_plate], skipped\r\nmaterials/mod_material_pairs_dogmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customdog@materials\\grass], skipped\r\nmaterials/mod_material_pairs_dogmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customdog@materials\\sand], skipped\r\nmaterials/mod_material_pairs_dogmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customdog@objects\\tin_can], skipped\r\nmaterials/mod_material_pairs_dogmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customdog@materials\\bricks], skipped\r\nmaterials/mod_material_pairs_dogmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customdog@materials\\wooden_board], skipped\r\nmaterials/mod_material_pairs_dogmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customdog@objects\\large_weapon], skipped\r\nmaterials/mod_material_pairs_dogmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customdog@materials\\metal_pipe], skipped\r\nmaterials/mod_material_pairs_dogmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customdog@materials\\bush], skipped\r\nmaterials/mod_material_pairs_dogmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customdog@objects\\bullet], skipped\r\nmaterials/mod_material_pairs_dogmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customdog@materials\\tree_trunk], skipped\r\nmaterials/mod_material_pairs_dogmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customdog@materials\\setka_rabica], skipped\r\nmaterials/mod_material_pairs_dogmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customdog@materials\\stucco], skipped\r\nmaterials/mod_material_pairs_dogmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customdog@creatures\\large], skipped\r\nmaterials/mod_material_pairs_dogmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customdog@materials\\tin], skipped\r\nmaterials/mod_material_pairs_dogmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customdog@objects\\car_cabine], skipped\r\nmaterials/mod_material_pairs_dogmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customdog@creatures\\small], skipped\r\nmaterials/mod_material_pairs_dogmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customdog@objects\\clothes], skipped\r\nmaterials/mod_material_pairs_dogmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customdog@objects\\small_box], skipped\r\nmaterials/mod_material_pairs_dogmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customdog@objects\\small_weapon], skipped\r\nmaterials/mod_material_pairs_dogmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customdog@objects\\dead_body], skipped\r\nmaterials/mod_material_pairs_dogmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customdog@objects\\bottle], skipped\r\nmaterials/mod_material_pairs_dogmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customdog@objects\\barrel], skipped\r\nmaterials/mod_material_pairs_dogmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customdog@creatures\\medium], skipped\r\nmaterials/mod_material_pairs_dogmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customdog@objects\\metal_box], skipped\r\nmaterials/mod_material_pairs_dogmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customdog@objects\\small_metal_trash], skipped\r\nmaterials/mod_material_pairs_dogmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customdog@objects\\large_metal_trash], skipped\r\nmaterials/mod_material_pairs_dogmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customdog@objects\\car_wheel], skipped\r\nmaterials/mod_material_pairs_dogmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customdog@objects\\large_furniture], skipped\r\nmaterials/mod_material_pairs_dogmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customdog@objects\\fuel_can], skipped\r\nmaterials/mod_material_pairs_dogmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customdog@objects\\concrete_box], skipped\r\nmaterials/mod_material_pairs_dogmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customdog@materials\\fake], skipped\r\nmaterials/mod_material_pairs_dogmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customdog@materials\\cloth], skipped\r\nmaterials/mod_material_pairs_dogmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customdog@materials\\fake_ladders], skipped\r\nmaterials/mod_material_pairs_dogmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customdog@default_object], skipped\r\nmaterials/mod_material_pairs_dogmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customdog@objects\\monster_body], skipped\r\nmaterials/mod_material_pairs_dogmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customdog@creatures\\hoof], skipped\r\nmaterials/mod_material_pairs_dogmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customdog@objects\\glass], skipped\r\nmaterials/mod_material_pairs_dogmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customdog@materials\\death], skipped\r\nmaterials/mod_material_pairs_dogmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customdog@creatures\\actor], skipped\r\nmaterials/mod_material_pairs_dogmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customdog@creatures\\human_head], skipped\r\nmaterials/mod_material_pairs_dogmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customdog@creatures\\phantom], skipped\r\nmaterials/mod_material_pairs_dogmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customdog@materials\\earth_death], skipped\r\nmaterials/mod_material_pairs_dogmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customdog@materials\\earth_slide], skipped\r\nmaterials/mod_material_pairs_dogmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customdog@materials\\bush_sux], skipped\r\nmaterials/mod_material_pairs_dogmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customdog@materials\\water_radiation], skipped\r\nmaterials/mod_material_pairs_dogmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customdog@materials\\occ], skipped\r\nmaterials/mod_material_pairs_dogmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customdog@materials\\fake_ladders_woods], skipped\r\nmaterials/mod_material_pairs_dogmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customdog@materials\\fake_slide], skipped\r\nmaterials/mod_material_pairs_dogmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customdog@objects\\knife], skipped\r\nmaterials/mod_material_pairs_dogmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customdog@materials\\shifer], skipped\r\nmaterials/mod_material_pairs_dogmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customdog@creatures\\customdog], skipped\r\nmaterials/mod_material_pairs_dogmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customdog@creatures\\customcat], skipped\r\nmaterials/mod_material_pairs_dogmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customdog@creatures\\custombare], skipped\r\nmaterials/mod_material_pairs_dogmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customdog@creatures\\custombarefast], skipped\r\nmaterials/mod_material_pairs_dogmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customdog@creatures\\customboar], skipped\r\nmaterials/mod_material_pairs_dogmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customdog@creatures\\customflesh], skipped\r\nmaterials/mod_material_pairs_dogmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customdog@creatures\\customleaper], skipped\r\nmaterials/mod_material_pairs_dogmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customdog@creatures\\customgiant], skipped\r\nmaterials/mod_material_pairs_dogmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): 0 pair step_sounds
+    overrides\r\nmaterials/mod_material_pairs_fleshmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customflesh@creatures\\human],
+    skipped\r\nmaterials/mod_material_pairs_fleshmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customflesh@default],
+    skipped\r\nmaterials/mod_material_pairs_fleshmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customflesh@materials\\wood],
+    skipped\r\nmaterials/mod_material_pairs_fleshmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customflesh@materials\\concrete],
+    skipped\r\nmaterials/mod_material_pairs_fleshmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customflesh@materials\\asphalt],
+    skipped\r\nmaterials/mod_material_pairs_fleshmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customflesh@materials\\metal],
+    skipped\r\nmaterials/mod_material_pairs_fleshmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customflesh@materials\\glass],
+    skipped\r\nmaterials/mod_material_pairs_fleshmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customflesh@materials\\earth],
+    skipped\r\nmaterials/mod_material_pairs_fleshmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customflesh@materials\\gravel],
+    skipped\r\nmaterials/mod_material_pairs_fleshmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customflesh@materials\\dirt],
+    skipped\r\nmaterials/mod_material_pairs_fleshmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customflesh@materials\\water],
+    skipped\r\nmaterials/mod_material_pairs_fleshmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customflesh@materials\\flooring_tile],
+    skipped\r\nmaterials/mod_material_pairs_fleshmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customflesh@materials\\metal_plate],
+    skipped\r\nmaterials/mod_material_pairs_fleshmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customflesh@materials\\grass],
+    skipped\r\nmaterials/mod_material_pairs_fleshmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customflesh@materials\\sand],
+    skipped\r\nmaterials/mod_material_pairs_fleshmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customflesh@objects\\tin_can],
+    skipped\r\nmaterials/mod_material_pairs_fleshmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customflesh@materials\\bricks],
+    skipped\r\nmaterials/mod_material_pairs_fleshmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customflesh@materials\\wooden_board],
+    skipped\r\nmaterials/mod_material_pairs_fleshmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customflesh@objects\\large_weapon],
+    skipped\r\nmaterials/mod_material_pairs_fleshmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customflesh@materials\\metal_pipe],
+    skipped\r\nmaterials/mod_material_pairs_fleshmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customflesh@materials\\bush],
+    skipped\r\nmaterials/mod_material_pairs_fleshmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customflesh@objects\\bullet],
+    skipped\r\nmaterials/mod_material_pairs_fleshmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customflesh@materials\\tree_trunk],
+    skipped\r\nmaterials/mod_material_pairs_fleshmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customflesh@materials\\setka_rabica],
+    skipped\r\nmaterials/mod_material_pairs_fleshmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customflesh@materials\\stucco],
+    skipped\r\nmaterials/mod_material_pairs_fleshmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customflesh@creatures\\large],
+    skipped\r\nmaterials/mod_material_pairs_fleshmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customflesh@materials\\tin],
+    skipped\r\nmaterials/mod_material_pairs_fleshmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customflesh@objects\\car_cabine],
+    skipped\r\nmaterials/mod_material_pairs_fleshmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customflesh@creatures\\small],
+    skipped\r\nmaterials/mod_material_pairs_fleshmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customflesh@objects\\clothes],
+    skipped\r\nmaterials/mod_material_pairs_fleshmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customflesh@objects\\small_box],
+    skipped\r\nmaterials/mod_material_pairs_fleshmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customflesh@objects\\small_weapon],
+    skipped\r\nmaterials/mod_material_pairs_fleshmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customflesh@objects\\dead_body],
+    skipped\r\nmaterials/mod_material_pairs_fleshmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customflesh@objects\\bottle],
+    skipped\r\nmaterials/mod_material_pairs_fleshmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customflesh@objects\\barrel],
+    skipped\r\nmaterials/mod_material_pairs_fleshmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customflesh@creatures\\medium],
+    skipped\r\nmaterials/mod_material_pairs_fleshmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customflesh@objects\\metal_box],
+    skipped\r\nmaterials/mod_material_pairs_fleshmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customflesh@objects\\small_metal_trash],
+    skipped\r\nmaterials/mod_material_pairs_fleshmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customflesh@objects\\large_metal_trash],
+    skipped\r\nmaterials/mod_material_pairs_fleshmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customflesh@objects\\car_wheel],
+    skipped\r\nmaterials/mod_material_pairs_fleshmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customflesh@objects\\large_furniture],
+    skipped\r\nmaterials/mod_material_pairs_fleshmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customflesh@objects\\fuel_can],
+    skipped\r\nmaterials/mod_material_pairs_fleshmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customflesh@objects\\concrete_box],
+    skipped\r\nmaterials/mod_material_pairs_fleshmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customflesh@materials\\fake],
+    skipped\r\nmaterials/mod_material_pairs_fleshmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customflesh@materials\\cloth],
+    skipped\r\nmaterials/mod_material_pairs_fleshmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customflesh@materials\\fake_ladders],
+    skipped\r\nmaterials/mod_material_pairs_fleshmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customflesh@default_object],
+    skipped\r\nmaterials/mod_material_pairs_fleshmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customflesh@objects\\monster_body],
+    skipped\r\nmaterials/mod_material_pairs_fleshmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customflesh@creatures\\hoof],
+    skipped\r\nmaterials/mod_material_pairs_fleshmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customflesh@objects\\glass],
+    skipped\r\nmaterials/mod_material_pairs_fleshmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customflesh@materials\\death],
+    skipped\r\nmaterials/mod_material_pairs_fleshmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customflesh@creatures\\actor],
+    skipped\r\nmaterials/mod_material_pairs_fleshmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customflesh@creatures\\human_head],
+    skipped\r\nmaterials/mod_material_pairs_fleshmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customflesh@creatures\\phantom],
+    skipped\r\nmaterials/mod_material_pairs_fleshmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customflesh@materials\\earth_death],
+    skipped\r\nmaterials/mod_material_pairs_fleshmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customflesh@materials\\earth_slide],
+    skipped\r\nmaterials/mod_material_pairs_fleshmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customflesh@materials\\bush_sux],
+    skipped\r\nmaterials/mod_material_pairs_fleshmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customflesh@materials\\water_radiation],
+    skipped\r\nmaterials/mod_material_pairs_fleshmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customflesh@materials\\occ],
+    skipped\r\nmaterials/mod_material_pairs_fleshmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customflesh@materials\\fake_ladders_woods],
+    skipped\r\nmaterials/mod_material_pairs_fleshmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customflesh@materials\\fake_slide],
+    skipped\r\nmaterials/mod_material_pairs_fleshmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customflesh@objects\\knife],
+    skipped\r\nmaterials/mod_material_pairs_fleshmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customflesh@materials\\shifer],
+    skipped\r\nmaterials/mod_material_pairs_fleshmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customflesh@creatures\\customflesh],
+    skipped\r\nmaterials/mod_material_pairs_fleshmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customflesh@creatures\\customcat],
+    skipped\r\nmaterials/mod_material_pairs_fleshmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customflesh@creatures\\custombare],
+    skipped\r\nmaterials/mod_material_pairs_fleshmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customflesh@creatures\\custombarefast],
+    skipped\r\nmaterials/mod_material_pairs_fleshmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customflesh@creatures\\customboar],
+    skipped\r\nmaterials/mod_material_pairs_fleshmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customflesh@creatures\\customdog],
+    skipped\r\nmaterials/mod_material_pairs_fleshmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customflesh@creatures\\customleaper],
+    skipped\r\nmaterials/mod_material_pairs_fleshmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customflesh@creatures\\customgiant],
+    skipped\r\nmaterials/mod_material_pairs_fleshmp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): 0 pair step_sounds overrides\r\nmaterials/mod_material_pairs_giantmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customgiant@creatures\\human], skipped\r\nmaterials/mod_material_pairs_giantmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customgiant@default], skipped\r\nmaterials/mod_material_pairs_giantmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customgiant@materials\\wood], skipped\r\nmaterials/mod_material_pairs_giantmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customgiant@materials\\concrete], skipped\r\nmaterials/mod_material_pairs_giantmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customgiant@materials\\asphalt], skipped\r\nmaterials/mod_material_pairs_giantmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customgiant@materials\\metal], skipped\r\nmaterials/mod_material_pairs_giantmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customgiant@materials\\glass], skipped\r\nmaterials/mod_material_pairs_giantmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customgiant@materials\\earth], skipped\r\nmaterials/mod_material_pairs_giantmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customgiant@materials\\gravel], skipped\r\nmaterials/mod_material_pairs_giantmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customgiant@materials\\dirt], skipped\r\nmaterials/mod_material_pairs_giantmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customgiant@materials\\water], skipped\r\nmaterials/mod_material_pairs_giantmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customgiant@materials\\flooring_tile], skipped\r\nmaterials/mod_material_pairs_giantmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customgiant@materials\\metal_plate], skipped\r\nmaterials/mod_material_pairs_giantmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customgiant@materials\\grass], skipped\r\nmaterials/mod_material_pairs_giantmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customgiant@materials\\sand], skipped\r\nmaterials/mod_material_pairs_giantmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customgiant@objects\\tin_can], skipped\r\nmaterials/mod_material_pairs_giantmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customgiant@materials\\bricks], skipped\r\nmaterials/mod_material_pairs_giantmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customgiant@materials\\wooden_board], skipped\r\nmaterials/mod_material_pairs_giantmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customgiant@objects\\large_weapon], skipped\r\nmaterials/mod_material_pairs_giantmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customgiant@materials\\metal_pipe], skipped\r\nmaterials/mod_material_pairs_giantmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customgiant@materials\\bush], skipped\r\nmaterials/mod_material_pairs_giantmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customgiant@objects\\bullet], skipped\r\nmaterials/mod_material_pairs_giantmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customgiant@materials\\tree_trunk], skipped\r\nmaterials/mod_material_pairs_giantmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customgiant@materials\\setka_rabica], skipped\r\nmaterials/mod_material_pairs_giantmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customgiant@materials\\stucco], skipped\r\nmaterials/mod_material_pairs_giantmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customgiant@creatures\\large], skipped\r\nmaterials/mod_material_pairs_giantmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customgiant@materials\\tin], skipped\r\nmaterials/mod_material_pairs_giantmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customgiant@objects\\car_cabine], skipped\r\nmaterials/mod_material_pairs_giantmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customgiant@creatures\\small], skipped\r\nmaterials/mod_material_pairs_giantmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customgiant@objects\\clothes], skipped\r\nmaterials/mod_material_pairs_giantmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customgiant@objects\\small_box], skipped\r\nmaterials/mod_material_pairs_giantmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customgiant@objects\\small_weapon], skipped\r\nmaterials/mod_material_pairs_giantmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customgiant@objects\\dead_body], skipped\r\nmaterials/mod_material_pairs_giantmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customgiant@objects\\bottle], skipped\r\nmaterials/mod_material_pairs_giantmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customgiant@objects\\barrel], skipped\r\nmaterials/mod_material_pairs_giantmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customgiant@creatures\\medium], skipped\r\nmaterials/mod_material_pairs_giantmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customgiant@objects\\metal_box], skipped\r\nmaterials/mod_material_pairs_giantmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customgiant@objects\\small_metal_trash], skipped\r\nmaterials/mod_material_pairs_giantmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customgiant@objects\\large_metal_trash], skipped\r\nmaterials/mod_material_pairs_giantmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customgiant@objects\\car_wheel], skipped\r\nmaterials/mod_material_pairs_giantmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customgiant@objects\\large_furniture], skipped\r\nmaterials/mod_material_pairs_giantmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customgiant@objects\\fuel_can], skipped\r\nmaterials/mod_material_pairs_giantmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customgiant@objects\\concrete_box], skipped\r\nmaterials/mod_material_pairs_giantmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customgiant@materials\\fake], skipped\r\nmaterials/mod_material_pairs_giantmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customgiant@materials\\cloth], skipped\r\nmaterials/mod_material_pairs_giantmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customgiant@materials\\fake_ladders], skipped\r\nmaterials/mod_material_pairs_giantmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customgiant@default_object], skipped\r\nmaterials/mod_material_pairs_giantmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customgiant@objects\\monster_body], skipped\r\nmaterials/mod_material_pairs_giantmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customgiant@creatures\\hoof], skipped\r\nmaterials/mod_material_pairs_giantmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customgiant@objects\\glass], skipped\r\nmaterials/mod_material_pairs_giantmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customgiant@materials\\death], skipped\r\nmaterials/mod_material_pairs_giantmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customgiant@creatures\\actor], skipped\r\nmaterials/mod_material_pairs_giantmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customgiant@creatures\\human_head], skipped\r\nmaterials/mod_material_pairs_giantmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customgiant@creatures\\phantom], skipped\r\nmaterials/mod_material_pairs_giantmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customgiant@materials\\earth_death], skipped\r\nmaterials/mod_material_pairs_giantmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customgiant@materials\\earth_slide], skipped\r\nmaterials/mod_material_pairs_giantmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customgiant@materials\\bush_sux], skipped\r\nmaterials/mod_material_pairs_giantmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customgiant@materials\\water_radiation], skipped\r\nmaterials/mod_material_pairs_giantmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customgiant@materials\\occ], skipped\r\nmaterials/mod_material_pairs_giantmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customgiant@materials\\fake_ladders_woods], skipped\r\nmaterials/mod_material_pairs_giantmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customgiant@materials\\fake_slide], skipped\r\nmaterials/mod_material_pairs_giantmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customgiant@objects\\knife], skipped\r\nmaterials/mod_material_pairs_giantmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customgiant@materials\\shifer], skipped\r\nmaterials/mod_material_pairs_giantmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customgiant@creatures\\customgiant], skipped\r\nmaterials/mod_material_pairs_giantmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customgiant@creatures\\customcat], skipped\r\nmaterials/mod_material_pairs_giantmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customgiant@creatures\\custombare], skipped\r\nmaterials/mod_material_pairs_giantmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customgiant@creatures\\custombarefast], skipped\r\nmaterials/mod_material_pairs_giantmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customgiant@creatures\\customboar], skipped\r\nmaterials/mod_material_pairs_giantmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customgiant@creatures\\customflesh], skipped\r\nmaterials/mod_material_pairs_giantmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customgiant@creatures\\customdog], skipped\r\nmaterials/mod_material_pairs_giantmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customgiant@creatures\\customleaper], skipped\r\nmaterials/mod_material_pairs_giantmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): 0 pair step_sounds
+    overrides\r\nmaterials/mod_material_pairs_leapermp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customleaper@creatures\\human],
+    skipped\r\nmaterials/mod_material_pairs_leapermp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customleaper@default],
+    skipped\r\nmaterials/mod_material_pairs_leapermp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customleaper@materials\\wood],
+    skipped\r\nmaterials/mod_material_pairs_leapermp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customleaper@materials\\concrete],
+    skipped\r\nmaterials/mod_material_pairs_leapermp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customleaper@materials\\asphalt],
+    skipped\r\nmaterials/mod_material_pairs_leapermp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customleaper@materials\\metal],
+    skipped\r\nmaterials/mod_material_pairs_leapermp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customleaper@materials\\glass],
+    skipped\r\nmaterials/mod_material_pairs_leapermp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customleaper@materials\\earth],
+    skipped\r\nmaterials/mod_material_pairs_leapermp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customleaper@materials\\gravel],
+    skipped\r\nmaterials/mod_material_pairs_leapermp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customleaper@materials\\dirt],
+    skipped\r\nmaterials/mod_material_pairs_leapermp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customleaper@materials\\water],
+    skipped\r\nmaterials/mod_material_pairs_leapermp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customleaper@materials\\flooring_tile],
+    skipped\r\nmaterials/mod_material_pairs_leapermp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customleaper@materials\\metal_plate],
+    skipped\r\nmaterials/mod_material_pairs_leapermp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customleaper@materials\\grass],
+    skipped\r\nmaterials/mod_material_pairs_leapermp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customleaper@materials\\sand],
+    skipped\r\nmaterials/mod_material_pairs_leapermp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customleaper@objects\\tin_can],
+    skipped\r\nmaterials/mod_material_pairs_leapermp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customleaper@materials\\bricks],
+    skipped\r\nmaterials/mod_material_pairs_leapermp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customleaper@materials\\wooden_board],
+    skipped\r\nmaterials/mod_material_pairs_leapermp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customleaper@objects\\large_weapon],
+    skipped\r\nmaterials/mod_material_pairs_leapermp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customleaper@materials\\metal_pipe],
+    skipped\r\nmaterials/mod_material_pairs_leapermp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customleaper@materials\\bush],
+    skipped\r\nmaterials/mod_material_pairs_leapermp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customleaper@objects\\bullet],
+    skipped\r\nmaterials/mod_material_pairs_leapermp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customleaper@materials\\tree_trunk],
+    skipped\r\nmaterials/mod_material_pairs_leapermp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customleaper@materials\\setka_rabica],
+    skipped\r\nmaterials/mod_material_pairs_leapermp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customleaper@materials\\stucco],
+    skipped\r\nmaterials/mod_material_pairs_leapermp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customleaper@creatures\\large],
+    skipped\r\nmaterials/mod_material_pairs_leapermp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customleaper@materials\\tin],
+    skipped\r\nmaterials/mod_material_pairs_leapermp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customleaper@objects\\car_cabine],
+    skipped\r\nmaterials/mod_material_pairs_leapermp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customleaper@creatures\\small],
+    skipped\r\nmaterials/mod_material_pairs_leapermp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customleaper@objects\\clothes],
+    skipped\r\nmaterials/mod_material_pairs_leapermp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customleaper@objects\\small_box],
+    skipped\r\nmaterials/mod_material_pairs_leapermp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customleaper@objects\\small_weapon],
+    skipped\r\nmaterials/mod_material_pairs_leapermp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customleaper@objects\\dead_body],
+    skipped\r\nmaterials/mod_material_pairs_leapermp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customleaper@objects\\bottle],
+    skipped\r\nmaterials/mod_material_pairs_leapermp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customleaper@objects\\barrel],
+    skipped\r\nmaterials/mod_material_pairs_leapermp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customleaper@creatures\\medium],
+    skipped\r\nmaterials/mod_material_pairs_leapermp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customleaper@objects\\metal_box],
+    skipped\r\nmaterials/mod_material_pairs_leapermp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customleaper@objects\\small_metal_trash],
+    skipped\r\nmaterials/mod_material_pairs_leapermp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customleaper@objects\\large_metal_trash],
+    skipped\r\nmaterials/mod_material_pairs_leapermp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customleaper@objects\\car_wheel],
+    skipped\r\nmaterials/mod_material_pairs_leapermp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customleaper@objects\\large_furniture],
+    skipped\r\nmaterials/mod_material_pairs_leapermp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customleaper@objects\\fuel_can],
+    skipped\r\nmaterials/mod_material_pairs_leapermp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customleaper@objects\\concrete_box],
+    skipped\r\nmaterials/mod_material_pairs_leapermp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customleaper@materials\\fake],
+    skipped\r\nmaterials/mod_material_pairs_leapermp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customleaper@materials\\cloth],
+    skipped\r\nmaterials/mod_material_pairs_leapermp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customleaper@materials\\fake_ladders],
+    skipped\r\nmaterials/mod_material_pairs_leapermp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customleaper@default_object],
+    skipped\r\nmaterials/mod_material_pairs_leapermp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customleaper@objects\\monster_body],
+    skipped\r\nmaterials/mod_material_pairs_leapermp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customleaper@creatures\\hoof],
+    skipped\r\nmaterials/mod_material_pairs_leapermp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customleaper@objects\\glass],
+    skipped\r\nmaterials/mod_material_pairs_leapermp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customleaper@materials\\death],
+    skipped\r\nmaterials/mod_material_pairs_leapermp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customleaper@creatures\\actor],
+    skipped\r\nmaterials/mod_material_pairs_leapermp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customleaper@creatures\\human_head],
+    skipped\r\nmaterials/mod_material_pairs_leapermp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customleaper@creatures\\phantom],
+    skipped\r\nmaterials/mod_material_pairs_leapermp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customleaper@materials\\earth_death],
+    skipped\r\nmaterials/mod_material_pairs_leapermp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customleaper@materials\\earth_slide],
+    skipped\r\nmaterials/mod_material_pairs_leapermp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customleaper@materials\\bush_sux],
+    skipped\r\nmaterials/mod_material_pairs_leapermp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customleaper@materials\\water_radiation],
+    skipped\r\nmaterials/mod_material_pairs_leapermp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customleaper@materials\\occ],
+    skipped\r\nmaterials/mod_material_pairs_leapermp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customleaper@materials\\fake_ladders_woods],
+    skipped\r\nmaterials/mod_material_pairs_leapermp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customleaper@materials\\fake_slide],
+    skipped\r\nmaterials/mod_material_pairs_leapermp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customleaper@objects\\knife],
+    skipped\r\nmaterials/mod_material_pairs_leapermp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customleaper@materials\\shifer],
+    skipped\r\nmaterials/mod_material_pairs_leapermp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customleaper@creatures\\customleaper],
+    skipped\r\nmaterials/mod_material_pairs_leapermp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customleaper@creatures\\customcat],
+    skipped\r\nmaterials/mod_material_pairs_leapermp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customleaper@creatures\\custombare],
+    skipped\r\nmaterials/mod_material_pairs_leapermp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customleaper@creatures\\custombarefast],
+    skipped\r\nmaterials/mod_material_pairs_leapermp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customleaper@creatures\\customboar],
+    skipped\r\nmaterials/mod_material_pairs_leapermp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customleaper@creatures\\customflesh],
+    skipped\r\nmaterials/mod_material_pairs_leapermp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customleaper@creatures\\customdog],
+    skipped\r\nmaterials/mod_material_pairs_leapermp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): unknown material in [creatures\\customleaper@creatures\\customgiant],
+    skipped\r\nmaterials/mod_material_pairs_leapermp.ltx ([\u0417\u0432\u0443\u043A_\u04322+1]
+    More_Mutant_Step_SFX): 0 pair step_sounds overrides\r\nmaterials/mod_material_pairs_rodentmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customrodent@creatures\\human], skipped\r\nmaterials/mod_material_pairs_rodentmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customrodent@default], skipped\r\nmaterials/mod_material_pairs_rodentmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customrodent@materials\\wood], skipped\r\nmaterials/mod_material_pairs_rodentmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customrodent@materials\\concrete], skipped\r\nmaterials/mod_material_pairs_rodentmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customrodent@materials\\asphalt], skipped\r\nmaterials/mod_material_pairs_rodentmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customrodent@materials\\metal], skipped\r\nmaterials/mod_material_pairs_rodentmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customrodent@materials\\glass], skipped\r\nmaterials/mod_material_pairs_rodentmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customrodent@materials\\earth], skipped\r\nmaterials/mod_material_pairs_rodentmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customrodent@materials\\gravel], skipped\r\nmaterials/mod_material_pairs_rodentmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customrodent@materials\\dirt], skipped\r\nmaterials/mod_material_pairs_rodentmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customrodent@materials\\water], skipped\r\nmaterials/mod_material_pairs_rodentmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customrodent@materials\\flooring_tile], skipped\r\nmaterials/mod_material_pairs_rodentmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customrodent@materials\\metal_plate], skipped\r\nmaterials/mod_material_pairs_rodentmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customrodent@materials\\grass], skipped\r\nmaterials/mod_material_pairs_rodentmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customrodent@materials\\sand], skipped\r\nmaterials/mod_material_pairs_rodentmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customrodent@objects\\tin_can], skipped\r\nmaterials/mod_material_pairs_rodentmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customrodent@materials\\bricks], skipped\r\nmaterials/mod_material_pairs_rodentmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customrodent@materials\\wooden_board], skipped\r\nmaterials/mod_material_pairs_rodentmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customrodent@objects\\large_weapon], skipped\r\nmaterials/mod_material_pairs_rodentmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customrodent@materials\\metal_pipe], skipped\r\nmaterials/mod_material_pairs_rodentmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customrodent@materials\\bush], skipped\r\nmaterials/mod_material_pairs_rodentmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customrodent@objects\\bullet], skipped\r\nmaterials/mod_material_pairs_rodentmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customrodent@materials\\tree_trunk], skipped\r\nmaterials/mod_material_pairs_rodentmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customrodent@materials\\setka_rabica], skipped\r\nmaterials/mod_material_pairs_rodentmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customrodent@materials\\stucco], skipped\r\nmaterials/mod_material_pairs_rodentmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customrodent@creatures\\large], skipped\r\nmaterials/mod_material_pairs_rodentmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customrodent@materials\\tin], skipped\r\nmaterials/mod_material_pairs_rodentmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customrodent@objects\\car_cabine], skipped\r\nmaterials/mod_material_pairs_rodentmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customrodent@creatures\\small], skipped\r\nmaterials/mod_material_pairs_rodentmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customrodent@objects\\clothes], skipped\r\nmaterials/mod_material_pairs_rodentmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customrodent@objects\\small_box], skipped\r\nmaterials/mod_material_pairs_rodentmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customrodent@objects\\small_weapon], skipped\r\nmaterials/mod_material_pairs_rodentmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customrodent@objects\\dead_body], skipped\r\nmaterials/mod_material_pairs_rodentmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customrodent@objects\\bottle], skipped\r\nmaterials/mod_material_pairs_rodentmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customrodent@objects\\barrel], skipped\r\nmaterials/mod_material_pairs_rodentmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customrodent@creatures\\medium], skipped\r\nmaterials/mod_material_pairs_rodentmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customrodent@objects\\metal_box], skipped\r\nmaterials/mod_material_pairs_rodentmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customrodent@objects\\small_metal_trash], skipped\r\nmaterials/mod_material_pairs_rodentmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customrodent@objects\\large_metal_trash], skipped\r\nmaterials/mod_material_pairs_rodentmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customrodent@objects\\car_wheel], skipped\r\nmaterials/mod_material_pairs_rodentmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customrodent@objects\\large_furniture], skipped\r\nmaterials/mod_material_pairs_rodentmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customrodent@objects\\fuel_can], skipped\r\nmaterials/mod_material_pairs_rodentmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customrodent@objects\\concrete_box], skipped\r\nmaterials/mod_material_pairs_rodentmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customrodent@materials\\fake], skipped\r\nmaterials/mod_material_pairs_rodentmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customrodent@materials\\cloth], skipped\r\nmaterials/mod_material_pairs_rodentmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customrodent@materials\\fake_ladders], skipped\r\nmaterials/mod_material_pairs_rodentmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customrodent@default_object], skipped\r\nmaterials/mod_material_pairs_rodentmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customrodent@objects\\monster_body], skipped\r\nmaterials/mod_material_pairs_rodentmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customrodent@creatures\\hoof], skipped\r\nmaterials/mod_material_pairs_rodentmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customrodent@objects\\glass], skipped\r\nmaterials/mod_material_pairs_rodentmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customrodent@materials\\death], skipped\r\nmaterials/mod_material_pairs_rodentmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customrodent@creatures\\actor], skipped\r\nmaterials/mod_material_pairs_rodentmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customrodent@creatures\\human_head], skipped\r\nmaterials/mod_material_pairs_rodentmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customrodent@creatures\\phantom], skipped\r\nmaterials/mod_material_pairs_rodentmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customrodent@materials\\earth_death], skipped\r\nmaterials/mod_material_pairs_rodentmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customrodent@materials\\earth_slide], skipped\r\nmaterials/mod_material_pairs_rodentmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customrodent@materials\\bush_sux], skipped\r\nmaterials/mod_material_pairs_rodentmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customrodent@materials\\water_radiation], skipped\r\nmaterials/mod_material_pairs_rodentmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customrodent@materials\\occ], skipped\r\nmaterials/mod_material_pairs_rodentmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customrodent@materials\\fake_ladders_woods], skipped\r\nmaterials/mod_material_pairs_rodentmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customrodent@materials\\fake_slide], skipped\r\nmaterials/mod_material_pairs_rodentmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customrodent@objects\\knife], skipped\r\nmaterials/mod_material_pairs_rodentmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customrodent@materials\\shifer], skipped\r\nmaterials/mod_material_pairs_rodentmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customrodent@creatures\\customrodent], skipped\r\nmaterials/mod_material_pairs_rodentmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customrodent@creatures\\customcat], skipped\r\nmaterials/mod_material_pairs_rodentmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customrodent@creatures\\custombare], skipped\r\nmaterials/mod_material_pairs_rodentmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customrodent@creatures\\custombarefast], skipped\r\nmaterials/mod_material_pairs_rodentmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customrodent@creatures\\customboar], skipped\r\nmaterials/mod_material_pairs_rodentmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customrodent@creatures\\customflesh], skipped\r\nmaterials/mod_material_pairs_rodentmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customrodent@creatures\\customdog], skipped\r\nmaterials/mod_material_pairs_rodentmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customrodent@creatures\\customgiant], skipped\r\nmaterials/mod_material_pairs_rodentmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): unknown material
+    in [creatures\\customrodent@creatures\\customleaper], skipped\r\nmaterials/mod_material_pairs_rodentmp.ltx
+    ([\u0417\u0432\u0443\u043A_\u04322+1] More_Mutant_Step_SFX): 0 pair step_sounds
+    overrides\r\nscripts/footstep_according_moving_mode.script <- [\u0428\u0430\u0433\u0438_\u04321]
+    NPC Movement Sound [ RMS ]: 34 materials, move states [walk, crouch, run]\r\nscripts/eft_jump_sounds.script
+    <- [\u0428\u0430\u0433\u0438_\u04321] NPC Movement Sound [ RMS ]: 21 enabled
+    materials, jump variants 5, land variants 5\r\ndefault: pair [creatures\\actor]
+    step_sounds 12 files <- materials/material_pairs_footsteps.ltx ([\u0428\u0430\u0433\u0438_\u04321]
+    NPC Movement Sound [ RMS ])\r\nmaterials\\earth: pair [creatures\\actor] step_sounds
+    0 files <- materials/material_pairs_footsteps.ltx ([\u0428\u0430\u0433\u0438_\u04321]
+    NPC Movement Sound [ RMS ])\r\n  moving mode sound_key 'earth', sound_total_count
+    12\r\nmaterials\\grass: pair [creatures\\actor] step_sounds 0 files <- materials/material_pairs_footsteps.ltx
+    ([\u0428\u0430\u0433\u0438_\u04321] NPC Movement Sound [ RMS ])\r\n  moving mode
+    sound_key 'grass', sound_total_count 20\r\nmaterials\\gravel: pair [creatures\\actor]
+    step_sounds 0 files <- materials/material_pairs_footsteps.ltx ([\u0428\u0430\u0433\u0438_\u04321]
+    NPC Movement Sound [ RMS ])\r\n  moving mode sound_key 'gravel', sound_total_count
+    12\r\nmaterials\\sand: pair [creatures\\actor] step_sounds 0 files <- materials/material_pairs_footsteps.ltx
+    ([\u0428\u0430\u0433\u0438_\u04321] NPC Movement Sound [ RMS ])\r\nmaterials\\dirt:
+    pair [creatures\\actor] step_sounds 0 files <- materials/material_pairs_footsteps.ltx
+    ([\u0428\u0430\u0433\u0438_\u04321] NPC Movement Sound [ RMS ])\r\nmaterials\\asphalt:
+    pair [creatures\\actor] step_sounds 0 files <- materials/material_pairs_footsteps.ltx
+    ([\u0428\u0430\u0433\u0438_\u04321] NPC Movement Sound [ RMS ])\r\n  moving mode
+    sound_key 'asphalt', sound_total_count 15\r\nmaterials\\concrete: pair [creatures\\actor]
+    step_sounds 0 files <- materials/material_pairs_footsteps.ltx ([\u0428\u0430\u0433\u0438_\u04321]
+    NPC Movement Sound [ RMS ])\r\n  moving mode sound_key 'concrete', sound_total_count
+    12\r\nmaterials\\bricks: pair [creatures\\actor] step_sounds 0 files <- materials/material_pairs_footsteps.ltx
+    ([\u0428\u0430\u0433\u0438_\u04321] NPC Movement Sound [ RMS ])\r\n  moving mode
+    sound_key 'bricks', sound_total_count 6\r\nmaterials\\stucco: pair [creatures\\actor]
+    step_sounds 12 files <- materials/material_pairs_footsteps.ltx ([\u0428\u0430\u0433\u0438_\u04321]
+    NPC Movement Sound [ RMS ])\r\nmaterials\\flooring_tile: pair [creatures\\actor]
+    step_sounds 0 files <- materials/material_pairs_footsteps.ltx ([\u0428\u0430\u0433\u0438_\u04321]
+    NPC Movement Sound [ RMS ])\r\n  moving mode sound_key 'flooring_tile', sound_total_count
+    12\r\nmaterials\\metal: pair [creatures\\actor] step_sounds 0 files <- materials/material_pairs_footsteps.ltx
+    ([\u0428\u0430\u0433\u0438_\u04321] NPC Movement Sound [ RMS ])\r\n  moving mode
+    sound_key 'metal', sound_total_count 12\r\nmaterials\\metal_pipe: pair [creatures\\actor]
+    step_sounds 0 files <- materials/material_pairs_footsteps.ltx ([\u0428\u0430\u0433\u0438_\u04321]
+    NPC Movement Sound [ RMS ])\r\n  moving mode sound_key 'metal_pipe', sound_total_count
+    12\r\nmaterials\\metal_plate: pair [creatures\\actor] step_sounds 0 files <-
+    materials/material_pairs_footsteps.ltx ([\u0428\u0430\u0433\u0438_\u04321] NPC
+    Movement Sound [ RMS ])\r\n  moving mode sound_key 'metal_plate', sound_total_count
+    12\r\nmaterials\\tin: pair [creatures\\actor] step_sounds 0 files <- materials/material_pairs_footsteps.ltx
+    ([\u0428\u0430\u0433\u0438_\u04321] NPC Movement Sound [ RMS ])\r\n  moving mode
+    sound_key 'tin', sound_total_count 12\r\nmaterials\\shifer: pair [creatures\\actor]
+    step_sounds 12 files <- materials/material_pairs_footsteps.ltx ([\u0428\u0430\u0433\u0438_\u04321]
+    NPC Movement Sound [ RMS ])\r\nmaterials\\wood: pair [creatures\\actor] step_sounds
+    0 files <- materials/material_pairs_footsteps.ltx ([\u0428\u0430\u0433\u0438_\u04321]
+    NPC Movement Sound [ RMS ])\r\n  moving mode sound_key 'wood', sound_total_count
+    12\r\nmaterials\\wooden_board: pair [creatures\\actor] step_sounds 0 files <-
+    materials/material_pairs_footsteps.ltx ([\u0428\u0430\u0433\u0438_\u04321] NPC
+    Movement Sound [ RMS ])\r\n  moving mode sound_key 'wooden_board', sound_total_count
+    12\r\nmaterials\\tree_trunk: pair [creatures\\actor] step_sounds 0 files <- materials/material_pairs_footsteps.ltx
+    ([\u0428\u0430\u0433\u0438_\u04321] NPC Movement Sound [ RMS ])\r\n  moving mode
+    sound_key 'tree_trunk', sound_total_count 12\r\nmaterials\\bush: pair [creatures\\actor]
+    step_sounds 6 files <- materials/material_pairs_footsteps.ltx ([\u0428\u0430\u0433\u0438_\u04321]
+    NPC Movement Sound [ RMS ])\r\n  moving mode sound_key 'bush', sound_total_count
+    6\r\nmaterials\\cloth: pair [creatures\\actor] step_sounds 0 files <- materials/material_pairs_footsteps.ltx
+    ([\u0428\u0430\u0433\u0438_\u04321] NPC Movement Sound [ RMS ])\r\n  moving mode
+    sound_key 'cloth', sound_total_count 6\r\nmaterials\\setka_rabica: pair [creatures\\actor]
+    step_sounds 0 files <- materials/material_pairs_footsteps.ltx ([\u0428\u0430\u0433\u0438_\u04321]
+    NPC Movement Sound [ RMS ])\r\n  moving mode sound_key 'setka_rabica', sound_total_count
+    6\r\nmaterials\\glass: pair [creatures\\actor] step_sounds 0 files <- materials/material_pairs_footsteps.ltx
+    ([\u0428\u0430\u0433\u0438_\u04321] NPC Movement Sound [ RMS ])\r\nmaterials\\water:
+    pair [creatures\\actor] step_sounds 6 files <- materials/material_pairs_footsteps.ltx
+    ([\u0428\u0430\u0433\u0438_\u04321] NPC Movement Sound [ RMS ])\r\nscripts/gear_rustle_sounds.script
+    <- [\u0428\u0430\u0433\u0438_\u04321] NPC Movement Sound [ RMS ]: tac_gear_1..18\r\nscripts/move_effects.script
+    <- [\u0428\u0430\u0433\u0438_\u04321] NPC Movement Sound [ RMS ]: crouch key
+    mvt_short_1..9\r\nImported audio clips referenced by the library: 651, failed:
+    0\r\ndefault: pair 12, walk 0, run 0, crouch 0, jump 5, land 5\r\nmaterials\\earth:
+    pair 0, walk 12, run 12, crouch 0, jump 5, land 5\r\nmaterials\\grass: pair 0,
+    walk 20, run 20, crouch 0, jump 5, land 5\r\nmaterials\\gravel: pair 0, walk
+    12, run 12, crouch 0, jump 5, land 5\r\nmaterials\\sand: pair 0, walk 0, run
+    0, crouch 0, jump 0, land 0\r\nmaterials\\dirt: pair 0, walk 0, run 0, crouch
+    0, jump 0, land 0\r\nmaterials\\asphalt: pair 0, walk 15, run 15, crouch 0, jump
+    5, land 5\r\nmaterials\\concrete: pair 0, walk 12, run 12, crouch 0, jump 5,
+    land 5\r\nmaterials\\bricks: pair 0, walk 6, run 6, crouch 0, jump 5, land 5\r\nmaterials\\stucco:
+    pair 12, walk 0, run 0, crouch 0, jump 0, land 0\r\nmaterials\\flooring_tile:
+    pair 0, walk 12, run 12, crouch 0, jump 5, land 5\r\nmaterials\\metal: pair 0,
+    walk 12, run 12, crouch 0, jump 5, land 5\r\nmaterials\\metal_pipe: pair 0, walk
+    12, run 12, crouch 0, jump 5, land 5\r\nmaterials\\metal_plate: pair 0, walk
+    12, run 12, crouch 0, jump 5, land 5\r\nmaterials\\tin: pair 0, walk 12, run
+    12, crouch 0, jump 5, land 5\r\nmaterials\\shifer: pair 12, walk 0, run 0, crouch
+    0, jump 5, land 5\r\nmaterials\\wood: pair 0, walk 12, run 12, crouch 0, jump
+    5, land 5\r\nmaterials\\wooden_board: pair 0, walk 12, run 12, crouch 0, jump
+    5, land 5\r\nmaterials\\tree_trunk: pair 0, walk 12, run 12, crouch 0, jump 5,
+    land 5\r\nmaterials\\bush: pair 0, walk 6, run 6, crouch 0, jump 5, land 5\r\nmaterials\\cloth:
+    pair 0, walk 6, run 6, crouch 0, jump 5, land 5\r\nmaterials\\setka_rabica: pair
+    0, walk 6, run 6, crouch 0, jump 5, land 5\r\nmaterials\\glass: pair 0, walk
+    0, run 0, crouch 0, jump 0, land 0\r\nmaterials\\water: pair 6, walk 0, run 0,
+    crouch 0, jump 5, land 5\r\ngear rustle 18, crouch key 9\r\nsnd_volume_eff =
+    1 <- user.ltx; land sound above 5 m/s, volume divider 5; ray 1 m up, range 1.1
+    m\r\nUnity adaptation: fallback surface 'earth' for colliders without a surface
+    component, PhysicsMaterial or Terrain layer mapping (X-Ray always has a game
+    material per triangle).\r\nUnity adaptation: psHUDStepSoundVolume is not stored
+    in user.ltx; the engine default 1 is used.\r\n"

@@ -15,6 +15,9 @@ namespace RaidIntoDarkness.Player.Editor
         public const string INPUT_PATH = "Assets/_Source/Settings/Input/StalkerControls.inputactions";
         public const string TEST_AREA = "PlayerTestArea";
 
+        public const string CAMERA_PIVOT = "CameraMotionPivot";
+        public const string FOLEY_SOURCE = "FoleyAudio";
+
         private const string MENU = "Tools/X-Ray/Setup Stalker Player";
         private const string PLAYER_NAME = "FPS_Player";
         private const string SCENE_CAMERA = "Main Camera";
@@ -57,11 +60,78 @@ namespace RaidIntoDarkness.Player.Editor
                 return false;
             }
 
-            SetupPrefab(profile, input);
-            return SetupScene();
+            var cameraEffects = AssetDatabase.LoadAssetAtPath<StalkerCameraEffectsProfile>(StalkerCameraEffectsBuilder.PROFILE_PATH);
+            var audio = AssetDatabase.LoadAssetAtPath<StalkerSurfaceAudioLibrary>(StalkerSurfaceAudioBuilder.LIBRARY_PATH);
+            var timing = AssetDatabase.LoadAssetAtPath<StalkerFootstepTimingLibrary>(StalkerFootstepTimingBuilder.TIMING_PATH);
+            if (cameraEffects == null || audio == null || timing == null)
+            {
+                bool built = StalkerFoleyAssets.Build(out string report);
+                Debug.Log("[Player] " + report);
+                cameraEffects = AssetDatabase.LoadAssetAtPath<StalkerCameraEffectsProfile>(StalkerCameraEffectsBuilder.PROFILE_PATH);
+                audio = AssetDatabase.LoadAssetAtPath<StalkerSurfaceAudioLibrary>(StalkerSurfaceAudioBuilder.LIBRARY_PATH);
+                timing = AssetDatabase.LoadAssetAtPath<StalkerFootstepTimingLibrary>(StalkerFootstepTimingBuilder.TIMING_PATH);
+                if (!built)
+                {
+                    Debug.LogWarning("[Player] Foley assets were not fully built; missing references stay empty.");
+                }
+            }
+
+            SetupPrefab(profile, input, cameraEffects, audio, timing);
+            return SetupScene(audio);
         }
 
-        private static void SetupPrefab(StalkerMovementProfile profile, InputActionAsset input)
+        private static void SetupFoley(GameObject root, Transform cameraRoot, Camera camera, StalkerMovementProfile profile, StalkerCameraEffectsProfile cameraEffects, StalkerSurfaceAudioLibrary audio, StalkerFootstepTimingLibrary timing, StalkerPlayerController player)
+        {
+            Transform pivot = cameraRoot.Find(CAMERA_PIVOT);
+            if (pivot == null)
+            {
+                pivot = new GameObject(CAMERA_PIVOT).transform;
+                pivot.SetParent(cameraRoot, false);
+            }
+
+            pivot.localPosition = Vector3.zero;
+            pivot.localRotation = Quaternion.identity;
+            pivot.localScale = Vector3.one;
+            if (camera.transform.parent != pivot)
+            {
+                camera.transform.SetParent(pivot, false);
+            }
+
+            Transform foleyTransform = root.transform.Find(FOLEY_SOURCE);
+            if (foleyTransform == null)
+            {
+                foleyTransform = new GameObject(FOLEY_SOURCE).transform;
+                foleyTransform.SetParent(root.transform, false);
+            }
+
+            foleyTransform.localPosition = Vector3.zero;
+            var source = GetOrAdd<AudioSource>(foleyTransform.gameObject);
+            source.playOnAwake = false;
+            source.loop = false;
+            source.spatialBlend = 0.0f;
+            source.dopplerLevel = 0.0f;
+            source.priority = 64;
+            var effects = GetOrAdd<StalkerCameraEffects>(root);
+            var detector = GetOrAdd<StalkerSurfaceDetector>(root);
+            var footsteps = GetOrAdd<StalkerFootstepSynchronizer>(root);
+            var foley = GetOrAdd<StalkerPlayerFoley>(root);
+            Set(effects, "_profile", cameraEffects);
+            Set(effects, "_pivot", pivot);
+            Set(detector, "_library", audio);
+            var detectorObject = new SerializedObject(detector);
+            detectorObject.FindProperty("_mask").intValue = profile.Unity.CollisionMask;
+            detectorObject.ApplyModifiedPropertiesWithoutUndo();
+            Set(footsteps, "_library", timing);
+            Set(foley, "_library", audio);
+            Set(foley, "_detector", detector);
+            Set(foley, "_source", source);
+            Set(player, "_cameraEffects", effects);
+            Set(player, "_footsteps", footsteps);
+            Set(player, "_foley", foley);
+            Set(player, "_surfaceDetector", detector);
+        }
+
+        private static void SetupPrefab(StalkerMovementProfile profile, InputActionAsset input, StalkerCameraEffectsProfile cameraEffects, StalkerSurfaceAudioLibrary audio, StalkerFootstepTimingLibrary timing)
         {
             GameObject root = PrefabUtility.LoadPrefabContents(PREFAB_PATH);
             try
@@ -115,6 +185,7 @@ namespace RaidIntoDarkness.Player.Editor
                 camera.fieldOfView = profile.Camera.FieldOfView;
                 camera.nearClipPlane = profile.Camera.NearClip;
                 GetOrAdd<AudioListener>(camera.gameObject);
+                SetupFoley(root, cameraRoot, camera, profile, cameraEffects, audio, timing, player);
                 PrefabUtility.SaveAsPrefabAsset(root, PREFAB_PATH);
             }
             finally
@@ -123,7 +194,7 @@ namespace RaidIntoDarkness.Player.Editor
             }
         }
 
-        private static bool SetupScene()
+        private static bool SetupScene(StalkerSurfaceAudioLibrary audio)
         {
             Scene scene = EditorSceneManager.OpenScene(SCENE_PATH, OpenSceneMode.Single);
             GameObject sceneCamera = FindRoot(scene, SCENE_CAMERA);
@@ -139,6 +210,7 @@ namespace RaidIntoDarkness.Player.Editor
                 SceneManager.MoveGameObjectToScene(area, scene);
             }
 
+            StalkerSurfaceTestAreaBuilder.Build(area.transform, audio);
             GameObject player = FindRoot(scene, PLAYER_NAME);
             if (player == null)
             {

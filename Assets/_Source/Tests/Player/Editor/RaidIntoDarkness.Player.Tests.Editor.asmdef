@@ -5,6 +5,7 @@
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
         "RaidIntoDarkness.Player",
+        "RaidIntoDarkness.Player.Editor",
         "RaidIntoDarkness.FirstPerson",
         "XRay.Importer.Runtime"
     ],

@@ -31,6 +31,8 @@ namespace RaidIntoDarkness.Player
         public bool CaptureCursorPressed => WasPressed(_captureCursor);
         public bool ToggleOverlayPressed => WasPressed(_toggleOverlay);
         public bool ToggleCombatPressed => WasPressed(_toggleCombat);
+        public bool CrouchKeyPressed => WasPressed(_crouch) || WasPressed(_lowCrouch);
+        public bool CrouchKeyReleased => WasReleased(_crouch) || WasReleased(_lowCrouch);
         public bool NextOutfitPressed => WasPressed(_nextOutfit);
         public bool PreviousOutfitPressed => WasPressed(_previousOutfit);
         public InputActionAsset Actions => _actions;
@@ -168,6 +170,11 @@ namespace RaidIntoDarkness.Player
         private static bool WasPressed(InputAction action)
         {
             return action != null && action.WasPressedThisFrame();
+        }
+
+        private static bool WasReleased(InputAction action)
+        {
+            return action != null && action.WasReleasedThisFrame();
         }
     }
 }

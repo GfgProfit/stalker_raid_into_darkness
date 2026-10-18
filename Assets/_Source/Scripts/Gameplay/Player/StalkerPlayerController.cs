@@ -16,6 +16,10 @@ namespace RaidIntoDarkness.Player
         [SerializeField] private StalkerVisibleBody _visibleBody;
         [SerializeField] private StalkerBodyAnimationPlayer _bodyPlayer;
         [SerializeField] private FirstPersonRig _rig;
+        [SerializeField] private StalkerCameraEffects _cameraEffects;
+        [SerializeField] private StalkerFootstepSynchronizer _footsteps;
+        [SerializeField] private StalkerPlayerFoley _foley;
+        [SerializeField] private StalkerSurfaceDetector _surfaceDetector;
         [SerializeField] private string _outfitSection = FirstPersonOutfitCatalog.NO_OUTFIT_SECTION;
 
         private string _appliedSection;
@@ -27,6 +31,10 @@ namespace RaidIntoDarkness.Player
         public StalkerVisibleBody VisibleBody => _visibleBody;
         public StalkerBodyAnimationPlayer BodyPlayer => _bodyPlayer;
         public FirstPersonRig Rig => _rig;
+        public StalkerCameraEffects CameraEffects => _cameraEffects;
+        public StalkerFootstepSynchronizer Footsteps => _footsteps;
+        public StalkerPlayerFoley Foley => _foley;
+        public StalkerSurfaceDetector SurfaceDetector => _surfaceDetector;
         public StalkerMovementState State => _motor.State;
         public string OutfitSection => _appliedSection;
 
@@ -55,6 +63,24 @@ namespace RaidIntoDarkness.Player
 
             _motor.Initialize(_profile);
             _camera.Initialize(_profile);
+            if (_surfaceDetector != null)
+            {
+                _surfaceDetector.Initialize(_surfaceDetector.Library, _profile.Unity.CollisionMask);
+            }
+
+            if (_foley != null)
+            {
+                _foley.Initialize();
+            }
+
+            _motor.JumpStarted += OnJumpStarted;
+            _motor.Landed += OnLanded;
+            _motor.ContactRestored += OnContactRestored;
+            if (_footsteps != null)
+            {
+                _footsteps.Footstep += OnFootstep;
+            }
+
             _visibleBody.Initialize(_profile);
             if (_rig != null)
             {
@@ -72,6 +98,18 @@ namespace RaidIntoDarkness.Player
             if (_rig != null)
             {
                 _rig.OutfitApplied -= OnOutfitApplied;
+            }
+
+            if (_motor != null)
+            {
+                _motor.JumpStarted -= OnJumpStarted;
+                _motor.Landed -= OnLanded;
+                _motor.ContactRestored -= OnContactRestored;
+            }
+
+            if (_footsteps != null)
+            {
+                _footsteps.Footstep -= OnFootstep;
             }
         }
 
@@ -108,6 +146,7 @@ namespace RaidIntoDarkness.Player
                 }
 
                 _camera.Look(_input.LookDelta);
+                HandleCrouchKey();
                 _motor.Wish = _input.Apply(_motor.Wish, _profile.Input);
             }
 
@@ -119,6 +158,15 @@ namespace RaidIntoDarkness.Player
             _motor.ClearHeldCommands();
             _camera.Apply(_motor.Stance.CameraHeight);
             _visibleBody.Tick(_motor.State, _camera, deltaTime);
+            if (_footsteps != null)
+            {
+                _footsteps.Tick(_motor.State, _bodyPlayer, deltaTime);
+            }
+
+            if (_cameraEffects != null)
+            {
+                _cameraEffects.Tick(_motor.State, _motor.Condition.IsLimping(), _footsteps != null ? _footsteps.CyclePhase : -1.0f, deltaTime);
+            }
         }
 
         private void HandleDebugInput()
@@ -138,6 +186,72 @@ namespace RaidIntoDarkness.Player
                 int count = _rig.Catalog.Entries.Count;
                 _outfitIndex = (_outfitIndex + (_input.NextOutfitPressed ? 1 : count - 1)) % count;
                 ApplyOutfit(_rig.Catalog.Entries[_outfitIndex].Section);
+            }
+        }
+
+        private void HandleCrouchKey()
+        {
+            bool pressed = _input.CrouchKeyPressed;
+            if (!pressed && !_input.CrouchKeyReleased)
+            {
+                return;
+            }
+
+            if (pressed && _foley != null)
+            {
+                _foley.PlayCrouchKey();
+            }
+
+            if (_cameraEffects != null)
+            {
+                _cameraEffects.OnCrouchKey(pressed);
+            }
+        }
+
+        private void OnFootstep(StalkerFootstep step)
+        {
+            if (_foley != null)
+            {
+                _foley.PlayFootstep(step);
+            }
+
+            if (_cameraEffects != null)
+            {
+                _cameraEffects.OnFootstep(_motor.State, _motor.Condition.Power);
+            }
+        }
+
+        private void OnJumpStarted()
+        {
+            if (_foley != null)
+            {
+                _foley.PlayJump();
+            }
+
+            if (_cameraEffects != null)
+            {
+                _cameraEffects.OnJump();
+            }
+        }
+
+        private void OnLanded(float contactSpeed)
+        {
+            if (_foley != null)
+            {
+                _foley.PlayLanding(contactSpeed);
+            }
+
+            if (_cameraEffects != null)
+            {
+                _cameraEffects.OnLanded(contactSpeed);
+            }
+        }
+
+        private void OnContactRestored(float contactSpeed)
+        {
+            if (_cameraEffects != null)
+            {
+                _cameraEffects.OnContact(contactSpeed);
             }
         }
 

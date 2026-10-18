@@ -51,7 +51,41 @@ namespace RaidIntoDarkness.Player
                 _style = new GUIStyle(GUI.skin.box) { alignment = TextAnchor.UpperLeft, fontSize = 12, richText = false };
             }
 
-            GUI.Box(new Rect(10.0f, 10.0f, 460.0f, _showProfile ? 560.0f : 330.0f), _text, _style);
+            GUI.Box(new Rect(10.0f, 10.0f, 620.0f, _showProfile ? 700.0f : 470.0f), _text, _style);
+        }
+
+        private void AppendFoley()
+        {
+            StalkerSurfaceDetector detector = _controller.SurfaceDetector;
+            StalkerFootstepSynchronizer footsteps = _controller.Footsteps;
+            StalkerPlayerFoley foley = _controller.Foley;
+            StalkerCameraEffects effects = _controller.CameraEffects;
+            if (detector != null)
+            {
+                _builder.Append("Surface: ").Append(detector.Current).Append(" (").Append(detector.CurrentSource).Append(", ").Append(detector.CurrentCollider != null ? detector.CurrentCollider.name : "-").Append(")\n");
+            }
+
+            if (footsteps != null)
+            {
+                _builder.Append("Footstep phase: ").Append(footsteps.Phase.ToString("0.00")).Append("  step cycle: ").Append(footsteps.CyclePhase.ToString("0.00")).Append("  source: ").Append(footsteps.ActiveSource).Append("  legs: ").Append(footsteps.LegsMotion ?? "-").Append('\n');
+                if (footsteps.HasLastStep)
+                {
+                    StalkerFootstep step = footsteps.LastStep;
+                    _builder.Append("Last step: ").Append(step.Side).Append(" power ").Append(step.Power.ToString("0.00")).Append(" at ").Append(step.Phase.ToString("0.00")).Append(" of ").Append(step.BodyMotion ?? "-").Append('\n');
+                }
+            }
+
+            if (effects != null)
+            {
+                Vector3 offset = effects.MotionOffset;
+                _builder.Append("Bob amplitude: ").Append(effects.BobAmplitude.ToString("0.0000")).Append("  fade: ").Append(effects.BobReminder.ToString("0.00")).Append("  offset: ").Append(offset.x.ToString("0.0000")).Append(", ").Append(offset.y.ToString("0.0000")).Append(", ").Append(offset.z.ToString("0.0000")).Append('\n');
+            }
+
+            if (foley != null)
+            {
+                _builder.Append("Landing speed: ").Append(foley.LastLandingSpeed.ToString("0.00")).Append("  last clip: ").Append(foley.LastClipName).Append('\n');
+                _builder.Append("Why: ").Append(foley.LastReason).Append('\n');
+            }
         }
 
         private string Build()
@@ -77,6 +111,7 @@ namespace RaidIntoDarkness.Player
             _builder.Append("Body motion: ").Append(player != null ? player.CurrentMotion : "-").Append("  offset: ").Append(body != null ? body.ForwardOffset.ToString("0.00") : "-").Append('\n');
             _builder.Append("Blend: ").Append(player != null ? player.DescribeBlend() : "-").Append('\n');
             _builder.Append("Outfit: ").Append(_controller.OutfitSection).Append('\n');
+            AppendFoley();
             if (_showProfile)
             {
                 StalkerMovementProfile profile = _controller.Profile;

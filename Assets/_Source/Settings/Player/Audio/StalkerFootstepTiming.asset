@@ -1,0 +1,927 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e70fd5facaed83443a7eeec9536fcf23, type: 3}
+  m_Name: StalkerFootstepTiming
+  m_EditorClassIdentifier: RaidIntoDarkness.Player::RaidIntoDarkness.Player.StalkerFootstepTimingLibrary
+  _bodyMotions:
+  - _motion: leg_stand_idle
+    _clip: {fileID: -7465242720750695351, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _length: 5.3
+    _contacts: []
+  - _motion: leg_stand_walk_fwd_shift
+    _clip: {fileID: -4884037004228166015, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _length: 1.3000001
+    _contacts:
+    - _phase: 0.44276392
+      _side: 0
+    - _phase: 0.9856634
+      _side: 1
+  - _motion: leg_stand_walk_fwd_left_shift
+    _clip: {fileID: 1411514545008003035, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _length: 1.3333334
+    _contacts:
+    - _phase: 0.42879528
+      _side: 1
+    - _phase: 0.92901444
+      _side: 0
+  - _motion: leg_stand_walk_fwd_right_shift
+    _clip: {fileID: -2244794067321833941, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _length: 1.3333334
+    _contacts:
+    - _phase: 0.428785
+      _side: 0
+    - _phase: 0.9289726
+      _side: 1
+  - _motion: leg_stand_walk_back_shift
+    _clip: {fileID: -1464960680801399043, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _length: 1.3000001
+    _contacts:
+    - _phase: 0.50223494
+      _side: 1
+    - _phase: 0.9956655
+      _side: 0
+  - _motion: leg_stand_walk_back_left_shift
+    _clip: {fileID: 7191468801090644767, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _length: 1.3333334
+    _contacts:
+    - _phase: 0.42875886
+      _side: 0
+    - _phase: 0.9287623
+      _side: 1
+  - _motion: leg_stand_walk_back_right_shift
+    _clip: {fileID: -1648316007584727121, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _length: 1.3333334
+    _contacts:
+    - _phase: 0.42876828
+      _side: 1
+    - _phase: 0.9287419
+      _side: 0
+  - _motion: leg_stand_walk_right_shift
+    _clip: {fileID: 7273831461671412778, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _length: 0.8333334
+    _contacts:
+    - _phase: 0.22094712
+      _side: 0
+    - _phase: 0.73171103
+      _side: 1
+  - _motion: leg_stand_walk_left_shift
+    _clip: {fileID: -2367907820917158366, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _length: 0.8333334
+    _contacts:
+    - _phase: 0.35750458
+      _side: 0
+    - _phase: 0.8769177
+      _side: 1
+  - _motion: leg_crouch_idle
+    _clip: {fileID: 7091325097746540251, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _length: 0.033333335
+    _contacts: []
+  - _motion: leg_crouch_walk_fwd
+    _clip: {fileID: 6265894994251454734, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _length: 1.8000001
+    _contacts:
+    - _phase: 0.11308776
+      _side: 0
+    - _phase: 0.7190787
+      _side: 1
+  - _motion: lancew_legs_moving_fl_c
+    _clip: {fileID: 1560465670150584297, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _length: 0.8333334
+    _contacts:
+    - _phase: 0.20224366
+      _side: 0
+    - _phase: 0.77772033
+      _side: 1
+  - _motion: lancew_legs_moving_fr_c
+    _clip: {fileID: -6428463774632881500, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _length: 0.8333334
+    _contacts:
+    - _phase: 0.20224366
+      _side: 0
+    - _phase: 0.77772033
+      _side: 1
+  - _motion: leg_crouch_walk_back
+    _clip: {fileID: -2201098771575646033, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _length: 1.8000001
+    _contacts:
+    - _phase: 0.54725116
+      _side: 0
+    - _phase: 0.98795605
+      _side: 1
+  - _motion: lancew_legs_moving_bl_c
+    _clip: {fileID: 9031743039601790012, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _length: 0.8333334
+    _contacts:
+    - _phase: 0.43182302
+      _side: 0
+    - _phase: 0.84329855
+      _side: 1
+  - _motion: lancew_legs_moving_br_c
+    _clip: {fileID: 8551994030827199291, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _length: 0.8333334
+    _contacts:
+    - _phase: 0.43182302
+      _side: 0
+    - _phase: 0.84329855
+      _side: 1
+  - _motion: leg_crouch_walk_left
+    _clip: {fileID: 7808721192707975290, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _length: 1.2666668
+    _contacts:
+    - _phase: 0.09422196
+      _side: 0
+    - _phase: 0.42778227
+      _side: 0
+    - _phase: 0.4413855
+      _side: 1
+  - _motion: leg_crouch_walk_right
+    _clip: {fileID: 2096042720772133497, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _length: 1.2666668
+    _contacts:
+    - _phase: 0.23709986
+      _side: 1
+    - _phase: 0.91445327
+      _side: 0
+  - _motion: lancew_legs_moving
+    _clip: {fileID: -6880402639993475763, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _length: 0.8333334
+    _contacts:
+    - _phase: 0.3916093
+      _side: 1
+    - _phase: 0.9145627
+      _side: 0
+  - _motion: lancew_legs_moving_fl
+    _clip: {fileID: 1779266633477690700, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _length: 0.8333334
+    _contacts:
+    - _phase: 0.37590727
+      _side: 0
+    - _phase: 0.9071816
+      _side: 1
+  - _motion: lancew_legs_moving_fr
+    _clip: {fileID: 4844932069063418986, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _length: 0.8333334
+    _contacts:
+    - _phase: 0.3665037
+      _side: 0
+    - _phase: 0.8627738
+      _side: 1
+  - _motion: leg_stand_walk_fwd
+    _clip: {fileID: -6591572613829653715, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _length: 1.3000001
+    _contacts:
+    - _phase: 0.44276392
+      _side: 0
+    - _phase: 0.9856634
+      _side: 1
+  - _motion: leg_stand_walk_fwd_left
+    _clip: {fileID: -4932958360401025061, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _length: 1.3333334
+    _contacts:
+    - _phase: 0.42892236
+      _side: 1
+    - _phase: 0.92883116
+      _side: 0
+  - _motion: leg_stand_walk_fwd_right
+    _clip: {fileID: -5824370207633174986, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _length: 1.3333334
+    _contacts:
+    - _phase: 0.42890894
+      _side: 0
+    - _phase: 0.9288634
+      _side: 1
+  - _motion: lancew_legs_moving_c
+    _clip: {fileID: -3598085683224841694, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _length: 0.8333334
+    _contacts:
+    - _phase: 0.20224366
+      _side: 0
+    - _phase: 0.77772033
+      _side: 1
+  - _motion: lancew_legs_moving_b_c
+    _clip: {fileID: -6528952299725728844, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _length: 0.8333334
+    _contacts:
+    - _phase: 0.43182302
+      _side: 0
+    - _phase: 0.84329855
+      _side: 1
+  - _motion: lancew_legs_moving_l_c
+    _clip: {fileID: 2988836347128297940, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _length: 0.8333334
+    _contacts:
+    - _phase: 0.33063123
+      _side: 0
+    - _phase: 0.85953677
+      _side: 1
+  - _motion: lancew_legs_moving_r_c
+    _clip: {fileID: -5649685828708974736, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _length: 0.8333334
+    _contacts:
+    - _phase: 0.21631218
+      _side: 0
+    - _phase: 0.81478304
+      _side: 1
+  - _motion: lancew_legs_idle
+    _clip: {fileID: 3339031967465149789, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _length: 1.6333334
+    _contacts: []
+  - _motion: lancew_legs_idle_c
+    _clip: {fileID: -7369152412508752671, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _length: 1.6000001
+    _contacts: []
+  - _motion: lancew_legs_idle_sc
+    _clip: {fileID: 484322871140162138, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _length: 1.6000001
+    _contacts: []
+  - _motion: lancew_legs_sprint
+    _clip: {fileID: 2279151472944552395, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _length: 0.6666667
+    _contacts:
+    - _phase: 0.23273174
+      _side: 1
+    - _phase: 0.71726316
+      _side: 0
+  - _motion: lancew_legs_jump_start
+    _clip: {fileID: -8830408081737591292, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _length: 0.3
+    _contacts: []
+  - _motion: lancew_legs_jump_idle
+    _clip: {fileID: -3400316982062796189, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _length: 1.3000001
+    _contacts:
+    - _phase: 0.28487244
+      _side: 0
+    - _phase: 0.3614377
+      _side: 1
+  - _motion: lancew_legs_jump_end
+    _clip: {fileID: -2570986726033060484, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _length: 0.3
+    _contacts: []
+  - _motion: lancew_legs_jump_idle_c
+    _clip: {fileID: 1553523742747049958, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _length: 1.3000001
+    _contacts:
+    - _phase: 0.31692797
+      _side: 0
+    - _phase: 0.33179602
+      _side: 1
+  - _motion: lancew_legs_jump_start_sc
+    _clip: {fileID: 1918546999159535049, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _length: 0.3
+    _contacts: []
+  - _motion: lancew_legs_jump_idle_sc
+    _clip: {fileID: 7648265364567954727, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _length: 1.3000001
+    _contacts:
+    - _phase: 0.27292985
+      _side: 0
+    - _phase: 0.32574743
+      _side: 1
+  - _motion: lancew_legs_walk
+    _clip: {fileID: 6938243147463489497, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _length: 0.8333334
+    _contacts:
+    - _phase: 0.22139193
+      _side: 0
+    - _phase: 0.7690673
+      _side: 1
+  - _motion: lancew_legs_walk_l
+    _clip: {fileID: -4582909448675387579, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _length: 0.8333334
+    _contacts:
+    - _phase: 0.3581279
+      _side: 0
+    - _phase: 0.8769215
+      _side: 1
+  - _motion: lancew_legs_walk_r
+    _clip: {fileID: 1096836042805521882, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _length: 0.8333334
+    _contacts:
+    - _phase: 0.22121401
+      _side: 0
+    - _phase: 0.7321709
+      _side: 1
+  - _motion: lancew_legs_walk_sc
+    _clip: {fileID: 4433181501406799149, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _length: 1.8000001
+    _contacts:
+    - _phase: 0.11254013
+      _side: 0
+    - _phase: 0.71882385
+      _side: 1
+  - _motion: lancew_legs_walk_fl_sc
+    _clip: {fileID: 1455273137515296408, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _length: 1.8000001
+    _contacts:
+    - _phase: 0.11254013
+      _side: 0
+    - _phase: 0.71882385
+      _side: 1
+  - _motion: lancew_legs_walk_fr_sc
+    _clip: {fileID: -3472289639490919228, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _length: 1.8000001
+    _contacts:
+    - _phase: 0.11254013
+      _side: 0
+    - _phase: 0.71882385
+      _side: 1
+  - _motion: lancew_legs_moving_b
+    _clip: {fileID: 1769851068877961237, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _length: 0.8333334
+    _contacts:
+    - _phase: 0.34144482
+      _side: 0
+    - _phase: 0.86299455
+      _side: 1
+  - _motion: lancew_legs_moving_bl
+    _clip: {fileID: -47187759930186648, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _length: 0.8333334
+    _contacts:
+    - _phase: 0.42146456
+      _side: 0
+    - _phase: 0.96898806
+      _side: 1
+  - _motion: lancew_legs_moving_br
+    _clip: {fileID: -4526950959557467155, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _length: 0.8333334
+    _contacts:
+    - _phase: 0.094803736
+      _side: 1
+    - _phase: 0.6094231
+      _side: 0
+  - _motion: lancew_legs_walk_b
+    _clip: {fileID: 5789604605864713005, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _length: 0.8333334
+    _contacts:
+    - _phase: 0.094803736
+      _side: 1
+    - _phase: 0.6094231
+      _side: 0
+  - _motion: lancew_legs_walk_bl
+    _clip: {fileID: 3876104884395317687, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _length: 0.8333334
+    _contacts:
+    - _phase: 0.094803736
+      _side: 1
+    - _phase: 0.6094231
+      _side: 0
+  - _motion: lancew_legs_walk_br
+    _clip: {fileID: 1258184429369252057, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _length: 0.8333334
+    _contacts:
+    - _phase: 0.094803736
+      _side: 1
+    - _phase: 0.6094231
+      _side: 0
+  - _motion: lancew_legs_walk_b_sc
+    _clip: {fileID: 5688829204625223017, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _length: 1.8000001
+    _contacts:
+    - _phase: 0.3618635
+      _side: 0
+    - _phase: 0.80316955
+      _side: 1
+  - _motion: lancew_legs_walk_bl_sc
+    _clip: {fileID: 1859599805040590413, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _length: 1.8000001
+    _contacts:
+    - _phase: 0.3618635
+      _side: 0
+    - _phase: 0.80316955
+      _side: 1
+  - _motion: lancew_legs_walk_br_sc
+    _clip: {fileID: -48037154718768913, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _length: 1.8000001
+    _contacts:
+    - _phase: 0.3618635
+      _side: 0
+    - _phase: 0.80316955
+      _side: 1
+  - _motion: lancew_legs_moving_l
+    _clip: {fileID: 6283395903642594442, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _length: 0.8333334
+    _contacts:
+    - _phase: 0.38951743
+      _side: 0
+    - _phase: 0.95833653
+      _side: 1
+  - _motion: lancew_legs_walk_l_sc
+    _clip: {fileID: -3215553864178953378, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _length: 1.2666668
+    _contacts:
+    - _phase: 0.24597035
+      _side: 0
+    - _phase: 0.26000008
+      _side: 1
+    - _phase: 0.932095
+      _side: 0
+  - _motion: lancew_legs_moving_r
+    _clip: {fileID: -6870201439340544389, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _length: 0.8333334
+    _contacts:
+    - _phase: 0.31222796
+      _side: 0
+    - _phase: 0.86567134
+      _side: 1
+  - _motion: lancew_legs_walk_r_sc
+    _clip: {fileID: -856457707025349810, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _length: 1.2666668
+    _contacts:
+    - _phase: 0.07074457
+      _side: 0
+    - _phase: 0.42132583
+      _side: 1
+  - _motion: leg_ladder_idle
+    _clip: {fileID: 6256075772902650306, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _length: 0.033333335
+    _contacts: []
+  - _motion: leg_ladder_up
+    _clip: {fileID: -7143440252536634613, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _length: 0.8333334
+    _contacts:
+    - _phase: 0.39211765
+      _side: 0
+    - _phase: 0.9154682
+      _side: 1
+  - _motion: lancew_legs_turn_left
+    _clip: {fileID: -1094123049232819244, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _length: 0.9666667
+    _contacts:
+    - _phase: 0.94025964
+      _side: 1
+  - _motion: lancew_legs_turn_right
+    _clip: {fileID: 5393487068580148684, guid: b5330eb5ec21c9a4c90e46374e7dc962, type: 3}
+    _length: 0.9666667
+    _contacts:
+    - _phase: 0.98609495
+      _side: 1
+  _legsMotions:
+  - _motion: cl_run_back_0
+    _cycleTime: 0.93333334
+    _cycles: 1
+    _leftTime: 0.2
+    _leftPower: 1
+    _rightTime: 0.4
+    _rightPower: 1
+    _stopAtEnd: 0
+  - _motion: cl_run_fwd_0
+    _cycleTime: 0.93333334
+    _cycles: 1
+    _leftTime: 0.2
+    _leftPower: 1
+    _rightTime: 0.4
+    _rightPower: 1
+    _stopAtEnd: 0
+  - _motion: cr_run_back_0
+    _cycleTime: 1.2444445
+    _cycles: 1
+    _leftTime: 0.2
+    _leftPower: 0.1
+    _rightTime: 0.65
+    _rightPower: 0.1
+    _stopAtEnd: 0
+  - _motion: cr_run_fwd_0
+    _cycleTime: 1.2444445
+    _cycles: 1
+    _leftTime: 0.2
+    _leftPower: 0.1
+    _rightTime: 0.65
+    _rightPower: 0.1
+    _stopAtEnd: 0
+  - _motion: cr_run_ls_0
+    _cycleTime: 1.2444445
+    _cycles: 1
+    _leftTime: 0.2
+    _leftPower: 0.1
+    _rightTime: 0.65
+    _rightPower: 0.1
+    _stopAtEnd: 0
+  - _motion: cr_run_rs_0
+    _cycleTime: 1.2444445
+    _cycles: 1
+    _leftTime: 0.2
+    _leftPower: 0.1
+    _rightTime: 0.65
+    _rightPower: 0.1
+    _stopAtEnd: 0
+  - _motion: cr_turn_left_0
+    _cycleTime: 1.0666667
+    _cycles: 1
+    _leftTime: 0.2
+    _leftPower: 0.1
+    _rightTime: 0.65
+    _rightPower: 0.1
+    _stopAtEnd: 0
+  - _motion: cr_turn_right_0
+    _cycleTime: 1.0666667
+    _cycles: 1
+    _leftTime: 0.2
+    _leftPower: 0.1
+    _rightTime: 0.65
+    _rightPower: 0.1
+    _stopAtEnd: 0
+  - _motion: cr_walk_back_0
+    _cycleTime: 1.9
+    _cycles: 1
+    _leftTime: 0.2
+    _leftPower: 0.1
+    _rightTime: 0.65
+    _rightPower: 0.1
+    _stopAtEnd: 0
+  - _motion: cr_walk_fwd_0
+    _cycleTime: 1.9
+    _cycles: 1
+    _leftTime: 0.2
+    _leftPower: 0.1
+    _rightTime: 0.65
+    _rightPower: 0.1
+    _stopAtEnd: 0
+  - _motion: cr_walk_ls_0
+    _cycleTime: 1.3666667
+    _cycles: 1
+    _leftTime: 0.2
+    _leftPower: 0.1
+    _rightTime: 0.65
+    _rightPower: 0.1
+    _stopAtEnd: 0
+  - _motion: cr_walk_rs_0
+    _cycleTime: 1.3666667
+    _cycles: 1
+    _leftTime: 0.2
+    _leftPower: 0.1
+    _rightTime: 0.65
+    _rightPower: 0.1
+    _stopAtEnd: 0
+  - _motion: dmg_norm_escape_0
+    _cycleTime: 0.73333335
+    _cycles: 1
+    _leftTime: 0.2
+    _leftPower: 1.3
+    _rightTime: 0.65
+    _rightPower: 1.3
+    _stopAtEnd: 0
+  - _motion: dmg_norm_run_back_0
+    _cycleTime: 0.73333335
+    _cycles: 1
+    _leftTime: 0.2
+    _leftPower: 1
+    _rightTime: 0.65
+    _rightPower: 1
+    _stopAtEnd: 0
+  - _motion: dmg_norm_run_fwd_0
+    _cycleTime: 0.73333335
+    _cycles: 1
+    _leftTime: 0.2
+    _leftPower: 1
+    _rightTime: 0.65
+    _rightPower: 1
+    _stopAtEnd: 0
+  - _motion: dmg_norm_run_fwd_1
+    _cycleTime: 1.4
+    _cycles: 1
+    _leftTime: 0.2
+    _leftPower: 1
+    _rightTime: 0.65
+    _rightPower: 1
+    _stopAtEnd: 0
+  - _motion: dmg_norm_run_ls_0
+    _cycleTime: 0.73333335
+    _cycles: 1
+    _leftTime: 0.2
+    _leftPower: 1
+    _rightTime: 0.65
+    _rightPower: 1
+    _stopAtEnd: 0
+  - _motion: dmg_norm_run_rs_0
+    _cycleTime: 0.73333335
+    _cycles: 1
+    _leftTime: 0.2
+    _leftPower: 1
+    _rightTime: 0.65
+    _rightPower: 1
+    _stopAtEnd: 0
+  - _motion: dmg_norm_turn_left_0
+    _cycleTime: 0.9
+    _cycles: 1
+    _leftTime: 0.2
+    _leftPower: 0.2
+    _rightTime: 0.65
+    _rightPower: 0.2
+    _stopAtEnd: 1
+  - _motion: dmg_norm_turn_right_0
+    _cycleTime: 0.9
+    _cycles: 1
+    _leftTime: 0.2
+    _leftPower: 0.2
+    _rightTime: 0.65
+    _rightPower: 0.2
+    _stopAtEnd: 1
+  - _motion: dmg_norm_walk_back_0
+    _cycleTime: 1.4
+    _cycles: 1
+    _leftTime: 0.2
+    _leftPower: 0.2
+    _rightTime: 0.65
+    _rightPower: 0.2
+    _stopAtEnd: 0
+  - _motion: dmg_norm_walk_fwd_0
+    _cycleTime: 0.93333334
+    _cycles: 1
+    _leftTime: 0.2
+    _leftPower: 0.2
+    _rightTime: 0.65
+    _rightPower: 0.2
+    _stopAtEnd: 0
+  - _motion: dmg_norm_walk_fwd_1
+    _cycleTime: 1.4
+    _cycles: 1
+    _leftTime: 0.2
+    _leftPower: 0.2
+    _rightTime: 0.65
+    _rightPower: 0.2
+    _stopAtEnd: 0
+  - _motion: dmg_norm_walk_ls_0
+    _cycleTime: 0.93333334
+    _cycles: 1
+    _leftTime: 0.2
+    _leftPower: 0.2
+    _rightTime: 0.65
+    _rightPower: 0.2
+    _stopAtEnd: 0
+  - _motion: dmg_norm_walk_rs_0
+    _cycleTime: 0.93333334
+    _cycles: 1
+    _leftTime: 0.2
+    _leftPower: 0.2
+    _rightTime: 0.65
+    _rightPower: 0.2
+    _stopAtEnd: 0
+  - _motion: norm_escape_0
+    _cycleTime: 0.73333335
+    _cycles: 1
+    _leftTime: 0.2
+    _leftPower: 1.3
+    _rightTime: 0.65
+    _rightPower: 1.3
+    _stopAtEnd: 0
+  - _motion: norm_escape_00
+    _cycleTime: 0.7
+    _cycles: 1
+    _leftTime: 0.2
+    _leftPower: 2.3
+    _rightTime: 0.65
+    _rightPower: 2.3
+    _stopAtEnd: 0
+  - _motion: norm_jump_end
+    _cycleTime: 0.4
+    _cycles: 1
+    _leftTime: 0.2
+    _leftPower: 1.3
+    _rightTime: 0.21
+    _rightPower: 1.2
+    _stopAtEnd: 0
+  - _motion: norm_run_back_0
+    _cycleTime: 0.93333334
+    _cycles: 1
+    _leftTime: 0.2
+    _leftPower: 0.8
+    _rightTime: 0.65
+    _rightPower: 1
+    _stopAtEnd: 0
+  - _motion: norm_run_fwd_0
+    _cycleTime: 0.93333334
+    _cycles: 1
+    _leftTime: 0.2
+    _leftPower: 0.9
+    _rightTime: 0.65
+    _rightPower: 1
+    _stopAtEnd: 0
+  - _motion: norm_run_fwd_1
+    _cycleTime: 1.111111
+    _cycles: 1
+    _leftTime: 0.2
+    _leftPower: 0.9
+    _rightTime: 0.65
+    _rightPower: 1
+    _stopAtEnd: 0
+  - _motion: norm_run_ls_0
+    _cycleTime: 0.93333334
+    _cycles: 1
+    _leftTime: 0.2
+    _leftPower: 0.8
+    _rightTime: 0.65
+    _rightPower: 1
+    _stopAtEnd: 0
+  - _motion: norm_run_rs_0
+    _cycleTime: 0.93333334
+    _cycles: 1
+    _leftTime: 0.2
+    _leftPower: 0.8
+    _rightTime: 0.65
+    _rightPower: 1
+    _stopAtEnd: 0
+  - _motion: norm_turn_left_0
+    _cycleTime: 1.0666667
+    _cycles: 1
+    _leftTime: 0.2
+    _leftPower: 0.2
+    _rightTime: 0.65
+    _rightPower: 0.2
+    _stopAtEnd: 0
+  - _motion: norm_turn_left_1
+    _cycleTime: 0.9
+    _cycles: 1
+    _leftTime: 0.2
+    _leftPower: 0.2
+    _rightTime: 0.65
+    _rightPower: 0.2
+    _stopAtEnd: 1
+  - _motion: norm_turn_right_0
+    _cycleTime: 1.0666667
+    _cycles: 1
+    _leftTime: 0.2
+    _leftPower: 0.2
+    _rightTime: 0.65
+    _rightPower: 0.2
+    _stopAtEnd: 0
+  - _motion: norm_turn_right_1
+    _cycleTime: 0.9
+    _cycles: 1
+    _leftTime: 0.2
+    _leftPower: 0.2
+    _rightTime: 0.65
+    _rightPower: 0.2
+    _stopAtEnd: 1
+  - _motion: norm_walk_back_0
+    _cycleTime: 1
+    _cycles: 1
+    _leftTime: 0.2
+    _leftPower: 0.25
+    _rightTime: 0.65
+    _rightPower: 0.25
+    _stopAtEnd: 0
+  - _motion: norm_walk_fwd_0
+    _cycleTime: 1
+    _cycles: 1
+    _leftTime: 0.2
+    _leftPower: 0.25
+    _rightTime: 0.65
+    _rightPower: 0.25
+    _stopAtEnd: 0
+  - _motion: norm_walk_fwd_1
+    _cycleTime: 1.4
+    _cycles: 1
+    _leftTime: 0.2
+    _leftPower: 0.2
+    _rightTime: 0.65
+    _rightPower: 0.25
+    _stopAtEnd: 0
+  - _motion: norm_walk_ls_0
+    _cycleTime: 1
+    _cycles: 1
+    _leftTime: 0.2
+    _leftPower: 0.25
+    _rightTime: 0.65
+    _rightPower: 0.25
+    _stopAtEnd: 0
+  - _motion: norm_walk_rs_0
+    _cycleTime: 1
+    _cycles: 1
+    _leftTime: 0.2
+    _leftPower: 0.25
+    _rightTime: 0.65
+    _rightPower: 0.25
+    _stopAtEnd: 0
+  _sourceReport: "MO2 profile: 1v2(DX11) (v_12gb) 2.5, \u0412\u0441\u0435 \u0432\u043A\u043B\u044E\u0447\u0435\u043D\u043E
+    (168), active mods: 173, indexed files: 13898\r\n[actor] LegsCount = 2, step_params
+    = stalker_step_manager <- Base Anomaly :: configs/creatures/m_stalker.ltx\r\nmeshes/actors/stalker_animation.omf
+    <- [\u041D\u041F\u0421] Animation_Overhaul v1.1: 1442 motions\r\n  cl_run_back_0:
+    cycles 1, L 0,2/1, R 0,4/1, blend time 0.93333 s (28 frames / 30 fps / speed
+    1)\r\n  cl_run_fwd_0: cycles 1, L 0,2/1, R 0,4/1, blend time 0.93333 s (28 frames
+    / 30 fps / speed 1)\r\n  cr_run_back_0: cycles 1, L 0,2/0,1, R 0,65/0,1, blend
+    time 1.24444 s (28 frames / 30 fps / speed 0.75)\r\n  cr_run_fwd_0: cycles 1,
+    L 0,2/0,1, R 0,65/0,1, blend time 1.24444 s (28 frames / 30 fps / speed 0.75)\r\n 
+    cr_run_ls_0: cycles 1, L 0,2/0,1, R 0,65/0,1, blend time 1.24444 s (28 frames
+    / 30 fps / speed 0.75)\r\n  cr_run_rs_0: cycles 1, L 0,2/0,1, R 0,65/0,1, blend
+    time 1.24444 s (28 frames / 30 fps / speed 0.75)\r\n  cr_turn_left_0: cycles
+    1, L 0,2/0,1, R 0,65/0,1, blend time 1.06667 s (32 frames / 30 fps / speed 1)\r\n 
+    cr_turn_right_0: cycles 1, L 0,2/0,1, R 0,65/0,1, blend time 1.06667 s (32 frames
+    / 30 fps / speed 1)\r\n  cr_walk_back_0: cycles 1, L 0,2/0,1, R 0,65/0,1, blend
+    time 1.9 s (57 frames / 30 fps / speed 1)\r\n  cr_walk_fwd_0: cycles 1, L 0,2/0,1,
+    R 0,65/0,1, blend time 1.9 s (57 frames / 30 fps / speed 1)\r\n  cr_walk_ls_0:
+    cycles 1, L 0,2/0,1, R 0,65/0,1, blend time 1.36667 s (41 frames / 30 fps / speed
+    1)\r\n  cr_walk_rs_0: cycles 1, L 0,2/0,1, R 0,65/0,1, blend time 1.36667 s (41
+    frames / 30 fps / speed 1)\r\n  dmg_norm_escape_0: cycles 1, L 0,2/1,3, R 0,65/1,3,
+    blend time 0.73333 s (22 frames / 30 fps / speed 1)\r\n  dmg_norm_run_back_0:
+    cycles 1, L 0,2/1, R 0,65/1, blend time 0.73333 s (22 frames / 30 fps / speed
+    1)\r\n  dmg_norm_run_fwd_0: cycles 1, L 0,2/1, R 0,65/1, blend time 0.73333 s
+    (22 frames / 30 fps / speed 1)\r\n  dmg_norm_run_fwd_1: cycles 1, L 0,2/1, R
+    0,65/1, blend time 1.4 s (42 frames / 30 fps / speed 1)\r\n  dmg_norm_run_ls_0:
+    cycles 1, L 0,2/1, R 0,65/1, blend time 0.73333 s (22 frames / 30 fps / speed
+    1)\r\n  dmg_norm_run_rs_0: cycles 1, L 0,2/1, R 0,65/1, blend time 0.73333 s
+    (22 frames / 30 fps / speed 1)\r\n  dmg_norm_turn_left_0: cycles 1, L 0,2/0,2,
+    R 0,65/0,2, blend time 0.9 s (27 frames / 30 fps / speed 1), stop at end\r\n 
+    dmg_norm_turn_right_0: cycles 1, L 0,2/0,2, R 0,65/0,2, blend time 0.9 s (27
+    frames / 30 fps / speed 1), stop at end\r\n  dmg_norm_walk_back_0: cycles 1,
+    L 0,2/0,2, R 0,65/0,2, blend time 1.4 s (42 frames / 30 fps / speed 1)\r\n  dmg_norm_walk_fwd_0:
+    cycles 1, L 0,2/0,2, R 0,65/0,2, blend time 0.93333 s (42 frames / 30 fps / speed
+    1.5)\r\n  dmg_norm_walk_fwd_1: cycles 1, L 0,2/0,2, R 0,65/0,2, blend time 1.4
+    s (42 frames / 30 fps / speed 1)\r\n  dmg_norm_walk_ls_0: cycles 1, L 0,2/0,2,
+    R 0,65/0,2, blend time 0.93333 s (42 frames / 30 fps / speed 1.5)\r\n  dmg_norm_walk_rs_0:
+    cycles 1, L 0,2/0,2, R 0,65/0,2, blend time 0.93333 s (42 frames / 30 fps / speed
+    1.5)\r\n  norm_escape_0: cycles 1, L 0,2/1,3, R 0,65/1,3, blend time 0.73333
+    s (22 frames / 30 fps / speed 1)\r\n  norm_escape_00: cycles 1, L 0,2/2,3, R
+    0,65/2,3, blend time 0.7 s (21 frames / 30 fps / speed 1)\r\n  norm_jump_end:
+    cycles 1, L 0,2/1,3, R 0,21/1,2, blend time 0.4 s (12 frames / 30 fps / speed
+    1)\r\n  norm_run_back_0: cycles 1, L 0,2/0,8, R 0,65/1, blend time 0.93333 s
+    (21 frames / 30 fps / speed 0.75)\r\n  norm_run_fwd_0: cycles 1, L 0,2/0,9, R
+    0,65/1, blend time 0.93333 s (21 frames / 30 fps / speed 0.75)\r\n  norm_run_fwd_1:
+    cycles 1, L 0,2/0,9, R 0,65/1, blend time 1.11111 s (25 frames / 30 fps / speed
+    0.75)\r\n  norm_run_ls_0: cycles 1, L 0,2/0,8, R 0,65/1, blend time 0.93333 s
+    (21 frames / 30 fps / speed 0.75)\r\n  norm_run_rs_0: cycles 1, L 0,2/0,8, R
+    0,65/1, blend time 0.93333 s (21 frames / 30 fps / speed 0.75)\r\n  norm_turn_left_0:
+    cycles 1, L 0,2/0,2, R 0,65/0,2, blend time 1.06667 s (32 frames / 30 fps / speed
+    1)\r\n  norm_turn_left_1: cycles 1, L 0,2/0,2, R 0,65/0,2, blend time 0.9 s (27
+    frames / 30 fps / speed 1), stop at end\r\n  norm_turn_right_0: cycles 1, L 0,2/0,2,
+    R 0,65/0,2, blend time 1.06667 s (32 frames / 30 fps / speed 1)\r\n  norm_turn_right_1:
+    cycles 1, L 0,2/0,2, R 0,65/0,2, blend time 0.9 s (27 frames / 30 fps / speed
+    1), stop at end\r\n  norm_walk_back_0: cycles 1, L 0,2/0,25, R 0,65/0,25, blend
+    time 1 s (30 frames / 30 fps / speed 1)\r\n  norm_walk_fwd_0: cycles 1, L 0,2/0,25,
+    R 0,65/0,25, blend time 1 s (30 frames / 30 fps / speed 1)\r\n  norm_walk_fwd_1:
+    cycles 1, L 0,2/0,2, R 0,65/0,25, blend time 1.4 s (42 frames / 30 fps / speed
+    1)\r\n  norm_walk_ls_0: cycles 1, L 0,2/0,25, R 0,65/0,25, blend time 1 s (30
+    frames / 30 fps / speed 1)\r\n  norm_walk_rs_0: cycles 1, L 0,2/0,25, R 0,65/0,25,
+    blend time 1 s (30 frames / 30 fps / speed 1)\r\nBody contacts: Assets/_Source/FirstPerson/Animations/Body/BodyAnimationLibrary.asset
+    sampled on no_outfit, foot bones bip01_l_foot/bip01_r_foot, contact = foot height
+    falls below min + 0,2 * range\r\n  leg_stand_idle (leg_stand_idle, 5.3 s): no
+    foot contacts (feet do not lift)\r\n  leg_stand_walk_fwd_shift (leg_stand_walk_fwd_shift,
+    1.3 s): L@0.44276 R@0.98566\r\n  leg_stand_walk_fwd_left_shift (leg_stand_walk_fwd_left_shift,
+    1.33333 s): R@0.4288 L@0.92901\r\n  leg_stand_walk_fwd_right_shift (leg_stand_walk_fwd_right_shift,
+    1.33333 s): L@0.42879 R@0.92897\r\n  leg_stand_walk_back_shift (leg_stand_walk_back_shift,
+    1.3 s): R@0.50223 L@0.99567\r\n  leg_stand_walk_back_left_shift (leg_stand_walk_back_left_shift,
+    1.33333 s): L@0.42876 R@0.92876\r\n  leg_stand_walk_back_right_shift (leg_stand_walk_back_right_shift,
+    1.33333 s): R@0.42877 L@0.92874\r\n  leg_stand_walk_right_shift (leg_stand_walk_right_shift,
+    0.83333 s): L@0.22095 R@0.73171\r\n  leg_stand_walk_left_shift (leg_stand_walk_left_shift,
+    0.83333 s): L@0.3575 R@0.87692\r\n  leg_crouch_idle (leg_crouch_idle, 0.03333
+    s): no foot contacts (feet do not lift)\r\n  leg_crouch_walk_fwd (leg_crouch_walk_fwd,
+    1.8 s): L@0.11309 R@0.71908\r\n  lancew_legs_moving_fl_c (lancew_legs_moving_fl_c,
+    0.83333 s): L@0.20224 R@0.77772\r\n  lancew_legs_moving_fr_c (lancew_legs_moving_fr_c,
+    0.83333 s): L@0.20224 R@0.77772\r\n  leg_crouch_walk_back (leg_crouch_walk_back,
+    1.8 s): L@0.54725 R@0.98796\r\n  lancew_legs_moving_bl_c (lancew_legs_moving_bl_c,
+    0.83333 s): L@0.43182 R@0.8433\r\n  lancew_legs_moving_br_c (lancew_legs_moving_br_c,
+    0.83333 s): L@0.43182 R@0.8433\r\n  leg_crouch_walk_left (leg_crouch_walk_left,
+    1.26667 s): L@0.09422 L@0.42778 R@0.44139\r\n  leg_crouch_walk_right (leg_crouch_walk_right,
+    1.26667 s): R@0.2371 L@0.91445\r\n  lancew_legs_moving (lancew_legs_moving, 0.83333
+    s): R@0.39161 L@0.91456\r\n  lancew_legs_moving_fl (lancew_legs_moving_fl, 0.83333
+    s): L@0.37591 R@0.90718\r\n  lancew_legs_moving_fr (lancew_legs_moving_fr, 0.83333
+    s): L@0.3665 R@0.86277\r\n  leg_stand_walk_fwd (leg_stand_walk_fwd, 1.3 s): L@0.44276
+    R@0.98566\r\n  leg_stand_walk_fwd_left (leg_stand_walk_fwd_left, 1.33333 s):
+    R@0.42892 L@0.92883\r\n  leg_stand_walk_fwd_right (leg_stand_walk_fwd_right,
+    1.33333 s): L@0.42891 R@0.92886\r\n  lancew_legs_moving_c (lancew_legs_moving_c,
+    0.83333 s): L@0.20224 R@0.77772\r\n  lancew_legs_moving_b_c (lancew_legs_moving_b_c,
+    0.83333 s): L@0.43182 R@0.8433\r\n  lancew_legs_moving_l_c (lancew_legs_moving_l_c,
+    0.83333 s): L@0.33063 R@0.85954\r\n  lancew_legs_moving_r_c (lancew_legs_moving_r_c,
+    0.83333 s): L@0.21631 R@0.81478\r\n  lancew_legs_idle (lancew_legs_idle, 1.63333
+    s): no foot contacts (feet do not lift)\r\n  lancew_legs_idle_c (lancew_legs_idle_c,
+    1.6 s): no foot contacts (feet do not lift)\r\n  lancew_legs_idle_sc (lancew_legs_idle_sc,
+    1.6 s): no foot contacts (feet do not lift)\r\n  lancew_legs_sprint (lancew_legs_sprint,
+    0.66667 s): R@0.23273 L@0.71726\r\n  lancew_legs_jump_start (lancew_legs_jump_start,
+    0.3 s): no foot contacts (feet do not lift)\r\n  lancew_legs_jump_idle (lancew_legs_jump_idle,
+    1.3 s): L@0.28487 R@0.36144\r\n  lancew_legs_jump_end (lancew_legs_jump_end,
+    0.3 s): no foot contacts (feet do not lift)\r\n  lancew_legs_jump_idle_c (lancew_legs_jump_idle_c,
+    1.3 s): L@0.31693 R@0.3318\r\n  lancew_legs_jump_start_sc (lancew_legs_jump_start_sc,
+    0.3 s): no foot contacts (feet do not lift)\r\n  lancew_legs_jump_idle_sc (lancew_legs_jump_idle_sc,
+    1.3 s): L@0.27293 R@0.32575\r\n  lancew_legs_walk (lancew_legs_walk, 0.83333
+    s): L@0.22139 R@0.76907\r\n  lancew_legs_walk_l (lancew_legs_walk_l, 0.83333
+    s): L@0.35813 R@0.87692\r\n  lancew_legs_walk_r (lancew_legs_walk_r, 0.83333
+    s): L@0.22121 R@0.73217\r\n  lancew_legs_walk_sc (lancew_legs_walk_sc, 1.8 s):
+    L@0.11254 R@0.71882\r\n  lancew_legs_walk_fl_sc (lancew_legs_walk_fl_sc, 1.8
+    s): L@0.11254 R@0.71882\r\n  lancew_legs_walk_fr_sc (lancew_legs_walk_fr_sc,
+    1.8 s): L@0.11254 R@0.71882\r\n  lancew_legs_moving_b (lancew_legs_moving_b,
+    0.83333 s): L@0.34144 R@0.86299\r\n  lancew_legs_moving_bl (lancew_legs_moving_bl,
+    0.83333 s): L@0.42146 R@0.96899\r\n  lancew_legs_moving_br (lancew_legs_moving_br,
+    0.83333 s): R@0.0948 L@0.60942\r\n  lancew_legs_walk_b (lancew_legs_walk_b, 0.83333
+    s): R@0.0948 L@0.60942\r\n  lancew_legs_walk_bl (lancew_legs_walk_bl, 0.83333
+    s): R@0.0948 L@0.60942\r\n  lancew_legs_walk_br (lancew_legs_walk_br, 0.83333
+    s): R@0.0948 L@0.60942\r\n  lancew_legs_walk_b_sc (lancew_legs_walk_b_sc, 1.8
+    s): L@0.36186 R@0.80317\r\n  lancew_legs_walk_bl_sc (lancew_legs_walk_bl_sc,
+    1.8 s): L@0.36186 R@0.80317\r\n  lancew_legs_walk_br_sc (lancew_legs_walk_br_sc,
+    1.8 s): L@0.36186 R@0.80317\r\n  lancew_legs_moving_l (lancew_legs_moving_l,
+    0.83333 s): L@0.38952 R@0.95834\r\n  lancew_legs_walk_l_sc (lancew_legs_walk_l_sc,
+    1.26667 s): L@0.24597 R@0.26 L@0.9321\r\n  lancew_legs_moving_r (lancew_legs_moving_r,
+    0.83333 s): L@0.31223 R@0.86567\r\n  lancew_legs_walk_r_sc (lancew_legs_walk_r_sc,
+    1.26667 s): L@0.07074 R@0.42133\r\n  leg_ladder_idle (leg_ladder_idle, 0.03333
+    s): no foot contacts (feet do not lift)\r\n  leg_ladder_up (leg_ladder_up, 0.83333
+    s): L@0.39212 R@0.91547\r\n  lancew_legs_turn_left (lancew_legs_turn_left, 0.96667
+    s): R@0.94026\r\n  lancew_legs_turn_right (lancew_legs_turn_right, 0.96667 s):
+    R@0.9861\r\n"

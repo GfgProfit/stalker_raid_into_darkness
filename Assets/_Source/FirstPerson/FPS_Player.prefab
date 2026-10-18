@@ -1,5 +1,37 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &2337629211157428515
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6289932980763896100}
+  m_Layer: 0
+  m_Name: CameraMotionPivot
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6289932980763896100
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2337629211157428515}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1653321686631299020}
+  m_Father: {fileID: 1853972464879935931}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2460005502469064615
 GameObject:
   m_ObjectHideFlags: 0
@@ -31,6 +63,135 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1853972464879935931}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &6075032427836401157
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7043789987327356857}
+  - component: {fileID: 2430702164848563777}
+  m_Layer: 0
+  m_Name: FoleyAudio
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7043789987327356857
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6075032427836401157}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4506691865267215982}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!82 &2430702164848563777
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6075032427836401157}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 0}
+  m_PlayOnAwake: 0
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 64
+  DopplerLevel: 0
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1 &6457694589525271600
 GameObject:
   m_ObjectHideFlags: 0
@@ -60,8 +221,8 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1653321686631299020}
   - {fileID: 7536706216107034830}
+  - {fileID: 6289932980763896100}
   m_Father: {fileID: 4506691865267215982}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &7789572824475499757
@@ -126,7 +287,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1853972464879935931}
+  m_Father: {fileID: 6289932980763896100}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!20 &6243923892120857249
 Camera:
@@ -207,6 +368,10 @@ GameObject:
   - component: {fileID: 1434901721949175874}
   - component: {fileID: 334293385447183373}
   - component: {fileID: 5170115981608553266}
+  - component: {fileID: 3170219032278336436}
+  - component: {fileID: 4394079865577217288}
+  - component: {fileID: 163336873398552154}
+  - component: {fileID: 3924682037822528286}
   m_Layer: 0
   m_Name: FPS_Player
   m_TagString: Untagged
@@ -229,6 +394,7 @@ Transform:
   m_Children:
   - {fileID: 1853972464879935931}
   - {fileID: 6104158516176760372}
+  - {fileID: 7043789987327356857}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1844661020335746395
@@ -248,6 +414,7 @@ MonoBehaviour:
   _bodyRoot: {fileID: 6104158516176760372}
   _initialOutfit: actor
   _driveBodyAnimation: 0
+  _castShadows: 0
 --- !u!143 &6634809658367128514
 CharacterController:
   m_ObjectHideFlags: 0
@@ -379,6 +546,9 @@ MonoBehaviour:
   _bodyRoot: {fileID: 6104158516176760372}
   _player: {fileID: 8362631657092042833}
   _combat: 0
+  _landingFadeIn: 0.08
+  _landingHold: 0.15
+  _landingBlend: 0.3
 --- !u!114 &334293385447183373
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -398,6 +568,10 @@ MonoBehaviour:
   _visibleBody: {fileID: 1434901721949175874}
   _bodyPlayer: {fileID: 8362631657092042833}
   _rig: {fileID: 1844661020335746395}
+  _cameraEffects: {fileID: 3170219032278336436}
+  _footsteps: {fileID: 163336873398552154}
+  _foley: {fileID: 3924682037822528286}
+  _surfaceDetector: {fileID: 4394079865577217288}
   _outfitSection: actor
 --- !u!114 &5170115981608553266
 MonoBehaviour:
@@ -415,3 +589,63 @@ MonoBehaviour:
   _input: {fileID: 5296497837016955254}
   _visible: 1
   _showProfile: 0
+--- !u!114 &3170219032278336436
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9095947929063771272}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d618b46d0b55dd9478ec7cde8aa82b40, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: RaidIntoDarkness.Player::RaidIntoDarkness.Player.StalkerCameraEffects
+  _profile: {fileID: 11400000, guid: 8028623510fb5b8448695f7feb5f4950, type: 2}
+  _pivot: {fileID: 6289932980763896100}
+--- !u!114 &4394079865577217288
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9095947929063771272}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 90fa3951511677d4c95150676afe5526, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: RaidIntoDarkness.Player::RaidIntoDarkness.Player.StalkerSurfaceDetector
+  _library: {fileID: 11400000, guid: 1737dfeac290608458356e19a4b264cd, type: 2}
+  _mask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+--- !u!114 &163336873398552154
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9095947929063771272}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 202971de273b61f4b910ae1edfc6f657, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: RaidIntoDarkness.Player::RaidIntoDarkness.Player.StalkerFootstepSynchronizer
+  _library: {fileID: 11400000, guid: d46611926b4e63a40991f2de7911aaf2, type: 2}
+  _dominantWeight: 0.5
+--- !u!114 &3924682037822528286
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9095947929063771272}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4908ffbec16f3d642a11f8a441dcec3e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: RaidIntoDarkness.Player::RaidIntoDarkness.Player.StalkerPlayerFoley
+  _library: {fileID: 11400000, guid: 1737dfeac290608458356e19a4b264cd, type: 2}
+  _detector: {fileID: 4394079865577217288}
+  _source: {fileID: 2430702164848563777}
+  _masterVolume: 1

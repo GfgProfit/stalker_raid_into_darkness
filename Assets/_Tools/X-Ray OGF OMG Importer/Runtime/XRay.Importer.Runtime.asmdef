@@ -1,7 +1,9 @@
 {
     "name": "XRay.Importer.Runtime",
     "rootNamespace": "XRay.Importer",
-    "references": [],
+    "references": [
+        "XRay.Importer.Core"
+    ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,

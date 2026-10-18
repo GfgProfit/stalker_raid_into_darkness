@@ -1,5 +1,18 @@
 # Changelog
 
+## 2.1.0 — 2026-10-18
+
+### Added
+
+- Импорт X-Ray object motions `.anm` (v3, v4, v5): `XRayAnmImporter`, Core-парсер и вычислитель envelope (TCB, Hermite, Bezier 1D/2D, Linear, Stepped, все behaviours) с режимами `Engine` и `BlenderXRay`, AnimationClip с аналитическими позиционными и адаптивными кватернионными кривыми, `XRayAnmAsset` с исходными кривыми, объект предпросмотра и опциональная камера.
+- `XRayAnmPlayer`: точное runtime-воспроизведение, режимы Absolute и Additive, одновременные эффекты, восстановление позы.
+- Инспектор `.anm` со статистикой каналов и кнопкой **Create Preview In Scene**.
+- `Tools~/blender_export_anm_reference.py` и тесты сравнения с blender-xray.
+
+### Changed
+
+- `XRay.Importer.Runtime` ссылается на `XRay.Importer.Core`.
+
 ## 2.0.0 — 2026-10-18
 
 ### Added

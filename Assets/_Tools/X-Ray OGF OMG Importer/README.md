@@ -6,8 +6,8 @@
 
 | Сборка | Платформа | Назначение |
 | --- | --- | --- |
-| `XRay.Importer.Core` | все, без UnityEngine | Парсинг OGF/OMF, математика скелета |
-| `XRay.Importer.Runtime` | все | `XRayModel`, `XRayMotionLibrary`, `XRayRigPlayer`, `XRayHudAnimator` |
+| `XRay.Importer.Core` | все, без UnityEngine | Парсинг OGF/OMF/ANM, математика скелета, вычисление envelope ANM |
+| `XRay.Importer.Runtime` | все | `XRayModel`, `XRayMotionLibrary`, `XRayRigPlayer`, `XRayHudAnimator`, `XRayAnmAsset`, `XRayAnmPlayer` |
 | `XRay.Importer.Sources` | Editor, без UnityEngine | MO2, виртуальная файловая система, индекс, `textures.ltx`/`.thm`, DDS, правила шейдеров |
 | `XRay.Importer.Editor` | Editor | `ScriptedImporter`, генерация ассетов, окна и инспекторы |
 | `XRay.Importer.Tests.Editor` | Editor | EditMode-тесты |
@@ -127,6 +127,78 @@ N  = normalize(Ne)
 * Окно Asset Sources: состояние MO2, статистика индекса, **Validate Sources**, **Show Missing Resources**, **Clear Cache**.
 * Архивы `.db`/`.xdb` в модах не индексируются. Отсутствующая текстура получает заметку, если такие архивы есть (в реальном профиле — 3 источника).
 
+## Анимации объектов `.anm`
+
+`XRayAnmImporter` (`ScriptedImporter`, расширение `anm`) импортирует X-Ray object motions: камерные эффекты, сценарные камеры, пути объектов. Импортёр не связан с OMF и скелетами.
+
+```text
+camera_shoot.anm
+├── camera_shoot (GameObject, main: Transform + Animator + XRayAnmPlayer [+ дочерняя Camera])
+├── camera_shoot (AnimationClip: m_LocalPosition + m_LocalRotation)
+└── camera_shoot (XRayAnmAsset: заголовок, статистика каналов, исходные кривые)
+```
+
+Без **Create Preview Object** главным ассетом становится `XRayAnmAsset`.
+
+### Формат (Core, `Runtime/Core/Anm`, без UnityEngine)
+
+* Chunk `0x1100`: `name` (stringZ cp1251), `frame_start` и `frame_end` (`int32`, поэтому `0xFFFFFFFF` читается как `-1`), `fps` (`f32`), `version` (`u16`).
+* Шесть envelope: behaviour pre/post (`u8`×2 в v4/v5, `int32`×2 в v3) и число ключей (`u16` / `u32`). Ключ: `value` (`f32`), `time` (`f32`, секунды) и `shape` (`u8` / `u32 & 0xFF`). В v4/v5 дальше идут 7 значений `q16` в диапазоне [-32, 32] (`tension`, `continuity`, `bias`, `param[0..3]`), у Stepped их нет. В v3 это 7 × `f32`.
+* Порядок каналов, как в `COMotion::Load` движка: v3 и v5 — `X, Y, Z, H, P, B`; v4 — `X, Y, Z, P, H, B`. blender-xray читает все версии в порядке v5, поэтому v4-файлы в Blender получают перепутанные H и P.
+* Проверяются границы данных, число ключей относительно размера буфера, версия, FPS и наличие chunk. Ошибка указывает файл, chunk и смещение.
+
+### Кривые
+
+`XRayAnmEnvelope` — порт `evalEnvelope` из OpenXRay (`xrCore/Animation/interp.cpp`):
+
+* Формы: TCB (Kochanek–Bartels), Hermite, Bezier 1D, Bezier 2D, Linear, Stepped. Форма сегмента берётся по конечному ключу, исходящая касательная — по начальному.
+* Behaviours: Reset, Constant, Repeat, Oscillate (нечётный цикл отражается по формуле OpenXRay), Offset Repeat, Linear.
+* Bezier 2D: время ищется бисекцией до 1e-9 с. В движке допуск 1e-4 с, что даёт шум до ~1e-4 по значению; более точное решение кривую не меняет.
+
+| `XRayAnmSemantics` | Поведение |
+| --- | --- |
+| `Engine` (по умолчанию) | Как в движке |
+| `BlenderXRay` | Как в blender-xray 2.39: TCB на краях `0.5·(a+b)·d` вместо `b·d` / `a·d`, исходящая касательная Linear-ключа равна 0, временные ручки Bezier 2D трактуются в кадрах, v4 в порядке v5, периодические behaviours заменяются на Constant |
+
+### Координаты
+
+X-Ray model space совпадает с пространством Unity: левая система, Y вверх, Z вперёд. Поэтому `localPosition = (X, Y, Z) · scale`, `localRotation = Ry(H) · Rx(P) · Rz(B)` = `Quaternion.Euler(P°, H°, B°)`.
+
+* Совпадает с матрицей движка `setHPB(-H, -P, -B)` (`setXYZi` в `CObjectAnimator`), что проверено тестом на 200 случайных углах.
+* Совпадает с blender-xray: Blender хранит `location = (X, Z, Y)`, `rotation_euler = (-P, -B, -H)` в режиме `YXZ`. Сопряжение матрицы Blender перестановкой Y и Z даёт ту же матрицу.
+* Связанная камера blender-xray повёрнута на `(90°, 0, 0)`, потому что камера Blender смотрит по −Z. Камера Unity смотрит по +Z, поэтому поправка не нужна: Camera — дочерний объект с единичной трансформацией. FOV камеры предпросмотра (67.5°, `SOC_LEVEL_FOV` blender-xray) — настройка импортёра, ANM его не содержит.
+
+### AnimationClip
+
+* **Exact**, позиции: ключи Unity ставятся в моменты ключей ANM. TCB, Hermite и Bezier 1D задаются аналитическими касательными (`out/Δt`, `in/Δt`), поэтому кубика Эрмита Unity совпадает с кубикой X-Ray. Linear задаётся наклоном, Stepped — касательными `Constant`, Bezier 2D — weighted-касательными с контрольными точками X-Ray. Участки без точного представления (Bezier 2D, обрезанный диапазоном кадров или с весами вне [0, 1], периодические behaviours) семплируются адаптивно.
+* Вращение: композицию трёх эйлеровых кривых нельзя точно записать ключами Unity, а Euler-кривые Unity при импорте пересэмплирует (~0.04°). Поэтому пишутся кривые `m_LocalRotation`:
+  * ключи ставятся в моменты ключей ANM;
+  * интервалы делятся, пока ошибка угла не станет ≤ 0.001°;
+  * знаки кватернионов выравниваются, поэтому переходы через ±180° и многократные обороты непрерывны;
+  * ступенчатые скачки переносятся парой ключей с интервалом 10 мкс и `Constant`-касательной.
+* **Adaptive**: всё семплируется с проверкой ошибки, позиции с допуском 1e-5 · scale. **Fixed FPS**: один ключ на кадр ANM, наименее точный вариант.
+* Время клипа `τ = t − frame_start / fps`, длина `(frame_end − frame_start) / fps`, `frameRate` берётся из ANM. Галочки `Loop` и `Loop Pose` задают `loopTime` и `loopBlend`.
+
+### Runtime
+
+* `XRayAnmAsset.Evaluate(clipTime)` вычисляет позу точно, через Core, по сохранённым исходным кривым (**Preserve Original Curves**).
+* `XRayAnmPlayer` (без PlayableGraph):
+  * управление: `Play` / `Stop` / `Pause` / `Resume` / `Seek`, `Speed`, `Loop`, `Weight`, смена `Asset`, старт с заданного времени;
+  * `Tick(deltaTime)` (при `DriveSelf` = false) для ручного или синхронного обновления;
+  * после остановки восстанавливает исходную локальную позу цели.
+* Режимы:
+  * **Absolute**: локальная поза цели = поза ANM; `Weight` интерполирует от исходной позы.
+  * **Additive**: поза = исходная · Δ, где Δ — движение относительно первого кадра (`RelativeToFirstFrame`), смешанное с единицей по `Weight`.
+  * `PlayEffect` добавляет одновременные additive-эффекты (recoil, shake, bob); они перемножаются по порядку.
+* FPS-камера: `Player → CameraRoot (мышь) → CameraEffectsPivot (XRayAnmPlayer, Additive) → MainCamera`. Эффект меняет только pivot, мышь управляет `CameraRoot`, после остановки pivot возвращается в исходное положение.
+* AnimationClip — обычный generic-клип для Animator, Timeline и Playables, в том числе для `XRayRigPlayer.Play(clip)` на объекте с Animator.
+
+### Проверка по blender-xray
+
+`Tools~/blender_export_anm_reference.py` (Blender 3.6, blender-xray 2.39, `camera_animation=True`) выгружает fcurves, `matrix_basis`, `matrix_world` объекта и связанной камеры на каждом кадре и в долях кадра 0.25 / 0.5 / 0.75. Тесты `AnmValidationTests` (категория `RealData`) берут JSON из `XRAY_ANM_REFERENCE_DIR` и ANM из `XRAY_ANM_FILES_DIR`.
+
+blender-xray запекает нелинейные формы только в целых кадрах, а между ними Blender интерполирует свои ключи сам. Поэтому точное сравнение возможно только в целых кадрах.
+
 ## Тесты
 
 `Window > General > Test Runner > EditMode`, или:
@@ -145,3 +217,4 @@ Unity.exe -batchmode -projectPath <project> -runTests -testPlatform EditMode -te
 * Smoothness / Mask Map не генерируются: X-Ray gloss не является HDRP smoothness.
 * Изменение файла глубоко в моде без изменения времени папок требует **Rebuild Index**.
 * Текстуры и материалы создаются отдельно для каждой папки с моделями (структура «рядом с OGF»).
+* ANM: shape вне диапазона 0..5 вычисляется как 0 (как в движке) с предупреждением; Reset-скачок на границе ключей в клипе сглаживается адаптивной выборкой. ANM не содержит FOV и других параметров камеры.

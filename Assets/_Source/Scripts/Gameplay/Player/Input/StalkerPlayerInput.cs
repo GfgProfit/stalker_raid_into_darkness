@@ -152,6 +152,22 @@ namespace RaidIntoDarkness.Player
             return wish;
         }
 
+        public StalkerMoveFlags ApplyBlocked(StalkerMoveFlags wish, StalkerInputSettings settings)
+        {
+            StalkerMoveFlags kept = StalkerMoveFlags.None;
+            if (settings.CrouchToggle)
+            {
+                kept |= wish & StalkerMoveFlags.Crouch;
+            }
+
+            if (settings.WalkToggle)
+            {
+                kept |= wish & StalkerMoveFlags.Accel;
+            }
+
+            return kept;
+        }
+
         private static StalkerMoveFlags ClearForSprint(StalkerMoveFlags wish, StalkerInputSettings settings)
         {
             if (settings.WalkToggle)

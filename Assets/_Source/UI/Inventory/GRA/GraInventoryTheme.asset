@@ -1,0 +1,151 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c74e25ace639f4e4681c61571a773d25, type: 3}
+  m_Name: GraInventoryTheme
+  m_EditorClassIdentifier: Inventory.UI::Inventory.UI.InventoryTheme
+  _bodyFont: {fileID: 11400000, guid: 5d42b6420626b1a44839d8b205e274f7, type: 2}
+  _headerFont: {fileID: 11400000, guid: 5d42b6420626b1a44839d8b205e274f7, type: 2}
+  _accentFont: {fileID: 11400000, guid: 5d42b6420626b1a44839d8b205e274f7, type: 2}
+  _smallFont: {fileID: 11400000, guid: 5d42b6420626b1a44839d8b205e274f7, type: 2}
+  _textColor: {r: 0.6666667, g: 0.6666667, b: 0.6666667, a: 1}
+  _mutedTextColor: {r: 0.5019608, g: 0.5019608, b: 0.5019608, a: 1}
+  _accentColor: {r: 0.9411765, g: 0.8509804, b: 0.7137255, a: 1}
+  _negativeColor: {r: 1, g: 0.19607843, b: 0.19607843, a: 1}
+  _panelSprite: {fileID: 21300000, guid: 07d7aa58afe33984883b6dbb4e206bdc, type: 3}
+  _panelColor: {r: 1, g: 1, b: 1, a: 1}
+  _panelPadding: {x: 18, y: 18, z: 18, w: 18}
+  _showItemBackground: 0
+  _showItemWeight: 0
+  _showItemCount: 1
+  _itemTextShadow: 1
+  _countFormat: x{0}
+  _weightUnit: "\u043A\u0433"
+  _itemTextSize: 15
+  _itemNameSize: 14
+  _itemTextColor: {r: 1, g: 1, b: 1, a: 1}
+  _itemShadowColor: {r: 0, g: 0, b: 0, a: 0.9}
+  _conditionColor: {r: 0.39215687, g: 1, b: 0.5882353, a: 1}
+  _shortNameCategories:
+  - Weapon
+  _labels:
+  - _key: use
+    _text: "\u0418\u0441\u043F\u043E\u043B\u044C\u0437\u043E\u0432\u0430\u0442\u044C"
+  - _key: equip
+    _text: "\u042D\u043A\u0438\u043F\u0438\u0440\u043E\u0432\u0430\u0442\u044C"
+  - _key: unequip
+    _text: "\u0421\u043D\u044F\u0442\u044C"
+  - _key: split
+    _text: "\u0420\u0430\u0437\u0434\u0435\u043B\u0438\u0442\u044C"
+  - _key: move
+    _text: "\u041F\u0435\u0440\u0435\u043C\u0435\u0441\u0442\u0438\u0442\u044C: {0}"
+  - _key: inspect
+    _text: "\u041E\u043F\u0438\u0441\u0430\u043D\u0438\u0435"
+  - _key: drop
+    _text: "\u0412\u044B\u0431\u0440\u043E\u0441\u0438\u0442\u044C"
+  - _key: favorite_add
+    _text: "\u041E\u0442\u043C\u0435\u0442\u0438\u0442\u044C \u043A\u0430\u043A \u0438\u0437\u0431\u0440\u0430\u043D\u043D\u043E\u0435"
+  - _key: favorite_remove
+    _text: "\u0421\u043D\u044F\u0442\u044C \u043E\u0442\u043C\u0435\u0442\u043A\u0443
+      \u0438\u0437\u0431\u0440\u0430\u043D\u043D\u043E\u0433\u043E"
+  - _key: junk_add
+    _text: "\u041E\u0442\u043C\u0435\u0442\u0438\u0442\u044C \u043A\u0430\u043A \u043C\u0443\u0441\u043E\u0440"
+  - _key: junk_remove
+    _text: "\u0421\u043D\u044F\u0442\u044C \u043E\u0442\u043C\u0435\u0442\u043A\u0443
+      \u043C\u0443\u0441\u043E\u0440\u0430"
+  - _key: status_used
+    _text: "\u0418\u0441\u043F\u043E\u043B\u044C\u0437\u043E\u0432\u0430\u043D\u043E:
+      {0}"
+  - _key: status_equipped
+    _text: "\u042D\u043A\u0438\u043F\u0438\u0440\u043E\u0432\u0430\u043D\u043E: {0}"
+  - _key: status_unequipped
+    _text: "\u0421\u043D\u044F\u0442\u043E: {0}"
+  - _key: status_split
+    _text: "\u041E\u0442\u0434\u0435\u043B\u0435\u043D\u043E {0} \u0448\u0442.: {1}"
+  - _key: status_moved
+    _text: "\u041F\u0435\u0440\u0435\u043C\u0435\u0449\u0435\u043D\u043E: {0}"
+  - _key: status_dropped
+    _text: "\u0412\u044B\u0431\u0440\u043E\u0448\u0435\u043D\u043E: {0}"
+  - _key: failure_InvalidItem
+    _text: "\u041D\u0435\u0432\u0435\u0440\u043D\u044B\u0439 \u043F\u0440\u0435\u0434\u043C\u0435\u0442"
+  - _key: failure_ItemNotFound
+    _text: "\u041F\u0440\u0435\u0434\u043C\u0435\u0442 \u043D\u0435 \u043D\u0430\u0439\u0434\u0435\u043D"
+  - _key: failure_ContainerNotFound
+    _text: "\u041A\u043E\u043D\u0442\u0435\u0439\u043D\u0435\u0440 \u043D\u0435 \u043D\u0430\u0439\u0434\u0435\u043D"
+  - _key: failure_OutOfBounds
+    _text: "\u041D\u0435 \u043F\u043E\u043C\u0435\u0449\u0430\u0435\u0442\u0441\u044F"
+  - _key: failure_Occupied
+    _text: "\u041C\u0435\u0441\u0442\u043E \u0437\u0430\u043D\u044F\u0442\u043E"
+  - _key: failure_NoSlot
+    _text: "\u041D\u0435\u0442 \u043F\u043E\u0434\u0445\u043E\u0434\u044F\u0449\u0435\u0433\u043E
+      \u0441\u043B\u043E\u0442\u0430"
+  - _key: failure_SlotUnavailable
+    _text: "\u0421\u043B\u043E\u0442 \u043D\u0435\u0434\u043E\u0441\u0442\u0443\u043F\u0435\u043D"
+  - _key: failure_SlotRejected
+    _text: "\u041F\u0440\u0435\u0434\u043C\u0435\u0442 \u043D\u0435 \u043F\u043E\u0434\u0445\u043E\u0434\u0438\u0442
+      \u0434\u043B\u044F \u0441\u043B\u043E\u0442\u0430"
+  - _key: failure_ValidatorRejected
+    _text: "\u0421\u044E\u0434\u0430 \u043D\u0435\u043B\u044C\u0437\u044F \u043F\u043E\u043B\u043E\u0436\u0438\u0442\u044C"
+  - _key: failure_RotationNotAllowed
+    _text: "\u041D\u0435\u043B\u044C\u0437\u044F \u043F\u043E\u0432\u0435\u0440\u043D\u0443\u0442\u044C"
+  - _key: failure_NotStackable
+    _text: "\u041D\u0435 \u0441\u043A\u043B\u0430\u0434\u044B\u0432\u0430\u0435\u0442\u0441\u044F"
+  - _key: failure_StackFull
+    _text: "\u0421\u0442\u043E\u043F\u043A\u0430 \u0437\u0430\u043F\u043E\u043B\u043D\u0435\u043D\u0430"
+  - _key: failure_InvalidAmount
+    _text: "\u041D\u0435\u0432\u0435\u0440\u043D\u043E\u0435 \u043A\u043E\u043B\u0438\u0447\u0435\u0441\u0442\u0432\u043E"
+  - _key: failure_NoSpace
+    _text: "\u041D\u0435\u0442 \u043C\u0435\u0441\u0442\u0430"
+  - _key: failure_AlreadyInInventory
+    _text: "\u0423\u0436\u0435 \u0432 \u0438\u043D\u0432\u0435\u043D\u0442\u0430\u0440\u0435"
+  - _key: failure_DependentSlotOccupied
+    _text: "\u0421\u043D\u0430\u0447\u0430\u043B\u0430 \u043E\u0441\u0432\u043E\u0431\u043E\u0434\u0438\u0442\u0435
+      \u0437\u0430\u0432\u0438\u0441\u0438\u043C\u044B\u0435 \u0441\u043B\u043E\u0442\u044B"
+  - _key: failure_Duplicate
+    _text: "\u041F\u0440\u0435\u0434\u043C\u0435\u0442 \u0443\u0436\u0435 \u0437\u0434\u0435\u0441\u044C"
+  - _key: tooltip_weight
+    _text: "\u0412\u0435\u0441: "
+  - _key: tooltip_amount
+    _text: "   \u041A\u043E\u043B\u0438\u0447\u0435\u0441\u0442\u0432\u043E: "
+  - _key: tooltip_tags
+    _text: "\u0422\u0435\u0433\u0438: "
+  - _key: unit_kg
+    _text: " \u043A\u0433"
+  - _key: split_title
+    _text: "\u0420\u0430\u0437\u0434\u0435\u043B\u0438\u0442\u044C: "
+  - _key: button_split
+    _text: "\u0420\u0430\u0437\u0434\u0435\u043B\u0438\u0442\u044C"
+  - _key: button_cancel
+    _text: "\u041E\u0442\u043C\u0435\u043D\u0430"
+  - _key: button_close
+    _text: "\u0417\u0430\u043A\u0440\u044B\u0442\u044C"
+  - _key: inspect_body
+    _text: "{0}\n\n\u041A\u0430\u0442\u0435\u0433\u043E\u0440\u0438\u044F: {1}\n\u0420\u0430\u0437\u043C\u0435\u0440:
+      {2}x{3}\n\u0412\u0435\u0441: {4} \u043A\u0433\n\u041A\u043E\u043B\u0438\u0447\u0435\u0441\u0442\u0432\u043E:
+      {5}/{6}"
+  - _key: category_Weapon
+    _text: "\u041E\u0440\u0443\u0436\u0438\u0435"
+  - _key: category_Ammo
+    _text: "\u041F\u0430\u0442\u0440\u043E\u043D\u044B"
+  - _key: category_Armor
+    _text: "\u0411\u0440\u043E\u043D\u044F"
+  - _key: category_Head
+    _text: "\u0428\u043B\u0435\u043C"
+  - _key: category_Accessory
+    _text: "\u0423\u0441\u0442\u0440\u043E\u0439\u0441\u0442\u0432\u043E"
+  - _key: category_Attachment
+    _text: "\u041C\u043E\u0434\u0443\u043B\u044C"
+  - _key: category_Consumable
+    _text: "\u0420\u0430\u0441\u0445\u043E\u0434\u043D\u0438\u043A\u0438"
+  - _key: category_Artifact
+    _text: "\u0410\u0440\u0442\u0435\u0444\u0430\u043A\u0442"
+  - _key: category_Misc
+    _text: "\u0420\u0430\u0437\u043D\u043E\u0435"

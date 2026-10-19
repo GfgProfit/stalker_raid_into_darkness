@@ -1,0 +1,455 @@
+using System.Threading;
+using TMPro;
+using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
+
+namespace Inventory.UI
+{
+    [DisallowMultipleComponent]
+    public sealed class InventoryItemView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler, IInitializePotentialDragHandler, IBeginDragHandler, IDragHandler, IEndDragHandler
+    {
+        private const float DRAGGED_SOURCE_ALPHA = 0.35f;
+        private const float DIMMED_ALPHA = 0.25f;
+
+        private RectTransform _rectTransform;
+        private RectTransform _content;
+        private Image _background;
+        private Image _icon;
+        private TextMeshProUGUI _countText;
+        private TextMeshProUGUI _nameText;
+        private TextMeshProUGUI _infoText;
+        private TextMeshProUGUI _infoShadow;
+        private TextMeshProUGUI _nameShadow;
+        private TextMeshProUGUI _conditionText;
+        private TextMeshProUGUI _conditionShadow;
+        private InventoryTheme _appliedTheme;
+        private Image _indicator;
+        private Image _badge;
+        private CanvasGroup _canvasGroup;
+        private InventoryGridViewBase _grid;
+        private CancellationTokenSource _iconCancellation;
+        private int _iconVersion;
+        private ItemIconRequest _currentRequest;
+        private bool _hasRequest;
+        private bool _ghost;
+        private bool _dimmed;
+        private bool _dragSource;
+
+        public ItemInstance Item { get; private set; }
+        public InventoryGridViewBase Grid => _grid;
+        public RectTransform RectTransform => _rectTransform;
+        public Image Icon => _icon;
+        public Sprite IconSprite => _icon != null ? _icon.sprite : null;
+        public bool IsIconLoading { get; private set; }
+        public bool IsGhost => _ghost;
+        public string CountText => _appliedTheme != null ? _infoText.text : _countText != null ? _countText.text : string.Empty;
+        public bool IsDimmed => _dimmed;
+        private InventoryTheme Theme => _grid != null && _grid.Window != null ? _grid.Window.Theme : null;
+
+        public static InventoryItemView Create(RectTransform parent, HideFlags hideFlags)
+        {
+            var root = new GameObject("Item", typeof(RectTransform));
+            root.hideFlags = hideFlags;
+            root.layer = parent.gameObject.layer;
+            var rootRect = (RectTransform)root.transform;
+            rootRect.SetParent(parent, false);
+            rootRect.anchorMin = new Vector2(0f, 1f);
+            rootRect.anchorMax = new Vector2(0f, 1f);
+            rootRect.pivot = new Vector2(0.5f, 0.5f);
+            InventoryItemView view = root.AddComponent<InventoryItemView>();
+            view.Build(hideFlags);
+            return view;
+        }
+
+        public void Bind(ItemInstance item, InventoryGridViewBase grid)
+        {
+            _ghost = false;
+            Item = item;
+            _grid = grid;
+            _canvasGroup.blocksRaycasts = true;
+            Refresh();
+        }
+
+        public void BindGhost(ItemInstance item, InventoryGridViewBase grid, Vector2 cellSize, bool rotated, int amount)
+        {
+            _ghost = true;
+            Item = item;
+            _grid = grid;
+            _canvasGroup.blocksRaycasts = false;
+            _canvasGroup.alpha = 0.85f;
+            ApplyTheme(Theme);
+            Vector2Int size = item.GetSize(rotated);
+            _rectTransform.sizeDelta = new Vector2(size.x * cellSize.x, size.y * cellSize.y);
+            ApplyContent(item.Definition.Size, cellSize, rotated);
+            ApplyTexts(amount);
+            _background.color = BackgroundColor(item.Definition);
+            RequestIcon(ItemIconRequest.ForItem(item));
+        }
+
+        public void Refresh()
+        {
+            if (Item == null || _grid == null)
+            {
+                return;
+            }
+
+            ApplyTheme(Theme);
+            ApplyDecoration();
+            ApplyTexts(Item.Amount);
+            bool slotIcon = _grid.UsesSlotIcon(Item, out Vector2Int slotSize);
+            ItemIconRequest request = slotIcon ? ItemIconRequest.ForSlot(Item, slotSize.x, slotSize.y) : ItemIconRequest.ForItem(Item);
+            RequestIcon(request);
+
+            if (_ghost == false && _grid.Container != null && _grid.Container.Contains(Item))
+            {
+                Layout(_grid.GetAreaRect(_grid.Container.GetItemArea(Item)));
+            }
+        }
+
+        public void Layout(Rect topLeftArea)
+        {
+            if (Item == null || _grid == null)
+            {
+                return;
+            }
+
+            _rectTransform.anchoredPosition = new Vector2(topLeftArea.center.x, -topLeftArea.center.y);
+            _rectTransform.sizeDelta = topLeftArea.size;
+
+            if (_grid.UsesSlotIcon(Item, out _))
+            {
+                _content.sizeDelta = topLeftArea.size;
+                _content.localRotation = Quaternion.identity;
+                return;
+            }
+
+            ApplyContent(Item.Definition.Size, _grid.CellSize, Item.Location.Rotated);
+        }
+
+        public void SetDragSource(bool dragging)
+        {
+            _dragSource = dragging;
+            UpdateAlpha();
+        }
+
+        public void SetDimmed(bool dimmed)
+        {
+            _dimmed = dimmed;
+            UpdateAlpha();
+        }
+
+        public void SetIndicator(bool visible, Color indicatorColor)
+        {
+            _indicator.enabled = visible;
+            _indicator.color = indicatorColor;
+        }
+
+        public void SetGhostRotation(bool rotated, Vector2 cellSize)
+        {
+            if (Item == null)
+            {
+                return;
+            }
+
+            Vector2Int size = Item.GetSize(rotated);
+            _rectTransform.sizeDelta = new Vector2(size.x * cellSize.x, size.y * cellSize.y);
+            ApplyContent(Item.Definition.Size, cellSize, rotated);
+        }
+
+        public void OnPointerEnter(PointerEventData eventData) => _grid?.Window?.HandleItemPointerEnter(this, eventData);
+        public void OnPointerExit(PointerEventData eventData) => _grid?.Window?.HandleItemPointerExit(this, eventData);
+        public void OnPointerClick(PointerEventData eventData) => _grid?.Window?.HandleItemClick(this, eventData);
+
+        public void OnInitializePotentialDrag(PointerEventData eventData) => eventData.useDragThreshold = true;
+        public void OnBeginDrag(PointerEventData eventData) => _grid?.Window?.HandleBeginDrag(this, eventData);
+        public void OnDrag(PointerEventData eventData) => _grid?.Window?.HandleDrag(eventData);
+        public void OnEndDrag(PointerEventData eventData) => _grid?.Window?.HandleEndDrag(eventData);
+
+        private void OnDestroy() => CancelIcon();
+
+        private void ApplyContent(Vector2Int baseSize, Vector2 cellSize, bool rotated)
+        {
+            _content.sizeDelta = new Vector2(baseSize.x * cellSize.x, baseSize.y * cellSize.y);
+            _content.localRotation = Quaternion.Euler(0f, 0f, rotated ? -90f : 0f);
+        }
+
+        private void ApplyTexts(int amount)
+        {
+            ItemDefinition definition = Item.Definition;
+            InventoryTheme theme = _appliedTheme;
+            bool showCount = definition.IsStackable && amount > 1;
+
+            if (theme == null)
+            {
+                _countText.enabled = showCount;
+
+                if (showCount)
+                {
+                    _countText.SetText("{0}", amount);
+                }
+
+                _nameText.text = definition.ShortName;
+                _nameText.enabled = string.IsNullOrEmpty(definition.ShortName) == false;
+                return;
+            }
+
+            _countText.enabled = false;
+            string count = showCount && theme.ShowItemCount ? theme.FormatCount(amount) : string.Empty;
+            bool inSlot = _ghost == false && _grid != null && _grid.UsesSlotIcon(Item, out _);
+            string weight = theme.ShowItemWeight && inSlot == false ? theme.FormatWeight(definition.Weight * amount) : string.Empty;
+            string info = count.Length > 0 && weight.Length > 0 ? count + "\n" + weight : count + weight;
+            SetLabel(_infoText, _infoShadow, info);
+            SetLabel(_nameText, _nameShadow, theme.ShowsShortName(definition) ? definition.ShortName : string.Empty);
+            string condition = Item.GetState("condition");
+            string conditionText = string.Empty;
+
+            if (string.IsNullOrEmpty(condition) == false && float.TryParse(condition, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out float value))
+            {
+                conditionText = Mathf.RoundToInt(Mathf.Clamp01(value) * 100f) + "%";
+            }
+
+            SetLabel(_conditionText, _conditionShadow, conditionText);
+        }
+
+        private void ApplyTheme(InventoryTheme theme)
+        {
+            if (theme == _appliedTheme)
+            {
+                return;
+            }
+
+            _appliedTheme = theme;
+            bool themed = theme != null;
+            _infoText.gameObject.SetActive(themed);
+            _conditionText.gameObject.SetActive(themed);
+            _infoShadow.gameObject.SetActive(themed && theme.ItemTextShadow);
+            _nameShadow.gameObject.SetActive(themed && theme.ItemTextShadow);
+            _conditionShadow.gameObject.SetActive(themed && theme.ItemTextShadow);
+
+            if (themed == false)
+            {
+                _nameText.alignment = TextAlignmentOptions.TopLeft;
+                return;
+            }
+
+            _nameText.alignment = TextAlignmentOptions.BottomRight;
+            StyleLabel(_infoText, _infoShadow, theme.SmallFont, theme.ItemTextSize, theme.ItemTextColor, theme);
+            StyleLabel(_nameText, _nameShadow, theme.BodyFont, theme.ItemNameSize, theme.ItemTextColor, theme);
+            StyleLabel(_conditionText, _conditionShadow, theme.SmallFont, theme.ItemTextSize, theme.ConditionColor, theme);
+        }
+
+        private static void StyleLabel(TextMeshProUGUI label, TextMeshProUGUI shadow, TMP_FontAsset font, float size, Color color, InventoryTheme theme)
+        {
+            if (font != null)
+            {
+                label.font = font;
+                shadow.font = font;
+            }
+
+            label.fontSize = size;
+            shadow.fontSize = size;
+            label.color = color;
+            shadow.color = theme.ItemShadowColor;
+            shadow.alignment = label.alignment;
+            shadow.lineSpacing = label.lineSpacing;
+        }
+
+        private static void SetLabel(TextMeshProUGUI label, TextMeshProUGUI shadow, string value)
+        {
+            label.text = value;
+            label.enabled = value.Length > 0;
+            shadow.text = value;
+            shadow.enabled = label.enabled;
+        }
+
+        private void ApplyDecoration()
+        {
+            InventoryWindow window = _grid != null ? _grid.Window : null;
+            InventoryItemDecoration decoration = _ghost == false && window != null && window.ItemDecorator != null ? window.ItemDecorator(Item) : InventoryItemDecoration.None;
+            _background.color = decoration.HasTint ? decoration.Tint : BackgroundColor(Item.Definition);
+            _badge.sprite = decoration.Badge;
+            _badge.enabled = decoration.Badge != null;
+        }
+
+        private Color BackgroundColor(ItemDefinition definition) => _appliedTheme != null && _appliedTheme.ShowItemBackground == false ? Color.clear : definition.BackgroundColor;
+
+        private void UpdateAlpha()
+        {
+            if (_ghost)
+            {
+                return;
+            }
+
+            _canvasGroup.alpha = _dragSource ? DRAGGED_SOURCE_ALPHA : _dimmed ? DIMMED_ALPHA : 1f;
+        }
+
+        private void RequestIcon(ItemIconRequest request)
+        {
+            if (_hasRequest && SameRequest(request, _currentRequest) && (_icon.sprite != null || IsIconLoading))
+            {
+                return;
+            }
+
+            CancelIcon();
+            _currentRequest = request;
+            _hasRequest = true;
+            IItemIconProvider provider = _grid != null && _grid.Window != null ? _grid.Window.IconProvider : null;
+
+            if (provider == null)
+            {
+                SetIcon(request.Definition.FallbackIcon);
+                return;
+            }
+
+            if (provider.TryGetIcon(request, out Sprite cached))
+            {
+                SetIcon(cached);
+                return;
+            }
+
+            SetIcon(request.Definition.FallbackIcon);
+            IsIconLoading = true;
+            int version = ++_iconVersion;
+            _iconCancellation = new CancellationTokenSource();
+            provider.RequestIcon(request, sprite => OnIconReady(version, sprite), _iconCancellation.Token);
+        }
+
+        private void OnIconReady(int version, Sprite sprite)
+        {
+            if (this == null || version != _iconVersion)
+            {
+                return;
+            }
+
+            IsIconLoading = false;
+            SetIcon(sprite != null ? sprite : _currentRequest.Definition.FallbackIcon);
+        }
+
+        private void SetIcon(Sprite sprite)
+        {
+            _icon.sprite = sprite;
+            _icon.enabled = sprite != null;
+        }
+
+        private void CancelIcon()
+        {
+            IsIconLoading = false;
+            _iconVersion++;
+
+            if (_iconCancellation != null)
+            {
+                _iconCancellation.Cancel();
+                _iconCancellation.Dispose();
+                _iconCancellation = null;
+            }
+        }
+
+        private static bool SameRequest(ItemIconRequest left, ItemIconRequest right)
+        {
+            if (left.Definition != right.Definition || left.Width != right.Width || left.Height != right.Height || left.ProfileType != right.ProfileType || left.VariantIds.Count != right.VariantIds.Count)
+            {
+                return false;
+            }
+
+            for (int i = 0; i < left.VariantIds.Count; i++)
+            {
+                if (left.VariantIds[i] != right.VariantIds[i])
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private void Build(HideFlags hideFlags)
+        {
+            _rectTransform = (RectTransform)transform;
+            _canvasGroup = gameObject.AddComponent<CanvasGroup>();
+            Image hitArea = gameObject.AddComponent<Image>();
+            hitArea.color = new Color(0f, 0f, 0f, 0f);
+            hitArea.raycastTarget = true;
+            _content = CreateChild("Content", hideFlags, _rectTransform, true);
+            _content.anchorMin = new Vector2(0.5f, 0.5f);
+            _content.anchorMax = new Vector2(0.5f, 0.5f);
+            _background = _content.gameObject.AddComponent<Image>();
+            _background.raycastTarget = false;
+            _icon = CreateChild("Icon", hideFlags, _content, false).gameObject.AddComponent<Image>();
+            _icon.raycastTarget = false;
+            _icon.preserveAspect = false;
+            _icon.enabled = false;
+            RectTransform overlay = CreateChild("Overlay", hideFlags, _rectTransform, false);
+            _infoShadow = CreateShadow("InfoShadow", hideFlags, overlay, TextAlignmentOptions.TopLeft);
+            _infoText = CreateText("Info", hideFlags, overlay, TextAlignmentOptions.TopLeft, 15f);
+            _conditionShadow = CreateShadow("ConditionShadow", hideFlags, overlay, TextAlignmentOptions.BottomLeft);
+            _conditionText = CreateText("Condition", hideFlags, overlay, TextAlignmentOptions.BottomLeft, 15f);
+            _countText = CreateText("Count", hideFlags, overlay, TextAlignmentOptions.BottomRight, 15f);
+            _nameShadow = CreateShadow("NameShadow", hideFlags, overlay, TextAlignmentOptions.BottomRight);
+            _nameText = CreateText("Name", hideFlags, overlay, TextAlignmentOptions.TopLeft, 12f);
+            _infoText.gameObject.SetActive(false);
+            _conditionText.gameObject.SetActive(false);
+            _indicator = CreateChild("Indicator", hideFlags, overlay, true).gameObject.AddComponent<Image>();
+            RectTransform indicatorRect = _indicator.rectTransform;
+            indicatorRect.anchorMin = new Vector2(1f, 1f);
+            indicatorRect.anchorMax = new Vector2(1f, 1f);
+            indicatorRect.pivot = new Vector2(1f, 1f);
+            indicatorRect.sizeDelta = new Vector2(8f, 8f);
+            indicatorRect.anchoredPosition = new Vector2(-3f, -3f);
+            _indicator.raycastTarget = false;
+            _indicator.enabled = false;
+            _badge = CreateChild("Badge", hideFlags, overlay, true).gameObject.AddComponent<Image>();
+            RectTransform badgeRect = _badge.rectTransform;
+            badgeRect.anchorMin = new Vector2(1f, 0.5f);
+            badgeRect.anchorMax = new Vector2(1f, 0.5f);
+            badgeRect.pivot = new Vector2(1f, 0.5f);
+            badgeRect.sizeDelta = new Vector2(18f, 18f);
+            badgeRect.anchoredPosition = new Vector2(-2f, 0f);
+            _badge.raycastTarget = false;
+            _badge.enabled = false;
+        }
+
+        private static RectTransform CreateChild(string childName, HideFlags hideFlags, RectTransform parent, bool fixedSize)
+        {
+            var child = new GameObject(childName, typeof(RectTransform));
+            child.hideFlags = hideFlags;
+            child.layer = parent.gameObject.layer;
+            var rect = (RectTransform)child.transform;
+            rect.SetParent(parent, false);
+
+            if (fixedSize == false)
+            {
+                rect.anchorMin = Vector2.zero;
+                rect.anchorMax = Vector2.one;
+                rect.offsetMin = Vector2.zero;
+                rect.offsetMax = Vector2.zero;
+            }
+
+            return rect;
+        }
+
+        private static TextMeshProUGUI CreateShadow(string childName, HideFlags hideFlags, RectTransform parent, TextAlignmentOptions alignment)
+        {
+            TextMeshProUGUI shadow = CreateText(childName, hideFlags, parent, alignment, 15f);
+            shadow.rectTransform.offsetMin += new Vector2(1f, -1f);
+            shadow.rectTransform.offsetMax += new Vector2(1f, -1f);
+            shadow.gameObject.SetActive(false);
+            return shadow;
+        }
+
+        private static TextMeshProUGUI CreateText(string childName, HideFlags hideFlags, RectTransform parent, TextAlignmentOptions alignment, float fontSize)
+        {
+            RectTransform rect = CreateChild(childName, hideFlags, parent, false);
+            rect.offsetMin = new Vector2(4f, 2f);
+            rect.offsetMax = new Vector2(-4f, -2f);
+            TextMeshProUGUI text = rect.gameObject.AddComponent<TextMeshProUGUI>();
+            text.raycastTarget = false;
+            text.alignment = alignment;
+            text.fontSize = fontSize;
+            text.textWrappingMode = TextWrappingModes.NoWrap;
+            text.overflowMode = TextOverflowModes.Ellipsis;
+            text.color = new Color(0.92f, 0.92f, 0.88f, 1f);
+            return text;
+        }
+    }
+}

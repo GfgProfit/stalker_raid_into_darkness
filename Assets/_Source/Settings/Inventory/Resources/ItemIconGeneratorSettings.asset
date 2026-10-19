@@ -1,0 +1,99 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 470dcf584e1b961489e47a94e5d69f65, type: 3}
+  m_Name: ItemIconGeneratorSettings
+  m_EditorClassIdentifier: Inventory.IconGeneration::Inventory.IconGeneration.ItemIconGeneratorSettings
+  _prewarmItems: []
+  _prewarmSlotProfiles:
+  - _restrictCategory: 1
+    _acceptedCategory: Head
+    _width: 2
+    _height: 2
+  - _restrictCategory: 1
+    _acceptedCategory: Armor
+    _width: 2
+    _height: 3
+  - _restrictCategory: 1
+    _acceptedCategory: Weapon
+    _width: 5
+    _height: 2
+  - _restrictCategory: 1
+    _acceptedCategory: Weapon
+    _width: 2
+    _height: 1
+  - _restrictCategory: 1
+    _acceptedCategory: Accessory
+    _width: 2
+    _height: 1
+  - _restrictCategory: 1
+    _acceptedCategory: Consumable
+    _width: 1
+    _height: 1
+  _prewarmFrameBudgetMilliseconds: 6
+  _renderLayer: 31
+  _renderingLayer: 7
+  _renderOrigin: {x: 8192, y: 0, z: 8192}
+  _excludeIconLayerFromSceneLights: 1
+  _rendererLightProbeUsage: 0
+  _rendererReflectionProbeUsage: 0
+  _rendererReceiveShadows: 0
+  _renderTextureFormat: 2
+  _iconRenderScale: 1
+  _allowHdr: 1
+  _useCameraMsaa: 1
+  _cameraDistanceMultiplier: 3
+  _cameraDistanceOffset: 1
+  _nearClipPlane: 0.01
+  _farClipBoundsMultiplier: 8
+  _farClipOffset: 10
+  _enableDirectSpecularLighting: 0
+  _enableExposureControl: 1
+  _enableAtmosphericScattering: 0
+  _enablePostProcess: 1
+  _enableColorGrading: 1
+  _enableTonemapping: 1
+  _enableVolumetrics: 0
+  _enableSkyReflection: 0
+  _useFrontFillLight: 1
+  _frontFillLightIntensityMultiplier: 0.65
+  _frontFillLightCameraDirection: {x: 0, y: 0.15, z: 1}
+  _useSideFillLight: 1
+  _sideFillLightIntensityMultiplier: 0.5
+  _sideFillLightCameraDirection: {x: -0.85, y: 0.1, z: 1}
+  _useRimLight: 1
+  _rimLightIntensityMultiplier: 0.25
+  _rimLightCameraDirection: {x: 0.35, y: 0.2, z: -1}
+  _generatedLightShadows: 0
+  _skyAmbientMode: 1
+  _skyRenderingSpace: 0
+  _physicallyBasedSkyModel: 1
+  _physicallyBasedSkyGroundTint: {r: 0.122641504, g: 0.1043775, b: 0.09313812, a: 1}
+  _fogEnabled: 0
+  _fogColorMode: 1
+  _maxFogDistance: 5000
+  _meanFreePath: 400
+  _enableVolumetricFog: 0
+  _fogAnisotropy: 0.65
+  _exposureMode: 0
+  _fixedExposure: 0
+  _exposureCompensation: 0.1
+  _exposureLimitMin: 2
+  _exposureLimitMax: 14
+  _histogramPercentages: {x: 0, y: 50}
+  _postExposure: 0.1
+  _contrast: 0
+  _colorFilter: {r: 1, g: 1, b: 1, a: 1}
+  _hueShift: 0
+  _saturation: 18
+  _tonemappingMode: 1
+  _iconOutlineColor: {r: 0, g: 0, b: 0, a: 0.8509804}
+  _iconShadowColor: {r: 0, g: 0, b: 0, a: 0.34901962}

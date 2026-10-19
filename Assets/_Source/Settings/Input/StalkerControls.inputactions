@@ -320,9 +320,50 @@
                     "isPartOfComposite": false
                 }
             ]
+        },
+        {
+            "name": "Inventory",
+            "id": "6a0f2a6c-3c1d-4d7e-9f51-2b1f3c0a9e03",
+            "actions": [
+                { "name": "ToggleInventory", "type": "Button", "id": "1d4a6b0e-7c3a-4c55-8a14-5e1a8b3c2d31", "expectedControlType": "Button", "processors": "", "interactions": "", "initialStateCheck": false },
+                { "name": "CloseInventory", "type": "Button", "id": "1d4a6b0e-7c3a-4c55-8a14-5e1a8b3c2d32", "expectedControlType": "Button", "processors": "", "interactions": "", "initialStateCheck": false },
+                { "name": "RotateItem", "type": "Button", "id": "1d4a6b0e-7c3a-4c55-8a14-5e1a8b3c2d33", "expectedControlType": "Button", "processors": "", "interactions": "", "initialStateCheck": false },
+                { "name": "QuickTransferModifier", "type": "Button", "id": "1d4a6b0e-7c3a-4c55-8a14-5e1a8b3c2d35", "expectedControlType": "Button", "processors": "", "interactions": "", "initialStateCheck": true },
+                { "name": "ToggleStash", "type": "Button", "id": "1d4a6b0e-7c3a-4c55-8a14-5e1a8b3c2d36", "expectedControlType": "Button", "processors": "", "interactions": "", "initialStateCheck": false },
+                { "name": "ToggleFavorite", "type": "Button", "id": "1d4a6b0e-7c3a-4c55-8a14-5e1a8b3c2d37", "expectedControlType": "Button", "processors": "", "interactions": "", "initialStateCheck": false },
+                { "name": "ToggleJunk", "type": "Button", "id": "1d4a6b0e-7c3a-4c55-8a14-5e1a8b3c2d38", "expectedControlType": "Button", "processors": "", "interactions": "", "initialStateCheck": false }
+            ],
+            "bindings": [
+                { "name": "", "id": "2e5b7c1f-8d4b-4d66-9b25-6f2b9c4d3e31", "path": "<Keyboard>/tab", "interactions": "", "processors": "", "groups": "Keyboard&Mouse", "action": "ToggleInventory", "isComposite": false, "isPartOfComposite": false },
+                { "name": "", "id": "2e5b7c1f-8d4b-4d66-9b25-6f2b9c4d3e32", "path": "<Keyboard>/escape", "interactions": "", "processors": "", "groups": "Keyboard&Mouse", "action": "CloseInventory", "isComposite": false, "isPartOfComposite": false },
+                { "name": "", "id": "2e5b7c1f-8d4b-4d66-9b25-6f2b9c4d3e33", "path": "<Keyboard>/r", "interactions": "", "processors": "", "groups": "Keyboard&Mouse", "action": "RotateItem", "isComposite": false, "isPartOfComposite": false },
+                { "name": "", "id": "2e5b7c1f-8d4b-4d66-9b25-6f2b9c4d3e35", "path": "<Keyboard>/leftShift", "interactions": "", "processors": "", "groups": "Keyboard&Mouse", "action": "QuickTransferModifier", "isComposite": false, "isPartOfComposite": false },
+                { "name": "", "id": "2e5b7c1f-8d4b-4d66-9b25-6f2b9c4d3e36", "path": "<Keyboard>/b", "interactions": "", "processors": "", "groups": "Keyboard&Mouse", "action": "ToggleStash", "isComposite": false, "isPartOfComposite": false },
+                { "name": "", "id": "2e5b7c1f-8d4b-4d66-9b25-6f2b9c4d3e37", "path": "<Keyboard>/k", "interactions": "", "processors": "", "groups": "Keyboard&Mouse", "action": "ToggleFavorite", "isComposite": false, "isPartOfComposite": false },
+                { "name": "", "id": "2e5b7c1f-8d4b-4d66-9b25-6f2b9c4d3e38", "path": "<Keyboard>/j", "interactions": "", "processors": "", "groups": "Keyboard&Mouse", "action": "ToggleJunk", "isComposite": false, "isPartOfComposite": false }
+            ]
+        },
+        {
+            "name": "UI",
+            "id": "6a0f2a6c-3c1d-4d7e-9f51-2b1f3c0a9e04",
+            "actions": [
+                { "name": "Point", "type": "PassThrough", "id": "1d4a6b0e-7c3a-4c55-8a14-5e1a8b3c2d41", "expectedControlType": "Vector2", "processors": "", "interactions": "", "initialStateCheck": true },
+                { "name": "Click", "type": "PassThrough", "id": "1d4a6b0e-7c3a-4c55-8a14-5e1a8b3c2d42", "expectedControlType": "Button", "processors": "", "interactions": "", "initialStateCheck": true },
+                { "name": "RightClick", "type": "PassThrough", "id": "1d4a6b0e-7c3a-4c55-8a14-5e1a8b3c2d43", "expectedControlType": "Button", "processors": "", "interactions": "", "initialStateCheck": true },
+                { "name": "MiddleClick", "type": "PassThrough", "id": "1d4a6b0e-7c3a-4c55-8a14-5e1a8b3c2d44", "expectedControlType": "Button", "processors": "", "interactions": "", "initialStateCheck": true },
+                { "name": "ScrollWheel", "type": "PassThrough", "id": "1d4a6b0e-7c3a-4c55-8a14-5e1a8b3c2d45", "expectedControlType": "Vector2", "processors": "", "interactions": "", "initialStateCheck": true }
+            ],
+            "bindings": [
+                { "name": "", "id": "2e5b7c1f-8d4b-4d66-9b25-6f2b9c4d3e41", "path": "<Pointer>/position", "interactions": "", "processors": "", "groups": "Keyboard&Mouse", "action": "Point", "isComposite": false, "isPartOfComposite": false },
+                { "name": "", "id": "2e5b7c1f-8d4b-4d66-9b25-6f2b9c4d3e42", "path": "<Mouse>/leftButton", "interactions": "", "processors": "", "groups": "Keyboard&Mouse", "action": "Click", "isComposite": false, "isPartOfComposite": false },
+                { "name": "", "id": "2e5b7c1f-8d4b-4d66-9b25-6f2b9c4d3e43", "path": "<Mouse>/rightButton", "interactions": "", "processors": "", "groups": "Keyboard&Mouse", "action": "RightClick", "isComposite": false, "isPartOfComposite": false },
+                { "name": "", "id": "2e5b7c1f-8d4b-4d66-9b25-6f2b9c4d3e44", "path": "<Mouse>/middleButton", "interactions": "", "processors": "", "groups": "Keyboard&Mouse", "action": "MiddleClick", "isComposite": false, "isPartOfComposite": false },
+                { "name": "", "id": "2e5b7c1f-8d4b-4d66-9b25-6f2b9c4d3e45", "path": "<Mouse>/scroll", "interactions": "", "processors": "", "groups": "Keyboard&Mouse", "action": "ScrollWheel", "isComposite": false, "isPartOfComposite": false }
+            ]
         }
     ],
-    "controlSchemes": [
+    "controlSchemes"
+: [
         {
             "name": "Keyboard&Mouse",
             "bindingGroup": "Keyboard&Mouse",

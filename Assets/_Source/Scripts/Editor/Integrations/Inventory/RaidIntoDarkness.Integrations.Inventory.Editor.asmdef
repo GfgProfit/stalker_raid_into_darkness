@@ -1,0 +1,27 @@
+{
+    "name": "RaidIntoDarkness.Integrations.Inventory.Editor",
+    "rootNamespace": "RaidIntoDarkness.Integrations.Inventory.Editor",
+    "references": [
+        "RaidIntoDarkness.Integrations.Inventory",
+        "RaidIntoDarkness.Player",
+        "Inventory",
+        "Inventory.UI",
+        "Inventory.IconGeneration",
+        "Inventory.Editor",
+        "UniTask",
+        "Unity.InputSystem",
+        "UnityEngine.UI",
+        "Unity.TextMeshPro"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

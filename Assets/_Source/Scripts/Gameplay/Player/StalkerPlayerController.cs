@@ -39,6 +39,7 @@ namespace RaidIntoDarkness.Player
         public string OutfitSection => _appliedSection;
 
         public StalkerMoveFlags ScriptedWish { get; set; }
+        public bool GameplayInputBlocked { get; set; }
 
         public bool Combat
         {
@@ -128,13 +129,21 @@ namespace RaidIntoDarkness.Player
         private void Update()
         {
             float deltaTime = Mathf.Min(Time.deltaTime, MAX_FRAME_DELTA);
-            HandleDebugInput();
+            if (!GameplayInputBlocked)
+            {
+                HandleDebugInput();
+            }
+
             if (_outfitSection != _appliedSection && _rig != null && _rig.Catalog != null)
             {
                 ApplyOutfit(_outfitSection);
             }
 
-            if (_input != null)
+            if (_input != null && GameplayInputBlocked)
+            {
+                _motor.Wish = _input.ApplyBlocked(_motor.Wish, _profile.Input);
+            }
+            else if (_input != null)
             {
                 if (_input.ReleaseCursorPressed)
                 {

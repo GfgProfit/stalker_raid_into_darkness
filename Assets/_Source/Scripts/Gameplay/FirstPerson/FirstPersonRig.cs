@@ -15,6 +15,7 @@ namespace RaidIntoDarkness.FirstPerson
         [Tooltip("When off, another component animates the body and no XRayRigPlayer is added to it.")]
         [SerializeField] private bool _driveBodyAnimation = true;
         [SerializeField] private bool _castShadows;
+        [SerializeField] private bool _handsVisible;
 
         private GameObject _hands;
         private GameObject _body;
@@ -26,6 +27,7 @@ namespace RaidIntoDarkness.FirstPerson
         public GameObject Body => _body;
         public XRayRigPlayer BodyPlayer => _bodyPlayer;
         public FirstPersonOutfitCatalog Catalog => _catalog;
+        public bool HandsVisible => _handsVisible;
 
         public event Action<FirstPersonOutfitEntry, bool> OutfitApplied;
 
@@ -55,6 +57,7 @@ namespace RaidIntoDarkness.FirstPerson
             if (_current == null || _current.HandsModel != entry.HandsModel)
             {
                 Replace(ref _hands, entry.HandsModel, _handsRoot);
+                ApplyHandsVisibility();
             }
 
             bool bodyChanged = _current == null || _current.BodyModel != entry.BodyModel;
@@ -68,6 +71,12 @@ namespace RaidIntoDarkness.FirstPerson
             PlayBody(0, true, false, 0.0f);
             OutfitApplied?.Invoke(entry, bodyChanged);
             return true;
+        }
+
+        public void SetHandsVisible(bool visible)
+        {
+            _handsVisible = visible;
+            ApplyHandsVisibility();
         }
 
         public void PlayBody(int movingState, bool isCalm, bool isSlowedDown, float fadeDuration)
@@ -98,6 +107,14 @@ namespace RaidIntoDarkness.FirstPerson
                 {
                     renderer.shadowCastingMode = ShadowCastingMode.Off;
                 }
+            }
+        }
+
+        private void ApplyHandsVisibility()
+        {
+            if (_hands != null && _hands.activeSelf != _handsVisible)
+            {
+                _hands.SetActive(_handsVisible);
             }
         }
 

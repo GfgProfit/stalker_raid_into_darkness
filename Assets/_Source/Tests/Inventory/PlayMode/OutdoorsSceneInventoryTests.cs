@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Inventory;
 using Inventory.UI;
 using NUnit.Framework;
+using RaidIntoDarkness.FirstPerson;
 using RaidIntoDarkness.Player;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -160,10 +161,27 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             yield return null;
             Assert.That(window.Hint, Does.Contain("Подобрать"), "pick up hint was not shown");
             int pickedBefore = CountItems(model, pickedDefinition);
+            Assert.That(player.Pickup, Is.Not.Null, "FPS_Player has no FirstPersonPickupAnimator");
+            Assert.That(player.Rig.Hands.activeSelf, Is.False, "hands are visible before pick up");
             yield return Tap(_keyboard.fKey);
-            yield return null;
-            Assert.That(CountItems(model, pickedDefinition), Is.EqualTo(pickedBefore + 1), "F did not pick up the world item");
+            Assert.That(interactor.IsPickingUp, Is.True, "F did not start the pick up animation");
+            Assert.That(player.Pickup.IsPlaying, Is.True, "pick up animation is not playing");
+            Assert.That(player.Rig.Hands.activeSelf, Is.True, "hands are hidden during pick up");
+            Assert.That(CountItems(model, pickedDefinition), Is.EqualTo(pickedBefore), "item was taken before the middle of the animation");
+            FirstPersonPickupHand hand = player.Pickup.CurrentHand;
+            yield return Tap(_keyboard.fKey);
+            Assert.That(player.Pickup.CurrentHand, Is.EqualTo(hand), "a repeated press restarted the pick up");
+            float timeout = Time.time + player.Pickup.Duration + 1f;
+
+            while (interactor.IsPickingUp && Time.time < timeout)
+            {
+                yield return null;
+            }
+
+            Assert.That(interactor.IsPickingUp, Is.False, "pick up did not finish");
+            Assert.That(CountItems(model, pickedDefinition), Is.EqualTo(pickedBefore + 1), "F did not pick up the world item exactly once");
             Assert.That(spawned == null, Is.True, "picked world item was not removed from the scene");
+            Assert.That(player.Rig.Hands.activeSelf, Is.False, "hands stay visible after pick up");
 
             yield return Tap(_keyboard.tabKey);
             ItemInstance picked = null;

@@ -16,6 +16,7 @@ namespace RaidIntoDarkness.Player
         [SerializeField] private StalkerVisibleBody _visibleBody;
         [SerializeField] private StalkerBodyAnimationPlayer _bodyPlayer;
         [SerializeField] private FirstPersonRig _rig;
+        [SerializeField] private FirstPersonPickupAnimator _pickup;
         [SerializeField] private StalkerCameraEffects _cameraEffects;
         [SerializeField] private StalkerFootstepSynchronizer _footsteps;
         [SerializeField] private StalkerPlayerFoley _foley;
@@ -31,6 +32,7 @@ namespace RaidIntoDarkness.Player
         public StalkerVisibleBody VisibleBody => _visibleBody;
         public StalkerBodyAnimationPlayer BodyPlayer => _bodyPlayer;
         public FirstPersonRig Rig => _rig;
+        public FirstPersonPickupAnimator Pickup => _pickup;
         public StalkerCameraEffects CameraEffects => _cameraEffects;
         public StalkerFootstepSynchronizer Footsteps => _footsteps;
         public StalkerPlayerFoley Foley => _foley;

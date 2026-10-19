@@ -4,6 +4,7 @@
     "references": [
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
+        "RaidIntoDarkness.FirstPerson",
         "RaidIntoDarkness.Player",
         "RaidIntoDarkness.Integrations.Inventory",
         "Inventory",

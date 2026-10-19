@@ -512,6 +512,7 @@ GameObject:
   - component: {fileID: 4394079865577217288}
   - component: {fileID: 163336873398552154}
   - component: {fileID: 3924682037822528286}
+  - component: {fileID: 3929634974446198521}
   m_Layer: 0
   m_Name: FPS_Player
   m_TagString: Untagged
@@ -555,6 +556,7 @@ MonoBehaviour:
   _initialOutfit: actor
   _driveBodyAnimation: 0
   _castShadows: 0
+  _handsVisible: 0
 --- !u!143 &6634809658367128514
 CharacterController:
   m_ObjectHideFlags: 0
@@ -607,6 +609,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: RaidIntoDarkness.Player::RaidIntoDarkness.Player.StalkerActorCondition
   _profile: {fileID: 11400000, guid: 07c6249f5233a9247823cc3638c99187, type: 2}
   _carryWeightSource: {fileID: 0}
+  _sprintSource: {fileID: 0}
   _powerLossSource: {fileID: 0}
   _healthSource: {fileID: 0}
   _satietySource: {fileID: 0}
@@ -708,6 +711,7 @@ MonoBehaviour:
   _visibleBody: {fileID: 1434901721949175874}
   _bodyPlayer: {fileID: 8362631657092042833}
   _rig: {fileID: 1844661020335746395}
+  _pickup: {fileID: 3929634974446198521}
   _cameraEffects: {fileID: 3170219032278336436}
   _footsteps: {fileID: 163336873398552154}
   _foley: {fileID: 3924682037822528286}
@@ -789,3 +793,21 @@ MonoBehaviour:
   _detector: {fileID: 4394079865577217288}
   _source: {fileID: 2430702164848563777}
   _masterVolume: 1
+--- !u!114 &3929634974446198521
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9095947929063771272}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a96fa2a53fbdb3b41a33e9e5f1cfdee3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: RaidIntoDarkness.FirstPerson::RaidIntoDarkness.FirstPerson.FirstPersonPickupAnimator
+  _rig: {fileID: 1844661020335746395}
+  _leftHand: {fileID: 3690615174817671640, guid: 59b2c57bdeb35131c154188d512ca3dc, type: 3}
+  _rightHand: {fileID: 3883840924286874699, guid: 59b2c57bdeb35131c154188d512ca3dc, type: 3}
+  _leftHandWithWeapon: {fileID: 4275597488559875013, guid: 59b2c57bdeb35131c154188d512ca3dc, type: 3}
+  _speed: 1.2
+  _takeMoment: 0.5

@@ -1,5 +1,6 @@
 using Inventory;
 using Inventory.UI;
+using RaidIntoDarkness.FirstPerson;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -18,6 +19,11 @@ namespace RaidIntoDarkness.Integrations.Inventory
         private readonly RaycastHit[] _hits = new RaycastHit[32];
         private InventoryWindow _subscribedWindow;
         private WorldItem _hintTarget;
+        private WorldItem _pickupTarget;
+        private bool _pickupPending;
+
+        public bool IsPickingUp => _pickupPending;
+        public WorldItem PickupTarget => _pickupPending ? _pickupTarget : null;
 
         public void Configure(InventoryWindowController controller, InputActionReference pickUp)
         {
@@ -64,6 +70,36 @@ namespace RaidIntoDarkness.Integrations.Inventory
             }
 
             return target;
+        }
+
+        public bool BeginPickUp(WorldItem worldItem)
+        {
+            if (worldItem == null || _pickupPending)
+            {
+                return false;
+            }
+
+            FirstPersonPickupAnimator pickup = GetPickupAnimator();
+            if (pickup == null)
+            {
+                return TryPickUp(worldItem);
+            }
+
+            if (pickup.IsPlaying)
+            {
+                return false;
+            }
+
+            _pickupTarget = worldItem;
+            _pickupPending = true;
+            if (pickup.TryPlay(OnPickupTake, OnPickupFinished))
+            {
+                return true;
+            }
+
+            _pickupTarget = null;
+            _pickupPending = false;
+            return TryPickUp(worldItem);
         }
 
         public bool TryPickUp(WorldItem worldItem)
@@ -130,6 +166,18 @@ namespace RaidIntoDarkness.Integrations.Inventory
         {
             SetHintTarget(null);
 
+            if (_pickupPending)
+            {
+                FirstPersonPickupAnimator pickup = GetPickupAnimator();
+                if (pickup != null)
+                {
+                    pickup.Cancel();
+                }
+
+                _pickupTarget = null;
+                _pickupPending = false;
+            }
+
             if (_subscribedWindow != null)
             {
                 _subscribedWindow.ItemDropped -= OnItemDropped;
@@ -150,12 +198,12 @@ namespace RaidIntoDarkness.Integrations.Inventory
                 return;
             }
 
-            WorldItem target = FindTarget();
+            WorldItem target = FindAvailableTarget();
 
             if (target != null && _pickUp != null && _pickUp.action != null && _pickUp.action.WasPressedThisFrame())
             {
-                TryPickUp(target);
-                target = FindTarget();
+                BeginPickUp(target);
+                target = FindAvailableTarget();
             }
 
             SetHintTarget(target);
@@ -185,6 +233,28 @@ namespace RaidIntoDarkness.Integrations.Inventory
             string key = _pickUp != null && _pickUp.action != null ? _pickUp.action.GetBindingDisplayString() : string.Empty;
             window.ShowHint(window.FormatLabel("hint_pick_up", "[{0}] Pick up", key));
         }
+
+        private WorldItem FindAvailableTarget()
+        {
+            WorldItem target = FindTarget();
+            return _pickupPending && ReferenceEquals(target, _pickupTarget) ? null : target;
+        }
+
+        private void OnPickupTake()
+        {
+            if (_pickupTarget != null)
+            {
+                TryPickUp(_pickupTarget);
+            }
+        }
+
+        private void OnPickupFinished(bool taken)
+        {
+            _pickupTarget = null;
+            _pickupPending = false;
+        }
+
+        private FirstPersonPickupAnimator GetPickupAnimator() => _controller != null && _controller.Player != null ? _controller.Player.Pickup : null;
 
         private void OnItemDropped(ItemInstance item)
         {

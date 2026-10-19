@@ -1,0 +1,110 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da0f90c2955673d46b25d465cbe44ed0, type: 3}
+  m_Name: monolith_trenchcoat_outfit
+  m_EditorClassIdentifier: Inventory::Inventory.ItemDefinition
+  _definitionId: afe6a49235192f84c83abaf34a94981f
+  _displayName: "\u041F\u043B\u0430\u0449 \xAB\u041C\u043E\u043D\u043E\u043B\u0438\u0442\u0430\xBB"
+  _shortName: "\u041F\u043B\u0430\u0449 \xAB\u041C\u043E\u043D\u043E\u043B\u0438\u0442\u0430\xBB"
+  _description: "\u0414\u043B\u0438\u043D\u043D\u044B\u0439 \u043F\u043B\u043E\u0442\u043D\u044B\u0439
+    \u043F\u043B\u0430\u0449. \u041F\u043E\u043A\u0430\u0437\u0430\u0442\u0435\u043B\u0438
+    \u0435\u0433\u043E \u0437\u0430\u0449\u0438\u0442\u044B \u043C\u043E\u0433\u0443\u0442
+    \u0441\u0438\u043B\u044C\u043D\u043E \u0432\u0430\u0440\u044C\u0438\u0440\u043E\u0432\u0430\u0442\u044C\u0441\u044F
+    \u0432 \u0437\u0430\u0432\u0438\u0441\u0438\u043C\u043E\u0441\u0442\u0438 \u043E\u0442
+    \u043F\u043E\u0440\u0442\u043D\u043E\u0433\u043E, \u043A\u043E\u0442\u043E\u0440\u044B\u0439
+    \u0437\u0430\u043D\u0438\u043C\u0430\u043B\u0441\u044F \u0438\u0437\u0433\u043E\u0442\u043E\u0432\u043B\u0435\u043D\u0438\u0435\u043C.
+    \u0418 \u0445\u043E\u0442\u044F \u0432\u0441\u0451 \u0441\u0432\u043E\u0434\u0438\u0442\u0441\u044F
+    \u043A \u0442\u043E\u043C\u0443, \u0447\u0442\u043E \u043F\u043E\u0434\u043E\u0431\u043D\u044B\u0439
+    \u043F\u043B\u0430\u0449 \u043B\u0438\u0448\u044C \u0447\u0443\u0442\u044C-\u0447\u0443\u0442\u044C
+    \u043B\u0443\u0447\u0448\u0435 \u0442\u043E\u0439 \u0436\u0435 \u043A\u043E\u0436\u0430\u043D\u043E\u0439
+    \u043A\u0443\u0440\u0442\u043A\u0438, \u043E\u043D \u0432\u0441\u0451 \u0440\u0430\u0432\u043D\u043E
+    \u043F\u043E\u043F\u0443\u043B\u044F\u0440\u0435\u043D \u0441\u0440\u0435\u0434\u0438
+    \u0441\u0442\u0430\u043B\u043A\u0435\u0440\u043E\u0432-\u043D\u043E\u0432\u0438\u0447\u043A\u043E\u0432,
+    \u043A\u043E\u0442\u043E\u0440\u044B\u043C \u0432\u0441\u0451 \u0435\u0449\u0451
+    \u0432\u0430\u0436\u0435\u043D \u0432\u043D\u0435\u0448\u043D\u0438\u0439 \u0432\u0438\u0434."
+  _category: Armor
+  _tags: []
+  _size: {x: 3, y: 3}
+  _weight: 6.55
+  _maxStack: 1
+  _allowRotation: 1
+  _backgroundColor: {r: 1, g: 1, b: 1, a: 0.04}
+  _fallbackIcon: {fileID: 0}
+  _iconOverride: {fileID: -1556502903, guid: 5709f73643465ba40bd623e3613dfa99, type: 3}
+  _visualPrefab: {fileID: 6495776548284079221, guid: 99b6aaadc105f874cb9030595af3f396, type: 3}
+  _defaultIconVariant: []
+  _icon:
+    _generateIcon: 1
+    _pixelsPerCell: 64
+    _antiAliasing: 1
+    _useOutline: 1
+    _outlineWidth: 2
+    _useShadow: 1
+    _shadowOffset: {x: 2, y: -2}
+    _shadowBlur: 2
+    _defaultView:
+      _modelEulerAngles: {x: 0, y: 0, z: 0}
+      _modelScale: {x: 1, y: 1, z: 1}
+      _cameraEulerAngles: {x: 89, y: 180, z: 0}
+      _padding: 1.15
+      _useDirectionalLight: 1
+      _lightIntensity: 20
+    _useCustomSlotView: 0
+    _slotView:
+      _modelEulerAngles: {x: 0, y: 0, z: 0}
+      _modelScale: {x: 1, y: 1, z: 1}
+      _cameraEulerAngles: {x: 25, y: -135, z: 0}
+      _padding: 1.15
+      _useDirectionalLight: 1
+      _lightIntensity: 10
+  _components:
+  - rid: 3479885471900762350
+  - rid: 3479885471900762351
+  - rid: 3479885472039698551
+  references:
+    version: 2
+    RefIds:
+    - rid: 3479885471900762350
+      type: {class: EquippableItemComponent, ns: Inventory, asm: Inventory}
+      data:
+        _preferredSlotIds:
+        - Outfit
+    - rid: 3479885471900762351
+      type: {class: EquipmentStatsComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      data:
+        _section: monolith_trenchcoat_outfit
+        _cost: 14190
+        _repairType: outfit_light
+        _community: monolith
+        _burnProtection: 0.155
+        _shockProtection: 0.82
+        _chemicalBurnProtection: 0.068
+        _radiationProtection: 0.0048
+        _telepaticProtection: 0.041
+        _woundProtection: 0.38
+        _strikeProtection: 0.28
+        _explosionProtection: 0.22
+        _fireWoundProtection: 0.28
+        _helmetFireWoundProtection: 0
+        _artefactCount: 2
+        _additionalWeight: 8
+        _powerLoss: 0.05
+        _helmetAvailable: 1
+        _sprintAllowed: 1
+        _nightVisionSection: 
+        _speed: 1.04
+        _physicalDurability: 0.151142
+        _anomalyDurability: 0.6871167
+    - rid: 3479885472039698551
+      type: {class: WorldItemComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      data:
+        _prefab: {fileID: 5174761754858728101, guid: 0fde78bc9ffb08b43adfc5a7a8096ac7, type: 3}

@@ -1,0 +1,45 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8e4845fe0077c0348a6e51c34d8afe86, type: 3}
+  m_Name: EquipmentStatIcons
+  m_EditorClassIdentifier: Inventory.UI::Inventory.UI.InventoryIconSet
+  _entries:
+  - _id: ui_am_prop_Vibros
+    _sprite: {fileID: -1060341649, guid: d9322833281e24546a9ab5697a1379d1, type: 3}
+  - _id: ui_am_prop_artefact
+    _sprite: {fileID: 532783582, guid: d9322833281e24546a9ab5697a1379d1, type: 3}
+  - _id: ui_am_prop_carry_weight_negative
+    _sprite: {fileID: 1409003744, guid: d9322833281e24546a9ab5697a1379d1, type: 3}
+  - _id: ui_am_prop_chem
+    _sprite: {fileID: 1846988888, guid: d9322833281e24546a9ab5697a1379d1, type: 3}
+  - _id: ui_am_prop_damage
+    _sprite: {fileID: -937338628, guid: d9322833281e24546a9ab5697a1379d1, type: 3}
+  - _id: ui_am_prop_electro
+    _sprite: {fileID: -824717862, guid: d9322833281e24546a9ab5697a1379d1, type: 3}
+  - _id: ui_am_prop_explo
+    _sprite: {fileID: -960436041, guid: 9b2087e2ea0428c48abcd6310dfcdf80, type: 3}
+  - _id: ui_am_prop_sprint
+    _sprite: {fileID: 1975992859, guid: d9322833281e24546a9ab5697a1379d1, type: 3}
+  - _id: ui_am_prop_strike
+    _sprite: {fileID: 1410035549, guid: 9b2087e2ea0428c48abcd6310dfcdf80, type: 3}
+  - _id: ui_am_prop_thermo
+    _sprite: {fileID: -1240450954, guid: d9322833281e24546a9ab5697a1379d1, type: 3}
+  - _id: ui_am_prop_wound
+    _sprite: {fileID: 743723136, guid: 9b2087e2ea0428c48abcd6310dfcdf80, type: 3}
+  - _id: ui_am_propery_01
+    _sprite: {fileID: 2020989432, guid: 9b2087e2ea0428c48abcd6310dfcdf80, type: 3}
+  - _id: ui_am_propery_08
+    _sprite: {fileID: -1399127683, guid: 9b2087e2ea0428c48abcd6310dfcdf80, type: 3}
+  - _id: ui_am_propery_09
+    _sprite: {fileID: 1109638298, guid: 9b2087e2ea0428c48abcd6310dfcdf80, type: 3}
+  - _id: ui_am_propery_11
+    _sprite: {fileID: -1656648241, guid: 9b2087e2ea0428c48abcd6310dfcdf80, type: 3}

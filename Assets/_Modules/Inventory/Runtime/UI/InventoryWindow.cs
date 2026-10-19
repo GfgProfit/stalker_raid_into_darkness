@@ -63,6 +63,7 @@ namespace Inventory.UI
 
         private readonly List<RaycastResult> _raycastResults = new();
         private readonly List<IInventoryItemAction> _visibleActions = new();
+        private readonly List<InventoryItemStat> _tooltipStats = new();
         private readonly List<InventoryContextMenu.Entry> _menuEntries = new();
         private readonly List<RectInt> _compatibleAreas = new();
         private InventoryDragState _drag;
@@ -71,6 +72,7 @@ namespace Inventory.UI
         private Vector2 _hoverPosition;
         private Camera _hoverCamera;
         private float _statusUntil;
+        private string _hint = string.Empty;
         private bool _initialized;
 
         public InventoryModel Model { get; private set; }
@@ -90,11 +92,14 @@ namespace Inventory.UI
         public string SecondaryContainerId => _secondaryContainerId;
         public string EquipmentContainerId => _equipmentContainerId;
         public string LastStatus { get; private set; } = string.Empty;
+        public string Hint => _hint;
         public InventoryTheme Theme => _theme;
         public bool SecondaryVisible => _secondaryRoot == null || _secondaryRoot.gameObject.activeSelf;
         public bool IsSecondaryOpen => _secondaryRoot != null && _secondaryRoot.gameObject.activeSelf && Model != null && Model.GetContainer(_secondaryContainerId) != null;
         public Func<ItemInstance, bool> ItemFilter { get; private set; }
         public Func<ItemInstance, InventoryItemDecoration> ItemDecorator { get; set; }
+        public Action<ItemInstance, List<InventoryItemStat>> ItemStatsProvider { get; set; }
+        public Func<ItemInstance, string> ItemDescriptionProvider { get; set; }
         public ItemInstance HoveredItem => _hovered != null ? _hovered.Item : null;
 
         public event Action<InventoryWindow> Opened;
@@ -607,7 +612,7 @@ namespace Inventory.UI
             ApplyThemeTo(_contextMenu);
         }
 
-        public bool CanUseItem(ItemInstance item) => item != null;
+        public bool CanUseItem(ItemInstance item) => item != null && item.Definition.GetComponent<ConsumableItemComponent>() != null;
 
         public void UseItem(ItemInstance item)
         {
@@ -775,6 +780,51 @@ namespace Inventory.UI
             _statusUntil = Time.unscaledTime + STATUS_DURATION;
         }
 
+        public void ShowHint(string hint)
+        {
+            string value = hint ?? string.Empty;
+
+            if (_hint == value)
+            {
+                return;
+            }
+
+            _hint = value;
+
+            if (_statusText != null && _statusUntil <= 0f)
+            {
+                _statusText.text = _hint;
+            }
+        }
+
+        public void ClearHint() => ShowHint(string.Empty);
+
+        public IReadOnlyList<InventoryItemStat> CollectStats(ItemInstance item)
+        {
+            _tooltipStats.Clear();
+
+            if (item != null && ItemStatsProvider != null)
+            {
+                ItemStatsProvider(item, _tooltipStats);
+            }
+
+            return _tooltipStats;
+        }
+
+        public string CollectDescription(ItemInstance item) => item != null && ItemDescriptionProvider != null ? ItemDescriptionProvider(item) : null;
+
+        public void RefreshTooltip()
+        {
+            if (_tooltip == null || _tooltip.IsVisible == false || _hovered == null || _hovered.Item == null)
+            {
+                return;
+            }
+
+            Vector2 pointer = UnityEngine.InputSystem.Pointer.current != null ? UnityEngine.InputSystem.Pointer.current.position.ReadValue() : _hoverPosition;
+            _tooltip.Show(_hovered.Item, pointer, _hoverCamera, CollectStats(_hovered.Item), CollectDescription(_hovered.Item));
+            ApplyThemeTo(_tooltip);
+        }
+
         private string DescribeFailure(InventoryFailure failure) => Label("failure_" + failure, InventoryUIFactory.Describe(failure));
 
         private void ApplyThemeTo(Component widget)
@@ -842,7 +892,7 @@ namespace Inventory.UI
             if (_statusText != null && _statusUntil > 0f && Time.unscaledTime > _statusUntil)
             {
                 _statusUntil = 0f;
-                _statusText.text = string.Empty;
+                _statusText.text = _hint;
             }
 
             if (IsOpen == false)
@@ -868,7 +918,7 @@ namespace Inventory.UI
 
                     if (_tooltip.IsVisible == false)
                     {
-                        _tooltip.Show(_hovered.Item, pointer, _hoverCamera);
+                        _tooltip.Show(_hovered.Item, pointer, _hoverCamera, CollectStats(_hovered.Item), CollectDescription(_hovered.Item));
                         ApplyThemeTo(_tooltip);
                     }
                     else

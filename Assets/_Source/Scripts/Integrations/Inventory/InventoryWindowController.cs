@@ -39,11 +39,18 @@ namespace RaidIntoDarkness.Integrations.Inventory
         [SerializeField] private Sprite _favoriteBadge;
         [SerializeField] private Sprite _junkBadge;
         [SerializeField] private bool _prewarmIcons = true;
+        [SerializeField] private InputActionReference _fullStatsModifier;
 
         private InventorySortingPlus _sorting;
+        private EquipmentStatsFormatter _statsFormatter;
+        private EquipmentStatusPresenter _statusPresenter;
+        private FirstPersonOutfitBinder _outfitBinder;
+        private ItemInstance _statsHovered;
         private int _restoreFrame = -1;
         private bool _gameplayBlocked;
         private bool _bound;
+        private bool _fullCondition;
+        private bool _statsDirty = true;
 
         public InventoryWindow Window => _window;
         public PlayerInventoryRuntime Inventory => _inventory;
@@ -80,6 +87,11 @@ namespace RaidIntoDarkness.Integrations.Inventory
             _toggleJunk = toggleJunk;
             _favoriteBadge = favoriteBadge;
             _junkBadge = junkBadge;
+        }
+
+        public void ConfigureStats(InputActionReference fullStatsModifier)
+        {
+            _fullStatsModifier = fullStatsModifier;
         }
 
         public void Open() => Open(false);
@@ -140,6 +152,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
             Enable(_toggleStash);
             Enable(_toggleFavorite);
             Enable(_toggleJunk);
+            Enable(_fullStatsModifier);
         }
 
         private void Start()
@@ -190,6 +203,11 @@ namespace RaidIntoDarkness.Integrations.Inventory
                 ToggleMark(_window.HoveredItem, true);
             }
 
+            if (IsOpen)
+            {
+                UpdateStats();
+            }
+
             if (IsOpen && _gameplayBlocked && Cursor.lockState != CursorLockMode.None)
             {
                 ReleaseCursor();
@@ -213,8 +231,10 @@ namespace RaidIntoDarkness.Integrations.Inventory
             if (_header != null)
             {
                 _header.SetCharacter(_characterName, _community, _portrait, _rank);
-                _header.SetMoney(_money);
+                _header.SetMoney(_money, Utils.FormatNumber(_money, EquipmentStatsFormatter.NUMBER_SEPARATOR));
             }
+
+            _statsDirty = true;
 
             if (_status == null)
             {
@@ -261,6 +281,17 @@ namespace RaidIntoDarkness.Integrations.Inventory
                 _sorting.Changed -= OnSortingChanged;
                 _sorting = null;
             }
+
+            if (_bound && _inventory != null)
+            {
+                _inventory.Model.Changed -= OnModelChanged;
+            }
+
+            if (_outfitBinder != null)
+            {
+                _outfitBinder.Dispose();
+                _outfitBinder = null;
+            }
         }
 
         private void EnsureBound()
@@ -274,6 +305,17 @@ namespace RaidIntoDarkness.Integrations.Inventory
             _window.Bind(_inventory.Model, new ItemIconCacheProvider());
             _inventory.SeedOnce();
             BindSorting();
+            _statsFormatter = new EquipmentStatsFormatter(_window);
+            _window.ItemStatsProvider = _statsFormatter.Collect;
+            _window.ItemDescriptionProvider = _statsFormatter.Describe;
+            _statusPresenter = _status != null ? new EquipmentStatusPresenter(_window, _status) : null;
+            _inventory.Model.Changed += OnModelChanged;
+
+            if (_player != null && _player.Rig != null)
+            {
+                _outfitBinder = new FirstPersonOutfitBinder(_window, _player.Rig);
+                _outfitBinder.Refresh();
+            }
         }
 
         private void BindSorting()
@@ -281,6 +323,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
             _sorting = new InventorySortingPlus(_inventory.Model, new[] { _window.PrimaryContainerId, _window.SecondaryContainerId }, _favoriteBadge, _junkBadge);
             _sorting.Changed += OnSortingChanged;
             _window.ItemDecorator = _sorting.Decorate;
+            _window.Actions.Unregister(InventoryBuiltInActions.INSPECT);
             _window.Actions.Register(new InventoryDelegateAction(FAVORITE_ACTION, 45, GetFavoriteLabel, context => _sorting.ToggleFavorite(context.Item.Definition), context => _sorting.IsSorted(context.Item.ContainerId)));
             _window.Actions.Register(new InventoryDelegateAction(JUNK_ACTION, 46, GetJunkLabel, context => _sorting.ToggleJunk(context.Item.Definition), context => _sorting.IsSorted(context.Item.ContainerId)));
         }
@@ -310,6 +353,42 @@ namespace RaidIntoDarkness.Integrations.Inventory
             {
                 _sorting.ToggleFavorite(item.Definition);
             }
+        }
+
+        private void UpdateStats()
+        {
+            bool fullCondition = IsHeld(_fullStatsModifier);
+            ItemInstance hovered = _window.HoveredItem;
+
+            if (fullCondition == _fullCondition && hovered == _statsHovered && _statsDirty == false)
+            {
+                return;
+            }
+
+            bool refreshTooltip = fullCondition != _fullCondition || _statsDirty;
+            _fullCondition = fullCondition;
+            _statsHovered = hovered;
+            _statsDirty = false;
+
+            if (_statsFormatter != null)
+            {
+                _statsFormatter.FullCondition = fullCondition;
+            }
+
+            if (_statusPresenter != null)
+            {
+                _statusPresenter.Refresh(hovered, fullCondition);
+            }
+
+            if (refreshTooltip)
+            {
+                _window.RefreshTooltip();
+            }
+        }
+
+        private void OnModelChanged(InventoryChange change)
+        {
+            _statsDirty = true;
         }
 
         private void OnSortingChanged()
@@ -390,5 +469,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
         }
 
         private static bool WasPressed(InputActionReference reference) => reference != null && reference.action != null && reference.action.WasPressedThisFrame();
+
+        private static bool IsHeld(InputActionReference reference) => reference != null && reference.action != null && reference.action.IsPressed();
     }
 }

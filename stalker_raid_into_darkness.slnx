@@ -2,6 +2,7 @@
   <Project Path="UniTask.csproj" />
   <Project Path="UniTask.Linq.csproj" />
   <Project Path="XRay.Importer.Editor.csproj" />
+  <Project Path="RaidIntoDarkness.Integrations.Inventory.Editor.csproj" />
   <Project Path="Inventory.csproj" />
   <Project Path="XRay.Importer.Sources.csproj" />
   <Project Path="Inventory.UI.csproj" />
@@ -13,15 +14,15 @@
   <Project Path="Inventory.Editor.csproj" />
   <Project Path="XRay.Importer.Tests.Editor.csproj" />
   <Project Path="RaidIntoDarkness.Player.Editor.csproj" />
+  <Project Path="RaidIntoDarkness.Integrations.Inventory.csproj" />
   <Project Path="UniTask.TextMeshPro.csproj" />
   <Project Path="Inventory.IconGeneration.csproj" />
-  <Project Path="RaidIntoDarkness.Integrations.Inventory.csproj" />
   <Project Path="RaidIntoDarkness.Inventory.Tests.PlayMode.csproj" />
   <Project Path="XRay.Importer.Runtime.csproj" />
   <Project Path="RaidIntoDarkness.FirstPerson.Editor.csproj" />
   <Project Path="RaidIntoDarkness.Player.Tests.PlayMode.csproj" />
   <Project Path="RaidIntoDarkness.Player.Tests.Editor.csproj" />
+  <Project Path="RaidIntoDarkness.Utils.csproj" />
   <Project Path="UniTask.Editor.csproj" />
-  <Project Path="RaidIntoDarkness.Integrations.Inventory.Editor.csproj" />
   <Project Path="UniTask.DOTween.csproj" />
 </Solution>

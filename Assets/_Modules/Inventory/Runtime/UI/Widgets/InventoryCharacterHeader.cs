@@ -43,13 +43,15 @@ namespace Inventory.UI
             SetSprite(_rankIcon, rank);
         }
 
-        public void SetMoney(long money)
+        public void SetMoney(long money) => SetMoney(money, money.ToString(CultureInfo.InvariantCulture));
+
+        public void SetMoney(long money, string text)
         {
             Money = money;
 
             if (_moneyText != null)
             {
-                _moneyText.text = money.ToString(CultureInfo.InvariantCulture);
+                _moneyText.text = text;
             }
         }
 

@@ -1,0 +1,3912 @@
+fileFormatVersion: 2
+guid: 5bb3bcf1e5ed7dd438cdba2f9a1d7797
+TextureImporter:
+  internalIDToNameTable: []
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 4096
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 2
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: army_nosorog_outfit
+      rect:
+        serializedVersion: 2
+        x: 3300
+        y: 3796
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5e94e70baacf379439d3e390b0fd06de
+      internalID: 1758516839
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: army_outfit
+      rect:
+        serializedVersion: 2
+        x: 150
+        y: 646
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 508aa17da4251d74d8398ba06c189945
+      internalID: -501273636
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: bandit_exo_outfit
+      rect:
+        serializedVersion: 2
+        x: 3050
+        y: 3496
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 74a90df46cdd40e429b633a8b8f1dbe9
+      internalID: 247695652
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: bandit_exolight_outfit
+      rect:
+        serializedVersion: 2
+        x: 2300
+        y: 1096
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f5cb6b9b727a8ae409c0aea0f55b3169
+      internalID: 1579039675
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: bandit_nbc_outfit
+      rect:
+        serializedVersion: 2
+        x: 2050
+        y: 3496
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: dd342c266e6f3b846b5628a20f5479ae
+      internalID: -1711899695
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: bandit_ps5_outfit
+      rect:
+        serializedVersion: 2
+        x: 1300
+        y: 2596
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 985fd8ed56153654d9e79c37314b29cc
+      internalID: -1941813894
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: bandit_scientific_dark_outfit
+      rect:
+        serializedVersion: 2
+        x: 1800
+        y: 2296
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 183a1391763add949b461d3661dbde02
+      internalID: 914995849
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: bandit_scientific_outfit
+      rect:
+        serializedVersion: 2
+        x: 1800
+        y: 496
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: eb6e8123948501d4ea7dbdb261d30ffc
+      internalID: 1408377919
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: bandit_sun_outfit
+      rect:
+        serializedVersion: 2
+        x: 1050
+        y: 2596
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5aaa8e4ea75f6804186b318febd3befd
+      internalID: 318754808
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: banditmerc_outfit
+      rect:
+        serializedVersion: 2
+        x: 650
+        y: 346
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c9c685702b8841144a4937a9ec54a437
+      internalID: 978698292
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: cs_exo_outfit
+      rect:
+        serializedVersion: 2
+        x: 3050
+        y: 3196
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6f0677b53c594c648b963a23df5196a9
+      internalID: 1730074704
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: cs_exolight_outfit
+      rect:
+        serializedVersion: 2
+        x: 2300
+        y: 796
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 446fb19f7248f534ea045ab12e36c453
+      internalID: 676209191
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: cs_heavy_outfit
+      rect:
+        serializedVersion: 2
+        x: 1550
+        y: 196
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 069be6b0d749e7645a6d60875fdfefd6
+      internalID: 1687358169
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: cs_light_outfit
+      rect:
+        serializedVersion: 2
+        x: 150
+        y: 946
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4aa04c44068c6264c94d0fcd652b5082
+      internalID: -1882447730
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: cs_medium_outfit
+      rect:
+        serializedVersion: 2
+        x: 1550
+        y: 496
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6b4e68ced53826d439667bec5f898ec9
+      internalID: -1387672591
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: cs_nbc_outfit
+      rect:
+        serializedVersion: 2
+        x: 2050
+        y: 2596
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4aa436eca827c0c43b1c4aa4726ebb1a
+      internalID: -1728928554
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: cs_scientific_outfit
+      rect:
+        serializedVersion: 2
+        x: 2050
+        y: 1696
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e59718974aed0dc46a2f091233736fcd
+      internalID: -690757473
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: cs_scientific_outfit_good
+      rect:
+        serializedVersion: 2
+        x: 2050
+        y: 1396
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 50af3d0cd5c716043bb486e374e7fe83
+      internalID: -1043167724
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: cs_stalker_outfit
+      rect:
+        serializedVersion: 2
+        x: 1050
+        y: 1996
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8d1cd723b92132c4f865c2bd8a540263
+      internalID: -603209280
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: cs_stalker_proto_exo_outfit
+      rect:
+        serializedVersion: 2
+        x: 2800
+        y: 3496
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e4af2be971660a447af99a2ea9e6e54f
+      internalID: 1078526808
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dolg_exo_outfit
+      rect:
+        serializedVersion: 2
+        x: 3050
+        y: 2896
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f18f3c500b58586458fd94ed53df8161
+      internalID: -762894993
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dolg_exolight_outfit
+      rect:
+        serializedVersion: 2
+        x: 2300
+        y: 496
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9e44315276acc41419fb12fcb06e3dd0
+      internalID: 704946900
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dolg_heavy_outfit
+      rect:
+        serializedVersion: 2
+        x: 1550
+        y: 1396
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 868c7c5df92895840938cf0968754b95
+      internalID: 661311417
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dolg_heavy_proto_exo_outfit
+      rect:
+        serializedVersion: 2
+        x: 2800
+        y: 1696
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e0ea45632c3401347bbdef6fd9bb22e2
+      internalID: -1800053974
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dolg_heavy_redline_outfit
+      rect:
+        serializedVersion: 2
+        x: 1550
+        y: 796
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 85d6677bb023b1a4eb8df386dd3a012e
+      internalID: 220837256
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dolg_nosorog_outfit
+      rect:
+        serializedVersion: 2
+        x: 3300
+        y: 3496
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: caaf338966c534e479e31cc6ff22ca6c
+      internalID: 927385790
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dolg_outfit
+      rect:
+        serializedVersion: 2
+        x: 1050
+        y: 496
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 73bd9a3deeca3f541b70e6e155c0a0e9
+      internalID: -747233211
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dolg_pantsir_outfit
+      rect:
+        serializedVersion: 2
+        x: 1550
+        y: 1096
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c62016de0c9e8594a8d732d3e6209b0a
+      internalID: -400530144
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dolg_proto_exo_outfit
+      rect:
+        serializedVersion: 2
+        x: 2800
+        y: 3196
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4877d9339c2033749953cce1b54505da
+      internalID: -1158936037
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dolg_red_outfit
+      rect:
+        serializedVersion: 2
+        x: 1050
+        y: 196
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b7d202a1d60b277459c18484abf3a386
+      internalID: -1468448247
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dolg_scientific_outfit
+      rect:
+        serializedVersion: 2
+        x: 1800
+        y: 1996
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c381179bd3245d846ae16c48268e41cc
+      internalID: -1906311811
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dolg_scientific_red_outfit
+      rect:
+        serializedVersion: 2
+        x: 2050
+        y: 1096
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 259f73db01bf51f488a0ba7c8e84e7db
+      internalID: -2015599654
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dolg_scientific_wood_outfit
+      rect:
+        serializedVersion: 2
+        x: 2050
+        y: 796
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6faca6b745a5f8a4fbcfe738073a75e2
+      internalID: 605968905
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dolg_scout_outfit
+      rect:
+        serializedVersion: 2
+        x: 1300
+        y: 3796
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 72f5a943dbc825848a5f2bc543f4099a
+      internalID: 1330883418
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dolg_specops_red_outfit
+      rect:
+        serializedVersion: 2
+        x: 1300
+        y: 3496
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9ddeecbb6e683e54b882021b2dc00a03
+      internalID: 1957956174
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dolg_voin_outfit
+      rect:
+        serializedVersion: 2
+        x: 1300
+        y: 2296
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: eb30574dcccc2734a884c49009dd9852
+      internalID: 1600573784
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ecolog_exo_outfit
+      rect:
+        serializedVersion: 2
+        x: 3050
+        y: 2596
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6851626de1c1b5849b3fee1d3466d731
+      internalID: 961314518
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ecolog_guard_outfit
+      rect:
+        serializedVersion: 2
+        x: 1300
+        y: 1996
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 62fbf9e7dbcaa0447866330fb5a2dd5f
+      internalID: 213209899
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ecolog_outfit_blue
+      rect:
+        serializedVersion: 2
+        x: 2300
+        y: 3496
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 204455682de849a4c961d3a7897b7004
+      internalID: 1955280828
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ecolog_outfit_green
+      rect:
+        serializedVersion: 2
+        x: 2300
+        y: 3196
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7b9355504d37e244ba8255f44d507db6
+      internalID: 1949631884
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ecolog_outfit_orange
+      rect:
+        serializedVersion: 2
+        x: 2300
+        y: 3796
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a691b19299fcc12438eb1e0af7b6d39f
+      internalID: 706013171
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ecolog_outfit_red
+      rect:
+        serializedVersion: 2
+        x: 2300
+        y: 2296
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 197668754404e9143ac96d286227e656
+      internalID: 86656648
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ecolog_outfit_white
+      rect:
+        serializedVersion: 2
+        x: 2300
+        y: 2896
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0e4b1cad62be6b447bcd641bb41902e8
+      internalID: -722074322
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ecolog_outfit_yello
+      rect:
+        serializedVersion: 2
+        x: 2300
+        y: 2596
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 10bd858313196d5489b43ff5713b3739
+      internalID: 1277476115
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ecolog_proto_exo_outfit
+      rect:
+        serializedVersion: 2
+        x: 2800
+        y: 2896
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fc2d76c6f8455c14ca2bd6b3e3b59abf
+      internalID: -1484853810
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: exo_dolg_outfit
+      rect:
+        serializedVersion: 2
+        x: 2300
+        y: 196
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 76bca3555f152fc4b8d01dd69b409d0e
+      internalID: -1407800480
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: exo_dolg_red_outfit
+      rect:
+        serializedVersion: 2
+        x: 2300
+        y: 496
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f57d7fb307462a5418a8fe7738c1f6ec
+      internalID: 1219481997
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: exo_dolg_urban_outfit
+      rect:
+        serializedVersion: 2
+        x: 2550
+        y: 3796
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 70c6d2ce3f41c9d47bed0572632d82f5
+      internalID: 633795589
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: exo_dolg_wood_outfit
+      rect:
+        serializedVersion: 2
+        x: 2550
+        y: 3496
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4b23d66da6d8d304eb422e3e019b2e73
+      internalID: -1582233928
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: exo_merc_grass_outfit
+      rect:
+        serializedVersion: 2
+        x: 2550
+        y: 3196
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 62012b2cf10bbd541b88614eefc58d9f
+      internalID: -1378391710
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: exo_merc_urban_outfit
+      rect:
+        serializedVersion: 2
+        x: 2550
+        y: 2896
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 516964536369f8d4997e62f54562e0b3
+      internalID: 784598702
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: exo_merc_wood_outfit
+      rect:
+        serializedVersion: 2
+        x: 2550
+        y: 2596
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 78385cb64bd32034f94b44391ffc36c0
+      internalID: -292964355
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: exo_outfit
+      rect:
+        serializedVersion: 2
+        x: 3050
+        y: 3796
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6fe76b32750dfbf4f93c3a6d5aaf7481
+      internalID: 200399399
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: exo_wood_outfit
+      rect:
+        serializedVersion: 2
+        x: 2550
+        y: 496
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 093d6e79282f3cf409864028e0f4ff92
+      internalID: 381852156
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: exolight_outfit
+      rect:
+        serializedVersion: 2
+        x: 2300
+        y: 1396
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 61c661f9b7d3aba4cbbab544ffa0481b
+      internalID: -404660730
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: freedom_exo_vineleaf_outfit
+      rect:
+        serializedVersion: 2
+        x: 2550
+        y: 2296
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2dc942c4ce05184489edb8c97b827243
+      internalID: -934619735
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: freedom_nosorog_outfit
+      rect:
+        serializedVersion: 2
+        x: 3300
+        y: 3196
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9a6ad371ba9452c40a6c94317988321a
+      internalID: 1169434329
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ghillie_outfit
+      rect:
+        serializedVersion: 2
+        x: 150
+        y: 346
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: bede5b042fdacce49976b6fdeab97dd9
+      internalID: 2003791054
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: greh_armored_camo_outfit
+      rect:
+        serializedVersion: 2
+        x: 650
+        y: 46
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a5a1f9a27f41d9f41886fa14d48be20e
+      internalID: -488427795
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: greh_armored_outfit
+      rect:
+        serializedVersion: 2
+        x: 400
+        y: 46
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3a6b806fd6043c84d9e3d0710e83bc19
+      internalID: -1607924653
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: greh_exo_outfit
+      rect:
+        serializedVersion: 2
+        x: 3050
+        y: 2296
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9138a48bea8e2ca489e63112790b3b72
+      internalID: -771018724
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: greh_ps5_outfit
+      rect:
+        serializedVersion: 2
+        x: 1300
+        y: 3196
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 626f78c080d186c4ea6a37ca7378994a
+      internalID: 560169015
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hybrid_outfit
+      rect:
+        serializedVersion: 2
+        x: 2300
+        y: 1696
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6bb0153d3e0a95542969821162df84f4
+      internalID: -1375238519
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: isg_camo_outfit
+      rect:
+        serializedVersion: 2
+        x: 1050
+        y: 1396
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a2e833264d9ecb04987de32bea34e637
+      internalID: 1005617317
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: isg_exo_outfit
+      rect:
+        serializedVersion: 2
+        x: 3050
+        y: 1996
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2fe4adbbd5e8027449df8dfbfe8f9fab
+      internalID: -122145700
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: isg_exolight_outfit
+      rect:
+        serializedVersion: 2
+        x: 2550
+        y: 1996
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: dfe27264453d87f45acf720237484e7e
+      internalID: -550198673
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: isg_lcs_camo_outfit
+      rect:
+        serializedVersion: 2
+        x: 650
+        y: 1246
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 91f172266ca3e3049be8f814626ae899
+      internalID: -628807264
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: isg_lcs_outfit
+      rect:
+        serializedVersion: 2
+        x: 650
+        y: 1546
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: adf1074e9624c5649a598e0ee523ccf0
+      internalID: -2005078976
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: isg_lcs_urban_outfit
+      rect:
+        serializedVersion: 2
+        x: 650
+        y: 946
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 377c54eedbb527e48aac9f761d0b33aa
+      internalID: 1322220563
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: isg_nosorog_outfit
+      rect:
+        serializedVersion: 2
+        x: 3300
+        y: 2896
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e519632e00b097d449ef0730c660ad15
+      internalID: 1327175358
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: isg_outfit
+      rect:
+        serializedVersion: 2
+        x: 1050
+        y: 1696
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e7ea13599e1e7094a88bee707b09bfdc
+      internalID: -818656638
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: isg_proto_exo_outfit
+      rect:
+        serializedVersion: 2
+        x: 2800
+        y: 2596
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 93e33c1df0e9c1144accc153bf4adf85
+      internalID: 915406837
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: isg_scientific_outfit
+      rect:
+        serializedVersion: 2
+        x: 2050
+        y: 496
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1d78ebdec007fd04da0e23d460ac79f6
+      internalID: 1467180854
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: light_dolg_outfit
+      rect:
+        serializedVersion: 2
+        x: 1550
+        y: 3496
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 57bb4bbdf21590b44b5b11493e5bd2c0
+      internalID: -1170522583
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: light_freedom_outfit
+      rect:
+        serializedVersion: 2
+        x: 1550
+        y: 2896
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: aea5c7a11b5ad0f4c856c900353be08d
+      internalID: 1316489260
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: light_isg_outfit
+      rect:
+        serializedVersion: 2
+        x: 1550
+        y: 3196
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7fcbce9db8cfc8644a2d881076ad3d51
+      internalID: -1802042189
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: light_loner_outfit
+      rect:
+        serializedVersion: 2
+        x: 1550
+        y: 3796
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 556e01d994c18be49bb34f6c88f31a57
+      internalID: -1910637819
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: light_merc_outfit
+      rect:
+        serializedVersion: 2
+        x: 1550
+        y: 2296
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d3eb3194b786f284cb4781dc71ca279b
+      internalID: -1411734247
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: light_monolit_outfit
+      rect:
+        serializedVersion: 2
+        x: 1550
+        y: 1996
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1d1f9f36ac003444aad866d694f9cc1b
+      internalID: 1641253124
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: light_voen_outfit
+      rect:
+        serializedVersion: 2
+        x: 1550
+        y: 2596
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fe369a812042ca34487179ffa9bc1c7e
+      internalID: 924117775
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: merc_ace_outfit
+      rect:
+        serializedVersion: 2
+        x: 1800
+        y: 1696
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ceae1c65b9d2b894e8f88e3655100037
+      internalID: 1684304228
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: merc_combat_scientific_outfit
+      rect:
+        serializedVersion: 2
+        x: 1800
+        y: 1696
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e59c506c08eb61247bcf0e34fd9edc8c
+      internalID: -1195828806
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: merc_coyote_outfit
+      rect:
+        serializedVersion: 2
+        x: 400
+        y: 646
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3700106ac1c6a114cac50c39b77063a3
+      internalID: 695929212
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: merc_exo_outfit
+      rect:
+        serializedVersion: 2
+        x: 3050
+        y: 1696
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3b7353eed2a9fb0469ccdf646a09cdfb
+      internalID: 1476425522
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: merc_exolight_outfit
+      rect:
+        serializedVersion: 2
+        x: 2550
+        y: 1696
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: bb72bbdac5a761a48aa735e2eec3e325
+      internalID: 1161363661
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: merc_fighter_outfit
+      rect:
+        serializedVersion: 2
+        x: 400
+        y: 1246
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 52c438a357f4a0a41b4b1147310469e0
+      internalID: 513120674
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: merc_jackal_outfit
+      rect:
+        serializedVersion: 2
+        x: 400
+        y: 946
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 262023ba9bbe7d94793864c561f42016
+      internalID: 467570854
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: merc_nighthunter_outfit
+      rect:
+        serializedVersion: 2
+        x: 1050
+        y: 1096
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e5b38a967429e0245acea2e146d6df48
+      internalID: 274094060
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: merc_nosorog_outfit
+      rect:
+        serializedVersion: 2
+        x: 3300
+        y: 2596
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f1e03571ca142c840a9e3b50c831c515
+      internalID: -1770834309
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: merc_outfit
+      rect:
+        serializedVersion: 2
+        x: 400
+        y: 1546
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3ab7074716ed9904d83e2bd857a51ab0
+      internalID: -321226894
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: merc_scientific_armored_outfit
+      rect:
+        serializedVersion: 2
+        x: 1800
+        y: 796
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ecdfcb4b364fd4148ab5ca84add77865
+      internalID: -1387491649
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: merc_scientific_outfit
+      rect:
+        serializedVersion: 2
+        x: 1800
+        y: 1696
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3550aedae8e7a4c43beb44dcf2ca90e8
+      internalID: 741232881
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: merc_scout_outfit
+      rect:
+        serializedVersion: 2
+        x: 400
+        y: 346
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9b87aa98dc8e61941a5d58362ae4f5cb
+      internalID: -613945929
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: merc_sun_outfit
+      rect:
+        serializedVersion: 2
+        x: 1050
+        y: 796
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0b60aff56fa145e459feb2a5f39dab44
+      internalID: 529491104
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: merc_sunset_outfit
+      rect:
+        serializedVersion: 2
+        x: 150
+        y: 46
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 68605b1bfc15cd0468a8d51d994eca79
+      internalID: -568125290
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: merc_wolven_outfit
+      rect:
+        serializedVersion: 2
+        x: 1050
+        y: 796
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 352614ebbe6b5b145b350b5c5fff0c31
+      internalID: -1834224592
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: military_bandit_outfit
+      rect:
+        serializedVersion: 2
+        x: 1800
+        y: 3796
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c1e3bc9ab371766449ee5976cd6aeda1
+      internalID: 131780655
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: military_exo_outfit
+      rect:
+        serializedVersion: 2
+        x: 3050
+        y: 1396
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 60a4eea88a38aad4bbd4b4a4fbcfedda
+      internalID: 1603932462
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: military_exolight_outfit
+      rect:
+        serializedVersion: 2
+        x: 2550
+        y: 1396
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8b852b04bb317c74cb0e1f17d07a68cb
+      internalID: 1297232114
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: military_freedom_outfit
+      rect:
+        serializedVersion: 2
+        x: 1800
+        y: 3496
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 283283bcc50cb9744bcd2d4bee322d79
+      internalID: -871362404
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: military_merc_outfit
+      rect:
+        serializedVersion: 2
+        x: 1800
+        y: 3196
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 25670ad9d791aa940b103dce3277a745
+      internalID: 1435605820
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: military_monolit_outfit
+      rect:
+        serializedVersion: 2
+        x: 1800
+        y: 2896
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7cdbcd5aca344274aa213b36a569c824
+      internalID: 1974450103
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: military_outfit
+      rect:
+        serializedVersion: 2
+        x: 1550
+        y: 1696
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a3446eaa09891ff44be27782085ba475
+      internalID: -1692093578
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: military_proto_exo_outfit
+      rect:
+        serializedVersion: 2
+        x: 2800
+        y: 1396
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9f20a44da2215e14691fba2b907c66df
+      internalID: 2036994392
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: military_sky_outfit
+      rect:
+        serializedVersion: 2
+        x: 1800
+        y: 2596
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c85abf53831620a4fb9712a70f6fb749
+      internalID: -1937572321
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: monolith_exo_outfit
+      rect:
+        serializedVersion: 2
+        x: 3050
+        y: 1096
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e93eb72fc9e556b4ab8d8f803e9c49ce
+      internalID: -1731848021
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: monolith_exolight_outfit
+      rect:
+        serializedVersion: 2
+        x: 2550
+        y: 1096
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d1434181074f76b46933788c0516b5e2
+      internalID: -1606230441
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: monolith_nbc_outfit
+      rect:
+        serializedVersion: 2
+        x: 2050
+        y: 3196
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 12c56ac9285b0684586f6e41c650beb5
+      internalID: 263633602
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: monolith_nosorog_outfit
+      rect:
+        serializedVersion: 2
+        x: 3300
+        y: 2296
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a5edda2be3c67ef4685406664e9f47d0
+      internalID: 2098626070
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: monolith_outfit
+      rect:
+        serializedVersion: 2
+        x: 1050
+        y: 2296
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b3bfaceea7e23f346aee4eeb6c9cf6d2
+      internalID: -1075123843
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: monolith_proto_exo_outfit
+      rect:
+        serializedVersion: 2
+        x: 2800
+        y: 1996
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4e55b7c936925b340a1c871f3bc278b9
+      internalID: -1480544100
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: monolith_scientific_light_outfit
+      rect:
+        serializedVersion: 2
+        x: 1800
+        y: 1396
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: dd9cb54636e58094d814a1013a24fcb7
+      internalID: 1721020976
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: monolith_scientific_outfit
+      rect:
+        serializedVersion: 2
+        x: 2050
+        y: 196
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 453fcce08e8672c4f8068c6186c74855
+      internalID: 1249343103
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: nbc_dolg_outfit
+      rect:
+        serializedVersion: 2
+        x: 2050
+        y: 2296
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: bd5f907e5726a1d4baa583da17448ec8
+      internalID: -865611964
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: nbc_freedom_outfit
+      rect:
+        serializedVersion: 2
+        x: 2050
+        y: 1996
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e141eac543b17a8458a38d499c90964a
+      internalID: 948428042
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: nbc_merc_outfit
+      rect:
+        serializedVersion: 2
+        x: 2050
+        y: 2896
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9819bb2449483d64cb1de2d378a49e83
+      internalID: -1897241830
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: nbc_outfit
+      rect:
+        serializedVersion: 2
+        x: 2050
+        y: 3796
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 813c83aef40d4554e854306feca0a040
+      internalID: -793821681
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: nomad_outfit
+      rect:
+        serializedVersion: 2
+        x: 800
+        y: 3796
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 08abf3bb018186e4ea79e85fd0f82f47
+      internalID: 1445715691
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: renegade_exo_outfit
+      rect:
+        serializedVersion: 2
+        x: 3050
+        y: 796
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 14ed8475381ab194da22084711297412
+      internalID: 100137998
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: renegade_scientific_outfit
+      rect:
+        serializedVersion: 2
+        x: 1800
+        y: 1096
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7906a13223fd719489a4642c550ca328
+      internalID: -1046730388
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: renegademerc_outfit
+      rect:
+        serializedVersion: 2
+        x: 650
+        y: 646
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 50ebe3ba4b70d884ab243be4acd7cde4
+      internalID: -2011974139
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: scientific_outfit
+      rect:
+        serializedVersion: 2
+        x: 1800
+        y: 196
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: bba71b3a82676834da36cb3f95b5edfb
+      internalID: 121390935
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: specops_bandit_outfit
+      rect:
+        serializedVersion: 2
+        x: 1300
+        y: 1396
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3bae320ff888d864ea997894b1904211
+      internalID: -1960838011
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: specops_dolg_outfit
+      rect:
+        serializedVersion: 2
+        x: 1300
+        y: 1096
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c58c8e94ecd6376479c7b74025020a76
+      internalID: 1373719387
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: specops_merc_outfit
+      rect:
+        serializedVersion: 2
+        x: 1300
+        y: 796
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e354f9deb28f37d43a92736a2dac51a5
+      internalID: 994987216
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: specops_outfit
+      rect:
+        serializedVersion: 2
+        x: 1300
+        y: 1696
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 24070ab0d15f9434eb3802b6028b6daf
+      internalID: 1074513345
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: stalker_autumn_outfit
+      rect:
+        serializedVersion: 2
+        x: 800
+        y: 2596
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a76af938b3c60d140b2ebb3ddfa4704e
+      internalID: -1225070596
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: stalker_bear_outfit
+      rect:
+        serializedVersion: 2
+        x: 800
+        y: 2296
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4c730974b92ac2a4a9b399d3de0a010c
+      internalID: 688853256
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: stalker_drought_outfit
+      rect:
+        serializedVersion: 2
+        x: 800
+        y: 1996
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 39b6b8c5690cc7e429576a00f5dbbbaf
+      internalID: -315375316
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: stalker_graphite_outfit
+      rect:
+        serializedVersion: 2
+        x: 1050
+        y: 3796
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7ebf5c3bf29405d45a547358f5b5ffe0
+      internalID: -673717006
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: stalker_outfit
+      rect:
+        serializedVersion: 2
+        x: 800
+        y: 2896
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4894caacbe9762c41bf71c97b3cc6f73
+      internalID: 1604841025
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: stalker_predator_outfit
+      rect:
+        serializedVersion: 2
+        x: 1050
+        y: 3496
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 14f9ec8f5627b7941911a951f2d6befc
+      internalID: -1878456342
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: stalker_proto_exo_outfit
+      rect:
+        serializedVersion: 2
+        x: 2800
+        y: 3796
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 192e218b479af7247a3d189cab25aff1
+      internalID: -256993104
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: stalker_salamander_outfit
+      rect:
+        serializedVersion: 2
+        x: 1050
+        y: 3196
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 318561535b408304699c554e132b926c
+      internalID: -932542483
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: stalker_tigerstripe_outfit
+      rect:
+        serializedVersion: 2
+        x: 1050
+        y: 2896
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 58118a02525dcc949ac6df94c93ee7a9
+      internalID: -352432763
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: svoboda_exo_outfit
+      rect:
+        serializedVersion: 2
+        x: 3050
+        y: 496
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: feb926c89b1945446a1fe6a1246478a9
+      internalID: 1090648358
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: svoboda_exolight_outfit
+      rect:
+        serializedVersion: 2
+        x: 2550
+        y: 796
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e88010ddc53682340ba331c4a5cb7894
+      internalID: -1158079760
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: svoboda_heavy_outfit
+      rect:
+        serializedVersion: 2
+        x: 1300
+        y: 496
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c4827e951b844cc42a1705484c3102ca
+      internalID: -1666634773
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: svoboda_heavy_outfit_2
+      rect:
+        serializedVersion: 2
+        x: 1300
+        y: 2896
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ba211c0105d8e0e4daa5dde785256a54
+      internalID: -1689381986
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: svoboda_light_outfit
+      rect:
+        serializedVersion: 2
+        x: 1300
+        y: 196
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3ee0d8a200779964b967d9fe2c893e82
+      internalID: -1465096062
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: svoboda_light_proto_exo_outfit
+      rect:
+        serializedVersion: 2
+        x: 2800
+        y: 2296
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 27b8f8b0a242e344f8f62708310efed4
+      internalID: -1727749200
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: svoboda_scientific_outfit
+      rect:
+        serializedVersion: 2
+        x: 2300
+        y: 1996
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 03857683ae2951a40b85f24444c302af
+      internalID: 835926462
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: travel_outfit
+      rect:
+        serializedVersion: 2
+        x: 800
+        y: 3196
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ffdb4b4edd2f63848b8a8701451bbbfb
+      internalID: -1016422206
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: wastelander_outfit
+      rect:
+        serializedVersion: 2
+        x: 800
+        y: 3496
+        width: 250
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6fab71a1ee5510b49b6941ab3e2d841d
+      internalID: -118171978
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: helm_ach7
+      rect:
+        serializedVersion: 2
+        x: 200
+        y: 3296
+        width: 200
+        height: 200
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7999f2bd505c4a842afdecad527d727a
+      internalID: 508505921
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: helm_ach7ex
+      rect:
+        serializedVersion: 2
+        x: 200
+        y: 3096
+        width: 200
+        height: 200
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1b12b2f6c132ee84daf750473b0cfd5f
+      internalID: 1678557811
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: helm_bandana
+      rect:
+        serializedVersion: 2
+        x: 200
+        y: 3496
+        width: 200
+        height: 200
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9fd4953fe0e650949987d377a9f6c20c
+      internalID: -972489436
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: helm_battle
+      rect:
+        serializedVersion: 2
+        x: 200
+        y: 2696
+        width: 200
+        height: 200
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: be2b620cb510cca449420ba0e6ad1f9a
+      internalID: 711681822
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: helm_cloth_mask
+      rect:
+        serializedVersion: 2
+        x: 200
+        y: 3896
+        width: 200
+        height: 200
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5e9e827ec2007ff4e9de4984feeba5fb
+      internalID: 1565627940
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: helm_exo
+      rect:
+        serializedVersion: 2
+        x: 200
+        y: 2296
+        width: 200
+        height: 200
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a9ea317219578b742873adde72f2f971
+      internalID: 1327234182
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: helm_hardhat
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 3096
+        width: 200
+        height: 200
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9ff15daf503b99447a006a7d1502cdc9
+      internalID: 1751137674
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: helm_hardhat_snag
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 3096
+        width: 200
+        height: 200
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d372a6dd780c21a478ceb000d976bdfa
+      internalID: -1967230192
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: helm_m40
+      rect:
+        serializedVersion: 2
+        x: 200
+        y: 2496
+        width: 200
+        height: 200
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0b8580c4c9c57f7468ab36df2d2ef707
+      internalID: -1143586208
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: helm_m50
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 2296
+        width: 200
+        height: 200
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ad4f56b28ba393244ac263f8e10a505d
+      internalID: -1958351792
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: helm_metro
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 2096
+        width: 200
+        height: 200
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a536896f86669e9468041cd7fd2a7da4
+      internalID: -210081413
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: helm_ppm88
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 2696
+        width: 200
+        height: 200
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: cd6da9e937dec38408ea471bb46b639c
+      internalID: 538862716
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: helm_protective
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 2896
+        width: 200
+        height: 200
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 563231b08ce663e49949d5e4ddc69705
+      internalID: -764664831
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: helm_ranger
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 2496
+        width: 200
+        height: 200
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: cf73d0920d200054ba6f02950b70851d
+      internalID: 1499512619
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: helm_resp
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 3896
+        width: 200
+        height: 200
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 07aca11c52d15b848b5934e809687902
+      internalID: 1815075973
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: helm_respirator
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 3696
+        width: 200
+        height: 200
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ed48178777a324240a44d13c8c8313ef
+      internalID: 734708209
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: helm_respirator_gp5
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 3296
+        width: 200
+        height: 200
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4054fce8d70450747babcd363d29016b
+      internalID: -1888414391
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: helm_respirator_old
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 3496
+        width: 200
+        height: 200
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3644ff0a85bd5744fa84caa925b1f304
+      internalID: 106276894
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: helm_rp_bala
+      rect:
+        serializedVersion: 2
+        x: 200
+        y: 3696
+        width: 200
+        height: 200
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 60049a08817195c4e83da28001189d91
+      internalID: -651920512
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: helm_spartan
+      rect:
+        serializedVersion: 2
+        x: 200
+        y: 2096
+        width: 200
+        height: 200
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f250b5b7893857146b15d72c9b651c60
+      internalID: -1216824244
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: helm_tactic
+      rect:
+        serializedVersion: 2
+        x: 200
+        y: 2896
+        width: 200
+        height: 200
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e3cd670b8f3c2ae45af08623bdce40d0
+      internalID: -1772173092
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 20a192f8f586508458ed2d4262c5534a
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      army_nosorog_outfit: 1758516839
+      army_outfit: -501273636
+      bandit_exo_outfit: 247695652
+      bandit_exolight_outfit: 1579039675
+      bandit_nbc_outfit: -1711899695
+      bandit_ps5_outfit: -1941813894
+      bandit_scientific_dark_outfit: 914995849
+      bandit_scientific_outfit: 1408377919
+      bandit_sun_outfit: 318754808
+      banditmerc_outfit: 978698292
+      cs_exo_outfit: 1730074704
+      cs_exolight_outfit: 676209191
+      cs_heavy_outfit: 1687358169
+      cs_light_outfit: -1882447730
+      cs_medium_outfit: -1387672591
+      cs_nbc_outfit: -1728928554
+      cs_scientific_outfit: -690757473
+      cs_scientific_outfit_good: -1043167724
+      cs_stalker_outfit: -603209280
+      cs_stalker_proto_exo_outfit: 1078526808
+      dolg_exo_outfit: -762894993
+      dolg_exolight_outfit: 704946900
+      dolg_heavy_outfit: 661311417
+      dolg_heavy_proto_exo_outfit: -1800053974
+      dolg_heavy_redline_outfit: 220837256
+      dolg_nosorog_outfit: 927385790
+      dolg_outfit: -747233211
+      dolg_pantsir_outfit: -400530144
+      dolg_proto_exo_outfit: -1158936037
+      dolg_red_outfit: -1468448247
+      dolg_scientific_outfit: -1906311811
+      dolg_scientific_red_outfit: -2015599654
+      dolg_scientific_wood_outfit: 605968905
+      dolg_scout_outfit: 1330883418
+      dolg_specops_red_outfit: 1957956174
+      dolg_voin_outfit: 1600573784
+      ecolog_exo_outfit: 961314518
+      ecolog_guard_outfit: 213209899
+      ecolog_outfit_blue: 1955280828
+      ecolog_outfit_green: 1949631884
+      ecolog_outfit_orange: 706013171
+      ecolog_outfit_red: 86656648
+      ecolog_outfit_white: -722074322
+      ecolog_outfit_yello: 1277476115
+      ecolog_proto_exo_outfit: -1484853810
+      exo_dolg_outfit: -1407800480
+      exo_dolg_red_outfit: 1219481997
+      exo_dolg_urban_outfit: 633795589
+      exo_dolg_wood_outfit: -1582233928
+      exo_merc_grass_outfit: -1378391710
+      exo_merc_urban_outfit: 784598702
+      exo_merc_wood_outfit: -292964355
+      exo_outfit: 200399399
+      exo_wood_outfit: 381852156
+      exolight_outfit: -404660730
+      freedom_exo_vineleaf_outfit: -934619735
+      freedom_nosorog_outfit: 1169434329
+      ghillie_outfit: 2003791054
+      greh_armored_camo_outfit: -488427795
+      greh_armored_outfit: -1607924653
+      greh_exo_outfit: -771018724
+      greh_ps5_outfit: 560169015
+      helm_ach7: 508505921
+      helm_ach7ex: 1678557811
+      helm_bandana: -972489436
+      helm_battle: 711681822
+      helm_cloth_mask: 1565627940
+      helm_exo: 1327234182
+      helm_hardhat: 1751137674
+      helm_hardhat_snag: -1967230192
+      helm_m40: -1143586208
+      helm_m50: -1958351792
+      helm_metro: -210081413
+      helm_ppm88: 538862716
+      helm_protective: -764664831
+      helm_ranger: 1499512619
+      helm_resp: 1815075973
+      helm_respirator: 734708209
+      helm_respirator_gp5: -1888414391
+      helm_respirator_old: 106276894
+      helm_rp_bala: -651920512
+      helm_spartan: -1216824244
+      helm_tactic: -1772173092
+      hybrid_outfit: -1375238519
+      isg_camo_outfit: 1005617317
+      isg_exo_outfit: -122145700
+      isg_exolight_outfit: -550198673
+      isg_lcs_camo_outfit: -628807264
+      isg_lcs_outfit: -2005078976
+      isg_lcs_urban_outfit: 1322220563
+      isg_nosorog_outfit: 1327175358
+      isg_outfit: -818656638
+      isg_proto_exo_outfit: 915406837
+      isg_scientific_outfit: 1467180854
+      light_dolg_outfit: -1170522583
+      light_freedom_outfit: 1316489260
+      light_isg_outfit: -1802042189
+      light_loner_outfit: -1910637819
+      light_merc_outfit: -1411734247
+      light_monolit_outfit: 1641253124
+      light_voen_outfit: 924117775
+      merc_ace_outfit: 1684304228
+      merc_combat_scientific_outfit: -1195828806
+      merc_coyote_outfit: 695929212
+      merc_exo_outfit: 1476425522
+      merc_exolight_outfit: 1161363661
+      merc_fighter_outfit: 513120674
+      merc_jackal_outfit: 467570854
+      merc_nighthunter_outfit: 274094060
+      merc_nosorog_outfit: -1770834309
+      merc_outfit: -321226894
+      merc_scientific_armored_outfit: -1387491649
+      merc_scientific_outfit: 741232881
+      merc_scout_outfit: -613945929
+      merc_sun_outfit: 529491104
+      merc_sunset_outfit: -568125290
+      merc_wolven_outfit: -1834224592
+      military_bandit_outfit: 131780655
+      military_exo_outfit: 1603932462
+      military_exolight_outfit: 1297232114
+      military_freedom_outfit: -871362404
+      military_merc_outfit: 1435605820
+      military_monolit_outfit: 1974450103
+      military_outfit: -1692093578
+      military_proto_exo_outfit: 2036994392
+      military_sky_outfit: -1937572321
+      monolith_exo_outfit: -1731848021
+      monolith_exolight_outfit: -1606230441
+      monolith_nbc_outfit: 263633602
+      monolith_nosorog_outfit: 2098626070
+      monolith_outfit: -1075123843
+      monolith_proto_exo_outfit: -1480544100
+      monolith_scientific_light_outfit: 1721020976
+      monolith_scientific_outfit: 1249343103
+      nbc_dolg_outfit: -865611964
+      nbc_freedom_outfit: 948428042
+      nbc_merc_outfit: -1897241830
+      nbc_outfit: -793821681
+      nomad_outfit: 1445715691
+      renegade_exo_outfit: 100137998
+      renegade_scientific_outfit: -1046730388
+      renegademerc_outfit: -2011974139
+      scientific_outfit: 121390935
+      specops_bandit_outfit: -1960838011
+      specops_dolg_outfit: 1373719387
+      specops_merc_outfit: 994987216
+      specops_outfit: 1074513345
+      stalker_autumn_outfit: -1225070596
+      stalker_bear_outfit: 688853256
+      stalker_drought_outfit: -315375316
+      stalker_graphite_outfit: -673717006
+      stalker_outfit: 1604841025
+      stalker_predator_outfit: -1878456342
+      stalker_proto_exo_outfit: -256993104
+      stalker_salamander_outfit: -932542483
+      stalker_tigerstripe_outfit: -352432763
+      svoboda_exo_outfit: 1090648358
+      svoboda_exolight_outfit: -1158079760
+      svoboda_heavy_outfit: -1666634773
+      svoboda_heavy_outfit_2: -1689381986
+      svoboda_light_outfit: -1465096062
+      svoboda_light_proto_exo_outfit: -1727749200
+      svoboda_scientific_outfit: 835926462
+      travel_outfit: -1016422206
+      wastelander_outfit: -118171978
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

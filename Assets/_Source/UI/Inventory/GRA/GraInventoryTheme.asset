@@ -12,15 +12,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c74e25ace639f4e4681c61571a773d25, type: 3}
   m_Name: GraInventoryTheme
   m_EditorClassIdentifier: Inventory.UI::Inventory.UI.InventoryTheme
-  _bodyFont: {fileID: 11400000, guid: 5d42b6420626b1a44839d8b205e274f7, type: 2}
-  _headerFont: {fileID: 11400000, guid: 5d42b6420626b1a44839d8b205e274f7, type: 2}
-  _accentFont: {fileID: 11400000, guid: 5d42b6420626b1a44839d8b205e274f7, type: 2}
-  _smallFont: {fileID: 11400000, guid: 5d42b6420626b1a44839d8b205e274f7, type: 2}
+  _bodyFont: {fileID: 11400000, guid: cc5efc8ed1175bf45a893d4dd6e86295, type: 2}
+  _headerFont: {fileID: 11400000, guid: cc5efc8ed1175bf45a893d4dd6e86295, type: 2}
+  _accentFont: {fileID: 11400000, guid: cc5efc8ed1175bf45a893d4dd6e86295, type: 2}
+  _smallFont: {fileID: 11400000, guid: cc5efc8ed1175bf45a893d4dd6e86295, type: 2}
   _textColor: {r: 0.6666667, g: 0.6666667, b: 0.6666667, a: 1}
   _mutedTextColor: {r: 0.5019608, g: 0.5019608, b: 0.5019608, a: 1}
   _accentColor: {r: 0.9411765, g: 0.8509804, b: 0.7137255, a: 1}
   _negativeColor: {r: 1, g: 0.19607843, b: 0.19607843, a: 1}
   _panelSprite: {fileID: 21300000, guid: 07d7aa58afe33984883b6dbb4e206bdc, type: 3}
+  _icons: {fileID: 11400000, guid: d1036c617f3c1914aa4bb1556dc9bebe, type: 2}
   _panelColor: {r: 1, g: 1, b: 1, a: 1}
   _panelPadding: {x: 18, y: 18, z: 18, w: 18}
   _showItemBackground: 0
@@ -74,6 +75,10 @@ MonoBehaviour:
     _text: "\u041F\u0435\u0440\u0435\u043C\u0435\u0449\u0435\u043D\u043E: {0}"
   - _key: status_dropped
     _text: "\u0412\u044B\u0431\u0440\u043E\u0448\u0435\u043D\u043E: {0}"
+  - _key: status_picked
+    _text: "\u041F\u043E\u0434\u043E\u0431\u0440\u0430\u043D\u043E: {0}"
+  - _key: hint_pick_up
+    _text: "[{0}] \u041F\u043E\u0434\u043E\u0431\u0440\u0430\u0442\u044C"
   - _key: failure_InvalidItem
     _text: "\u041D\u0435\u0432\u0435\u0440\u043D\u044B\u0439 \u043F\u0440\u0435\u0434\u043C\u0435\u0442"
   - _key: failure_ItemNotFound
@@ -115,8 +120,6 @@ MonoBehaviour:
     _text: "\u0412\u0435\u0441: "
   - _key: tooltip_amount
     _text: "   \u041A\u043E\u043B\u0438\u0447\u0435\u0441\u0442\u0432\u043E: "
-  - _key: tooltip_tags
-    _text: "\u0422\u0435\u0433\u0438: "
   - _key: unit_kg
     _text: " \u043A\u0433"
   - _key: split_title
@@ -149,3 +152,83 @@ MonoBehaviour:
     _text: "\u0410\u0440\u0442\u0435\u0444\u0430\u043A\u0442"
   - _key: category_Misc
     _text: "\u0420\u0430\u0437\u043D\u043E\u0435"
+  - _key: stat_fire_wound
+    _text: "\u0411\u0430\u043B\u043B\u0438\u0441\u0442. \u0437\u0430\u0449\u0438\u0442\u0430"
+  - _key: stat_burn
+    _text: "\u0422\u0435\u0440\u043C\u043E\u0437\u0430\u0449\u0438\u0442\u0430"
+  - _key: stat_shock
+    _text: "\u042D\u043B\u0435\u043A\u0442\u0440\u043E\u0437\u0430\u0449\u0438\u0442\u0430"
+  - _key: stat_chemical_burn
+    _text: "\u0425\u0438\u043C\u0437\u0430\u0449\u0438\u0442\u0430"
+  - _key: stat_radiation
+    _text: "\u0420\u0430\u0434\u0438\u043E\u0437\u0430\u0449\u0438\u0442\u0430"
+  - _key: stat_telepatic
+    _text: "\u041F\u0441\u0438-\u0437\u0430\u0449\u0438\u0442\u0430"
+  - _key: stat_wound
+    _text: "\u0417\u0430\u0449. \u043E\u0442 \u0440\u0430\u0437\u0440\u044B\u0432\u0430"
+  - _key: stat_strike
+    _text: "\u0413\u0430\u0448\u0435\u043D\u0438\u0435 \u0443\u0434\u0430\u0440\u0430"
+  - _key: stat_explosion
+    _text: "\u0417\u0430\u0449. \u043E\u0442 \u0432\u0437\u0440\u044B\u0432\u0430"
+  - _key: stat_artefact_count
+    _text: "\u041A\u043E\u043B-\u0432\u043E \u0441\u043B\u043E\u0442\u043E\u0432"
+  - _key: stat_additional_weight
+    _text: "\u041F\u0435\u0440\u0435\u043D\u043E\u0441\u0438\u043C\u044B\u0439 \u0432\u0435\u0441"
+  - _key: stat_fire_wound_helmet
+    _text: "\u0411\u0430\u043B\u043B. \u0437\u0430\u0449. \u0428\u043B\u0435\u043C\u0430"
+  - _key: stat_speed
+    _text: "\u041C\u043D\u043E\u0436. \u043F\u043E\u0434\u0432\u0438\u0436\u043D\u043E\u0441\u0442\u0438"
+  - _key: stat_durability_physical
+    _text: "\u0424\u0438\u0437. \u043F\u0440\u043E\u0447\u043D\u043E\u0441\u0442\u044C"
+  - _key: stat_durability_anomaly
+    _text: "\u0410\u043D\u043E\u043C. \u043F\u0440\u043E\u0447\u043D\u043E\u0441\u0442\u044C"
+  - _key: stat_unit_kg
+    _text: "\u043A\u0433"
+  - _key: tooltip_cost
+    _text: "\u0421\u0442\u043E\u0438\u043C\u043E\u0441\u0442\u044C:"
+  - _key: unit_currency
+    _text: "\u0440\u0443\u0431."
+  - _key: tooltip_condition
+    _text: "\u0421\u043E\u0441\u0442\u043E\u044F\u043D\u0438\u0435"
+  - _key: tooltip_features
+    _text: "\u041E\u0421\u041E\u0411\u0415\u041D\u041D\u041E\u0421\u0422\u0418"
+  - _key: feature_community
+    _text: "\u0433\u0440\u0443\u043F\u043F\u0438\u0440\u043E\u0432\u043A\u0430"
+  - _key: feature_helmet
+    _text: "\u0433\u043E\u043B\u043E\u0432\u043D\u043E\u0439 \u0443\u0431\u043E\u0440"
+  - _key: feature_helmet_none
+    _text: "\u043E\u0442\u0441\u0443\u0442\u0441\u0442\u0432\u0443\u0435\u0442"
+  - _key: feature_helmet_builtin
+    _text: "\u0432\u0441\u0442\u0440\u043E\u0435\u043D\u043D\u044B\u0439"
+  - _key: feature_sprint
+    _text: "\u043F\u0435\u0440\u0435\u0434\u0432\u0438\u0436\u0435\u043D\u0438\u0435 \u0431\u0435\u0433\u043E\u043C:"
+  - _key: feature_possible
+    _text: "\u0432\u043E\u0437\u043C\u043E\u0436\u043D\u043E"
+  - _key: feature_not_possible
+    _text: "\u043D\u0435\u0432\u043E\u0437\u043C\u043E\u0436\u043D\u043E"
+  - _key: community_unknown
+    _text: "\u041D\u0435\u0438\u0437\u0432\u0435\u0441\u0442\u043D\u044B\u0439"
+  - _key: community_stalker
+    _text: "\u041E\u0434\u0438\u043D\u043E\u0447\u043A\u0438"
+  - _key: community_dolg
+    _text: "\u00AB\u0414\u043E\u043B\u0433\u00BB"
+  - _key: community_freedom
+    _text: "\u00AB\u0421\u0432\u043E\u0431\u043E\u0434\u0430\u00BB"
+  - _key: community_csky
+    _text: "\u00AB\u0427\u0438\u0441\u0442\u043E\u0435 \u043D\u0435\u0431\u043E\u00BB"
+  - _key: community_ecolog
+    _text: "\u0423\u0447\u0451\u043D\u044B\u0435"
+  - _key: community_killer
+    _text: "\u041D\u0430\u0451\u043C\u043D\u0438\u043A\u0438"
+  - _key: community_army
+    _text: "\u0412\u043E\u0435\u043D\u043D\u044B\u0435"
+  - _key: community_bandit
+    _text: "\u0411\u0430\u043D\u0434\u0438\u0442\u044B"
+  - _key: community_monolith
+    _text: "\u00AB\u041C\u043E\u043D\u043E\u043B\u0438\u0442\u00BB"
+  - _key: community_renegade
+    _text: "\u0420\u0435\u043D\u0435\u0433\u0430\u0442\u044B"
+  - _key: community_greh
+    _text: "\u00AB\u0413\u0440\u0435\u0445\u00BB"
+  - _key: community_isg
+    _text: "\u00AB\u0418\u043D\u0442\u0435\u0440\u043D\u0430\u0446\u0438\u043E\u043D\u0430\u043B\u044C\u043D\u0430\u044F \u0438\u0441\u0441\u043B\u0435\u0434\u043E\u0432\u0430\u0442\u0435\u043B\u044C\u0441\u043A\u0430\u044F \u0433\u0440\u0443\u043F\u043F\u0430\u00BB"

@@ -1,0 +1,118 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da0f90c2955673d46b25d465cbe44ed0, type: 3}
+  m_Name: light_monolit_outfit
+  m_EditorClassIdentifier: Inventory::Inventory.ItemDefinition
+  _definitionId: 20401186a301adc4ba8e325a718c7540
+  _displayName: "\u0411\u0440\u043E\u043D\u0435\u0436\u0438\u043B\u0435\u0442 IBA-\u0417
+    \xAB\u041C\u043E\u043D\u043E\u043B\u0438\u0442\u0430\xBB"
+  _shortName: "\u0411\u0440\u043E\u043D\u0435\u0436\u0438\u043B\u0435\u0442 IBA-\u0417
+    \xAB\u041C\u043E\u043D\u043E\u043B\u0438\u0442\u0430\xBB"
+  _description: "\u0410\u0440\u043C\u0435\u0439\u0441\u043A\u0438\u0439 \u043A\u043E\u043C\u043F\u043B\u0435\u043A\u0442
+    \u043A\u043E\u0441\u0442\u044E\u043C\u0430 \u0441 \u0431\u0440\u043E\u043D\u0435\u0436\u0438\u043B\u0435\u0442\u043E\u043C
+    IBA \xAB\u041F\u0435\u0440\u0435\u0445\u0432\u0430\u0442\u0447\u0438\u043A\xBB,
+    \u0430\u0434\u0430\u043F\u0442\u0438\u0440\u043E\u0432\u0430\u043D\u043D\u044B\u043C
+    \u043A \u0430\u043D\u043E\u043C\u0430\u043B\u044C\u043D\u044B\u043C \u0443\u0441\u043B\u043E\u0432\u0438\u044F\u043C
+    \u0417\u043E\u043D\u044B (IBA-\u0417), \u043A\u0430\u043A\u0438\u043C-\u0442\u043E
+    \u043E\u0431\u0440\u0430\u0437\u043E\u043C \u043F\u043E\u043F\u0430\u0432\u0448\u0438\u0439
+    \u0432 \u0440\u0430\u0441\u043F\u043E\u0440\u044F\u0436\u0435\u043D\u0438\u0435
+    \u0433\u0440\u0443\u043F\u043F\u0438\u0440\u043E\u0432\u043A\u0438 \xAB\u041C\u043E\u043D\u043E\u043B\u0438\u0442\xBB.
+    \u0412\u043F\u043E\u043B\u043D\u0435 \u0432\u0435\u0440\u043E\u044F\u0442\u043D\u043E,
+    \u0447\u0442\u043E \u044F\u0432\u043B\u044F\u0435\u0442\u0441\u044F \u0442\u0440\u043E\u0444\u0435\u0439\u043D\u044B\u043C,
+    \u0441\u043D\u044F\u0442\u044B\u043C \u0441 \u0443\u0431\u0438\u0442\u043E\u0433\u043E
+    \u0438\u043B\u0438 \u043F\u043E\u0442\u0435\u0440\u044F\u0432\u0448\u0435\u0433\u043E
+    \u0440\u0430\u0437\u0443\u043C \u0441\u0442\u0430\u043B\u043A\u0435\u0440\u0430,
+    \u043A\u043E\u0442\u043E\u0440\u044B\u0439 \u0440\u0438\u0441\u043A\u043D\u0443\u043B
+    \u043F\u0435\u0440\u0435\u0441\u0435\u0447\u044C \xAB\u0411\u0430\u0440\u044C\u0435\u0440\xBB.
+    \u041E\u0442 \u043E\u0440\u0438\u0433\u0438\u043D\u0430\u043B\u044C\u043D\u043E\u0439
+    \u043C\u043E\u0434\u0435\u043B\u0438 (IBA-\u0417) \u043E\u0442\u043B\u0438\u0447\u0430\u0435\u0442\u0441\u044F
+    \u0441\u043B\u0435\u0433\u043A\u0430 \u043F\u043E\u0432\u044B\u0448\u0435\u043D\u043D\u043E\u0439
+    \u044D\u0440\u0433\u043E\u043D\u043E\u043C\u0438\u0447\u043D\u043E\u0441\u0442\u044C\u044E
+    \u0438 \u043A\u0443\u0434\u0430 \u0431\u043E\u043B\u0435\u0435 \u043F\u0440\u043E\u0434\u0432\u0438\u043D\u0443\u0442\u043E\u0439
+    \u043F\u0441\u0438-\u0437\u0430\u0449\u0438\u0442\u043E\u0439."
+  _category: Armor
+  _tags: []
+  _size: {x: 3, y: 3}
+  _weight: 9.22
+  _maxStack: 1
+  _allowRotation: 1
+  _backgroundColor: {r: 1, g: 1, b: 1, a: 0.04}
+  _fallbackIcon: {fileID: 0}
+  _iconOverride: {fileID: 1641253124, guid: 5bb3bcf1e5ed7dd438cdba2f9a1d7797, type: 3}
+  _visualPrefab: {fileID: -6542412131631041810, guid: 1c906f814f0880f4b87e5d27309466bd, type: 3}
+  _defaultIconVariant: []
+  _icon:
+    _generateIcon: 1
+    _pixelsPerCell: 64
+    _antiAliasing: 1
+    _useOutline: 1
+    _outlineWidth: 2
+    _useShadow: 1
+    _shadowOffset: {x: 2, y: -2}
+    _shadowBlur: 2
+    _defaultView:
+      _modelEulerAngles: {x: 0, y: 0, z: 0}
+      _modelScale: {x: 1, y: 1, z: 1}
+      _cameraEulerAngles: {x: 89, y: 180, z: 0}
+      _padding: 1.15
+      _useDirectionalLight: 1
+      _lightIntensity: 20
+    _useCustomSlotView: 0
+    _slotView:
+      _modelEulerAngles: {x: 0, y: 0, z: 0}
+      _modelScale: {x: 1, y: 1, z: 1}
+      _cameraEulerAngles: {x: 25, y: -135, z: 0}
+      _padding: 1.15
+      _useDirectionalLight: 1
+      _lightIntensity: 10
+  _components:
+  - rid: 3479885471900762280
+  - rid: 3479885471900762281
+  - rid: 3479885472039698516
+  references:
+    version: 2
+    RefIds:
+    - rid: 3479885471900762280
+      type: {class: EquippableItemComponent, ns: Inventory, asm: Inventory}
+      data:
+        _preferredSlotIds:
+        - Outfit
+    - rid: 3479885471900762281
+      type: {class: EquipmentStatsComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      data:
+        _section: light_monolit_outfit
+        _cost: 51830
+        _repairType: outfit_medium
+        _community: monolith
+        _burnProtection: 0.56
+        _shockProtection: 1.8
+        _chemicalBurnProtection: 0.28
+        _radiationProtection: 0.01
+        _telepaticProtection: 0.08
+        _woundProtection: 0.62
+        _strikeProtection: 0.62
+        _explosionProtection: 0.82
+        _fireWoundProtection: 0.59
+        _helmetFireWoundProtection: 0
+        _artefactCount: 2
+        _additionalWeight: 20
+        _powerLoss: 0.05
+        _helmetAvailable: 1
+        _sprintAllowed: 1
+        _nightVisionSection: 
+        _speed: 1.02
+        _physicalDurability: 0.92655617
+        _anomalyDurability: 0.71498466
+    - rid: 3479885472039698516
+      type: {class: WorldItemComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      data:
+        _prefab: {fileID: 2180443714660477823, guid: 59dbc091ab315ee45b691180c146beae, type: 3}

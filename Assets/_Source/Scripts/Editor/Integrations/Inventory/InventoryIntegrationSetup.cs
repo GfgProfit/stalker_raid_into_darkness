@@ -23,8 +23,9 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
     public static class InventoryIntegrationSetup
     {
         public const string SCENE_PATH = "Assets/OutdoorsScene.unity";
-        public const string PREFAB_FOLDER = "Assets/_Source/UI/Inventory";
-        public const string PREFAB_PATH = PREFAB_FOLDER + "/InventoryWindow.prefab";
+        public const string WINDOW_NAME = "InventoryWindow";
+        public const string STASH_OWNER = "World";
+        public const string STASH_TITLE = "Тайник";
         public const string INPUT_PATH = "Assets/_Source/Settings/Input/StalkerControls.inputactions";
         public const string CANVAS_NAME = "InventoryCanvas";
         public const string INTEGRATION_NAME = "InventoryIntegration";
@@ -47,9 +48,12 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
         {
             ImportTmpEssentials();
             InventoryDemoContentBuilder.DemoContent content = InventoryDemoContentBuilder.Build();
-            GameObject prefab = BuildWindowPrefab(content);
-            bool sceneSaved = SetupScene(prefab);
-            Debug.Log($"[Inventory] Demo content: {content.Items.Count} definitions, window prefab {PREFAB_PATH}, scene saved: {sceneSaved}.");
+            TMP_FontAsset font = GraInventoryWindowBuilder.ImportAssets();
+            ApplyDefaultFont(font);
+            InventoryTheme theme = GraInventoryWindowBuilder.BuildTheme(font);
+            List<WorldItem> worldItems = WorldItemPrefabBuilder.Build(content.Items.Values);
+            bool sceneSaved = SetupScene(font, theme, worldItems);
+            Debug.Log($"[Inventory] Demo content: {content.Items.Count} definitions, {worldItems.Count} world items, scene saved: {sceneSaved}.");
 
             if (bakeIcons)
             {
@@ -95,25 +99,76 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
             AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
         }
 
-        private static GameObject BuildWindowPrefab(InventoryDemoContentBuilder.DemoContent content)
+        private static InventoryWindow BuildWindow(Transform canvas, TMP_FontAsset font, InventoryTheme theme)
         {
-            InventoryDemoContentBuilder.EnsureFolder(PREFAB_FOLDER);
-            TMP_FontAsset font = GraInventoryWindowBuilder.ImportAssets();
-            ApplyDefaultFont(font);
-            InventoryTheme theme = GraInventoryWindowBuilder.BuildTheme(font);
-            var root = new GameObject("InventoryWindow", typeof(RectTransform));
+            var root = new GameObject(WINDOW_NAME, typeof(RectTransform));
+            root.layer = canvas.gameObject.layer;
+            root.transform.SetParent(canvas, false);
+            GraInventoryWindowBuilder.Result result = GraInventoryWindowBuilder.Build(root, theme, font, "Тайник");
+            result.Window.ConfigureContainers(InventoryDemoContentBuilder.BACKPACK, InventoryDemoContentBuilder.STASH, InventoryDemoContentBuilder.EQUIPMENT, InventoryDemoContentBuilder.OWNER, 45f);
+            result.Window.Input.Set(FindReference("Inventory", "RotateItem"), FindReference("Inventory", "QuickTransferModifier"));
+            return result.Window;
+        }
 
-            try
+        private static void BindSceneGrids(InventoryWindow window)
+        {
+            var grids = new List<InventoryGridViewBase>();
+            Transform stashPanel = FindDescendant(window.transform, GraInventoryWindowBuilder.STASH_PANEL);
+            Vector2 cellSize = new Vector2(GraInventoryWindowBuilder.CELL, GraInventoryWindowBuilder.CELL);
+
+            foreach (InventoryGridView grid in window.GetComponentsInChildren<InventoryGridView>(true))
             {
-                GraInventoryWindowBuilder.Result result = GraInventoryWindowBuilder.Build(root, theme, font, "Тайник");
-                result.Window.ConfigureContainers(InventoryDemoContentBuilder.BACKPACK, InventoryDemoContentBuilder.STASH, InventoryDemoContentBuilder.EQUIPMENT, InventoryDemoContentBuilder.OWNER, 45f);
-                result.Window.Input.Set(FindReference("Inventory", "RotateItem"), FindReference("Inventory", "QuickTransferModifier"));
-                return PrefabUtility.SaveAsPrefabAsset(root, PREFAB_PATH);
+                bool stash = stashPanel != null && grid.transform.IsChildOf(stashPanel);
+                string containerId = stash ? InventoryDemoContentBuilder.STASH : InventoryDemoContentBuilder.BACKPACK;
+                cellSize = grid.CellSize;
+
+                if (grid.ContainerId != containerId)
+                {
+                    grid.Configure(containerId, stash ? STASH_OWNER : InventoryDemoContentBuilder.OWNER, stash ? STASH_TITLE : grid.DisplayName, grid.CellSize);
+                    EditorUtility.SetDirty(grid);
+                }
+
+                grids.Add(grid);
             }
-            finally
+
+            InventoryGridViewBase equipment = GraInventoryWindowBuilder.BindEquipmentPanel(window, cellSize);
+
+            if (equipment != null && grids.Contains(equipment) == false)
             {
-                UnityEngine.Object.DestroyImmediate(root);
+                grids.Insert(0, equipment);
             }
+
+            var serialized = new SerializedObject(window);
+            SerializedProperty list = serialized.FindProperty("_grids");
+            list.arraySize = grids.Count;
+
+            for (int i = 0; i < grids.Count; i++)
+            {
+                list.GetArrayElementAtIndex(i).objectReferenceValue = grids[i];
+            }
+
+            SerializedProperty secondaryRoot = serialized.FindProperty("_secondaryRoot");
+
+            if (secondaryRoot.objectReferenceValue == null && stashPanel != null)
+            {
+                secondaryRoot.objectReferenceValue = stashPanel;
+            }
+
+            serialized.ApplyModifiedPropertiesWithoutUndo();
+            EditorUtility.SetDirty(window);
+        }
+
+        private static Transform FindDescendant(Transform root, string name)
+        {
+            foreach (Transform child in root.GetComponentsInChildren<Transform>(true))
+            {
+                if (child.name == name)
+                {
+                    return child;
+                }
+            }
+
+            return null;
         }
 
         private static void ApplyDefaultFont(TMP_FontAsset font)
@@ -133,7 +188,14 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
                 }
 
                 var serialized = new SerializedObject(settings);
-                serialized.FindProperty("m_defaultFontAsset").objectReferenceValue = font;
+                SerializedProperty defaultFont = serialized.FindProperty("m_defaultFontAsset");
+
+                if (defaultFont.objectReferenceValue != null)
+                {
+                    continue;
+                }
+
+                defaultFont.objectReferenceValue = font;
                 serialized.ApplyModifiedPropertiesWithoutUndo();
                 EditorUtility.SetDirty(settings);
             }
@@ -141,7 +203,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
             AssetDatabase.SaveAssets();
         }
 
-        private static bool SetupScene(GameObject windowPrefab)
+        private static bool SetupScene(TMP_FontAsset font, InventoryTheme theme, IReadOnlyList<WorldItem> worldItems)
         {
             Scene scene = EditorSceneManager.OpenScene(SCENE_PATH, OpenSceneMode.Single);
             GameObject canvasObject = FindRoot(scene, CANVAS_NAME);
@@ -164,9 +226,10 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
 
             if (window == null)
             {
-                var instance = (GameObject)PrefabUtility.InstantiatePrefab(windowPrefab, canvasObject.transform);
-                window = instance.GetComponent<InventoryWindow>();
+                window = BuildWindow(canvasObject.transform, font, theme);
             }
+
+            BindSceneGrids(window);
 
             SetupEventSystem(scene);
             GameObject integration = FindRoot(scene, INTEGRATION_NAME);
@@ -193,7 +256,12 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
             controller.Configure(window, runtime, player, FindReference("Inventory", "ToggleInventory"), FindReference("Inventory", "CloseInventory"));
             controller.ConfigurePresentation(FindReference("Inventory", "ToggleStash"), FindHeader(window), window.GetComponentInChildren<InventoryStatusPanel>(true), "Сталкер", "Одиночки", 5000, GraInventoryWindowBuilder.LoadSprite(GraInventoryWindowBuilder.PORTRAIT_SPRITE), GraInventoryWindowBuilder.LoadSprite(GraInventoryWindowBuilder.RANK_SPRITE));
             controller.ConfigureSorting(FindReference("Inventory", "ToggleFavorite"), FindReference("Inventory", "ToggleJunk"), GraInventoryWindowBuilder.LoadSprite(GraInventoryWindowBuilder.FAVORITE_SPRITE), GraInventoryWindowBuilder.LoadSprite(GraInventoryWindowBuilder.JUNK_SPRITE));
+            controller.ConfigureStats(FindReference("Inventory", "FullStatsModifier"));
             EditorUtility.SetDirty(controller);
+            WorldItemInteractor interactor = GetOrAdd<WorldItemInteractor>(integration);
+            interactor.Configure(controller, FindReference("Inventory", "PickUp"));
+            EditorUtility.SetDirty(interactor);
+            WorldItemPrefabBuilder.PlaceInScene(scene, worldItems, player != null ? player.transform : null);
             EditorSceneManager.MarkSceneDirty(scene);
             return EditorSceneManager.SaveScene(scene);
         }

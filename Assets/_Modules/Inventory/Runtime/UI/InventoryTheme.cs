@@ -19,6 +19,7 @@ namespace Inventory.UI
         [SerializeField] private Color _accentColor = new(0.94f, 0.85f, 0.71f, 1f);
         [SerializeField] private Color _negativeColor = new(1f, 0.2f, 0.2f, 1f);
         [SerializeField] private Sprite _panelSprite;
+        [SerializeField] private InventoryIconSet _icons;
         [SerializeField] private Color _panelColor = Color.white;
         [SerializeField] private Vector4 _panelPadding = new(18f, 18f, 18f, 18f);
         [SerializeField] private bool _showItemBackground = true;
@@ -44,6 +45,7 @@ namespace Inventory.UI
         public Color AccentColor => _accentColor;
         public Color NegativeColor => _negativeColor;
         public Sprite PanelSprite => _panelSprite;
+        public InventoryIconSet Icons => _icons;
         public Color PanelColor => _panelColor;
         public Vector4 PanelPadding => _panelPadding;
         public bool ShowItemBackground => _showItemBackground;
@@ -57,6 +59,8 @@ namespace Inventory.UI
         public Color ConditionColor => _conditionColor;
 
         public static string Resolve(InventoryTheme theme, string key, string fallback) => theme != null ? theme.Label(key, fallback) : fallback;
+
+        public Sprite Icon(string id) => _icons != null ? _icons.Get(id) : null;
 
         public string Label(string key, string fallback)
         {

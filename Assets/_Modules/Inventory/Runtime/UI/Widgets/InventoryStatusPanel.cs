@@ -39,6 +39,33 @@ namespace Inventory.UI
             return found;
         }
 
+        public bool SetBonus(string id, float value, Color color)
+        {
+            bool found = false;
+
+            for (int i = 0; i < _bars.Count; i++)
+            {
+                if (_bars[i] != null && string.Equals(_bars[i].Id, id, StringComparison.Ordinal))
+                {
+                    _bars[i].ApplyBonus(value, color);
+                    found = true;
+                }
+            }
+
+            return found;
+        }
+
+        public void ClearBonus()
+        {
+            for (int i = 0; i < _bars.Count; i++)
+            {
+                if (_bars[i] != null)
+                {
+                    _bars[i].ClearBonus();
+                }
+            }
+        }
+
         public float GetValue(string id) => _values.TryGetValue(id, out float value) ? value : 0f;
     }
 }

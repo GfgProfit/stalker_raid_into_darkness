@@ -36,6 +36,11 @@ namespace Inventory.IconGeneration
                 return null;
             }
 
+            if (definition.IconOverride != null)
+            {
+                return definition.IconOverride;
+            }
+
             ItemIconGeneratorSettings settings = ItemIconGeneratorSettings.LoadDefault();
             IconRenderProfile renderProfile = IconRenderProfile.Create(definition, width, height, profileType, settings);
             IconCacheKey key = ItemIconStableKeyBuilder.Build(definition, variantIds, settings, renderProfile);
@@ -47,6 +52,12 @@ namespace Inventory.IconGeneration
             if (definition == null)
             {
                 icon = null;
+                return true;
+            }
+
+            if (definition.IconOverride != null)
+            {
+                icon = definition.IconOverride;
                 return true;
             }
 
@@ -204,6 +215,12 @@ namespace Inventory.IconGeneration
         private static async UniTask<Sprite> GetOrCreateStandaloneAsync(ItemDefinition definition, IReadOnlyList<string> variantIds, ItemIconGeneratorSettings settings, IconRenderProfile renderProfile, CancellationToken cancellationToken)
         {
             await UniTask.SwitchToMainThread(cancellationToken);
+
+            if (definition.IconOverride != null)
+            {
+                return definition.IconOverride;
+            }
+
             int settingsHash = settings.BuildHash();
             IconCacheKey key = ItemIconStableKeyBuilder.Build(definition, variantIds, settings, renderProfile);
 

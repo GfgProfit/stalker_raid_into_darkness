@@ -103,7 +103,7 @@ namespace Inventory.UI
 
         public static void RegisterDefaults(InventoryActionRegistry registry)
         {
-            registry.Register(new InventoryDelegateAction(USE, 0, context => context.Window.Label(USE, "Use"), context => context.Window.UseItem(context.Item), enabled: context => context.Window.CanUseItem(context.Item)));
+            registry.Register(new InventoryDelegateAction(USE, 0, context => context.Window.Label(USE, "Use"), context => context.Window.UseItem(context.Item), context => context.Window.CanUseItem(context.Item)));
             registry.Register(new InventoryDelegateAction(EQUIP, 10, context => context.Window.Label(EQUIP, "Equip"), context => context.Window.EquipItem(context.Item), context => context.Window.IsEquipped(context.Item) == false && context.Window.HasEquipmentSlotFor(context.Item), context => context.Window.CanEquipItem(context.Item)));
             registry.Register(new InventoryDelegateAction(UNEQUIP, 11, context => context.Window.Label(UNEQUIP, "Unequip"), context => context.Window.UnequipItem(context.Item), context => context.Window.IsEquipped(context.Item)));
             registry.Register(new InventoryDelegateAction(SPLIT, 20, context => context.Window.Label(SPLIT, "Split"), context => context.Window.OpenSplitDialog(context.Item), context => context.Item.IsStackable, context => context.Item.Amount > 1));

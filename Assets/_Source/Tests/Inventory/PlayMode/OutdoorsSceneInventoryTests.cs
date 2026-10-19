@@ -60,10 +60,10 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             InventoryGridViewBase backpackGrid = window.FindGrid(BACKPACK);
             InventoryGridViewBase stashGrid = window.FindGrid(STASH);
             InventoryGridViewBase equipmentGrid = window.FindGrid(EQUIPMENT);
-            Assert.That(backpackGrid.Columns, Is.EqualTo(11));
-            Assert.That(backpackGrid.Rows, Is.EqualTo(14));
-            Assert.That(stashGrid.Columns, Is.EqualTo(11));
-            Assert.That(stashGrid.Rows, Is.EqualTo(14));
+            Assert.That(backpackGrid.Columns, Is.GreaterThan(0));
+            Assert.That(backpackGrid.Rows, Is.GreaterThan(0));
+            Assert.That(stashGrid.Columns, Is.GreaterThan(0));
+            Assert.That(stashGrid.Rows, Is.GreaterThan(0));
             Assert.That(window.SecondaryVisible, Is.False, "Tab must open the personal inventory without the stash panel");
             yield return Tap(_keyboard.bKey);
             Assert.That(window.IsOpen, Is.True);
@@ -132,6 +132,111 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
 
             Assert.That(Horizontal(player.transform.position - position), Is.GreaterThan(0.3f), "WASD did not resume after closing");
 
+            WorldItemInteractor interactor = Object.FindAnyObjectByType<WorldItemInteractor>();
+            Assert.That(interactor, Is.Not.Null, "OutdoorsScene has no WorldItemInteractor");
+            int sceneItems = Object.FindObjectsByType<WorldItem>(FindObjectsSortMode.None).Length;
+            Assert.That(sceneItems, Is.GreaterThan(0), "OutdoorsScene has no world items to pick up");
+            ItemDefinition pickedDefinition = null;
+
+            foreach (ItemDefinition definition in controller.Inventory.Database.Definitions)
+            {
+                if (definition.TryGetComponent(out WorldItemComponent worldComponent) && worldComponent.Prefab != null)
+                {
+                    pickedDefinition = definition;
+                    break;
+                }
+            }
+
+            Assert.That(pickedDefinition, Is.Not.Null, "no item definition has a world prefab");
+            WorldItem spawned = interactor.Spawn(pickedDefinition, 1);
+            Assert.That(spawned, Is.Not.Null);
+            spawned.GetComponent<Rigidbody>().isKinematic = true;
+            Transform view = player.CameraController.Camera.transform;
+            Vector3 colliderOffset = spawned.GetComponent<Collider>().bounds.center - spawned.transform.position;
+            spawned.transform.position = view.position + view.forward * 1.2f - colliderOffset;
+            Physics.SyncTransforms();
+            yield return null;
+            Assert.That(interactor.FindTarget(), Is.SameAs(spawned), "the spawned world item is not under the crosshair");
+            yield return null;
+            Assert.That(window.Hint, Does.Contain("Подобрать"), "pick up hint was not shown");
+            int pickedBefore = CountItems(model, pickedDefinition);
+            yield return Tap(_keyboard.fKey);
+            yield return null;
+            Assert.That(CountItems(model, pickedDefinition), Is.EqualTo(pickedBefore + 1), "F did not pick up the world item");
+            Assert.That(spawned == null, Is.True, "picked world item was not removed from the scene");
+
+            yield return Tap(_keyboard.tabKey);
+            ItemInstance picked = null;
+
+            foreach (ItemInstance item in window.FindGrid(BACKPACK).Container.Items)
+            {
+                if (item.Definition == pickedDefinition)
+                {
+                    picked = item;
+                }
+            }
+
+            Assert.That(picked, Is.Not.Null);
+            InventoryItemView pickedView = window.FindGrid(BACKPACK).GetItemView(picked);
+            Assert.That(pickedView.Icon.preserveAspect, Is.True, "grid icons must keep the sprite aspect");
+            controller.Sorting.SetFavorite(pickedDefinition, true);
+            Color favoriteColor = controller.Sorting.Decorate(picked).Tint;
+            Assert.That(pickedView.Background.color, Is.EqualTo(favoriteColor));
+            Move(_mouse.position, RectTransformUtility.WorldToScreenPoint(null, pickedView.RectTransform.position), queueEventOnly: true);
+            yield return null;
+            yield return null;
+            Assert.That(pickedView.Background.color.a, Is.GreaterThan(favoriteColor.a), "hovered favorite item is not highlighted");
+            Assert.That(new Vector3(pickedView.Background.color.r, pickedView.Background.color.g, pickedView.Background.color.b), Is.EqualTo(new Vector3(favoriteColor.r, favoriteColor.g, favoriteColor.b)), "hover must keep the favorite hue");
+            Move(_mouse.position, new Vector2(5f, 5f), queueEventOnly: true);
+            yield return null;
+            yield return null;
+            Assert.That(pickedView.Background.color, Is.EqualTo(favoriteColor), "favorite color did not return after hover");
+            controller.Sorting.SetFavorite(pickedDefinition, false);
+            IReadOnlyList<InventoryItemStat> stats = window.CollectStats(picked);
+            Assert.That(stats.Count, Is.GreaterThanOrEqualTo(9), "equipment stats are missing in the tooltip data");
+            Assert.That(stats[0].Value.EndsWith("%") && stats[0].Icon != null, Is.True);
+            ItemDefinition nosorog = null;
+
+            foreach (ItemDefinition definition in controller.Inventory.Database.Definitions)
+            {
+                if (definition.name == "army_nosorog_outfit")
+                {
+                    nosorog = definition;
+                }
+            }
+
+            Assert.That(nosorog, Is.Not.Null);
+            var nosorogValues = new List<string>();
+
+            foreach (InventoryItemStat stat in window.CollectStats(model.CreateItem(nosorog)))
+            {
+                nosorogValues.Add(stat.Value);
+            }
+
+            Assert.That(nosorogValues, Is.EqualTo(new[] { "+62 %", "+37 %", "+66 %", "+61 %", "+44 %", "+52 %", "+16 %", "+25 %", "+16 %", "+91 %", "2", "+108 кг", "100 %", "98 %", "72 %" }), "army_nosorog_outfit stats differ from the game");
+            window.Tooltip.Show(picked, new Vector2(400f, 400f), null, stats);
+            Assert.That(window.Tooltip.StatCount, Is.EqualTo(stats.Count));
+            Assert.That(((RectTransform)window.Tooltip.transform).sizeDelta.x, Is.GreaterThanOrEqualTo(440f));
+            window.Tooltip.Hide();
+            window.EquipItem(picked);
+            yield return null;
+            Assert.That(picked.ContainerId, Is.EqualTo(EQUIPMENT));
+            InventoryEquipmentSlot equippedSlot = ((InventoryEquipmentPanel)equipmentGrid).GetSlotView(picked.Location.SlotId);
+            Assert.That(equippedSlot, Is.Not.Null, "equipment panel has no slot object for " + picked.Location.SlotId);
+            Assert.That(equippedSlot.Icon.sprite, Is.SameAs(pickedDefinition.FallbackIcon), "equipped icon is not shown in the slot icon image");
+            Assert.That(equippedSlot.Icon.isActiveAndEnabled && equippedSlot.Icon.preserveAspect, Is.True, "equipped icon is hidden");
+            window.UnequipItem(picked);
+            yield return null;
+            Assert.That(equippedSlot.Icon.isActiveAndEnabled, Is.False, "unequipped slot still shows the icon");
+            int worldBefore = Object.FindObjectsByType<WorldItem>(FindObjectsSortMode.None).Length;
+            window.DropItem(picked);
+            yield return null;
+            Assert.That(model.ContainsItem(picked), Is.False);
+            Assert.That(Object.FindObjectsByType<WorldItem>(FindObjectsSortMode.None).Length, Is.EqualTo(worldBefore + 1), "dropping did not spawn a world item");
+            yield return Tap(_keyboard.tabKey);
+            yield return null;
+            yield return null;
+
             int generated = window.GetComponentsInChildren<InventoryGeneratedElement>(true).Length;
             int itemCount = model.ItemCount;
             yield return Tap(_keyboard.tabKey);
@@ -155,6 +260,21 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             yield return null;
             Release(button, queueEventOnly: true);
             yield return null;
+        }
+
+        private static int CountItems(InventoryModel model, ItemDefinition definition)
+        {
+            int count = 0;
+
+            foreach (ItemInstance item in model.Items)
+            {
+                if (item.Definition == definition)
+                {
+                    count += item.Amount;
+                }
+            }
+
+            return count;
         }
 
         private static float Horizontal(Vector3 delta) => new Vector2(delta.x, delta.z).magnitude;

@@ -331,7 +331,9 @@
                 { "name": "QuickTransferModifier", "type": "Button", "id": "1d4a6b0e-7c3a-4c55-8a14-5e1a8b3c2d35", "expectedControlType": "Button", "processors": "", "interactions": "", "initialStateCheck": true },
                 { "name": "ToggleStash", "type": "Button", "id": "1d4a6b0e-7c3a-4c55-8a14-5e1a8b3c2d36", "expectedControlType": "Button", "processors": "", "interactions": "", "initialStateCheck": false },
                 { "name": "ToggleFavorite", "type": "Button", "id": "1d4a6b0e-7c3a-4c55-8a14-5e1a8b3c2d37", "expectedControlType": "Button", "processors": "", "interactions": "", "initialStateCheck": false },
-                { "name": "ToggleJunk", "type": "Button", "id": "1d4a6b0e-7c3a-4c55-8a14-5e1a8b3c2d38", "expectedControlType": "Button", "processors": "", "interactions": "", "initialStateCheck": false }
+                { "name": "ToggleJunk", "type": "Button", "id": "1d4a6b0e-7c3a-4c55-8a14-5e1a8b3c2d38", "expectedControlType": "Button", "processors": "", "interactions": "", "initialStateCheck": false },
+                { "name": "PickUp", "type": "Button", "id": "1d4a6b0e-7c3a-4c55-8a14-5e1a8b3c2d39", "expectedControlType": "Button", "processors": "", "interactions": "", "initialStateCheck": false },
+                { "name": "FullStatsModifier", "type": "Button", "id": "1d4a6b0e-7c3a-4c55-8a14-5e1a8b3c2d3a", "expectedControlType": "Button", "processors": "", "interactions": "", "initialStateCheck": true }
             ],
             "bindings": [
                 { "name": "", "id": "2e5b7c1f-8d4b-4d66-9b25-6f2b9c4d3e31", "path": "<Keyboard>/tab", "interactions": "", "processors": "", "groups": "Keyboard&Mouse", "action": "ToggleInventory", "isComposite": false, "isPartOfComposite": false },
@@ -340,7 +342,10 @@
                 { "name": "", "id": "2e5b7c1f-8d4b-4d66-9b25-6f2b9c4d3e35", "path": "<Keyboard>/leftShift", "interactions": "", "processors": "", "groups": "Keyboard&Mouse", "action": "QuickTransferModifier", "isComposite": false, "isPartOfComposite": false },
                 { "name": "", "id": "2e5b7c1f-8d4b-4d66-9b25-6f2b9c4d3e36", "path": "<Keyboard>/b", "interactions": "", "processors": "", "groups": "Keyboard&Mouse", "action": "ToggleStash", "isComposite": false, "isPartOfComposite": false },
                 { "name": "", "id": "2e5b7c1f-8d4b-4d66-9b25-6f2b9c4d3e37", "path": "<Keyboard>/k", "interactions": "", "processors": "", "groups": "Keyboard&Mouse", "action": "ToggleFavorite", "isComposite": false, "isPartOfComposite": false },
-                { "name": "", "id": "2e5b7c1f-8d4b-4d66-9b25-6f2b9c4d3e38", "path": "<Keyboard>/j", "interactions": "", "processors": "", "groups": "Keyboard&Mouse", "action": "ToggleJunk", "isComposite": false, "isPartOfComposite": false }
+                { "name": "", "id": "2e5b7c1f-8d4b-4d66-9b25-6f2b9c4d3e38", "path": "<Keyboard>/j", "interactions": "", "processors": "", "groups": "Keyboard&Mouse", "action": "ToggleJunk", "isComposite": false, "isPartOfComposite": false },
+                { "name": "", "id": "2e5b7c1f-8d4b-4d66-9b25-6f2b9c4d3e39", "path": "<Keyboard>/f", "interactions": "", "processors": "", "groups": "Keyboard&Mouse", "action": "PickUp", "isComposite": false, "isPartOfComposite": false },
+                { "name": "", "id": "2e5b7c1f-8d4b-4d66-9b25-6f2b9c4d3e3a", "path": "<Keyboard>/leftCtrl", "interactions": "", "processors": "", "groups": "Keyboard&Mouse", "action": "FullStatsModifier", "isComposite": false, "isPartOfComposite": false },
+                { "name": "", "id": "2e5b7c1f-8d4b-4d66-9b25-6f2b9c4d3e3b", "path": "<Keyboard>/rightCtrl", "interactions": "", "processors": "", "groups": "Keyboard&Mouse", "action": "FullStatsModifier", "isComposite": false, "isPartOfComposite": false }
             ]
         },
         {

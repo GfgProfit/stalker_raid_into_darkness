@@ -26,6 +26,8 @@ namespace Inventory.UI
         private InventoryTheme _appliedTheme;
         private Image _indicator;
         private Image _badge;
+        private Image _iconTarget;
+        private RectTransform _overlay;
         private CanvasGroup _canvasGroup;
         private InventoryGridViewBase _grid;
         private CancellationTokenSource _iconCancellation;
@@ -35,11 +37,13 @@ namespace Inventory.UI
         private bool _ghost;
         private bool _dimmed;
         private bool _dragSource;
+        private bool _hovered;
 
         public ItemInstance Item { get; private set; }
         public InventoryGridViewBase Grid => _grid;
         public RectTransform RectTransform => _rectTransform;
         public Image Icon => _icon;
+        public Image Background => _background;
         public Sprite IconSprite => _icon != null ? _icon.sprite : null;
         public bool IsIconLoading { get; private set; }
         public bool IsGhost => _ghost;
@@ -119,7 +123,9 @@ namespace Inventory.UI
 
             if (_grid.UsesSlotIcon(Item, out _))
             {
-                _content.sizeDelta = topLeftArea.size;
+                Rect iconArea = _grid.GetIconRect(Item, topLeftArea);
+                _content.sizeDelta = iconArea.size;
+                _content.anchoredPosition = new Vector2(iconArea.center.x - topLeftArea.center.x, topLeftArea.center.y - iconArea.center.y);
                 _content.localRotation = Quaternion.identity;
                 return;
             }
@@ -136,6 +142,32 @@ namespace Inventory.UI
         public void SetDimmed(bool dimmed)
         {
             _dimmed = dimmed;
+            UpdateAlpha();
+        }
+
+        public void SetIconTarget(Image target)
+        {
+            if (_iconTarget == target)
+            {
+                return;
+            }
+
+            if (_iconTarget != null)
+            {
+                _iconTarget.canvasRenderer.SetAlpha(1f);
+            }
+
+            _iconTarget = target;
+            bool external = target != null;
+            _background.enabled = external == false;
+            _overlay.gameObject.SetActive(external == false);
+
+            if (external)
+            {
+                target.preserveAspect = true;
+            }
+
+            SetIcon(_icon.sprite);
             UpdateAlpha();
         }
 
@@ -157,8 +189,18 @@ namespace Inventory.UI
             ApplyContent(Item.Definition.Size, cellSize, rotated);
         }
 
-        public void OnPointerEnter(PointerEventData eventData) => _grid?.Window?.HandleItemPointerEnter(this, eventData);
-        public void OnPointerExit(PointerEventData eventData) => _grid?.Window?.HandleItemPointerExit(this, eventData);
+        public void OnPointerEnter(PointerEventData eventData)
+        {
+            SetHovered(true);
+            _grid?.Window?.HandleItemPointerEnter(this, eventData);
+        }
+
+        public void OnPointerExit(PointerEventData eventData)
+        {
+            SetHovered(false);
+            _grid?.Window?.HandleItemPointerExit(this, eventData);
+        }
+
         public void OnPointerClick(PointerEventData eventData) => _grid?.Window?.HandleItemClick(this, eventData);
 
         public void OnInitializePotentialDrag(PointerEventData eventData) => eventData.useDragThreshold = true;
@@ -166,11 +208,14 @@ namespace Inventory.UI
         public void OnDrag(PointerEventData eventData) => _grid?.Window?.HandleDrag(eventData);
         public void OnEndDrag(PointerEventData eventData) => _grid?.Window?.HandleEndDrag(eventData);
 
+        private void OnDisable() => SetHovered(false);
+
         private void OnDestroy() => CancelIcon();
 
         private void ApplyContent(Vector2Int baseSize, Vector2 cellSize, bool rotated)
         {
             _content.sizeDelta = new Vector2(baseSize.x * cellSize.x, baseSize.y * cellSize.y);
+            _content.anchoredPosition = Vector2.zero;
             _content.localRotation = Quaternion.Euler(0f, 0f, rotated ? -90f : 0f);
         }
 
@@ -267,9 +312,33 @@ namespace Inventory.UI
         {
             InventoryWindow window = _grid != null ? _grid.Window : null;
             InventoryItemDecoration decoration = _ghost == false && window != null && window.ItemDecorator != null ? window.ItemDecorator(Item) : InventoryItemDecoration.None;
-            _background.color = decoration.HasTint ? decoration.Tint : BackgroundColor(Item.Definition);
+            Color background = decoration.HasTint ? decoration.Tint : BackgroundColor(Item.Definition);
+            _background.color = _hovered && _ghost == false ? HoverColor(background, decoration.HasTint) : background;
             _badge.sprite = decoration.Badge;
             _badge.enabled = decoration.Badge != null;
+        }
+
+        private void SetHovered(bool hovered)
+        {
+            if (_hovered == hovered || Item == null)
+            {
+                return;
+            }
+
+            _hovered = hovered;
+            ApplyDecoration();
+        }
+
+        private Color HoverColor(Color background, bool tinted)
+        {
+            Color highlight = _grid != null ? _grid.Style.HighlightColor : Color.clear;
+
+            if (tinted)
+            {
+                return new Color(background.r, background.g, background.b, Mathf.Clamp01(background.a + highlight.a));
+            }
+
+            return highlight.a > background.a ? highlight : background;
         }
 
         private Color BackgroundColor(ItemDefinition definition) => _appliedTheme != null && _appliedTheme.ShowItemBackground == false ? Color.clear : definition.BackgroundColor;
@@ -282,6 +351,11 @@ namespace Inventory.UI
             }
 
             _canvasGroup.alpha = _dragSource ? DRAGGED_SOURCE_ALPHA : _dimmed ? DIMMED_ALPHA : 1f;
+
+            if (_iconTarget != null)
+            {
+                _iconTarget.canvasRenderer.SetAlpha(_canvasGroup.alpha);
+            }
         }
 
         private void RequestIcon(ItemIconRequest request)
@@ -329,7 +403,14 @@ namespace Inventory.UI
         private void SetIcon(Sprite sprite)
         {
             _icon.sprite = sprite;
-            _icon.enabled = sprite != null;
+            _icon.enabled = sprite != null && _iconTarget == null;
+
+            if (_iconTarget != null)
+            {
+                _iconTarget.sprite = sprite;
+                _iconTarget.enabled = true;
+                _iconTarget.gameObject.SetActive(sprite != null);
+            }
         }
 
         private void CancelIcon()
@@ -377,9 +458,10 @@ namespace Inventory.UI
             _background.raycastTarget = false;
             _icon = CreateChild("Icon", hideFlags, _content, false).gameObject.AddComponent<Image>();
             _icon.raycastTarget = false;
-            _icon.preserveAspect = false;
+            _icon.preserveAspect = true;
             _icon.enabled = false;
             RectTransform overlay = CreateChild("Overlay", hideFlags, _rectTransform, false);
+            _overlay = overlay;
             _infoShadow = CreateShadow("InfoShadow", hideFlags, overlay, TextAlignmentOptions.TopLeft);
             _infoText = CreateText("Info", hideFlags, overlay, TextAlignmentOptions.TopLeft, 15f);
             _conditionShadow = CreateShadow("ConditionShadow", hideFlags, overlay, TextAlignmentOptions.BottomLeft);

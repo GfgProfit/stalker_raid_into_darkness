@@ -45,6 +45,7 @@ namespace Inventory.UI
         public override int Rows => _gridHeight;
         public override Vector2 ContentSize => _contentSize;
         public override string LayoutWarning => _layoutWarning;
+        public override bool UsesItemFilter => _isEquipment == false;
 
         public void SetLayout(InventorySlotLayout layout, float slotSpacing, bool centerRows, bool isEquipment)
         {

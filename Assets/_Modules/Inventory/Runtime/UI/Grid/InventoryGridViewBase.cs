@@ -56,6 +56,7 @@ namespace Inventory.UI
         public abstract int Rows { get; }
         public abstract Vector2 ContentSize { get; }
         public abstract string LayoutWarning { get; }
+        public virtual bool UsesItemFilter => true;
 
         public event Action<InventoryGridViewBase> LayoutRebuilt;
 
@@ -119,6 +120,8 @@ namespace Inventory.UI
             slotSize = Vector2Int.zero;
             return false;
         }
+
+        public virtual Rect GetIconRect(ItemInstance item, Rect area) => area;
 
         public void Bind(InventoryWindow window, InventoryContainer container)
         {
@@ -204,6 +207,7 @@ namespace Inventory.UI
             {
                 if (_itemViews.TryGetValue(instanceId, out InventoryItemView stale) && stale != null)
                 {
+                    stale.SetIconTarget(null);
                     DestroyGenerated(stale.gameObject);
                 }
 
@@ -223,11 +227,12 @@ namespace Inventory.UI
 
             RelayoutItems();
             ApplyFilter();
+            OnItemsSynced();
         }
 
         public void ApplyFilter()
         {
-            Func<ItemInstance, bool> filter = _window != null ? _window.ItemFilter : null;
+            Func<ItemInstance, bool> filter = _window != null && UsesItemFilter ? _window.ItemFilter : null;
 
             foreach (InventoryItemView view in _itemViews.Values)
             {
@@ -249,6 +254,14 @@ namespace Inventory.UI
         }
 
         protected virtual bool DrawCompatibleAreas(IReadOnlyList<RectInt> areas) => false;
+
+        protected virtual void OnItemViewLayout(InventoryItemView view)
+        {
+        }
+
+        protected virtual void OnItemsSynced()
+        {
+        }
 
         protected void DrawCellRegion(InventoryGridGraphic graphic, Rect region, int columns, int rows) => DrawCellRegion(graphic, region, columns, rows, CellSize);
 
@@ -361,6 +374,7 @@ namespace Inventory.UI
                 if (view != null && view.Item != null && _container.Contains(view.Item))
                 {
                     view.Layout(GetAreaRect(_container.GetItemArea(view.Item)));
+                    OnItemViewLayout(view);
                 }
             }
         }

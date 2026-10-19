@@ -15,6 +15,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
         [SerializeField] private bool _rotated;
         [SerializeField] private bool _autoPlace;
         [SerializeField] private List<ItemDefinition> _visualVariant = new();
+        [SerializeField] [Range(0f, 1f)] private float _condition = 1f;
 
         public InventorySeedEntry()
         {
@@ -38,6 +39,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
         public bool Rotated => _rotated;
         public bool AutoPlace => _autoPlace;
         public IReadOnlyList<ItemDefinition> VisualVariant => _visualVariant;
+        public float Condition => Mathf.Clamp01(_condition);
     }
 
     [CreateAssetMenu(menuName = "Raid Into Darkness/Inventory/Inventory Seed", fileName = "InventorySeed")]
@@ -74,6 +76,11 @@ namespace RaidIntoDarkness.Integrations.Inventory
                 if (variant.Count > 0)
                 {
                     item.SetVisualVariant(variant);
+                }
+
+                if (entry.Condition < 1f)
+                {
+                    item.SetState(EquipmentStatsFormatter.CONDITION_STATE, entry.Condition.ToString(System.Globalization.CultureInfo.InvariantCulture));
                 }
 
                 InventoryResult result = entry.AutoPlace ? model.TryAddAuto(item, entry.ContainerId, false) : model.TryAdd(item, entry.ContainerId, entry.Position, entry.Rotated);

@@ -19,6 +19,7 @@ namespace Inventory
         [SerializeField] private bool _allowRotation = true;
         [SerializeField] private Color _backgroundColor = new(1f, 1f, 1f, 0.04f);
         [SerializeField] private Sprite _fallbackIcon;
+        [SerializeField] private Sprite _iconOverride;
         [SerializeField] private GameObject _visualPrefab;
         [SerializeField] private List<ItemDefinition> _defaultIconVariant = new();
         [SerializeField] private ItemIconSettings _icon = new();
@@ -38,12 +39,13 @@ namespace Inventory
         public bool IsStackable => MaxStack > 1;
         public bool AllowRotation => _allowRotation && Width != Height;
         public Color BackgroundColor => _backgroundColor;
-        public Sprite FallbackIcon => _fallbackIcon;
+        public Sprite FallbackIcon => _iconOverride != null ? _iconOverride : _fallbackIcon;
+        public Sprite IconOverride => _iconOverride;
         public GameObject VisualPrefab => _visualPrefab;
         public IReadOnlyList<ItemDefinition> DefaultIconVariant => _defaultIconVariant;
         public ItemIconSettings Icon => _icon;
         public IReadOnlyList<ItemDefinitionComponent> Components => _components;
-        public bool CanGenerateIcon => _icon != null && _icon.GenerateIcon && _visualPrefab != null;
+        public bool CanGenerateIcon => _iconOverride == null && _icon != null && _icon.GenerateIcon && _visualPrefab != null;
 
         public bool HasTag(string tag)
         {

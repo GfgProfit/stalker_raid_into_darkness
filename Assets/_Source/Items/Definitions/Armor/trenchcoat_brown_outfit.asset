@@ -1,0 +1,110 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da0f90c2955673d46b25d465cbe44ed0, type: 3}
+  m_Name: trenchcoat_brown_outfit
+  m_EditorClassIdentifier: Inventory::Inventory.ItemDefinition
+  _definitionId: 0f52292d5af2f8246a3c245e8e6effc7
+  _displayName: "\u0422\u044F\u0436\u0451\u043B\u044B\u0439 \u043A\u043E\u0440\u0438\u0447\u043D\u0435\u0432\u044B\u0439
+    \u043F\u043B\u0430\u0449"
+  _shortName: "\u0422\u044F\u0436\u0451\u043B\u044B\u0439 \u043A\u043E\u0440\u0438\u0447\u043D\u0435\u0432\u044B\u0439
+    \u043F\u043B\u0430\u0449"
+  _description: "\u0414\u043B\u0438\u043D\u043D\u044B\u0439 \u043F\u043B\u043E\u0442\u043D\u044B\u0439
+    \u043F\u043B\u0430\u0449, \u043F\u0440\u0438\u0448\u0438\u0442\u044B\u0439 \u043A
+    \u043F\u043E\u0432\u0438\u0434\u0430\u0432\u0448\u0435\u043C\u0443 \u0441\u0432\u043E\u0438
+    \u0433\u043E\u0434\u044B \u043D\u0430\u0443\u0447\u043D\u043E\u043C\u0443 \u043A\u043E\u043C\u0431\u0438\u043D\u0435\u0437\u043E\u043D\u0443.
+    \u0414\u0430\u0436\u0435 \u043D\u0435\u0441\u043C\u043E\u0442\u0440\u044F \u043D\u0430
+    \u043E\u0442\u0441\u0443\u0442\u0441\u0442\u0432\u0438\u0435 \u0437\u0430\u043C\u043A\u043D\u0443\u0442\u043E\u0439
+    \u0441\u0438\u0441\u0442\u0435\u043C\u044B \u0434\u044B\u0445\u0430\u043D\u0438\u044F
+    \u0438 \u043F\u0440\u043E\u0447\u0438\u0445 \u044D\u043B\u0435\u043C\u0435\u043D\u0442\u043E\u0432,
+    \u043F\u0440\u0438\u0441\u0443\u0449\u0438\u0445 \u043D\u0430\u0443\u0447\u043D\u044B\u043C
+    \u043A\u043E\u043C\u0431\u0438\u043D\u0435\u0437\u043E\u043D\u0430\u043C, \u0438\u043C\u0435\u044E\u0449\u0438\u0435\u0441\u044F
+    \u043F\u043E\u043A\u0430\u0437\u0430\u0442\u0435\u043B\u0438 \u0437\u0430\u0449\u0438\u0442\u044B
+    \u0432\u0441\u0451 \u0440\u0430\u0432\u043D\u043E \u043B\u0443\u0447\u0448\u0435
+    \u0440\u044F\u0434\u0430 \u0431\u0430\u0437\u043E\u0432\u044B\u0445 \u0437\u0430\u0449\u0438\u0442\u043D\u044B\u0445
+    \u043A\u043E\u0441\u0442\u044E\u043C\u043E\u0432."
+  _category: Armor
+  _tags: []
+  _size: {x: 3, y: 3}
+  _weight: 5.08
+  _maxStack: 1
+  _allowRotation: 1
+  _backgroundColor: {r: 1, g: 1, b: 1, a: 0.04}
+  _fallbackIcon: {fileID: 0}
+  _iconOverride: {fileID: 1022822042, guid: 5709f73643465ba40bd623e3613dfa99, type: 3}
+  _visualPrefab: {fileID: 6495776548284079221, guid: 99b6aaadc105f874cb9030595af3f396, type: 3}
+  _defaultIconVariant: []
+  _icon:
+    _generateIcon: 1
+    _pixelsPerCell: 64
+    _antiAliasing: 1
+    _useOutline: 1
+    _outlineWidth: 2
+    _useShadow: 1
+    _shadowOffset: {x: 2, y: -2}
+    _shadowBlur: 2
+    _defaultView:
+      _modelEulerAngles: {x: 0, y: 0, z: 0}
+      _modelScale: {x: 1, y: 1, z: 1}
+      _cameraEulerAngles: {x: 89, y: 180, z: 0}
+      _padding: 1.15
+      _useDirectionalLight: 1
+      _lightIntensity: 20
+    _useCustomSlotView: 0
+    _slotView:
+      _modelEulerAngles: {x: 0, y: 0, z: 0}
+      _modelScale: {x: 1, y: 1, z: 1}
+      _cameraEulerAngles: {x: 25, y: -135, z: 0}
+      _padding: 1.15
+      _useDirectionalLight: 1
+      _lightIntensity: 10
+  _components:
+  - rid: 3479885471900762422
+  - rid: 3479885471900762423
+  - rid: 3479885472039698587
+  references:
+    version: 2
+    RefIds:
+    - rid: 3479885471900762422
+      type: {class: EquippableItemComponent, ns: Inventory, asm: Inventory}
+      data:
+        _preferredSlotIds:
+        - Outfit
+    - rid: 3479885471900762423
+      type: {class: EquipmentStatsComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      data:
+        _section: trenchcoat_brown_outfit
+        _cost: 13500
+        _repairType: outfit_light
+        _community: 
+        _burnProtection: 0.122
+        _shockProtection: 0.47
+        _chemicalBurnProtection: 0.046
+        _radiationProtection: 0.003
+        _telepaticProtection: 0.038
+        _woundProtection: 0.36
+        _strikeProtection: 0.26
+        _explosionProtection: 0.2
+        _fireWoundProtection: 0.28
+        _helmetFireWoundProtection: 0
+        _artefactCount: 1
+        _additionalWeight: 8
+        _powerLoss: 0.05
+        _helmetAvailable: 1
+        _sprintAllowed: 1
+        _nightVisionSection: 
+        _speed: 1.04
+        _physicalDurability: 0.151142
+        _anomalyDurability: 0.6871167
+    - rid: 3479885472039698587
+      type: {class: WorldItemComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      data:
+        _prefab: {fileID: 2703485172414374610, guid: aae6add11ff9275469c5423cb3d2f09c, type: 3}

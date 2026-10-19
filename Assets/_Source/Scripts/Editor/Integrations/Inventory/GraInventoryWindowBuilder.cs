@@ -12,12 +12,16 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
     {
         public const string ROOT = "Assets/_Source/UI/Inventory/GRA";
         public const string SPRITES_FOLDER = ROOT + "/Sprites";
-        public const string FONT_PATH = "Assets/_Source/Fonts/Oswald/Oswald-Regular SDF.asset";
+        public const string FONT_PATH = "Assets/_Source/Fonts/Bender/bender_regular SDF.asset";
         public const string THEME_PATH = ROOT + "/GraInventoryTheme.asset";
         public const string PORTRAIT_SPRITE = "gra_portrait";
         public const string RANK_SPRITE = "gra_rank";
         public const string FAVORITE_SPRITE = "gra_sort_favourite";
         public const string JUNK_SPRITE = "gra_sort_junk";
+        public const string STASH_PANEL = "StashPanel";
+        public const string SLOT_SUFFIX = " Slot";
+        public const string SLOT_ICON = "Icon";
+        public const string EQUIPMENT_TITLE = "Экипировка";
         public const float CELL = 41f * SCALE_Y;
 
         private const float SCALE_X = 1920f / 1024f;
@@ -26,6 +30,14 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
         private const int BAG_ROWS = 14;
         private const string WEIGHT_FORMAT = "<color=#808080>Общий вес:</color>  <color=#{2}>{0} кг</color>  <color=#808080>(max {1} кг)</color>";
         private const string WEIGHT_FORMAT_UNLIMITED = "<color=#808080>Общий вес:</color>  <color=#{2}>{0} кг</color>";
+        private const string PROTECTION_BAR_SPRITE = "gra_bar_progress";
+
+        private static readonly (string Name, string SlotId)[] _slotAliases =
+        {
+            ("Helmet", "Head"),
+            ("PDA", "Pda"),
+            ("Melee", "Knife")
+        };
 
         private static readonly (string Key, string Text)[] _labels =
         {
@@ -46,6 +58,48 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
             ("status_split", "Отделено {0} шт.: {1}"),
             ("status_moved", "Перемещено: {0}"),
             ("status_dropped", "Выброшено: {0}"),
+            ("status_picked", "Подобрано: {0}"),
+            ("hint_pick_up", "[{0}] Подобрать"),
+            ("stat_fire_wound", "Баллист. защита"),
+            ("stat_fire_wound_helmet", "Балл. защ. Шлема"),
+            ("stat_speed", "Множ. подвижности"),
+            ("stat_durability_physical", "Физ. прочность"),
+            ("stat_durability_anomaly", "Аном. прочность"),
+            ("stat_unit_kg", "кг"),
+            ("stat_burn", "Термозащита"),
+            ("stat_shock", "Электрозащита"),
+            ("stat_chemical_burn", "Химзащита"),
+            ("stat_radiation", "Радиозащита"),
+            ("stat_telepatic", "Пси-защита"),
+            ("stat_wound", "Защ. от разрыва"),
+            ("stat_strike", "Гашение удара"),
+            ("stat_explosion", "Защ. от взрыва"),
+            ("stat_artefact_count", "Кол-во слотов"),
+            ("stat_additional_weight", "Переносимый вес"),
+            ("tooltip_cost", "Стоимость:"),
+            ("unit_currency", "руб."),
+            ("tooltip_condition", "Состояние"),
+            ("tooltip_features", "ОСОБЕННОСТИ"),
+            ("feature_community", "группировка"),
+            ("feature_helmet", "головной убор"),
+            ("feature_helmet_none", "отсутствует"),
+            ("feature_helmet_builtin", "встроенный"),
+            ("feature_sprint", "передвижение бегом:"),
+            ("feature_possible", "возможно"),
+            ("feature_not_possible", "невозможно"),
+            ("community_unknown", "Неизвестный"),
+            ("community_stalker", "Одиночки"),
+            ("community_dolg", "«Долг»"),
+            ("community_freedom", "«Свобода»"),
+            ("community_csky", "«Чистое небо»"),
+            ("community_ecolog", "Учёные"),
+            ("community_killer", "Наёмники"),
+            ("community_army", "Военные"),
+            ("community_bandit", "Бандиты"),
+            ("community_monolith", "«Монолит»"),
+            ("community_renegade", "Ренегаты"),
+            ("community_greh", "«Грех»"),
+            ("community_isg", "«Интернациональная исследовательская группа»"),
             ("failure_InvalidItem", "Неверный предмет"),
             ("failure_ItemNotFound", "Предмет не найден"),
             ("failure_ContainerNotFound", "Контейнер не найден"),
@@ -65,7 +119,6 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
             ("failure_Duplicate", "Предмет уже здесь"),
             ("tooltip_weight", "Вес: "),
             ("tooltip_amount", "   Количество: "),
-            ("tooltip_tags", "Теги: "),
             ("unit_kg", " кг"),
             ("split_title", "Разделить: "),
             ("button_split", "Разделить"),
@@ -86,9 +139,9 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
         private static readonly Color _mutedColor = new(128f / 255f, 128f / 255f, 128f / 255f, 1f);
         private static readonly Color _accentColor = new(240f / 255f, 217f / 255f, 182f / 255f, 1f);
         private static readonly Color _barBackgroundColor = new(26f / 255f, 26f / 255f, 26f / 255f, 1f);
-        private static readonly Color _healthColor = new(0.86f, 0.69f, 0.2f, 1f);
-        private static readonly Color _protectionColor = new(0.36f, 0.8f, 0.25f, 1f);
-        private static readonly Color _needsColor = new(0.86f, 0.69f, 0.2f, 1f);
+        private static readonly Color _healthColor = new(219f / 255f, 56f / 255f, 51f / 255f, 1f);
+        private static readonly Color _protectionColor = new(219f / 255f, 176f / 255f, 51f / 255f, 1f);
+        private static readonly Color _needsColor = new(219f / 255f, 176f / 255f, 51f / 255f, 1f);
 
         public sealed class Result
         {
@@ -120,52 +173,72 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
         public static InventoryTheme BuildTheme(TMP_FontAsset font)
         {
             var theme = AssetDatabase.LoadAssetAtPath<InventoryTheme>(THEME_PATH);
+            bool created = theme == null;
 
-            if (theme == null)
+            if (created)
             {
                 theme = ScriptableObject.CreateInstance<InventoryTheme>();
                 AssetDatabase.CreateAsset(theme, THEME_PATH);
             }
 
             var serialized = new SerializedObject(theme);
-            serialized.FindProperty("_bodyFont").objectReferenceValue = font;
-            serialized.FindProperty("_headerFont").objectReferenceValue = font;
-            serialized.FindProperty("_accentFont").objectReferenceValue = font;
-            serialized.FindProperty("_smallFont").objectReferenceValue = font;
-            serialized.FindProperty("_textColor").colorValue = new Color(170f / 255f, 170f / 255f, 170f / 255f, 1f);
-            serialized.FindProperty("_mutedTextColor").colorValue = _mutedColor;
-            serialized.FindProperty("_accentColor").colorValue = _accentColor;
-            serialized.FindProperty("_negativeColor").colorValue = new Color(1f, 50f / 255f, 50f / 255f, 1f);
-            serialized.FindProperty("_panelSprite").objectReferenceValue = LoadSprite("gra_hint_window");
-            serialized.FindProperty("_panelColor").colorValue = Color.white;
-            serialized.FindProperty("_showItemBackground").boolValue = false;
-            serialized.FindProperty("_showItemWeight").boolValue = false;
-            serialized.FindProperty("_showItemCount").boolValue = true;
-            serialized.FindProperty("_itemTextShadow").boolValue = true;
-            serialized.FindProperty("_countFormat").stringValue = "x{0}";
-            serialized.FindProperty("_weightUnit").stringValue = "кг";
-            serialized.FindProperty("_itemTextSize").floatValue = 15f;
-            serialized.FindProperty("_itemNameSize").floatValue = 14f;
-            serialized.FindProperty("_itemTextColor").colorValue = Color.white;
-            serialized.FindProperty("_itemShadowColor").colorValue = new Color(0f, 0f, 0f, 0.9f);
-            serialized.FindProperty("_conditionColor").colorValue = new Color(100f / 255f, 1f, 150f / 255f, 1f);
-            SerializedProperty categories = serialized.FindProperty("_shortNameCategories");
-            categories.arraySize = 1;
-            categories.GetArrayElementAtIndex(0).stringValue = "Weapon";
-            SerializedProperty labels = serialized.FindProperty("_labels");
-            labels.arraySize = _labels.Length;
 
-            for (int i = 0; i < _labels.Length; i++)
+            if (created)
             {
-                SerializedProperty label = labels.GetArrayElementAtIndex(i);
-                label.FindPropertyRelative("_key").stringValue = _labels[i].Key;
-                label.FindPropertyRelative("_text").stringValue = _labels[i].Text;
+                serialized.FindProperty("_bodyFont").objectReferenceValue = font;
+                serialized.FindProperty("_headerFont").objectReferenceValue = font;
+                serialized.FindProperty("_accentFont").objectReferenceValue = font;
+                serialized.FindProperty("_smallFont").objectReferenceValue = font;
+                serialized.FindProperty("_textColor").colorValue = new Color(170f / 255f, 170f / 255f, 170f / 255f, 1f);
+                serialized.FindProperty("_mutedTextColor").colorValue = _mutedColor;
+                serialized.FindProperty("_accentColor").colorValue = _accentColor;
+                serialized.FindProperty("_negativeColor").colorValue = new Color(1f, 50f / 255f, 50f / 255f, 1f);
+                serialized.FindProperty("_panelSprite").objectReferenceValue = LoadSprite("gra_hint_window");
+                serialized.FindProperty("_panelColor").colorValue = Color.white;
+                serialized.FindProperty("_showItemBackground").boolValue = false;
+                serialized.FindProperty("_showItemWeight").boolValue = false;
+                serialized.FindProperty("_showItemCount").boolValue = true;
+                serialized.FindProperty("_itemTextShadow").boolValue = true;
+                serialized.FindProperty("_countFormat").stringValue = "x{0}";
+                serialized.FindProperty("_weightUnit").stringValue = "кг";
+                serialized.FindProperty("_itemTextSize").floatValue = 15f;
+                serialized.FindProperty("_itemNameSize").floatValue = 14f;
+                serialized.FindProperty("_itemTextColor").colorValue = Color.white;
+                serialized.FindProperty("_itemShadowColor").colorValue = new Color(0f, 0f, 0f, 0.9f);
+                serialized.FindProperty("_conditionColor").colorValue = new Color(100f / 255f, 1f, 150f / 255f, 1f);
+                SerializedProperty categories = serialized.FindProperty("_shortNameCategories");
+                categories.arraySize = 1;
+                categories.GetArrayElementAtIndex(0).stringValue = "Weapon";
             }
 
+            AddMissingLabels(serialized.FindProperty("_labels"));
             serialized.ApplyModifiedPropertiesWithoutUndo();
             EditorUtility.SetDirty(theme);
             AssetDatabase.SaveAssets();
             return theme;
+        }
+
+        private static void AddMissingLabels(SerializedProperty labels)
+        {
+            var existing = new HashSet<string>(System.StringComparer.Ordinal);
+
+            for (int i = 0; i < labels.arraySize; i++)
+            {
+                existing.Add(labels.GetArrayElementAtIndex(i).FindPropertyRelative("_key").stringValue);
+            }
+
+            foreach ((string Key, string Text) entry in _labels)
+            {
+                if (existing.Add(entry.Key) == false)
+                {
+                    continue;
+                }
+
+                labels.arraySize++;
+                SerializedProperty label = labels.GetArrayElementAtIndex(labels.arraySize - 1);
+                label.FindPropertyRelative("_key").stringValue = entry.Key;
+                label.FindPropertyRelative("_text").stringValue = entry.Text;
+            }
         }
 
         public static Result Build(GameObject root, InventoryTheme theme, TMP_FontAsset font, string stashTitle)
@@ -180,7 +253,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
             screen.pivot = new Vector2(0.5f, 0.5f);
             screen.sizeDelta = new Vector2(1920f, 1080f);
 
-            RectTransform stashPanel = Place(screen, "StashPanel", U(0f, 0f, 382f, 768f));
+            RectTransform stashPanel = Place(screen, STASH_PANEL, U(0f, 0f, 382f, 768f));
             Background(stashPanel, "gra_side_panel");
             Header(stashPanel, font, stashTitle, string.Empty, false);
             result.Stash = BagGrid(stashPanel, "SecondaryInventory", InventoryDemoContentBuilder.STASH, "World", stashTitle);
@@ -282,10 +355,10 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
         private static TextMeshProUGUI HudMessage(RectTransform root, TMP_FontAsset font)
         {
             RectTransform rect = InventoryUIFactory.CreateRect("HudMessage", root);
-            rect.anchorMin = new Vector2(0.5f, 0.5f);
-            rect.anchorMax = new Vector2(0.5f, 0.5f);
-            rect.pivot = new Vector2(0.5f, 0.5f);
-            rect.anchoredPosition = Vector2.zero;
+            rect.anchorMin = new Vector2(0.5f, 0f);
+            rect.anchorMax = new Vector2(0.5f, 0f);
+            rect.pivot = new Vector2(0.5f, 0f);
+            rect.anchoredPosition = new Vector2(0f, 20f);
             rect.sizeDelta = new Vector2(1200f, 40f);
             TextMeshProUGUI label = rect.gameObject.AddComponent<TextMeshProUGUI>();
 
@@ -312,14 +385,14 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
             var bars = new List<InventoryStatusBar>
             {
                 Bar(statusRect, InventoryWindowController.STATUS_HEALTH, "gra_state_health", 0f, 0f, 211.5f, "gra_bar_health", _healthColor),
-                Bar(statusRect, "radiation", "gra_state_radia", 0f, 24.25f, 91.5f, "gra_bar_progress", _protectionColor),
-                Bar(statusRect, "chemical", "gra_state_acid", 0f, 48f, 91.5f, "gra_bar_progress", _protectionColor),
-                Bar(statusRect, "shock", "gra_state_shock", 0f, 72f, 91.5f, "gra_bar_progress", _protectionColor),
-                Bar(statusRect, "fire", "gra_state_fire", 0f, 96f, 91.5f, "gra_bar_progress", _protectionColor),
-                Bar(statusRect, "psi", "gra_state_psi", 120f, 24.25f, 91.5f, "gra_bar_progress", _protectionColor),
-                Bar(statusRect, "wound", "gra_state_wound", 120f, 48f, 91.5f, "gra_bar_progress", _protectionColor),
-                Bar(statusRect, "fire_wound", "gra_state_fire_wound", 120f, 72f, 91.5f, "gra_bar_progress", _protectionColor),
-                Bar(statusRect, InventoryWindowController.STATUS_POWER, "gra_state_power", 120f, 96f, 91.5f, "gra_bar_progress", _protectionColor),
+                Bar(statusRect, EquipmentStatusPresenter.STATUS_RADIATION, "gra_state_radia", 0f, 24.25f, 91.5f, PROTECTION_BAR_SPRITE, _protectionColor),
+                Bar(statusRect, EquipmentStatusPresenter.STATUS_CHEMICAL, "gra_state_acid", 0f, 48f, 91.5f, PROTECTION_BAR_SPRITE, _protectionColor),
+                Bar(statusRect, EquipmentStatusPresenter.STATUS_SHOCK, "gra_state_shock", 0f, 72f, 91.5f, PROTECTION_BAR_SPRITE, _protectionColor),
+                Bar(statusRect, EquipmentStatusPresenter.STATUS_FIRE, "gra_state_fire", 0f, 96f, 91.5f, PROTECTION_BAR_SPRITE, _protectionColor),
+                Bar(statusRect, EquipmentStatusPresenter.STATUS_PSI, "gra_state_psi", 120f, 24.25f, 91.5f, PROTECTION_BAR_SPRITE, _protectionColor),
+                Bar(statusRect, EquipmentStatusPresenter.STATUS_WOUND, "gra_state_wound", 120f, 48f, 91.5f, PROTECTION_BAR_SPRITE, _protectionColor),
+                Bar(statusRect, EquipmentStatusPresenter.STATUS_FIRE_WOUND, "gra_state_fire_wound", 120f, 72f, 91.5f, PROTECTION_BAR_SPRITE, _protectionColor),
+                Bar(statusRect, InventoryWindowController.STATUS_POWER, "gra_state_power", 120f, 96f, 91.5f, PROTECTION_BAR_SPRITE, _protectionColor),
                 Bar(statusRect, InventoryWindowController.STATUS_HUNGER, "gra_state_hunger", 0f, 120.25f, 46.5f, "gra_bar_hts", _needsColor),
                 Bar(statusRect, InventoryWindowController.STATUS_THIRST, "gra_state_thirst", 82.5f, 120.25f, 46.5f, "gra_bar_hts", _needsColor),
                 Bar(statusRect, InventoryWindowController.STATUS_SLEEP, "gra_state_sleep", 165f, 120.25f, 46.5f, "gra_bar_hts", _needsColor)
@@ -340,7 +413,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
             fill.fillMethod = Image.FillMethod.Horizontal;
             fill.fillOrigin = (int)Image.OriginHorizontal.Left;
             fill.fillAmount = 0f;
-            return new InventoryStatusBar(id, fill, icon, BarGradient(color, color == _protectionColor));
+            return new InventoryStatusBar(id, fill, icon, BarGradient(color, barSprite == PROTECTION_BAR_SPRITE));
         }
 
         private static Gradient BarGradient(Color full, bool constant)
@@ -426,6 +499,85 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
             Image image = panel.gameObject.AddComponent<Image>();
             image.sprite = LoadSprite(sprite);
             image.raycastTarget = true;
+        }
+
+        public static InventoryGridViewBase BindEquipmentPanel(InventoryWindow window, Vector2 cellSize)
+        {
+            RectTransform panel = FindSlotPanel(window.transform);
+
+            if (panel == null)
+            {
+                return window.GetComponentInChildren<InventorySlotGridView>(true);
+            }
+
+            var slots = new List<InventoryEquipmentSlot>();
+
+            for (int i = 0; i < panel.childCount; i++)
+            {
+                Transform child = panel.GetChild(i);
+
+                if (child.name.EndsWith(SLOT_SUFFIX, System.StringComparison.Ordinal) == false)
+                {
+                    continue;
+                }
+
+                InventoryEquipmentSlot slot = child.GetComponent<InventoryEquipmentSlot>();
+
+                if (slot == null)
+                {
+                    slot = child.gameObject.AddComponent<InventoryEquipmentSlot>();
+                    Transform icon = child.Find(SLOT_ICON);
+                    slot.Configure(SlotId(child.name.Substring(0, child.name.Length - SLOT_SUFFIX.Length)), icon != null ? icon.GetComponent<Image>() : null);
+                    EditorUtility.SetDirty(slot);
+                }
+
+                slots.Add(slot);
+            }
+
+            InventoryEquipmentPanel equipment = panel.GetComponent<InventoryEquipmentPanel>();
+
+            if (equipment == null)
+            {
+                equipment = panel.gameObject.AddComponent<InventoryEquipmentPanel>();
+            }
+
+            equipment.Configure(InventoryDemoContentBuilder.EQUIPMENT, InventoryDemoContentBuilder.OWNER, EQUIPMENT_TITLE, cellSize);
+            equipment.Configure(AssetDatabase.LoadAssetAtPath<global::Inventory.InventorySlotLayout>(InventoryDemoContentBuilder.EQUIPMENT_LAYOUT_PATH), slots);
+            ApplyTransparentStyle(equipment);
+            var serialized = new SerializedObject(equipment);
+            serialized.FindProperty("_applyBackgroundToImage").boolValue = false;
+            serialized.ApplyModifiedPropertiesWithoutUndo();
+            EditorUtility.SetDirty(equipment);
+            return equipment;
+        }
+
+        private static RectTransform FindSlotPanel(Transform root)
+        {
+            foreach (RectTransform candidate in root.GetComponentsInChildren<RectTransform>(true))
+            {
+                for (int i = 0; i < candidate.childCount; i++)
+                {
+                    if (candidate.GetChild(i).name.EndsWith(SLOT_SUFFIX, System.StringComparison.Ordinal))
+                    {
+                        return candidate;
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        private static string SlotId(string slotName)
+        {
+            foreach ((string Name, string SlotId) alias in _slotAliases)
+            {
+                if (string.Equals(alias.Name, slotName, System.StringComparison.OrdinalIgnoreCase))
+                {
+                    return alias.SlotId;
+                }
+            }
+
+            return slotName;
         }
 
         private static void ApplyTransparentStyle(InventoryGridViewBase grid)

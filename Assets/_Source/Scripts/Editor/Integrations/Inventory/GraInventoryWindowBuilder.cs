@@ -12,6 +12,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
     {
         public const string ROOT = "Assets/_Source/UI/Inventory/GRA";
         public const string SPRITES_FOLDER = ROOT + "/Sprites";
+        public const string CONTEXT_MENU_FOLDER = ROOT + "/ContextMenu";
         public const string FONT_PATH = "Assets/_Source/Fonts/Bender/bender_regular SDF.asset";
         public const string THEME_PATH = ROOT + "/GraInventoryTheme.asset";
         public const string PORTRAIT_SPRITE = "gra_portrait";
@@ -212,11 +213,22 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
                 categories.GetArrayElementAtIndex(0).stringValue = "Weapon";
             }
 
+            AssignIfMissing(serialized.FindProperty("_contextMenuFrame"), CONTEXT_MENU_FOLDER + "/gra_context_frame.png");
+            AssignIfMissing(serialized.FindProperty("_contextMenuHighlight"), CONTEXT_MENU_FOLDER + "/gra_context_highlight.png");
+            AssignIfMissing(serialized.FindProperty("_contextMenuDivider"), CONTEXT_MENU_FOLDER + "/gra_context_divider.png");
             AddMissingLabels(serialized.FindProperty("_labels"));
             serialized.ApplyModifiedPropertiesWithoutUndo();
             EditorUtility.SetDirty(theme);
             AssetDatabase.SaveAssets();
             return theme;
+        }
+
+        private static void AssignIfMissing(SerializedProperty property, string spritePath)
+        {
+            if (property.objectReferenceValue == null)
+            {
+                property.objectReferenceValue = AssetDatabase.LoadAssetAtPath<Sprite>(spritePath);
+            }
         }
 
         private static void AddMissingLabels(SerializedProperty labels)

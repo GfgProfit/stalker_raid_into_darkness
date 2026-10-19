@@ -20,6 +20,9 @@ namespace Inventory.UI
         [SerializeField] private Color _negativeColor = new(1f, 0.2f, 0.2f, 1f);
         [SerializeField] private Sprite _panelSprite;
         [SerializeField] private InventoryIconSet _icons;
+        [SerializeField] private Sprite _contextMenuFrame;
+        [SerializeField] private Sprite _contextMenuHighlight;
+        [SerializeField] private Sprite _contextMenuDivider;
         [SerializeField] private Color _panelColor = Color.white;
         [SerializeField] private Vector4 _panelPadding = new(18f, 18f, 18f, 18f);
         [SerializeField] private bool _showItemBackground = true;
@@ -46,6 +49,9 @@ namespace Inventory.UI
         public Color NegativeColor => _negativeColor;
         public Sprite PanelSprite => _panelSprite;
         public InventoryIconSet Icons => _icons;
+        public Sprite ContextMenuFrame => _contextMenuFrame;
+        public Sprite ContextMenuHighlight => _contextMenuHighlight;
+        public Sprite ContextMenuDivider => _contextMenuDivider;
         public Color PanelColor => _panelColor;
         public Vector4 PanelPadding => _panelPadding;
         public bool ShowItemBackground => _showItemBackground;

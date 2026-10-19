@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace Inventory.UI
 {
@@ -89,6 +90,18 @@ namespace Inventory.UI
                 }
             }
         }
+    }
+
+    public readonly struct InventoryActionStyle
+    {
+        public InventoryActionStyle(Sprite icon, int group)
+        {
+            Icon = icon;
+            Group = group;
+        }
+
+        public Sprite Icon { get; }
+        public int Group { get; }
     }
 
     public static class InventoryBuiltInActions

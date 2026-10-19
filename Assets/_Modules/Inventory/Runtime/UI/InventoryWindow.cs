@@ -100,6 +100,7 @@ namespace Inventory.UI
         public Func<ItemInstance, InventoryItemDecoration> ItemDecorator { get; set; }
         public Action<ItemInstance, List<InventoryItemStat>> ItemStatsProvider { get; set; }
         public Func<ItemInstance, string> ItemDescriptionProvider { get; set; }
+        public Func<InventoryActionContext, IInventoryItemAction, InventoryActionStyle> ActionStyleProvider { get; set; }
         public ItemInstance HoveredItem => _hovered != null ? _hovered.Item : null;
 
         public event Action<InventoryWindow> Opened;
@@ -605,13 +606,14 @@ namespace Inventory.UI
             foreach (IInventoryItemAction action in _visibleActions)
             {
                 IInventoryItemAction captured = action;
+                InventoryActionStyle style = ActionStyleProvider != null ? ActionStyleProvider(context, action) : default;
                 _menuEntries.Add(new InventoryContextMenu.Entry(action.GetLabel(context), action.IsEnabled(context), () =>
                 {
                     if (Model != null && Model.ContainsItem(item))
                     {
                         captured.Execute(context);
                     }
-                }));
+                }, style.Icon, style.Group));
             }
 
             _contextMenu.Show(screenPosition, eventCamera, _menuEntries);
@@ -873,6 +875,11 @@ namespace Inventory.UI
             if (_tooltip != null)
             {
                 _tooltip.Theme = _theme;
+            }
+
+            if (_contextMenu != null)
+            {
+                _contextMenu.Theme = _theme;
             }
 
             if (_splitDialog != null)

@@ -43,3 +43,89 @@ MonoBehaviour:
     _sprite: {fileID: 1109638298, guid: 9b2087e2ea0428c48abcd6310dfcdf80, type: 3}
   - _id: ui_am_propery_11
     _sprite: {fileID: -1656648241, guid: 9b2087e2ea0428c48abcd6310dfcdf80, type: 3}
+  - _id: ui_cmo_placeholder
+    _sprite: {fileID: 2066778867, guid: 151d95fb55231b04895e3707a0d45edc, type: 3}
+  - _id: ui_cmo_vest
+    _sprite: {fileID: -644060186, guid: 151d95fb55231b04895e3707a0d45edc, type: 3}
+  - _id: ui_cmo_cell
+    _sprite: {fileID: -1363104930, guid: 151d95fb55231b04895e3707a0d45edc, type: 3}
+  - _id: ui_cmo_info
+    _sprite: {fileID: 888238260, guid: 151d95fb55231b04895e3707a0d45edc, type: 3}
+  - _id: ui_cmo_tools
+    _sprite: {fileID: -1652154083, guid: 151d95fb55231b04895e3707a0d45edc, type: 3}
+  - _id: ui_cmo_bullets
+    _sprite: {fileID: 208296490, guid: 151d95fb55231b04895e3707a0d45edc, type: 3}
+  - _id: ui_cmo_gift
+    _sprite: {fileID: -2131069344, guid: 151d95fb55231b04895e3707a0d45edc, type: 3}
+  - _id: ui_cmo_book
+    _sprite: {fileID: -1338455239, guid: 151d95fb55231b04895e3707a0d45edc, type: 3}
+  - _id: ui_cmo_backpack
+    _sprite: {fileID: 1824080306, guid: 151d95fb55231b04895e3707a0d45edc, type: 3}
+  - _id: ui_cmo_star
+    _sprite: {fileID: 552645640, guid: 151d95fb55231b04895e3707a0d45edc, type: 3}
+  - _id: ui_cmo_unstar
+    _sprite: {fileID: -1050835353, guid: 151d95fb55231b04895e3707a0d45edc, type: 3}
+  - _id: ui_cmo_arrows
+    _sprite: {fileID: -975033370, guid: 151d95fb55231b04895e3707a0d45edc, type: 3}
+  - _id: ui_cmo_utensils
+    _sprite: {fileID: -1570522317, guid: 151d95fb55231b04895e3707a0d45edc, type: 3}
+  - _id: ui_cmo_arrow_down
+    _sprite: {fileID: -1520320447, guid: 151d95fb55231b04895e3707a0d45edc, type: 3}
+  - _id: ui_cmo_saw
+    _sprite: {fileID: -520305816, guid: 151d95fb55231b04895e3707a0d45edc, type: 3}
+  - _id: ui_cmo_divide
+    _sprite: {fileID: 501125769, guid: 151d95fb55231b04895e3707a0d45edc, type: 3}
+  - _id: ui_cmo_trashbin
+    _sprite: {fileID: -1623590511, guid: 151d95fb55231b04895e3707a0d45edc, type: 3}
+  - _id: ui_cmo_untrashbin
+    _sprite: {fileID: 1335209443, guid: 151d95fb55231b04895e3707a0d45edc, type: 3}
+  - _id: ui_cmo_helmet
+    _sprite: {fileID: 99546685, guid: 151d95fb55231b04895e3707a0d45edc, type: 3}
+  - _id: ui_cmo_silencer
+    _sprite: {fileID: 1949187709, guid: 151d95fb55231b04895e3707a0d45edc, type: 3}
+  - _id: ui_cmo_gl
+    _sprite: {fileID: -598478861, guid: 151d95fb55231b04895e3707a0d45edc, type: 3}
+  - _id: ui_cmo_scope
+    _sprite: {fileID: -1669752485, guid: 151d95fb55231b04895e3707a0d45edc, type: 3}
+  - _id: ui_cmo_patch
+    _sprite: {fileID: 1346839356, guid: 151d95fb55231b04895e3707a0d45edc, type: 3}
+  - _id: ui_cmo_unpack
+    _sprite: {fileID: -1421327750, guid: 151d95fb55231b04895e3707a0d45edc, type: 3}
+  - _id: ui_cmo_pie
+    _sprite: {fileID: 1948004034, guid: 151d95fb55231b04895e3707a0d45edc, type: 3}
+  - _id: ui_cmo_screwdriver
+    _sprite: {fileID: -929055344, guid: 151d95fb55231b04895e3707a0d45edc, type: 3}
+  - _id: ui_cmo_components_star
+    _sprite: {fileID: 30500920, guid: 151d95fb55231b04895e3707a0d45edc, type: 3}
+  - _id: ui_cmo_oil
+    _sprite: {fileID: -1895424268, guid: 151d95fb55231b04895e3707a0d45edc, type: 3}
+  - _id: ui_cmo_eye
+    _sprite: {fileID: -1333381555, guid: 151d95fb55231b04895e3707a0d45edc, type: 3}
+  - _id: ui_cmo_magazine
+    _sprite: {fileID: 385719644, guid: 151d95fb55231b04895e3707a0d45edc, type: 3}
+  - _id: ui_cmo_health
+    _sprite: {fileID: -1028632209, guid: 151d95fb55231b04895e3707a0d45edc, type: 3}
+  - _id: ui_cmo_water
+    _sprite: {fileID: 387608570, guid: 151d95fb55231b04895e3707a0d45edc, type: 3}
+  - _id: ui_cmo_hands
+    _sprite: {fileID: 183617325, guid: 151d95fb55231b04895e3707a0d45edc, type: 3}
+  - _id: ui_cmo_cigarette
+    _sprite: {fileID: 1908108349, guid: 151d95fb55231b04895e3707a0d45edc, type: 3}
+  - _id: ui_cmo_lockpick
+    _sprite: {fileID: 1018120112, guid: 151d95fb55231b04895e3707a0d45edc, type: 3}
+  - _id: ui_cmo_filter
+    _sprite: {fileID: -845108798, guid: 151d95fb55231b04895e3707a0d45edc, type: 3}
+  - _id: ui_cmo_plant
+    _sprite: {fileID: -868030115, guid: 151d95fb55231b04895e3707a0d45edc, type: 3}
+  - _id: ui_cmo_cross
+    _sprite: {fileID: 176261647, guid: 151d95fb55231b04895e3707a0d45edc, type: 3}
+  - _id: ui_cmo_tank
+    _sprite: {fileID: 1065818372, guid: 151d95fb55231b04895e3707a0d45edc, type: 3}
+  - _id: ui_cmo_toolkit
+    _sprite: {fileID: -992502487, guid: 151d95fb55231b04895e3707a0d45edc, type: 3}
+  - _id: ui_cmo_merge
+    _sprite: {fileID: 1289308577, guid: 151d95fb55231b04895e3707a0d45edc, type: 3}
+  - _id: ui_cmo_chevron
+    _sprite: {fileID: -256782686, guid: 151d95fb55231b04895e3707a0d45edc, type: 3}
+  - _id: ui_cmo_pouch
+    _sprite: {fileID: 976213968, guid: 151d95fb55231b04895e3707a0d45edc, type: 3}

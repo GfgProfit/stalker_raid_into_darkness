@@ -341,6 +341,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
             _sorting = new InventorySortingPlus(_inventory.Model, new[] { _window.PrimaryContainerId, _window.SecondaryContainerId }, _favoriteBadge, _junkBadge);
             _sorting.Changed += OnSortingChanged;
             _window.ItemDecorator = _sorting.Decorate;
+            _window.ActionStyleProvider = new ContextMenuOverhaulStyle(_window, _sorting).Resolve;
             _window.Actions.Unregister(InventoryBuiltInActions.INSPECT);
             _window.Actions.Register(new InventoryDelegateAction(FAVORITE_ACTION, 45, GetFavoriteLabel, context => _sorting.ToggleFavorite(context.Item.Definition), context => _sorting.IsSorted(context.Item.ContainerId)));
             _window.Actions.Register(new InventoryDelegateAction(JUNK_ACTION, 46, GetJunkLabel, context => _sorting.ToggleJunk(context.Item.Definition), context => _sorting.IsSorted(context.Item.ContainerId)));

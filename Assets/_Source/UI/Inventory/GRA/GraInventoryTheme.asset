@@ -22,6 +22,9 @@ MonoBehaviour:
   _negativeColor: {r: 1, g: 0.19607843, b: 0.19607843, a: 1}
   _panelSprite: {fileID: 21300000, guid: 07d7aa58afe33984883b6dbb4e206bdc, type: 3}
   _icons: {fileID: 11400000, guid: d1036c617f3c1914aa4bb1556dc9bebe, type: 2}
+  _contextMenuFrame: {fileID: 21300000, guid: ca51d23ef9a605c9f76d67c0cd1309ad, type: 3}
+  _contextMenuHighlight: {fileID: 21300000, guid: 9be3c4110168384ffc5ad36dc4925095, type: 3}
+  _contextMenuDivider: {fileID: 21300000, guid: 07e4de91f88a6bbf1bb20468060918c0, type: 3}
   _panelColor: {r: 1, g: 1, b: 1, a: 1}
   _panelPadding: {x: 18, y: 18, z: 18, w: 18}
   _showItemBackground: 0

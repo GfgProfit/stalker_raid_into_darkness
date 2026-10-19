@@ -45,6 +45,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
         private EquipmentStatsFormatter _statsFormatter;
         private EquipmentStatusPresenter _statusPresenter;
         private FirstPersonOutfitBinder _outfitBinder;
+        private OutfitHelmetRule _helmetRule;
         private ItemInstance _statsHovered;
         private int _restoreFrame = -1;
         private bool _gameplayBlocked;
@@ -292,6 +293,12 @@ namespace RaidIntoDarkness.Integrations.Inventory
                 _outfitBinder.Dispose();
                 _outfitBinder = null;
             }
+
+            if (_helmetRule != null)
+            {
+                _helmetRule.Dispose();
+                _helmetRule = null;
+            }
         }
 
         private void EnsureBound()
@@ -311,11 +318,22 @@ namespace RaidIntoDarkness.Integrations.Inventory
             _statusPresenter = _status != null ? new EquipmentStatusPresenter(_window, _status) : null;
             _inventory.Model.Changed += OnModelChanged;
 
+            _helmetRule = new OutfitHelmetRule(_window);
+            _helmetRule.Refresh();
+
             if (_player != null && _player.Rig != null)
             {
-                _outfitBinder = new FirstPersonOutfitBinder(_window, _player.Rig);
+                _outfitBinder = new FirstPersonOutfitBinder(_window, _player);
                 _outfitBinder.Refresh();
             }
+
+            if (_player != null && _player.Motor != null && _player.Motor.Condition != null)
+            {
+                _player.Motor.Condition.SetCarryWeightSource(_inventory);
+                _player.Motor.Condition.SetSprintSource(_inventory);
+            }
+
+            UpdateMaxCarryWeight();
         }
 
         private void BindSorting()
@@ -389,6 +407,15 @@ namespace RaidIntoDarkness.Integrations.Inventory
         private void OnModelChanged(InventoryChange change)
         {
             _statsDirty = true;
+            UpdateMaxCarryWeight();
+        }
+
+        private void UpdateMaxCarryWeight()
+        {
+            if (_player != null && _player.Motor != null && _player.Motor.Condition != null && _player.Profile != null)
+            {
+                _window.SetMaxCarryWeight(_player.Motor.Condition.MaxCarryWeight);
+            }
         }
 
         private void OnSortingChanged()

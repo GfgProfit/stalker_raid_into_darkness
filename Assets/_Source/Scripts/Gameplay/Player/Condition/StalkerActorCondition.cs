@@ -12,6 +12,7 @@ namespace RaidIntoDarkness.Player
 
         [SerializeField] private StalkerMovementProfile _profile;
         [SerializeField] private MonoBehaviour _carryWeightSource;
+        [SerializeField] private MonoBehaviour _sprintSource;
         [SerializeField] private MonoBehaviour _powerLossSource;
         [SerializeField] private MonoBehaviour _healthSource;
         [SerializeField] private MonoBehaviour _satietySource;
@@ -44,6 +45,7 @@ namespace RaidIntoDarkness.Player
         public float AdditionalWeight => _carryWeightSource is IStalkerCarryWeightSource source ? source.AdditionalWeight : 0.0f;
         public float MaxCarryWeight => _profile.Actor.MaxItemMass + AdditionalWeight;
         public float MaxWalkWeight => _profile.Condition.MaxWalkWeight + AdditionalWeight;
+        public bool SprintAllowed => _sprintSource is IStalkerSprintSource source ? source.SprintAllowed : true;
         public float RunCoef => _runCoef;
         public float RunBackCoef => _runBackCoef;
         public float SprintKoef => _sprintKoef;
@@ -54,6 +56,16 @@ namespace RaidIntoDarkness.Player
         {
             _profile = profile;
             RecalculateSpeeds();
+        }
+
+        public void SetCarryWeightSource(MonoBehaviour source)
+        {
+            _carryWeightSource = source;
+        }
+
+        public void SetSprintSource(MonoBehaviour source)
+        {
+            _sprintSource = source;
         }
 
         public void SetPower(float power)

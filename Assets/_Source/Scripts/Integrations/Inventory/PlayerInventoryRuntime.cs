@@ -1,14 +1,17 @@
 using System.Collections.Generic;
 using Inventory;
+using RaidIntoDarkness.Player;
 using UnityEngine;
 
 namespace RaidIntoDarkness.Integrations.Inventory
 {
     [DisallowMultipleComponent]
-    public sealed class PlayerInventoryRuntime : MonoBehaviour
+    public sealed class PlayerInventoryRuntime : MonoBehaviour, IStalkerCarryWeightSource, IStalkerSprintSource
     {
         [SerializeField] private ItemDatabase _database;
         [SerializeField] private InventorySeed _seed;
+        [SerializeField] private string _ownerId = "Player";
+        [SerializeField] private string _equipmentContainerId = "Equipment";
 
         private InventoryModel _model;
         private bool _seeded;
@@ -16,6 +19,60 @@ namespace RaidIntoDarkness.Integrations.Inventory
         public ItemDatabase Database => _database;
         public InventorySeed Seed => _seed;
         public bool IsSeeded => _seeded;
+        public float TotalWeight => Model.GetOwnerWeight(_ownerId);
+
+        public float AdditionalWeight
+        {
+            get
+            {
+                InventoryContainer equipment = Model.GetContainer(_equipmentContainerId);
+                float weight = 0f;
+
+                if (equipment == null)
+                {
+                    return weight;
+                }
+
+                for (int i = 0; i < equipment.Items.Count; i++)
+                {
+                    ItemDefinition definition = equipment.Items[i].Definition;
+                    EquipmentStatsComponent stats = definition.GetComponent<EquipmentStatsComponent>();
+
+                    if (stats != null && (definition.IsCategory(EquipmentStatsFormatter.OUTFIT_CATEGORY) || definition.IsCategory(EquipmentStatsFormatter.BACKPACK_CATEGORY)))
+                    {
+                        weight += stats.AdditionalWeight;
+                    }
+                }
+
+                return weight;
+            }
+        }
+
+        public bool SprintAllowed
+        {
+            get
+            {
+                InventoryContainer equipment = Model.GetContainer(_equipmentContainerId);
+
+                if (equipment == null)
+                {
+                    return true;
+                }
+
+                for (int i = 0; i < equipment.Items.Count; i++)
+                {
+                    ItemDefinition definition = equipment.Items[i].Definition;
+                    EquipmentStatsComponent stats = definition.GetComponent<EquipmentStatsComponent>();
+
+                    if (stats != null && stats.SprintAllowed == false && definition.IsCategory(EquipmentStatsFormatter.OUTFIT_CATEGORY))
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+        }
 
         public InventoryModel Model
         {

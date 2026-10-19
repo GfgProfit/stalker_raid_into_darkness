@@ -31,6 +31,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
         private const string WEIGHT_FORMAT = "<color=#808080>Общий вес:</color>  <color=#{2}>{0} кг</color>  <color=#808080>(max {1} кг)</color>";
         private const string WEIGHT_FORMAT_UNLIMITED = "<color=#808080>Общий вес:</color>  <color=#{2}>{0} кг</color>";
         private const string PROTECTION_BAR_SPRITE = "gra_bar_progress";
+        private const string HELMET_BLOCKER_SPRITE = "gra_blocker_big";
 
         private static readonly (string Name, string SlotId)[] _slotAliases =
         {
@@ -528,6 +529,12 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
                     slot = child.gameObject.AddComponent<InventoryEquipmentSlot>();
                     Transform icon = child.Find(SLOT_ICON);
                     slot.Configure(SlotId(child.name.Substring(0, child.name.Length - SLOT_SUFFIX.Length)), icon != null ? icon.GetComponent<Image>() : null);
+                    EditorUtility.SetDirty(slot);
+                }
+
+                if (slot.SlotId == OutfitHelmetRule.HELMET_SLOT && slot.LockedSprite == null)
+                {
+                    slot.SetLockedSprite(LoadSprite(HELMET_BLOCKER_SPRITE));
                     EditorUtility.SetDirty(slot);
                 }
 

@@ -130,6 +130,12 @@ namespace Inventory.UI
             _maxCarryWeight = maxCarryWeight;
         }
 
+        public void SetMaxCarryWeight(float maxCarryWeight)
+        {
+            _maxCarryWeight = Mathf.Max(0f, maxCarryWeight);
+            UpdateWeight();
+        }
+
         public void ConfigurePresentation(InventoryTheme theme, RectTransform secondaryRoot, string weightFormat, string weightFormatUnlimited, Color overweightColor)
         {
             _theme = theme;

@@ -2,6 +2,7 @@ using System;
 using Inventory;
 using Inventory.UI;
 using RaidIntoDarkness.FirstPerson;
+using RaidIntoDarkness.Player;
 
 namespace RaidIntoDarkness.Integrations.Inventory
 {
@@ -9,13 +10,13 @@ namespace RaidIntoDarkness.Integrations.Inventory
     {
         private readonly InventoryWindow _window;
         private readonly InventoryModel _model;
-        private readonly FirstPersonRig _rig;
+        private readonly StalkerPlayerController _player;
         private string _section;
 
-        public FirstPersonOutfitBinder(InventoryWindow window, FirstPersonRig rig)
+        public FirstPersonOutfitBinder(InventoryWindow window, StalkerPlayerController player)
         {
             _window = window;
-            _rig = rig;
+            _player = player;
             _model = window.Model;
             _model.ItemEquipped += OnEquipmentChanged;
             _model.ItemUnequipped += OnEquipmentChanged;
@@ -27,12 +28,12 @@ namespace RaidIntoDarkness.Integrations.Inventory
             EquipmentStatsComponent stats = outfit != null ? outfit.Definition.GetComponent<EquipmentStatsComponent>() : null;
             string section = stats != null && stats.Section.Length > 0 ? stats.Section : FirstPersonOutfitCatalog.NO_OUTFIT_SECTION;
 
-            if (_rig == null || string.Equals(_section, section, StringComparison.OrdinalIgnoreCase))
+            if (_player == null || string.Equals(_section, section, StringComparison.OrdinalIgnoreCase))
             {
                 return;
             }
 
-            if (_rig.ApplyOutfit(section))
+            if (_player.ApplyOutfit(section))
             {
                 _section = section;
             }

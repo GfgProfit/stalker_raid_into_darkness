@@ -1787,6 +1787,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Inventory.UI::Inventory.UI.InventoryEquipmentSlot
   _slotId: Head
   _icon: {fileID: 2127573938}
+  _lockedSprite: {fileID: 21300000, guid: df01df4255614754aa734218cbf96bf8, type: 3}
 --- !u!1 &107685175
 GameObject:
   m_ObjectHideFlags: 0

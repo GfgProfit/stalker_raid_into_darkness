@@ -165,10 +165,14 @@ namespace Inventory.UI
 
             foreach (InventoryEquipmentSlot slot in _viewsById.Values)
             {
-                if (slotted == null || slotted.GetSlotOccupant(slot.SlotId) == null)
+                bool occupied = slotted != null && slotted.GetSlotOccupant(slot.SlotId) != null;
+
+                if (occupied == false)
                 {
                     slot.ClearIcon();
                 }
+
+                slot.SetLocked(slotted != null && occupied == false && slotted.GetSlot(slot.SlotId) != null && slotted.IsSlotAvailable(slot.SlotId) == false);
             }
         }
 

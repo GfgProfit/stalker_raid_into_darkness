@@ -229,7 +229,7 @@ namespace RaidIntoDarkness.Player
 
         private bool CanSprint()
         {
-            bool canSprint = CanAccelerate() && !_condition.IsCantSprint();
+            bool canSprint = CanAccelerate() && !_condition.IsCantSprint() && _condition.SprintAllowed;
             if (_real.Has(StalkerMoveFlags.LeftStrafe | StalkerMoveFlags.RightStrafe) && !_real.Has(StalkerMoveFlags.Forward))
             {
                 canSprint = false;

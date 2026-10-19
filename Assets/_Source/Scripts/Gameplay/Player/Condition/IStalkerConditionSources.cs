@@ -6,6 +6,11 @@ namespace RaidIntoDarkness.Player
         float AdditionalWeight { get; }
     }
 
+    public interface IStalkerSprintSource
+    {
+        bool SprintAllowed { get; }
+    }
+
     public interface IStalkerPowerLossSource
     {
         float? OutfitPowerLoss { get; }

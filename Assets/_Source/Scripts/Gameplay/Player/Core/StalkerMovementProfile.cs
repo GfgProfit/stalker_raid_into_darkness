@@ -348,6 +348,10 @@ namespace RaidIntoDarkness.Player
     {
         [Tooltip("Console 'fov': X-Ray passes it as the vertical field of view.")]
         [SerializeField] private float _fieldOfView = 95.0f;
+        [Tooltip("Console 'hud_fov': hands and HUD items use a vertical field of view of hud_fov * 83 degrees, independent of 'fov'.")]
+        [SerializeField] [Range(0.1f, 1.0f)] private float _hudFieldOfView = 0.45f;
+        [Tooltip("r_dsgraph_render_hud: build_projection(deg2rad(psHUD_FOV * 83)).")]
+        [SerializeField] private float _hudFieldOfViewScale = 83.0f;
         [SerializeField] private float _nearClip = 0.05f;
         [Tooltip("Console 'mouse_sens'.")]
         [SerializeField] private float _mouseSensitivity = 0.061f;
@@ -364,6 +368,8 @@ namespace RaidIntoDarkness.Player
         [SerializeField] private Vector2 _ladderYawLimits = new Vector2(-1.0f, 1.0f);
 
         public float FieldOfView => _fieldOfView;
+        public float HudFieldOfView => _hudFieldOfView;
+        public float HudFieldOfViewScale => _hudFieldOfViewScale;
         public float NearClip => _nearClip;
         public float MouseSensitivity => _mouseSensitivity;
         public float MouseSensitivityVertical => _mouseSensitivityVertical;

@@ -165,6 +165,7 @@ namespace RaidIntoDarkness.Player.Editor
                 Set(playerInput, "_actions", input);
                 Set(view, "_cameraRoot", cameraRoot);
                 Set(view, "_camera", camera);
+                Set(view, "_hudRoot", cameraRoot.Find("HandsRoot"));
                 Set(body, "_bodyRoot", bodyRoot);
                 Set(body, "_player", animationPlayer);
                 Set(player, "_profile", profile);

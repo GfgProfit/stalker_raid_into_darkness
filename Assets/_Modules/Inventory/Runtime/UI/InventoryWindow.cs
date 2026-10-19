@@ -676,6 +676,14 @@ namespace Inventory.UI
                 }
             }
 
+            foreach (SlotDefinition slot in EquipCandidates(item, equipment))
+            {
+                if (CanSwapIntoSlot(item, equipment, slot.Bounds.position))
+                {
+                    return true;
+                }
+            }
+
             return false;
         }
 

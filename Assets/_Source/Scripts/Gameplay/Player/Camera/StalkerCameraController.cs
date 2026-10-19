@@ -5,11 +5,16 @@ namespace RaidIntoDarkness.Player
     [DisallowMultipleComponent]
     public sealed class StalkerCameraController : MonoBehaviour
     {
+        private const float MIN_HUD_FIELD_OF_VIEW = 0.1f;
+        private const float MAX_HUD_FIELD_OF_VIEW = 1.0f;
+
         [SerializeField] private Transform _cameraRoot;
         [SerializeField] private Camera _camera;
+        [SerializeField] private Transform _hudRoot;
         [SerializeField] private bool _lockCursorOnStart = true;
 
         private StalkerMovementProfile _profile;
+        private float _hudFieldOfView;
         private float _yaw;
         private float _pitch;
         private bool _ladderClamp;
@@ -22,6 +27,16 @@ namespace RaidIntoDarkness.Player
         public Vector3 Direction => _cameraRoot != null ? _cameraRoot.forward : transform.forward;
         public bool CursorLocked => Cursor.lockState == CursorLockMode.Locked;
 
+        public float HudFieldOfView
+        {
+            get => _hudFieldOfView;
+            set
+            {
+                _hudFieldOfView = Mathf.Clamp(value, MIN_HUD_FIELD_OF_VIEW, MAX_HUD_FIELD_OF_VIEW);
+                ApplyHudFieldOfView();
+            }
+        }
+
         public void Initialize(StalkerMovementProfile profile)
         {
             _profile = profile;
@@ -32,6 +47,8 @@ namespace RaidIntoDarkness.Player
                 _camera.fieldOfView = profile.Camera.FieldOfView;
                 _camera.nearClipPlane = profile.Camera.NearClip;
             }
+
+            HudFieldOfView = profile.Camera.HudFieldOfView;
 
             if (_lockCursorOnStart && Application.isPlaying)
             {
@@ -89,6 +106,20 @@ namespace RaidIntoDarkness.Player
                 _cameraRoot.localPosition = new Vector3(0.0f, cameraHeight, 0.0f);
                 _cameraRoot.localRotation = Quaternion.Euler(_pitch * Mathf.Rad2Deg, 0.0f, 0.0f);
             }
+
+            ApplyHudFieldOfView();
+        }
+
+        private void ApplyHudFieldOfView()
+        {
+            if (_hudRoot == null || _camera == null || _profile == null)
+            {
+                return;
+            }
+
+            float hudHalfTangent = Mathf.Tan(_hudFieldOfView * _profile.Camera.HudFieldOfViewScale * 0.5f * Mathf.Deg2Rad);
+            float scale = Mathf.Tan(_camera.fieldOfView * 0.5f * Mathf.Deg2Rad) / hudHalfTangent;
+            _hudRoot.localScale = new Vector3(scale, scale, 1.0f);
         }
     }
 }

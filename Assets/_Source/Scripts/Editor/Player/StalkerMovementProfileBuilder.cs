@@ -184,6 +184,7 @@ namespace RaidIntoDarkness.Player.Editor
 
             string origin = "user.ltx ";
             writer.Float("_camera._fieldOfView", Get(values, "fov"), origin + "fov");
+            writer.FloatOrDefault("_camera._hudFieldOfView", Get(values, "hud_fov"), 0.45f, origin + "hud_fov");
             writer.Float("_camera._mouseSensitivity", Get(values, "mouse_sens"), origin + "mouse_sens");
             writer.FloatOrDefault("_camera._mouseSensitivityVertical", Get(values, "mouse_sens_vertical"), 1.0f, origin + "mouse_sens_vertical");
             writer.Bool("_camera._invertMouse", Get(values, "mouse_invert"), origin + "mouse_invert");

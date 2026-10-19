@@ -203,6 +203,8 @@ MonoBehaviour:
       m_Bits: 4294967295
   _camera:
     _fieldOfView: 95
+    _hudFieldOfView: 0.8
+    _hudFieldOfViewScale: 83
     _nearClip: 0.05
     _mouseSensitivity: 0.061
     _mouseSensitivityVertical: 1

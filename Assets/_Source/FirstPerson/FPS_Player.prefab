@@ -657,6 +657,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: RaidIntoDarkness.Player::RaidIntoDarkness.Player.StalkerCameraController
   _cameraRoot: {fileID: 1853972464879935931}
   _camera: {fileID: 6243923892120857249}
+  _hudRoot: {fileID: 7536706216107034830}
   _lockCursorOnStart: 1
 --- !u!114 &8362631657092042833
 MonoBehaviour:

@@ -1,0 +1,30 @@
+fileFormatVersion: 2
+guid: c205cbd3e1ffeaf4183e2408401729ab
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\wpn_pl15_suppressor_cover|models\weapons
+    second: {fileID: 2100000, guid: 5c0ace27f26905044a4362ecac5fe46c, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\wpn_pl15_suppressor|models\weapons
+    second: {fileID: 2100000, guid: 89ca54a485ed64146a835f5cb88dbfa7, type: 2}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 61e536e21e96f284493f2969a9250cdf, type: 3}
+  _scale: 1
+  _importMaterials: 1
+  _texturesFolder: 
+  _searchTexturesByName: 1
+  _importEmbeddedMotions: 1
+  _embeddedLoopMode: 0
+  _addAnimator: 1
+  _readableMeshes: 0
+  _updateWhenOffscreen: 0
+  _autoResolveResources: 1

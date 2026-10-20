@@ -1,0 +1,103 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da0f90c2955673d46b25d465cbe44ed0, type: 3}
+  m_Name: deltapoint
+  m_EditorClassIdentifier: Inventory::Inventory.ItemDefinition
+  _definitionId: fda774a86032cfa49bb671d46146021c
+  _displayName: "\u041F\u0440\u0438\u0446\u0435\u043B Deltapoint PRO"
+  _shortName: "\u041F\u0440\u0438\u0446\u0435\u043B Deltapoint PRO"
+  _description: "\u041A\u043E\u043C\u043F\u0430\u043A\u0442\u043D\u044B\u0439 \u043A\u043E\u043B\u043B\u0438\u043C\u0430\u0442\u043E\u0440\u043D\u044B\u0439
+    \u043F\u0440\u0438\u0446\u0435\u043B DeltaPoint PRO \u043E\u0442 \u043A\u043E\u043C\u043F\u0430\u043D\u0438\u0438
+    Leupold \u043F\u0440\u0430\u043A\u0442\u0438\u0447\u0435\u0441\u043A\u0438 \u043D\u0435
+    \u0438\u043C\u0435\u0435\u0442 \u043E\u0433\u0440\u0430\u043D\u0438\u0447\u0435\u043D\u0438\u0439
+    \u0432 \u043E\u0431\u043B\u0430\u0441\u0442\u0438 \u043F\u0440\u0438\u043C\u0435\u043D\u0435\u043D\u0438\u044F.
+    \u0418\u0437\u043D\u0430\u0447\u0430\u043B\u044C\u043D\u043E \u043F\u043B\u0430\u043D\u0438\u0440\u043E\u0432\u0430\u0432\u0448\u0438\u0439\u0441\u044F
+    \u0434\u043B\u044F \u0443\u0441\u0442\u0430\u043D\u043E\u0432\u043A\u0438 \u043D\u0430
+    \u043F\u043E\u043C\u043F\u043E\u0432\u044B\u0435 \u0433\u043B\u0430\u0434\u043A\u043E\u0441\u0442\u0432\u043E\u043B\u044C\u043D\u044B\u0435
+    \u0440\u0443\u0436\u044C\u044F \u0434\u043B\u044F \u0441\u043E\u0440\u0435\u0432\u043D\u043E\u0432\u0430\u043D\u0438\u0439
+    \u0438 \u043F\u0440\u0430\u043A\u0442\u0438\u0447\u0435\u0441\u043A\u043E\u0439
+    \u0441\u0442\u0440\u0435\u043B\u044C\u0431\u044B, \u043E\u043D \u043D\u0435\u043F\u043B\u043E\u0445\u043E
+    \u043F\u043E\u043A\u0430\u0437\u0430\u043B \u0441\u0435\u0431\u044F \u043D\u0430
+    \u0448\u0438\u0440\u043E\u043A\u043E\u043C \u0441\u043F\u0435\u043A\u0442\u0440\u0435
+    \u043E\u0440\u0443\u0436\u0438\u044F. \u041E\u0442 \u0440\u0443\u0436\u044C\u044F
+    \u0438 \u043F\u0438\u0441\u0442\u043E\u043B\u0435\u0442\u0430 \u0434\u043E \u043F\u043B\u0430\u0442\u0444\u043E\u0440\u043C\u044B
+    AR, \u043A\u0430\u043A \u043E\u0441\u043D\u043E\u0432\u043D\u043E\u0439 \u0438\u043B\u0438
+    \u0432\u0441\u043F\u043E\u043C\u043E\u0433\u0430\u0442\u0435\u043B\u044C\u043D\u044B\u0439
+    \u043F\u0440\u0438\u0446\u0435\u043B, \u043E\u043D \u0431\u0443\u0434\u0435\u0442
+    \u043F\u043E\u043A\u0430\u0437\u044B\u0432\u0430\u0442\u044C \u043E\u0442\u043B\u0438\u0447\u043D\u044B\u0439
+    \u0440\u0435\u0437\u0443\u043B\u044C\u0442\u0430\u0442."
+  _category: Attachment
+  _tags:
+  - Scope
+  _size: {x: 1, y: 1}
+  _weight: 0.041
+  _maxStack: 1
+  _allowRotation: 1
+  _backgroundColor: {r: 1, g: 1, b: 1, a: 0.04}
+  _fallbackIcon: {fileID: 0}
+  _iconOverride: {fileID: 180474441, guid: b3e68370cc9da564986ec1dd6f5c65ab, type: 3}
+  _visualPrefab: {fileID: 3752748865845540863, guid: 2661c3ea9400d3f45bb9ed910685b96d, type: 3}
+  _defaultIconVariant: []
+  _icon:
+    _generateIcon: 0
+    _pixelsPerCell: 64
+    _antiAliasing: 1
+    _useOutline: 0
+    _outlineWidth: 2
+    _useShadow: 1
+    _shadowOffset: {x: 2, y: -2}
+    _shadowBlur: 2
+    _defaultView:
+      _modelEulerAngles: {x: 0, y: 0, z: 0}
+      _modelScale: {x: 1, y: 1, z: 1}
+      _cameraEulerAngles: {x: 0, y: -90, z: 0}
+      _padding: 1.15
+      _useDirectionalLight: 1
+      _lightIntensity: 40
+    _useCustomSlotView: 0
+    _slotView:
+      _modelEulerAngles: {x: 0, y: 0, z: 0}
+      _modelScale: {x: 1, y: 1, z: 1}
+      _cameraEulerAngles: {x: 0, y: -90, z: 0}
+      _padding: 1.15
+      _useDirectionalLight: 1
+      _lightIntensity: 40
+  _components:
+  - rid: 3479885496768528408
+  - rid: 3479885496768528554
+  - rid: 3479885496768528700
+  references:
+    version: 2
+    RefIds:
+    - rid: 3479885496768528408
+      type: {class: WeaponAddonComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      data:
+        _section: deltapoint
+        _kind: 1
+        _cost: 2500
+        _bulletHitPowerFactor: 1
+        _bulletHitImpulseFactor: 1
+        _bulletSpeedFactor: 1
+        _fireDispersionBaseFactor: 1
+        _camDispersionFactor: 1
+        _camDispersionIncrementFactor: 1
+        _scopeZoomFactor: 0
+    - rid: 3479885496768528554
+      type: {class: WorldItemComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      data:
+        _prefab: {fileID: 3762736310107160036, guid: e232836f8cc0e274ebf3e14d21c5d1ac, type: 3}
+    - rid: 3479885496768528700
+      type: {class: ItemTakeSoundComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      data:
+        _category: attchscope
+        _clips:
+        - {fileID: 8300000, guid: 1694b29543aca0b4b91ce712213948d6, type: 3}

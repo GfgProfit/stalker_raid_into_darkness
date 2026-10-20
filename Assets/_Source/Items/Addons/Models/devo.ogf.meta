@@ -1,0 +1,55 @@
+fileFormatVersion: 2
+guid: c46ebc6b79bc714469314520c68fc5dd
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: none|models\scope_back
+    second: {fileID: 2100000, guid: 85cc84a934a4a274f8c6d8a247f2344e, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: none|models\scope_zwrite
+    second: {fileID: 2100000, guid: 91fe0313784577e4b90fc5f56987ffe4, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\crosshair_red_dot_simple|models\reflex_reticle_simple
+    second: {fileID: 2100000, guid: 5096224d490156940a5d653d60c75beb, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\scope_reticles\leupold_devo|models\scope_reticle_precise
+    second: {fileID: 2100000, guid: e4179fbe01d988a4f8036f4a43069651, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\wpn_addon_scope_devo_dual_optic|models\weapons
+    second: {fileID: 2100000, guid: b8ee8963faf31a142b30388a814d4bf0, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\wpn_addon_scope_lco_reddot|models\model
+    second: {fileID: 2100000, guid: 43c4afc4b3f940d4d98aa7a9fefe0138, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\wpn_scope_pso_1m2-1_lens_diff|models\model
+    second: {fileID: 2100000, guid: 65ddeddc24dd6de49900fce792a6211d, type: 2}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 61e536e21e96f284493f2969a9250cdf, type: 3}
+  _scale: 1
+  _importMaterials: 1
+  _texturesFolder: 
+  _searchTexturesByName: 1
+  _importEmbeddedMotions: 1
+  _embeddedLoopMode: 0
+  _addAnimator: 1
+  _readableMeshes: 0
+  _updateWhenOffscreen: 0
+  _autoResolveResources: 1

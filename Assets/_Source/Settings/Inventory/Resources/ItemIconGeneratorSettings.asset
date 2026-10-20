@@ -47,7 +47,7 @@ MonoBehaviour:
   _rendererReflectionProbeUsage: 0
   _rendererReceiveShadows: 0
   _renderTextureFormat: 2
-  _iconRenderScale: 1
+  _iconRenderScale: 2
   _allowHdr: 1
   _useCameraMsaa: 1
   _cameraDistanceMultiplier: 3
@@ -95,5 +95,5 @@ MonoBehaviour:
   _hueShift: 0
   _saturation: 18
   _tonemappingMode: 1
-  _iconOutlineColor: {r: 0, g: 0, b: 0, a: 0.8509804}
-  _iconShadowColor: {r: 0, g: 0, b: 0, a: 0.34901962}
+  _iconOutlineColor: {r: 0, g: 0, b: 0, a: 0.98039216}
+  _iconShadowColor: {r: 0, g: 0, b: 0, a: 0.3529412}

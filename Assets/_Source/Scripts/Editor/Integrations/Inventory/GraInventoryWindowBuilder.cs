@@ -140,6 +140,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
         private static readonly Color _labelColor = new(1f, 1f, 1f, 230f / 255f);
         private static readonly Color _mutedColor = new(128f / 255f, 128f / 255f, 128f / 255f, 1f);
         private static readonly Color _accentColor = new(240f / 255f, 217f / 255f, 182f / 255f, 1f);
+        private static readonly Color _itemInfoBackground = new(0f, 0f, 0f, 0.65f);
         private static readonly Color _barBackgroundColor = new(26f / 255f, 26f / 255f, 26f / 255f, 1f);
         private static readonly Color _healthColor = new(219f / 255f, 56f / 255f, 51f / 255f, 1f);
         private static readonly Color _protectionColor = new(219f / 255f, 176f / 255f, 51f / 255f, 1f);
@@ -198,13 +199,16 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
                 serialized.FindProperty("_panelSprite").objectReferenceValue = LoadSprite("gra_hint_window");
                 serialized.FindProperty("_panelColor").colorValue = Color.white;
                 serialized.FindProperty("_showItemBackground").boolValue = false;
-                serialized.FindProperty("_showItemWeight").boolValue = false;
+                serialized.FindProperty("_showItemWeight").boolValue = true;
                 serialized.FindProperty("_showItemCount").boolValue = true;
                 serialized.FindProperty("_itemTextShadow").boolValue = true;
                 serialized.FindProperty("_countFormat").stringValue = "x{0}";
                 serialized.FindProperty("_weightUnit").stringValue = "кг";
                 serialized.FindProperty("_itemTextSize").floatValue = 15f;
                 serialized.FindProperty("_itemNameSize").floatValue = 14f;
+                serialized.FindProperty("_itemWeightSize").floatValue = 16f;
+                serialized.FindProperty("_itemWeightColor").colorValue = _accentColor;
+                serialized.FindProperty("_itemInfoBackground").colorValue = _itemInfoBackground;
                 serialized.FindProperty("_itemTextColor").colorValue = Color.white;
                 serialized.FindProperty("_itemShadowColor").colorValue = new Color(0f, 0f, 0f, 0.9f);
                 serialized.FindProperty("_conditionColor").colorValue = new Color(100f / 255f, 1f, 150f / 255f, 1f);

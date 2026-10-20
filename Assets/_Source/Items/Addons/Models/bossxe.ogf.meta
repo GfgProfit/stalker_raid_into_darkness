@@ -1,0 +1,50 @@
+fileFormatVersion: 2
+guid: c40a984564394e5438817ab8cc8404cd
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\addons\laserbeam|models_laserbeam
+    second: {fileID: 2100000, guid: e0df47c78d0663947bcd4e32e9338bd7, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\addons\laserdot|models_laserbeam
+    second: {fileID: 2100000, guid: ed278575cbd1e1a4ca7c1ec0a9151cc1, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\boss_xe\willcox_boss|models\model
+    second: {fileID: 2100000, guid: 60bc0d2937a817e478cb82cda115937c, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\prs\wpn_addon_lens_green|models\reflex_lens
+    second: {fileID: 2100000, guid: accfb1149742864499872c3cad364512, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\wpn_crosshair_boss_xe|models\reflex_reticle
+    second: {fileID: 2100000, guid: f253fcc23da86dc459a7bf8ac3f3cb0b, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\wpn_gauss_energy|models_laserbeam
+    second: {fileID: 2100000, guid: 4c5b3f130d9960840b4d8c769aeef4ad, type: 2}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 61e536e21e96f284493f2969a9250cdf, type: 3}
+  _scale: 1
+  _importMaterials: 1
+  _texturesFolder: 
+  _searchTexturesByName: 1
+  _importEmbeddedMotions: 1
+  _embeddedLoopMode: 0
+  _addAnimator: 1
+  _readableMeshes: 0
+  _updateWhenOffscreen: 0
+  _autoResolveResources: 1

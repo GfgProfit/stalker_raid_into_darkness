@@ -1,0 +1,22 @@
+fileFormatVersion: 2
+guid: ce5753d1f515b834ca2db93bb88f56a6
+IHVImageFormatImporter:
+  externalObjects: {}
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 0
+    wrapV: 0
+    wrapW: 0
+  isReadable: 0
+  sRGBTexture: 1
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  ignoreMipmapLimit: 0
+  mipmapLimitGroupName: 
+  userData: xray-asset:{"_key":"textures/wpn/wpn_addon_sil_pbs4.dds#albedo","_role":"Albedo","_source":"Base
+    Anomaly","_sourcePath":"D:\\GRA2.5\\Anomaly 1.5.3 up\\tools\\_unpacked\\textures\\wpn\\wpn_addon_sil_pbs4.dds","_stamp":"174904:639278671969914436"}
+  assetBundleName: 
+  assetBundleVariant: 

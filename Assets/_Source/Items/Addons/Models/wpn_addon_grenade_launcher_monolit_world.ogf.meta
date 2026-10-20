@@ -1,0 +1,35 @@
+fileFormatVersion: 2
+guid: c21be4eeff253484dad5e6740719cd7a
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\wpn_addon_scope_acog_mount|models\model
+    second: {fileID: 2100000, guid: bd9462d6cdd258642ba0c78b526d4240, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\wpn_eft_ak74_gl_gp34_diff|models\model
+    second: {fileID: 2100000, guid: f8e40c433933d2041ae2c6bdd10c62c0, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\wpn_pistolgrip_ak_zenit_rk3_diff|models\model
+    second: {fileID: 2100000, guid: edc378c17b5b5a945b753d6b4bc75d29, type: 2}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 61e536e21e96f284493f2969a9250cdf, type: 3}
+  _scale: 1
+  _importMaterials: 1
+  _texturesFolder: 
+  _searchTexturesByName: 1
+  _importEmbeddedMotions: 1
+  _embeddedLoopMode: 0
+  _addAnimator: 1
+  _readableMeshes: 0
+  _updateWhenOffscreen: 0
+  _autoResolveResources: 1

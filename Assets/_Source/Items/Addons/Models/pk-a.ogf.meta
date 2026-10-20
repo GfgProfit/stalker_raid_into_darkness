@@ -1,0 +1,35 @@
+fileFormatVersion: 2
+guid: bd684006d9fd49949aac7dcc999f7d24
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\wpn_addons\wpn_addon_aim\wpn_addon_aim_dot|models\lfo_light_dot_weapons
+    second: {fileID: 2100000, guid: ac07bc57451b4d3418d49543bc5461ad, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\wpn_addons\wpn_addon_mount\wpn_addon_mount_mtk83|models\model
+    second: {fileID: 2100000, guid: e8e716708b815d541a4f0bdb868555c6, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\wpn_addons\wpn_addon_scope_pk-a\wpn_addon_scope_pk-a|models\model
+    second: {fileID: 2100000, guid: 862d089defcebe84598944fbf6a70968, type: 2}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 61e536e21e96f284493f2969a9250cdf, type: 3}
+  _scale: 1
+  _importMaterials: 1
+  _texturesFolder: 
+  _searchTexturesByName: 1
+  _importEmbeddedMotions: 1
+  _embeddedLoopMode: 0
+  _addAnimator: 1
+  _readableMeshes: 0
+  _updateWhenOffscreen: 0
+  _autoResolveResources: 1

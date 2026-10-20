@@ -1,0 +1,92 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da0f90c2955673d46b25d465cbe44ed0, type: 3}
+  m_Name: wpn_sil_apb
+  m_EditorClassIdentifier: Inventory::Inventory.ItemDefinition
+  _definitionId: 777c683d22592014891954e65895c30e
+  _displayName: "\u0413\u043B\u0443\u0448\u0438\u0442\u0435\u043B\u044C \u0410\u041F\u0411"
+  _shortName: "\u0413\u043B\u0443\u0448\u0438\u0442\u0435\u043B\u044C \u0410\u041F\u0411"
+  _description: "<color=#8C8C8C>\u0421\u041E\u0412\u041C\u0415\u0421\u0422\u0418\u041C\u041E\u0421\u0422\u042C:\n\n<color=#99FFFF>
+    \u2022 <color=#8C8C8C> 9 \u043C\u043C \u043A\u0430\u043B\u0438\u0431\u0440.\n\n<color=#AAAAAA>\u041F\u0440\u0438\u0431\u043E\u0440
+    \u0431\u0435\u0441\u0448\u0443\u043C\u043D\u043E\u0439 \u0441\u0442\u0440\u0435\u043B\u044C\u0431\u044B
+    \u0434\u043B\u044F \u043F\u0438\u0441\u0442\u043E\u043B\u0435\u0442\u0430 \u0410\u041F\u0421,
+    \u0443\u043B\u0443\u0447\u0448\u0435\u043D\u043D\u043E\u0433\u043E \u0441 \u043F\u043E\u043C\u043E\u0449\u044C\u044E
+    \u0442\u0430\u043A\u0442\u0438\u0447\u0435\u0441\u043A\u043E\u0433\u043E \u043D\u0430\u0431\u043E\u0440\u0430.\n\n<color=#5D0074>
+    \u2022 <color=#8C8C8C> \u0413\u043B\u0443\u0448\u0435\u043D\u0438\u0435 \u0437\u0432\u0443\u043A\u0430:
+    <color=#AAAAAA>\u0441\u0440\u0435\u0434\u043D\u0435\u0435"
+  _category: Attachment
+  _tags:
+  - Silencer
+  _size: {x: 2, y: 1}
+  _weight: 0.2
+  _maxStack: 1
+  _allowRotation: 1
+  _backgroundColor: {r: 1, g: 1, b: 1, a: 0.04}
+  _fallbackIcon: {fileID: 0}
+  _iconOverride: {fileID: -2056037713, guid: b3e68370cc9da564986ec1dd6f5c65ab, type: 3}
+  _visualPrefab: {fileID: -5482209590318731223, guid: f9c2e6bc4021b1146bbcc5e563226e03, type: 3}
+  _defaultIconVariant: []
+  _icon:
+    _generateIcon: 0
+    _pixelsPerCell: 64
+    _antiAliasing: 1
+    _useOutline: 0
+    _outlineWidth: 2
+    _useShadow: 1
+    _shadowOffset: {x: 2, y: -2}
+    _shadowBlur: 2
+    _defaultView:
+      _modelEulerAngles: {x: 0, y: 0, z: 0}
+      _modelScale: {x: 1, y: 1, z: 1}
+      _cameraEulerAngles: {x: 0, y: -90, z: 0}
+      _padding: 1.15
+      _useDirectionalLight: 1
+      _lightIntensity: 40
+    _useCustomSlotView: 0
+    _slotView:
+      _modelEulerAngles: {x: 0, y: 0, z: 0}
+      _modelScale: {x: 1, y: 1, z: 1}
+      _cameraEulerAngles: {x: 0, y: -90, z: 0}
+      _padding: 1.15
+      _useDirectionalLight: 1
+      _lightIntensity: 40
+  _components:
+  - rid: 3479885496768528493
+  - rid: 3479885496768528639
+  - rid: 3479885496768528785
+  references:
+    version: 2
+    RefIds:
+    - rid: 3479885496768528493
+      type: {class: WeaponAddonComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      data:
+        _section: wpn_sil_apb
+        _kind: 0
+        _cost: 800
+        _bulletHitPowerFactor: 0.9
+        _bulletHitImpulseFactor: 0.8
+        _bulletSpeedFactor: 0.9
+        _fireDispersionBaseFactor: 1
+        _camDispersionFactor: 0.82
+        _camDispersionIncrementFactor: 0.82
+        _scopeZoomFactor: 0
+    - rid: 3479885496768528639
+      type: {class: WorldItemComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      data:
+        _prefab: {fileID: 158628561225628103, guid: 3fdc805fd2d1fc140853ac3a3b52d3f9, type: 3}
+    - rid: 3479885496768528785
+      type: {class: ItemTakeSoundComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      data:
+        _category: attchsilen
+        _clips:
+        - {fileID: 8300000, guid: 651ca6a8a4ce61141bc8232419bc7edb, type: 3}
+        - {fileID: 8300000, guid: 02b396ea17161b74cab273d51371e909, type: 3}

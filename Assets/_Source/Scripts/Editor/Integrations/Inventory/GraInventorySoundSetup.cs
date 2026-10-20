@@ -175,6 +175,11 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
 
         private static int SetupTakeSounds(StalkerXRaySources sources, StringBuilder log)
         {
+            return SetupTakeSounds(sources, LoadDefinitions(), log);
+        }
+
+        public static int SetupTakeSounds(StalkerXRaySources sources, IEnumerable<ItemDefinition> definitions, StringBuilder log)
+        {
             XRayLtxDatabase table = XRayLtxDatabase.LoadFile(sources.Index, ITEM_SOUNDS_LTX);
             var categories = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             foreach (XRayLtxSection section in table.Sections.Values)
@@ -189,7 +194,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
             XRayLtxDatabase system = XRayLtxDatabase.LoadSystem(sources.Index);
             var clipsByCategory = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
             var assigned = new List<KeyValuePair<ItemDefinition, string>>();
-            foreach (ItemDefinition definition in LoadDefinitions())
+            foreach (ItemDefinition definition in definitions)
             {
                 EquipmentStatsComponent stats = definition.GetComponent<EquipmentStatsComponent>();
                 string section = stats != null && stats.Section.Length > 0 ? stats.Section : definition.name;
@@ -411,7 +416,9 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
         {
             material = WorldItemImpactSound.DEFAULT_MATERIAL;
             mass = 0f;
-            string path = definition.VisualPrefab != null ? AssetDatabase.GetAssetPath(definition.VisualPrefab) : null;
+            GameObject source = definition.VisualPrefab != null ? PrefabUtility.GetCorrespondingObjectFromOriginalSource(definition.VisualPrefab) : null;
+            source = source != null ? source : definition.VisualPrefab;
+            string path = source != null ? AssetDatabase.GetAssetPath(source) : null;
             if (string.IsNullOrEmpty(path) || !path.EndsWith(".ogf", StringComparison.OrdinalIgnoreCase) || !File.Exists(path))
             {
                 return;

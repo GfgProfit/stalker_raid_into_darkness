@@ -1,0 +1,35 @@
+fileFormatVersion: 2
+guid: e32e23494996f04469a51f0c6216c384
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\prs\wpn_addon_lens_green|models\reflex_lens
+    second: {fileID: 2100000, guid: accfb1149742864499872c3cad364512, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\scope_all_vomz_pilad_p1x42_weaver|models\model
+    second: {fileID: 2100000, guid: 66d31d0675531104f80874b96ca043b7, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\wpn_crosshair_pk6|models\reflex_reticle
+    second: {fileID: 2100000, guid: 508785756ea8e904190177dbe58c145c, type: 2}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 61e536e21e96f284493f2969a9250cdf, type: 3}
+  _scale: 1
+  _importMaterials: 1
+  _texturesFolder: 
+  _searchTexturesByName: 1
+  _importEmbeddedMotions: 1
+  _embeddedLoopMode: 0
+  _addAnimator: 1
+  _readableMeshes: 0
+  _updateWhenOffscreen: 0
+  _autoResolveResources: 1

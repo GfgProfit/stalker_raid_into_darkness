@@ -12,4 +12,34 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 10c7e266b7f82244c830adbadb6f791f, type: 3}
   m_Name: BakedItemIconCatalog
   m_EditorClassIdentifier: Inventory.IconGeneration::Inventory.IconGeneration.BakedItemIconCatalog
-  _entries: []
+  _entries:
+  - _itemId: 36d0b42ed2880d842bd2f2fef624d0a0
+    _variantIds: []
+    _width: 5
+    _height: 2
+    _profileType: 0
+    _visualSignature: 0fa8d3b5c384c05e
+    _spriteResourcePath: Generated/ItemIcons/36d0b42ed2880d842bd2f2fef624d0a0_5fb66b6354fc0b6e
+    _bakeSignature: 15da9367bb97f5ff26350efd5c0c0b58
+    _sourceItemAssetGuid: 36d0b42ed2880d842bd2f2fef624d0a0
+    _estimatedTextureBytes: 655360
+  - _itemId: 36d0b42ed2880d842bd2f2fef624d0a0
+    _variantIds: []
+    _width: 2
+    _height: 1
+    _profileType: 1
+    _visualSignature: dba0d6c6bf28b2f9
+    _spriteResourcePath: Generated/ItemIcons/36d0b42ed2880d842bd2f2fef624d0a0_fa37f5517a8c8c3e
+    _bakeSignature: d1b6f76aea7c21ce62bd1d7b16fc6450
+    _sourceItemAssetGuid: 36d0b42ed2880d842bd2f2fef624d0a0
+    _estimatedTextureBytes: 131072
+  - _itemId: 36d0b42ed2880d842bd2f2fef624d0a0
+    _variantIds: []
+    _width: 5
+    _height: 2
+    _profileType: 1
+    _visualSignature: e968bcc6d2fd90c5
+    _spriteResourcePath: Generated/ItemIcons/36d0b42ed2880d842bd2f2fef624d0a0_8d6f3f6d33a96db6
+    _bakeSignature: a10feb52bfa47bb69664630c42ab4f9a
+    _sourceItemAssetGuid: 36d0b42ed2880d842bd2f2fef624d0a0
+    _estimatedTextureBytes: 655360

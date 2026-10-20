@@ -338,7 +338,6 @@
             "bindings": [
                 { "name": "", "id": "2e5b7c1f-8d4b-4d66-9b25-6f2b9c4d3e31", "path": "<Keyboard>/tab", "interactions": "", "processors": "", "groups": "Keyboard&Mouse", "action": "ToggleInventory", "isComposite": false, "isPartOfComposite": false },
                 { "name": "", "id": "2e5b7c1f-8d4b-4d66-9b25-6f2b9c4d3e32", "path": "<Keyboard>/escape", "interactions": "", "processors": "", "groups": "Keyboard&Mouse", "action": "CloseInventory", "isComposite": false, "isPartOfComposite": false },
-                { "name": "", "id": "2e5b7c1f-8d4b-4d66-9b25-6f2b9c4d3e33", "path": "<Keyboard>/r", "interactions": "", "processors": "", "groups": "Keyboard&Mouse", "action": "RotateItem", "isComposite": false, "isPartOfComposite": false },
                 { "name": "", "id": "2e5b7c1f-8d4b-4d66-9b25-6f2b9c4d3e35", "path": "<Keyboard>/leftShift", "interactions": "", "processors": "", "groups": "Keyboard&Mouse", "action": "QuickTransferModifier", "isComposite": false, "isPartOfComposite": false },
                 { "name": "", "id": "2e5b7c1f-8d4b-4d66-9b25-6f2b9c4d3e36", "path": "<Keyboard>/b", "interactions": "", "processors": "", "groups": "Keyboard&Mouse", "action": "ToggleStash", "isComposite": false, "isPartOfComposite": false },
                 { "name": "", "id": "2e5b7c1f-8d4b-4d66-9b25-6f2b9c4d3e37", "path": "<Keyboard>/k", "interactions": "", "processors": "", "groups": "Keyboard&Mouse", "action": "ToggleFavorite", "isComposite": false, "isPartOfComposite": false },

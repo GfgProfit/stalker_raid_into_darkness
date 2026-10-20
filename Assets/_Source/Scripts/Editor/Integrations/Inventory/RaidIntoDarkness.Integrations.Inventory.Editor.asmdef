@@ -5,6 +5,8 @@
         "RaidIntoDarkness.Integrations.Inventory",
         "RaidIntoDarkness.Player",
         "RaidIntoDarkness.Player.Editor",
+        "RaidIntoDarkness.FirstPerson",
+        "XRay.Importer.Runtime",
         "XRay.Importer.Core",
         "XRay.Importer.Sources",
         "XRay.Importer.Editor",
@@ -15,7 +17,8 @@
         "UniTask",
         "Unity.InputSystem",
         "UnityEngine.UI",
-        "Unity.TextMeshPro"
+        "Unity.TextMeshPro",
+        "Unity.2D.Sprite.Editor"
     ],
     "includePlatforms": [
         "Editor"

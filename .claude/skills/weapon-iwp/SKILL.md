@@ -1,9 +1,9 @@
 ---
 name: weapon-iwp
-description: Use for any weapon work in this project - weapons, attachments/modules (silencers, scopes, grenade launchers), weapon items in the inventory grid, weapon world/HUD models, weapon hand animations, weapon sounds and stats. Weapon models and HUD animations come from the unpacked CoC IWP pack (E:\STALKER CoC IWP Unpacked pacth 16.03.2026); stats, balance, module compatibility and module models come from GRA. Triggers - "оружие", "ствол", "пушка", "глушитель", "прицел", "подствол", "модуль/обвес", "IWP", any wpn_* section.
+description: Use for any weapon work in this project - weapons, attachments/modules (silencers, scopes, grenade launchers), weapon items in the inventory grid, weapon world/HUD models, weapon hand animations, weapon sounds, particles and stats. Only clean weapon models (never per-module variant files - modules attach to weapon bones at runtime), HUD animations, weapon sounds and effects come from the unpacked CoC IWP pack (E:\STALKER CoC IWP Unpacked pacth 16.03.2026); stats, balance, module compatibility and module models come from GRA. Triggers - "оружие", "ствол", "пушка", "глушитель", "прицел", "подствол", "модуль/обвес", "IWP", any wpn_* section.
 ---
 
-# Оружие: модели IWP + данные GRA
+# Оружие: модели, анимации, звуки и эффекты IWP + данные GRA
 
 ## Главное правило
 
@@ -22,18 +22,20 @@ description: Use for any weapon work in this project - weapons, attachments/modu
 
 | Что | Источник |
 |---|---|
-| Мировые и HUD-модели оружия, их текстуры | **IWP** |
+| Мировые и HUD-модели оружия (только чистые, см. ниже), их текстуры | **IWP** |
 | HUD-анимации оружия и рук (OMF) | **IWP** |
-| Характеристики и баланс (урон, скорострельность, разброс, отдача, вес, цена, износ, патроны, магазин, апгрейды) | **GRA** (скилл `gra-research`) |
+| Звуки оружия: выстрел, перезарядка, затвор, смена режима, осечка и т.д. (`sounds/weapons/<ствол>/`) | **IWP** |
+| Эффекты оружия: партиклы вспышки, дыма, гильз и т.п. (`particles.xr`), камерные эффекты | **IWP** |
+| Характеристики и баланс (урон, скорострельность, разброс, отдача, вес, цена, износ, патроны, магазин, апгрейды, размер в сетке) | **GRA** (скилл `gra-research`) |
 | Совместимость и параметры модулей: `silencer_*`, `scope*`, `grenade_launcher_*` | **GRA** |
 | Модели модулей (глушители, прицелы, подствольники) | **GRA** (`dynamics\weapons\wpn_upgrade\...`) |
 | Названия и описания | **GRA** (`gra.js strings`) |
+| Звук подбора/переноса в инвентаре (`snd_on_take`) | **GRA** — общая система звуков инвентаря проекта |
 | Иконки оружия и модулей | **ни откуда**, их делает генератор иконок |
 
-- Звуки и HUD-параметры (`hands_position/orientation`, `aim_hud_offset_*`, `item_position`, `fire_point`, `shell_point`) пользователь отдельно не распределял:
-  - звуки по умолчанию берутся из GRA, по ключам `snd_*` секции GRA;
-  - HUD-параметры привязаны к модели и анимациям IWP, поэтому значения GRA для HUD-моделей GRA к ним могут не подойти.
-  - Если из-за этого что-то не сходится, спроси пользователя, а не подбирай значения сам.
+- Описание из GRA содержит цветовые теги `%c[имя]` / `%c[a,r,g,b]`. Их не вырезать: они переводятся в TMP `<color=#RRGGBB>` по `configs/ui/color_defs.xml` (`%c[default]` → `ui_gray_1`). Так у модулей в тултипе остаются цветные точки, как в «Особенностях» снаряжения: `d_purple` точка, текст `ui_gray_2`.
+- В GRA имена звуков и партиклов указаны в секции ствола (`snd_*`, `*_particles`), но сами файлы берутся из IWP. Если у файла IWP другое имя, ищи его в `sounds/weapons/<ствол>/` пака; если однозначной пары нет, спроси пользователя.
+- HUD-параметры (`hands_position/orientation`, `aim_hud_offset_*`, `item_position`, `fire_point`, `shell_point`) привязаны к модели и анимациям IWP, а значения GRA рассчитаны на модели GRA и к ним могут не подойти. Если что-то не сходится, спроси пользователя, а не подбирай значения сам.
 - Руки IWP совместимы с руками проекта (`wpn_hand_01` из GRA) — подтверждено пользователем. Rig рук не меняй и retarget не делай.
 - Ствол берётся в проект только если есть и секция GRA, и модель IWP. Одно и то же оружие в IWP и GRA часто названо по-разному:
   - `wpn_dvl_10` — `wpn_dvl10`;
@@ -49,19 +51,50 @@ description: Use for any weapon work in this project - weapons, attachments/modu
   Поэтому пару ищи через `iwpmap` (таблица синонимов `IWP_ALIASES` лежит в `iwp.js`; найдёшь новую пару — добавь туда). Не объявляй ствол «отсутствующим в GRA», пока не проверил его через `iwpmap` и полный список папок моделей GRA. Пользователь бегал с этими стволами в своей GRA.
 - Без пары в GRA сейчас: `awm`, `b725`, `mdr`, `mp43`, `mp9`, `mts255`, `taurus`, `vpo101` и гранатомёты/мины `m320`, `rgm40`, `pfm1`. Для них характеристики не выдумывай, спроси пользователя.
 
+## Только чистая модель
+
+**При добавлении оружия из IWP берётся ТОЛЬКО чистая модель ствола без модулей:**
+- мировая `wpn_<name>.ogf`, HUD-модель `wpn_<name>_hud.ogf` и её OMF;
+- **никогда** не тяни варианты `wpn_<name>_<прицел>[_hud].ogf` (`_acog`, `_eot`, `_specter`, `_1p78`, `_ac10632`, ...), модели с глушителем и любые другие сборки «ствол + модуль».
+
+Модули ставятся в кость нужного оружия в нашем движке во время игры. Так не будет, как в сталкере, отдельного файла и отдельной модели под каждую вариацию.
+
+- Кости крепления модулей: `wpn_scope`, `wpn_silencer`, `wpn_launcher` (константы в `WeaponHudComponent`). У AUG A3 есть `wpn_scope` и `wpn_silencer`. Найденные кости записываются в `WeaponHudComponent._attachmentBones`.
+  - Если у чистой модели нет кости под модуль, не бери вариант с модулем, а сообщи пользователю.
+- В «чистых» моделях IWP часто зашит меш модуля, скиннутый на кость модуля. Например, у `wpn_aug_a3.ogf` внутри лежит глушитель с текстурой `wpn_addon_sil_nato`; в X-Ray движок прячет его, пока модуль не установлен.
+  - У нас такие меши выключаются в визуальном префабе `Items/Weapons/Visuals/<section>[_hud].prefab`: это меши, все веса которых на костях модулей. Модель при этом не правится.
+  - `ItemDefinition._visualPrefab` и `WeaponHudComponent._hudModel` ссылаются на эти префабы, а не на `.ogf`.
+
 ## Иконки
 
-**Иконки оружия и модулей не импортируются.** Их делает генератор иконок проекта:
+**Иконки оружия не импортируются** — их делает генератор иконок проекта (на оружии рендерится само оружие с модулями).
+
+**Иконки модулей — из HD-атласов GRA** (решение пользователя).
+- атлас: ключ `icons_texture` секции модуля, пробелы в значении убираются (в GRA есть опечатка `ui\ui_ raid_hd_aattachments`); если ключа нет — `ui\ui_icon_equipment`;
+- прямоугольник: `inv_grid_x/y/width/height` × 50 px, `y` отсчитывается сверху;
+- атлас конвертируется в PNG в `Assets/_Source/Items/Icons/<имя>.png`, спрайты с именами секций (`ISpriteEditorDataProvider`), ссылка — `ItemDefinition._iconOverride`, `_generateIcon = false`.
+
+Генератор иконок проекта:
 - `Assets/_Modules/Inventory/Runtime/IconGeneration`, окно — `Assets/_Modules/Inventory/Editor/IconGeneration/ItemIconGeneratorWindow.cs`;
 - варианты с модулями — компонент `ItemIconVariantPart` в визуальном префабе предмета: `_part`, `_group`, `_installedObjects`, `_defaultObjects`, `_requiredParts`, `_incompatibleParts`, `_sizeDelta`.
 
 Не нарезай `ui_icon_equipment.dds` ни из IWP, ни из GRA. Иконки остальных предметов (снаряжение и т.п.) делаются по правилам скилла `xray-gra-import`.
 
+Параметры генерируемых иконок в `ItemDefinition` (требование пользователя) задаёт `ItemIconDefaults.Apply`:
+- `LightIntensity = 40`;
+- `SlotLightIntensity = 40`;
+- `UseOutline = false`;
+- камера сбоку `(0, -90, 0)`, дуло вправо.
+
+Пользователь может поправить иконку конкретного предмета вручную. При переносе из зеркала такие правки не затирай: переноси в проектный файл только нужные поля.
+
 ## Размер в сетке
 
 - В GRA своя мелкая сетка: АК-74 `10x4`, ПМ `4x2`, глушитель TGP-A `4x2`.
 - В проекте размеры свои: костюмы `3x3`, шлемы и рюкзаки `2x2`, и это не прямые значения GRA (у `army_outfit` в GRA `5x6`).
-- Как переводить размер оружия из GRA в сетку проекта, пока не решено. Не выбирай формулу сам, спроси пользователя.
+- Как переводить размер оружия из GRA в сетку проекта, в общем случае не решено. Не выбирай формулу сам, спроси пользователя.
+  - Исключение: если в GRA размер уже в масштабе проекта (AUG A3 `5x2` = слот «Основное» `5x2`), он берётся как есть.
+- **Модули (решение пользователя): половина размера GRA с округлением вверх** — `GraWeaponAddonSetup.ToProjectSize`. Примеры: `2x2 → 1x1`, `4x2 → 2x1`, `6x2 → 3x1`, `4x4 → 2x2`.
 - Правило глушителя (+1 клетка) действует в сетке проекта.
 
 ## IWP: структура пака
@@ -71,8 +104,11 @@ description: Use for any weapon work in this project - weapons, attachments/modu
 | Что | Где |
 |---|---|
 | Мировые и HUD-модели | `meshes/dynamics/weapons/wpn_<name>/` — `wpn_<name>.ogf`, `_hud.ogf`, `_lod.ogf`, варианты под прицелы `wpn_<name>_<scope>[_hud].ogf` |
-| HUD-анимации | `meshes/dynamics/weapons/wpn_<name>/wpn_<name>_hud_animation.omf` (рядом бывает `wpn_hand_<name>_hud_animation.omf`) |
+| HUD-анимации оружия | `meshes/dynamics/weapons/wpn_<name>/wpn_<name>_hud_animation.omf` (rig — HUD-модель ствола) |
+| HUD-анимации рук | `wpn_hand_<name>_hud_animation.omf`, но не всегда в папке ствола: руки AUG (`aug_*`) лежат в `wpn_fn2000/wpn_hand_fn2000_hud_animation.omf`. Ищи через `iwp.js motions <имя>` (rig — `wpn_hand_01` проекта) |
 | Текстуры | `textures/wpn/` |
+| Звуки | `sounds/weapons/<ствол>/` |
+| Партиклы | `particles.xr` |
 
 Модели модулей в IWP (`wpn_upgrade/`) тоже лежат, но их **не берём** — модели модулей идут из GRA.
 
@@ -112,15 +148,51 @@ description: Use for any weapon work in this project - weapons, attachments/modu
 
 ## Импорт в Unity
 
-- Модели и анимации импортируются только нашим X-Ray импортёром, по правилам скилла `xray-gra-import`: копировать файлы в `Assets`, без Blender/FBX и без своих импортёров. Модели оружия и OMF копируются из IWP, модели модулей и звуки — из файлов-победителей GRA (`gra.js winner`).
+- Образец сетапа — `Assets/_Source/Scripts/Editor/Integrations/Inventory/IwpWeaponSetup.cs` (AUG A3, меню `Tools/Inventory/Setup Test Weapon (AUG A3)`, batch `IwpWeaponSetup.SetupBatch`, лог `[IwpWeapon]`). Он делает следующее:
+  - копирует чистые модели и OMF из IWP;
+  - назначает rig;
+  - генерирует материалы из текстур IWP;
+  - проверяет анимации на HUD-модели и на всех руках из `OutfitCatalog`;
+  - строит визуальные префабы без встроенных модулей;
+  - создаёт `ItemDefinition` с `WeaponStatsComponent` (GRA) и `WeaponHudComponent` (IWP);
+  - добавляет его в `ItemDatabase`, строит мировой префаб;
+  - назначает звук `snd_on_take`, кладёт ствол в `OutdoorsScene` и запекает иконку.
+- Модели и анимации импортируются только нашим X-Ray импортёром, по правилам скилла `xray-gra-import`: копировать файлы в `Assets`, без Blender/FBX и без своих импортёров. Модели оружия, OMF, звуки и эффекты оружия копируются из IWP; модели модулей — из файлов-победителей GRA (`gra.js winner`).
+- Текстуры моделей IWP: при копировании `.ogf` в `Assets` автоматическая генерация ищет текстуры в MO2 GRA и может их не найти или взять чужие. Поэтому после копирования вызывай `XRayAssetGenerationCoordinator.Process`:
+  - с источником `XRaySourceMode.CustomFolder` = корень IWP и `PreserveExistingMaterials = false`;
+  - повторяй до `Completed`, потому что текстуры импортируются отложенно.
+- Ограничение импортёра: bump в BC7 (`DX10 DXGI 98`) не декодируется, материал остаётся без карты нормалей. Так у AUG A3 (`aug_a3_bump.dds`). Импортёр без запроса пользователя не правь — сообщи об этом.
 - Batch-сетапы и тесты запускай только через `unity-batch-mirror`.
 - Данные стволов и модулей храни в `ItemDefinition` и его компонентах, как у снаряжения. Правила оружия не клади в UI.
 - Совместимость модулей бери из секций GRA, а не из имён файлов.
 - Папки создавай рядом с существующими предметами: `Assets/_Source/Items/Weapons`, `Assets/_Source/Items/Addons`, `Assets/_Source/Items/Definitions/{Weapons,Addons}`.
 
+## Модули GRA
+
+Сетап `Assets/_Source/Scripts/Editor/Integrations/Inventory/GraWeaponAddonSetup.cs`: меню `Tools/Inventory/Setup GRA Weapon Addons`, batch `GraWeaponAddonSetup.SetupBatch`, лог `[WeaponAddons]`.
+
+- **«Реально используется в игре»** — класс `WP_SILEN` / `WP_SCOPE` / `WP_GLAUN`, есть `visual`, и на секцию есть ссылка:
+  - в оружии: `scopes`, `silencer_name`, `grenade_launcher_name` через `XRayLtxDatabase.GetList` (учитывает DLTX `>scopes = ...`; `GetValue` добавки НЕ видит — так в первый раз потерялись почти все прицелы);
+  - в группе прицелов MAS: `modular_scope_group` оружия → `scopes` группы (`scope_group_*`);
+  - в торговых и лут-списках (`configs/**` с `trade|death|treasure|loot|craft|stash|drop` в пути).
+  - Исключены `scope_base` (без модели), `placeholder` («MAS инструмент разработчика»). Без ссылок сейчас только `wpn_addon_scope_mosin`.
+  - Наборы переделки (`II_FOOD`: `archangel`, `pn23fore`, `susatov`, ...) в списках `scopes` — не модули, пишутся в лог.
+  - Сейчас модулей 146 (прицелы, включая обычную оптику, ночные и тепловизоры, глушители, подствольники).
+- **Модель модуля** — то, что ставится на оружие: `hud = <секция>_hud` → `item_visual` (`attachments\scopes\<имя>`, мод Pizza's Ultimate Sight / MAS). Если такого файла нет — `visual`.
+  - `visual` у части прицелов — коробка (`wpn_case_*`) или чужая модель: у `ekp8_18` это модель ЕКП-8-02, у `0kp2`/`rmr` — коробка без текстуры. Поэтому `visual` — только запасной вариант.
+- Ошибки моделей в самой GRA исправляются через таблицу `MESH_ONLY` в сетапе: секция → материал, который нужно оставить, остальные меши выключаются в префабе `Items/Addons/Visuals/<секция>.prefab`. Пример: `wpn_sil_spec_isg` — в моде Boomsticks его мировая модель — целый АК, из него берётся только меш глушителя `wpn_silencer_hexagon12`. Каждый модуль, для которого `ogftex` показывает текстуры оружия (`receiver`, `stock`, `magazine`, `handguard`), проверяй так же.
+- Текстуры — через MO2 GRA обычной генерацией импортёра. Всё лежит в `Assets/_Source/Items/Addons/{Models,Prefabs}` (~1,1 ГБ, из них ~540 МБ — нормали, которые импортёр сохраняет несжатыми PNG).
+- Определения — `Assets/_Source/Items/Definitions/Addons/<секция>.asset`:
+  - категория `Attachment`, тег `Silencer` / `Scope` / `GrenadeLauncher`;
+  - компонент `WeaponAddonComponent` с типом, ценой, множителями `*_k` и `scope_zoom_factor`;
+  - звук `snd_on_take` (`attchsilen` / `attchscope` / `attchscopenv` / `attchgl` ...).
+- В мир модули кладутся в группу `WorldItems/Addons` сцены `OutdoorsScene`: `WorldItemPrefabBuilder.AppendToScene`, свободное ровное место рядом с игроком. Остальные предметы `WorldItems` не трогаются, при повторном запуске группа пересоздаётся. Любой новый предмет должен лежать в мире, иначе его нельзя подобрать.
+- После сетапа `ItemIconBatchBake.BakeAllAsync` перепекает каталог: в нём остаются только генерируемые иконки (оружие), старые иконки модулей удаляются.
+
 ## Проверка перед сдачей
 
-- Характеристики совпадают с секциями GRA; модели оружия и анимации взяты из IWP, модели модулей — из GRA.
+- Характеристики совпадают с секциями GRA; модели оружия, анимации, звуки и эффекты оружия взяты из IWP, модели модулей — из GRA.
+- В проект скопированы только чистые модели (без `_<прицел>` и прочих вариантов); встроенные меши модулей выключены в визуальных префабах.
 - Для каждого ствола со съёмным глушителем: с глушителем ширина на 1 больше базовой, без него — базовая.
 - Глушитель расширяет предмет вправо, а если справа занято — влево. При нехватке места установка отклоняется.
 - Иконка варианта с глушителем на клетку шире и совпадает с размером в сетке.

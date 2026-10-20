@@ -1,0 +1,94 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da0f90c2955673d46b25d465cbe44ed0, type: 3}
+  m_Name: wpn_addon_grenade_launcher_l85
+  m_EditorClassIdentifier: Inventory::Inventory.ItemDefinition
+  _definitionId: 4b39f7989351f8d4f85d0d8cdd6f3cda
+  _displayName: "\u041F\u043E\u0434\u0441\u0442\u0432\u043E\u043B\u044C\u043D\u044B\u0439
+    \u0433\u0440\u0430\u043D\u0430\u0442\u043E\u043C\u0435\u0442 M320"
+  _shortName: "\u041F\u043E\u0434\u0441\u0442\u0432\u043E\u043B\u044C\u043D\u044B\u0439
+    \u0433\u0440\u0430\u043D\u0430\u0442\u043E\u043C\u0435\u0442 M320"
+  _description: "<color=#8C8C8C>\u0421\u041E\u0412\u041C\u0415\u0421\u0422\u0418\u041C\u041E\u0421\u0422\u042C:\n\n<color=#99FFFF>
+    \u2022 <color=#8C8C8C> L85 A2 \u0422\u0430\u043A\u0442\u0438\u0447\u0435\u0441\u043A\u0438\u0439\n\n<color=#AAAAAA>
+    \u041F\u043E\u0434\u0441\u0442\u0432\u043E\u043B\u044C\u043D\u044B\u0439 \u0433\u0440\u0430\u043D\u0430\u0442\u043E\u043C\u0451\u0442
+    M320 \u0431\u044B\u043B \u0441\u043E\u0437\u0434\u0430\u043D \u043A\u043E\u043C\u043F\u0430\u043D\u0438\u0435\u0439
+    Heckler & Koch \u0432 2008 \u0433\u043E\u0434\u0443 \u0434\u043B\u044F \u0437\u0430\u043C\u0435\u043D\u044B
+    \u043F\u043E\u0434\u0441\u0442\u0432\u043E\u043B\u044C\u043D\u043E\u0433\u043E
+    \u0433\u0440\u0430\u043D\u0430\u0442\u043E\u043C\u0451\u0442\u0430 M203.\n<color=#5D0074>
+    \u2022 <color=#8C8C8C> \u0431\u043E\u0435\u043F\u0440\u0438\u043F\u0430\u0441\u044B:
+    <color=#AAAAAA>\u0433\u0440\u0430\u043D\u0430\u0442\u0430 \u041C209 40 \u043C\u043C"
+  _category: Attachment
+  _tags:
+  - GrenadeLauncher
+  _size: {x: 2, y: 2}
+  _weight: 1.2
+  _maxStack: 1
+  _allowRotation: 1
+  _backgroundColor: {r: 1, g: 1, b: 1, a: 0.04}
+  _fallbackIcon: {fileID: 0}
+  _iconOverride: {fileID: 2115666121, guid: b3e68370cc9da564986ec1dd6f5c65ab, type: 3}
+  _visualPrefab: {fileID: 1345444110793755058, guid: 9dc180486a5378842905ea9721fce2a2, type: 3}
+  _defaultIconVariant: []
+  _icon:
+    _generateIcon: 0
+    _pixelsPerCell: 64
+    _antiAliasing: 1
+    _useOutline: 0
+    _outlineWidth: 2
+    _useShadow: 1
+    _shadowOffset: {x: 2, y: -2}
+    _shadowBlur: 2
+    _defaultView:
+      _modelEulerAngles: {x: 0, y: 0, z: 0}
+      _modelScale: {x: 1, y: 1, z: 1}
+      _cameraEulerAngles: {x: 0, y: -90, z: 0}
+      _padding: 1.15
+      _useDirectionalLight: 1
+      _lightIntensity: 40
+    _useCustomSlotView: 0
+    _slotView:
+      _modelEulerAngles: {x: 0, y: 0, z: 0}
+      _modelScale: {x: 1, y: 1, z: 1}
+      _cameraEulerAngles: {x: 0, y: -90, z: 0}
+      _padding: 1.15
+      _useDirectionalLight: 1
+      _lightIntensity: 40
+  _components:
+  - rid: 3479885496768528475
+  - rid: 3479885496768528621
+  - rid: 3479885496768528767
+  references:
+    version: 2
+    RefIds:
+    - rid: 3479885496768528475
+      type: {class: WeaponAddonComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      data:
+        _section: wpn_addon_grenade_launcher_l85
+        _kind: 2
+        _cost: 10200
+        _bulletHitPowerFactor: 1
+        _bulletHitImpulseFactor: 1
+        _bulletSpeedFactor: 1
+        _fireDispersionBaseFactor: 1
+        _camDispersionFactor: 1
+        _camDispersionIncrementFactor: 1
+        _scopeZoomFactor: 0
+    - rid: 3479885496768528621
+      type: {class: WorldItemComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      data:
+        _prefab: {fileID: 1374101350796217721, guid: 4f4864ea06068b247a135d88aa3b29e5, type: 3}
+    - rid: 3479885496768528767
+      type: {class: ItemTakeSoundComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      data:
+        _category: attchgl
+        _clips:
+        - {fileID: 8300000, guid: fb449a419932bb448821a0faf1eca76a, type: 3}

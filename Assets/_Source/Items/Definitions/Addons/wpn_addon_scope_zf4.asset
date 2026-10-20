@@ -1,0 +1,115 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da0f90c2955673d46b25d465cbe44ed0, type: 3}
+  m_Name: wpn_addon_scope_zf4
+  m_EditorClassIdentifier: Inventory::Inventory.ItemDefinition
+  _definitionId: f3c873573672873468a3cb9b0e9b25f2
+  _displayName: "\u041F\u0440\u0438\u0446\u0435\u043B ZF-4"
+  _shortName: "\u041F\u0440\u0438\u0446\u0435\u043B ZF-4"
+  _description: "<color=#8C8C8C>\u0421\u041E\u0412\u041C\u0415\u0421\u0422\u0418\u041C\u041E\u0421\u0422\u042C:\n\n<color=#99FFFF>
+    \u2022 <color=#8C8C8C> \u0438\u0441\u0442\u043E\u0440\u0438\u0447\u0435\u0441\u043A\u043E\u0435
+    \u043D\u0435\u043C\u0435\u0446\u043A\u043E\u0435 \u043E\u0440\u0443\u0436\u0438\u0435\n\n<color=#AAAAAA>\u041F\u0440\u0438\u0446\u0435\u043B
+    ZF-4 (ZF-43) \u0431\u044B\u043B \u0441\u043E\u0437\u0434\u0430\u043D \u0432 \u0413\u0435\u0440\u043C\u0430\u043D\u0438\u0438
+    \u0432 1943 \u0433\u043E\u0434\u0443 \u043D\u0430 \u043E\u0441\u043D\u043E\u0432\u0435
+    \u0441\u043E\u0432\u0435\u0442\u0441\u043A\u043E\u0433\u043E \u043E\u043F\u0442\u0438\u0447\u0435\u0441\u043A\u043E\u0433\u043E
+    \u043F\u0440\u0438\u0446\u0435\u043B\u0430 \u041F\u0423. \u041E\u043D \u043F\u0440\u0435\u0434\u043D\u0430\u0437\u043D\u0430\u0447\u0430\u043B\u0441\u044F
+    \u0434\u043B\u044F \u0432\u043E\u043E\u0440\u0443\u0436\u0435\u043D\u0438\u044F
+    \u0440\u0435\u0433\u0443\u043B\u044F\u0440\u043D\u044B\u0445 \u0432\u043E\u0439\u0441\u043A,
+    \u0447\u0442\u043E\u0431\u044B \u0434\u0430\u0442\u044C \u0438\u043C \u0432\u043E\u0437\u043C\u043E\u0436\u043D\u043E\u0441\u0442\u044C
+    \u0441\u0440\u0430\u0436\u0430\u0442\u044C\u0441\u044F \u043D\u0430 \u0434\u0430\u043B\u044C\u043D\u0438\u0445
+    \u0434\u0438\u0441\u0442\u0430\u043D\u0446\u0438\u044F\u0445. \u041E\u0434\u043D\u0430\u043A\u043E,
+    \u0432 \u0441\u0432\u044F\u0437\u0438 \u0441 \u043D\u0435\u0434\u043E\u0441\u0442\u0430\u0442\u043E\u0447\u043D\u044B\u043C
+    \u043A\u043E\u043B\u0438\u0447\u0435\u0441\u0442\u0432\u043E\u043C \u043F\u0440\u043E\u0438\u0437\u0432\u0435\u0434\u0451\u043D\u043D\u044B\u0445
+    \u043F\u0440\u0438\u0446\u0435\u043B\u043E\u0432, \u0438\u043C\u0438 \u0431\u044B\u043B\u0438
+    \u0432 \u043F\u0435\u0440\u0432\u0443\u044E \u043E\u0447\u0435\u0440\u0435\u0434\u044C
+    \u043E\u0431\u0435\u0441\u043F\u0435\u0447\u0435\u043D\u044B \u043D\u0435\u043C\u0435\u0446\u043A\u0438\u0435
+    \u0441\u043D\u0430\u0439\u043F\u0435\u0440\u044B \u0438 \u044D\u043B\u0438\u0442\u043D\u044B\u0435
+    \u043F\u043E\u0434\u0440\u0430\u0437\u0434\u0435\u043B\u0435\u043D\u0438\u044F.
+    \u041D\u0430 \u0441\u0435\u0433\u043E\u0434\u043D\u044F\u0448\u043D\u0438\u0439
+    \u0434\u0435\u043D\u044C ZF-4 \u043E\u0441\u0442\u0430\u0451\u0442\u0441\u044F
+    \u0434\u043E\u0432\u043E\u043B\u044C\u043D\u043E \u043F\u043E\u043F\u0443\u043B\u044F\u0440\u043D\u044B\u043C
+    \u0432 \u0417\u043E\u043D\u0435, \u043F\u043E\u0441\u043A\u043E\u043B\u044C\u043A\u0443
+    \u043E\u0440\u0443\u0436\u0438\u0435 \u0432\u0440\u0435\u043C\u0451\u043D \u0412\u0442\u043E\u0440\u043E\u0439
+    \u043C\u0438\u0440\u043E\u0432\u043E\u0439, \u0434\u043B\u044F \u043A\u043E\u0442\u043E\u0440\u043E\u0433\u043E
+    \u043E\u043D \u0431\u044B\u043B \u0440\u0430\u0437\u0440\u0430\u0431\u043E\u0442\u0430\u043D,
+    \u0432\u0441\u0451 \u0435\u0449\u0451 \u043F\u0440\u0438\u043C\u0435\u043D\u044F\u0435\u0442\u0441\u044F
+    \u0437\u0434\u0435\u0441\u044C.\n\n<color=#5D0074> \u2022 <color=#8C8C8C> \u0423\u0432\u0435\u043B\u0438\u0447\u0435\u043D\u0438\u0435:
+    <color=#AAAAAA>2.0x\n<color=#5D0074> \u2022 <color=#8C8C8C> \u0421\u043E\u0441\u0442\u043E\u044F\u043D\u0438\u0435:
+    <color=#AAAAAA>\u0445\u043E\u0440\u043E\u0448\u0435\u0435\n<color=#5D0074> \u2022
+    <color=#8C8C8C> \u0422\u0438\u043F \u043F\u0440\u0438\u0446\u0435\u043B\u044C\u043D\u043E\u0439
+    \u0441\u0435\u0442\u043A\u0438: <color=#AAAAAA>ZF-41"
+  _category: Attachment
+  _tags:
+  - Scope
+  _size: {x: 2, y: 1}
+  _weight: 0.4
+  _maxStack: 1
+  _allowRotation: 1
+  _backgroundColor: {r: 1, g: 1, b: 1, a: 0.04}
+  _fallbackIcon: {fileID: 0}
+  _iconOverride: {fileID: -879263000, guid: b3e68370cc9da564986ec1dd6f5c65ab, type: 3}
+  _visualPrefab: {fileID: -1619909376772431483, guid: 6550ab94b958d364f9a29ba94353c317, type: 3}
+  _defaultIconVariant: []
+  _icon:
+    _generateIcon: 0
+    _pixelsPerCell: 64
+    _antiAliasing: 1
+    _useOutline: 0
+    _outlineWidth: 2
+    _useShadow: 1
+    _shadowOffset: {x: 2, y: -2}
+    _shadowBlur: 2
+    _defaultView:
+      _modelEulerAngles: {x: 0, y: 0, z: 0}
+      _modelScale: {x: 1, y: 1, z: 1}
+      _cameraEulerAngles: {x: 0, y: -90, z: 0}
+      _padding: 1.15
+      _useDirectionalLight: 1
+      _lightIntensity: 40
+    _useCustomSlotView: 0
+    _slotView:
+      _modelEulerAngles: {x: 0, y: 0, z: 0}
+      _modelScale: {x: 1, y: 1, z: 1}
+      _cameraEulerAngles: {x: 0, y: -90, z: 0}
+      _padding: 1.15
+      _useDirectionalLight: 1
+      _lightIntensity: 40
+  _components:
+  - rid: 3479885496768528485
+  - rid: 3479885496768528631
+  - rid: 3479885496768528777
+  references:
+    version: 2
+    RefIds:
+    - rid: 3479885496768528485
+      type: {class: WeaponAddonComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      data:
+        _section: wpn_addon_scope_zf4
+        _kind: 1
+        _cost: 1590
+        _bulletHitPowerFactor: 1
+        _bulletHitImpulseFactor: 1
+        _bulletSpeedFactor: 1
+        _fireDispersionBaseFactor: 1
+        _camDispersionFactor: 1
+        _camDispersionIncrementFactor: 1
+        _scopeZoomFactor: 24.8
+    - rid: 3479885496768528631
+      type: {class: WorldItemComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      data:
+        _prefab: {fileID: 2336543920955177588, guid: 0a6b2cf14b7eaae44ad7abed6ccc6bc6, type: 3}
+    - rid: 3479885496768528777
+      type: {class: ItemTakeSoundComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      data:
+        _category: attchscope
+        _clips:
+        - {fileID: 8300000, guid: 1694b29543aca0b4b91ce712213948d6, type: 3}

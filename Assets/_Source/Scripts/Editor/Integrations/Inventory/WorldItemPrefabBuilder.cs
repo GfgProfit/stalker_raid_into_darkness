@@ -73,6 +73,52 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
                 return;
             }
 
+            Place(scene, prefabs, anchor, root.transform, new List<Bounds>());
+        }
+
+        public static void AppendToScene(Scene scene, IReadOnlyList<WorldItem> prefabs, Transform anchor, string groupName)
+        {
+            GameObject root = null;
+
+            foreach (GameObject existing in scene.GetRootGameObjects())
+            {
+                if (existing.name == WORLD_ITEMS_ROOT)
+                {
+                    root = existing;
+                }
+            }
+
+            if (root == null)
+            {
+                root = new GameObject(WORLD_ITEMS_ROOT);
+                SceneManager.MoveGameObjectToScene(root, scene);
+            }
+
+            Transform previous = root.transform.Find(groupName);
+
+            if (previous != null)
+            {
+                UnityEngine.Object.DestroyImmediate(previous.gameObject);
+            }
+
+            var occupied = new List<Bounds>();
+
+            foreach (Collider collider in root.GetComponentsInChildren<Collider>())
+            {
+                occupied.Add(collider.bounds);
+            }
+
+            var group = new GameObject(groupName);
+            group.transform.SetParent(root.transform, false);
+
+            if (prefabs.Count > 0)
+            {
+                Place(scene, prefabs, anchor, group.transform, occupied);
+            }
+        }
+
+        private static void Place(Scene scene, IReadOnlyList<WorldItem> prefabs, Transform anchor, Transform parent, List<Bounds> occupied)
+        {
             Vector3 origin = anchor != null ? anchor.position : Vector3.zero;
             Vector3 forward = anchor != null ? Vector3.ProjectOnPlane(anchor.forward, Vector3.up).normalized : Vector3.forward;
             forward = forward.sqrMagnitude > 0f ? forward : Vector3.forward;
@@ -80,6 +126,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
             int rows = (prefabs.Count + COLUMNS - 1) / COLUMNS;
             Physics.SyncTransforms();
             Collider ground = CollectObstacles(scene, anchor, out List<Bounds> obstacles);
+            obstacles.AddRange(occupied);
             Vector3 center = FindFreeCenter(origin, forward, right, rows, prefabs.Count, ground, obstacles);
 
             var heights = new float[prefabs.Count];
@@ -93,7 +140,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
             for (int i = 0; i < prefabs.Count; i++)
             {
                 Vector3 position = GetCell(center, forward, right, rows, i);
-                var instance = (GameObject)PrefabUtility.InstantiatePrefab(prefabs[i].gameObject, root.transform);
+                var instance = (GameObject)PrefabUtility.InstantiatePrefab(prefabs[i].gameObject, parent);
                 var collider = instance.GetComponent<BoxCollider>();
                 float bottom = collider != null ? collider.center.y - collider.size.y * 0.5f : 0f;
                 instance.transform.SetPositionAndRotation(new Vector3(position.x, heights[i] + DROP_HEIGHT - bottom, position.z), Quaternion.LookRotation(-forward, Vector3.up));
@@ -239,7 +286,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
 
         private static Bounds CalculateBounds(GameObject root)
         {
-            Renderer[] renderers = root.GetComponentsInChildren<Renderer>(true);
+            Renderer[] renderers = root.GetComponentsInChildren<Renderer>(false);
 
             if (renderers.Length == 0)
             {

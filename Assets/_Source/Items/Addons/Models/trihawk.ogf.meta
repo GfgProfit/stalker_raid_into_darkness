@@ -1,0 +1,45 @@
+fileFormatVersion: 2
+guid: 9640073c43b62cc4aa676f03a81774ac
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: none|models\scope_back
+    second: {fileID: 2100000, guid: 9c3363f08b88d664fbcc2f0a84098608, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: none|models\scope_zwrite
+    second: {fileID: 2100000, guid: 73ca2e09928b06b4ea06d25898c289b3, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\scope_reticles\trihawk|models\scope_reticle_precise
+    second: {fileID: 2100000, guid: a6e7913be1d5bb84fb8b9adf53af2d34, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\scope_swampfox_trihawk_prism_scope_3x30|models\model
+    second: {fileID: 2100000, guid: f51eb3328b66c024c9d798586377a283, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\wpn_scope_night_scope_lens|models\weapons
+    second: {fileID: 2100000, guid: 75ad596ef883aab45a81e22dfaefde2a, type: 2}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 61e536e21e96f284493f2969a9250cdf, type: 3}
+  _scale: 1
+  _importMaterials: 1
+  _texturesFolder: 
+  _searchTexturesByName: 1
+  _importEmbeddedMotions: 1
+  _embeddedLoopMode: 0
+  _addAnimator: 1
+  _readableMeshes: 0
+  _updateWhenOffscreen: 0
+  _autoResolveResources: 1

@@ -1,0 +1,22 @@
+fileFormatVersion: 2
+guid: 41d030174df5c5642a0ca7bd972132fc
+IHVImageFormatImporter:
+  externalObjects: {}
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 0
+    wrapV: 0
+    wrapW: 0
+  isReadable: 0
+  sRGBTexture: 1
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  ignoreMipmapLimit: 0
+  mipmapLimitGroupName: 
+  userData: xray-asset:{"_key":"textures/wpn/wpn_addon_sil_nato.dds#albedo","_role":"Albedo","_source":"Custom
+    folder","_sourcePath":"E:\\STALKER CoC IWP Unpacked pacth 16.03.2026\\textures\\wpn\\wpn_addon_sil_nato.dds","_stamp":"1398276:639092091095342170"}
+  assetBundleName: 
+  assetBundleVariant: 

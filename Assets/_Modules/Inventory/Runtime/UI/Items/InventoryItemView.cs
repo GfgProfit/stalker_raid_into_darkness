@@ -11,6 +11,8 @@ namespace Inventory.UI
     {
         private const float DRAGGED_SOURCE_ALPHA = 0.35f;
         private const float DIMMED_ALPHA = 0.25f;
+        private const float INFO_BACKGROUND_PADDING_X = 3f;
+        private const float INFO_BACKGROUND_PADDING_Y = 1f;
 
         private RectTransform _rectTransform;
         private RectTransform _content;
@@ -23,6 +25,7 @@ namespace Inventory.UI
         private TextMeshProUGUI _nameShadow;
         private TextMeshProUGUI _conditionText;
         private TextMeshProUGUI _conditionShadow;
+        private Image[] _infoBackgrounds;
         private InventoryTheme _appliedTheme;
         private Image _indicator;
         private Image _badge;
@@ -87,6 +90,7 @@ namespace Inventory.UI
             _rectTransform.sizeDelta = new Vector2(size.x * cellSize.x, size.y * cellSize.y);
             ApplyContent(item.Definition.Size, cellSize, rotated);
             ApplyTexts(amount);
+            HideTexts();
             _background.color = BackgroundColor(item.Definition);
             RequestIcon(ItemIconRequest.ForItem(item));
         }
@@ -242,9 +246,10 @@ namespace Inventory.UI
             _countText.enabled = false;
             string count = showCount && theme.ShowItemCount ? theme.FormatCount(amount) : string.Empty;
             bool inSlot = _ghost == false && _grid != null && _grid.UsesSlotIcon(Item, out _);
-            string weight = theme.ShowItemWeight && inSlot == false ? theme.FormatWeight(definition.Weight * amount) : string.Empty;
+            string weight = theme.ShowItemWeight && inSlot == false ? theme.FormatItemWeight(definition.Weight * amount) : string.Empty;
             string info = count.Length > 0 && weight.Length > 0 ? count + "\n" + weight : count + weight;
             SetLabel(_infoText, _infoShadow, info);
+            LayoutInfoBackgrounds(theme);
             SetLabel(_nameText, _nameShadow, theme.ShowsShortName(definition) ? definition.ShortName : string.Empty);
             string condition = Item.GetState("condition");
             string conditionText = string.Empty;
@@ -268,12 +273,13 @@ namespace Inventory.UI
             bool themed = theme != null;
             _infoText.gameObject.SetActive(themed);
             _conditionText.gameObject.SetActive(themed);
-            _infoShadow.gameObject.SetActive(themed && theme.ItemTextShadow);
+            _infoShadow.gameObject.SetActive(themed && theme.ItemTextShadow && theme.ItemInfoBackground.a <= 0f);
             _nameShadow.gameObject.SetActive(themed && theme.ItemTextShadow);
             _conditionShadow.gameObject.SetActive(themed && theme.ItemTextShadow);
 
             if (themed == false)
             {
+                HideInfoBackgrounds();
                 _nameText.alignment = TextAlignmentOptions.TopLeft;
                 return;
             }
@@ -296,6 +302,7 @@ namespace Inventory.UI
             shadow.fontSize = size;
             label.color = color;
             shadow.color = theme.ItemShadowColor;
+            shadow.overrideColorTags = true;
             shadow.alignment = label.alignment;
             shadow.lineSpacing = label.lineSpacing;
         }
@@ -306,6 +313,61 @@ namespace Inventory.UI
             label.enabled = value.Length > 0;
             shadow.text = value;
             shadow.enabled = label.enabled;
+        }
+
+        private void LayoutInfoBackgrounds(InventoryTheme theme)
+        {
+            if (theme.ItemInfoBackground.a <= 0f || _infoText.enabled == false)
+            {
+                HideInfoBackgrounds();
+                return;
+            }
+
+            _infoText.ForceMeshUpdate();
+            TMP_TextInfo textInfo = _infoText.textInfo;
+
+            for (int i = 0; i < _infoBackgrounds.Length; i++)
+            {
+                Image background = _infoBackgrounds[i];
+
+                if (i >= textInfo.lineCount || textInfo.lineInfo[i].characterCount == 0)
+                {
+                    background.enabled = false;
+                    continue;
+                }
+
+                Extents extents = textInfo.lineInfo[i].lineExtents;
+                Rect textRect = _infoText.rectTransform.rect;
+                Vector2 textOffset = new Vector2(_infoText.rectTransform.offsetMin.x, _infoText.rectTransform.offsetMax.y);
+                RectTransform rect = background.rectTransform;
+                rect.anchorMin = new Vector2(0f, 1f);
+                rect.anchorMax = new Vector2(0f, 1f);
+                rect.pivot = new Vector2(0f, 1f);
+                rect.anchoredPosition = new Vector2(textOffset.x + extents.min.x - textRect.xMin - INFO_BACKGROUND_PADDING_X, textOffset.y + extents.max.y - textRect.yMax + INFO_BACKGROUND_PADDING_Y);
+                rect.sizeDelta = new Vector2(extents.max.x - extents.min.x + INFO_BACKGROUND_PADDING_X * 2f, extents.max.y - extents.min.y + INFO_BACKGROUND_PADDING_Y * 2f);
+                background.color = theme.ItemInfoBackground;
+                background.enabled = true;
+            }
+        }
+
+        private void HideInfoBackgrounds()
+        {
+            for (int i = 0; i < _infoBackgrounds.Length; i++)
+            {
+                _infoBackgrounds[i].enabled = false;
+            }
+        }
+
+        private void HideTexts()
+        {
+            _infoText.enabled = false;
+            _infoShadow.enabled = false;
+            _nameText.enabled = false;
+            _nameShadow.enabled = false;
+            _conditionText.enabled = false;
+            _conditionShadow.enabled = false;
+            _countText.enabled = false;
+            HideInfoBackgrounds();
         }
 
         private void ApplyDecoration()
@@ -462,6 +524,15 @@ namespace Inventory.UI
             _icon.enabled = false;
             RectTransform overlay = CreateChild("Overlay", hideFlags, _rectTransform, false);
             _overlay = overlay;
+            _infoBackgrounds = new Image[2];
+
+            for (int i = 0; i < _infoBackgrounds.Length; i++)
+            {
+                _infoBackgrounds[i] = CreateChild("InfoBackground" + i, hideFlags, overlay, true).gameObject.AddComponent<Image>();
+                _infoBackgrounds[i].raycastTarget = false;
+                _infoBackgrounds[i].enabled = false;
+            }
+
             _infoShadow = CreateShadow("InfoShadow", hideFlags, overlay, TextAlignmentOptions.TopLeft);
             _infoText = CreateText("Info", hideFlags, overlay, TextAlignmentOptions.TopLeft, 15f);
             _conditionShadow = CreateShadow("ConditionShadow", hideFlags, overlay, TextAlignmentOptions.BottomLeft);

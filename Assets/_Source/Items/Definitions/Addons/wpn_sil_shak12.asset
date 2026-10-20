@@ -1,0 +1,106 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da0f90c2955673d46b25d465cbe44ed0, type: 3}
+  m_Name: wpn_sil_shak12
+  m_EditorClassIdentifier: Inventory::Inventory.ItemDefinition
+  _definitionId: 5d9acb8d4f496ba46b49ae2f321a20df
+  _displayName: "\u0422\u0430\u043A\u0442\u0438\u0447\u0435\u0441\u043A\u0438\u0439
+    \u0433\u043B\u0443\u0448\u0438\u0442\u0435\u043B\u044C \u043A \u0428\u0410\u041A-12"
+  _shortName: "\u0422\u0430\u043A\u0442\u0438\u0447\u0435\u0441\u043A\u0438\u0439
+    \u0433\u043B\u0443\u0448\u0438\u0442\u0435\u043B\u044C \u043A \u0428\u0410\u041A-12"
+  _description: "<color=#8C8C8C>\u0421\u041E\u0412\u041C\u0415\u0421\u0422\u0418\u041C\u041E\u0421\u0422\u042C:\n\n<color=#99FFFF>
+    \u2022 <color=#8C8C8C> \u043E\u0440\u0443\u0436\u0438\u0435 \u043A\u0430\u043B\u0438\u0431\u0440\u0430
+    12,7\u044555 \u043C\u043C\n\n<color=#AAAAAA>\u041E\u0442\u043D\u043E\u0441\u0438\u0442\u0435\u043B\u044C\u043D\u043E
+    \u043D\u0435\u0431\u043E\u043B\u044C\u0448\u043E\u0439 \u0433\u043B\u0443\u0448\u0438\u0442\u0435\u043B\u044C
+    \u0434\u043B\u044F ShAK-12, \u043D\u0435 \u043D\u0430\u0441\u0442\u043E\u043B\u044C\u043A\u043E
+    \u0431\u043E\u043B\u044C\u0448\u043E\u0439 \u0438 \u043C\u043E\u0449\u043D\u044B\u0439,
+    \u0447\u0442\u043E\u0431\u044B \u043F\u043E\u043B\u043D\u043E\u0441\u0442\u044C\u044E
+    \u0437\u0430\u0433\u043B\u0443\u0448\u0438\u0442\u044C \u0432\u044B\u0441\u0442\u0440\u0435\u043B
+    \u0438\u043B\u0438 \u0443\u043C\u0435\u043D\u044C\u0448\u0438\u0442\u044C \u0434\u0443\u043B\u044C\u043D\u0443\u044E
+    \u0432\u0441\u043F\u044B\u0448\u043A\u0443 \u0434\u043E \u0443\u0440\u043E\u0432\u043D\u044F
+    \u0434\u044B\u043C\u0430, \u043D\u043E \u0434\u043E\u0441\u0442\u0430\u0442\u043E\u0447\u0435\u043D
+    \u0447\u0442\u043E\u0431\u044B \u0437\u0430\u043C\u0435\u0442\u043D\u043E \u043F\u043E\u0434\u0430\u0432\u0438\u0442\u044C
+    \u0435\u0433\u043E \u0438 \u0443\u043C\u0435\u043D\u044C\u0448\u0438\u0442\u044C
+    \u0434\u0443\u043B\u044C\u043D\u0443\u044E \u0432\u0441\u043F\u044B\u0448\u043A\u0443.\n\n<color=#5D0074>
+    \u2022 <color=#8C8C8C> \u0423\u043C\u0435\u043D\u044C\u0448\u0435\u043D\u0438\u0435
+    \u0433\u0440\u043E\u043C\u043A\u043E\u0441\u0442\u0438 \u0432\u044B\u0441\u0442\u0440\u0435\u043B\u0430:
+    <color=#AAAAAA>\u0441\u0440\u0435\u0434\u043D\u0435\u0435"
+  _category: Attachment
+  _tags:
+  - Silencer
+  _size: {x: 2, y: 1}
+  _weight: 1
+  _maxStack: 1
+  _allowRotation: 1
+  _backgroundColor: {r: 1, g: 1, b: 1, a: 0.04}
+  _fallbackIcon: {fileID: 0}
+  _iconOverride: {fileID: 2039376725, guid: b3e68370cc9da564986ec1dd6f5c65ab, type: 3}
+  _visualPrefab: {fileID: 237993867392024515, guid: a67a3c1f9dd5bb247bad63e2c78826bd, type: 3}
+  _defaultIconVariant: []
+  _icon:
+    _generateIcon: 0
+    _pixelsPerCell: 64
+    _antiAliasing: 1
+    _useOutline: 0
+    _outlineWidth: 2
+    _useShadow: 1
+    _shadowOffset: {x: 2, y: -2}
+    _shadowBlur: 2
+    _defaultView:
+      _modelEulerAngles: {x: 0, y: 0, z: 0}
+      _modelScale: {x: 1, y: 1, z: 1}
+      _cameraEulerAngles: {x: 0, y: -90, z: 0}
+      _padding: 1.15
+      _useDirectionalLight: 1
+      _lightIntensity: 40
+    _useCustomSlotView: 0
+    _slotView:
+      _modelEulerAngles: {x: 0, y: 0, z: 0}
+      _modelScale: {x: 1, y: 1, z: 1}
+      _cameraEulerAngles: {x: 0, y: -90, z: 0}
+      _padding: 1.15
+      _useDirectionalLight: 1
+      _lightIntensity: 40
+  _components:
+  - rid: 3479885496768528520
+  - rid: 3479885496768528666
+  - rid: 3479885496768528812
+  references:
+    version: 2
+    RefIds:
+    - rid: 3479885496768528520
+      type: {class: WeaponAddonComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      data:
+        _section: wpn_sil_shak12
+        _kind: 0
+        _cost: 2450
+        _bulletHitPowerFactor: 0.98
+        _bulletHitImpulseFactor: 0.96
+        _bulletSpeedFactor: 0.96
+        _fireDispersionBaseFactor: 0.98
+        _camDispersionFactor: 0.96
+        _camDispersionIncrementFactor: 1
+        _scopeZoomFactor: 0
+    - rid: 3479885496768528666
+      type: {class: WorldItemComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      data:
+        _prefab: {fileID: 6305594000892161232, guid: 123ab5a202d57b3498bf12b32c7b2702, type: 3}
+    - rid: 3479885496768528812
+      type: {class: ItemTakeSoundComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      data:
+        _category: other
+        _clips:
+        - {fileID: 8300000, guid: 5def6369c6832c340ad4c0b8b807ccef, type: 3}
+        - {fileID: 8300000, guid: 556f365171554cb49a02b3936d524a8e, type: 3}
+        - {fileID: 8300000, guid: 6aebe2576f7caaf4eab15ae0951dd45c, type: 3}
+        - {fileID: 8300000, guid: 4358a07e861b2eb43beae83b54a6c37a, type: 3}
+        - {fileID: 8300000, guid: d34c0f5eb7beb7642b6d8a049a141dfa, type: 3}

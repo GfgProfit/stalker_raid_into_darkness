@@ -7,6 +7,7 @@
         "RaidIntoDarkness.FirstPerson",
         "RaidIntoDarkness.Player",
         "RaidIntoDarkness.Integrations.Inventory",
+        "XRay.Importer.Runtime",
         "Inventory",
         "Inventory.UI",
         "Unity.InputSystem",

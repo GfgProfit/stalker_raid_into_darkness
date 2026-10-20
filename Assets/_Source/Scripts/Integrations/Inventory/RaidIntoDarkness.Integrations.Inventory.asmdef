@@ -8,6 +8,7 @@
         "RaidIntoDarkness.FirstPerson",
         "RaidIntoDarkness.Player",
         "RaidIntoDarkness.Utils",
+        "XRay.Importer.Runtime",
         "UniTask",
         "Unity.InputSystem",
         "UnityEngine.UI",

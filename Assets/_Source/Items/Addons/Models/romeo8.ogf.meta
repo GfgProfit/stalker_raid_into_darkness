@@ -1,0 +1,35 @@
+fileFormatVersion: 2
+guid: 29ca3d4bae100834f99818d025843c7d
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\prs\wpn_addon_lens_orange|models\reflex_lens
+    second: {fileID: 2100000, guid: 0d57ab46ed1ee284c8c19b794e7d9eb3, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\scope_sig_romeo_8t|models\model
+    second: {fileID: 2100000, guid: dd8dfa7824f4c844ca866b14ada5eb7b, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\wpn_crosshair_romeo4_reticles|models\reflex_reticle
+    second: {fileID: 2100000, guid: 18cc2334cd53f2c42a9a1b1a4998fbdc, type: 2}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 61e536e21e96f284493f2969a9250cdf, type: 3}
+  _scale: 1
+  _importMaterials: 1
+  _texturesFolder: 
+  _searchTexturesByName: 1
+  _importEmbeddedMotions: 1
+  _embeddedLoopMode: 0
+  _addAnimator: 1
+  _readableMeshes: 0
+  _updateWhenOffscreen: 0
+  _autoResolveResources: 1

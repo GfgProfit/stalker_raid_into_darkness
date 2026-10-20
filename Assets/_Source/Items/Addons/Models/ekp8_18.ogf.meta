@@ -1,0 +1,35 @@
+fileFormatVersion: 2
+guid: 87a63641ba0e5b94b952ed28f91ec6d5
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\prs\wpn_addon_lens_orange|models\reflex_lens
+    second: {fileID: 2100000, guid: 0d57ab46ed1ee284c8c19b794e7d9eb3, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\scope_ekp8_18|models\model
+    second: {fileID: 2100000, guid: 3154ad573e4a9ba429cc8dc68d8cf317, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\wpn_ekp8_18_mark|models\reflex_reticle
+    second: {fileID: 2100000, guid: 563686abb6a61a54cb0f3a030bc4365d, type: 2}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 61e536e21e96f284493f2969a9250cdf, type: 3}
+  _scale: 1
+  _importMaterials: 1
+  _texturesFolder: 
+  _searchTexturesByName: 1
+  _importEmbeddedMotions: 1
+  _embeddedLoopMode: 0
+  _addAnimator: 1
+  _readableMeshes: 0
+  _updateWhenOffscreen: 0
+  _autoResolveResources: 1

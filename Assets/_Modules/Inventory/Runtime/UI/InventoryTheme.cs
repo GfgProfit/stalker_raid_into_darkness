@@ -34,9 +34,12 @@ namespace Inventory.UI
         [SerializeField] private string _weightUnit = "kg";
         [SerializeField] [Min(4f)] private float _itemTextSize = 15f;
         [SerializeField] [Min(4f)] private float _itemNameSize = 18f;
+        [SerializeField] [Min(4f)] private float _itemWeightSize = 16f;
         [SerializeField] private Color _itemTextColor = new(1f, 1f, 1f, 0.9f);
         [SerializeField] private Color _itemShadowColor = new(0f, 0f, 0f, 0.85f);
         [SerializeField] private Color _conditionColor = new(0.39f, 0.59f, 1f, 1f);
+        [SerializeField] private Color _itemWeightColor = new(240f / 255f, 217f / 255f, 182f / 255f, 1f);
+        [SerializeField] private Color _itemInfoBackground = new(0f, 0f, 0f, 0f);
         [SerializeField] private List<string> _shortNameCategories = new();
         [SerializeField] private List<InventoryThemeLabel> _labels = new();
 
@@ -62,9 +65,12 @@ namespace Inventory.UI
         public bool ItemTextShadow => _itemTextShadow;
         public float ItemTextSize => _itemTextSize;
         public float ItemNameSize => _itemNameSize;
+        public float ItemWeightSize => _itemWeightSize;
         public Color ItemTextColor => _itemTextColor;
         public Color ItemShadowColor => _itemShadowColor;
         public Color ConditionColor => _conditionColor;
+        public Color ItemWeightColor => _itemWeightColor;
+        public Color ItemInfoBackground => _itemInfoBackground;
 
         public static string Resolve(InventoryTheme theme, string key, string fallback) => theme != null ? theme.Label(key, fallback) : fallback;
 
@@ -89,6 +95,8 @@ namespace Inventory.UI
         public string FormatCount(int amount) => string.Format(CultureInfo.InvariantCulture, string.IsNullOrEmpty(_countFormat) ? "{0}" : _countFormat, amount);
 
         public string FormatWeight(float weight) => Math.Round(weight, 2).ToString("0.##", CultureInfo.InvariantCulture) + _weightUnit;
+
+        public string FormatItemWeight(float weight) => "<size=" + _itemWeightSize.ToString("0.##", CultureInfo.InvariantCulture) + "><color=#" + ColorUtility.ToHtmlStringRGBA(_itemWeightColor) + ">" + FormatWeight(weight) + "</color></size>";
 
         public bool ShowsShortName(ItemDefinition definition)
         {

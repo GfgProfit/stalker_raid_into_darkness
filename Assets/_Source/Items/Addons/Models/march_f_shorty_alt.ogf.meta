@@ -1,0 +1,70 @@
+fileFormatVersion: 2
+guid: a94b26e96a37320498d5e160ff0663ee
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: none|models\scope_back
+    second: {fileID: 2100000, guid: 85cc84a934a4a274f8c6d8a247f2344e, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: none|models\scope_zwrite
+    second: {fileID: 2100000, guid: 91fe0313784577e4b90fc5f56987ffe4, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\crosshair_red_dot_simple|models\reflex_reticle_simple
+    second: {fileID: 2100000, guid: 5096224d490156940a5d653d60c75beb, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\prs\wpn_addon_lens_green|models\reflex_lens
+    second: {fileID: 2100000, guid: accfb1149742864499872c3cad364512, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\scope_reticles\shorty|models\scope_reticle_precise
+    second: {fileID: 2100000, guid: 26dd66111bf478d42869aa2a54953fcb, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\wpn_howa20_scope_diff|models\model
+    second: {fileID: 2100000, guid: 84693160fc6f5a94f966f155433b2470, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\wpn_mount_trijicon_rmr_diff|models\model
+    second: {fileID: 2100000, guid: 1665a414745ce5b46ac6c6d756c999d7, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\wpn_ncstar_mpr45|models\model
+    second: {fileID: 2100000, guid: 08443b53ba09960478754503073910c6, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\wpn_scope_base_leupold_deltapoint_diff|models\weapons
+    second: {fileID: 2100000, guid: 378d877a40c43804fbca11093f0b86b6, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\wpn_scope_pso_1m2-1_lens_diff|models\model
+    second: {fileID: 2100000, guid: 65ddeddc24dd6de49900fce792a6211d, type: 2}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 61e536e21e96f284493f2969a9250cdf, type: 3}
+  _scale: 1
+  _importMaterials: 1
+  _texturesFolder: 
+  _searchTexturesByName: 1
+  _importEmbeddedMotions: 1
+  _embeddedLoopMode: 0
+  _addAnimator: 1
+  _readableMeshes: 0
+  _updateWhenOffscreen: 0
+  _autoResolveResources: 1

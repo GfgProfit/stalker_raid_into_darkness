@@ -29,16 +29,19 @@ MonoBehaviour:
   _panelColor: {r: 1, g: 1, b: 1, a: 1}
   _panelPadding: {x: 18, y: 18, z: 18, w: 18}
   _showItemBackground: 0
-  _showItemWeight: 0
+  _showItemWeight: 1
   _showItemCount: 1
   _itemTextShadow: 1
   _countFormat: x{0}
   _weightUnit: "\u043A\u0433"
   _itemTextSize: 15
   _itemNameSize: 14
+  _itemWeightSize: 16
   _itemTextColor: {r: 1, g: 1, b: 1, a: 1}
   _itemShadowColor: {r: 0, g: 0, b: 0, a: 0.9}
   _conditionColor: {r: 0.39215687, g: 1, b: 0.5882353, a: 1}
+  _itemWeightColor: {r: 0.9411765, g: 0.8509804, b: 0.7137255, a: 1}
+  _itemInfoBackground: {r: 0, g: 0, b: 0, a: 0.65}
   _shortNameCategories:
   - Weapon
   _labels:

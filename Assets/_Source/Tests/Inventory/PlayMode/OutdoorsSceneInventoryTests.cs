@@ -450,6 +450,167 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             yield return Tap(_keyboard.tabKey);
         }
 
+        [UnityTest]
+        public IEnumerator TestWeaponAugCanBePickedUpAndEquipped()
+        {
+            SceneManager.LoadScene(SCENE, LoadSceneMode.Single);
+            yield return null;
+            yield return new WaitForSeconds(1.0f);
+
+            InventoryWindowController controller = Object.FindAnyObjectByType<InventoryWindowController>();
+            WorldItemInteractor interactor = Object.FindAnyObjectByType<WorldItemInteractor>();
+            InventoryWindow window = controller.Window;
+            WorldItem aug = null;
+
+            foreach (WorldItem candidate in Object.FindObjectsByType<WorldItem>(FindObjectsSortMode.None))
+            {
+                if (candidate.Definition != null && candidate.Definition.name == "wpn_aug_a3")
+                {
+                    aug = candidate;
+                }
+            }
+
+            Assert.That(aug, Is.Not.Null, "the test AUG is not placed in the scene");
+            ItemDefinition definition = aug.Definition;
+            Assert.That(definition.IsCategory("Weapon"), Is.True);
+            Assert.That(definition.Size, Is.EqualTo(new Vector2Int(5, 2)), "AUG A3 grid size must come from GRA inv_grid_width/height");
+            Assert.That(definition.CanGenerateIcon, Is.True, "weapon icons must be generated, not imported");
+            Assert.That(definition.Description, Does.Contain("<color=#5D0074> • <color=#8C8C8C>"), "module bullets must keep GRA d_purple / ui_gray_2 colors");
+            Assert.That(definition.Description, Does.Not.Contain("%c["));
+            WeaponStatsComponent stats = definition.GetComponent<WeaponStatsComponent>();
+            Assert.That(stats, Is.Not.Null);
+            Assert.That(stats.Section, Is.EqualTo("wpn_aug_a3"));
+            Assert.That(stats.SilencerStatus, Is.EqualTo(WeaponAddonStatus.Attachable));
+            Assert.That(stats.MagazineSize, Is.EqualTo(30));
+            WeaponHudComponent hud = definition.GetComponent<WeaponHudComponent>();
+            Assert.That(hud != null && hud.HudModel != null && hud.WeaponMotions != null && hud.HandsMotions != null, Is.True, "IWP HUD model and motions are missing");
+            Assert.That(hud.AttachmentBones, Does.Contain(WeaponHudComponent.SCOPE_BONE).And.Contain(WeaponHudComponent.SILENCER_BONE));
+            Assert.That(definition.GetComponent<ItemTakeSoundComponent>(), Is.Not.Null, "AUG has no snd_on_take sound");
+            Assert.That(aug.GetComponent<WorldItemImpactSound>(), Is.Not.Null);
+            Assert.That(interactor.TryPickUp(aug), Is.True);
+            ItemInstance item = null;
+
+            foreach (ItemInstance candidate in window.FindGrid(BACKPACK).Container.Items)
+            {
+                if (candidate.Definition == definition)
+                {
+                    item = candidate;
+                }
+            }
+
+            Assert.That(item, Is.Not.Null, "the AUG did not reach the backpack");
+            InventoryItemView view = null;
+
+            foreach (InventoryItemView candidate in window.FindGrid(BACKPACK).ItemViews.Values)
+            {
+                view = candidate.Item == item ? candidate : view;
+            }
+
+            Assert.That(view, Is.Not.Null);
+            Assert.That(view.CountText, Does.StartWith("<size=16><color=#F0D9B6FF>3.9"), "stack weight must be shown in the top-left corner with the HudMessage color");
+            window.EquipItem(item);
+            yield return WaitForEquipmentAnimations(controller);
+            Assert.That(item.ContainerId, Is.EqualTo(EQUIPMENT));
+            Assert.That(item.Location.SlotId, Is.EqualTo("Primary"));
+        }
+
+        [UnityTest]
+        public IEnumerator GraWeaponAddonsHaveModelsAndGeneratedIcons()
+        {
+            SceneManager.LoadScene(SCENE, LoadSceneMode.Single);
+            yield return null;
+
+            InventoryWindowController controller = Object.FindAnyObjectByType<InventoryWindowController>();
+            var addons = new Dictionary<string, ItemDefinition>();
+
+            foreach (ItemDefinition definition in controller.Inventory.Database.Definitions)
+            {
+                if (definition.IsCategory("Attachment"))
+                {
+                    addons[definition.name] = definition;
+                }
+            }
+
+            Assert.That(addons.Count, Is.GreaterThanOrEqualTo(140), "GRA addons used in the game were not imported");
+
+            foreach (ItemDefinition addon in addons.Values)
+            {
+                Assert.That(addon.GetComponent<WeaponAddonComponent>(), Is.Not.Null, addon.name);
+                Assert.That(addon.VisualPrefab, Is.Not.Null, addon.name + " has no GRA model");
+                Assert.That(addon.IconOverride, Is.Not.Null, addon.name + " must use the GRA HD icon");
+                Assert.That(addon.IconOverride.name, Is.EqualTo(addon.name));
+                Assert.That(addon.CanGenerateIcon, Is.False, addon.name);
+            }
+
+            Assert.That(addons["wpn_sil_nato"].Size, Is.EqualTo(new Vector2Int(1, 1)), "GRA 2x2 must become 1x1");
+            Assert.That(addons["wpn_sil_nato"].GetComponent<WeaponAddonComponent>().Kind, Is.EqualTo(WeaponAddonKind.Silencer));
+            Assert.That(addons["acog"].GetComponent<WeaponAddonComponent>().Kind, Is.EqualTo(WeaponAddonKind.Scope));
+            foreach (string scope in new[] { "pso1m21", "1p59", "t12", "1pn93", "leupold", "specter" })
+            {
+                Assert.That(addons.ContainsKey(scope), Is.True, scope + " (optics / thermal) is missing");
+            }
+
+            Assert.That(addons["ekp8_18"].VisualPrefab.name, Is.EqualTo("ekp8_18"), "EKP-8-18 must use its own MAS model, not the EKP-8-02 one");
+
+            foreach (Renderer renderer in addons["wpn_sil_spec_isg"].VisualPrefab.GetComponentsInChildren<Renderer>(false))
+            {
+                Assert.That(renderer.sharedMaterial.name, Is.EqualTo("wpn_silencer_hexagon12"), "wpn_sil_spec_isg must show only the silencer, not the whole rifle");
+            }
+
+            foreach (string scope in new[] { "0kp2", "rmr", "exps3" })
+            {
+                foreach (Renderer renderer in addons[scope].VisualPrefab.GetComponentsInChildren<Renderer>(true))
+                {
+                    Assert.That(renderer.sharedMaterial.name, Is.Not.EqualTo("wpn_case_med"), scope + " still uses the textureless case model");
+                }
+            }
+
+            Assert.That(addons["wpn_addon_grenade_launcher_m203"].Size, Is.EqualTo(new Vector2Int(2, 1)), "GRA 4x2 must become 2x1");
+            WeaponStatsComponent aug = null;
+
+            foreach (ItemDefinition definition in controller.Inventory.Database.Definitions)
+            {
+                if (definition.name == "wpn_aug_a3")
+                {
+                    aug = definition.GetComponent<WeaponStatsComponent>();
+                }
+            }
+
+            Assert.That(addons.ContainsKey(aug.SilencerSection), Is.True);
+            Assert.That(addons.ContainsKey(aug.GrenadeLauncherSection), Is.True);
+
+            foreach (string scope in aug.Scopes)
+            {
+                Assert.That(addons.ContainsKey(scope), Is.True, "AUG scope " + scope + " is missing");
+            }
+
+            yield return new WaitForSeconds(1.0f);
+            var placed = new HashSet<ItemDefinition>();
+            WorldItem silencer = null;
+
+            foreach (WorldItem worldItem in Object.FindObjectsByType<WorldItem>(FindObjectsSortMode.None))
+            {
+                if (worldItem.Definition != null && worldItem.Definition.IsCategory("Attachment"))
+                {
+                    placed.Add(worldItem.Definition);
+                    silencer = worldItem.Definition.name == "wpn_sil_nato" ? worldItem : silencer;
+                }
+            }
+
+            Assert.That(placed.Count, Is.EqualTo(addons.Count), "every addon must lie in the world");
+            Assert.That(silencer, Is.Not.Null);
+            Assert.That(silencer.transform.position.y, Is.GreaterThan(-5f), "the silencer fell through the ground");
+            Assert.That(Object.FindAnyObjectByType<WorldItemInteractor>().TryPickUp(silencer), Is.True);
+            bool inBackpack = false;
+
+            foreach (ItemInstance item in controller.Window.FindGrid(BACKPACK).Container.Items)
+            {
+                inBackpack |= item.Definition.name == "wpn_sil_nato";
+            }
+
+            Assert.That(inBackpack, Is.True, "the picked silencer did not reach the backpack");
+        }
+
         private static ItemInstance AddItem(InventoryModel model, InventoryWindowController controller, InventoryWindow window, string definitionName)
         {
             ItemDefinition found = null;

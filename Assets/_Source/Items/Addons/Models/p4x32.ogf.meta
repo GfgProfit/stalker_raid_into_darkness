@@ -1,0 +1,50 @@
+fileFormatVersion: 2
+guid: 7fc5c46f7b145c64c8c52ce68f3a0414
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: none|models\scope_back
+    second: {fileID: 2100000, guid: 9c3363f08b88d664fbcc2f0a84098608, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: none|models\scope_zwrite
+    second: {fileID: 2100000, guid: 73ca2e09928b06b4ea06d25898c289b3, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\mount_all_utg_rings_25_4mm|models\model
+    second: {fileID: 2100000, guid: 0b7301deac192234cb80c2e574ede80f, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\scope_25_4mm_vomz_pilad_4x32m|models\model
+    second: {fileID: 2100000, guid: 708f489a264385140873dbf2465953b8, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\scope_reticles\pilad_p4x32|models\scope_reticle_precise
+    second: {fileID: 2100000, guid: 20fedccda6dece44eb69086a7cd8d0e6, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\wpn_scope_pso_1m2-1_lens_diff|models\weapons
+    second: {fileID: 2100000, guid: fef5aa5e0e7644945b11f8279bb5b654, type: 2}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 61e536e21e96f284493f2969a9250cdf, type: 3}
+  _scale: 1
+  _importMaterials: 1
+  _texturesFolder: 
+  _searchTexturesByName: 1
+  _importEmbeddedMotions: 1
+  _embeddedLoopMode: 0
+  _addAnimator: 1
+  _readableMeshes: 0
+  _updateWhenOffscreen: 0
+  _autoResolveResources: 1

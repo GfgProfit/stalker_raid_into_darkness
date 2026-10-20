@@ -1,0 +1,35 @@
+fileFormatVersion: 2
+guid: 393ee0d4a69908a4d98a2f126e73e242
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\prs\wpn_addon_lens_holo|models\reflex_lens
+    second: {fileID: 2100000, guid: 64088db022f53904f8b9b33208e84fc5, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\wpn_addon_crosshair_uh1|models\reflex_reticle
+    second: {fileID: 2100000, guid: 34dd8de6a3c7b3f4eac59e4f13d05fc8, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\wpn_scope_all_vortex_razor_amg_uh-1_diff|models\model
+    second: {fileID: 2100000, guid: 70d7bcd226098f94db9488931bfdb522, type: 2}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 61e536e21e96f284493f2969a9250cdf, type: 3}
+  _scale: 1
+  _importMaterials: 1
+  _texturesFolder: 
+  _searchTexturesByName: 1
+  _importEmbeddedMotions: 1
+  _embeddedLoopMode: 0
+  _addAnimator: 1
+  _readableMeshes: 0
+  _updateWhenOffscreen: 0
+  _autoResolveResources: 1

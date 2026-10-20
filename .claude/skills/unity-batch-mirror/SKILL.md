@@ -25,7 +25,10 @@ node .claude/skills/unity-batch-mirror/scripts/compile.js RaidIntoDarkness.Playe
 2. Синхронизация:
    - `sh scripts/sync.sh code` — только код (`_Source/Scripts`, `_Source/Tests`, `_Source/Shaders`, `_Modules`, X-Ray импортёр) и inputactions; сгенерированные в зеркале ассеты не трогаются;
    - `sh scripts/sync.sh full` — /MIR `Assets`, `Packages`, `ProjectSettings`. Стирает в зеркале всё, чего нет в проекте, поэтому сначала перенеси обратно нужные результаты.
-3. `node scripts/meta_check.js --fix` — обязательно перед batch, если появились новые файлы. Открытый редактор сам генерирует `.meta` для новых скриптов; зеркало должно иметь тот же GUID, иначе префабы и сцены, сохранённые в зеркале, получат битые ссылки на скрипты. Источник истины — `.meta` проекта.
+3. `node scripts/meta_check.js --create --fix` — обязательно перед batch, если появились новые файлы.
+   - Зеркало должно иметь тот же GUID, что и проект, иначе префабы, сцены и ассеты, сохранённые в зеркале, получат битые ссылки на скрипты. Источник истины — `.meta` проекта.
+   - Открытый редактор генерирует `.meta` только когда его сфокусируют. Если меты нет, `--create` сам пишет стандартную MonoImporter-мету со случайным GUID для новых `.cs` (редактор её примет).
+   - `--fix` копирует меты проекта в зеркало.
 4. Запуск:
    - сетап: `sh scripts/run_method.sh Namespace.Class.SetupBatch setup_name [nographics|graphics]`. Метод обязан вызвать `EditorApplication.Exit(0|1)`; логируй с тегом вида `[EquipmentAnimations]` и потом `grep` по нему.
    - тесты: `sh scripts/run_tests.sh EditMode "RaidIntoDarkness.Player.Tests.Editor"` или `sh scripts/run_tests.sh PlayMode "RaidIntoDarkness.Inventory.Tests.PlayMode;RaidIntoDarkness.Player.Tests.PlayMode" [filter]`. Итог печатает `results.js`.
@@ -56,3 +59,4 @@ node .claude/skills/unity-batch-mirror/scripts/compile.js RaidIntoDarkness.Playe
 - Проверь `git diff --stat` целевых сцен и префабов: пользователь параллельно правит `OutdoorsScene` и объекты UI (например `HudMessage`). Никогда не перезаписывай их целиком вслепую — только если изменения от сетапа ожидаемые; иначе внеси правку в проект напрямую.
 - Префабы и сцены после копирования проверь по `git diff`: должны появиться только ожидаемые компоненты и поля.
 - Временные бэкапы держи в рабочей папке сессии, не в `Assets`.
+- Если перенесённые ассеты получили новые `[SerializeReference]`-данные (например, компоненты `ItemDefinition`), открытый редактор может оставить в памяти старую версию, хотя в логе есть реимпорт. В ручных шагах проси пользователя сделать Reimport папки или перезапустить редактор.

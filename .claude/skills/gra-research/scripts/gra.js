@@ -64,6 +64,13 @@ function winners(subdir, extension) {
     if (!fs.existsSync(start)) {
       continue;
     }
+    if (fs.statSync(start).isFile()) {
+      const rel = subdir.replace(/\\/g, '/').toLowerCase();
+      if (!map.has(rel)) {
+        map.set(rel, { label, path: start });
+      }
+      continue;
+    }
     const walk = dir => {
       for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
         const full = path.join(dir, entry.name);

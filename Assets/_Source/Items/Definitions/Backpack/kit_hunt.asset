@@ -110,6 +110,7 @@ MonoBehaviour:
   - rid: 3479885471900762488
   - rid: 3479885471900762489
   - rid: 3479885472039698599
+  - rid: 3479885488572596387
   references:
     version: 2
     RefIds:
@@ -148,3 +149,9 @@ MonoBehaviour:
       type: {class: WorldItemComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
       data:
         _prefab: {fileID: 7699895209900423060, guid: 968c923b845bada4ea21162f27ae50c0, type: 3}
+    - rid: 3479885488572596387
+      type: {class: ItemTakeSoundComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      data:
+        _category: huntkit
+        _clips:
+        - {fileID: 8300000, guid: e106b7315e8fd324e9328d299f2b13ac, type: 3}

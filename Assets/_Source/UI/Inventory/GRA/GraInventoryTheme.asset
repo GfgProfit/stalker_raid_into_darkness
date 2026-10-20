@@ -22,6 +22,7 @@ MonoBehaviour:
   _negativeColor: {r: 1, g: 0.19607843, b: 0.19607843, a: 1}
   _panelSprite: {fileID: 21300000, guid: 07d7aa58afe33984883b6dbb4e206bdc, type: 3}
   _icons: {fileID: 11400000, guid: d1036c617f3c1914aa4bb1556dc9bebe, type: 2}
+  _sounds: {fileID: 11400000, guid: 3590b366aed84f04895513915b889f20, type: 2}
   _contextMenuFrame: {fileID: 21300000, guid: ca51d23ef9a605c9f76d67c0cd1309ad, type: 3}
   _contextMenuHighlight: {fileID: 21300000, guid: 9be3c4110168384ffc5ad36dc4925095, type: 3}
   _contextMenuDivider: {fileID: 21300000, guid: 07e4de91f88a6bbf1bb20468060918c0, type: 3}
@@ -204,7 +205,8 @@ MonoBehaviour:
   - _key: feature_helmet_builtin
     _text: "\u0432\u0441\u0442\u0440\u043E\u0435\u043D\u043D\u044B\u0439"
   - _key: feature_sprint
-    _text: "\u043F\u0435\u0440\u0435\u0434\u0432\u0438\u0436\u0435\u043D\u0438\u0435 \u0431\u0435\u0433\u043E\u043C:"
+    _text: "\u043F\u0435\u0440\u0435\u0434\u0432\u0438\u0436\u0435\u043D\u0438\u0435
+      \u0431\u0435\u0433\u043E\u043C:"
   - _key: feature_possible
     _text: "\u0432\u043E\u0437\u043C\u043E\u0436\u043D\u043E"
   - _key: feature_not_possible
@@ -214,11 +216,11 @@ MonoBehaviour:
   - _key: community_stalker
     _text: "\u041E\u0434\u0438\u043D\u043E\u0447\u043A\u0438"
   - _key: community_dolg
-    _text: "\u00AB\u0414\u043E\u043B\u0433\u00BB"
+    _text: "\xAB\u0414\u043E\u043B\u0433\xBB"
   - _key: community_freedom
-    _text: "\u00AB\u0421\u0432\u043E\u0431\u043E\u0434\u0430\u00BB"
+    _text: "\xAB\u0421\u0432\u043E\u0431\u043E\u0434\u0430\xBB"
   - _key: community_csky
-    _text: "\u00AB\u0427\u0438\u0441\u0442\u043E\u0435 \u043D\u0435\u0431\u043E\u00BB"
+    _text: "\xAB\u0427\u0438\u0441\u0442\u043E\u0435 \u043D\u0435\u0431\u043E\xBB"
   - _key: community_ecolog
     _text: "\u0423\u0447\u0451\u043D\u044B\u0435"
   - _key: community_killer
@@ -228,10 +230,12 @@ MonoBehaviour:
   - _key: community_bandit
     _text: "\u0411\u0430\u043D\u0434\u0438\u0442\u044B"
   - _key: community_monolith
-    _text: "\u00AB\u041C\u043E\u043D\u043E\u043B\u0438\u0442\u00BB"
+    _text: "\xAB\u041C\u043E\u043D\u043E\u043B\u0438\u0442\xBB"
   - _key: community_renegade
     _text: "\u0420\u0435\u043D\u0435\u0433\u0430\u0442\u044B"
   - _key: community_greh
-    _text: "\u00AB\u0413\u0440\u0435\u0445\u00BB"
+    _text: "\xAB\u0413\u0440\u0435\u0445\xBB"
   - _key: community_isg
-    _text: "\u00AB\u0418\u043D\u0442\u0435\u0440\u043D\u0430\u0446\u0438\u043E\u043D\u0430\u043B\u044C\u043D\u0430\u044F \u0438\u0441\u0441\u043B\u0435\u0434\u043E\u0432\u0430\u0442\u0435\u043B\u044C\u0441\u043A\u0430\u044F \u0433\u0440\u0443\u043F\u043F\u0430\u00BB"
+    _text: "\xAB\u0418\u043D\u0442\u0435\u0440\u043D\u0430\u0446\u0438\u043E\u043D\u0430\u043B\u044C\u043D\u0430\u044F
+      \u0438\u0441\u0441\u043B\u0435\u0434\u043E\u0432\u0430\u0442\u0435\u043B\u044C\u0441\u043A\u0430\u044F
+      \u0433\u0440\u0443\u043F\u043F\u0430\xBB"

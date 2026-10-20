@@ -70,6 +70,7 @@ MonoBehaviour:
   - rid: 3479885471900762440
   - rid: 3479885471900762441
   - rid: 3479885472039698596
+  - rid: 3479885488572596384
   references:
     version: 2
     RefIds:
@@ -108,3 +109,9 @@ MonoBehaviour:
       type: {class: WorldItemComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
       data:
         _prefab: {fileID: 8128043140468671573, guid: 846d6384f2afc9248a381b80699f495a, type: 3}
+    - rid: 3479885488572596384
+      type: {class: ItemTakeSoundComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      data:
+        _category: backpack
+        _clips:
+        - {fileID: 8300000, guid: 136e38b44997bac4881a1fd458cf2934, type: 3}

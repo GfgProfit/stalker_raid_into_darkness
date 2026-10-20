@@ -75,6 +75,7 @@ MonoBehaviour:
   - rid: 3479885471900762348
   - rid: 3479885471900762349
   - rid: 3479885472039698550
+  - rid: 3479885488572596339
   references:
     version: 2
     RefIds:
@@ -113,3 +114,9 @@ MonoBehaviour:
       type: {class: WorldItemComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
       data:
         _prefab: {fileID: 2920022342864873325, guid: 52f0f09165f14e942a846602d5d8e653, type: 3}
+    - rid: 3479885488572596339
+      type: {class: ItemTakeSoundComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      data:
+        _category: mediumarmor
+        _clips:
+        - {fileID: 8300000, guid: bda8d791b5b5eda4599575cca3791cf9, type: 3}

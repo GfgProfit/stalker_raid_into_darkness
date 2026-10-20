@@ -19,6 +19,7 @@ namespace RaidIntoDarkness.Player.Editor
         public int Material0 { get; }
         public int Material1 { get; }
         public string StepSounds { get; set; }
+        public string CollideSounds { get; set; } = string.Empty;
         public string Origin { get; set; }
     }
 
@@ -33,7 +34,9 @@ namespace RaidIntoDarkness.Player.Editor
         private const int GAMEMTL_CHUNK_MAIN = 0x1000;
         private const int GAMEMTLPAIR_CHUNK_PAIR = 0x1000;
         private const int GAMEMTLPAIR_CHUNK_STEP = 0x1003;
+        private const int GAMEMTLPAIR_CHUNK_COLLIDE = 0x1005;
         private const string STEP_SOUNDS = "step_sounds";
+        private const string COLLIDE_SOUNDS = "collide_sounds";
         private const string MOD_PREFIX = "mod_material_pairs";
         private const string INCLUDE_PREFIX = "material_pairs_";
         private const string MODDED_EXES_ARCHIVE = "db/mods/00_modded_exes_gamedata.db0";
@@ -147,6 +150,7 @@ namespace RaidIntoDarkness.Player.Editor
             int material0 = -1;
             int material1 = -1;
             string step = null;
+            string collide = null;
             foreach (KeyValuePair<int, ArraySegment<byte>> part in Chunks(data, chunk.Offset, chunk.Count))
             {
                 if (part.Key == GAMEMTLPAIR_CHUNK_PAIR)
@@ -158,11 +162,15 @@ namespace RaidIntoDarkness.Player.Editor
                 {
                     step = ReadString(data, part.Value.Offset, part.Value.Offset + part.Value.Count, out _);
                 }
+                else if (part.Key == GAMEMTLPAIR_CHUNK_COLLIDE)
+                {
+                    collide = ReadString(data, part.Value.Offset, part.Value.Offset + part.Value.Count, out _);
+                }
             }
 
             if (material0 >= 0 && material1 >= 0)
             {
-                _pairs.Add(new StalkerGameMtlPair(material0, material1, step ?? string.Empty, GAMEMTL));
+                _pairs.Add(new StalkerGameMtlPair(material0, material1, step ?? string.Empty, GAMEMTL) { CollideSounds = collide ?? string.Empty });
             }
         }
 
@@ -199,7 +207,9 @@ namespace RaidIntoDarkness.Player.Editor
             foreach (XRayLtxSection section in database.Sections.Values)
             {
                 string[] materials = section.Name.Split('@');
-                if (materials.Length < 2 || !section.Values.TryGetValue(STEP_SOUNDS, out string step))
+                bool hasStep = section.Values.TryGetValue(STEP_SOUNDS, out string step);
+                bool hasCollide = section.Values.TryGetValue(COLLIDE_SOUNDS, out string collide);
+                if (materials.Length < 2 || (!hasStep && !hasCollide))
                 {
                     continue;
                 }
@@ -217,12 +227,21 @@ namespace RaidIntoDarkness.Player.Editor
                     _pairs.Add(pair);
                 }
 
-                pair.StepSounds = step ?? string.Empty;
+                if (hasStep)
+                {
+                    pair.StepSounds = step ?? string.Empty;
+                }
+
+                if (hasCollide)
+                {
+                    pair.CollideSounds = collide ?? string.Empty;
+                }
+
                 pair.Origin = origin;
                 changed++;
             }
 
-            Log.Add($"{origin}: {changed} pair step_sounds overrides{(unknown > 0 ? $", {unknown} pairs with materials outside gamemtl.xr skipped" : string.Empty)}");
+            Log.Add($"{origin}: {changed} pair step/collide overrides{(unknown > 0 ? $", {unknown} pairs with materials outside gamemtl.xr skipped" : string.Empty)}");
         }
 
         private static string ReadString(byte[] data, int start, int limit, out int next)

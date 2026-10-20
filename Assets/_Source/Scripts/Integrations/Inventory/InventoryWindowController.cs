@@ -47,6 +47,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
         private FirstPersonOutfitBinder _outfitBinder;
         private OutfitHelmetRule _helmetRule;
         private EquipmentAnimationQueue _equipmentAnimations;
+        private InventoryItemSounds _itemSounds;
         private ItemInstance _statsHovered;
         private int _restoreFrame = -1;
         private bool _gameplayBlocked;
@@ -62,6 +63,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
         public bool IsStashVisible => IsOpen && _window.SecondaryVisible;
         public InventorySortingPlus Sorting => _sorting;
         public EquipmentAnimationQueue EquipmentAnimations => _equipmentAnimations;
+        public InventoryItemSounds ItemSounds => _itemSounds;
 
         public void Configure(InventoryWindow window, PlayerInventoryRuntime inventory, StalkerPlayerController player, InputActionReference toggleInventory, InputActionReference closeInventory)
         {
@@ -312,6 +314,12 @@ namespace RaidIntoDarkness.Integrations.Inventory
                 _equipmentAnimations.Dispose();
                 _equipmentAnimations = null;
             }
+
+            if (_itemSounds != null)
+            {
+                _itemSounds.Dispose();
+                _itemSounds = null;
+            }
         }
 
         private void EnsureBound()
@@ -331,6 +339,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
             _statusPresenter = _status != null ? new EquipmentStatusPresenter(_window, _status) : null;
             _inventory.Model.Changed += OnModelChanged;
 
+            _itemSounds = new InventoryItemSounds(_window);
             _helmetRule = new OutfitHelmetRule(_window);
             _helmetRule.Refresh();
 

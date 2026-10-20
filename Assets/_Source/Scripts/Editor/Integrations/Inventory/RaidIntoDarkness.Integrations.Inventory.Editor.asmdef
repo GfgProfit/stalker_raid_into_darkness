@@ -4,6 +4,10 @@
     "references": [
         "RaidIntoDarkness.Integrations.Inventory",
         "RaidIntoDarkness.Player",
+        "RaidIntoDarkness.Player.Editor",
+        "XRay.Importer.Core",
+        "XRay.Importer.Sources",
+        "XRay.Importer.Editor",
         "Inventory",
         "Inventory.UI",
         "Inventory.IconGeneration",

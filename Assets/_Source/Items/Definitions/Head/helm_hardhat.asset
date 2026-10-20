@@ -69,6 +69,7 @@ MonoBehaviour:
   - rid: 3479885471900762456
   - rid: 3479885471900762457
   - rid: 3479885472039698606
+  - rid: 3479885488572596394
   references:
     version: 2
     RefIds:
@@ -107,3 +108,9 @@ MonoBehaviour:
       type: {class: WorldItemComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
       data:
         _prefab: {fileID: 7221828573955440143, guid: bab9157b1f17fe84f9ece98ea6e35d5b, type: 3}
+    - rid: 3479885488572596394
+      type: {class: ItemTakeSoundComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      data:
+        _category: helmet
+        _clips:
+        - {fileID: 8300000, guid: 62bf6fa4b1e2046489a741e205610859, type: 3}

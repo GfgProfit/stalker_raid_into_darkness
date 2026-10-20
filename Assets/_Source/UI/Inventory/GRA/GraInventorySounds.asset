@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aacf41d7f04f7f0c270bc27b6e1bfb83, type: 3}
+  m_Name: GraInventorySounds
+  m_EditorClassIdentifier: Inventory.UI::Inventory.UI.InventorySoundSet
+  _open: {fileID: 8300000, guid: ef382b788e2658e418d8e4233367ec07, type: 3}
+  _close: {fileID: 8300000, guid: ba8a8cd305fcc2b44a6ac5f0dddc17cd, type: 3}
+  _toSlot: {fileID: 8300000, guid: 93151ba38eb2fb744871ef1a85a6c3ea, type: 3}
+  _toBag: {fileID: 8300000, guid: 5b17c7b2da9f8784fbbfdcc4aa57f980, type: 3}
+  _contextMenu: {fileID: 8300000, guid: f26660aef00b66249b963d4116315d1d, type: 3}
+  _drop: {fileID: 8300000, guid: e3f54660392b8d94b849c49ca659d02b, type: 3}
+  _use: {fileID: 8300000, guid: ab4b34b52172c1842a7e4cd2e0f5e02c, type: 3}
+  _volume: 1
+  _minInterval: 0.5

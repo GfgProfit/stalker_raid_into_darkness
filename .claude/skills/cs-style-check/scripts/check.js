@@ -10,7 +10,7 @@ const explicit = args.filter(arg => !arg.startsWith('--'));
 const CODE_EXTENSIONS = /\.(cs|shader|hlsl|js|sh|ps1)$/i;
 const THIRD_PARTY = /^Assets\/(Plugins|TextMesh Pro)\//;
 
-const git = command => execSync(`git -c core.quotepath=off ${command}`, { cwd: project, encoding: 'utf8', maxBuffer: 1 << 28 });
+const git = command => execSync(`git -c core.quotepath=off ${command}`, { cwd: project, encoding: 'utf8', maxBuffer: 1 << 28, stdio: ['ignore', 'pipe', 'ignore'] });
 
 function addedLines() {
   const result = new Map();

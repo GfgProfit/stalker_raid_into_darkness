@@ -74,6 +74,8 @@ namespace Inventory.UI
         private float _statusUntil;
         private string _hint = string.Empty;
         private bool _initialized;
+        private AudioSource _audio;
+        private float _lastSoundTime = float.MinValue;
 
         public InventoryModel Model { get; private set; }
         public IItemIconProvider IconProvider { get; set; }
@@ -109,6 +111,7 @@ namespace Inventory.UI
         public event Action<ItemInstance> ItemUsed;
         public event Action<ItemInstance> ItemDropped;
         public event Action<ItemInstance> ItemInspected;
+        public event Action<InventorySound> SoundPlayed;
 
         public void Configure(RectTransform content, RectTransform dragLayer, InventoryTooltip tooltip, InventoryContextMenu contextMenu, InventorySplitDialog splitDialog, InventoryInspectPanel inspectPanel, TMP_Text weightText, TMP_Text statusText, IEnumerable<InventoryGridViewBase> grids)
         {
@@ -265,6 +268,7 @@ namespace Inventory.UI
             }
 
             UpdateWeight();
+            PlaySound(InventorySound.Open);
             Opened?.Invoke(this);
         }
 
@@ -286,6 +290,7 @@ namespace Inventory.UI
                 _content.gameObject.SetActive(false);
             }
 
+            PlaySound(InventorySound.Close);
             Closed?.Invoke(this);
         }
 
@@ -555,6 +560,7 @@ namespace Inventory.UI
 
             InventoryDragState drag = _drag;
             InventoryResult result = InventoryResult.Fail(InventoryFailure.NoSlot);
+            string sourceContainerId = drag.Item != null ? drag.Item.ContainerId : null;
             EndDrag();
 
             if (drag.TargetGrid != null && drag.TargetGrid.Container != null && drag.Kind != InventoryDropKind.None)
@@ -583,6 +589,14 @@ namespace Inventory.UI
                 if (result.Success == false)
                 {
                     ShowStatus(DescribeFailure(result.Failure));
+                }
+                else if (target.Id == _equipmentContainerId)
+                {
+                    PlaySound(InventorySound.ToSlot);
+                }
+                else if (sourceContainerId == _equipmentContainerId)
+                {
+                    PlaySound(InventorySound.ToBag);
                 }
             }
 
@@ -624,6 +638,11 @@ namespace Inventory.UI
 
             _contextMenu.Show(screenPosition, eventCamera, _menuEntries);
             ApplyThemeTo(_contextMenu);
+
+            if (_menuEntries.Count > 0)
+            {
+                PlaySound(InventorySound.ContextMenu);
+            }
         }
 
         public bool CanUseItem(ItemInstance item) => item != null && item.Definition.GetComponent<ConsumableItemComponent>() != null;
@@ -642,6 +661,7 @@ namespace Inventory.UI
             }
 
             ShowStatus(FormatLabel("status_used", "Used {0}", item.Definition.DisplayName));
+            PlaySound(InventorySound.Use);
             ItemUsed?.Invoke(item);
         }
 
@@ -719,7 +739,11 @@ namespace Inventory.UI
                     moved = TrySwapIntoSlot(item, target, slot);
                 }
 
-                Report(moved, FormatLabel("status_equipped", "Equipped {0}", item.Definition.DisplayName));
+                if (Report(moved, FormatLabel("status_equipped", "Equipped {0}", item.Definition.DisplayName)))
+                {
+                    PlaySound(InventorySound.ToSlot);
+                }
+
                 return;
             }
 
@@ -737,7 +761,10 @@ namespace Inventory.UI
                 }
             }
 
-            Report(result, FormatLabel("status_equipped", "Equipped {0}", item.Definition.DisplayName));
+            if (Report(result, FormatLabel("status_equipped", "Equipped {0}", item.Definition.DisplayName)))
+            {
+                PlaySound(InventorySound.ToSlot);
+            }
         }
 
         public void UnequipItem(ItemInstance item)
@@ -752,7 +779,9 @@ namespace Inventory.UI
             UnequipItemNow(item, target);
         }
 
-        public InventoryResult UnequipItemNow(ItemInstance item, InventoryUnequipTarget target)
+        public InventoryResult UnequipItemNow(ItemInstance item, InventoryUnequipTarget target) => UnequipItemNow(item, target, true);
+
+        public InventoryResult UnequipItemNow(ItemInstance item, InventoryUnequipTarget target, bool playSound)
         {
             if (item == null || Model == null || Model.ContainsItem(item) == false)
             {
@@ -766,7 +795,11 @@ namespace Inventory.UI
                 result = Model.TryTransfer(item.InstanceId, target.ContainerId);
             }
 
-            Report(result, FormatLabel("status_unequipped", "Unequipped {0}", item.Definition.DisplayName));
+            if (Report(result, FormatLabel("status_unequipped", "Unequipped {0}", item.Definition.DisplayName)) && playSound)
+            {
+                PlaySound(InventorySound.ToBag);
+            }
+
             return result;
         }
 
@@ -809,9 +842,11 @@ namespace Inventory.UI
                 return;
             }
 
-            if (target != null)
+            bool equipped = IsEquipped(item);
+
+            if (target != null && Report(Model.TryTransfer(item.InstanceId, target.Id), FormatLabel("status_moved", "Moved to {0}", target.DisplayName)) && equipped)
             {
-                Report(Model.TryTransfer(item.InstanceId, target.Id), FormatLabel("status_moved", "Moved to {0}", target.DisplayName));
+                PlaySound(InventorySound.ToBag);
             }
         }
 
@@ -862,6 +897,7 @@ namespace Inventory.UI
 
             if (Report(result, FormatLabel("status_dropped", "Dropped {0}", item.Definition.DisplayName)))
             {
+                PlaySound(InventorySound.Drop);
                 ItemDropped?.Invoke(result.Item);
             }
         }
@@ -921,6 +957,46 @@ namespace Inventory.UI
             Vector2 pointer = UnityEngine.InputSystem.Pointer.current != null ? UnityEngine.InputSystem.Pointer.current.position.ReadValue() : _hoverPosition;
             _tooltip.Show(_hovered.Item, pointer, _hoverCamera, CollectStats(_hovered.Item), CollectDescription(_hovered.Item));
             ApplyThemeTo(_tooltip);
+        }
+
+        public void PlaySound(InventorySound sound)
+        {
+            InventorySoundSet sounds = _theme != null ? _theme.Sounds : null;
+            AudioClip clip = sounds != null ? sounds.Get(sound) : null;
+
+            if (clip == null)
+            {
+                return;
+            }
+
+            float now = Time.unscaledTime;
+
+            if (now - _lastSoundTime < sounds.MinInterval)
+            {
+                return;
+            }
+
+            _lastSoundTime = now;
+            PlayClip(clip, sounds.Volume);
+            SoundPlayed?.Invoke(sound);
+        }
+
+        public void PlayClip(AudioClip clip, float volume)
+        {
+            if (clip == null)
+            {
+                return;
+            }
+
+            if (_audio == null)
+            {
+                _audio = gameObject.AddComponent<AudioSource>();
+                _audio.playOnAwake = false;
+                _audio.spatialBlend = 0f;
+                _audio.ignoreListenerPause = true;
+            }
+
+            _audio.PlayOneShot(clip, volume);
         }
 
         private string DescribeFailure(InventoryFailure failure) => Label("failure_" + failure, InventoryUIFactory.Describe(failure));

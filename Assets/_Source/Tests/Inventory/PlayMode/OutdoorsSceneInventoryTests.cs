@@ -343,6 +343,113 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             Assert.That(player.Rig.Hands.activeSelf, Is.False, "hands stay visible after equipment animations");
         }
 
+        [UnityTest]
+        public IEnumerator InventoryWorldAndStashSoundsFollowGra()
+        {
+            SceneManager.LoadScene(SCENE, LoadSceneMode.Single);
+            yield return null;
+            yield return new WaitForSeconds(1.0f);
+
+            InventoryWindowController controller = Object.FindAnyObjectByType<InventoryWindowController>();
+            WorldItemInteractor interactor = Object.FindAnyObjectByType<WorldItemInteractor>();
+            InventoryWindow window = controller.Window;
+            InventoryModel model = controller.Inventory.Model;
+            var sounds = new List<InventorySound>();
+            window.SoundPlayed += sounds.Add;
+            Assert.That(window.Theme != null && window.Theme.Sounds != null, Is.True, "GRA theme has no inventory sound set");
+            Assert.That(controller.ItemSounds, Is.Not.Null);
+
+            yield return Tap(_keyboard.tabKey);
+            Assert.That(sounds, Is.EqualTo(new[] { InventorySound.Open }), "opening the inventory must play inv_open");
+            yield return WaitForEquipmentAnimations(controller);
+            ItemInstance oldHat = EquipmentStatsFormatter.FindEquipped(window, EquipmentStatsFormatter.HELMET_CATEGORY);
+
+            if (oldHat != null)
+            {
+                window.UnequipItemNow(oldHat, InventoryUnequipTarget.Auto(window.PrimaryContainerId), false);
+            }
+
+            ItemInstance outfit = EquipmentStatsFormatter.FindEquipped(window, EquipmentStatsFormatter.OUTFIT_CATEGORY);
+
+            if (outfit != null)
+            {
+                window.UnequipItemNow(outfit, InventoryUnequipTarget.Auto(window.PrimaryContainerId), false);
+            }
+
+            Assert.That(sounds.Count, Is.EqualTo(1), "silent FDDA moves played a sound");
+            ItemInstance hat = AddItem(model, controller, window, "helm_hardhat");
+            yield return new WaitForSeconds(0.6f);
+            window.OpenContextMenu(hat, window.FindGrid(BACKPACK), new Vector2(400f, 400f), null);
+            Assert.That(sounds[sounds.Count - 1], Is.EqualTo(InventorySound.ContextMenu), "context menu must play inv_properties_2");
+            window.CloseTopWidget();
+            yield return new WaitForSeconds(0.6f);
+            window.EquipItem(hat);
+            Assert.That(sounds.Contains(InventorySound.ToSlot), Is.False, "inv_slot played before the FDDA animation finished");
+            yield return WaitForEquipmentAnimations(controller);
+            Assert.That(sounds[sounds.Count - 1], Is.EqualTo(InventorySound.ToSlot), "equipping must play inv_slot when the helmet reaches the slot");
+            yield return new WaitForSeconds(0.6f);
+            window.UnequipItem(hat);
+            yield return WaitForEquipmentAnimations(controller);
+            Assert.That(sounds[sounds.Count - 1], Is.EqualTo(InventorySound.ToBag), "unequipping must play inv_ruck");
+            yield return new WaitForSeconds(0.6f);
+            int worldBefore = Object.FindObjectsByType<WorldItem>(FindObjectsSortMode.None).Length;
+            window.DropItem(hat);
+            Assert.That(sounds[sounds.Count - 1], Is.EqualTo(InventorySound.Drop), "dropping must play inv_drop");
+            yield return null;
+            WorldItem dropped = null;
+
+            foreach (WorldItem candidate in Object.FindObjectsByType<WorldItem>(FindObjectsSortMode.None))
+            {
+                if (candidate.Definition == hat.Definition)
+                {
+                    dropped = candidate;
+                }
+            }
+
+            Assert.That(Object.FindObjectsByType<WorldItem>(FindObjectsSortMode.None).Length, Is.EqualTo(worldBefore + 1));
+            WorldItemImpactSound impact = dropped.GetComponent<WorldItemImpactSound>();
+            Assert.That(impact, Is.Not.Null, "world item prefab has no impact sound");
+            float timeout = Time.time + 3f;
+
+            while (impact.PlayedCount == 0 && Time.time < timeout)
+            {
+                yield return null;
+            }
+
+            Assert.That(impact.PlayedCount, Is.GreaterThan(0), "the dropped helmet hit the ground silently");
+            Assert.That(impact.LastVolume, Is.InRange(0.1f, 1f));
+            int taken = controller.ItemSounds.PlayedCount;
+            Assert.That(interactor.TryPickUp(dropped), Is.True);
+            Assert.That(controller.ItemSounds.PlayedCount, Is.EqualTo(taken + 1), "picking up must play snd_on_take");
+            Assert.That(controller.ItemSounds.LastVolume, Is.EqualTo(InventoryItemSounds.TAKE_VOLUME));
+            Assert.That(hat.Definition.GetComponent<ItemTakeSoundComponent>().Category, Is.EqualTo("helmet"));
+            yield return new WaitForSeconds(0.6f);
+            yield return Tap(_keyboard.tabKey);
+            Assert.That(sounds[sounds.Count - 1], Is.EqualTo(InventorySound.Close), "closing must play inv_close");
+            yield return Tap(_keyboard.bKey);
+            yield return null;
+            ItemInstance picked = null;
+
+            foreach (ItemInstance item in window.FindGrid(BACKPACK).Container.Items)
+            {
+                if (item.Definition == hat.Definition)
+                {
+                    picked = item;
+                }
+            }
+
+            yield return new WaitForSeconds(0.05f);
+            window.QuickTransfer(picked);
+            Assert.That(picked.ContainerId, Is.EqualTo(STASH));
+            Assert.That(controller.ItemSounds.LastVolume, Is.EqualTo(InventoryItemSounds.PUT_IN_BOX_VOLUME), "putting into the stash must play snd_on_take at 0.75");
+            yield return new WaitForSeconds(0.05f);
+            window.QuickTransfer(picked);
+            Assert.That(picked.ContainerId, Is.EqualTo(BACKPACK));
+            Assert.That(controller.ItemSounds.LastVolume, Is.EqualTo(InventoryItemSounds.TAKE_VOLUME), "taking from the stash must play snd_on_take at 1.0");
+            window.SoundPlayed -= sounds.Add;
+            yield return Tap(_keyboard.tabKey);
+        }
+
         private static ItemInstance AddItem(InventoryModel model, InventoryWindowController controller, InventoryWindow window, string definitionName)
         {
             ItemDefinition found = null;

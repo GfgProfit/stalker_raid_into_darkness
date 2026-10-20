@@ -118,6 +118,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
             if (result.Success)
             {
                 window.ShowStatus(window.FormatLabel("status_picked", "Picked up {0}", worldItem.Definition.DisplayName));
+                PlayTakeSound(item);
                 worldItem.gameObject.SetActive(false);
                 Destroy(worldItem.gameObject);
                 return true;
@@ -126,6 +127,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
             if (item.Amount < before)
             {
                 worldItem.Configure(worldItem.Definition, item.Amount);
+                PlayTakeSound(item);
                 window.ShowStatus(window.FormatLabel("status_picked", "Picked up {0}", worldItem.Definition.DisplayName));
                 return true;
             }
@@ -252,6 +254,14 @@ namespace RaidIntoDarkness.Integrations.Inventory
         {
             _pickupTarget = null;
             _pickupPending = false;
+        }
+
+        private void PlayTakeSound(ItemInstance item)
+        {
+            if (_controller.ItemSounds != null)
+            {
+                _controller.ItemSounds.PlayTake(item);
+            }
         }
 
         private FirstPersonPickupAnimator GetPickupAnimator() => _controller != null && _controller.Player != null ? _controller.Player.Pickup : null;

@@ -20,6 +20,7 @@ namespace Inventory.UI
         [SerializeField] private Color _negativeColor = new(1f, 0.2f, 0.2f, 1f);
         [SerializeField] private Sprite _panelSprite;
         [SerializeField] private InventoryIconSet _icons;
+        [SerializeField] private InventorySoundSet _sounds;
         [SerializeField] private Sprite _contextMenuFrame;
         [SerializeField] private Sprite _contextMenuHighlight;
         [SerializeField] private Sprite _contextMenuDivider;
@@ -49,6 +50,7 @@ namespace Inventory.UI
         public Color NegativeColor => _negativeColor;
         public Sprite PanelSprite => _panelSprite;
         public InventoryIconSet Icons => _icons;
+        public InventorySoundSet Sounds => _sounds;
         public Sprite ContextMenuFrame => _contextMenuFrame;
         public Sprite ContextMenuHighlight => _contextMenuHighlight;
         public Sprite ContextMenuDivider => _contextMenuDivider;

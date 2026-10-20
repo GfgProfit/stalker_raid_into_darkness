@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using System.IO;
 using Inventory;
+using RaidIntoDarkness.Player;
+using RaidIntoDarkness.Player.Editor;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -226,6 +228,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
                 body.interpolation = RigidbodyInterpolation.Interpolate;
                 body.collisionDetectionMode = CollisionDetectionMode.Continuous;
                 root.AddComponent<WorldItem>().Configure(definition, 1);
+                GraInventorySoundSetup.ConfigureImpact(root, definition, AssetDatabase.LoadAssetAtPath<StalkerCollideSoundLibrary>(GraInventorySoundSetup.COLLIDE_LIBRARY_PATH), AssetDatabase.LoadAssetAtPath<StalkerSurfaceAudioLibrary>(StalkerSurfaceAudioBuilder.LIBRARY_PATH));
                 return PrefabUtility.SaveAsPrefabAsset(root, path).GetComponent<WorldItem>();
             }
             finally

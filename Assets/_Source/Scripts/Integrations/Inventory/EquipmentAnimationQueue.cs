@@ -272,7 +272,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
             ItemInstance old = EquipmentStatsFormatter.FindEquipped(_window, EquipmentStatsFormatter.HELMET_CATEGORY);
             if (old != null && old != request.Item)
             {
-                AddHeadgearRemoval(old, () => _window.UnequipItemNow(old, InventoryUnequipTarget.Auto(_window.PrimaryContainerId)), speed);
+                AddHeadgearRemoval(old, () => _window.UnequipItemNow(old, InventoryUnequipTarget.Auto(_window.PrimaryContainerId), false), speed);
             }
 
             string section = GetSection(request.Item);
@@ -318,7 +318,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
             if (old != null && old != request.Item)
             {
                 AddAnimation(unequip, 1.0f, false);
-                _steps.Enqueue(new Step { Kind = StepKind.Move, Move = () => _window.UnequipItemNow(old, InventoryUnequipTarget.Auto(_window.PrimaryContainerId)) });
+                _steps.Enqueue(new Step { Kind = StepKind.Move, Move = () => _window.UnequipItemNow(old, InventoryUnequipTarget.Auto(_window.PrimaryContainerId), false) });
             }
 
             AddAnimation(equip, 1.0f, false);

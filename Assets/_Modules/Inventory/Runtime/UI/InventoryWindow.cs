@@ -101,6 +101,7 @@ namespace Inventory.UI
         public Action<ItemInstance, List<InventoryItemStat>> ItemStatsProvider { get; set; }
         public Func<ItemInstance, string> ItemDescriptionProvider { get; set; }
         public Func<InventoryActionContext, IInventoryItemAction, InventoryActionStyle> ActionStyleProvider { get; set; }
+        public IInventoryEquipmentGate EquipmentGate { get; set; }
         public ItemInstance HoveredItem => _hovered != null ? _hovered.Item : null;
 
         public event Action<InventoryWindow> Opened;
@@ -560,6 +561,11 @@ namespace Inventory.UI
             {
                 InventoryContainer target = drag.TargetGrid.Container;
 
+                if (TryGateDrag(drag, target))
+                {
+                    return InventoryResult.Ok(drag.Item, drag.Item.Amount);
+                }
+
                 if (drag.AutoPlace)
                 {
                     result = Model.TryTransfer(drag.Item.InstanceId, target.Id);
@@ -689,15 +695,43 @@ namespace Inventory.UI
 
         public void EquipItem(ItemInstance item)
         {
+            if (EquipmentGate != null && EquipmentGate.HandleEquip(item, null))
+            {
+                return;
+            }
+
+            EquipItemNow(item, null);
+        }
+
+        public void EquipItemNow(ItemInstance item, SlotDefinition slot)
+        {
+            if (item == null || Model == null || Model.ContainsItem(item) == false)
+            {
+                return;
+            }
+
+            if (slot != null && Model.TryGetContainer(_equipmentContainerId, out SlottedContainer target))
+            {
+                InventoryResult moved = Model.TryMove(item.InstanceId, target.Id, slot.Bounds.position, false, false);
+
+                if (moved.Success == false && CanSwapIntoSlot(item, target, slot.Bounds.position))
+                {
+                    moved = TrySwapIntoSlot(item, target, slot);
+                }
+
+                Report(moved, FormatLabel("status_equipped", "Equipped {0}", item.Definition.DisplayName));
+                return;
+            }
+
             InventoryResult result = Model.TryEquip(item.InstanceId, _equipmentContainerId);
 
             if (result.Success == false && Model.TryGetContainer(_equipmentContainerId, out SlottedContainer equipment))
             {
-                foreach (SlotDefinition slot in EquipCandidates(item, equipment))
+                foreach (SlotDefinition candidate in EquipCandidates(item, equipment))
                 {
-                    if (CanSwapIntoSlot(item, equipment, slot.Bounds.position))
+                    if (CanSwapIntoSlot(item, equipment, candidate.Bounds.position))
                     {
-                        result = TrySwapIntoSlot(item, equipment, slot);
+                        result = TrySwapIntoSlot(item, equipment, candidate);
                         break;
                     }
                 }
@@ -706,7 +740,35 @@ namespace Inventory.UI
             Report(result, FormatLabel("status_equipped", "Equipped {0}", item.Definition.DisplayName));
         }
 
-        public void UnequipItem(ItemInstance item) => Report(Model.TryTransfer(item.InstanceId, _primaryContainerId), FormatLabel("status_unequipped", "Unequipped {0}", item.Definition.DisplayName));
+        public void UnequipItem(ItemInstance item)
+        {
+            InventoryUnequipTarget target = InventoryUnequipTarget.Auto(_primaryContainerId);
+
+            if (EquipmentGate != null && EquipmentGate.HandleUnequip(item, target))
+            {
+                return;
+            }
+
+            UnequipItemNow(item, target);
+        }
+
+        public InventoryResult UnequipItemNow(ItemInstance item, InventoryUnequipTarget target)
+        {
+            if (item == null || Model == null || Model.ContainsItem(item) == false)
+            {
+                return InventoryResult.Fail(InventoryFailure.ItemNotFound);
+            }
+
+            InventoryResult result = target.AutoPlace ? Model.TryTransfer(item.InstanceId, target.ContainerId) : Model.TryMove(item.InstanceId, target.ContainerId, target.Origin, target.Rotated);
+
+            if (result.Success == false && target.AutoPlace == false)
+            {
+                result = Model.TryTransfer(item.InstanceId, target.ContainerId);
+            }
+
+            Report(result, FormatLabel("status_unequipped", "Unequipped {0}", item.Definition.DisplayName));
+            return result;
+        }
 
         public void OpenSplitDialog(ItemInstance item)
         {
@@ -742,6 +804,11 @@ namespace Inventory.UI
         {
             InventoryContainer target = GetQuickTransferTarget(item);
 
+            if (target != null && IsEquipped(item) && EquipmentGate != null && EquipmentGate.HandleUnequip(item, InventoryUnequipTarget.Auto(target.Id)))
+            {
+                return;
+            }
+
             if (target != null)
             {
                 Report(Model.TryTransfer(item.InstanceId, target.Id), FormatLabel("status_moved", "Moved to {0}", target.DisplayName));
@@ -776,6 +843,21 @@ namespace Inventory.UI
 
         public void DropItem(ItemInstance item)
         {
+            if (IsEquipped(item) && EquipmentGate != null && EquipmentGate.HandleDrop(item))
+            {
+                return;
+            }
+
+            DropItemNow(item);
+        }
+
+        public void DropItemNow(ItemInstance item)
+        {
+            if (item == null || Model == null || Model.ContainsItem(item) == false)
+            {
+                return;
+            }
+
             InventoryResult result = Model.TryRemove(item.InstanceId);
 
             if (Report(result, FormatLabel("status_dropped", "Dropped {0}", item.Definition.DisplayName)))
@@ -1154,6 +1236,25 @@ namespace Inventory.UI
 
             area = default;
             return false;
+        }
+
+        private bool TryGateDrag(InventoryDragState drag, InventoryContainer target)
+        {
+            if (EquipmentGate == null || drag.IsSplit || drag.Item == null)
+            {
+                return false;
+            }
+
+            bool fromEquipment = drag.Item.ContainerId == _equipmentContainerId;
+            bool toEquipment = target.Id == _equipmentContainerId;
+
+            if (toEquipment && fromEquipment == false && target is SlottedContainer slotted)
+            {
+                SlotDefinition slot = slotted.GetSlotAt(drag.TargetOrigin);
+                return slot != null && slot.Mode == SlotMode.Single && slot.Rule.AcceptsDefinition(drag.Item.Definition) && EquipmentGate.HandleEquip(drag.Item, slot);
+            }
+
+            return fromEquipment && toEquipment == false && EquipmentGate.HandleUnequip(drag.Item, new InventoryUnequipTarget(target.Id, drag.TargetOrigin, drag.Rotated, drag.AutoPlace));
         }
 
         private bool CanSwapIntoSlot(ItemInstance item, SlottedContainer container, Vector2Int cell)

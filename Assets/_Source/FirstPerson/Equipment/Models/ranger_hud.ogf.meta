@@ -1,0 +1,35 @@
+fileFormatVersion: 2
+guid: d683df3404a43fb499fe6409149281cf
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: headgear_hud\mask_glass|models\transparent
+    second: {fileID: 2100000, guid: 10deb9e5a8d710f4797255c39face41a, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: headgear_hud\ppm88_hud_dark_base|models\model
+    second: {fileID: 2100000, guid: adce60567ef8f604a8acfb662adfe829, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: headgear_hud\ranger|models\model
+    second: {fileID: 2100000, guid: c302d48a43bf36c42acbe0e6a09373a6, type: 2}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 61e536e21e96f284493f2969a9250cdf, type: 3}
+  _scale: 1
+  _importMaterials: 1
+  _texturesFolder: 
+  _searchTexturesByName: 1
+  _importEmbeddedMotions: 1
+  _embeddedLoopMode: 0
+  _addAnimator: 1
+  _readableMeshes: 0
+  _updateWhenOffscreen: 0
+  _autoResolveResources: 1

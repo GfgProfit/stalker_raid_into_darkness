@@ -37,6 +37,7 @@ namespace RaidIntoDarkness.Player
 
         private readonly AnmEffect[] _effects = new AnmEffect[SLOT_COUNT];
         private readonly AnmEffect[] _fading = new AnmEffect[SLOT_COUNT];
+        private readonly AnmEffect[] _itemEffects = new AnmEffect[1];
         private float _bobAngle;
         private float _lastBobTarget;
         private bool _hasBobTarget;
@@ -55,10 +56,21 @@ namespace RaidIntoDarkness.Player
         public Vector3 MotionOffset { get; private set; }
         public Quaternion MotionRotation { get; private set; } = Quaternion.identity;
         public bool EffectsEnabled { get; set; } = true;
+        public bool IsItemEffectPlaying => _itemEffects[0].Asset != null;
 
         public bool IsPlaying(StalkerCameraEffectSlot slot)
         {
             return _effects[(int)slot].Asset != null;
+        }
+
+        public void PlayItemEffect(XRayAnmAsset asset)
+        {
+            _itemEffects[0] = asset != null ? new AnmEffect { Asset = asset, Time = 0.0f, Factor = 1.0f, Scale = 1.0f, Fade = 1.0f } : default;
+        }
+
+        public void StopItemEffect()
+        {
+            _itemEffects[0] = default;
         }
 
         public void Tick(StalkerMovementState state, bool limping, float bodyPhase, float deltaTime)
@@ -85,8 +97,11 @@ namespace RaidIntoDarkness.Player
 
             Transform parent = _pivot.parent;
             Vector3 up = parent != null ? parent.InverseTransformDirection(Vector3.up) : Vector3.up;
-            MotionOffset = (local + up * worldUp) * intensity;
-            MotionRotation = Quaternion.SlerpUnclamped(Quaternion.identity, rotation, intensity);
+            Vector3 itemLocal = Vector3.zero;
+            Quaternion itemRotation = Quaternion.identity;
+            TickAnm(_itemEffects, 0, deltaTime, 0.0f, ref itemLocal, ref itemRotation);
+            MotionOffset = (local + up * worldUp) * intensity + itemLocal;
+            MotionRotation = Quaternion.SlerpUnclamped(Quaternion.identity, rotation, intensity) * itemRotation;
             _pivot.localPosition = MotionOffset;
             _pivot.localRotation = MotionRotation;
         }

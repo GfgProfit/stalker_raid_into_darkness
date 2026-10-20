@@ -28,8 +28,29 @@ namespace RaidIntoDarkness.FirstPerson
         public XRayRigPlayer BodyPlayer => _bodyPlayer;
         public FirstPersonOutfitCatalog Catalog => _catalog;
         public bool HandsVisible => _handsVisible;
+        public object HandsOwner { get; private set; }
+        public bool HandsBusy => HandsOwner != null;
 
         public event Action<FirstPersonOutfitEntry, bool> OutfitApplied;
+
+        public bool TryAcquireHands(object owner)
+        {
+            if (owner == null || (HandsOwner != null && HandsOwner != owner))
+            {
+                return false;
+            }
+
+            HandsOwner = owner;
+            return true;
+        }
+
+        public void ReleaseHands(object owner)
+        {
+            if (HandsOwner == owner)
+            {
+                HandsOwner = null;
+            }
+        }
 
         private void Start()
         {

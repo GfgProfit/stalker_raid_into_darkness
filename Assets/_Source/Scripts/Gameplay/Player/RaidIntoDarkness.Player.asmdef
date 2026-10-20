@@ -4,7 +4,9 @@
     "references": [
         "RaidIntoDarkness.FirstPerson",
         "XRay.Importer.Runtime",
-        "Unity.InputSystem"
+        "Unity.InputSystem",
+        "Unity.RenderPipelines.Core.Runtime",
+        "Unity.RenderPipelines.HighDefinition.Runtime"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

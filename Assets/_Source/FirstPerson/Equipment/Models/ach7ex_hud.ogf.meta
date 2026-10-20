@@ -1,0 +1,40 @@
+fileFormatVersion: 2
+guid: b68a85595c70ae54486d97aba33b78d1
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: headgear_hud\ach7ex_glass_base|models\transparent
+    second: {fileID: 2100000, guid: 8c8e95be34c87bc4b9a66643ffc765ca, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: headgear_hud\ach7ex_mask_base|models\model
+    second: {fileID: 2100000, guid: 4a72cb9a8f2481342a1893e9a34ea085, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: headgear_hud\hardhat_b_base|models\model
+    second: {fileID: 2100000, guid: 1d4f6262022735941812ef1678d1d527, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: headgear_hud\ppm88_hud_gray_base|models\model
+    second: {fileID: 2100000, guid: 566892a485fffae42826df69d0de5229, type: 2}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 61e536e21e96f284493f2969a9250cdf, type: 3}
+  _scale: 1
+  _importMaterials: 1
+  _texturesFolder: 
+  _searchTexturesByName: 1
+  _importEmbeddedMotions: 1
+  _embeddedLoopMode: 0
+  _addAnimator: 1
+  _readableMeshes: 0
+  _updateWhenOffscreen: 0
+  _autoResolveResources: 1

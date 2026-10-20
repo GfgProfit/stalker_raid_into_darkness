@@ -39,7 +39,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
 
             if (helmet != null && _model.TryTransfer(helmet.InstanceId, _window.PrimaryContainerId).Success == false)
             {
-                _window.DropItem(helmet);
+                _window.DropItemNow(helmet);
             }
 
             _model.TrySetSlotLocked(_window.EquipmentContainerId, HELMET_SLOT, locked);

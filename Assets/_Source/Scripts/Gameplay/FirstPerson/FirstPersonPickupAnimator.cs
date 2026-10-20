@@ -69,7 +69,7 @@ namespace RaidIntoDarkness.FirstPerson
         public bool TryPlay(FirstPersonPickupHand hand, Action onTake, Action<bool> onFinished)
         {
             AnimationClip clip = GetClip(hand);
-            if (IsPlaying || clip == null || _rig == null)
+            if (IsPlaying || clip == null || _rig == null || !_rig.TryAcquireHands(this))
             {
                 return false;
             }
@@ -79,6 +79,7 @@ namespace RaidIntoDarkness.FirstPerson
             if (hands == null)
             {
                 _rig.SetHandsVisible(false);
+                _rig.ReleaseHands(this);
                 return false;
             }
 
@@ -176,6 +177,7 @@ namespace RaidIntoDarkness.FirstPerson
             if (_rig != null)
             {
                 _rig.SetHandsVisible(false);
+                _rig.ReleaseHands(this);
             }
 
             finished?.Invoke(taken);

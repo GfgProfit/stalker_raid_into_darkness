@@ -1,0 +1,732 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 14077ff5025433f4e944682ee1b6bdbd, type: 3}
+  m_Name: EquipmentAnimationLibrary
+  m_EditorClassIdentifier: RaidIntoDarkness.FirstPerson::RaidIntoDarkness.FirstPerson.FirstPersonEquipmentAnimationLibrary
+  _motions:
+  - _id: outfit_animation_hud|anm_equip
+    _hands: {fileID: -7055220814953622721, guid: df37b96f71e727a4fa3304afcb53be62, type: 3}
+    _itemModel: {fileID: 0}
+    _item: {fileID: 0}
+    _cameraEffect: {fileID: 4908183818744415850, guid: 4fbd3ba07d9eb2b4a8c8e26845f8bfa5, type: 3}
+    _sound: {fileID: 8300000, guid: 65678608c19676842b04516076b9e107, type: 3}
+    _hudFieldOfView: 0.6
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: outfit_animation_fast_hud|anm_equip
+    _hands: {fileID: 7357050994269929413, guid: df37b96f71e727a4fa3304afcb53be62, type: 3}
+    _itemModel: {fileID: 0}
+    _item: {fileID: 0}
+    _cameraEffect: {fileID: 4908183818744415850, guid: 94d09ab58e2a8f24a9069c3b9d0fd308, type: 3}
+    _sound: {fileID: 8300000, guid: 99ccfccb4b53fe145bdc7501124bfc95, type: 3}
+    _hudFieldOfView: 0.6
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: gasmask_headgear_hud|anm_equip
+    _hands: {fileID: -2492431852395544859, guid: ab16d9dd0df9c2c4ca8cbc19fa5badd4, type: 3}
+    _itemModel: {fileID: -4788229014625914596, guid: a2521060d90e5c14d9418212809ee323, type: 3}
+    _item: {fileID: 2964147628730984700, guid: b05493f89800f474fa5758c32fdd0ba6, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: d0600255e6eac4b4ca9f855eb8259fdb, type: 3}
+    _sound: {fileID: 8300000, guid: a2a320f9524b39b47a53c7720b8f3a79, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: gasmask_headgear_hud|anm_unequip
+    _hands: {fileID: 5243666973736650643, guid: ab16d9dd0df9c2c4ca8cbc19fa5badd4, type: 3}
+    _itemModel: {fileID: -4788229014625914596, guid: a2521060d90e5c14d9418212809ee323, type: 3}
+    _item: {fileID: -9166107283524161040, guid: b05493f89800f474fa5758c32fdd0ba6, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: b95fa49c68dfe4c4189d26a816100b80, type: 3}
+    _sound: {fileID: 8300000, guid: 792dfe1c368d6fe4aa8b2beaf0390f85, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: helm_ach7_headgear_hud|anm_equip
+    _hands: {fileID: -7691899857518611146, guid: a26956eb5add2f845b42250947262aca, type: 3}
+    _itemModel: {fileID: -2247690629597808512, guid: f2b20743a91dd5a4ba65c76bd2ea21b1, type: 3}
+    _item: {fileID: 3416337059652062937, guid: 95da7029f6c058b43a9a4f4c9d394f15, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: ca67c9bd4dbdd09438aaf215e2bee119, type: 3}
+    _sound: {fileID: 8300000, guid: 98199246d6b02cd4982196fd414898a5, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0.03}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: helm_ach7_headgear_hud|anm_unequip
+    _hands: {fileID: -2153927967693136277, guid: a26956eb5add2f845b42250947262aca, type: 3}
+    _itemModel: {fileID: -2247690629597808512, guid: f2b20743a91dd5a4ba65c76bd2ea21b1, type: 3}
+    _item: {fileID: -4616279295385607674, guid: 95da7029f6c058b43a9a4f4c9d394f15, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: f77ccc434da763f46af8b7ec86ed5c17, type: 3}
+    _sound: {fileID: 8300000, guid: 792dfe1c368d6fe4aa8b2beaf0390f85, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0.03}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: helm_ach7ex_headgear_hud|anm_equip
+    _hands: {fileID: -7691899857518611146, guid: a26956eb5add2f845b42250947262aca, type: 3}
+    _itemModel: {fileID: -7267817011087567214, guid: b68a85595c70ae54486d97aba33b78d1, type: 3}
+    _item: {fileID: 3416337059652062937, guid: a5066d12576d0ef44afb86c0087a2179, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: ca67c9bd4dbdd09438aaf215e2bee119, type: 3}
+    _sound: {fileID: 8300000, guid: 98199246d6b02cd4982196fd414898a5, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0.03}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: helm_ach7ex_headgear_hud|anm_unequip
+    _hands: {fileID: -2153927967693136277, guid: a26956eb5add2f845b42250947262aca, type: 3}
+    _itemModel: {fileID: -7267817011087567214, guid: b68a85595c70ae54486d97aba33b78d1, type: 3}
+    _item: {fileID: -4616279295385607674, guid: a5066d12576d0ef44afb86c0087a2179, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: f77ccc434da763f46af8b7ec86ed5c17, type: 3}
+    _sound: {fileID: 8300000, guid: 792dfe1c368d6fe4aa8b2beaf0390f85, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0.03}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: helm_battle_headgear_hud|anm_equip
+    _hands: {fileID: -7691899857518611146, guid: a26956eb5add2f845b42250947262aca, type: 3}
+    _itemModel: {fileID: 1031779577149328769, guid: ccb7829ad585f4a499ce359597200057, type: 3}
+    _item: {fileID: 3416337059652062937, guid: f51230d874aba484e95196280cb32a53, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: ca67c9bd4dbdd09438aaf215e2bee119, type: 3}
+    _sound: {fileID: 8300000, guid: 98199246d6b02cd4982196fd414898a5, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0.03}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: helm_battle_headgear_hud|anm_unequip
+    _hands: {fileID: -2153927967693136277, guid: a26956eb5add2f845b42250947262aca, type: 3}
+    _itemModel: {fileID: 1031779577149328769, guid: ccb7829ad585f4a499ce359597200057, type: 3}
+    _item: {fileID: -4616279295385607674, guid: f51230d874aba484e95196280cb32a53, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: f77ccc434da763f46af8b7ec86ed5c17, type: 3}
+    _sound: {fileID: 8300000, guid: 792dfe1c368d6fe4aa8b2beaf0390f85, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0.03}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: helm_exo_headgear_hud|anm_equip
+    _hands: {fileID: -7691899857518611146, guid: a26956eb5add2f845b42250947262aca, type: 3}
+    _itemModel: {fileID: 2954615499097403795, guid: a7d7c2be0decc3e42b16055b8455202d, type: 3}
+    _item: {fileID: 3416337059652062937, guid: 1483f701bee608d4b9e4d2ef412fc314, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: ca67c9bd4dbdd09438aaf215e2bee119, type: 3}
+    _sound: {fileID: 8300000, guid: 98199246d6b02cd4982196fd414898a5, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0.03}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: helm_exo_headgear_hud|anm_unequip
+    _hands: {fileID: -2153927967693136277, guid: a26956eb5add2f845b42250947262aca, type: 3}
+    _itemModel: {fileID: 2954615499097403795, guid: a7d7c2be0decc3e42b16055b8455202d, type: 3}
+    _item: {fileID: -4616279295385607674, guid: 1483f701bee608d4b9e4d2ef412fc314, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: f77ccc434da763f46af8b7ec86ed5c17, type: 3}
+    _sound: {fileID: 8300000, guid: 792dfe1c368d6fe4aa8b2beaf0390f85, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0.03}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: helm_hardhat_headgear_hud|anm_equip
+    _hands: {fileID: -7691899857518611146, guid: a26956eb5add2f845b42250947262aca, type: 3}
+    _itemModel: {fileID: 3966340542154689755, guid: 790d14f560895a642a65253e8c0e5845, type: 3}
+    _item: {fileID: 3416337059652062937, guid: 4825e93e9450a9645a5f4737f9a1f6e4, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: ca67c9bd4dbdd09438aaf215e2bee119, type: 3}
+    _sound: {fileID: 8300000, guid: 98199246d6b02cd4982196fd414898a5, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0.03}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: helm_hardhat_headgear_hud|anm_unequip
+    _hands: {fileID: -2153927967693136277, guid: a26956eb5add2f845b42250947262aca, type: 3}
+    _itemModel: {fileID: 3966340542154689755, guid: 790d14f560895a642a65253e8c0e5845, type: 3}
+    _item: {fileID: -4616279295385607674, guid: 4825e93e9450a9645a5f4737f9a1f6e4, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: f77ccc434da763f46af8b7ec86ed5c17, type: 3}
+    _sound: {fileID: 8300000, guid: 792dfe1c368d6fe4aa8b2beaf0390f85, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0.03}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: helm_hardhat_snag_headgear_hud|anm_equip
+    _hands: {fileID: -7691899857518611146, guid: a26956eb5add2f845b42250947262aca, type: 3}
+    _itemModel: {fileID: 613276883559215384, guid: d534adb6297774f41a69e88048e2aac5, type: 3}
+    _item: {fileID: 3416337059652062937, guid: a7e1af2f8204ca348a4f143991c4ea52, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: ca67c9bd4dbdd09438aaf215e2bee119, type: 3}
+    _sound: {fileID: 8300000, guid: 98199246d6b02cd4982196fd414898a5, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0.03}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: helm_hardhat_snag_headgear_hud|anm_unequip
+    _hands: {fileID: -2153927967693136277, guid: a26956eb5add2f845b42250947262aca, type: 3}
+    _itemModel: {fileID: 613276883559215384, guid: d534adb6297774f41a69e88048e2aac5, type: 3}
+    _item: {fileID: -4616279295385607674, guid: a7e1af2f8204ca348a4f143991c4ea52, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: f77ccc434da763f46af8b7ec86ed5c17, type: 3}
+    _sound: {fileID: 8300000, guid: 792dfe1c368d6fe4aa8b2beaf0390f85, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0.03}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: helm_m40_headgear_hud|anm_equip
+    _hands: {fileID: -2492431852395544859, guid: ab16d9dd0df9c2c4ca8cbc19fa5badd4, type: 3}
+    _itemModel: {fileID: -4788229014625914596, guid: a2521060d90e5c14d9418212809ee323, type: 3}
+    _item: {fileID: 2964147628730984700, guid: b05493f89800f474fa5758c32fdd0ba6, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: d0600255e6eac4b4ca9f855eb8259fdb, type: 3}
+    _sound: {fileID: 8300000, guid: a2a320f9524b39b47a53c7720b8f3a79, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: helm_m40_headgear_hud|anm_unequip
+    _hands: {fileID: 5243666973736650643, guid: ab16d9dd0df9c2c4ca8cbc19fa5badd4, type: 3}
+    _itemModel: {fileID: -4788229014625914596, guid: a2521060d90e5c14d9418212809ee323, type: 3}
+    _item: {fileID: -9166107283524161040, guid: b05493f89800f474fa5758c32fdd0ba6, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: b95fa49c68dfe4c4189d26a816100b80, type: 3}
+    _sound: {fileID: 8300000, guid: 792dfe1c368d6fe4aa8b2beaf0390f85, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: helm_m50_headgear_hud|anm_equip
+    _hands: {fileID: -4261807239584576578, guid: ab16d9dd0df9c2c4ca8cbc19fa5badd4, type: 3}
+    _itemModel: {fileID: -6735179545935661387, guid: b2bdc3482d8739943b59822964f75ccf, type: 3}
+    _item: {fileID: 3496193865719813442, guid: adf77d0aefa0cd342bebcd3f86c31880, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: d0600255e6eac4b4ca9f855eb8259fdb, type: 3}
+    _sound: {fileID: 8300000, guid: a2a320f9524b39b47a53c7720b8f3a79, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: helm_m50_headgear_hud|anm_unequip
+    _hands: {fileID: -8264168143882914268, guid: ab16d9dd0df9c2c4ca8cbc19fa5badd4, type: 3}
+    _itemModel: {fileID: -6735179545935661387, guid: b2bdc3482d8739943b59822964f75ccf, type: 3}
+    _item: {fileID: 5601719503810305283, guid: adf77d0aefa0cd342bebcd3f86c31880, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: b95fa49c68dfe4c4189d26a816100b80, type: 3}
+    _sound: {fileID: 8300000, guid: 792dfe1c368d6fe4aa8b2beaf0390f85, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: helm_metro_headgear_hud|anm_equip
+    _hands: {fileID: -5650828496614294419, guid: 63de87b112e47694298be375386a3690, type: 3}
+    _itemModel: {fileID: 6371752121387934427, guid: 7b44b843e84b0944ebd944b7bbb86b9f, type: 3}
+    _item: {fileID: 9033390626971437623, guid: 1e2317e0cb1e8f642b45c70b17662d5b, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: 225048d2fdeef8842a8f5710827d2dd9, type: 3}
+    _sound: {fileID: 8300000, guid: cce2ad0ec040a9248b7236a02e9f2926, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0.03}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: helm_metro_headgear_hud|anm_unequip
+    _hands: {fileID: -2038957611344812950, guid: 63de87b112e47694298be375386a3690, type: 3}
+    _itemModel: {fileID: 6371752121387934427, guid: 7b44b843e84b0944ebd944b7bbb86b9f, type: 3}
+    _item: {fileID: 1579702994401334041, guid: 1e2317e0cb1e8f642b45c70b17662d5b, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: 6e26cba1df4c4694b8a47de6a91097d2, type: 3}
+    _sound: {fileID: 8300000, guid: b9e8313cb7c82504795f6aa2e490bf57, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0.03}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: helm_ppm88_headgear_hud|anm_equip
+    _hands: {fileID: -2492431852395544859, guid: ab16d9dd0df9c2c4ca8cbc19fa5badd4, type: 3}
+    _itemModel: {fileID: -2808471245521103622, guid: 09f95cac594467749bf74783bdc0c53c, type: 3}
+    _item: {fileID: 2964147628730984700, guid: aa1191e648d656941943db6baf66a83a, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: d0600255e6eac4b4ca9f855eb8259fdb, type: 3}
+    _sound: {fileID: 8300000, guid: a2a320f9524b39b47a53c7720b8f3a79, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: helm_ppm88_headgear_hud|anm_unequip
+    _hands: {fileID: 5243666973736650643, guid: ab16d9dd0df9c2c4ca8cbc19fa5badd4, type: 3}
+    _itemModel: {fileID: -2808471245521103622, guid: 09f95cac594467749bf74783bdc0c53c, type: 3}
+    _item: {fileID: -9166107283524161040, guid: aa1191e648d656941943db6baf66a83a, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: b95fa49c68dfe4c4189d26a816100b80, type: 3}
+    _sound: {fileID: 8300000, guid: 792dfe1c368d6fe4aa8b2beaf0390f85, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: helm_protective_headgear_hud|anm_equip
+    _hands: {fileID: -4813484468180576642, guid: 1573d48182d8edf4c8665f3e7ad93e03, type: 3}
+    _itemModel: {fileID: 1317121627375010913, guid: 021a4d83389b61d48b6d79e75f57fc65, type: 3}
+    _item: {fileID: -4970246011599412503, guid: 3871580f98250534b8453b5485cc89e5, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: 84c05eea21832ca45b8670fe3d490acb, type: 3}
+    _sound: {fileID: 8300000, guid: 928e9130f36a22e439b18d1c31e6a29c, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: helm_protective_headgear_hud|anm_unequip
+    _hands: {fileID: 4973017959211643805, guid: 1573d48182d8edf4c8665f3e7ad93e03, type: 3}
+    _itemModel: {fileID: 1317121627375010913, guid: 021a4d83389b61d48b6d79e75f57fc65, type: 3}
+    _item: {fileID: 5323600940319566944, guid: 3871580f98250534b8453b5485cc89e5, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: c4ad111fabdc03f42a9f34e2709d36ab, type: 3}
+    _sound: {fileID: 8300000, guid: 5bd5f62e667183549acda433f4f30cd3, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: helm_ranger_headgear_hud|anm_equip
+    _hands: {fileID: -8108852322460595392, guid: ab16d9dd0df9c2c4ca8cbc19fa5badd4, type: 3}
+    _itemModel: {fileID: -7395978924494794016, guid: d683df3404a43fb499fe6409149281cf, type: 3}
+    _item: {fileID: -319052999035225225, guid: 638cf1139e348df4c8ae870c6a3acbc3, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: d0600255e6eac4b4ca9f855eb8259fdb, type: 3}
+    _sound: {fileID: 8300000, guid: a2a320f9524b39b47a53c7720b8f3a79, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: helm_ranger_headgear_hud|anm_unequip
+    _hands: {fileID: 8566408443371277240, guid: ab16d9dd0df9c2c4ca8cbc19fa5badd4, type: 3}
+    _itemModel: {fileID: -7395978924494794016, guid: d683df3404a43fb499fe6409149281cf, type: 3}
+    _item: {fileID: -150887561588770848, guid: 638cf1139e348df4c8ae870c6a3acbc3, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: b95fa49c68dfe4c4189d26a816100b80, type: 3}
+    _sound: {fileID: 8300000, guid: 792dfe1c368d6fe4aa8b2beaf0390f85, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: helm_resp_headgear_hud|anm_equip
+    _hands: {fileID: -5785514788467970747, guid: 65b7a84e7aefea74a99743d0e0874bdb, type: 3}
+    _itemModel: {fileID: 4689124680985890976, guid: 3925e51b095a1e649a8cd6e8cf506fb3, type: 3}
+    _item: {fileID: -8170525086474852585, guid: f37ca6a53e7742e4884af68880688a6f, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: b6498da4c7cdf864f8da5dc74ccda6a8, type: 3}
+    _sound: {fileID: 8300000, guid: a2a320f9524b39b47a53c7720b8f3a79, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: helm_resp_headgear_hud|anm_unequip
+    _hands: {fileID: -632354557588199137, guid: 65b7a84e7aefea74a99743d0e0874bdb, type: 3}
+    _itemModel: {fileID: 4689124680985890976, guid: 3925e51b095a1e649a8cd6e8cf506fb3, type: 3}
+    _item: {fileID: 8943913599977530294, guid: f37ca6a53e7742e4884af68880688a6f, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: 192b16f8cadcbb24597804e69ef735e3, type: 3}
+    _sound: {fileID: 8300000, guid: 792dfe1c368d6fe4aa8b2beaf0390f85, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: helm_respirator_gp5_headgear_hud|anm_equip
+    _hands: {fileID: -2492431852395544859, guid: ab16d9dd0df9c2c4ca8cbc19fa5badd4, type: 3}
+    _itemModel: {fileID: -4788229014625914596, guid: a2521060d90e5c14d9418212809ee323, type: 3}
+    _item: {fileID: 2964147628730984700, guid: b05493f89800f474fa5758c32fdd0ba6, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: d0600255e6eac4b4ca9f855eb8259fdb, type: 3}
+    _sound: {fileID: 8300000, guid: a2a320f9524b39b47a53c7720b8f3a79, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: helm_respirator_gp5_headgear_hud|anm_unequip
+    _hands: {fileID: 5243666973736650643, guid: ab16d9dd0df9c2c4ca8cbc19fa5badd4, type: 3}
+    _itemModel: {fileID: -4788229014625914596, guid: a2521060d90e5c14d9418212809ee323, type: 3}
+    _item: {fileID: -9166107283524161040, guid: b05493f89800f474fa5758c32fdd0ba6, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: b95fa49c68dfe4c4189d26a816100b80, type: 3}
+    _sound: {fileID: 8300000, guid: 792dfe1c368d6fe4aa8b2beaf0390f85, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: helm_respirator_headgear_hud|anm_equip
+    _hands: {fileID: -2492431852395544859, guid: ab16d9dd0df9c2c4ca8cbc19fa5badd4, type: 3}
+    _itemModel: {fileID: -4788229014625914596, guid: a2521060d90e5c14d9418212809ee323, type: 3}
+    _item: {fileID: 2964147628730984700, guid: b05493f89800f474fa5758c32fdd0ba6, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: d0600255e6eac4b4ca9f855eb8259fdb, type: 3}
+    _sound: {fileID: 8300000, guid: a2a320f9524b39b47a53c7720b8f3a79, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: helm_respirator_headgear_hud|anm_unequip
+    _hands: {fileID: 5243666973736650643, guid: ab16d9dd0df9c2c4ca8cbc19fa5badd4, type: 3}
+    _itemModel: {fileID: -4788229014625914596, guid: a2521060d90e5c14d9418212809ee323, type: 3}
+    _item: {fileID: -9166107283524161040, guid: b05493f89800f474fa5758c32fdd0ba6, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: b95fa49c68dfe4c4189d26a816100b80, type: 3}
+    _sound: {fileID: 8300000, guid: 792dfe1c368d6fe4aa8b2beaf0390f85, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: helm_respirator_old_headgear_hud|anm_equip
+    _hands: {fileID: -2492431852395544859, guid: ab16d9dd0df9c2c4ca8cbc19fa5badd4, type: 3}
+    _itemModel: {fileID: -4788229014625914596, guid: a2521060d90e5c14d9418212809ee323, type: 3}
+    _item: {fileID: 2964147628730984700, guid: b05493f89800f474fa5758c32fdd0ba6, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: d0600255e6eac4b4ca9f855eb8259fdb, type: 3}
+    _sound: {fileID: 8300000, guid: a2a320f9524b39b47a53c7720b8f3a79, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: helm_respirator_old_headgear_hud|anm_unequip
+    _hands: {fileID: 5243666973736650643, guid: ab16d9dd0df9c2c4ca8cbc19fa5badd4, type: 3}
+    _itemModel: {fileID: -4788229014625914596, guid: a2521060d90e5c14d9418212809ee323, type: 3}
+    _item: {fileID: -9166107283524161040, guid: b05493f89800f474fa5758c32fdd0ba6, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: b95fa49c68dfe4c4189d26a816100b80, type: 3}
+    _sound: {fileID: 8300000, guid: 792dfe1c368d6fe4aa8b2beaf0390f85, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: helm_spartan_headgear_hud|anm_equip
+    _hands: {fileID: -5796613750463747837, guid: 4f743c388af410843bb03291928cdd9f, type: 3}
+    _itemModel: {fileID: -4188786865722192830, guid: bb085106057db36409175ffce563a547, type: 3}
+    _item: {fileID: 9033390626971437623, guid: 407a061d37b4c8347bd4d8f5f6fd1e58, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: 225048d2fdeef8842a8f5710827d2dd9, type: 3}
+    _sound: {fileID: 8300000, guid: cce2ad0ec040a9248b7236a02e9f2926, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0.03}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: helm_spartan_headgear_hud|anm_unequip
+    _hands: {fileID: -8794525825625969793, guid: 4f743c388af410843bb03291928cdd9f, type: 3}
+    _itemModel: {fileID: -4188786865722192830, guid: bb085106057db36409175ffce563a547, type: 3}
+    _item: {fileID: 1579702994401334041, guid: 407a061d37b4c8347bd4d8f5f6fd1e58, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: 6e26cba1df4c4694b8a47de6a91097d2, type: 3}
+    _sound: {fileID: 8300000, guid: b9e8313cb7c82504795f6aa2e490bf57, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0.03}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: helm_tactic_headgear_hud|anm_equip
+    _hands: {fileID: -7691899857518611146, guid: a26956eb5add2f845b42250947262aca, type: 3}
+    _itemModel: {fileID: -9094189334982388141, guid: 7f2b0206406324249ae98eb59d514497, type: 3}
+    _item: {fileID: 3416337059652062937, guid: 2bb1ec7c50bf34844a170164d022a5e0, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: ca67c9bd4dbdd09438aaf215e2bee119, type: 3}
+    _sound: {fileID: 8300000, guid: 98199246d6b02cd4982196fd414898a5, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0.03}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: helm_tactic_headgear_hud|anm_unequip
+    _hands: {fileID: -2153927967693136277, guid: a26956eb5add2f845b42250947262aca, type: 3}
+    _itemModel: {fileID: -9094189334982388141, guid: 7f2b0206406324249ae98eb59d514497, type: 3}
+    _item: {fileID: -4616279295385607674, guid: 2bb1ec7c50bf34844a170164d022a5e0, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: f77ccc434da763f46af8b7ec86ed5c17, type: 3}
+    _sound: {fileID: 8300000, guid: 792dfe1c368d6fe4aa8b2beaf0390f85, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0.03}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: helmet_headgear_hud|anm_equip
+    _hands: {fileID: -7691899857518611146, guid: a26956eb5add2f845b42250947262aca, type: 3}
+    _itemModel: {fileID: 3966340542154689755, guid: 790d14f560895a642a65253e8c0e5845, type: 3}
+    _item: {fileID: 3416337059652062937, guid: 4825e93e9450a9645a5f4737f9a1f6e4, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: ca67c9bd4dbdd09438aaf215e2bee119, type: 3}
+    _sound: {fileID: 8300000, guid: 98199246d6b02cd4982196fd414898a5, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0.03}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: helmet_headgear_hud|anm_unequip
+    _hands: {fileID: -2153927967693136277, guid: a26956eb5add2f845b42250947262aca, type: 3}
+    _itemModel: {fileID: 3966340542154689755, guid: 790d14f560895a642a65253e8c0e5845, type: 3}
+    _item: {fileID: -4616279295385607674, guid: 4825e93e9450a9645a5f4737f9a1f6e4, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: f77ccc434da763f46af8b7ec86ed5c17, type: 3}
+    _sound: {fileID: 8300000, guid: 792dfe1c368d6fe4aa8b2beaf0390f85, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0.03}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: helmet_mask_headgear_hud|anm_equip
+    _hands: {fileID: -5650828496614294419, guid: 63de87b112e47694298be375386a3690, type: 3}
+    _itemModel: {fileID: 6371752121387934427, guid: 7b44b843e84b0944ebd944b7bbb86b9f, type: 3}
+    _item: {fileID: 9033390626971437623, guid: 1e2317e0cb1e8f642b45c70b17662d5b, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: 225048d2fdeef8842a8f5710827d2dd9, type: 3}
+    _sound: {fileID: 8300000, guid: cce2ad0ec040a9248b7236a02e9f2926, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0.03}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: helmet_mask_headgear_hud|anm_unequip
+    _hands: {fileID: -2038957611344812950, guid: 63de87b112e47694298be375386a3690, type: 3}
+    _itemModel: {fileID: 6371752121387934427, guid: 7b44b843e84b0944ebd944b7bbb86b9f, type: 3}
+    _item: {fileID: 1579702994401334041, guid: 1e2317e0cb1e8f642b45c70b17662d5b, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: 6e26cba1df4c4694b8a47de6a91097d2, type: 3}
+    _sound: {fileID: 8300000, guid: b9e8313cb7c82504795f6aa2e490bf57, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0.03}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: outfit_animation_backpack_equip_army_hud|anm_use
+    _hands: {fileID: 3927996122573835727, guid: 4d4b0cd6ce730af4086abc2c9913b71a, type: 3}
+    _itemModel: {fileID: -2470532940615383016, guid: b1cdf9df7bd496a4c8602afc99c5e681, type: 3}
+    _item: {fileID: 7847274700964300712, guid: ef78cce947e1f4241a5daa1599b70de7, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: db37086ae97d886468fc0ac1a68bda5e, type: 3}
+    _sound: {fileID: 8300000, guid: 64b4e8711a782064faf30cbf077bb6b1, type: 3}
+    _hudFieldOfView: 0.6
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: outfit_animation_backpack_equip_bandit_hud|anm_use
+    _hands: {fileID: 3927996122573835727, guid: 4d4b0cd6ce730af4086abc2c9913b71a, type: 3}
+    _itemModel: {fileID: -3259911040604204412, guid: 416ecd0ee2036b74d8e61087cd3925ad, type: 3}
+    _item: {fileID: 7847274700964300712, guid: f3748ac2d0f4517418767d493c39e0fe, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: db37086ae97d886468fc0ac1a68bda5e, type: 3}
+    _sound: {fileID: 8300000, guid: 64b4e8711a782064faf30cbf077bb6b1, type: 3}
+    _hudFieldOfView: 0.6
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: outfit_animation_backpack_equip_csky_hud|anm_use
+    _hands: {fileID: 3927996122573835727, guid: 4d4b0cd6ce730af4086abc2c9913b71a, type: 3}
+    _itemModel: {fileID: 3263677460145065575, guid: a4d2abb4c164aaa468eeb2e9bbd60554, type: 3}
+    _item: {fileID: 7847274700964300712, guid: ab03bb584c026bb428df093b8fd30f4f, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: db37086ae97d886468fc0ac1a68bda5e, type: 3}
+    _sound: {fileID: 8300000, guid: 64b4e8711a782064faf30cbf077bb6b1, type: 3}
+    _hudFieldOfView: 0.6
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: outfit_animation_backpack_equip_dolg_hud|anm_use
+    _hands: {fileID: 3927996122573835727, guid: 4d4b0cd6ce730af4086abc2c9913b71a, type: 3}
+    _itemModel: {fileID: -2075602383894440258, guid: 099f7e3e48ba09b4e8230c3939520a9d, type: 3}
+    _item: {fileID: 7847274700964300712, guid: 72b08d58de813ce41a8bcbdd75fcf8b3, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: db37086ae97d886468fc0ac1a68bda5e, type: 3}
+    _sound: {fileID: 8300000, guid: 64b4e8711a782064faf30cbf077bb6b1, type: 3}
+    _hudFieldOfView: 0.6
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: outfit_animation_backpack_equip_ecolog_hud|anm_use
+    _hands: {fileID: 3927996122573835727, guid: 4d4b0cd6ce730af4086abc2c9913b71a, type: 3}
+    _itemModel: {fileID: -3687072128074008731, guid: d60850b42b97d634e8225193a083fb87, type: 3}
+    _item: {fileID: 7847274700964300712, guid: c40cca252364c6044a0f7064facb7bcd, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: db37086ae97d886468fc0ac1a68bda5e, type: 3}
+    _sound: {fileID: 8300000, guid: 64b4e8711a782064faf30cbf077bb6b1, type: 3}
+    _hudFieldOfView: 0.6
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: outfit_animation_backpack_equip_freedom_hud|anm_use
+    _hands: {fileID: 3927996122573835727, guid: 4d4b0cd6ce730af4086abc2c9913b71a, type: 3}
+    _itemModel: {fileID: 1638050226430646232, guid: 6d0f61ce23cd3c840a69b3bc35f0bba7, type: 3}
+    _item: {fileID: 7847274700964300712, guid: 8f7917bf1a2aefe4bbfd5b3143c8ed56, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: db37086ae97d886468fc0ac1a68bda5e, type: 3}
+    _sound: {fileID: 8300000, guid: 64b4e8711a782064faf30cbf077bb6b1, type: 3}
+    _hudFieldOfView: 0.6
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: outfit_animation_backpack_equip_greh_hud|anm_use
+    _hands: {fileID: 3927996122573835727, guid: 4d4b0cd6ce730af4086abc2c9913b71a, type: 3}
+    _itemModel: {fileID: -2197907450648914488, guid: f0e3f9ba4db28a74a95d6f51424e0798, type: 3}
+    _item: {fileID: 7847274700964300712, guid: 2ca4f54b821e69446b2b14b51ac0d1a2, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: db37086ae97d886468fc0ac1a68bda5e, type: 3}
+    _sound: {fileID: 8300000, guid: 64b4e8711a782064faf30cbf077bb6b1, type: 3}
+    _hudFieldOfView: 0.6
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: outfit_animation_backpack_equip_hud|anm_use
+    _hands: {fileID: 3927996122573835727, guid: 4d4b0cd6ce730af4086abc2c9913b71a, type: 3}
+    _itemModel: {fileID: 6016516413652282868, guid: 6251d4e1232914642bd9e970e69fc32d, type: 3}
+    _item: {fileID: 7847274700964300712, guid: 79508e1bb2c831745a7b13fd1ed7a05d, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: db37086ae97d886468fc0ac1a68bda5e, type: 3}
+    _sound: {fileID: 8300000, guid: 64b4e8711a782064faf30cbf077bb6b1, type: 3}
+    _hudFieldOfView: 0.6
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: outfit_animation_backpack_equip_isg_hud|anm_use
+    _hands: {fileID: 3927996122573835727, guid: 4d4b0cd6ce730af4086abc2c9913b71a, type: 3}
+    _itemModel: {fileID: 4160828392569501110, guid: 9a11c36fce57ec74799bfcff769729ec, type: 3}
+    _item: {fileID: 7847274700964300712, guid: 64d2756fd0044e345a01d4fedbd2e55b, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: db37086ae97d886468fc0ac1a68bda5e, type: 3}
+    _sound: {fileID: 8300000, guid: 64b4e8711a782064faf30cbf077bb6b1, type: 3}
+    _hudFieldOfView: 0.6
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: outfit_animation_backpack_equip_killer_hud|anm_use
+    _hands: {fileID: 3927996122573835727, guid: 4d4b0cd6ce730af4086abc2c9913b71a, type: 3}
+    _itemModel: {fileID: 3998273165791827342, guid: 2a7d82c0fba190147aa3a217f3aca92b, type: 3}
+    _item: {fileID: 7847274700964300712, guid: 2fa8f613d76ccb74a8c6868c630084d1, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: db37086ae97d886468fc0ac1a68bda5e, type: 3}
+    _sound: {fileID: 8300000, guid: 64b4e8711a782064faf30cbf077bb6b1, type: 3}
+    _hudFieldOfView: 0.6
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: outfit_animation_backpack_equip_monolith_hud|anm_use
+    _hands: {fileID: 3927996122573835727, guid: 4d4b0cd6ce730af4086abc2c9913b71a, type: 3}
+    _itemModel: {fileID: -8660101622409907736, guid: 2c1b6958acc5d2a41a171814199db397, type: 3}
+    _item: {fileID: 7847274700964300712, guid: fcae9d3ba85e92441a4f3432838703ed, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: db37086ae97d886468fc0ac1a68bda5e, type: 3}
+    _sound: {fileID: 8300000, guid: 64b4e8711a782064faf30cbf077bb6b1, type: 3}
+    _hudFieldOfView: 0.6
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: outfit_animation_backpack_equip_renegade_hud|anm_use
+    _hands: {fileID: 3927996122573835727, guid: 4d4b0cd6ce730af4086abc2c9913b71a, type: 3}
+    _itemModel: {fileID: 6558471269367817709, guid: db299739f5d52c54681147fbb4ece04f, type: 3}
+    _item: {fileID: 7847274700964300712, guid: 186241c3422aa6d4ca82f377a1a993bb, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: db37086ae97d886468fc0ac1a68bda5e, type: 3}
+    _sound: {fileID: 8300000, guid: 64b4e8711a782064faf30cbf077bb6b1, type: 3}
+    _hudFieldOfView: 0.6
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: outfit_animation_backpack_equip_stalker_hud|anm_use
+    _hands: {fileID: 3927996122573835727, guid: 4d4b0cd6ce730af4086abc2c9913b71a, type: 3}
+    _itemModel: {fileID: 2559224551671683047, guid: 1f2f0fd8ade923f4f827a969cbda16e0, type: 3}
+    _item: {fileID: 7847274700964300712, guid: 85c954da8d1180540b5c5cddb2731724, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: db37086ae97d886468fc0ac1a68bda5e, type: 3}
+    _sound: {fileID: 8300000, guid: 64b4e8711a782064faf30cbf077bb6b1, type: 3}
+    _hudFieldOfView: 0.6
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: outfit_animation_backpack_equip_zombied_hud|anm_use
+    _hands: {fileID: 3927996122573835727, guid: 4d4b0cd6ce730af4086abc2c9913b71a, type: 3}
+    _itemModel: {fileID: 3949383891459369072, guid: b6d44b7f86696c644b21cb379373bd0b, type: 3}
+    _item: {fileID: 7847274700964300712, guid: e8f0e53c6ddcadc44aba4a82abec5bd7, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: db37086ae97d886468fc0ac1a68bda5e, type: 3}
+    _sound: {fileID: 8300000, guid: 64b4e8711a782064faf30cbf077bb6b1, type: 3}
+    _hudFieldOfView: 0.6
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: outfit_animation_backpack_unequip_army_hud|anm_use
+    _hands: {fileID: 3983489152822407541, guid: 4d4b0cd6ce730af4086abc2c9913b71a, type: 3}
+    _itemModel: {fileID: -2470532940615383016, guid: b1cdf9df7bd496a4c8602afc99c5e681, type: 3}
+    _item: {fileID: -7395252788654334615, guid: ef78cce947e1f4241a5daa1599b70de7, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: 2de13265251a4c94da5d9da66e82f61e, type: 3}
+    _sound: {fileID: 8300000, guid: ba9c2200cb8c5794a81fbe295f674084, type: 3}
+    _hudFieldOfView: 0.6
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: outfit_animation_backpack_unequip_bandit_hud|anm_use
+    _hands: {fileID: 3983489152822407541, guid: 4d4b0cd6ce730af4086abc2c9913b71a, type: 3}
+    _itemModel: {fileID: -3259911040604204412, guid: 416ecd0ee2036b74d8e61087cd3925ad, type: 3}
+    _item: {fileID: -7395252788654334615, guid: f3748ac2d0f4517418767d493c39e0fe, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: 2de13265251a4c94da5d9da66e82f61e, type: 3}
+    _sound: {fileID: 8300000, guid: ba9c2200cb8c5794a81fbe295f674084, type: 3}
+    _hudFieldOfView: 0.6
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: outfit_animation_backpack_unequip_csky_hud|anm_use
+    _hands: {fileID: 3983489152822407541, guid: 4d4b0cd6ce730af4086abc2c9913b71a, type: 3}
+    _itemModel: {fileID: 3263677460145065575, guid: a4d2abb4c164aaa468eeb2e9bbd60554, type: 3}
+    _item: {fileID: -7395252788654334615, guid: ab03bb584c026bb428df093b8fd30f4f, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: 2de13265251a4c94da5d9da66e82f61e, type: 3}
+    _sound: {fileID: 8300000, guid: ba9c2200cb8c5794a81fbe295f674084, type: 3}
+    _hudFieldOfView: 0.6
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: outfit_animation_backpack_unequip_dolg_hud|anm_use
+    _hands: {fileID: 3983489152822407541, guid: 4d4b0cd6ce730af4086abc2c9913b71a, type: 3}
+    _itemModel: {fileID: -2075602383894440258, guid: 099f7e3e48ba09b4e8230c3939520a9d, type: 3}
+    _item: {fileID: -7395252788654334615, guid: 72b08d58de813ce41a8bcbdd75fcf8b3, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: 2de13265251a4c94da5d9da66e82f61e, type: 3}
+    _sound: {fileID: 8300000, guid: ba9c2200cb8c5794a81fbe295f674084, type: 3}
+    _hudFieldOfView: 0.6
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: outfit_animation_backpack_unequip_ecolog_hud|anm_use
+    _hands: {fileID: 3983489152822407541, guid: 4d4b0cd6ce730af4086abc2c9913b71a, type: 3}
+    _itemModel: {fileID: -3687072128074008731, guid: d60850b42b97d634e8225193a083fb87, type: 3}
+    _item: {fileID: -7395252788654334615, guid: c40cca252364c6044a0f7064facb7bcd, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: 2de13265251a4c94da5d9da66e82f61e, type: 3}
+    _sound: {fileID: 8300000, guid: ba9c2200cb8c5794a81fbe295f674084, type: 3}
+    _hudFieldOfView: 0.6
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: outfit_animation_backpack_unequip_freedom_hud|anm_use
+    _hands: {fileID: 3983489152822407541, guid: 4d4b0cd6ce730af4086abc2c9913b71a, type: 3}
+    _itemModel: {fileID: 1638050226430646232, guid: 6d0f61ce23cd3c840a69b3bc35f0bba7, type: 3}
+    _item: {fileID: -7395252788654334615, guid: 8f7917bf1a2aefe4bbfd5b3143c8ed56, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: 2de13265251a4c94da5d9da66e82f61e, type: 3}
+    _sound: {fileID: 8300000, guid: ba9c2200cb8c5794a81fbe295f674084, type: 3}
+    _hudFieldOfView: 0.6
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: outfit_animation_backpack_unequip_greh_hud|anm_use
+    _hands: {fileID: 3983489152822407541, guid: 4d4b0cd6ce730af4086abc2c9913b71a, type: 3}
+    _itemModel: {fileID: -2197907450648914488, guid: f0e3f9ba4db28a74a95d6f51424e0798, type: 3}
+    _item: {fileID: -7395252788654334615, guid: 2ca4f54b821e69446b2b14b51ac0d1a2, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: 2de13265251a4c94da5d9da66e82f61e, type: 3}
+    _sound: {fileID: 8300000, guid: ba9c2200cb8c5794a81fbe295f674084, type: 3}
+    _hudFieldOfView: 0.6
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: outfit_animation_backpack_unequip_hud|anm_use
+    _hands: {fileID: 3983489152822407541, guid: 4d4b0cd6ce730af4086abc2c9913b71a, type: 3}
+    _itemModel: {fileID: 6016516413652282868, guid: 6251d4e1232914642bd9e970e69fc32d, type: 3}
+    _item: {fileID: -7395252788654334615, guid: 79508e1bb2c831745a7b13fd1ed7a05d, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: 2de13265251a4c94da5d9da66e82f61e, type: 3}
+    _sound: {fileID: 8300000, guid: ba9c2200cb8c5794a81fbe295f674084, type: 3}
+    _hudFieldOfView: 0.6
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: outfit_animation_backpack_unequip_isg_hud|anm_use
+    _hands: {fileID: 3983489152822407541, guid: 4d4b0cd6ce730af4086abc2c9913b71a, type: 3}
+    _itemModel: {fileID: 4160828392569501110, guid: 9a11c36fce57ec74799bfcff769729ec, type: 3}
+    _item: {fileID: -7395252788654334615, guid: 64d2756fd0044e345a01d4fedbd2e55b, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: 2de13265251a4c94da5d9da66e82f61e, type: 3}
+    _sound: {fileID: 8300000, guid: ba9c2200cb8c5794a81fbe295f674084, type: 3}
+    _hudFieldOfView: 0.6
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: outfit_animation_backpack_unequip_killer_hud|anm_use
+    _hands: {fileID: 3983489152822407541, guid: 4d4b0cd6ce730af4086abc2c9913b71a, type: 3}
+    _itemModel: {fileID: 3998273165791827342, guid: 2a7d82c0fba190147aa3a217f3aca92b, type: 3}
+    _item: {fileID: -7395252788654334615, guid: 2fa8f613d76ccb74a8c6868c630084d1, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: 2de13265251a4c94da5d9da66e82f61e, type: 3}
+    _sound: {fileID: 8300000, guid: ba9c2200cb8c5794a81fbe295f674084, type: 3}
+    _hudFieldOfView: 0.6
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: outfit_animation_backpack_unequip_monolith_hud|anm_use
+    _hands: {fileID: 3983489152822407541, guid: 4d4b0cd6ce730af4086abc2c9913b71a, type: 3}
+    _itemModel: {fileID: -8660101622409907736, guid: 2c1b6958acc5d2a41a171814199db397, type: 3}
+    _item: {fileID: -7395252788654334615, guid: fcae9d3ba85e92441a4f3432838703ed, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: 2de13265251a4c94da5d9da66e82f61e, type: 3}
+    _sound: {fileID: 8300000, guid: ba9c2200cb8c5794a81fbe295f674084, type: 3}
+    _hudFieldOfView: 0.6
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: outfit_animation_backpack_unequip_renegade_hud|anm_use
+    _hands: {fileID: 3983489152822407541, guid: 4d4b0cd6ce730af4086abc2c9913b71a, type: 3}
+    _itemModel: {fileID: 6558471269367817709, guid: db299739f5d52c54681147fbb4ece04f, type: 3}
+    _item: {fileID: -7395252788654334615, guid: 186241c3422aa6d4ca82f377a1a993bb, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: 2de13265251a4c94da5d9da66e82f61e, type: 3}
+    _sound: {fileID: 8300000, guid: ba9c2200cb8c5794a81fbe295f674084, type: 3}
+    _hudFieldOfView: 0.6
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: outfit_animation_backpack_unequip_stalker_hud|anm_use
+    _hands: {fileID: 3983489152822407541, guid: 4d4b0cd6ce730af4086abc2c9913b71a, type: 3}
+    _itemModel: {fileID: 2559224551671683047, guid: 1f2f0fd8ade923f4f827a969cbda16e0, type: 3}
+    _item: {fileID: -7395252788654334615, guid: 85c954da8d1180540b5c5cddb2731724, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: 2de13265251a4c94da5d9da66e82f61e, type: 3}
+    _sound: {fileID: 8300000, guid: ba9c2200cb8c5794a81fbe295f674084, type: 3}
+    _hudFieldOfView: 0.6
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: outfit_animation_backpack_unequip_zombied_hud|anm_use
+    _hands: {fileID: 3983489152822407541, guid: 4d4b0cd6ce730af4086abc2c9913b71a, type: 3}
+    _itemModel: {fileID: 3949383891459369072, guid: b6d44b7f86696c644b21cb379373bd0b, type: 3}
+    _item: {fileID: -7395252788654334615, guid: e8f0e53c6ddcadc44aba4a82abec5bd7, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: 2de13265251a4c94da5d9da66e82f61e, type: 3}
+    _sound: {fileID: 8300000, guid: ba9c2200cb8c5794a81fbe295f674084, type: 3}
+    _hudFieldOfView: 0.6
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: protector_headgear_hud|anm_equip
+    _hands: {fileID: -4813484468180576642, guid: 1573d48182d8edf4c8665f3e7ad93e03, type: 3}
+    _itemModel: {fileID: 1317121627375010913, guid: 021a4d83389b61d48b6d79e75f57fc65, type: 3}
+    _item: {fileID: -4970246011599412503, guid: 3871580f98250534b8453b5485cc89e5, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: 84c05eea21832ca45b8670fe3d490acb, type: 3}
+    _sound: {fileID: 8300000, guid: 928e9130f36a22e439b18d1c31e6a29c, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: protector_headgear_hud|anm_unequip
+    _hands: {fileID: 4973017959211643805, guid: 1573d48182d8edf4c8665f3e7ad93e03, type: 3}
+    _itemModel: {fileID: 1317121627375010913, guid: 021a4d83389b61d48b6d79e75f57fc65, type: 3}
+    _item: {fileID: 5323600940319566944, guid: 3871580f98250534b8453b5485cc89e5, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: c4ad111fabdc03f42a9f34e2709d36ab, type: 3}
+    _sound: {fileID: 8300000, guid: 5bd5f62e667183549acda433f4f30cd3, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: respirator_headgear_hud|anm_equip
+    _hands: {fileID: -5785514788467970747, guid: 65b7a84e7aefea74a99743d0e0874bdb, type: 3}
+    _itemModel: {fileID: 4689124680985890976, guid: 3925e51b095a1e649a8cd6e8cf506fb3, type: 3}
+    _item: {fileID: -8170525086474852585, guid: f37ca6a53e7742e4884af68880688a6f, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: b6498da4c7cdf864f8da5dc74ccda6a8, type: 3}
+    _sound: {fileID: 8300000, guid: a2a320f9524b39b47a53c7720b8f3a79, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: respirator_headgear_hud|anm_unequip
+    _hands: {fileID: -632354557588199137, guid: 65b7a84e7aefea74a99743d0e0874bdb, type: 3}
+    _itemModel: {fileID: 4689124680985890976, guid: 3925e51b095a1e649a8cd6e8cf506fb3, type: 3}
+    _item: {fileID: 8943913599977530294, guid: f37ca6a53e7742e4884af68880688a6f, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: 192b16f8cadcbb24597804e69ef735e3, type: 3}
+    _sound: {fileID: 8300000, guid: 792dfe1c368d6fe4aa8b2beaf0390f85, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  _fadeSections:
+  - gasmask_headgear_hud
+  - helm_ach7_headgear_hud
+  - helm_ach7ex_headgear_hud
+  - helm_battle_headgear_hud
+  - helm_exo_headgear_hud
+  - helm_hardhat_headgear_hud
+  - helm_hardhat_snag_headgear_hud
+  - helm_m40_headgear_hud
+  - helm_m50_headgear_hud
+  - helm_metro_headgear_hud
+  - helm_ppm88_headgear_hud
+  - helm_protective_headgear_hud
+  - helm_ranger_headgear_hud
+  - helm_respirator_gp5_headgear_hud
+  - helm_respirator_headgear_hud
+  - helm_respirator_old_headgear_hud
+  - helm_spartan_headgear_hud
+  - helm_tactic_headgear_hud
+  - helmet_headgear_hud
+  - helmet_mask_headgear_hud
+  - protector_headgear_hud
+  _headgearBlacklist:
+  - helm_bandana
+  - helm_cloth_mask
+  - helm_rp_bala
+  _outfitEnabled: 1
+  _backpackEnabled: 1
+  _headgearEnabled: 1
+  _outfitMemory: 1
+  _outfitMemorySize: 3
+  _alwaysShort: 0
+  _headgearSpeed: 1

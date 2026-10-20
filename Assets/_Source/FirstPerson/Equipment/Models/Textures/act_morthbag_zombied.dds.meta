@@ -1,0 +1,23 @@
+fileFormatVersion: 2
+guid: 6649d4f685c6a094babf6f863a40cceb
+IHVImageFormatImporter:
+  externalObjects: {}
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 0
+    wrapV: 0
+    wrapW: 0
+  isReadable: 0
+  sRGBTexture: 1
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  ignoreMipmapLimit: 0
+  mipmapLimitGroupName: 
+  userData: "xray-asset:{\"_key\":\"textures/act/act_morthbag_zombied.dds#albedo\",\"_role\":\"Albedo\",\"_source\":\"[\u0410\u043D\u0438\u043C\u0430\u0446\u0438\u0438]
+    FDDA 0.9b\",\"_sourcePath\":\"D:\\\\GRA2.5\\\\MO2\\\\mods\\\\[\u0410\u043D\u0438\u043C\u0430\u0446\u0438\u0438]
+    FDDA 0.9b\\\\gamedata\\\\textures\\\\act\\\\act_morthbag_zombied.dds\",\"_stamp\":\"11199288:637923889820000000\"}"
+  assetBundleName: 
+  assetBundleVariant: 

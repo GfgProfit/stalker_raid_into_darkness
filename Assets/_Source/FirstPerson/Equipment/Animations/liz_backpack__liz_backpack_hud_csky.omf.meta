@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: ab03bb584c026bb428df093b8fd30f4f
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects: {}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: f8a3322209271f944917d9c014d31962, type: 3}
+  _rigGuid: a4d2abb4c164aaa468eeb2e9bbd60554
+  _autoDetectRig: 0
+  _loopMode: 0
+  _excludedMotions: []

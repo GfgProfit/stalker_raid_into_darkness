@@ -1,0 +1,35 @@
+fileFormatVersion: 2
+guid: f2b20743a91dd5a4ba65c76bd2ea21b1
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: headgear_hud\hardhat_b_base|models\model
+    second: {fileID: 2100000, guid: 1d4f6262022735941812ef1678d1d527, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: headgear_hud\hardhat_b_glass_base|models\transparent
+    second: {fileID: 2100000, guid: d6adfa1578d5c414e9e2d024c84e93d1, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: headgear_hud\hardhat_b_googles_base|models\model
+    second: {fileID: 2100000, guid: 451d405ad1bbc93408c6b00e8929ffbd, type: 2}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 61e536e21e96f284493f2969a9250cdf, type: 3}
+  _scale: 1
+  _importMaterials: 1
+  _texturesFolder: 
+  _searchTexturesByName: 1
+  _importEmbeddedMotions: 1
+  _embeddedLoopMode: 0
+  _addAnimator: 1
+  _readableMeshes: 0
+  _updateWhenOffscreen: 0
+  _autoResolveResources: 1

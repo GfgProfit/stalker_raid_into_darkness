@@ -85,7 +85,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
                 return TryPickUp(worldItem);
             }
 
-            if (pickup.IsPlaying)
+            if (pickup.IsPlaying || (_controller.Player.Rig != null && _controller.Player.Rig.HandsBusy))
             {
                 return false;
             }

@@ -66,6 +66,11 @@ namespace XRay.Importer.Core.Anm
             return motion;
         }
 
+        public static XRayAnmEnvelope ReadEnvelope(XRayReader reader, List<string> warnings)
+        {
+            return ReadEnvelope(reader, XRayAnmFormat.VERSION_5, 0, warnings);
+        }
+
         private static XRayAnmEnvelope ReadEnvelope(XRayReader reader, ushort version, int channel, List<string> warnings)
         {
             var envelope = new XRayAnmEnvelope();

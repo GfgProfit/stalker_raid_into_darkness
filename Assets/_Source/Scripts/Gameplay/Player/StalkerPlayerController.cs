@@ -17,6 +17,8 @@ namespace RaidIntoDarkness.Player
         [SerializeField] private StalkerBodyAnimationPlayer _bodyPlayer;
         [SerializeField] private FirstPersonRig _rig;
         [SerializeField] private FirstPersonPickupAnimator _pickup;
+        [SerializeField] private FirstPersonHudAnimator _hudAnimator;
+        [SerializeField] private StalkerScreenFade _screenFade;
         [SerializeField] private StalkerCameraEffects _cameraEffects;
         [SerializeField] private StalkerFootstepSynchronizer _footsteps;
         [SerializeField] private StalkerPlayerFoley _foley;
@@ -25,6 +27,7 @@ namespace RaidIntoDarkness.Player
 
         private string _appliedSection;
         private int _outfitIndex = -1;
+        private float _savedHudFieldOfView = -1.0f;
 
         public StalkerMovementProfile Profile => _profile;
         public StalkerMovementMotor Motor => _motor;
@@ -33,6 +36,8 @@ namespace RaidIntoDarkness.Player
         public StalkerBodyAnimationPlayer BodyPlayer => _bodyPlayer;
         public FirstPersonRig Rig => _rig;
         public FirstPersonPickupAnimator Pickup => _pickup;
+        public FirstPersonHudAnimator HudAnimator => _hudAnimator;
+        public StalkerScreenFade ScreenFade => _screenFade;
         public StalkerCameraEffects CameraEffects => _cameraEffects;
         public StalkerFootstepSynchronizer Footsteps => _footsteps;
         public StalkerPlayerFoley Foley => _foley;
@@ -89,6 +94,12 @@ namespace RaidIntoDarkness.Player
             {
                 _rig.OutfitApplied += OnOutfitApplied;
             }
+
+            if (_hudAnimator != null)
+            {
+                _hudAnimator.Started += OnHudMotionStarted;
+                _hudAnimator.Stopped += OnHudMotionStopped;
+            }
         }
 
         private void Start()
@@ -101,6 +112,12 @@ namespace RaidIntoDarkness.Player
             if (_rig != null)
             {
                 _rig.OutfitApplied -= OnOutfitApplied;
+            }
+
+            if (_hudAnimator != null)
+            {
+                _hudAnimator.Started -= OnHudMotionStarted;
+                _hudAnimator.Stopped -= OnHudMotionStopped;
             }
 
             if (_motor != null)
@@ -279,6 +296,34 @@ namespace RaidIntoDarkness.Player
             if (bodyChanged || !_bodyPlayer.IsBound || _bodyPlayer.Body != _rig.Body)
             {
                 _bodyPlayer.Bind(_rig.Body, entry.BodyAnimations);
+            }
+        }
+
+        private void OnHudMotionStarted(FirstPersonHudMotion motion)
+        {
+            if (_cameraEffects != null && motion.CameraEffect != null)
+            {
+                _cameraEffects.PlayItemEffect(motion.CameraEffect);
+            }
+
+            if (_camera != null && motion.HudFieldOfView > 0.0f)
+            {
+                _savedHudFieldOfView = _camera.HudFieldOfView;
+                _camera.HudFieldOfView = motion.HudFieldOfView;
+            }
+        }
+
+        private void OnHudMotionStopped(FirstPersonHudMotion motion, bool completed)
+        {
+            if (!completed && _cameraEffects != null)
+            {
+                _cameraEffects.StopItemEffect();
+            }
+
+            if (_camera != null && _savedHudFieldOfView > 0.0f)
+            {
+                _camera.HudFieldOfView = _savedHudFieldOfView;
+                _savedHudFieldOfView = -1.0f;
             }
         }
 

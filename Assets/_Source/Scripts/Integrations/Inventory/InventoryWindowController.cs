@@ -46,6 +46,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
         private EquipmentStatusPresenter _statusPresenter;
         private FirstPersonOutfitBinder _outfitBinder;
         private OutfitHelmetRule _helmetRule;
+        private EquipmentAnimationQueue _equipmentAnimations;
         private ItemInstance _statsHovered;
         private int _restoreFrame = -1;
         private bool _gameplayBlocked;
@@ -60,6 +61,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
         public bool GameplayBlocked => _gameplayBlocked;
         public bool IsStashVisible => IsOpen && _window.SecondaryVisible;
         public InventorySortingPlus Sorting => _sorting;
+        public EquipmentAnimationQueue EquipmentAnimations => _equipmentAnimations;
 
         public void Configure(InventoryWindow window, PlayerInventoryRuntime inventory, StalkerPlayerController player, InputActionReference toggleInventory, InputActionReference closeInventory)
         {
@@ -176,6 +178,11 @@ namespace RaidIntoDarkness.Integrations.Inventory
             if (_restoreFrame >= 0 && Time.frameCount > _restoreFrame)
             {
                 RestoreGameplay();
+            }
+
+            if (_equipmentAnimations != null)
+            {
+                _equipmentAnimations.Tick(Time.deltaTime);
             }
 
             if (_window == null)
@@ -299,6 +306,12 @@ namespace RaidIntoDarkness.Integrations.Inventory
                 _helmetRule.Dispose();
                 _helmetRule = null;
             }
+
+            if (_equipmentAnimations != null)
+            {
+                _equipmentAnimations.Dispose();
+                _equipmentAnimations = null;
+            }
         }
 
         private void EnsureBound()
@@ -325,6 +338,11 @@ namespace RaidIntoDarkness.Integrations.Inventory
             {
                 _outfitBinder = new FirstPersonOutfitBinder(_window, _player);
                 _outfitBinder.Refresh();
+            }
+
+            if (_player != null && _player.HudAnimator != null && _player.HudAnimator.Library != null)
+            {
+                _equipmentAnimations = new EquipmentAnimationQueue(_window, _player);
             }
 
             if (_player != null && _player.Motor != null && _player.Motor.Condition != null)

@@ -237,12 +237,16 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             Assert.That(((RectTransform)window.Tooltip.transform).sizeDelta.x, Is.GreaterThanOrEqualTo(440f));
             window.Tooltip.Hide();
             window.EquipItem(picked);
+            Assert.That(player.HudAnimator.IsPlaying, Is.True, "outfit equip animation did not start");
+            Assert.That(player.CameraController.HudFieldOfView, Is.EqualTo(player.HudAnimator.Current.HudFieldOfView).Within(0.0001f), "outfit animation hud_fov was not applied");
             yield return null;
             Assert.That(picked.ContainerId, Is.EqualTo(EQUIPMENT));
             InventoryEquipmentSlot equippedSlot = ((InventoryEquipmentPanel)equipmentGrid).GetSlotView(picked.Location.SlotId);
             Assert.That(equippedSlot, Is.Not.Null, "equipment panel has no slot object for " + picked.Location.SlotId);
             Assert.That(equippedSlot.Icon.sprite, Is.SameAs(pickedDefinition.FallbackIcon), "equipped icon is not shown in the slot icon image");
             Assert.That(equippedSlot.Icon.isActiveAndEnabled && equippedSlot.Icon.preserveAspect, Is.True, "equipped icon is hidden");
+            yield return WaitForEquipmentAnimations(controller);
+            Assert.That(player.CameraController.HudFieldOfView, Is.EqualTo(player.Profile.Camera.HudFieldOfView).Within(0.0001f), "hud_fov was not restored");
             window.UnequipItem(picked);
             yield return null;
             Assert.That(equippedSlot.Icon.isActiveAndEnabled, Is.False, "unequipped slot still shows the icon");
@@ -270,6 +274,103 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             yield return null;
             Assert.That(player.GameplayInputBlocked, Is.False);
             Assert.That(Object.FindObjectsByType<EventSystem>(FindObjectsInactive.Include, FindObjectsSortMode.None).Length, Is.EqualTo(1));
+        }
+
+        [UnityTest]
+        public IEnumerator HeadgearAndBackpackPlayAnimationsBeforeMoving()
+        {
+            SceneManager.LoadScene(SCENE, LoadSceneMode.Single);
+            yield return null;
+            yield return new WaitForSeconds(1.0f);
+
+            InventoryWindowController controller = Object.FindAnyObjectByType<InventoryWindowController>();
+            StalkerPlayerController player = Object.FindAnyObjectByType<StalkerPlayerController>();
+            yield return Tap(_keyboard.tabKey);
+            InventoryWindow window = controller.Window;
+            InventoryModel model = controller.Inventory.Model;
+            EquipmentAnimationQueue queue = controller.EquipmentAnimations;
+            Assert.That(queue, Is.Not.Null, "equipment animations are not bound");
+            Assert.That(player.HudAnimator, Is.Not.Null, "FPS_Player has no FirstPersonHudAnimator");
+            Assert.That(player.ScreenFade, Is.Not.Null, "FPS_Player has no StalkerScreenFade");
+            yield return WaitForEquipmentAnimations(controller);
+            ItemInstance outfit = EquipmentStatsFormatter.FindEquipped(window, EquipmentStatsFormatter.OUTFIT_CATEGORY);
+
+            if (outfit != null)
+            {
+                window.UnequipItemNow(outfit, InventoryUnequipTarget.Auto(window.PrimaryContainerId));
+            }
+
+            ItemInstance oldHat = EquipmentStatsFormatter.FindEquipped(window, EquipmentStatsFormatter.HELMET_CATEGORY);
+
+            if (oldHat != null)
+            {
+                window.UnequipItemNow(oldHat, InventoryUnequipTarget.Auto(window.PrimaryContainerId));
+            }
+
+            ItemInstance hat = AddItem(model, controller, window, "helm_hardhat");
+            window.EquipItem(hat);
+            Assert.That(hat.ContainerId, Is.Not.EqualTo(EQUIPMENT), "helmet was equipped before its animation");
+            Assert.That(queue.IsInUse(hat), Is.True);
+            Assert.That(window.FindGrid(BACKPACK).GetItemView(hat).Background.color, Is.EqualTo(EquipmentAnimationQueue.IN_USE_TINT), "queued helmet is not highlighted");
+            Assert.That(player.HudAnimator.IsPlaying, Is.True, "helmet equip animation did not start");
+            Assert.That(player.HudAnimator.Item, Is.Not.Null, "helmet hud model is not shown");
+            Assert.That(player.CameraEffects.IsItemEffectPlaying, Is.True, "helmet camera effect did not start");
+            bool faded = false;
+            float timeout = Time.time + 30.0f;
+
+            while (queue.IsBusy && Time.time < timeout)
+            {
+                faded |= player.ScreenFade.IsPlaying;
+                yield return null;
+            }
+
+            Assert.That(hat.ContainerId, Is.EqualTo(EQUIPMENT), "helmet was not equipped after its animation");
+            Assert.That(faded, Is.True, "fade_use helmet did not play deimos_short.ppe");
+            Assert.That(queue.IsInUse(hat), Is.False);
+            window.UnequipItem(hat);
+            Assert.That(player.ScreenFade.IsPlaying, Is.True, "unequip did not start with the fade");
+            Assert.That(hat.ContainerId, Is.EqualTo(EQUIPMENT));
+            yield return WaitForEquipmentAnimations(controller);
+            Assert.That(hat.ContainerId, Is.EqualTo(BACKPACK), "helmet was not unequipped");
+
+            ItemInstance pack = AddItem(model, controller, window, "itm_backpack");
+            window.EquipItem(pack);
+            Assert.That(pack.ContainerId, Is.Not.EqualTo(EQUIPMENT));
+            Assert.That(player.HudAnimator.IsPlaying, Is.True, "backpack animation did not start");
+            Assert.That(player.HudAnimator.Item, Is.Not.Null, "backpack hud model is not shown");
+            yield return WaitForEquipmentAnimations(controller);
+            Assert.That(pack.ContainerId, Is.EqualTo(EQUIPMENT), "backpack was not equipped after its animation");
+            Assert.That(player.Rig.Hands.activeSelf, Is.False, "hands stay visible after equipment animations");
+        }
+
+        private static ItemInstance AddItem(InventoryModel model, InventoryWindowController controller, InventoryWindow window, string definitionName)
+        {
+            ItemDefinition found = null;
+
+            foreach (ItemDefinition definition in controller.Inventory.Database.Definitions)
+            {
+                if (definition.name == definitionName)
+                {
+                    found = definition;
+                }
+            }
+
+            Assert.That(found, Is.Not.Null, definitionName + " is missing in the item database");
+            ItemInstance item = model.CreateItem(found);
+            Assert.That(model.TryAddAuto(item, window.PrimaryContainerId).Success, Is.True, "no room for " + definitionName);
+            return item;
+        }
+
+        private static IEnumerator WaitForEquipmentAnimations(InventoryWindowController controller)
+        {
+            float timeout = Time.time + 30.0f;
+
+            while (controller.EquipmentAnimations != null && controller.EquipmentAnimations.IsBusy && Time.time < timeout)
+            {
+                yield return null;
+            }
+
+            Assert.That(controller.EquipmentAnimations == null || controller.EquipmentAnimations.IsBusy == false, Is.True, "equipment animations did not finish");
         }
 
         private IEnumerator Tap(ButtonControl button)

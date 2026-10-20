@@ -1,0 +1,23 @@
+fileFormatVersion: 2
+guid: 0d5895fc0832d944da07b5d8236fa11e
+IHVImageFormatImporter:
+  externalObjects: {}
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 0
+    wrapV: 0
+    wrapW: 0
+  isReadable: 0
+  sRGBTexture: 1
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  ignoreMipmapLimit: 0
+  mipmapLimitGroupName: 
+  userData: "xray-asset:{\"_key\":\"textures/headgear_hud/m50_hud_lens_base.dds#albedo\",\"_role\":\"Albedo\",\"_source\":\"[\u0410\u043D\u0438\u043C\u0430\u0446\u0438\u0438]
+    FDDA Redone 1.4.1\",\"_sourcePath\":\"D:\\\\GRA2.5\\\\MO2\\\\mods\\\\[\u0410\u043D\u0438\u043C\u0430\u0446\u0438\u0438]
+    FDDA Redone 1.4.1\\\\gamedata\\\\textures\\\\headgear_hud\\\\m50_hud_lens_base.dds\",\"_stamp\":\"131200:638098880920000000\"}"
+  assetBundleName: 
+  assetBundleVariant: 

@@ -34,23 +34,23 @@ namespace RaidIntoDarkness.Integrations.Inventory
 
         private sealed class Request
         {
-            public RequestKind Kind;
-            public ItemInstance Item;
-            public SlotDefinition Slot;
-            public InventoryUnequipTarget Target;
+            public RequestKind Kind { get; set; }
+            public ItemInstance Item { get; set; }
+            public SlotDefinition Slot { get; set; }
+            public InventoryUnequipTarget Target { get; set; }
         }
 
         private sealed class Step
         {
-            public StepKind Kind;
-            public Action Move;
-            public FirstPersonHudMotion Motion;
-            public float Speed;
-            public bool FadeAtEnd;
-            public bool Started;
-            public bool FadeStarted;
-            public bool FadeStopped;
-            public float Time;
+            public StepKind Kind { get; set; }
+            public Action Move { get; set; }
+            public FirstPersonHudMotion Motion { get; set; }
+            public float Speed { get; set; }
+            public bool FadeAtEnd { get; set; }
+            public bool Started { get; set; }
+            public bool FadeStarted { get; set; }
+            public bool FadeStopped { get; set; }
+            public float Time { get; set; }
         }
 
         private readonly InventoryWindow _window;

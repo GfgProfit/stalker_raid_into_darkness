@@ -25,7 +25,7 @@ description: Use when GRA/Anomaly assets must be brought into the Unity project 
 | Каталог костюмов → руки/тело | `Assets/_Source/FirstPerson/Outfits/OutfitCatalog.asset` |
 | Мировые модели и префабы предметов | `Assets/_Source/Items/{Outfits,Helmets,Backpacks}/{Models,Prefabs}` |
 | Определения предметов | `Assets/_Source/Items/Definitions/{Armor,Head,Backpack}` |
-| Иконки | `Assets/_Source/Items/Icons` — из `[Интерфейс] HD GRA Иконки`, нарезка через 2D Sprite; у `ItemDefinition` есть поле-override иконки |
+| Иконки (кроме оружия и модулей — их делает генератор) | `Assets/_Source/Items/Icons` — из `[Интерфейс] HD GRA Иконки`, нарезка через 2D Sprite; у `ItemDefinition` есть поле-override иконки |
 | Камерные `.anm` движения | `Assets/_Source/Settings/Player/Camera/Anm/` |
 
 Импортёр сам кладёт `Textures/` и `Materials/` рядом с моделью — не дублируй их вручную.
@@ -64,7 +64,7 @@ description: Use when GRA/Anomaly assets must be brought into the Unity project 
 
 ## Чего не делать
 
-- Не импортировать оружие и его анимации, пока об этом не попросили.
+- Не импортировать оружие и его анимации, пока об этом не попросили. Для работы с оружием и модулями используй скилл `weapon-iwp` (модели оружия и анимации — из CoC IWP, характеристики и модели модулей — из GRA, иконки оружия и модулей делает генератор).
 - Не удалять кости, не делать retarget, не менять rig рук.
 - Не плодить дубликаты текстур, материалов, мешей и клипов (кроме копий OMF под разные rig).
 - Не перезаписывать ручные настройки материалов и префабов пользователя.

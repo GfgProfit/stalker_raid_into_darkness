@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using RaidIntoDarkness.Effects;
 using RaidIntoDarkness.FirstPerson;
 using RaidIntoDarkness.Player;
 using UnityEngine;
@@ -46,6 +47,7 @@ namespace RaidIntoDarkness.Weapons
         private Transform _modelRoot;
         private Transform _muzzle;
         private bool _muzzleFromView;
+        private XRayParticleGroupPlayer _flame;
         private Vector3 _savedHandsPosition;
         private Quaternion _savedHandsRotation;
         private FirstPersonWeaponMotionKind _loopKind;
@@ -287,6 +289,7 @@ namespace RaidIntoDarkness.Weapons
 
             ResetModelRoot();
             ApplyHandsOffset();
+            UpdateFlame();
         }
 
         private void Subscribe()
@@ -541,10 +544,26 @@ namespace RaidIntoDarkness.Weapons
                 return;
             }
 
-            Transform direction = _muzzleFromView ? muzzle : _modelRoot != null ? _modelRoot : _model.transform;
-            Quaternion rotation = Quaternion.LookRotation(direction.forward, direction.up);
-            _effects.Play(asset.FlameParticles, muzzle, muzzle.position, rotation);
+            Quaternion rotation = GetMuzzleRotation(muzzle);
+            _flame = _effects.Play(asset.FlameParticles, muzzle, muzzle.position, rotation);
             _effects.Play(asset.SmokeParticles, null, muzzle.position, rotation);
+        }
+
+        private Quaternion GetMuzzleRotation(Transform muzzle)
+        {
+            Transform axis = _muzzleFromView ? muzzle : _modelRoot != null ? _modelRoot : _model.transform;
+            Vector3 forward = axis.TransformVector(Vector3.forward);
+            return forward.sqrMagnitude > 0.0f ? Quaternion.LookRotation(forward, Vector3.up) : axis.rotation;
+        }
+
+        private void UpdateFlame()
+        {
+            if (_flame == null || _muzzle == null || !_flame.IsPlaying || _flame.transform.parent != _muzzle)
+            {
+                return;
+            }
+
+            _flame.transform.SetPositionAndRotation(_muzzle.position, GetMuzzleRotation(_muzzle));
         }
 
         private void StartReload(FirstPersonWeaponAsset asset, Ammo ammo)
@@ -930,6 +949,7 @@ namespace RaidIntoDarkness.Weapons
             _modelRoot = null;
             _muzzle = null;
             _muzzleFromView = false;
+            _flame = null;
             FirstPersonRig rig = _player != null ? _player.Rig : null;
             if (_boundHands != null)
             {

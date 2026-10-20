@@ -119,10 +119,23 @@ namespace RaidIntoDarkness.Weapons
             for (int i = 0; i < transforms.Length; i++)
             {
                 mask.SetTransformPath(i, GetPath(root, transforms[i]));
-                mask.SetTransformActive(i, active.Contains(transforms[i].name));
+                mask.SetTransformActive(i, IsMasked(root, transforms[i], active));
             }
 
             return mask;
+        }
+
+        private static bool IsMasked(Transform root, Transform target, HashSet<string> bones)
+        {
+            for (Transform current = target; current != null && current != root; current = current.parent)
+            {
+                if (bones.Contains(current.name))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private static string GetPath(Transform root, Transform target)

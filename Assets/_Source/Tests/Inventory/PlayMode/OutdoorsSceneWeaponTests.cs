@@ -3,6 +3,7 @@ using Inventory;
 using Inventory.UI;
 using NUnit.Framework;
 using RaidIntoDarkness.Effects;
+using RaidIntoDarkness.FirstPerson;
 using RaidIntoDarkness.Player;
 using RaidIntoDarkness.Weapons;
 using TMPro;
@@ -20,6 +21,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
         private const string BACKPACK = "Backpack";
         private const string AUG = "wpn_aug_a3";
         private const float TIMEOUT = 5.0f;
+        private const string LEFT_FINGER = "bip01_l_finger11";
 
         private Keyboard _keyboard;
         private Mouse _mouse;
@@ -123,6 +125,22 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             Assert.That(weapons.Magazine, Is.EqualTo(30));
             Assert.That(weapons.Reserve, Is.EqualTo(90 - (30 - afterBurst)));
 
+            Transform finger = FindChild(player.Rig.Hands.transform, LEFT_FINGER);
+            Assert.That(finger, Is.Not.Null, "hands have no " + LEFT_FINGER);
+            Quaternion grip = finger.localRotation;
+            FirstPersonPickupAnimator pickup = player.Pickup;
+            Assert.That(pickup.TryPlay(FirstPersonPickupHand.Left, null, null), Is.True, "pickup did not start over the weapon");
+            Assert.That(pickup.IsOverlay, Is.True);
+            float maxAngle = 0.0f;
+            while (pickup.IsPlaying)
+            {
+                maxAngle = Mathf.Max(maxAngle, Quaternion.Angle(grip, finger.localRotation));
+                yield return null;
+            }
+
+            Assert.That(maxAngle, Is.GreaterThan(5.0f), "left hand fingers ignore the pickup overlay");
+            Assert.That(weapons.State, Is.EqualTo(FirstPersonWeaponState.Ready));
+
             Press(_mouse.rightButton, queueEventOnly: true);
             yield return new WaitForSeconds(0.8f);
             Assert.That(weapons.IsAiming, Is.True);
@@ -137,6 +155,19 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             Assert.That(player.Rig.HandsBusy, Is.False);
             Assert.That(player.Combat, Is.False);
             Assert.That(ammoView.Text.gameObject.activeInHierarchy, Is.False);
+        }
+
+        private static Transform FindChild(Transform root, string childName)
+        {
+            foreach (Transform child in root.GetComponentsInChildren<Transform>(true))
+            {
+                if (child.name == childName)
+                {
+                    return child;
+                }
+            }
+
+            return null;
         }
 
         private static bool IsEffectPlaying(string prefabName)

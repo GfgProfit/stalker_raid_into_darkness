@@ -36,6 +36,7 @@ namespace RaidIntoDarkness.FirstPerson
         private AnimationLayerMixerPlayable _layers;
         private AnimationClipPlayable _clip;
         private GameObject _boundHands;
+        private IFirstPersonHandsOverlay _overlay;
         private Action _onTake;
         private Action<bool> _onFinished;
         private float _elapsed;
@@ -47,6 +48,8 @@ namespace RaidIntoDarkness.FirstPerson
         public float Elapsed => _elapsed;
         public float Duration => _duration;
         public bool HasTaken => _taken;
+        public bool IsOverlay => _overlay != null;
+        public bool CanOverlay => _rig != null && _rig.HandsOwner is IFirstPersonHandsOverlay && _leftHandWithWeapon != null;
 
         public float Speed
         {
@@ -68,6 +71,11 @@ namespace RaidIntoDarkness.FirstPerson
 
         public bool TryPlay(FirstPersonPickupHand hand, Action onTake, Action<bool> onFinished)
         {
+            if (!IsPlaying && _rig != null && _rig.HandsBusy && _rig.HandsOwner is IFirstPersonHandsOverlay overlay)
+            {
+                return TryPlayOverlay(overlay, onTake, onFinished);
+            }
+
             AnimationClip clip = GetClip(hand);
             if (IsPlaying || clip == null || _rig == null || !_rig.TryAcquireHands(this))
             {
@@ -109,7 +117,11 @@ namespace RaidIntoDarkness.FirstPerson
             }
 
             _elapsed += deltaTime;
-            _graph.Evaluate(deltaTime);
+            if (_overlay == null)
+            {
+                _graph.Evaluate(deltaTime);
+            }
+
             if (!_taken && _elapsed >= _duration * _takeMoment)
             {
                 _taken = true;
@@ -170,17 +182,43 @@ namespace RaidIntoDarkness.FirstPerson
         {
             Action<bool> finished = _onFinished;
             bool taken = _taken;
+            IFirstPersonHandsOverlay overlay = _overlay;
             IsPlaying = false;
             _onTake = null;
             _onFinished = null;
+            _overlay = null;
             DestroyGraph();
-            if (_rig != null)
+            if (overlay != null)
+            {
+                overlay.StopOverlay();
+            }
+            else if (_rig != null)
             {
                 _rig.SetHandsVisible(false);
                 _rig.ReleaseHands(this);
             }
 
             finished?.Invoke(taken);
+        }
+
+        private bool TryPlayOverlay(IFirstPersonHandsOverlay overlay, Action onTake, Action<bool> onFinished)
+        {
+            AnimationClip clip = _leftHandWithWeapon;
+            if (clip == null || _rig.Hands == null || !overlay.TryPlayOverlay(clip, _speed))
+            {
+                return false;
+            }
+
+            _overlay = overlay;
+            _boundHands = _rig.Hands;
+            _elapsed = 0.0f;
+            _duration = clip.length / _speed;
+            _taken = false;
+            _onTake = onTake;
+            _onFinished = onFinished;
+            CurrentHand = FirstPersonPickupHand.LeftWithWeapon;
+            IsPlaying = true;
+            return true;
         }
 
         private void CreateGraph(GameObject hands, AnimationClip clip)

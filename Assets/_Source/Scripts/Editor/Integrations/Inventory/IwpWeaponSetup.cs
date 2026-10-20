@@ -10,6 +10,7 @@ using Inventory.Editor;
 using RaidIntoDarkness.FirstPerson;
 using RaidIntoDarkness.Player;
 using RaidIntoDarkness.Player.Editor;
+using RaidIntoDarkness.Weapons;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -34,9 +35,9 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
         public const string HANDS_MOTION_PREFIX = "aug_";
 
         private const string WORLD_MODEL = "meshes/dynamics/weapons/wpn_aug/wpn_aug_a3.ogf";
-        private const string HUD_MODEL = "meshes/dynamics/weapons/wpn_aug/wpn_aug_a3_hud.ogf";
-        private const string WEAPON_MOTIONS = "meshes/dynamics/weapons/wpn_aug/wpn_aug_a3_hud_animation.omf";
-        private const string HANDS_MOTIONS = "meshes/dynamics/weapons/wpn_fn2000/wpn_hand_fn2000_hud_animation.omf";
+        internal const string HUD_MODEL = "meshes/dynamics/weapons/wpn_aug/wpn_aug_a3_hud.ogf";
+        internal const string WEAPON_MOTIONS = "meshes/dynamics/weapons/wpn_aug/wpn_aug_a3_hud_animation.omf";
+        internal const string HANDS_MOTIONS = "meshes/dynamics/weapons/wpn_fn2000/wpn_hand_fn2000_hud_animation.omf";
         private const string MENU = "Tools/Inventory/Setup Test Weapon (AUG A3)";
         private const string LOG = "[IwpWeapon] ";
         private const string RIFLE_TAG = InventoryDemoContentBuilder.RIFLE_TAG;
@@ -150,7 +151,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
             EditorApplication.Exit(success ? 0 : 1);
         }
 
-        private static bool CopyFromIwp(IReadOnlyList<string> sources, IReadOnlyList<string> targets)
+        internal static bool CopyFromIwp(IReadOnlyList<string> sources, IReadOnlyList<string> targets)
         {
             foreach (string target in targets)
             {
@@ -189,7 +190,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
             return true;
         }
 
-        private static void AssignRig(string motionsPath, string rigPath)
+        internal static void AssignRig(string motionsPath, string rigPath)
         {
             string rigGuid = AssetDatabase.AssetPathToGUID(rigPath);
             var importer = AssetImporter.GetAtPath(motionsPath) as XRayOmfImporter;
@@ -365,6 +366,12 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
         private static GameObject CreateCleanVisual(GameObject model, string path, StringBuilder log)
         {
             StalkerXRaySources.EnsureFolder(VISUALS_FOLDER);
+            var existing = AssetDatabase.LoadAssetAtPath<GameObject>(path);
+            FirstPersonWeaponView view = existing != null ? existing.GetComponent<FirstPersonWeaponView>() : null;
+            Transform muzzle = view != null ? view.Muzzle : null;
+            string muzzleParent = muzzle != null && muzzle.parent != null ? muzzle.parent.name : null;
+            Vector3 muzzlePosition = muzzle != null ? muzzle.localPosition : Vector3.zero;
+            Quaternion muzzleRotation = muzzle != null ? muzzle.localRotation : Quaternion.identity;
             var root = (GameObject)PrefabUtility.InstantiatePrefab(model);
             var hidden = new List<string>();
 
@@ -377,6 +384,11 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
                         renderer.gameObject.SetActive(false);
                         hidden.Add(renderer.name + " (" + (renderer.sharedMaterial != null ? renderer.sharedMaterial.name : "no material") + ")");
                     }
+                }
+
+                if (muzzleParent != null)
+                {
+                    IwpFirstPersonWeaponSetup.CreateMuzzle(root, muzzleParent, muzzlePosition, muzzleRotation);
                 }
 
                 GameObject prefab = PrefabUtility.SaveAsPrefabAsset(root, path);

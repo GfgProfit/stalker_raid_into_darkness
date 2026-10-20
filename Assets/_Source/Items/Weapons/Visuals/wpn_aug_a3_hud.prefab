@@ -1,5 +1,36 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &6660844398700801705
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8451234093414793097}
+  m_Layer: 0
+  m_Name: MuzzlePoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8451234093414793097
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6660844398700801705}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0.00000002980233, z: 0, w: 1}
+  m_LocalPosition: {x: -0, y: -0.0034, z: -0.0116}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7052152242808026255}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &4674792483294705892
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -58,6 +89,35 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: -6827890349982512021, guid: 68452f2773a6cd542bcd75743b6d550d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8451234093414793097}
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: -9153839490115949874, guid: 68452f2773a6cd542bcd75743b6d550d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6368575166574556998}
   m_SourcePrefab: {fileID: -9137962142385034750, guid: 68452f2773a6cd542bcd75743b6d550d, type: 3}
+--- !u!1 &4618218789475996202 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -9153839490115949874, guid: 68452f2773a6cd542bcd75743b6d550d, type: 3}
+  m_PrefabInstance: {fileID: 4674792483294705892}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &6368575166574556998
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4618218789475996202}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b8631eef8cd22fd4180cc647d3c00590, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: RaidIntoDarkness.Weapons::RaidIntoDarkness.Weapons.FirstPersonWeaponView
+  _muzzle: {fileID: 8451234093414793097}
+--- !u!4 &7052152242808026255 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -6827890349982512021, guid: 68452f2773a6cd542bcd75743b6d550d, type: 3}
+  m_PrefabInstance: {fileID: 4674792483294705892}
+  m_PrefabAsset: {fileID: 0}

@@ -6,6 +6,8 @@
         "RaidIntoDarkness.Player",
         "RaidIntoDarkness.Player.Editor",
         "RaidIntoDarkness.FirstPerson",
+        "RaidIntoDarkness.Effects",
+        "RaidIntoDarkness.Weapons",
         "XRay.Importer.Runtime",
         "XRay.Importer.Core",
         "XRay.Importer.Sources",

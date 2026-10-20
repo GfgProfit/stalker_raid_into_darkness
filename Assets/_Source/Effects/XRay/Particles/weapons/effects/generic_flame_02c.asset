@@ -1,0 +1,400 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c2f58b0c1acc4d9f4c806ce33018cc1a, type: 3}
+  m_Name: generic_flame_02c
+  m_EditorClassIdentifier: RaidIntoDarkness.Effects::RaidIntoDarkness.Effects.XRayParticleEffectAsset
+  _effectName: weapons\effects\generic_flame_02c
+  _maxParticles: 27
+  _flags: 21505
+  _shaderName: particles\add
+  _textureName: pfx\pfx_flamefx_01
+  _blendMode: 2
+  _material: {fileID: 2100000, guid: d2f9509fad5e7db46ad9221091a06140, type: 2}
+  _frameSize: {x: 0.5, y: 0.5}
+  _frameColumns: 2
+  _frameCount: 4
+  _frameSpeed: 24
+  _timeLimit: 0.3
+  _velocityScale: {x: 0, y: 0, z: 0}
+  _defaultRotation: {x: 0, y: 0, z: 0}
+  _actions:
+  - _type: 10
+    _flags: 0
+    _position:
+      _type: 0
+      _p1: {x: 0, y: 0, z: 0}
+      _p2: {x: 0, y: 0, z: 0}
+      _u: {x: 0, y: 0, z: 0}
+      _v: {x: 0, y: 0, z: 0}
+      _radius1: 0
+      _radius2: 0
+    _velocity:
+      _type: 0
+      _p1: {x: 0, y: 0, z: 0}
+      _p2: {x: 0, y: 0, z: 0}
+      _u: {x: 0, y: 0, z: 0}
+      _v: {x: 0, y: 0, z: 0}
+      _radius1: 0
+      _radius2: 0
+    _rotation:
+      _type: 0
+      _p1: {x: 0, y: 0, z: 0}
+      _p2: {x: 0, y: 0, z: 0}
+      _u: {x: 0, y: 0, z: 0}
+      _v: {x: 0, y: 0, z: 0}
+      _radius1: 0
+      _radius2: 0
+    _size:
+      _type: 0
+      _p1: {x: 0, y: 0, z: 0}
+      _p2: {x: 0, y: 0, z: 0}
+      _u: {x: 0, y: 0, z: 0}
+      _v: {x: 0, y: 0, z: 0}
+      _radius1: 0
+      _radius2: 0
+    _color:
+      _type: 0
+      _p1: {x: 0, y: 0, z: 0}
+      _p2: {x: 0, y: 0, z: 0}
+      _u: {x: 0, y: 0, z: 0}
+      _v: {x: 0, y: 0, z: 0}
+      _radius1: 0
+      _radius2: 0
+    _vector: {x: 0, y: 0, z: 0}
+    _scale: {x: 0, y: 0, z: 0}
+    _alpha: 0
+    _rate: 0
+    _age: 0.3
+    _ageSigma: 0
+    _parentMotion: 0
+    _factor: 0
+    _timeFrom: 0
+    _timeTo: 0
+    _killLessThan: 0
+  - _type: 21
+    _flags: 2684354562
+    _position:
+      _type: 0
+      _p1: {x: 0, y: 0, z: 0}
+      _p2: {x: 2.195947e-39, y: 6.226604e-39, z: 2.195532e-39}
+      _u: {x: 1e-45, y: 0, z: 0}
+      _v: {x: 0, y: -5, z: -3}
+      _radius1: 2
+      _radius2: 0
+    _velocity:
+      _type: 1
+      _p1: {x: 0, y: 0, z: 0}
+      _p2: {x: -5, y: -3, z: 2}
+      _u: {x: 1e-45, y: -30, z: -30}
+      _v: {x: -30, y: 30, z: 30}
+      _radius1: 30
+      _radius2: 1
+    _rotation:
+      _type: 1
+      _p1: {x: -30, y: -30, z: -30}
+      _p2: {x: 60, y: 60, z: 60}
+      _u: {x: 1e-45, y: 0.007, z: 0.007}
+      _v: {x: 0, y: 0.01, z: 0.01}
+      _radius1: 0
+      _radius2: 0
+    _size:
+      _type: 1
+      _p1: {x: 0.007, y: 0.007, z: 0}
+      _p2: {x: 0.0029999996, y: 0.0029999996, z: 0}
+      _u: {x: 2.195734e-39, y: 1.1e-44, z: 1}
+      _v: {x: 0.81, y: 0, z: 0}
+      _radius1: 0
+      _radius2: 2.195947e-39
+    _color:
+      _type: 0
+      _p1: {x: 1, y: 0.81, z: 0.81}
+      _p2: {x: 2.19639e-39, y: 6.5489e-39, z: 6.76937e-39}
+      _u: {x: 2.195835e-39, y: 2.112228e-39, z: 2.112228e-39}
+      _v: {x: 2.112228e-39, y: 0, z: 0}
+      _radius1: 0
+      _radius2: 2.195947e-39
+    _vector: {x: 0, y: 0, z: 0}
+    _scale: {x: 0, y: 0, z: 0}
+    _alpha: 0
+    _rate: 10000
+    _age: 0
+    _ageSigma: 0
+    _parentMotion: 0
+    _factor: 0
+    _timeFrom: 0
+    _timeTo: 0
+    _killLessThan: 0
+  - _type: 23
+    _flags: 0
+    _position:
+      _type: 0
+      _p1: {x: 0, y: 0, z: 0}
+      _p2: {x: 0, y: 0, z: 0}
+      _u: {x: 0, y: 0, z: 0}
+      _v: {x: 0, y: 0, z: 0}
+      _radius1: 0
+      _radius2: 0
+    _velocity:
+      _type: 0
+      _p1: {x: 0, y: 0, z: 0}
+      _p2: {x: 0, y: 0, z: 0}
+      _u: {x: 0, y: 0, z: 0}
+      _v: {x: 0, y: 0, z: 0}
+      _radius1: 0
+      _radius2: 0
+    _rotation:
+      _type: 0
+      _p1: {x: 0, y: 0, z: 0}
+      _p2: {x: 0, y: 0, z: 0}
+      _u: {x: 0, y: 0, z: 0}
+      _v: {x: 0, y: 0, z: 0}
+      _radius1: 0
+      _radius2: 0
+    _size:
+      _type: 0
+      _p1: {x: 0, y: 0, z: 0}
+      _p2: {x: 0, y: 0, z: 0}
+      _u: {x: 0, y: 0, z: 0}
+      _v: {x: 0, y: 0, z: 0}
+      _radius1: 0
+      _radius2: 0
+    _color:
+      _type: 0
+      _p1: {x: 0, y: 0, z: 0}
+      _p2: {x: 0, y: 0, z: 0}
+      _u: {x: 0, y: 0, z: 0}
+      _v: {x: 0, y: 0, z: 0}
+      _radius1: 0
+      _radius2: 0
+    _vector: {x: 0, y: 0, z: 0}
+    _scale: {x: 0, y: 0, z: 0}
+    _alpha: 0
+    _rate: 0
+    _age: 0
+    _ageSigma: 0
+    _parentMotion: 0
+    _factor: 10
+    _timeFrom: 0
+    _timeTo: 1
+    _killLessThan: 0
+  - _type: 24
+    _flags: 0
+    _position:
+      _type: 0
+      _p1: {x: 0, y: 0, z: 0}
+      _p2: {x: 0, y: 0, z: 0}
+      _u: {x: 0, y: 0, z: 0}
+      _v: {x: 0, y: 0, z: 0}
+      _radius1: 0
+      _radius2: 0
+    _velocity:
+      _type: 0
+      _p1: {x: 0, y: 0, z: 0}
+      _p2: {x: 0, y: 0, z: 0}
+      _u: {x: 0, y: 0, z: 0}
+      _v: {x: 0, y: 0, z: 0}
+      _radius1: 0
+      _radius2: 0
+    _rotation:
+      _type: 0
+      _p1: {x: 0, y: 0, z: 0}
+      _p2: {x: 0, y: 0, z: 0}
+      _u: {x: 0, y: 0, z: 0}
+      _v: {x: 0, y: 0, z: 0}
+      _radius1: 0
+      _radius2: 0
+    _size:
+      _type: 0
+      _p1: {x: 0, y: 0, z: 0}
+      _p2: {x: 0, y: 0, z: 0}
+      _u: {x: 0, y: 0, z: 0}
+      _v: {x: 0, y: 0, z: 0}
+      _radius1: 0
+      _radius2: 0
+    _color:
+      _type: 0
+      _p1: {x: 0, y: 0, z: 0}
+      _p2: {x: 0, y: 0, z: 0}
+      _u: {x: 0, y: 0, z: 0}
+      _v: {x: 0, y: 0, z: 0}
+      _radius1: 0
+      _radius2: 0
+    _vector: {x: 0.15, y: 0.15, z: 3}
+    _scale: {x: 1, y: 1, z: 0}
+    _alpha: 0
+    _rate: 0
+    _age: 0
+    _ageSigma: 0
+    _parentMotion: 0
+    _factor: 0
+    _timeFrom: 0
+    _timeTo: 0
+    _killLessThan: 0
+  - _type: 27
+    _flags: 2
+    _position:
+      _type: 0
+      _p1: {x: 0, y: 0, z: 0}
+      _p2: {x: 0, y: 0, z: 0}
+      _u: {x: 0, y: 0, z: 0}
+      _v: {x: 0, y: 0, z: 0}
+      _radius1: 0
+      _radius2: 0
+    _velocity:
+      _type: 0
+      _p1: {x: 0, y: 0, z: 0}
+      _p2: {x: 0, y: 0, z: 0}
+      _u: {x: 0, y: 0, z: 0}
+      _v: {x: 0, y: 0, z: 0}
+      _radius1: 0
+      _radius2: 0
+    _rotation:
+      _type: 0
+      _p1: {x: 0, y: 0, z: 0}
+      _p2: {x: 0, y: 0, z: 0}
+      _u: {x: 0, y: 0, z: 0}
+      _v: {x: 0, y: 0, z: 0}
+      _radius1: 0
+      _radius2: 0
+    _size:
+      _type: 0
+      _p1: {x: 0, y: 0, z: 0}
+      _p2: {x: 0, y: 0, z: 0}
+      _u: {x: 0, y: 0, z: 0}
+      _v: {x: 0, y: 0, z: 0}
+      _radius1: 0
+      _radius2: 0
+    _color:
+      _type: 0
+      _p1: {x: 0, y: 0, z: 0}
+      _p2: {x: 0, y: 0, z: 0}
+      _u: {x: 0, y: 0, z: 0}
+      _v: {x: 0, y: 0, z: 0}
+      _radius1: 0
+      _radius2: 0
+    _vector: {x: 0, y: 0, z: 0}
+    _scale: {x: 0, y: 0, z: 0}
+    _alpha: 0
+    _rate: 0
+    _age: 0
+    _ageSigma: 0
+    _parentMotion: 0
+    _factor: 15
+    _timeFrom: 0
+    _timeTo: 0
+    _killLessThan: 0
+  - _type: 25
+    _flags: 0
+    _position:
+      _type: 0
+      _p1: {x: 0, y: 0, z: 0}
+      _p2: {x: 0, y: 0, z: 0}
+      _u: {x: 0, y: 0, z: 0}
+      _v: {x: 0, y: 0, z: 0}
+      _radius1: 0
+      _radius2: 0
+    _velocity:
+      _type: 0
+      _p1: {x: 0, y: 0, z: 0}
+      _p2: {x: 0, y: 0, z: 0}
+      _u: {x: 0, y: 0, z: 0}
+      _v: {x: 0, y: 0, z: 0}
+      _radius1: 0
+      _radius2: 0
+    _rotation:
+      _type: 0
+      _p1: {x: 0, y: 0, z: 0}
+      _p2: {x: 0, y: 0, z: 0}
+      _u: {x: 0, y: 0, z: 0}
+      _v: {x: 0, y: 0, z: 0}
+      _radius1: 0
+      _radius2: 0
+    _size:
+      _type: 0
+      _p1: {x: 0, y: 0, z: 0}
+      _p2: {x: 0, y: 0, z: 0}
+      _u: {x: 0, y: 0, z: 0}
+      _v: {x: 0, y: 0, z: 0}
+      _radius1: 0
+      _radius2: 0
+    _color:
+      _type: 0
+      _p1: {x: 0, y: 0, z: 0}
+      _p2: {x: 0, y: 0, z: 0}
+      _u: {x: 0, y: 0, z: 0}
+      _v: {x: 0, y: 0, z: 0}
+      _radius1: 0
+      _radius2: 0
+    _vector: {x: 12.87178, y: 0, z: 0}
+    _scale: {x: 0, y: 0, z: 0}
+    _alpha: 0
+    _rate: 0
+    _age: 0
+    _ageSigma: 0
+    _parentMotion: 0
+    _factor: 0.01
+    _timeFrom: 0
+    _timeTo: 0
+    _killLessThan: 0
+  - _type: 12
+    _flags: 0
+    _position:
+      _type: 0
+      _p1: {x: 0, y: 0, z: 0}
+      _p2: {x: 0, y: 0, z: 0}
+      _u: {x: 0, y: 0, z: 0}
+      _v: {x: 0, y: 0, z: 0}
+      _radius1: 0
+      _radius2: 0
+    _velocity:
+      _type: 0
+      _p1: {x: 0, y: 0, z: 0}
+      _p2: {x: 0, y: 0, z: 0}
+      _u: {x: 0, y: 0, z: 0}
+      _v: {x: 0, y: 0, z: 0}
+      _radius1: 0
+      _radius2: 0
+    _rotation:
+      _type: 0
+      _p1: {x: 0, y: 0, z: 0}
+      _p2: {x: 0, y: 0, z: 0}
+      _u: {x: 0, y: 0, z: 0}
+      _v: {x: 0, y: 0, z: 0}
+      _radius1: 0
+      _radius2: 0
+    _size:
+      _type: 0
+      _p1: {x: 0, y: 0, z: 0}
+      _p2: {x: 0, y: 0, z: 0}
+      _u: {x: 0, y: 0, z: 0}
+      _v: {x: 0, y: 0, z: 0}
+      _radius1: 0
+      _radius2: 0
+    _color:
+      _type: 0
+      _p1: {x: 0, y: 0, z: 0}
+      _p2: {x: 0, y: 0, z: 0}
+      _u: {x: 0, y: 0, z: 0}
+      _v: {x: 0, y: 0, z: 0}
+      _radius1: 0
+      _radius2: 0
+    _vector: {x: 0, y: 0, z: 0}
+    _scale: {x: 0, y: 0, z: 0}
+    _alpha: 0
+    _rate: 0
+    _age: 0
+    _ageSigma: 0
+    _parentMotion: 0
+    _factor: 0
+    _timeFrom: 0
+    _timeTo: 0
+    _killLessThan: 0

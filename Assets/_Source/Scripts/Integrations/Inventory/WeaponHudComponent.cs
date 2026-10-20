@@ -1,5 +1,6 @@
 using System;
 using Inventory;
+using RaidIntoDarkness.Weapons;
 using UnityEngine;
 using XRay.Importer;
 
@@ -17,11 +18,13 @@ namespace RaidIntoDarkness.Integrations.Inventory
         [SerializeField] private XRayMotionLibrary _handsMotions;
         [SerializeField] private string _handsMotionPrefix;
         [SerializeField] private string[] _attachmentBones = Array.Empty<string>();
+        [SerializeField] private FirstPersonWeaponAsset _firstPersonWeapon;
 
         public GameObject HudModel => _hudModel;
         public XRayMotionLibrary WeaponMotions => _weaponMotions;
         public XRayMotionLibrary HandsMotions => _handsMotions;
         public string HandsMotionPrefix => _handsMotionPrefix ?? string.Empty;
         public string[] AttachmentBones => _attachmentBones ?? Array.Empty<string>();
+        public FirstPersonWeaponAsset FirstPersonWeapon => _firstPersonWeapon;
     }
 }

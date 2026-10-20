@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 335ab8779db4fc317dd646dd295ff541, type: 3}
+  m_Name: heli_weapon
+  m_EditorClassIdentifier: RaidIntoDarkness.Effects::RaidIntoDarkness.Effects.XRayParticleGroupAsset
+  _groupName: weapons\heli_weapon
+  _timeLimit: 1
+  _entries:
+  - _effect: {fileID: 11400000, guid: 47714f86d1ca4ae48b1e24d69dcb4bec, type: 2}
+    _time0: 0
+    _time1: 0
+    _flags: 4
+  - _effect: {fileID: 11400000, guid: dd58fc58f3391214597917ebce8ca451, type: 2}
+    _time0: 0
+    _time1: 0.1
+    _flags: 4
+  - _effect: {fileID: 11400000, guid: 1bc0f4107357f3c4d93405acdda01767, type: 2}
+    _time0: 0
+    _time1: 0.1
+    _flags: 4

@@ -1,0 +1,45 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 335ab8779db4fc317dd646dd295ff541, type: 3}
+  m_Name: generic_flame_01
+  m_EditorClassIdentifier: RaidIntoDarkness.Effects::RaidIntoDarkness.Effects.XRayParticleGroupAsset
+  _groupName: weapons\generic_flame_01
+  _timeLimit: 1
+  _entries:
+  - _effect: {fileID: 11400000, guid: 011914aa3e944b14bb71c06ce4a88e09, type: 2}
+    _time0: 0
+    _time1: 0
+    _flags: 4
+  - _effect: {fileID: 11400000, guid: 47b6f4f8e33def5448b53c64ffde96d7, type: 2}
+    _time0: 0
+    _time1: 0
+    _flags: 4
+  - _effect: {fileID: 11400000, guid: 2079acbac68e5f84189d96674b3f71bf, type: 2}
+    _time0: 0
+    _time1: 0
+    _flags: 4
+  - _effect: {fileID: 11400000, guid: f296ec771870b54489f00bfb14517693, type: 2}
+    _time0: 0
+    _time1: 0
+    _flags: 4
+  - _effect: {fileID: 11400000, guid: c2a9af570ddfe0d48a96ac0a08ddd9ef, type: 2}
+    _time0: 0
+    _time1: 0
+    _flags: 4
+  - _effect: {fileID: 11400000, guid: 25aefd73f03b45743a3c2703b851f6b0, type: 2}
+    _time0: 0
+    _time1: 0
+    _flags: 4
+  - _effect: {fileID: 11400000, guid: 281d27559b45b144b8e2005f54e1c804, type: 2}
+    _time0: 0
+    _time1: 0
+    _flags: 4

@@ -189,6 +189,33 @@ description: Use for any weapon work in this project - weapons, attachments/modu
 - В мир модули кладутся в группу `WorldItems/Addons` сцены `OutdoorsScene`: `WorldItemPrefabBuilder.AppendToScene`, свободное ровное место рядом с игроком. Остальные предметы `WorldItems` не трогаются, при повторном запуске группа пересоздаётся. Любой новый предмет должен лежать в мире, иначе его нельзя подобрать.
 - После сетапа `ItemIconBatchBake.BakeAllAsync` перепекает каталог: в нём остаются только генерируемые иконки (оружие), старые иконки модулей удаляются.
 
+## Оружие от первого лица (своя логика, не порт X-Ray)
+
+Логика стрельбы своя; из IWP берутся только анимации, звуки, партиклы и камерные anm.
+
+- Рантайм — сборка `RaidIntoDarkness.Weapons` (`Assets/_Source/Scripts/Gameplay/Weapons`):
+  - `FirstPersonWeaponAsset` (SO, `Items/Weapons/FirstPerson/<секция>.asset`): HUD-префаб, смещения рук, калибровка прицела, моушены по видам (`FirstPersonWeaponMotionKind`), blend-anm прицеливания, rpm/режимы/магазин, префабы вспышки и дыма, отдача, звуки. Ссылка — `WeaponHudComponent._firstPersonWeapon`.
+  - `FirstPersonWeaponController` на `FPS_Player`: состояния Hidden/Drawing/Ready/Reloading/SwitchingMode/Holstering, слоты Primary (`3`) / Secondary (`2`), ЛКМ — огонь, ПКМ (удержание) — прицел, `R` — перезарядка, `X` — режим огня. Держит руки через `FirstPersonRig.TryAcquireHands`.
+  - `FirstPersonWeaponGraph` — Playables: слой рук (кроссфейд) + слой-оверлей левой руки с маской из костей `l_*` (у `wpn_hand_01` один bone part `default`) + микшер оружия. Подбор FDDA `liz_pickup_left_wpn_hands` играет оверлеем, если руки держит оружие (`IFirstPersonHandsOverlay`).
+  - Анимации экипировки (`EquipmentAnimationQueue`) просят руки через `FirstPersonRig.RequestHands` — оружие убирается и через 0,5 с свободных рук достаётся обратно.
+  - Привязка к инвентарю — `FirstPersonWeaponBinder` (слоты `Primary`/`Secondary` → `SetSlotWeapon`).
+  - Патроны пока условные: магазин из GRA `ammo_mag_size`, запас 90, по ключу `ItemInstance.InstanceId`; HUD `FirstPersonWeaponAmmoView` («30/90», TMP, `FPS_Player/WeaponHud/Ammo`).
+- Отдача — порт `WeaponRecoilManager`/`IRecoil` из BiohazardProtocol (`StalkerCameraRecoil` на `CameraRoot`, применяется в `StalkerCameraController.Apply`). Значения по умолчанию как у MDR из BiohazardProtocol: `(4, 4, 2)`, snappiness 13, return 9; в присяде вдвое меньше.
+- **HUD-смещения для анимаций IWP:** `hands_position/orientation` = 0 (поза зашита в анимации; значения GRA сдвигают ствол). `anm_idle_aim` IWP не прицельная поза — прицеливание даёт blend-anm `anims/blend/aim_{start,idle,end}_<тип>` в пространстве рук (как `player_hud` script layers модовых exe). Тип для AUG — `f2000`. После blend ось `wpn_scope` стоит на уровне глаз, но со сдвигом по X; поправка подбирается по скриншоту (у AUG `aim offset = (0.0127, -0.006, 0)` в пространстве `HandsRoot`, мушка в кольце целика по центру).
+- Моушены: руки `aug_*` из `wpn_hand_fn2000_hud_animation.omf`, оружие — сначала OMF A3 (`idle`, `idle_empty`, `reload`, `reload_empty`, `misfire`), недостающие (`draw`, `shoot`, `sprint*`, `firemode`) из `wpn_aug_hud_animation.omf` (A1) с rig A3. Камерные anm — `anims/camera_effects/weapon/aug_*.anm`.
+- Звуки: выстрел — варианты `aug_muzzle_stereo*` (случайный); пустой магазин — `aug_empty` (не чаще `rpm_empty_click`); на последнем патроне — `last_shell_out`, при ≤5 патронах — `mag_shot` поверх выстрела (в скриптах/конфигах IWP механики нет, это наше решение по файлам пака). `snd_draw/holster` GRA ищутся в IWP по имени, иначе `assault_draw/holster`.
+- Сетап: `IwpFirstPersonWeaponSetup` (меню `Tools/Inventory/Setup First Person Weapon (AUG A3)`, batch `SetupBatch`, лог `[FirstPersonWeapon]`), требует результата `IwpWeaponSetup`. Тест — `OutdoorsSceneWeaponTests`.
+
+### Партиклы X-Ray
+
+- Импорт `particles.xr` IWP: `XRayParticleImporter` (меню `Tools/Effects/Import IWP Weapon Particles`, лог `[XRayParticles]`), читалка `XRayParticleLibraryReader`. Берутся `weapons\*`, кроме гильз (`*shell*`, калиберные `weapons\<калибр>` и `weapons\effects\<калибр>`).
+- Результат — `Assets/_Source/Effects/XRay/Particles/<путь X-Ray>.{asset,mat,prefab}`, текстуры — `Effects/XRay/Textures` (DDS с sRGB-заголовком; DDS с неполной mip-цепочкой Unity не импортирует — конвертируются в PNG).
+- Рантайм `RaidIntoDarkness.Effects`: `XRayParticleSimulation` — порт CParticleEffect (шаг 0,033 с, действия Source/KillOld/Move/Target*/Gravity…), `XRayParticleGroupPlayer` — таймлайн CParticleGroup (t0/t1, deferred stop), отрисовка через `ParticleSystem.SetParticles` и шейдер `RaidIntoDarkness/XRayParticle` (кадры атласа в вершинном шейдере). `xdistort` не рисуется.
+- `ALIGN_TO_PATH` рисуется как в `CParticleEffect::Render`, а не Stretch-билбордом Unity (тот вытягивал «звезду» `weapon_shot_invert_*` вдоль ствола назад, в цевьё): при скорости > 0 и `FACE_ALIGN` — плоскость поперёк скорости с поворотом `rot.x`; иначе — спрайт вдоль скорости или `m_APDefaultRotation` (чанк PED `0x25`), развёрнутый к камере. Частицы — World-aligned billboard с `rotation3D`.
+- Аддитивные материалы получают `_Intensity = 4` — без этого вспышка в HDRP почти не видна.
+- Точка вспышки — Transform `FirstPersonWeaponView._muzzle` на HUD-префабе (`Items/Weapons/Visuals/<секция>_hud.prefab`, объект `MuzzlePoint` под костью `wpn_silencer`, forward = направление пламени). Его двигают в префабе руками; `IwpFirstPersonWeaponSetup` создаёт точку только если её нет, `IwpWeaponSetup` при пересоздании визуала сохраняет её родителя и локальную позу. Без компонента используется кость `FirstPersonWeaponAsset._muzzleBone`.
+- Вспышка AUG: `flame_particles = weapons\generic_weapon05` (следует за костью `wpn_silencer`), дым `smoke_particles = weapons\generic_shoot_00` (на месте выстрела). У глушителя `silencer_flame_particles` пуст — вспышки нет.
+
 ## Проверка перед сдачей
 
 - Характеристики совпадают с секциями GRA; модели оружия, анимации, звуки и эффекты оружия взяты из IWP, модели модулей — из GRA.

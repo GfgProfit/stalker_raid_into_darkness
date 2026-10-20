@@ -4,6 +4,7 @@ using Inventory;
 using Inventory.IconGeneration;
 using Inventory.UI;
 using RaidIntoDarkness.Player;
+using RaidIntoDarkness.Weapons;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -45,6 +46,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
         private EquipmentStatsFormatter _statsFormatter;
         private EquipmentStatusPresenter _statusPresenter;
         private FirstPersonOutfitBinder _outfitBinder;
+        private FirstPersonWeaponBinder _weaponBinder;
         private OutfitHelmetRule _helmetRule;
         private EquipmentAnimationQueue _equipmentAnimations;
         private InventoryItemSounds _itemSounds;
@@ -303,6 +305,12 @@ namespace RaidIntoDarkness.Integrations.Inventory
                 _outfitBinder = null;
             }
 
+            if (_weaponBinder != null)
+            {
+                _weaponBinder.Dispose();
+                _weaponBinder = null;
+            }
+
             if (_helmetRule != null)
             {
                 _helmetRule.Dispose();
@@ -347,6 +355,13 @@ namespace RaidIntoDarkness.Integrations.Inventory
             {
                 _outfitBinder = new FirstPersonOutfitBinder(_window, _player);
                 _outfitBinder.Refresh();
+            }
+
+            FirstPersonWeaponController weapons = _player != null ? _player.GetComponentInChildren<FirstPersonWeaponController>() : null;
+            if (weapons != null)
+            {
+                _weaponBinder = new FirstPersonWeaponBinder(_window, weapons);
+                _weaponBinder.Refresh();
             }
 
             if (_player != null && _player.HudAnimator != null && _player.HudAnimator.Library != null)

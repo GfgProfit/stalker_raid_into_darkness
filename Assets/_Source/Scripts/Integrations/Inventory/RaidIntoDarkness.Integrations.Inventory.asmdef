@@ -7,6 +7,7 @@
         "Inventory.IconGeneration",
         "RaidIntoDarkness.FirstPerson",
         "RaidIntoDarkness.Player",
+        "RaidIntoDarkness.Weapons",
         "RaidIntoDarkness.Utils",
         "XRay.Importer.Runtime",
         "UniTask",

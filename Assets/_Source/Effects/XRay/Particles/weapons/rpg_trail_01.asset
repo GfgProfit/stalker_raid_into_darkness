@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 335ab8779db4fc317dd646dd295ff541, type: 3}
+  m_Name: rpg_trail_01
+  m_EditorClassIdentifier: RaidIntoDarkness.Effects::RaidIntoDarkness.Effects.XRayParticleGroupAsset
+  _groupName: weapons\rpg_trail_01
+  _timeLimit: 0
+  _entries:
+  - _effect: {fileID: 11400000, guid: 2a9c187f201019542b4103c00f8a5f61, type: 2}
+    _time0: 0.2
+    _time1: 0
+    _flags: 4
+  - _effect: {fileID: 11400000, guid: 4c9a9ec00d7e0ca4f8885d1e2fa66c85, type: 2}
+    _time0: 0.25
+    _time1: 0
+    _flags: 4
+  - _effect: {fileID: 11400000, guid: 86892f577e666034db4067781e7ed53b, type: 2}
+    _time0: 0
+    _time1: 0
+    _flags: 4
+  - _effect: {fileID: 11400000, guid: e64144f5d3532594aa4d990e37c5b324, type: 2}
+    _time0: 0.2
+    _time1: 0
+    _flags: 4
+  - _effect: {fileID: 11400000, guid: 6404f7ad3686839428f76cc277f83ae1, type: 2}
+    _time0: 0
+    _time1: 0
+    _flags: 4

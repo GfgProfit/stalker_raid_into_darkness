@@ -1,0 +1,53 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 335ab8779db4fc317dd646dd295ff541, type: 3}
+  m_Name: generic_weapon07
+  m_EditorClassIdentifier: RaidIntoDarkness.Effects::RaidIntoDarkness.Effects.XRayParticleGroupAsset
+  _groupName: weapons\generic_weapon07
+  _timeLimit: 1.55
+  _entries:
+  - _effect: {fileID: 11400000, guid: 6cd6badc70f8c1744b2086e1a02dfd27, type: 2}
+    _time0: 0.01
+    _time1: 0
+    _flags: 4
+  - _effect: {fileID: 11400000, guid: 5a9b08da5f0ca9742a96a72acfbc0b71, type: 2}
+    _time0: 0
+    _time1: 0
+    _flags: 4
+  - _effect: {fileID: 11400000, guid: 21a9249375b3be34998ef18f8bdf8df8, type: 2}
+    _time0: 0.015
+    _time1: 0
+    _flags: 4
+  - _effect: {fileID: 11400000, guid: 7b5c5d7220933304992c671a0df869e5, type: 2}
+    _time0: 0.03
+    _time1: 0
+    _flags: 4
+  - _effect: {fileID: 11400000, guid: dba513834ac956c45b83e4e0af6d808c, type: 2}
+    _time0: 0.045
+    _time1: 0
+    _flags: 4
+  - _effect: {fileID: 11400000, guid: 2d2bd1565eff17e4a95291b84f6f0147, type: 2}
+    _time0: 0.06
+    _time1: 0
+    _flags: 4
+  - _effect: {fileID: 11400000, guid: e5a0d6e9c4b4a55409e3c59fbf7b23eb, type: 2}
+    _time0: 0.075
+    _time1: 0
+    _flags: 4
+  - _effect: {fileID: 11400000, guid: 1adb0d5071550ec4a819dd846ee96d4a, type: 2}
+    _time0: 0.09
+    _time1: 0
+    _flags: 4
+  - _effect: {fileID: 11400000, guid: 48ea63fe617248c4797a27ccbd3076ea, type: 2}
+    _time0: 0.1
+    _time1: 0
+    _flags: 4

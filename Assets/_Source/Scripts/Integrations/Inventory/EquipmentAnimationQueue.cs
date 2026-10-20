@@ -452,6 +452,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
             {
                 if (animator.Rig != null && animator.Rig.HandsBusy)
                 {
+                    animator.Rig.RequestHands(animator);
                     return false;
                 }
 

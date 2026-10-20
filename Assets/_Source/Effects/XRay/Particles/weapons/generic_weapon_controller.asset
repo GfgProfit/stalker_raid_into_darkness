@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 335ab8779db4fc317dd646dd295ff541, type: 3}
+  m_Name: generic_weapon_controller
+  m_EditorClassIdentifier: RaidIntoDarkness.Effects::RaidIntoDarkness.Effects.XRayParticleGroupAsset
+  _groupName: weapons\generic_weapon_controller
+  _timeLimit: 2.5
+  _entries:
+  - _effect: {fileID: 11400000, guid: 55fa5afdd07bb744e9db1ef6cf495b8d, type: 2}
+    _time0: 0.1
+    _time1: 0
+    _flags: 4
+  - _effect: {fileID: 11400000, guid: 1e89df4d6b519ce4db524e5f62b90b6a, type: 2}
+    _time0: 0
+    _time1: 0
+    _flags: 4
+  - _effect: {fileID: 11400000, guid: 8138b53c6edd7914697fbb369a077f1b, type: 2}
+    _time0: 0.1
+    _time1: 0
+    _flags: 4
+  - _effect: {fileID: 11400000, guid: b7e8489c2acef4d45bd292344fd5e19a, type: 2}
+    _time0: 0
+    _time1: 0
+    _flags: 4

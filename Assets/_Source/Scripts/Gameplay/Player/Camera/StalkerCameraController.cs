@@ -11,6 +11,7 @@ namespace RaidIntoDarkness.Player
         [SerializeField] private Transform _cameraRoot;
         [SerializeField] private Camera _camera;
         [SerializeField] private Transform _hudRoot;
+        [SerializeField] private StalkerCameraRecoil _recoil;
         [SerializeField] private bool _lockCursorOnStart = true;
 
         private StalkerMovementProfile _profile;
@@ -22,10 +23,13 @@ namespace RaidIntoDarkness.Player
 
         public Transform CameraRoot => _cameraRoot;
         public Camera Camera => _camera;
+        public StalkerCameraRecoil Recoil => _recoil;
         public float YawDegrees => _yaw * Mathf.Rad2Deg;
         public float PitchDegrees => _pitch * Mathf.Rad2Deg;
         public Vector3 Direction => _cameraRoot != null ? _cameraRoot.forward : transform.forward;
         public bool CursorLocked => Cursor.lockState == CursorLockMode.Locked;
+        public bool CursorReleased { get; private set; }
+        public int CursorLockFrame { get; private set; } = -1;
 
         public float HudFieldOfView
         {
@@ -59,6 +63,8 @@ namespace RaidIntoDarkness.Player
         public void SetCursorLocked(bool locked)
         {
             Cursor.lockState = locked ? CursorLockMode.Locked : CursorLockMode.None;
+            CursorLockFrame = locked && CursorReleased ? Time.frameCount : CursorLockFrame;
+            CursorReleased = !locked;
             Cursor.visible = !locked;
         }
 
@@ -104,7 +110,7 @@ namespace RaidIntoDarkness.Player
             if (_cameraRoot != null)
             {
                 _cameraRoot.localPosition = new Vector3(0.0f, cameraHeight, 0.0f);
-                _cameraRoot.localRotation = Quaternion.Euler(_pitch * Mathf.Rad2Deg, 0.0f, 0.0f);
+                _cameraRoot.localRotation = Quaternion.Euler(_pitch * Mathf.Rad2Deg, 0.0f, 0.0f) * (_recoil != null ? _recoil.Rotation : Quaternion.identity);
             }
 
             ApplyHudFieldOfView();

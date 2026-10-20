@@ -1,0 +1,20 @@
+{
+    "name": "RaidIntoDarkness.Weapons",
+    "rootNamespace": "RaidIntoDarkness.Weapons",
+    "references": [
+        "RaidIntoDarkness.FirstPerson",
+        "RaidIntoDarkness.Player",
+        "RaidIntoDarkness.Effects",
+        "XRay.Importer.Runtime",
+        "Unity.TextMeshPro"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

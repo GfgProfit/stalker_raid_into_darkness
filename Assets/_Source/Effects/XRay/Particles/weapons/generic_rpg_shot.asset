@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 335ab8779db4fc317dd646dd295ff541, type: 3}
+  m_Name: generic_rpg_shot
+  m_EditorClassIdentifier: RaidIntoDarkness.Effects::RaidIntoDarkness.Effects.XRayParticleGroupAsset
+  _groupName: weapons\generic_rpg_shot
+  _timeLimit: 3
+  _entries:
+  - _effect: {fileID: 11400000, guid: 2153561637d624a4b928a512792a39c3, type: 2}
+    _time0: 0.1
+    _time1: 0
+    _flags: 4
+  - _effect: {fileID: 11400000, guid: 8b4a25e83133a454e98ec8a608ec86a8, type: 2}
+    _time0: 0
+    _time1: 0
+    _flags: 4
+  - _effect: {fileID: 11400000, guid: 92b67a75e7dacca4b8a1360c3ab11704, type: 2}
+    _time0: 0
+    _time1: 0
+    _flags: 4
+  - _effect: {fileID: 11400000, guid: c2491f7ec62294c4aa86d83ce7bd6013, type: 2}
+    _time0: 0
+    _time1: 0
+    _flags: 4

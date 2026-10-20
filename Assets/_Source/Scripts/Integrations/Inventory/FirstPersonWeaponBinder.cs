@@ -1,0 +1,60 @@
+using System;
+using Inventory;
+using Inventory.UI;
+using RaidIntoDarkness.Weapons;
+
+namespace RaidIntoDarkness.Integrations.Inventory
+{
+    public sealed class FirstPersonWeaponBinder : IDisposable
+    {
+        public const string PRIMARY_SLOT = "Primary";
+        public const string SECONDARY_SLOT = "Secondary";
+
+        private readonly InventoryWindow _window;
+        private readonly InventoryModel _model;
+        private readonly FirstPersonWeaponController _controller;
+
+        public FirstPersonWeaponBinder(InventoryWindow window, FirstPersonWeaponController controller)
+        {
+            _window = window;
+            _controller = controller;
+            _model = window.Model;
+            _model.ItemEquipped += OnEquipmentChanged;
+            _model.ItemUnequipped += OnEquipmentChanged;
+        }
+
+        public void Refresh()
+        {
+            if (_controller == null)
+            {
+                return;
+            }
+
+            SlottedContainer equipment = _model != null ? _model.GetContainer(_window.EquipmentContainerId) as SlottedContainer : null;
+            Bind(equipment, PRIMARY_SLOT, FirstPersonWeaponController.PRIMARY_SLOT);
+            Bind(equipment, SECONDARY_SLOT, FirstPersonWeaponController.SECONDARY_SLOT);
+        }
+
+        public void Dispose()
+        {
+            _model.ItemEquipped -= OnEquipmentChanged;
+            _model.ItemUnequipped -= OnEquipmentChanged;
+        }
+
+        private void Bind(SlottedContainer equipment, string slotId, int slot)
+        {
+            ItemInstance item = equipment != null ? equipment.GetSlotOccupant(slotId) : null;
+            WeaponHudComponent hud = item != null ? item.Definition.GetComponent<WeaponHudComponent>() : null;
+            FirstPersonWeaponAsset weapon = hud != null ? hud.FirstPersonWeapon : null;
+            _controller.SetSlotWeapon(slot, weapon, weapon != null ? item.InstanceId : null);
+        }
+
+        private void OnEquipmentChanged(ItemInstance item, SlottedContainer container, SlotDefinition slot)
+        {
+            if (slot != null && (slot.Id == PRIMARY_SLOT || slot.Id == SECONDARY_SLOT))
+            {
+                Refresh();
+            }
+        }
+    }
+}

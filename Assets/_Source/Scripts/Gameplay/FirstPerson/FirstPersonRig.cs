@@ -32,6 +32,15 @@ namespace RaidIntoDarkness.FirstPerson
         public bool HandsBusy => HandsOwner != null;
 
         public event Action<FirstPersonOutfitEntry, bool> OutfitApplied;
+        public event Action<object> HandsRequested;
+
+        public void RequestHands(object requester)
+        {
+            if (HandsOwner != null && HandsOwner != requester)
+            {
+                HandsRequested?.Invoke(requester);
+            }
+        }
 
         public bool TryAcquireHands(object owner)
         {

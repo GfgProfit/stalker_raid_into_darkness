@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "unity-open-mcp": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "unity-open-mcp@1.5.0",
+        "--project-from-cwd"
+      ],
+      "env": {}
+    }
+  }
+}

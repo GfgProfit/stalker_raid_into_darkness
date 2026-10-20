@@ -84,6 +84,40 @@ Keep the final response concise and technical.
 
 If validation was not run because it is forbidden or unsafe, say so in `Risks or limitations` and list manual checks in `Manual Unity steps`.
 
+## Skill Integration
+
+Project skills:
+- `.claude/skills/...`
+
+Apply compatible principles from both skills to all user-facing responses by default:
+- Put the result or next concrete action first, within the required final response format.
+- Keep responses concise, easy to scan, and specific. Number multi-step instructions only when useful.
+- Use natural, direct Russian without generic AI phrasing, filler, hype, empty praise, or redundant conclusions.
+- Preserve meaning, technical accuracy, project terminology, identifiers, and existing code style.
+- Do not add extra final response sections or override any project hard constraints.
+
+For documentation, UI text, descriptions, and other prose writing or editing tasks, invoke `no-ai-slop` when relevant and preserve the author's voice. Do not apply prose-editing rules to source code or rename identifiers for stylistic reasons.
+
+Project constraints and explicit user instructions take precedence over these style preferences.
+
+## Unity MCP Workflow
+
+- Use Unity Open MCP for Unity Editor inspection and validation.
+- Verify the active Unity project before modifying assets.
+- Use the main project for normal development and validation.
+- Use CleanProject only for risky or experimental changes.
+- Prefer read-only MCP operations during investigation.
+- Do not modify scenes, prefabs, materials, shaders, or project settings unless required by the task.
+- Never execute destructive MCP operations without explicit authorization.
+- Do not copy entire projects for routine validation.
+
+## MCP Token Efficiency
+
+- Prefer targeted Unity MCP calls over broad project scans.
+- Avoid redundant MCP calls and repeated validation.
+- Retrieve only task-relevant Unity data.
+- Do not dump large MCP results into conversation context.
+
 ## Existing Code First
 
 Before introducing a new pattern, inspect nearby relevant code.

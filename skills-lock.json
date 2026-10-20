@@ -1,0 +1,53 @@
+{
+  "version": 1,
+  "skills": {
+    "i-have-adhd": {
+      "source": "ayghri/i-have-adhd",
+      "sourceType": "github",
+      "skillPath": "skills/i-have-adhd/SKILL.md",
+      "computedHash": "71e78492cf9d8c1d392f1e8fc97afd0c85c2e306bb388773c4a757758833acb6"
+    },
+    "no-ai-slop": {
+      "source": "petergyang/no-ai-slop",
+      "sourceType": "github",
+      "skillPath": "skills/no-ai-slop/SKILL.md",
+      "computedHash": "109e265d222da64314b5f08634e4c4ab91051c81eff92d52beea8f3cd81ddb3d"
+    },
+    "unity-async-patterns": {
+      "source": "Nice-Wolf-Studio/unity-claude-skills",
+      "sourceType": "github",
+      "skillPath": "skills/unity-async-patterns/SKILL.md",
+      "computedHash": "04fe95fd218797cffa619e21ad6cc6fc0efda7a232e8c13d4106d6d2ceaf4b65"
+    },
+    "unity-graphics": {
+      "source": "Nice-Wolf-Studio/unity-claude-skills",
+      "sourceType": "github",
+      "skillPath": "skills/unity-graphics/SKILL.md",
+      "computedHash": "d25fe1f5de49c07088d4b6b4e8c044d775ffb004fe12ec76081591d582347bc7"
+    },
+    "unity-lifecycle": {
+      "source": "Nice-Wolf-Studio/unity-claude-skills",
+      "sourceType": "github",
+      "skillPath": "skills/unity-lifecycle/SKILL.md",
+      "computedHash": "d613c3e126f0c399da7c359d6dc1edba8f9a60f67c17ae643f986e5e20d46304"
+    },
+    "unity-lighting-vfx": {
+      "source": "Nice-Wolf-Studio/unity-claude-skills",
+      "sourceType": "github",
+      "skillPath": "skills/unity-lighting-vfx/SKILL.md",
+      "computedHash": "707e479c9073b73024d5cafffdc241fb2fff1359ad179354de5767970d39f89f"
+    },
+    "unity-performance": {
+      "source": "Nice-Wolf-Studio/unity-claude-skills",
+      "sourceType": "github",
+      "skillPath": "skills/unity-performance/SKILL.md",
+      "computedHash": "678f9e7fac81f3ec982bc73b0203912620065514d0db5b26d03284ae67ede20a"
+    },
+    "unity-scripting": {
+      "source": "Nice-Wolf-Studio/unity-claude-skills",
+      "sourceType": "github",
+      "skillPath": "skills/unity-scripting/SKILL.md",
+      "computedHash": "d0315614db098c36213637189be2e72b8478c4f04b622ed520ade7b2a7fa1cba"
+    }
+  }
+}

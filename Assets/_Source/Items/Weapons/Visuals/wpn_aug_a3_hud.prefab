@@ -31,6 +31,72 @@ Transform:
   m_Children: []
   m_Father: {fileID: 7052152242808026255}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &348294353553770164
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 7052152242808026255}
+    m_Modifications:
+    - target: {fileID: 5006535559038916640, guid: a9a39beafa53f264c92c03a974ff36da, type: 3}
+      propertyPath: m_Name
+      value: silencer
+      objectReference: {fileID: 0}
+    - target: {fileID: 5006535559038916640, guid: a9a39beafa53f264c92c03a974ff36da, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5431306766904689922, guid: a9a39beafa53f264c92c03a974ff36da, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.0013
+      objectReference: {fileID: 0}
+    - target: {fileID: 5431306766904689922, guid: a9a39beafa53f264c92c03a974ff36da, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.0275
+      objectReference: {fileID: 0}
+    - target: {fileID: 5431306766904689922, guid: a9a39beafa53f264c92c03a974ff36da, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.0844
+      objectReference: {fileID: 0}
+    - target: {fileID: 5431306766904689922, guid: a9a39beafa53f264c92c03a974ff36da, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5431306766904689922, guid: a9a39beafa53f264c92c03a974ff36da, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5431306766904689922, guid: a9a39beafa53f264c92c03a974ff36da, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5431306766904689922, guid: a9a39beafa53f264c92c03a974ff36da, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5431306766904689922, guid: a9a39beafa53f264c92c03a974ff36da, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5431306766904689922, guid: a9a39beafa53f264c92c03a974ff36da, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5431306766904689922, guid: a9a39beafa53f264c92c03a974ff36da, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: a9a39beafa53f264c92c03a974ff36da, type: 3}
+--- !u!4 &5731537945318343606 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 5431306766904689922, guid: a9a39beafa53f264c92c03a974ff36da, type: 3}
+  m_PrefabInstance: {fileID: 348294353553770164}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &4674792483294705892
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -43,9 +109,9 @@ PrefabInstance:
       propertyPath: m_Name
       value: wpn_aug_a3_hud
       objectReference: {fileID: 0}
-    - target: {fileID: -8752304258850988442, guid: 68452f2773a6cd542bcd75743b6d550d, type: 3}
-      propertyPath: m_IsActive
-      value: 0
+    - target: {fileID: -4293851533041653226, guid: 68452f2773a6cd542bcd75743b6d550d, type: 3}
+      propertyPath: m_Name
+      value: def_sight
       objectReference: {fileID: 0}
     - target: {fileID: 456984401006525815, guid: 68452f2773a6cd542bcd75743b6d550d, type: 3}
       propertyPath: m_LocalPosition.x
@@ -87,12 +153,19 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8230346497751681488, guid: 68452f2773a6cd542bcd75743b6d550d, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: -6827890349982512021, guid: 68452f2773a6cd542bcd75743b6d550d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 8451234093414793097}
+    - targetCorrespondingSourceObject: {fileID: -6827890349982512021, guid: 68452f2773a6cd542bcd75743b6d550d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5731537945318343606}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: -9153839490115949874, guid: 68452f2773a6cd542bcd75743b6d550d, type: 3}
       insertIndex: -1

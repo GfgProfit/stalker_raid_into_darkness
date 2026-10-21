@@ -111,7 +111,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
 
             InventoryWindow window = _controller.Window;
             InventoryModel model = _controller.Inventory.Model;
-            ItemInstance item = model.CreateItem(worldItem.Definition, worldItem.Amount);
+            ItemInstance item = worldItem.Instance ?? model.CreateItem(worldItem.Definition, worldItem.Amount);
             int before = item.Amount;
             InventoryResult result = model.TryAddAuto(item, window.PrimaryContainerId);
 
@@ -126,7 +126,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
 
             if (item.Amount < before)
             {
-                worldItem.Configure(worldItem.Definition, item.Amount);
+                worldItem.Configure(item);
                 PlayTakeSound(item);
                 window.ShowStatus(window.FormatLabel("status_picked", "Picked up {0}", worldItem.Definition.DisplayName));
                 return true;
@@ -270,7 +270,12 @@ namespace RaidIntoDarkness.Integrations.Inventory
         {
             if (item != null)
             {
-                Spawn(item.Definition, item.Amount);
+                WorldItem worldItem = Spawn(item.Definition, item.Amount);
+
+                if (worldItem != null)
+                {
+                    worldItem.Configure(item);
+                }
             }
         }
 

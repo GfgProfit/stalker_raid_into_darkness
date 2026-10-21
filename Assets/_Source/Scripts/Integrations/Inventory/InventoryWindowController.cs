@@ -22,6 +22,8 @@ namespace RaidIntoDarkness.Integrations.Inventory
         public const string FAVORITE_ACTION = "favorite";
         public const string JUNK_ACTION = "junk";
 
+        private static readonly Color _compatibleAmmoTint = new(0f, 1f, 0.35f, 0.22f);
+
         [SerializeField] private InventoryWindow _window;
         [SerializeField] private PlayerInventoryRuntime _inventory;
         [SerializeField] private StalkerPlayerController _player;
@@ -51,6 +53,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
         private EquipmentAnimationQueue _equipmentAnimations;
         private InventoryItemSounds _itemSounds;
         private ItemInstance _statsHovered;
+        private ItemInstance _compatibilityHovered;
         private int _restoreFrame = -1;
         private bool _gameplayBlocked;
         private bool _bound;
@@ -214,6 +217,8 @@ namespace RaidIntoDarkness.Integrations.Inventory
             {
                 ToggleMark(_window.HoveredItem, true);
             }
+
+            UpdateCompatibilityHighlight();
 
             if (IsOpen)
             {
@@ -382,7 +387,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
         {
             _sorting = new InventorySortingPlus(_inventory.Model, new[] { _window.PrimaryContainerId, _window.SecondaryContainerId }, _favoriteBadge, _junkBadge);
             _sorting.Changed += OnSortingChanged;
-            _window.ItemDecorator = _sorting.Decorate;
+            _window.ItemDecorator = DecorateItem;
             _window.ActionStyleProvider = new ContextMenuOverhaulStyle(_window, _sorting).Resolve;
             _window.Actions.Unregister(InventoryBuiltInActions.INSPECT);
             _window.Actions.Register(new InventoryDelegateAction(FAVORITE_ACTION, 45, GetFavoriteLabel, context => _sorting.ToggleFavorite(context.Item.Definition), context => _sorting.IsSorted(context.Item.ContainerId)));
@@ -414,6 +419,51 @@ namespace RaidIntoDarkness.Integrations.Inventory
             {
                 _sorting.ToggleFavorite(item.Definition);
             }
+        }
+
+        private InventoryItemDecoration DecorateItem(ItemInstance item)
+        {
+            InventoryItemDecoration decoration = _sorting != null ? _sorting.Decorate(item) : InventoryItemDecoration.None;
+
+            if (_compatibilityHovered == null || item == null || item == _compatibilityHovered)
+            {
+                return decoration;
+            }
+
+            WeaponStatsComponent weapon = _compatibilityHovered.Definition.GetComponent<WeaponStatsComponent>();
+            AmmoStatsComponent ammo = item.Definition.GetComponent<AmmoStatsComponent>();
+
+            if (weapon == null || ammo == null)
+            {
+                weapon = item.Definition.GetComponent<WeaponStatsComponent>();
+                ammo = _compatibilityHovered.Definition.GetComponent<AmmoStatsComponent>();
+            }
+
+            return weapon != null && ammo != null && weapon.SupportsAmmo(ammo.Section) ? new InventoryItemDecoration(_compatibleAmmoTint, decoration.Badge) : decoration;
+        }
+
+        private void UpdateCompatibilityHighlight()
+        {
+            ItemInstance hovered = IsOpen && _window.IsDragging == false && _window.HasModalWidget == false ? _window.HoveredItem : null;
+
+            if (hovered != null)
+            {
+                InventoryGridViewBase grid = _window.FindGrid(hovered.ContainerId);
+                InventoryItemView view = grid != null ? grid.GetItemView(hovered) : null;
+
+                if (_window.Model.ContainsItem(hovered) == false || view == null || view.gameObject.activeInHierarchy == false)
+                {
+                    hovered = null;
+                }
+            }
+
+            if (_compatibilityHovered == hovered)
+            {
+                return;
+            }
+
+            _compatibilityHovered = hovered;
+            _window.RefreshItems();
         }
 
         private void UpdateStats()

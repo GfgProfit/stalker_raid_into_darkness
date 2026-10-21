@@ -37,7 +37,6 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
         private const string IWP_SOUNDS = "sounds/weapons/";
         private const string BLEND_TYPE = "f2000";
         private const string MOTION_PREFIX = "aug_";
-        private const int RESERVE_AMMO = 90;
         private const int LOW_AMMO_THRESHOLD = 5;
         private const int MAX_SHOT_VARIANTS = 6;
         private const float AMMO_FONT_SIZE = 32f;
@@ -190,7 +189,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
             int rpm = Mathf.RoundToInt(GetFloat(system, IwpWeaponSetup.SECTION, "rpm", 600f));
             int emptyRpm = Mathf.RoundToInt(GetFloat(system, IwpWeaponSetup.SECTION, "rpm_empty_click", 200f));
             int magazine = Mathf.RoundToInt(GetFloat(system, IwpWeaponSetup.SECTION, "ammo_mag_size", 30f));
-            asset.SetFire(rpm, emptyRpm, ParseFireModes(Get(system, IwpWeaponSetup.SECTION, "fire_modes")), magazine, RESERVE_AMMO, AssetDatabase.LoadAssetAtPath<GameObject>(flamePath), AssetDatabase.LoadAssetAtPath<GameObject>(smokePath));
+            asset.SetFire(rpm, emptyRpm, ParseFireModes(Get(system, IwpWeaponSetup.SECTION, "fire_modes")), magazine, AssetDatabase.LoadAssetAtPath<GameObject>(flamePath), AssetDatabase.LoadAssetAtPath<GameObject>(smokePath));
             var shots = new List<AudioClip>();
 
             foreach (string name in shotNames)

@@ -9,12 +9,14 @@ namespace Inventory.UI
     public sealed class InventoryEquipmentSlot : MonoBehaviour
     {
         private const string LOCK_NAME = "Lock";
+        private const string HIGHLIGHT_NAME = "Highlight";
 
         [SerializeField] private string _slotId;
         [SerializeField] private Image _icon;
         [SerializeField] private Sprite _lockedSprite;
 
         private Image _lock;
+        private Image _highlight;
 
         public string SlotId => _slotId ?? string.Empty;
         public Image Icon => _icon;
@@ -37,6 +39,29 @@ namespace Inventory.UI
             {
                 _lock.sprite = sprite;
             }
+        }
+
+        public Image GetHighlight()
+        {
+            if (_highlight != null || _icon == null)
+            {
+                return _highlight;
+            }
+
+            RectTransform iconRect = _icon.rectTransform;
+            RectTransform rect = InventoryUIFactory.CreateRect(HIGHLIGHT_NAME, iconRect.parent);
+            rect.anchorMin = iconRect.anchorMin;
+            rect.anchorMax = iconRect.anchorMax;
+            rect.pivot = iconRect.pivot;
+            rect.sizeDelta = iconRect.sizeDelta;
+            rect.anchoredPosition = iconRect.anchoredPosition;
+            rect.localRotation = iconRect.localRotation;
+            rect.localScale = iconRect.localScale;
+            rect.SetSiblingIndex(iconRect.GetSiblingIndex());
+            _highlight = rect.gameObject.AddComponent<Image>();
+            _highlight.raycastTarget = false;
+            _highlight.enabled = false;
+            return _highlight;
         }
 
         public void SetLocked(bool locked)
@@ -62,6 +87,11 @@ namespace Inventory.UI
 
         public void ClearIcon()
         {
+            if (_highlight != null)
+            {
+                _highlight.enabled = false;
+            }
+
             if (_icon == null)
             {
                 return;

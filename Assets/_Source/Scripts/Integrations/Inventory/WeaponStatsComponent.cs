@@ -61,5 +61,23 @@ namespace RaidIntoDarkness.Integrations.Inventory
         public string[] Scopes => _scopes ?? Array.Empty<string>();
         public WeaponAddonStatus GrenadeLauncherStatus => _grenadeLauncherStatus;
         public string GrenadeLauncherSection => _grenadeLauncherSection ?? string.Empty;
+
+        public bool SupportsAmmo(string section)
+        {
+            if (string.IsNullOrEmpty(section))
+            {
+                return false;
+            }
+
+            foreach (string compatible in AmmoClasses)
+            {
+                if (compatible == section)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
     }
 }

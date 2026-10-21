@@ -37,7 +37,6 @@ namespace RaidIntoDarkness.Weapons
         [SerializeField] [Min(1)] private int _emptyClicksPerMinute = 200;
         [SerializeField] private int[] _fireModes = { 1, AUTO_FIRE_MODE };
         [SerializeField] [Min(1)] private int _magazineSize = 30;
-        [SerializeField] [Min(0)] private int _reserveAmmo = 90;
         [SerializeField] private GameObject _flameParticles;
         [SerializeField] private GameObject _smokeParticles;
         [Header("Recoil")]
@@ -70,7 +69,6 @@ namespace RaidIntoDarkness.Weapons
         public float EmptyClickInterval => 60.0f / Mathf.Max(1, _emptyClicksPerMinute);
         public IReadOnlyList<int> FireModes => _fireModes != null && _fireModes.Length > 0 ? _fireModes : new[] { 1 };
         public int MagazineSize => _magazineSize;
-        public int ReserveAmmo => _reserveAmmo;
         public GameObject FlameParticles => _flameParticles;
         public GameObject SmokeParticles => _smokeParticles;
         public Vector3 Recoil => _recoil;
@@ -152,13 +150,12 @@ namespace RaidIntoDarkness.Weapons
             _aimEnd = aimEnd;
         }
 
-        public void SetFire(int roundsPerMinute, int emptyClicksPerMinute, int[] fireModes, int magazineSize, int reserveAmmo, GameObject flameParticles, GameObject smokeParticles)
+        public void SetFire(int roundsPerMinute, int emptyClicksPerMinute, int[] fireModes, int magazineSize, GameObject flameParticles, GameObject smokeParticles)
         {
             _roundsPerMinute = roundsPerMinute;
             _emptyClicksPerMinute = emptyClicksPerMinute;
             _fireModes = fireModes;
             _magazineSize = magazineSize;
-            _reserveAmmo = reserveAmmo;
             _flameParticles = flameParticles;
             _smokeParticles = smokeParticles;
         }

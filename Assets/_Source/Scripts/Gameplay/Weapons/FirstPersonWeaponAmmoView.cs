@@ -6,8 +6,6 @@ namespace RaidIntoDarkness.Weapons
     [DisallowMultipleComponent]
     public sealed class FirstPersonWeaponAmmoView : MonoBehaviour
     {
-        private const string FORMAT = "{0}/{1}";
-
         [SerializeField] private FirstPersonWeaponController _controller;
         [SerializeField] private TMP_Text _text;
         [SerializeField] private GameObject _root;
@@ -58,7 +56,7 @@ namespace RaidIntoDarkness.Weapons
 
             if (visible && _text != null)
             {
-                _text.SetText(FORMAT, _controller.Magazine, _controller.Reserve);
+                _text.text = $"{_controller.Magazine}/{_controller.Reserve} <size=65%>{_controller.AmmoName}</size>";
             }
         }
     }

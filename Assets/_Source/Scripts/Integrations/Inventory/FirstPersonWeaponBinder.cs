@@ -13,12 +13,15 @@ namespace RaidIntoDarkness.Integrations.Inventory
         private readonly InventoryWindow _window;
         private readonly InventoryModel _model;
         private readonly FirstPersonWeaponController _controller;
+        private readonly InventoryWeaponAmmoSource _ammo;
 
         public FirstPersonWeaponBinder(InventoryWindow window, FirstPersonWeaponController controller)
         {
             _window = window;
             _controller = controller;
             _model = window.Model;
+            _ammo = new InventoryWeaponAmmoSource(_model, window.PrimaryContainerId);
+            _controller.SetAmmoSource(_ammo);
             _model.ItemEquipped += OnEquipmentChanged;
             _model.ItemUnequipped += OnEquipmentChanged;
         }
@@ -39,6 +42,12 @@ namespace RaidIntoDarkness.Integrations.Inventory
         {
             _model.ItemEquipped -= OnEquipmentChanged;
             _model.ItemUnequipped -= OnEquipmentChanged;
+            if (_controller != null)
+            {
+                _controller.SetAmmoSource(null);
+            }
+
+            _ammo.Dispose();
         }
 
         private void Bind(SlottedContainer equipment, string slotId, int slot)

@@ -151,7 +151,7 @@ namespace Inventory.UI
         protected override void OnItemViewLayout(InventoryItemView view)
         {
             InventoryEquipmentSlot slot = GetSlotView(view.Item.Location.SlotId);
-            view.SetIconTarget(slot != null ? slot.Icon : null);
+            view.SetIconTarget(slot != null ? slot.Icon : null, slot != null ? slot.GetHighlight() : null);
         }
 
         protected override void OnItemsSynced()

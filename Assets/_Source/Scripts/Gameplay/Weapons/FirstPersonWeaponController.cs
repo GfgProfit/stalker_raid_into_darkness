@@ -38,7 +38,8 @@ namespace RaidIntoDarkness.Weapons
         [SerializeField] private string _itemAnchorBone = FirstPersonHudAnimator.ITEM_ANCHOR_BONE;
 
         private readonly Slot[] _slots = { new Slot(), new Slot() };
-        private readonly Dictionary<object, Ammo> _ammo = new Dictionary<object, Ammo>();
+        private readonly Dictionary<object, WeaponState> _weaponStates = new Dictionary<object, WeaponState>();
+        private IFirstPersonWeaponAmmoSource _ammoSource;
         private FirstPersonWeaponGraph _graph;
         private FirstPersonWeaponEffects _effects;
         private FirstPersonRig _subscribedRig;
@@ -75,9 +76,11 @@ namespace RaidIntoDarkness.Weapons
         public FirstPersonWeaponState State { get; private set; }
         public int ActiveSlot { get; private set; } = -1;
         public FirstPersonWeaponAsset ActiveWeapon => ActiveSlot >= 0 ? _slots[ActiveSlot].Asset : null;
-        public int Magazine => ActiveSlot >= 0 && _slots[ActiveSlot].Ammo != null ? _slots[ActiveSlot].Ammo.Magazine : 0;
-        public int Reserve => ActiveSlot >= 0 && _slots[ActiveSlot].Ammo != null ? _slots[ActiveSlot].Ammo.Reserve : 0;
-        public int FireMode => ActiveWeapon != null ? ActiveWeapon.FireModes[Mathf.Clamp(_slots[ActiveSlot].Ammo.FireModeIndex, 0, ActiveWeapon.FireModes.Count - 1)] : 0;
+        public int Magazine => ActiveSlot >= 0 && _ammoSource != null ? _ammoSource.GetMagazine(_slots[ActiveSlot].Key) : 0;
+        public int Reserve => ActiveSlot >= 0 && _ammoSource != null ? _ammoSource.GetReserve(_slots[ActiveSlot].Key) : 0;
+        public string AmmoSection => ActiveSlot >= 0 && _ammoSource != null ? _ammoSource.GetAmmoSection(_slots[ActiveSlot].Key) : string.Empty;
+        public string AmmoName => ActiveSlot >= 0 && _ammoSource != null ? _ammoSource.GetAmmoName(_slots[ActiveSlot].Key) : string.Empty;
+        public int FireMode => ActiveWeapon != null ? ActiveWeapon.FireModes[Mathf.Clamp(_slots[ActiveSlot].WeaponState.FireModeIndex, 0, ActiveWeapon.FireModes.Count - 1)] : 0;
         public bool IsAiming => _aiming;
         public float AimFactor => _aim;
         public GameObject Model => _model;
@@ -87,6 +90,23 @@ namespace RaidIntoDarkness.Weapons
         public FirstPersonWeaponAsset GetSlotWeapon(int slot)
         {
             return IsSlot(slot) ? _slots[slot].Asset : null;
+        }
+
+        public void SetAmmoSource(IFirstPersonWeaponAmmoSource source)
+        {
+            if (_ammoSource != null)
+            {
+                _ammoSource.Changed -= NotifyAmmo;
+            }
+
+            _ammoSource = source;
+
+            if (_ammoSource != null)
+            {
+                _ammoSource.Changed += NotifyAmmo;
+            }
+
+            NotifyAmmo();
         }
 
         public void SetSlotWeapon(int slot, FirstPersonWeaponAsset asset, object key)
@@ -105,7 +125,7 @@ namespace RaidIntoDarkness.Weapons
 
             target.Asset = asset;
             target.Key = ammoKey;
-            target.Ammo = asset != null ? GetAmmo(ammoKey, asset) : null;
+            target.WeaponState = asset != null ? GetWeaponState(ammoKey) : null;
             if (_redrawSlot == slot && asset == null)
             {
                 _redrawSlot = -1;
@@ -227,6 +247,7 @@ namespace RaidIntoDarkness.Weapons
 
         private void OnDestroy()
         {
+            SetAmmoSource(null);
             DestroyVisuals(true);
             if (_effects != null)
             {
@@ -423,7 +444,6 @@ namespace RaidIntoDarkness.Weapons
         private void HandleWeaponInput()
         {
             FirstPersonWeaponAsset asset = ActiveWeapon;
-            Ammo ammo = _slots[ActiveSlot].Ammo;
             bool ready = State == FirstPersonWeaponState.Ready;
             bool sprinting = _player.State.IsSprinting;
             SetAiming(_input.AimHeld && ready && !sprinting);
@@ -433,15 +453,23 @@ namespace RaidIntoDarkness.Weapons
                 return;
             }
 
-            if (_input.ReloadPressed && ammo.Magazine < asset.MagazineSize && ammo.Reserve > 0)
+            if (_input.NextAmmoPressed && _ammoSource != null && _ammoSource.TrySwitchAmmo(_slots[ActiveSlot].Key))
             {
-                StartReload(asset, ammo);
+                StartReload(asset);
+                NotifyAmmo();
+                return;
+            }
+
+            if (_input.ReloadPressed && _ammoSource != null && _ammoSource.TryStartReload(_slots[ActiveSlot].Key))
+            {
+                StartReload(asset);
+                NotifyAmmo();
                 return;
             }
 
             if (_input.FireModePressed && asset.FireModes.Count > 1)
             {
-                StartFireModeSwitch(asset, ammo);
+                StartFireModeSwitch(asset, _slots[ActiveSlot].WeaponState);
                 return;
             }
 
@@ -449,7 +477,7 @@ namespace RaidIntoDarkness.Weapons
             {
                 int mode = FireMode;
                 _burstLeft = mode == FirstPersonWeaponAsset.AUTO_FIRE_MODE ? int.MaxValue : Mathf.Max(1, mode);
-                if (ammo.Magazine <= 0)
+                if (Magazine <= 0)
                 {
                     _burstLeft = 0;
                     PlayEmptyClick(asset);
@@ -463,19 +491,24 @@ namespace RaidIntoDarkness.Weapons
 
             if (_burstLeft > 0 && Time.time >= _nextShotTime)
             {
-                if (ammo.Magazine <= 0)
+                if (Magazine <= 0)
                 {
                     _burstLeft = 0;
                     return;
                 }
 
-                Shoot(asset, ammo);
+                Shoot(asset);
             }
         }
 
-        private void Shoot(FirstPersonWeaponAsset asset, Ammo ammo)
+        private void Shoot(FirstPersonWeaponAsset asset)
         {
-            ammo.Magazine--;
+            if (_ammoSource == null || _ammoSource.TryShoot(_slots[ActiveSlot].Key) == false)
+            {
+                _burstLeft = 0;
+                return;
+            }
+
             _burstLeft--;
             _nextShotTime = Time.time + asset.ShotInterval;
             FirstPersonWeaponMotion motion = _aiming ? asset.FindRandom(FirstPersonWeaponMotionKind.ShootAim) : null;
@@ -490,7 +523,7 @@ namespace RaidIntoDarkness.Weapons
                 _actionUntil = Time.time + motion.Duration;
             }
 
-            PlayShotSounds(asset, ammo.Magazine);
+            PlayShotSounds(asset, Magazine);
             Vector3 recoil = asset.Recoil * (_player.State.IsCrouching ? 0.5f : 1.0f);
             if (_player.CameraController != null && _player.CameraController.Recoil != null)
             {
@@ -566,9 +599,9 @@ namespace RaidIntoDarkness.Weapons
             _flame.transform.SetPositionAndRotation(_muzzle.position, GetMuzzleRotation(_muzzle));
         }
 
-        private void StartReload(FirstPersonWeaponAsset asset, Ammo ammo)
+        private void StartReload(FirstPersonWeaponAsset asset)
         {
-            FirstPersonWeaponMotion motion = ammo.Magazine <= 0 ? asset.Find(FirstPersonWeaponMotionKind.ReloadEmpty, 0) : null;
+            FirstPersonWeaponMotion motion = Magazine <= 0 ? asset.Find(FirstPersonWeaponMotionKind.ReloadEmpty, 0) : null;
             if (motion == null)
             {
                 motion = asset.Find(FirstPersonWeaponMotionKind.Reload, 0);
@@ -578,7 +611,7 @@ namespace RaidIntoDarkness.Weapons
             _burstLeft = 0;
             if (motion == null)
             {
-                FinishReload(asset, ammo);
+                FinishReload(asset);
                 return;
             }
 
@@ -586,17 +619,19 @@ namespace RaidIntoDarkness.Weapons
             SetState(FirstPersonWeaponState.Reloading, motion.Duration);
         }
 
-        private void FinishReload(FirstPersonWeaponAsset asset, Ammo ammo)
+        private void FinishReload(FirstPersonWeaponAsset asset)
         {
-            int taken = Mathf.Min(asset.MagazineSize - ammo.Magazine, ammo.Reserve);
-            ammo.Magazine += taken;
-            ammo.Reserve -= taken;
+            if (_ammoSource != null)
+            {
+                _ammoSource.Reload(_slots[ActiveSlot].Key, asset.MagazineSize);
+            }
+
             NotifyAmmo();
         }
 
-        private void StartFireModeSwitch(FirstPersonWeaponAsset asset, Ammo ammo)
+        private void StartFireModeSwitch(FirstPersonWeaponAsset asset, WeaponState weaponState)
         {
-            ammo.FireModeIndex = (ammo.FireModeIndex + 1) % asset.FireModes.Count;
+            weaponState.FireModeIndex = (weaponState.FireModeIndex + 1) % asset.FireModes.Count;
             _burstLeft = 0;
             FirstPersonWeaponMotion motion = asset.Find(FirstPersonWeaponMotionKind.FireMode, 0);
             if (motion == null)
@@ -638,7 +673,7 @@ namespace RaidIntoDarkness.Weapons
                     Hide();
                     return;
                 case FirstPersonWeaponState.Reloading:
-                    FinishReload(asset, _slots[ActiveSlot].Ammo);
+                    FinishReload(asset);
                     break;
             }
 
@@ -980,15 +1015,15 @@ namespace RaidIntoDarkness.Weapons
             AmmoChanged?.Invoke(Magazine, Reserve);
         }
 
-        private Ammo GetAmmo(object key, FirstPersonWeaponAsset asset)
+        private WeaponState GetWeaponState(object key)
         {
-            if (!_ammo.TryGetValue(key, out Ammo ammo))
+            if (!_weaponStates.TryGetValue(key, out WeaponState weaponState))
             {
-                ammo = new Ammo { Magazine = asset.MagazineSize, Reserve = asset.ReserveAmmo };
-                _ammo.Add(key, ammo);
+                weaponState = new WeaponState();
+                _weaponStates.Add(key, weaponState);
             }
 
-            return ammo;
+            return weaponState;
         }
 
         private static bool IsSlot(int slot)
@@ -1065,13 +1100,11 @@ namespace RaidIntoDarkness.Weapons
         {
             public FirstPersonWeaponAsset Asset { get; set; }
             public object Key { get; set; }
-            public Ammo Ammo { get; set; }
+            public WeaponState WeaponState { get; set; }
         }
 
-        private sealed class Ammo
+        private sealed class WeaponState
         {
-            public int Magazine { get; set; }
-            public int Reserve { get; set; }
             public int FireModeIndex { get; set; }
         }
     }

@@ -195,6 +195,8 @@ MonoBehaviour:
   _smokeParticles: {fileID: 6292335335723028336, guid: 3e67f16876bef364ca7d91540a96b1ee, type: 3}
   _silencedFlameParticles: {fileID: 0}
   _silencedSmokeParticles: {fileID: 6292335335723028336, guid: 3e67f16876bef364ca7d91540a96b1ee, type: 3}
+  _lastShotHoldFrame: 1
+  _emptyShotStrength: 0.15
   _recoil: {x: 4, y: 4, z: 2}
   _recoilSnappiness: 13
   _recoilReturnSpeed: 9

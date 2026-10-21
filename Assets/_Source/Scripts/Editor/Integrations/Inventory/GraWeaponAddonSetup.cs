@@ -316,6 +316,38 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
             return remaining.Count;
         }
 
+        public static string TranslateAddon(XRayStringTable strings, string key)
+        {
+            string translated = strings.Translate(key);
+
+            if (translated == key && key != null && key.StartsWith("st_addon_scope_aim_acro", StringComparison.Ordinal))
+            {
+                return strings.Translate(key.Replace("st_addon_scope_aim_acro", "st_addon_scope_acro"));
+            }
+
+            return translated;
+        }
+
+        public static string RepairAcroText()
+        {
+            StalkerXRaySources sources = StalkerXRaySources.Open(new[] { "configs" }, out string error);
+
+            if (sources == null)
+            {
+                throw new InvalidOperationException(error);
+            }
+
+            XRayStringTable strings = XRayStringTable.Load(sources.Index, "rus");
+            ItemDefinition definition = AssetDatabase.LoadAssetAtPath<ItemDefinition>(DEFINITIONS_FOLDER + "/aim_acro.asset");
+            var serialized = new SerializedObject(definition);
+            serialized.FindProperty("_displayName").stringValue = TranslateAddon(strings, "st_addon_scope_aim_acro");
+            serialized.FindProperty("_shortName").stringValue = TranslateAddon(strings, "st_addon_scope_aim_acro");
+            serialized.FindProperty("_description").stringValue = GraTextFormatter.Format(TranslateAddon(strings, "st_addon_scope_aim_acro_descr"), GraTextFormatter.LoadColors(sources));
+            serialized.ApplyModifiedPropertiesWithoutUndo();
+            AssetDatabase.SaveAssets();
+            return definition.DisplayName;
+        }
+
         private static ItemDefinition CreateDefinition(XRayLtxDatabase system, XRayStringTable strings, IReadOnlyDictionary<string, Color32> colors, string section, GameObject model, Sprite icon)
         {
             string path = DEFINITIONS_FOLDER + "/" + section + ".asset";
@@ -332,9 +364,9 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
             string name = Get(system, section, "inv_name") ?? section;
             var serialized = new SerializedObject(definition);
             serialized.FindProperty("_definitionId").stringValue = AssetDatabase.AssetPathToGUID(path);
-            serialized.FindProperty("_displayName").stringValue = strings.Translate(name);
-            serialized.FindProperty("_shortName").stringValue = strings.Translate(Get(system, section, "inv_name_short") ?? name);
-            serialized.FindProperty("_description").stringValue = GraTextFormatter.Format(strings.Translate(Get(system, section, "description")), colors);
+            serialized.FindProperty("_displayName").stringValue = TranslateAddon(strings, name);
+            serialized.FindProperty("_shortName").stringValue = TranslateAddon(strings, Get(system, section, "inv_name_short") ?? name);
+            serialized.FindProperty("_description").stringValue = GraTextFormatter.Format(TranslateAddon(strings, Get(system, section, "description")), colors);
             serialized.FindProperty("_category").stringValue = ATTACHMENT_CATEGORY;
             SerializedProperty tags = serialized.FindProperty("_tags");
             tags.arraySize = 1;

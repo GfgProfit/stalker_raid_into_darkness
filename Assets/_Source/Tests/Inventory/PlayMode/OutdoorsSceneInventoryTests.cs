@@ -32,6 +32,92 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
         }
 
         [UnityTest]
+        public IEnumerator ShiftPressedOverHoveredItemTransfersOnceInBothDirections()
+        {
+            SceneManager.LoadScene(SCENE, LoadSceneMode.Single);
+            yield return new WaitForSeconds(0.6f);
+            InventoryWindowController controller = Object.FindAnyObjectByType<InventoryWindowController>();
+            InventoryWindow window = controller.Window;
+            InventoryModel model = controller.Inventory.Model;
+            ItemDefinition definition = null;
+
+            foreach (ItemDefinition candidate in controller.Inventory.Database.Definitions)
+            {
+                if (candidate.name == "ammo_5.56x45_fmj")
+                {
+                    definition = candidate;
+                }
+            }
+
+            ItemInstance item = model.CreateItem(definition, 10);
+            Assert.That(model.TryAddAuto(item, window.PrimaryContainerId, false).Success, Is.True);
+            controller.Open(true);
+            yield return null;
+
+            for (int i = 0; i < 2; i++)
+            {
+                InventoryItemView view = window.FindGrid(item.ContainerId).GetItemView(item);
+                var pointer = new PointerEventData(EventSystem.current) { position = RectTransformUtility.WorldToScreenPoint(null, view.RectTransform.position) };
+                ExecuteEvents.Execute(view.gameObject, pointer, ExecuteEvents.pointerEnterHandler);
+                yield return null;
+                string destination = item.ContainerId == window.PrimaryContainerId ? window.SecondaryContainerId : window.PrimaryContainerId;
+                Press(_keyboard.leftShiftKey, queueEventOnly: true);
+                yield return null;
+                yield return null;
+                Assert.That(item.ContainerId, Is.EqualTo(destination));
+                yield return new WaitForSeconds(0.1f);
+                Assert.That(item.ContainerId, Is.EqualTo(destination));
+                Release(_keyboard.leftShiftKey, queueEventOnly: true);
+                yield return null;
+            }
+
+            controller.Close();
+        }
+
+        [UnityTest]
+        public IEnumerator DroppingWhileLookingDownDoesNotIntersectThePlayerOrLaunchSideways()
+        {
+            SceneManager.LoadScene(SCENE, LoadSceneMode.Single);
+            yield return new WaitForSeconds(0.6f);
+            InventoryWindowController controller = Object.FindAnyObjectByType<InventoryWindowController>();
+            WorldItemInteractor interactor = Object.FindAnyObjectByType<WorldItemInteractor>();
+            controller.Player.CameraController.SetLook(0f, 90f);
+            yield return null;
+            yield return new WaitForEndOfFrame();
+            CharacterController character = controller.Player.GetComponent<CharacterController>();
+
+            foreach (string section in new[] { "ammo_5.56x45_fmj", "wpn_aug_a3" })
+            {
+                ItemDefinition definition = null;
+
+                foreach (ItemDefinition candidate in controller.Inventory.Database.Definitions)
+                {
+                    if (candidate.name == section)
+                    {
+                        definition = candidate;
+                    }
+                }
+
+                WorldItem dropped = interactor.Spawn(definition, 1);
+                Assert.That(dropped, Is.Not.Null, section);
+                Physics.SyncTransforms();
+
+                foreach (Collider collider in dropped.GetComponentsInChildren<Collider>())
+                {
+                    Assert.That(Physics.ComputePenetration(collider, collider.transform.position, collider.transform.rotation, character, character.transform.position, character.transform.rotation, out _, out _), Is.False, section);
+                }
+
+                Vector3 position = dropped.transform.position;
+                Rigidbody body = dropped.GetComponent<Rigidbody>();
+                yield return new WaitForSeconds(0.2f);
+                Assert.That(Vector3.ProjectOnPlane(dropped.transform.position - position, Vector3.up).magnitude, Is.LessThan(0.1f), section);
+                Assert.That(Vector3.ProjectOnPlane(body.linearVelocity, Vector3.up).magnitude, Is.LessThan(0.5f), section);
+                Object.Destroy(dropped.gameObject);
+                yield return null;
+            }
+        }
+
+        [UnityTest]
         public IEnumerator InventoryOpensBlocksGameplayAndSupportsItemOperations()
         {
             SceneManager.LoadScene(SCENE, LoadSceneMode.Single);

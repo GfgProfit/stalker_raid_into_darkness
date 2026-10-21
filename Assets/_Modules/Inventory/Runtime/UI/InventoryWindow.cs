@@ -1092,6 +1092,19 @@ namespace Inventory.UI
                 RotateDrag();
             }
 
+            if (_hovered != null && _drag == null && HasModalWidget == false && _input.TransferPressed && Model != null && Model.ContainsItem(_hovered.Item) && CanHoverTransfer(_hovered.Item))
+            {
+                ItemInstance item = _hovered.Item;
+                _hovered = null;
+
+                if (_tooltip != null)
+                {
+                    _tooltip.Hide();
+                }
+
+                QuickTransfer(item);
+            }
+
             if (_hovered != null && _drag == null && HasModalWidget == false && _tooltip != null)
             {
                 if (_hovered.Item == null || Model == null || Model.ContainsItem(_hovered.Item) == false)

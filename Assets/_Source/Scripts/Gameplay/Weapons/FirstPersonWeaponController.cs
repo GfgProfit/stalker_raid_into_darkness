@@ -52,11 +52,13 @@ namespace RaidIntoDarkness.Weapons
         private Vector3 _savedHandsPosition;
         private Quaternion _savedHandsRotation;
         private FirstPersonWeaponMotionKind _loopKind;
+        private AnimationClip _loopWeaponClip;
         private bool _hasLoop;
         private bool _inSprint;
         private float _stateTime;
         private float _stateDuration;
         private float _actionUntil;
+        private float _emptyWeaponAt = float.PositiveInfinity;
         private float _nextShotTime;
         private float _nextEmptyClickTime;
         private int _burstLeft;
@@ -65,9 +67,8 @@ namespace RaidIntoDarkness.Weapons
         private float _handsFreeTime;
         private float _aim;
         private bool _aiming;
-        private bool _aimEnding;
+        private AimPhase _aimPhase;
         private float _aimBlendTime;
-        private float _aimBlendScale = 1.0f;
         private FirstPersonWeaponAsset _recoilSource;
 
         public event Action<int, int> AmmoChanged;
@@ -325,6 +326,7 @@ namespace RaidIntoDarkness.Weapons
             }
 
             TickAim(deltaTime);
+            TickEmptyWeapon();
             if (_graph != null)
             {
                 _graph.Evaluate(deltaTime);
@@ -445,7 +447,8 @@ namespace RaidIntoDarkness.Weapons
             _player.Combat = true;
             _aim = 0.0f;
             _aiming = false;
-            _aimEnding = false;
+            _aimPhase = AimPhase.Hip;
+            _aimBlendTime = 0f;
             _hasLoop = false;
             _inSprint = false;
             FirstPersonWeaponMotion motion = asset.Find(FirstPersonWeaponMotionKind.Draw, 0);
@@ -543,6 +546,12 @@ namespace RaidIntoDarkness.Weapons
             {
                 PlayMotion(motion, SHOT_FADE, false, false);
                 _actionUntil = Time.time + motion.Duration;
+
+                if (Magazine <= 0 && asset.Find(FirstPersonWeaponMotionKind.IdleEmpty, 0)?.Weapon != null)
+                {
+                    float holdTime = motion.Weapon != null && motion.Weapon.frameRate > 0f ? asset.LastShotHoldFrame / motion.Weapon.frameRate : 0f;
+                    _emptyWeaponAt = Time.time + holdTime / motion.Speed;
+                }
             }
 
             PlayShotSounds(asset, Magazine);
@@ -588,6 +597,23 @@ namespace RaidIntoDarkness.Weapons
             }
 
             _nextEmptyClickTime = Time.time + asset.EmptyClickInterval;
+            FirstPersonWeaponMotion motion = asset.FindRandom(FirstPersonWeaponMotionKind.Shoot);
+
+            if (motion != null)
+            {
+                PlayLoop(asset, SelectIdle(asset, _player.State));
+                CurrentMotion = motion.Kind;
+                _emptyWeaponAt = float.PositiveInfinity;
+                _hasLoop = false;
+
+                if (_graph != null)
+                {
+                    _graph.PlayEmptyShot(motion.Hands, motion.Speed, SHOT_FADE, asset.EmptyShotStrength);
+                }
+
+                _actionUntil = Time.time + motion.Duration;
+            }
+
             PlayOneShot(_shotAudio != null ? _shotAudio : _audio, asset.EmptySound);
         }
 
@@ -749,7 +775,7 @@ namespace RaidIntoDarkness.Weapons
 
             if (!movement.IsMoving)
             {
-                return Magazine <= 0 && asset.HasMotion(FirstPersonWeaponMotionKind.IdleEmpty) ? FirstPersonWeaponMotionKind.IdleEmpty : FirstPersonWeaponMotionKind.Idle;
+                return FirstPersonWeaponMotionKind.Idle;
             }
 
             if (movement.IsCrouching && asset.HasMotion(FirstPersonWeaponMotionKind.MovingCrouch))
@@ -781,29 +807,47 @@ namespace RaidIntoDarkness.Weapons
 
         private void PlayLoop(FirstPersonWeaponAsset asset, FirstPersonWeaponMotionKind kind)
         {
-            if (_hasLoop && _loopKind == kind && CurrentMotion == kind)
-            {
-                return;
-            }
-
             FirstPersonWeaponMotion motion = asset.Find(kind, 0) ?? asset.Find(FirstPersonWeaponMotionKind.Idle, 0);
             if (motion == null)
             {
                 return;
             }
 
-            PlayMotion(motion, asset.CrossFade, true, false);
+            AnimationClip weaponClip = Magazine <= 0 ? asset.Find(FirstPersonWeaponMotionKind.IdleEmpty, 0)?.Weapon : null;
+            weaponClip = weaponClip != null ? weaponClip : motion.Weapon;
+
+            if (_hasLoop && _loopKind == kind && CurrentMotion == kind)
+            {
+                if (_loopWeaponClip != weaponClip)
+                {
+                    _loopWeaponClip = weaponClip;
+
+                    if (_graph != null)
+                    {
+                        _graph.PlayWeapon(weaponClip, motion.Speed, Magazine <= 0 ? 0f : asset.CrossFade, true);
+                    }
+                }
+
+                return;
+            }
+
+            PlayMotion(motion, asset.CrossFade, true, false, weaponClip);
+            _loopWeaponClip = weaponClip;
             _loopKind = kind;
             _hasLoop = true;
             CurrentMotion = kind;
         }
 
-        private void PlayMotion(FirstPersonWeaponMotion motion, float fade, bool loop, bool withEffects)
+        private void PlayMotion(FirstPersonWeaponMotion motion, float fade, bool loop, bool withEffects, AnimationClip weaponClip = null)
         {
             CurrentMotion = motion.Kind;
+            _emptyWeaponAt = float.PositiveInfinity;
             if (_graph != null)
             {
-                _graph.Play(motion.Hands, motion.Weapon, motion.Speed, fade, loop);
+                AnimationClip emptyClip = Magazine <= 0 ? ActiveWeapon.Find(FirstPersonWeaponMotionKind.IdleEmpty, 0)?.Weapon : null;
+                bool useEmptyPose = emptyClip != null && motion.Kind is not FirstPersonWeaponMotionKind.Shoot and not FirstPersonWeaponMotionKind.ShootAim and not FirstPersonWeaponMotionKind.Reload and not FirstPersonWeaponMotionKind.ReloadEmpty and not FirstPersonWeaponMotionKind.Misfire;
+                AnimationClip clip = useEmptyPose ? emptyClip : weaponClip != null ? weaponClip : motion.Weapon;
+                _graph.Play(motion.Hands, clip, motion.Speed, fade, loop, useEmptyPose ? 0f : fade);
             }
 
             if (motion.CameraEffect != null && _player.CameraEffects != null)
@@ -816,6 +860,28 @@ namespace RaidIntoDarkness.Weapons
                 _audio.Stop();
                 _audio.clip = motion.Sound;
                 _audio.Play();
+            }
+        }
+
+        private void TickEmptyWeapon()
+        {
+            if (Time.time < _emptyWeaponAt)
+            {
+                return;
+            }
+
+            _emptyWeaponAt = float.PositiveInfinity;
+
+            if (_graph == null || ActiveWeapon == null || Magazine > 0)
+            {
+                return;
+            }
+
+            FirstPersonWeaponMotion empty = ActiveWeapon.Find(FirstPersonWeaponMotionKind.IdleEmpty, 0);
+
+            if (empty?.Weapon != null)
+            {
+                _graph.PlayWeapon(empty.Weapon, empty.Speed, 0f, true);
             }
         }
 
@@ -839,33 +905,54 @@ namespace RaidIntoDarkness.Weapons
                 return;
             }
 
+            _aiming = aiming;
             FirstPersonWeaponAsset asset = ActiveWeapon;
-            float startDuration = asset != null && asset.AimStart != null ? asset.AimStart.Duration : 0.0f;
-            float endDuration = asset != null && asset.AimEnd != null ? asset.AimEnd.Duration : 0.0f;
-            if (aiming)
+
+            if (asset == null)
             {
-                float endProgress = _aimEnding && endDuration > 0.0f ? Mathf.Clamp01(_aimBlendTime / endDuration) : 1.0f;
-                _aimBlendTime = _aimEnding ? (1.0f - endProgress) * _aimBlendScale * startDuration : 0.0f;
-                _aimBlendScale = 1.0f;
-                _aimEnding = false;
-            }
-            else
-            {
-                _aimBlendScale = startDuration > 0.0f ? Mathf.Clamp01(_aimBlendTime / startDuration) : 1.0f;
-                _aimBlendTime = 0.0f;
-                _aimEnding = true;
+                return;
             }
 
-            _aiming = aiming;
-            _hasLoop = false;
+            if (aiming && _aimPhase == AimPhase.Hip)
+            {
+                _aimPhase = asset.AimStart != null ? AimPhase.Entering : asset.AimEnd != null ? AimPhase.Leaving : AimPhase.Aimed;
+                _aimBlendTime = _aimPhase == AimPhase.Leaving ? asset.AimEnd.Duration : 0f;
+            }
+            else if (!aiming && _aimPhase == AimPhase.Aimed)
+            {
+                _aimPhase = asset.AimEnd != null ? AimPhase.Leaving : asset.AimStart != null ? AimPhase.Entering : AimPhase.Hip;
+                _aimBlendTime = _aimPhase == AimPhase.Entering ? asset.AimStart.Duration : 0f;
+            }
         }
 
         private void TickAim(float deltaTime)
         {
             FirstPersonWeaponAsset asset = ActiveWeapon;
             float aimTime = asset != null ? asset.AimTime : 0.25f;
-            _aim = Mathf.MoveTowards(_aim, _aiming ? 1.0f : 0.0f, deltaTime / aimTime);
-            _aimBlendTime += deltaTime;
+            _aim = Mathf.MoveTowards(_aim, _aiming ? 1f : 0f, deltaTime / aimTime);
+
+            if (asset == null)
+            {
+                return;
+            }
+
+            XRayAnmAsset clip = _aimPhase == AimPhase.Entering ? asset.AimStart : _aimPhase == AimPhase.Leaving ? asset.AimEnd : null;
+
+            if (clip == null)
+            {
+                _aimBlendTime += deltaTime;
+                return;
+            }
+
+            bool entering = _aimPhase == AimPhase.Entering;
+            bool forward = entering == _aiming;
+            _aimBlendTime = Mathf.Clamp(_aimBlendTime + (forward ? deltaTime : -deltaTime), 0f, clip.Duration);
+
+            if (forward && _aimBlendTime >= clip.Duration || !forward && _aimBlendTime <= 0f)
+            {
+                _aimPhase = _aiming ? AimPhase.Aimed : AimPhase.Hip;
+                _aimBlendTime = 0f;
+            }
         }
 
         private void ApplyHandsOffset()
@@ -893,40 +980,41 @@ namespace RaidIntoDarkness.Weapons
         {
             position = Vector3.zero;
             rotation = Quaternion.identity;
-            XRayAnmAsset anm;
+            XRayAnmAsset clip;
             float time = _aimBlendTime;
-            if (_aiming)
+
+            switch (_aimPhase)
             {
-                anm = asset.AimStart;
-                if (anm == null || time >= anm.Duration)
-                {
-                    anm = asset.AimIdle != null ? asset.AimIdle : anm;
-                    time = anm != null && anm == asset.AimIdle ? 0.0f : time;
-                }
+                case AimPhase.Entering:
+                    clip = asset.AimStart;
+                    break;
+                case AimPhase.Leaving:
+                    clip = asset.AimEnd;
+                    break;
+                case AimPhase.Aimed:
+                    clip = asset.AimIdle != null ? asset.AimIdle : asset.AimStart != null ? asset.AimStart : asset.AimEnd;
+
+                    if (clip != null)
+                    {
+                        time = clip == asset.AimIdle && clip.Duration > 0f ? time % clip.Duration : clip == asset.AimStart ? clip.Duration : 0f;
+                    }
+
+                    break;
+                default:
+                    clip = asset.AimStart == null && asset.AimEnd == null && _aim > 0f ? asset.AimIdle : null;
+                    time = 0f;
+                    break;
             }
-            else if (_aimEnding)
-            {
-                anm = asset.AimEnd;
-                if (anm == null || time >= anm.Duration)
-                {
-                    _aimEnding = false;
-                    return false;
-                }
-            }
-            else
+
+            if (clip == null || !clip.Evaluate(time, out position, out rotation))
             {
                 return false;
             }
 
-            if (anm == null || !anm.Evaluate(Mathf.Min(time, anm.Duration), out position, out rotation))
+            if (asset.AimStart == null && asset.AimEnd == null)
             {
-                return false;
-            }
-
-            if (_aimEnding && _aimBlendScale < 1.0f)
-            {
-                position *= _aimBlendScale;
-                rotation = Quaternion.Slerp(Quaternion.identity, rotation, _aimBlendScale);
+                position *= _aim;
+                rotation = Quaternion.Slerp(Quaternion.identity, rotation, _aim);
             }
 
             return true;
@@ -955,6 +1043,11 @@ namespace RaidIntoDarkness.Weapons
             foreach (Renderer renderer in _model.GetComponentsInChildren<Renderer>(true))
             {
                 renderer.shadowCastingMode = ShadowCastingMode.Off;
+
+                if (renderer is SkinnedMeshRenderer skinned)
+                {
+                    skinned.updateWhenOffscreen = true;
+                }
             }
 
             _modelRoot = FindModelRoot(_model);
@@ -1128,6 +1221,14 @@ namespace RaidIntoDarkness.Weapons
             }
 
             return null;
+        }
+
+        private enum AimPhase
+        {
+            Hip,
+            Entering,
+            Aimed,
+            Leaving
         }
 
         private sealed class Slot

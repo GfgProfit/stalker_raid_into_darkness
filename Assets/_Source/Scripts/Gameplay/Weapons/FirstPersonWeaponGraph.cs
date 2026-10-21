@@ -13,8 +13,14 @@ namespace RaidIntoDarkness.Weapons
 
         private readonly PlayableGraph _graph;
         private readonly AnimationLayerMixerPlayable _handsLayers;
+        private readonly AnimationMixerPlayable _handsMotion;
         private readonly Channel _hands;
         private readonly Channel _weapon;
+        private AnimationClipPlayable _emptyShot;
+        private float _emptyShotTime;
+        private float _emptyShotDuration;
+        private float _emptyShotStrength;
+        private float _emptyShotFade;
         private AnimationClipPlayable _overlay;
         private float _overlayWeight;
         private bool _overlayActive;
@@ -27,7 +33,10 @@ namespace RaidIntoDarkness.Weapons
             var handsOutput = AnimationPlayableOutput.Create(_graph, "Hands", hands);
             handsOutput.SetSourcePlayable(_handsLayers);
             _hands = new Channel(_graph);
-            _graph.Connect(_hands.Mixer, 0, _handsLayers, BASE_LAYER);
+            _handsMotion = AnimationMixerPlayable.Create(_graph, 2);
+            _graph.Connect(_hands.Mixer, 0, _handsMotion, 0);
+            _handsMotion.SetInputWeight(0, 1f);
+            _graph.Connect(_handsMotion, 0, _handsLayers, BASE_LAYER);
             _handsLayers.SetInputWeight(BASE_LAYER, 1.0f);
             _handsLayers.SetInputWeight(OVERLAY_LAYER, 0.0f);
             if (overlayMask != null)
@@ -48,9 +57,35 @@ namespace RaidIntoDarkness.Weapons
         public bool IsValid => _graph.IsValid();
         public bool OverlayActive => _overlayActive;
 
-        public void Play(AnimationClip hands, AnimationClip weapon, float speed, float fade, bool loop)
+        public void Play(AnimationClip hands, AnimationClip weapon, float speed, float fade, bool loop, float weaponFade = -1f)
         {
+            StopEmptyShot();
             _hands.Play(hands, speed, fade, loop);
+            PlayWeapon(weapon, speed, weaponFade >= 0f ? weaponFade : fade, loop);
+        }
+
+        public void PlayEmptyShot(AnimationClip hands, float speed, float fade, float strength)
+        {
+            StopEmptyShot();
+
+            if (hands == null || strength <= 0f)
+            {
+                return;
+            }
+
+            _emptyShot = AnimationClipPlayable.Create(_graph, hands);
+            _emptyShot.SetApplyFootIK(false);
+            _emptyShot.SetTime(0.0);
+            _emptyShot.SetSpeed(speed);
+            _graph.Connect(_emptyShot, 0, _handsMotion, 1);
+            _emptyShotTime = 0f;
+            _emptyShotDuration = hands.length / Mathf.Max(0.01f, speed);
+            _emptyShotStrength = Mathf.Clamp01(strength);
+            _emptyShotFade = Mathf.Clamp(fade, 0f, _emptyShotDuration * 0.5f);
+        }
+
+        public void PlayWeapon(AnimationClip weapon, float speed, float fade, bool loop)
+        {
             if (_weapon != null)
             {
                 _weapon.Play(weapon, speed, fade, loop);
@@ -85,6 +120,20 @@ namespace RaidIntoDarkness.Weapons
             if (_weapon != null)
             {
                 _weapon.Tick(deltaTime);
+            }
+
+            if (_emptyShot.IsValid())
+            {
+                _emptyShotTime += deltaTime;
+                float envelope = _emptyShotFade > 0f ? Mathf.Clamp01(Mathf.Min(_emptyShotTime, _emptyShotDuration - _emptyShotTime) / _emptyShotFade) : 1f;
+                float weight = _emptyShotStrength * envelope;
+                _handsMotion.SetInputWeight(0, 1f - weight);
+                _handsMotion.SetInputWeight(1, weight);
+
+                if (_emptyShotTime >= _emptyShotDuration)
+                {
+                    StopEmptyShot();
+                }
             }
 
             float target = _overlayActive ? 1.0f : 0.0f;
@@ -167,19 +216,30 @@ namespace RaidIntoDarkness.Weapons
             _overlayWeight = 0.0f;
         }
 
+        private void StopEmptyShot()
+        {
+            if (_emptyShot.IsValid())
+            {
+                _handsMotion.DisconnectInput(1);
+                _emptyShot.Destroy();
+                _emptyShot = default;
+            }
+
+            _handsMotion.SetInputWeight(0, 1f);
+            _handsMotion.SetInputWeight(1, 0f);
+        }
+
         private sealed class Channel
         {
             private readonly PlayableGraph _graph;
-            private AnimationClipPlayable _current;
-            private AnimationClipPlayable _previous;
+            private readonly List<ClipState> _clips = new List<ClipState>();
             private float _fade;
             private float _fadeElapsed;
-            private bool _loop;
 
             public Channel(PlayableGraph graph)
             {
                 _graph = graph;
-                Mixer = AnimationMixerPlayable.Create(graph, 2);
+                Mixer = AnimationMixerPlayable.Create(graph, 0);
             }
 
             public AnimationMixerPlayable Mixer { get; }
@@ -191,58 +251,118 @@ namespace RaidIntoDarkness.Weapons
                     return;
                 }
 
-                if (_previous.IsValid())
+                if (fade <= 0f)
                 {
-                    Mixer.DisconnectInput(1);
-                    _previous.Destroy();
+                    ClearPrevious(_clips.Count);
                 }
 
-                _previous = default;
-                if (_current.IsValid())
+                for (int i = 0; i < _clips.Count; i++)
                 {
-                    Mixer.DisconnectInput(0);
-                    _previous = _current;
-                    _graph.Connect(_previous, 0, Mixer, 1);
+                    _clips[i].StartWeight = Mixer.GetInputWeight(i);
                 }
 
-                _current = AnimationClipPlayable.Create(_graph, clip);
-                _current.SetApplyFootIK(false);
-                _current.SetTime(0.0);
-                _current.SetSpeed(speed);
-                _graph.Connect(_current, 0, Mixer, 0);
-                _loop = loop;
-                _fade = _previous.IsValid() ? fade : 0.0f;
-                _fadeElapsed = 0.0f;
+                AnimationClipPlayable playable = AnimationClipPlayable.Create(_graph, clip);
+                playable.SetApplyFootIK(false);
+                playable.SetTime(0.0);
+                playable.SetSpeed(speed);
+                int index = _clips.Count;
+                Mixer.SetInputCount(index + 1);
+                _graph.Connect(playable, 0, Mixer, index);
+                _clips.Add(new ClipState { Playable = playable, Loop = loop });
+                _fade = index > 0 ? fade : 0f;
+                _fadeElapsed = 0f;
                 ApplyWeights();
             }
 
             public void Tick(float deltaTime)
             {
-                if (_loop && _current.IsValid())
+                for (int i = 0; i < _clips.Count; i++)
                 {
-                    double length = _current.GetAnimationClip().length;
-                    double time = _current.GetTime();
+                    ClipState state = _clips[i];
+                    double length = state.Playable.GetAnimationClip().length;
+                    double time = state.Playable.GetTime();
+
                     if (length > 0.0 && time >= length)
                     {
-                        _current.SetTime(time % length);
+                        state.Playable.SetTime(state.Loop ? time % length : length);
                     }
                 }
 
                 _fadeElapsed += deltaTime;
                 ApplyWeights();
-                if (_previous.IsValid() && _fadeElapsed >= _fade)
+
+                if (_clips.Count > 1 && _fadeElapsed >= _fade)
                 {
-                    Mixer.DisconnectInput(1);
-                    _previous.Destroy();
-                    _previous = default;
+                    ClearPrevious(_clips.Count - 1);
+                    Mixer.SetInputWeight(0, 1f);
+                }
+                else
+                {
+                    for (int i = _clips.Count - 2; i >= 0; i--)
+                    {
+                        if (Mixer.GetInputWeight(i) <= 0.00001f)
+                        {
+                            RemoveClip(i);
+                        }
+                    }
+                }
+            }
+
+            private void RemoveClip(int index)
+            {
+                Mixer.DisconnectInput(index);
+                _clips[index].Playable.Destroy();
+                _clips.RemoveAt(index);
+
+                for (int i = index; i < _clips.Count; i++)
+                {
+                    float weight = Mixer.GetInputWeight(i + 1);
+                    Mixer.DisconnectInput(i + 1);
+                    _graph.Connect(_clips[i].Playable, 0, Mixer, i);
+                    Mixer.SetInputWeight(i, weight);
+                }
+
+                Mixer.SetInputCount(_clips.Count);
+            }
+
+            private void ClearPrevious(int count)
+            {
+                for (int i = 0; i < count; i++)
+                {
+                    Mixer.DisconnectInput(i);
+                    _clips[i].Playable.Destroy();
+                }
+
+                if (count < _clips.Count)
+                {
+                    ClipState current = _clips[count];
+                    Mixer.DisconnectInput(count);
+                    _clips.RemoveRange(0, count);
+                    Mixer.SetInputCount(1);
+                    _graph.Connect(current.Playable, 0, Mixer, 0);
+                }
+                else
+                {
+                    _clips.Clear();
+                    Mixer.SetInputCount(0);
                 }
             }
 
             private void ApplyWeights()
             {
-                float weight = _fade > 0.0f ? Mathf.Clamp01(_fadeElapsed / _fade) : 1.0f;
-                Mixer.SetInputWeight(0, _previous.IsValid() ? weight : 1.0f);
-                Mixer.SetInputWeight(1, _previous.IsValid() ? 1.0f - weight : 0.0f);
+                float weight = _fade > 0f ? Mathf.Clamp01(_fadeElapsed / _fade) : 1f;
+
+                for (int i = 0; i < _clips.Count; i++)
+                {
+                    Mixer.SetInputWeight(i, i == _clips.Count - 1 ? weight : _clips[i].StartWeight * (1f - weight));
+                }
+            }
+
+            private sealed class ClipState
+            {
+                public AnimationClipPlayable Playable { get; set; }
+                public float StartWeight { get; set; }
+                public bool Loop { get; set; }
             }
         }
     }

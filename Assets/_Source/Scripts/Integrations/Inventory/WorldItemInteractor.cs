@@ -145,8 +145,34 @@ namespace RaidIntoDarkness.Integrations.Inventory
                 return null;
             }
 
-            WorldItem worldItem = Instantiate(component.Prefab, view.position + view.forward * _dropDistance, Quaternion.Euler(0f, view.eulerAngles.y, 0f));
+            Vector3 forward = Vector3.ProjectOnPlane(view.forward, Vector3.up);
+
+            if (forward.sqrMagnitude < 0.01f)
+            {
+                forward = Vector3.ProjectOnPlane(_controller.Player.transform.forward, Vector3.up);
+            }
+
+            forward.Normalize();
+            WorldItem worldItem = Instantiate(component.Prefab, view.position, Quaternion.LookRotation(forward, Vector3.up));
             worldItem.Configure(definition, amount);
+            Physics.SyncTransforms();
+            Bounds bounds = new Bounds(worldItem.transform.position, Vector3.zero);
+
+            foreach (Collider collider in worldItem.GetComponentsInChildren<Collider>())
+            {
+                if (collider.enabled && !collider.isTrigger)
+                {
+                    bounds.Encapsulate(collider.bounds);
+                }
+            }
+
+            CharacterController character = _controller.Player.GetComponent<CharacterController>();
+            float playerRadius = character != null ? Mathf.Max(character.bounds.extents.x, character.bounds.extents.z) : 0.5f;
+            float itemRadius = new Vector2(bounds.extents.x, bounds.extents.z).magnitude;
+            float distance = Mathf.Max(_dropDistance, playerRadius + itemRadius + 0.1f);
+            Vector3 position = view.position + forward * distance;
+            position.y += Mathf.Max(0f, view.forward.y) * _dropDistance;
+            worldItem.transform.position = position;
             return worldItem;
         }
 

@@ -131,11 +131,19 @@ namespace RaidIntoDarkness.FirstPerson
             }
 
             instance = model != null && root != null ? Instantiate(model, root, false) : null;
-            if (instance != null && !_castShadows)
+            if (instance != null)
             {
                 foreach (Renderer renderer in instance.GetComponentsInChildren<Renderer>(true))
                 {
-                    renderer.shadowCastingMode = ShadowCastingMode.Off;
+                    if (!_castShadows)
+                    {
+                        renderer.shadowCastingMode = ShadowCastingMode.Off;
+                    }
+
+                    if (renderer is SkinnedMeshRenderer skinned)
+                    {
+                        skinned.updateWhenOffscreen = true;
+                    }
                 }
             }
         }

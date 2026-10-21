@@ -26,5 +26,5 @@ ScriptedImporter:
   _embeddedLoopMode: 0
   _addAnimator: 1
   _readableMeshes: 0
-  _updateWhenOffscreen: 0
+  _updateWhenOffscreen: 1
   _autoResolveResources: 1

@@ -14,6 +14,7 @@ namespace Inventory.UI
         public InputActionReference TransferModifier => _transferModifier;
         public bool RotatePressed => WasPressed(_rotateItem);
         public bool TransferHeld => IsHeld(_transferModifier);
+        public bool TransferPressed => WasPressed(_transferModifier);
 
         public void Set(InputActionReference rotateItem, InputActionReference transferModifier)
         {

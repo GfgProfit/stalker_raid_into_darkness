@@ -142,7 +142,8 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             Image classBackground = outfitView.transform.Find("Overlay/NameBackground").GetComponent<Image>();
             Assert.That(community.isActiveAndEnabled, Is.True);
             Assert.That(community.sprite.name, Is.EqualTo("ui_dyn_eq_dolg"));
-            Assert.That(community.rectTransform.sizeDelta, Is.EqualTo(new Vector2(20f, 19f)));
+            Assert.That(community.rectTransform.sizeDelta.x, Is.EqualTo(24f).Within(0.001f));
+            Assert.That(community.rectTransform.sizeDelta.y, Is.EqualTo(22.8f).Within(0.001f));
             Assert.That(community.rectTransform.anchoredPosition.y, Is.EqualTo(outfitView.RectTransform.rect.height + classBackground.rectTransform.anchoredPosition.y + 5f).Within(0.01f));
             Assert.That(helmetView.transform.Find("Overlay/CommunityIcon").GetComponent<Image>().enabled, Is.False);
             Assert.That(slotHighlight.transform.parent, Is.SameAs(weaponSlot.Icon.transform.parent));

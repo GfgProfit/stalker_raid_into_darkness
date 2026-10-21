@@ -41,6 +41,8 @@ namespace RaidIntoDarkness.Weapons
         [SerializeField] private GameObject _smokeParticles;
         [SerializeField] private GameObject _silencedFlameParticles;
         [SerializeField] private GameObject _silencedSmokeParticles;
+        [SerializeField] [Min(0)] private int _lastShotHoldFrame;
+        [SerializeField] [Range(0f, 1f)] private float _emptyShotStrength = 0.15f;
         [Header("Recoil")]
         [SerializeField] private Vector3 _recoil = new Vector3(4.0f, 4.0f, 2.0f);
         [SerializeField] [Range(0.0f, 50.0f)] private float _recoilSnappiness = 13.0f;
@@ -76,6 +78,8 @@ namespace RaidIntoDarkness.Weapons
         public GameObject SmokeParticles => _smokeParticles;
         public GameObject SilencedFlameParticles => _silencedFlameParticles;
         public GameObject SilencedSmokeParticles => _silencedSmokeParticles;
+        public int LastShotHoldFrame => _lastShotHoldFrame;
+        public float EmptyShotStrength => Mathf.Clamp01(_emptyShotStrength);
         public Vector3 Recoil => _recoil;
         public float RecoilSnappiness => _recoilSnappiness;
         public float RecoilReturnSpeed => _recoilReturnSpeed;

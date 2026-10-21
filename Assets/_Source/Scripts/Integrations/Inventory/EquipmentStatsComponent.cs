@@ -26,6 +26,8 @@ namespace RaidIntoDarkness.Integrations.Inventory
     [Serializable]
     public sealed class EquipmentStatsComponent : ItemDefinitionComponent
     {
+        private const float COMMUNITY_ICON_SCALE = 1.2f;
+
         [SerializeField] private string _section;
         [SerializeField] private int _cost;
         [SerializeField] private string _repairType;
@@ -57,7 +59,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
         public string RepairType => _repairType ?? string.Empty;
         public string Community => _community ?? string.Empty;
         public Sprite CommunityIcon => _communityIcon;
-        public Vector2 CommunityIconSize => _communityIconSize;
+        public Vector2 CommunityIconSize => _communityIconSize * COMMUNITY_ICON_SCALE;
         public string ArmorTypeLabel => RepairType switch
         {
             "outfit_novice" or "outfit_light" or "helmet_light" => "LIGHT",

@@ -309,7 +309,10 @@ namespace RaidIntoDarkness.FirstPerson.Editor
         {
             foreach (string path in paths)
             {
-                if (SetImporterBool(path, "_importEmbeddedMotions", false))
+                bool changed = SetImporterBool(path, "_importEmbeddedMotions", false);
+                changed |= SetImporterBool(path, "_updateWhenOffscreen", true);
+
+                if (changed)
                 {
                     AssetImporter.GetAtPath(path).SaveAndReimport();
                 }

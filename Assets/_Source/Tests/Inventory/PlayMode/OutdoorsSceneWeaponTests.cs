@@ -12,6 +12,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Controls;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
+using XRay.Importer;
 
 namespace RaidIntoDarkness.Integrations.Inventory.Tests
 {
@@ -31,6 +32,315 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             base.Setup();
             _keyboard = InputSystem.AddDevice<Keyboard>();
             _mouse = InputSystem.AddDevice<Mouse>();
+        }
+
+        [TestCase(0f)]
+        [TestCase(0.15f)]
+        [TestCase(1f)]
+        public void EmptyShotScalesHandsAroundIdleAndKeepsTheWeaponPose(float strength)
+        {
+            var hands = new GameObject("Hands");
+            var handsBone = new GameObject("Bone");
+            handsBone.transform.SetParent(hands.transform, false);
+            var weapon = new GameObject("Weapon");
+            var weaponBone = new GameObject("Bone");
+            weaponBone.transform.SetParent(weapon.transform, false);
+            var clips = new AnimationClip[3];
+            var graph = new FirstPersonWeaponGraph("EmptyShot", hands.AddComponent<Animator>(), weapon.AddComponent<Animator>(), null);
+
+            try
+            {
+                float[] positions = { 10f, 20f, 3f };
+
+                for (int i = 0; i < clips.Length; i++)
+                {
+                    clips[i] = new AnimationClip();
+                    clips[i].SetCurve("Bone", typeof(Transform), "m_LocalPosition.x", AnimationCurve.Constant(0f, 1f, positions[i]));
+                }
+
+                graph.Play(clips[0], clips[2], 1f, 0f, true);
+                graph.Evaluate(0f);
+                graph.PlayEmptyShot(clips[1], 1f, 0.05f, strength);
+                graph.Evaluate(0.1f);
+                Assert.That(handsBone.transform.localPosition.x, Is.EqualTo(10f + 10f * strength).Within(0.001f));
+                Assert.That(weaponBone.transform.localPosition.x, Is.EqualTo(3f).Within(0.001f));
+                graph.Evaluate(1f);
+                Assert.That(handsBone.transform.localPosition.x, Is.EqualTo(10f).Within(0.001f));
+                graph.PlayEmptyShot(clips[1], 1f, 0.05f, strength);
+                graph.Evaluate(0.1f);
+                graph.Play(clips[1], clips[2], 1f, 0f, false);
+                graph.Evaluate(0f);
+                Assert.That(handsBone.transform.localPosition.x, Is.EqualTo(20f).Within(0.001f));
+            }
+            finally
+            {
+                graph.Destroy();
+                Object.DestroyImmediate(hands);
+                Object.DestroyImmediate(weapon);
+
+                foreach (AnimationClip clip in clips)
+                {
+                    Object.DestroyImmediate(clip);
+                }
+            }
+        }
+
+        [Test]
+        public void InterruptedCrossFadeKeepsTheBlendedHandsPose()
+        {
+            var hands = new GameObject("Hands");
+            var bone = new GameObject("Bone");
+            bone.transform.SetParent(hands.transform, false);
+            var clips = new AnimationClip[3];
+            var graph = new FirstPersonWeaponGraph("InterruptedFade", hands.AddComponent<Animator>(), null, null);
+
+            try
+            {
+                for (int i = 0; i < clips.Length; i++)
+                {
+                    clips[i] = new AnimationClip();
+                    clips[i].SetCurve("Bone", typeof(Transform), "m_LocalPosition.x", AnimationCurve.Constant(0f, 1f, i * 10f));
+                }
+
+                graph.Play(clips[0], null, 1f, 0f, true);
+                graph.Evaluate(0f);
+                graph.Play(clips[1], null, 1f, 1f, true);
+                graph.Evaluate(0.25f);
+                float blended = bone.transform.localPosition.x;
+                Assert.That(blended, Is.EqualTo(2.5f).Within(0.01f));
+
+                for (int i = 0; i < 1000; i++)
+                {
+                    graph.Play(clips[i % 2 + 1], null, 1f, 1f, true);
+                    graph.Evaluate(0f);
+                    Assert.That(bone.transform.localPosition.x, Is.EqualTo(blended).Within(0.001f));
+                    graph.Evaluate(0.02f);
+                    blended = bone.transform.localPosition.x;
+                }
+
+                graph.Evaluate(1f);
+                Assert.That(bone.transform.localPosition.x, Is.EqualTo(20f).Within(0.01f));
+            }
+            finally
+            {
+                graph.Destroy();
+                Object.DestroyImmediate(hands);
+
+                foreach (AnimationClip clip in clips)
+                {
+                    Object.DestroyImmediate(clip);
+                }
+            }
+        }
+
+        [UnityTest]
+        public IEnumerator AugAimTransitionsReverseTheActiveAnmWithoutRemappingTime()
+        {
+            SceneManager.LoadScene(SCENE, LoadSceneMode.Single);
+            yield return new WaitForSeconds(0.6f);
+            InventoryWindowController controller = Object.FindAnyObjectByType<InventoryWindowController>();
+            StalkerPlayerController player = controller.Player;
+            FirstPersonWeaponController weapons = player.GetComponentInChildren<FirstPersonWeaponController>();
+            ItemInstance weapon = AddItem(controller.Inventory.Model, FindWorldDefinition(AUG), controller.Window.PrimaryContainerId, 1);
+            Assert.That(controller.Inventory.Model.TryEquip(weapon.InstanceId, controller.Window.EquipmentContainerId).Success, Is.True);
+            player.CameraController.SetCursorLocked(true);
+            yield return Tap(_keyboard.digit3Key);
+            yield return WaitWhile(() => weapons.State != FirstPersonWeaponState.Ready);
+            FirstPersonWeaponAsset asset = weapons.ActiveWeapon;
+            var flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic;
+            var setAiming = typeof(FirstPersonWeaponController).GetMethod("SetAiming", flags);
+            var tickAim = typeof(FirstPersonWeaponController).GetMethod("TickAim", flags);
+            var applyOffset = typeof(FirstPersonWeaponController).GetMethod("ApplyHandsOffset", flags);
+            setAiming.Invoke(weapons, new object[] { true });
+            tickAim.Invoke(weapons, new object[] { 0.12f });
+            applyOffset.Invoke(weapons, null);
+            AssertAimPose(player, weapons, asset.AimStart, 0.12f);
+            Vector3 enteringPosition = player.Rig.Hands.transform.localPosition;
+            Quaternion enteringRotation = player.Rig.Hands.transform.localRotation;
+            setAiming.Invoke(weapons, new object[] { false });
+            applyOffset.Invoke(weapons, null);
+            Assert.That(Vector3.Distance(player.Rig.Hands.transform.localPosition, enteringPosition), Is.LessThan(0.00001f));
+            Assert.That(Quaternion.Angle(player.Rig.Hands.transform.localRotation, enteringRotation), Is.LessThan(0.05f));
+            tickAim.Invoke(weapons, new object[] { 0.04f });
+            applyOffset.Invoke(weapons, null);
+            AssertAimPose(player, weapons, asset.AimStart, 0.08f);
+            setAiming.Invoke(weapons, new object[] { true });
+            tickAim.Invoke(weapons, new object[] { 0.05f });
+            applyOffset.Invoke(weapons, null);
+            AssertAimPose(player, weapons, asset.AimStart, 0.13f);
+            tickAim.Invoke(weapons, new object[] { asset.AimStart.Duration });
+            applyOffset.Invoke(weapons, null);
+            AssertAimPose(player, weapons, asset.AimIdle, 0f);
+            setAiming.Invoke(weapons, new object[] { false });
+            tickAim.Invoke(weapons, new object[] { 0.11f });
+            applyOffset.Invoke(weapons, null);
+            AssertAimPose(player, weapons, asset.AimEnd, 0.11f);
+            Vector3 leavingPosition = player.Rig.Hands.transform.localPosition;
+            Quaternion leavingRotation = player.Rig.Hands.transform.localRotation;
+            setAiming.Invoke(weapons, new object[] { true });
+            applyOffset.Invoke(weapons, null);
+            Assert.That(Vector3.Distance(player.Rig.Hands.transform.localPosition, leavingPosition), Is.LessThan(0.00001f));
+            Assert.That(Quaternion.Angle(player.Rig.Hands.transform.localRotation, leavingRotation), Is.LessThan(0.05f));
+            tickAim.Invoke(weapons, new object[] { 0.04f });
+            applyOffset.Invoke(weapons, null);
+            AssertAimPose(player, weapons, asset.AimEnd, 0.07f);
+            tickAim.Invoke(weapons, new object[] { asset.AimEnd.Duration });
+            applyOffset.Invoke(weapons, null);
+            AssertAimPose(player, weapons, asset.AimIdle, 0f);
+            setAiming.Invoke(weapons, new object[] { false });
+            tickAim.Invoke(weapons, new object[] { asset.AimEnd.Duration });
+            applyOffset.Invoke(weapons, null);
+            Assert.That(player.Rig.Hands.transform.localPosition, Is.EqualTo(asset.HandsPosition));
+            Assert.That(Quaternion.Angle(player.Rig.Hands.transform.localRotation, asset.HandsRotation), Is.LessThan(0.05f));
+
+            for (int i = 0; i < 20; i++)
+            {
+                Press(_mouse.rightButton, queueEventOnly: true);
+                yield return null;
+                yield return null;
+                Release(_mouse.rightButton, queueEventOnly: true);
+                yield return null;
+                yield return null;
+            }
+
+            yield return new WaitForSeconds(asset.AimStart.Duration + asset.AimEnd.Duration + 0.1f);
+            Assert.That(weapons.IsAiming, Is.False);
+            Assert.That(weapons.AimFactor, Is.Zero);
+            Assert.That(Vector3.Distance(player.Rig.Hands.transform.localPosition, asset.HandsPosition), Is.LessThan(0.00001f));
+            Assert.That(Quaternion.Angle(player.Rig.Hands.transform.localRotation, asset.HandsRotation), Is.LessThan(0.05f));
+        }
+
+        [UnityTest]
+        public IEnumerator AugKeepsEmptyWeaponPoseWhenAimingMovingAndSprinting()
+        {
+            SceneManager.LoadScene(SCENE, LoadSceneMode.Single);
+            yield return new WaitForSeconds(0.6f);
+            InventoryWindowController controller = Object.FindAnyObjectByType<InventoryWindowController>();
+            InventoryModel model = controller.Inventory.Model;
+            StalkerPlayerController player = controller.Player;
+            FirstPersonWeaponController weapons = player.GetComponentInChildren<FirstPersonWeaponController>();
+            ItemInstance weapon = AddItem(model, FindWorldDefinition(AUG), controller.Window.PrimaryContainerId, 1);
+            ItemDefinition fmj = FindWorldDefinition("ammo_5.56x45_fmj");
+            AddItem(model, fmj, controller.Window.PrimaryContainerId, 1);
+            Assert.That(model.TryEquip(weapon.InstanceId, controller.Window.EquipmentContainerId).Success, Is.True);
+            player.CameraController.SetCursorLocked(true);
+            yield return Tap(_keyboard.digit3Key);
+            yield return WaitWhile(() => weapons.State != FirstPersonWeaponState.Ready);
+            yield return new WaitForSeconds(0.25f);
+            FirstPersonWeaponAsset asset = weapons.ActiveWeapon;
+            GameObject reference = Object.Instantiate(asset.HudModel);
+            reference.SetActive(false);
+            Transform referenceBolt = FindChild(reference.transform, "bolt");
+            Assert.That(referenceBolt, Is.Not.Null);
+            asset.Find(FirstPersonWeaponMotionKind.Idle, 0).Weapon.SampleAnimation(reference, 0f);
+            Vector3 loadedPosition = referenceBolt.localPosition;
+            Quaternion loadedRotation = referenceBolt.localRotation;
+            asset.Find(FirstPersonWeaponMotionKind.IdleEmpty, 0).Weapon.SampleAnimation(reference, 0f);
+            Vector3 emptyPosition = referenceBolt.localPosition;
+            Quaternion emptyRotation = referenceBolt.localRotation;
+            Object.Destroy(reference);
+            Assert.That(Vector3.Distance(loadedPosition, emptyPosition) + Quaternion.Angle(loadedRotation, emptyRotation), Is.GreaterThan(0.001f));
+            Transform bolt = FindChild(weapons.Model.transform, "bolt");
+            Assert.That(weapons.Magazine, Is.Zero);
+            AssertBoltPose(bolt, emptyPosition, emptyRotation);
+
+            foreach (GameObject hudModel in new[] { player.Rig.Hands, player.Rig.Body, weapons.Model })
+            {
+                foreach (SkinnedMeshRenderer renderer in hudModel.GetComponentsInChildren<SkinnedMeshRenderer>(true))
+                {
+                    Assert.That(renderer.updateWhenOffscreen, Is.True, renderer.name);
+                }
+            }
+
+            yield return Tap(_keyboard.digit3Key);
+            Assert.That(weapons.State, Is.EqualTo(FirstPersonWeaponState.Holstering));
+            AssertBoltPose(bolt, emptyPosition, emptyRotation);
+            yield return WaitWhile(() => weapons.State != FirstPersonWeaponState.Hidden);
+            yield return Tap(_keyboard.digit3Key);
+            Assert.That(weapons.State, Is.EqualTo(FirstPersonWeaponState.Drawing));
+            bolt = FindChild(weapons.Model.transform, "bolt");
+            AssertBoltPose(bolt, emptyPosition, emptyRotation);
+            yield return WaitWhile(() => weapons.State != FirstPersonWeaponState.Ready);
+            player.CameraEffects.StopItemEffect();
+            yield return Tap(_mouse.leftButton);
+            Assert.That(weapons.CurrentMotion, Is.EqualTo(FirstPersonWeaponMotionKind.Shoot));
+            Assert.That(player.CameraEffects.IsItemEffectPlaying, Is.False);
+            AssertBoltPose(bolt, emptyPosition, emptyRotation);
+            yield return new WaitForSeconds(0.12f);
+            Assert.That(weapons.CurrentMotion, Is.EqualTo(FirstPersonWeaponMotionKind.Shoot));
+            AssertBoltPose(bolt, emptyPosition, emptyRotation);
+            yield return new WaitForSeconds(asset.EmptyClickInterval - 0.12f + 0.02f);
+            yield return Tap(_mouse.leftButton);
+            yield return new WaitForSeconds(0.2f);
+            Assert.That(weapons.CurrentMotion, Is.EqualTo(FirstPersonWeaponMotionKind.Shoot));
+            AssertBoltPose(bolt, emptyPosition, emptyRotation);
+            yield return WaitWhile(() => weapons.CurrentMotion != FirstPersonWeaponMotionKind.Idle, 8f);
+            yield return new WaitForSeconds(asset.CrossFade + 0.05f);
+            AssertBoltPose(bolt, emptyPosition, emptyRotation);
+            Press(_mouse.rightButton, queueEventOnly: true);
+            yield return new WaitForSeconds(0.4f);
+            Assert.That(weapons.CurrentMotion, Is.EqualTo(FirstPersonWeaponMotionKind.IdleAim));
+            AssertBoltPose(bolt, emptyPosition, emptyRotation);
+            var flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic;
+            var setAiming = typeof(FirstPersonWeaponController).GetMethod("SetAiming", flags);
+            var applyOffset = typeof(FirstPersonWeaponController).GetMethod("ApplyHandsOffset", flags);
+
+            for (int i = 0; i < 12; i++)
+            {
+                Vector3 position = player.Rig.Hands.transform.localPosition;
+                Quaternion rotation = player.Rig.Hands.transform.localRotation;
+                setAiming.Invoke(weapons, new object[] { !weapons.IsAiming });
+                applyOffset.Invoke(weapons, null);
+                Assert.That(Vector3.Distance(player.Rig.Hands.transform.localPosition, position), Is.LessThan(0.00001f));
+                Assert.That(Quaternion.Angle(player.Rig.Hands.transform.localRotation, rotation), Is.LessThan(0.01f));
+                yield return null;
+                yield return null;
+            }
+
+            yield return new WaitForSeconds(0.4f);
+            Assert.That(weapons.AimFactor, Is.EqualTo(1f).Within(0.001f));
+            player.ScriptedWish = StalkerMoveFlags.Forward;
+            yield return new WaitForSeconds(0.4f);
+            Assert.That(weapons.CurrentMotion, Is.EqualTo(FirstPersonWeaponMotionKind.MovingAim));
+            AssertBoltPose(bolt, emptyPosition, emptyRotation);
+            Release(_mouse.rightButton, queueEventOnly: true);
+            yield return new WaitForSeconds(0.4f);
+            Assert.That(weapons.CurrentMotion, Is.EqualTo(FirstPersonWeaponMotionKind.Moving));
+            AssertBoltPose(bolt, emptyPosition, emptyRotation);
+            player.ScriptedWish = StalkerMoveFlags.Forward | StalkerMoveFlags.Sprint;
+            yield return WaitWhile(() => weapons.CurrentMotion != FirstPersonWeaponMotionKind.Sprint);
+            yield return new WaitForSeconds(0.25f);
+            AssertBoltPose(bolt, emptyPosition, emptyRotation);
+            player.ScriptedWish = StalkerMoveFlags.None;
+            yield return WaitWhile(() => weapons.CurrentMotion != FirstPersonWeaponMotionKind.Idle);
+            yield return new WaitForSeconds(0.25f);
+            AssertBoltPose(bolt, emptyPosition, emptyRotation);
+
+            using (var ammo = new InventoryWeaponAmmoSource(model, controller.Window.PrimaryContainerId))
+            {
+                ammo.Reload(weapon.InstanceId, 30);
+            }
+
+            yield return new WaitForSeconds(0.25f);
+            Assert.That(weapons.Magazine, Is.EqualTo(1));
+            Assert.That(weapons.CurrentMotion, Is.EqualTo(FirstPersonWeaponMotionKind.Idle));
+            AssertBoltPose(bolt, loadedPosition, loadedRotation);
+            yield return Tap(_mouse.leftButton);
+            Assert.That(weapons.Magazine, Is.Zero);
+            Assert.That(asset.LastShotHoldFrame, Is.GreaterThan(0));
+            yield return new WaitForSeconds(asset.LastShotHoldFrame / asset.Find(FirstPersonWeaponMotionKind.Shoot, 0).Weapon.frameRate + 0.06f);
+            Assert.That(weapons.CurrentMotion, Is.EqualTo(FirstPersonWeaponMotionKind.Shoot));
+            AssertBoltPose(bolt, emptyPosition, emptyRotation);
+            yield return WaitWhile(() => weapons.CurrentMotion != FirstPersonWeaponMotionKind.Idle);
+            yield return new WaitForSeconds(0.25f);
+            AssertBoltPose(bolt, emptyPosition, emptyRotation);
+            AddItem(model, fmj, controller.Window.PrimaryContainerId, 1);
+            yield return Tap(_keyboard.rKey);
+            Assert.That(weapons.CurrentMotion, Is.EqualTo(FirstPersonWeaponMotionKind.ReloadEmpty));
+            yield return WaitWhile(() => weapons.State != FirstPersonWeaponState.Ready, 8f);
+            yield return new WaitForSeconds(0.25f);
+            Assert.That(weapons.Magazine, Is.EqualTo(1));
+            AssertBoltPose(bolt, loadedPosition, loadedRotation);
         }
 
         [UnityTest]
@@ -457,6 +767,23 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
                 Assert.That(CountAmmo(model, ep, backpack), Is.EqualTo(15));
                 Assert.That(source.GetReserve(weapon.InstanceId), Is.Zero);
             }
+        }
+
+        private static void AssertAimPose(StalkerPlayerController player, FirstPersonWeaponController weapons, XRayAnmAsset clip, float time)
+        {
+            FirstPersonWeaponAsset asset = weapons.ActiveWeapon;
+            Assert.That(clip.Evaluate(time, out Vector3 offset, out Quaternion rotation), Is.True);
+            Quaternion aimRotation = FirstPersonWeaponAsset.ToAimRotation(asset.AimOffsetRotation * weapons.AimFactor);
+            Quaternion basis = aimRotation * asset.HandsRotation;
+            Vector3 expected = asset.AimOffsetPosition * weapons.AimFactor + aimRotation * asset.HandsPosition + basis * offset;
+            Assert.That(Vector3.Distance(player.Rig.Hands.transform.localPosition, expected), Is.LessThan(0.00001f));
+            Assert.That(Quaternion.Angle(player.Rig.Hands.transform.localRotation, basis * rotation), Is.LessThan(0.05f));
+        }
+
+        private static void AssertBoltPose(Transform bolt, Vector3 position, Quaternion rotation)
+        {
+            Assert.That(Vector3.Distance(bolt.localPosition, position), Is.LessThan(0.001f));
+            Assert.That(Quaternion.Angle(bolt.localRotation, rotation), Is.LessThan(0.1f));
         }
 
         private static int CountAmmo(InventoryModel model, ItemDefinition definition, string containerId)

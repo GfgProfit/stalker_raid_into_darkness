@@ -30,6 +30,7 @@ namespace Inventory.UI
         public InventoryDropKind Kind;
         public InventoryFailure Failure;
         public bool AutoPlace;
+        public ItemInstance TargetItem { get; set; }
     }
 
     [DisallowMultipleComponent]
@@ -105,6 +106,7 @@ namespace Inventory.UI
         public Func<ItemInstance, string> ItemShortNameProvider { get; set; }
         public Func<InventoryActionContext, IInventoryItemAction, InventoryActionStyle> ActionStyleProvider { get; set; }
         public IInventoryEquipmentGate EquipmentGate { get; set; }
+        public IInventoryItemDropHandler ItemDropHandler { get; set; }
         public ItemInstance HoveredItem => _hovered != null ? _hovered.Item : null;
 
         public event Action<InventoryWindow> Opened;
@@ -568,6 +570,11 @@ namespace Inventory.UI
             {
                 InventoryContainer target = drag.TargetGrid.Container;
 
+                if (drag.TargetItem != null && ItemDropHandler != null)
+                {
+                    return ItemDropHandler.Apply(drag.Item, drag.TargetItem);
+                }
+
                 if (TryGateDrag(drag, target))
                 {
                     return InventoryResult.Ok(drag.Item, drag.Item.Amount);
@@ -1000,7 +1007,7 @@ namespace Inventory.UI
             _audio.PlayOneShot(clip, volume);
         }
 
-        private string DescribeFailure(InventoryFailure failure) => Label("failure_" + failure, InventoryUIFactory.Describe(failure));
+        public string DescribeFailure(InventoryFailure failure) => Label("failure_" + failure, InventoryUIFactory.Describe(failure));
 
         private void ApplyThemeTo(Component widget)
         {
@@ -1225,9 +1232,26 @@ namespace Inventory.UI
             ItemInstance item = _drag.Item;
             bool slotTarget = container is SlottedContainer;
             _drag.AutoPlace = false;
+            _drag.TargetItem = null;
             origin = default;
             area = default;
             failure = InventoryFailure.None;
+
+            if (_drag.IsSplit == false && ItemDropHandler != null && target.TryGetCellAtScreen(screenPosition, eventCamera, out Vector2Int targetCell))
+            {
+                ItemInstance targetItem = container.GetItemAt(targetCell);
+
+                if (ItemDropHandler.Handles(item, targetItem))
+                {
+                    _drag.TargetItem = targetItem;
+                    InventoryResult preview = ItemDropHandler.Preview(item, targetItem);
+                    origin = targetItem.Location.Position;
+                    area = container.GetItemArea(targetItem);
+                    failure = preview.Failure;
+                    kind = preview.Success ? InventoryDropKind.Valid : InventoryDropKind.Invalid;
+                    return;
+                }
+            }
 
             if (target == _drag.SourceGrid && slotTarget == false)
             {

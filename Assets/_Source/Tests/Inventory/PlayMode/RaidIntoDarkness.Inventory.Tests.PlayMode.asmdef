@@ -12,6 +12,7 @@
         "XRay.Importer.Runtime",
         "Inventory",
         "Inventory.UI",
+        "Inventory.IconGeneration",
         "Unity.InputSystem",
         "Unity.InputSystem.TestFramework",
         "UnityEngine.UI",

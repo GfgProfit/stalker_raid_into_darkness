@@ -193,6 +193,8 @@ MonoBehaviour:
   _magazineSize: 30
   _flameParticles: {fileID: 2515879888457937910, guid: 3a54de4ee2055394b86df40a9e566872, type: 3}
   _smokeParticles: {fileID: 6292335335723028336, guid: 3e67f16876bef364ca7d91540a96b1ee, type: 3}
+  _silencedFlameParticles: {fileID: 0}
+  _silencedSmokeParticles: {fileID: 6292335335723028336, guid: 3e67f16876bef364ca7d91540a96b1ee, type: 3}
   _recoil: {x: 4, y: 4, z: 2}
   _recoilSnappiness: 13
   _recoilReturnSpeed: 9
@@ -204,6 +206,14 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 01f275ada7ea9fa428f46026302ae9ef, type: 3}
   - {fileID: 8300000, guid: e79674b687f0d684cb830144db31712c, type: 3}
   - {fileID: 8300000, guid: 3aeef1887fb54e94081bdb32bd17ef70, type: 3}
+  _silencedShotSounds:
+  - {fileID: 8300000, guid: 54a52bac7626cc24cb3a2f7d06793bd8, type: 3}
+  - {fileID: 8300000, guid: 9155de1e864d1d248b5cf6bd68cf0d78, type: 3}
+  - {fileID: 8300000, guid: 9b1713f03d9b170428e72c2ac1141abb, type: 3}
+  - {fileID: 8300000, guid: 08d40af0f5839e144b76a5c2734e1c75, type: 3}
+  - {fileID: 8300000, guid: a1f7e8048032bd942b06d8711da98ea9, type: 3}
+  - {fileID: 8300000, guid: c3d06aff7be4f614abb09b0509a1c468, type: 3}
+  - {fileID: 8300000, guid: 21497ad247e6c064f9b0dd4b66f7cba4, type: 3}
   _emptySound: {fileID: 8300000, guid: beed662d175cb774388aee8f2717b3d9, type: 3}
   _lastShellSound: {fileID: 8300000, guid: d286791b4c88ef743b8c13eb99af7d1f, type: 3}
   _lowAmmoSound: {fileID: 8300000, guid: f3393a0a5214d2e40803bde39b842922, type: 3}

@@ -39,12 +39,15 @@ namespace RaidIntoDarkness.Weapons
         [SerializeField] [Min(1)] private int _magazineSize = 30;
         [SerializeField] private GameObject _flameParticles;
         [SerializeField] private GameObject _smokeParticles;
+        [SerializeField] private GameObject _silencedFlameParticles;
+        [SerializeField] private GameObject _silencedSmokeParticles;
         [Header("Recoil")]
         [SerializeField] private Vector3 _recoil = new Vector3(4.0f, 4.0f, 2.0f);
         [SerializeField] [Range(0.0f, 50.0f)] private float _recoilSnappiness = 13.0f;
         [SerializeField] [Range(0.0f, 50.0f)] private float _recoilReturnSpeed = 9.0f;
         [Header("Sounds")]
         [SerializeField] private AudioClip[] _shotSounds = Array.Empty<AudioClip>();
+        [SerializeField] private AudioClip[] _silencedShotSounds = Array.Empty<AudioClip>();
         [SerializeField] private AudioClip _emptySound;
         [SerializeField] private AudioClip _lastShellSound;
         [SerializeField] private AudioClip _lowAmmoSound;
@@ -71,10 +74,13 @@ namespace RaidIntoDarkness.Weapons
         public int MagazineSize => _magazineSize;
         public GameObject FlameParticles => _flameParticles;
         public GameObject SmokeParticles => _smokeParticles;
+        public GameObject SilencedFlameParticles => _silencedFlameParticles;
+        public GameObject SilencedSmokeParticles => _silencedSmokeParticles;
         public Vector3 Recoil => _recoil;
         public float RecoilSnappiness => _recoilSnappiness;
         public float RecoilReturnSpeed => _recoilReturnSpeed;
         public IReadOnlyList<AudioClip> ShotSounds => _shotSounds ?? Array.Empty<AudioClip>();
+        public IReadOnlyList<AudioClip> SilencedShotSounds => _silencedShotSounds ?? Array.Empty<AudioClip>();
         public AudioClip EmptySound => _emptySound;
         public AudioClip LastShellSound => _lastShellSound;
         public AudioClip LowAmmoSound => _lowAmmoSound;

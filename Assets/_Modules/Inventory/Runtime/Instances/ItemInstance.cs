@@ -77,7 +77,18 @@ namespace Inventory
 
         public event Action<ItemInstance> StateChanged;
 
-        public Vector2Int GetSize(bool rotated) => rotated ? new Vector2Int(Definition.Height, Definition.Width) : Definition.Size;
+        public Vector2Int GetSize(bool rotated)
+        {
+            Vector2Int size = Definition.Size;
+
+            for (int i = 0; i < Definition.Components.Count; i++)
+            {
+                size += Definition.Components[i]?.GetSizeDelta(this, Resolver) ?? Vector2Int.zero;
+            }
+
+            size = Vector2Int.Max(Vector2Int.one, size);
+            return rotated ? new Vector2Int(size.y, size.x) : size;
+        }
 
         public bool CanStackWith(ItemInstance other) => other != null && other != this && IsStackable && other.DefinitionId == DefinitionId && HasSameState(other);
 

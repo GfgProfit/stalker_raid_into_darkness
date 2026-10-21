@@ -24,6 +24,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
             _controller.SetAmmoSource(_ammo);
             _model.ItemEquipped += OnEquipmentChanged;
             _model.ItemUnequipped += OnEquipmentChanged;
+            _model.Changed += OnItemChanged;
         }
 
         public void Refresh()
@@ -42,6 +43,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
         {
             _model.ItemEquipped -= OnEquipmentChanged;
             _model.ItemUnequipped -= OnEquipmentChanged;
+            _model.Changed -= OnItemChanged;
             if (_controller != null)
             {
                 _controller.SetAmmoSource(null);
@@ -56,6 +58,16 @@ namespace RaidIntoDarkness.Integrations.Inventory
             WeaponHudComponent hud = item != null ? item.Definition.GetComponent<WeaponHudComponent>() : null;
             FirstPersonWeaponAsset weapon = hud != null ? hud.FirstPersonWeapon : null;
             _controller.SetSlotWeapon(slot, weapon, weapon != null ? item.InstanceId : null);
+            WeaponStatsComponent stats = item?.Definition.GetComponent<WeaponStatsComponent>();
+            _controller.SetSlotSilencer(slot, stats != null && (stats.SilencerStatus == WeaponAddonStatus.Permanent || stats.GetSilencer(item, _model.Resolver) != null));
+        }
+
+        private void OnItemChanged(InventoryChange change)
+        {
+            if (change.Kind == InventoryChangeKind.ItemStateChanged && change.ContainerId == _window.EquipmentContainerId)
+            {
+                Refresh();
+            }
         }
 
         private void OnEquipmentChanged(ItemInstance item, SlottedContainer container, SlotDefinition slot)

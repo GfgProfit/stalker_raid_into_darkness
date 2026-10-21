@@ -78,6 +78,8 @@ MonoBehaviour:
         _camDispersionFactor: 0.82
         _camDispersionIncrementFactor: 0.82
         _scopeZoomFactor: 0
+        _attachSound: {fileID: 8300000, guid: 9675790cdb0a56e41b4f69fc4b2f9a3c, type: 3}
+        _detachSound: {fileID: 8300000, guid: 825ad3654f3c06f449923012ebf99008, type: 3}
     - rid: 3479885496768528674
       type: {class: WorldItemComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
       data:

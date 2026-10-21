@@ -49,6 +49,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
         private EquipmentStatusPresenter _statusPresenter;
         private FirstPersonOutfitBinder _outfitBinder;
         private FirstPersonWeaponBinder _weaponBinder;
+        private InventoryWeaponAttachments _weaponAttachments;
         private OutfitHelmetRule _helmetRule;
         private EquipmentAnimationQueue _equipmentAnimations;
         private InventoryItemSounds _itemSounds;
@@ -69,6 +70,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
         public InventorySortingPlus Sorting => _sorting;
         public EquipmentAnimationQueue EquipmentAnimations => _equipmentAnimations;
         public InventoryItemSounds ItemSounds => _itemSounds;
+        public InventoryWeaponAttachments WeaponAttachments => _weaponAttachments;
 
         public void Configure(InventoryWindow window, PlayerInventoryRuntime inventory, StalkerPlayerController player, InputActionReference toggleInventory, InputActionReference closeInventory)
         {
@@ -316,6 +318,8 @@ namespace RaidIntoDarkness.Integrations.Inventory
                 _weaponBinder = null;
             }
 
+            _weaponAttachments?.Dispose();
+
             if (_helmetRule != null)
             {
                 _helmetRule.Dispose();
@@ -354,6 +358,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
             _inventory.Model.Changed += OnModelChanged;
 
             _itemSounds = new InventoryItemSounds(_window);
+            _weaponAttachments = new InventoryWeaponAttachments(_window);
             _helmetRule = new OutfitHelmetRule(_window);
             _helmetRule.Refresh();
 
@@ -477,7 +482,9 @@ namespace RaidIntoDarkness.Integrations.Inventory
                 ammo = _compatibilityHovered.Definition.GetComponent<AmmoStatsComponent>();
             }
 
-            return weapon != null && ammo != null && weapon.SupportsAmmo(ammo.Section) ? new InventoryItemDecoration(_compatibleAmmoTint, decoration.Badge, decoration.CommunityIcon, decoration.CommunityIconSize) : decoration;
+            bool compatible = weapon != null && ammo != null && weapon.SupportsAmmo(ammo.Section);
+            compatible |= _weaponAttachments != null && (_weaponAttachments.Handles(item, _compatibilityHovered) || _weaponAttachments.Handles(_compatibilityHovered, item));
+            return compatible ? new InventoryItemDecoration(_compatibleAmmoTint, decoration.Badge, decoration.CommunityIcon, decoration.CommunityIconSize) : decoration;
         }
 
         private void UpdateCompatibilityHighlight()

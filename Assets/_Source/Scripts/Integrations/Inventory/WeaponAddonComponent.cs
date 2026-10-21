@@ -24,6 +24,8 @@ namespace RaidIntoDarkness.Integrations.Inventory
         [SerializeField] private float _camDispersionFactor = 1f;
         [SerializeField] private float _camDispersionIncrementFactor = 1f;
         [SerializeField] private float _scopeZoomFactor;
+        [SerializeField] private AudioClip _attachSound;
+        [SerializeField] private AudioClip _detachSound;
 
         public string Section => _section ?? string.Empty;
         public WeaponAddonKind Kind => _kind;
@@ -35,5 +37,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
         public float CamDispersionFactor => _camDispersionFactor;
         public float CamDispersionIncrementFactor => _camDispersionIncrementFactor;
         public float ScopeZoomFactor => _scopeZoomFactor;
+        public AudioClip AttachSound => _attachSound;
+        public AudioClip DetachSound => _detachSound;
     }
 }

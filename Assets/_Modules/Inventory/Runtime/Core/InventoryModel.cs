@@ -119,6 +119,123 @@ namespace Inventory
             }
         }
 
+        public InventoryResult TryReconfigureItem(ItemInstance item, ItemInstance updated, Vector2Int position, ItemInstance consumed = null, ItemInstance returned = null, string returnContainerId = null, bool apply = true)
+        {
+            if (ContainsItem(item) == false || updated == null || updated.Definition != item.Definition || updated.Amount != item.Amount || updated.InstanceId != item.InstanceId || consumed == item || (consumed != null && ContainsItem(consumed) == false) || (returned != null && (_items.ContainsKey(returned.InstanceId) || returned.Location.IsPlaced)))
+            {
+                return InventoryResult.Fail(InventoryFailure.InvalidItem);
+            }
+
+            InventoryContainer container = GetContainer(item.ContainerId);
+            InventoryContainer source = consumed != null ? GetContainer(consumed.ContainerId) : null;
+            InventoryContainer destination = returned != null ? GetContainer(returnContainerId) : null;
+
+            if (container.CanRelease(item, out InventoryFailure failure) == false || (consumed != null && source.CanRelease(consumed, out failure) == false))
+            {
+                return InventoryResult.Fail(failure);
+            }
+
+            if (returned != null && destination == null)
+            {
+                return InventoryResult.Fail(InventoryFailure.ContainerNotFound);
+            }
+
+            updated.Resolver = Resolver;
+
+            if (returned != null)
+            {
+                returned.Resolver = Resolver;
+            }
+
+            var ignored = new List<ItemInstance> { item };
+
+            if (consumed != null && consumed.Amount == 1)
+            {
+                ignored.Add(consumed);
+            }
+
+            if (container.CanPlace(updated, position, item.Location.Rotated, out ItemPlacement placement, out failure, ignored) == false)
+            {
+                return InventoryResult.Fail(failure);
+            }
+
+            foreach (InventoryContainer candidate in _containerList)
+            {
+                float delta = candidate == container ? updated.TotalWeight - item.TotalWeight : 0f;
+                delta -= candidate == source ? consumed.UnitWeight : 0f;
+                delta += candidate == destination ? returned.TotalWeight : 0f;
+
+                if (delta > 0f && WeightAllows(candidate, delta) == false)
+                {
+                    return InventoryResult.Fail(InventoryFailure.NoSpace);
+                }
+            }
+
+            ItemLocation previous = item.Location;
+            var original = new ItemPlacement(previous.Position, container.GetItemArea(item), previous.Rotated, previous.SlotId);
+            ItemLocation consumedLocation = consumed?.Location ?? ItemLocation.None;
+            ItemPlacement consumedPlacement = consumed != null ? new ItemPlacement(consumedLocation.Position, source.GetItemArea(consumed), consumedLocation.Rotated, consumedLocation.SlotId) : default;
+            ItemPlacement returnedPlacement = default;
+
+            if (returned != null)
+            {
+                bool found;
+                container.Release(item);
+
+                if (consumed != null && consumed.Amount == 1)
+                {
+                    source.Release(consumed);
+                }
+
+                container.Occupy(updated, placement);
+
+                try
+                {
+                    found = destination.TryFindSpace(returned, true, out returnedPlacement);
+                }
+                finally
+                {
+                    container.Release(updated);
+                    container.Occupy(item, original);
+
+                    if (consumed != null && consumed.Amount == 1)
+                    {
+                        source.Occupy(consumed, consumedPlacement);
+                    }
+                }
+
+                if (found == false)
+                {
+                    return InventoryResult.Fail(InventoryFailure.NoSpace);
+                }
+            }
+
+            if (apply == false)
+            {
+                return InventoryResult.Ok(item, 1);
+            }
+
+            if (consumed != null)
+            {
+                ReduceOrRemove(consumed, 1);
+            }
+
+            container.Release(item);
+            item.CopyStateFrom(updated);
+            container.Occupy(item, placement);
+
+            if (returned != null)
+            {
+                _items.Add(returned.InstanceId, returned);
+                OccupyInternal(returned, destination, returnedPlacement);
+                Emit(new InventoryChange(InventoryChangeKind.ItemAdded, returned, destination.Id, ItemLocation.None, returnedPlacement.SlotId));
+            }
+
+            Emit(new InventoryChange(InventoryChangeKind.ItemStateChanged, item, container.Id, previous, placement.SlotId));
+            Flush();
+            return InventoryResult.Ok(item, 1);
+        }
+
         public InventoryResult CanAdd(ItemInstance item, string containerId, Vector2Int position, bool rotated)
         {
             if (item == null)
@@ -746,6 +863,8 @@ namespace Inventory
 
         internal bool RestoreItem(ItemInstance item, InventoryContainer container, Vector2Int position, bool rotated)
         {
+            item.Resolver = Resolver;
+
             if (container.CanPlace(item, position, rotated, out ItemPlacement placement, out _) == false && container.TryFindSpace(item, true, out placement) == false)
             {
                 return false;

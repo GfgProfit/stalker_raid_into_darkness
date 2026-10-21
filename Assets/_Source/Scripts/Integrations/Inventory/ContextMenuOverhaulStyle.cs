@@ -51,6 +51,8 @@ namespace RaidIntoDarkness.Integrations.Inventory
                     return Style(SlotIcon(definition, ICON_CELL), DEFAULT_GROUP);
                 case InventoryBuiltInActions.UNEQUIP:
                     return Style(SlotIcon(definition, ICON_BACKPACK), DEFAULT_GROUP);
+                case InventoryWeaponAttachments.DETACH_ACTION:
+                    return Style("ui_cmo_silencer", DEFAULT_GROUP);
                 case InventoryBuiltInActions.MOVE:
                     return Style(ICON_ARROWS, DEFAULT_GROUP);
                 case InventoryBuiltInActions.SPLIT:
@@ -62,7 +64,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
                 case InventoryWindowController.JUNK_ACTION:
                     return Style(_sorting != null && _sorting.IsJunk(definition) ? ICON_UNTRASHBIN : ICON_TRASHBIN, MARK_GROUP);
                 default:
-                    return Style(null, DEFAULT_GROUP);
+                    return Style(action.Id.StartsWith(InventoryWeaponAttachments.ATTACH_ACTION, System.StringComparison.Ordinal) ? "ui_cmo_silencer" : null, DEFAULT_GROUP);
             }
         }
 

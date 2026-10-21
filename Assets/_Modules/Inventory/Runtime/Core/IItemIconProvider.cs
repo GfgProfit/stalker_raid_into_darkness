@@ -28,7 +28,7 @@ namespace Inventory
         public int Height { get; }
         public ItemIconProfileType ProfileType { get; }
 
-        public static ItemIconRequest ForItem(ItemInstance item) => new(item.Definition, item.VisualVariant, item.Definition.Width, item.Definition.Height, ItemIconProfileType.Default);
+        public static ItemIconRequest ForItem(ItemInstance item) => new(item.Definition, item.VisualVariant, item.GetSize(false).x, item.GetSize(false).y, ItemIconProfileType.Default);
         public static ItemIconRequest ForSlot(ItemInstance item, int slotWidth, int slotHeight) => new(item.Definition, item.VisualVariant, slotWidth, slotHeight, ItemIconProfileType.Slot);
     }
 

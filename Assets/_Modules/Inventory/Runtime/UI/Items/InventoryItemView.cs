@@ -92,7 +92,7 @@ namespace Inventory.UI
             ApplyTheme(Theme);
             Vector2Int size = item.GetSize(rotated);
             _rectTransform.sizeDelta = new Vector2(size.x * cellSize.x, size.y * cellSize.y);
-            ApplyContent(item.Definition.Size, cellSize, rotated);
+            ApplyContent(item.GetSize(false), cellSize, rotated);
             ApplyTexts(amount);
             HideTexts();
             _background.color = BackgroundColor(item.Definition);
@@ -139,7 +139,7 @@ namespace Inventory.UI
                 return;
             }
 
-            ApplyContent(Item.Definition.Size, _grid.CellSize, Item.Location.Rotated);
+            ApplyContent(Item.GetSize(false), _grid.CellSize, Item.Location.Rotated);
             LayoutTextBackgrounds();
         }
 
@@ -207,7 +207,7 @@ namespace Inventory.UI
 
             Vector2Int size = Item.GetSize(rotated);
             _rectTransform.sizeDelta = new Vector2(size.x * cellSize.x, size.y * cellSize.y);
-            ApplyContent(Item.Definition.Size, cellSize, rotated);
+            ApplyContent(Item.GetSize(false), cellSize, rotated);
         }
 
         public void OnPointerEnter(PointerEventData eventData)
@@ -494,6 +494,14 @@ namespace Inventory.UI
             }
 
             CancelIcon();
+            var variantIds = new string[request.VariantIds.Count];
+
+            for (int i = 0; i < variantIds.Length; i++)
+            {
+                variantIds[i] = request.VariantIds[i];
+            }
+
+            request = new ItemIconRequest(request.Definition, variantIds, request.Width, request.Height, request.ProfileType);
             _currentRequest = request;
             _hasRequest = true;
             IItemIconProvider provider = _grid != null && _grid.Window != null ? _grid.Window.IconProvider : null;

@@ -1,4 +1,5 @@
 using Inventory;
+using Inventory.IconGeneration;
 using UnityEngine;
 
 namespace RaidIntoDarkness.Integrations.Inventory
@@ -21,6 +22,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
             _definition = item.Definition;
             _amount = item.Amount;
             _instance = item;
+            ItemIconVisualConfigurators.Apply(gameObject, item.Definition, item.VisualVariant);
         }
 
         public void Configure(ItemDefinition definition, int amount)
@@ -28,6 +30,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
             _definition = definition;
             _amount = Mathf.Max(1, amount);
             _instance = null;
+            ItemIconVisualConfigurators.Apply(gameObject, definition, null);
         }
     }
 }

@@ -85,6 +85,7 @@ namespace RaidIntoDarkness.Weapons
         public float AimFactor => _aim;
         public GameObject Model => _model;
         public Transform Muzzle => _muzzle;
+        public bool IsSilenced => ActiveSlot >= 0 && _slots[ActiveSlot].Silenced;
         public FirstPersonWeaponMotionKind CurrentMotion { get; private set; }
 
         public FirstPersonWeaponAsset GetSlotWeapon(int slot)
@@ -107,6 +108,27 @@ namespace RaidIntoDarkness.Weapons
             }
 
             NotifyAmmo();
+        }
+
+        public void SetSlotSilencer(int slot, bool installed)
+        {
+            if (IsSlot(slot) == false || _slots[slot].Silenced == installed)
+            {
+                return;
+            }
+
+            _slots[slot].Silenced = installed;
+
+            if (ActiveSlot == slot && _model != null)
+            {
+                if (_flame != null)
+                {
+                    _flame.Stop(false);
+                    _flame = null;
+                }
+
+                ApplySilencerVisual();
+            }
         }
 
         public void SetSlotWeapon(int slot, FirstPersonWeaponAsset asset, object key)
@@ -542,7 +564,7 @@ namespace RaidIntoDarkness.Weapons
                 return;
             }
 
-            IReadOnlyList<AudioClip> shots = asset.ShotSounds;
+            IReadOnlyList<AudioClip> shots = IsSilenced ? asset.SilencedShotSounds : asset.ShotSounds;
             if (shots.Count > 0)
             {
                 PlayOneShot(source, shots[UnityEngine.Random.Range(0, shots.Count)]);
@@ -578,8 +600,8 @@ namespace RaidIntoDarkness.Weapons
             }
 
             Quaternion rotation = GetMuzzleRotation(muzzle);
-            _flame = _effects.Play(asset.FlameParticles, muzzle, muzzle.position, rotation);
-            _effects.Play(asset.SmokeParticles, null, muzzle.position, rotation);
+            _flame = _effects.Play(IsSilenced ? asset.SilencedFlameParticles : asset.FlameParticles, muzzle, muzzle.position, rotation);
+            _effects.Play(IsSilenced ? asset.SilencedSmokeParticles : asset.SmokeParticles, null, muzzle.position, rotation);
         }
 
         private Quaternion GetMuzzleRotation(Transform muzzle)
@@ -936,13 +958,25 @@ namespace RaidIntoDarkness.Weapons
             }
 
             _modelRoot = FindModelRoot(_model);
-            FirstPersonWeaponView view = _model.GetComponent<FirstPersonWeaponView>();
-            _muzzleFromView = view != null && view.Muzzle != null;
-            _muzzle = _muzzleFromView ? view.Muzzle : FindBone(_model, asset.MuzzleBone);
+            ApplySilencerVisual();
             Animator handsAnimator = GetAnimator(hands);
             Animator weaponAnimator = GetAnimator(_model);
             _graph = new FirstPersonWeaponGraph($"{name}.FirstPersonWeapon", handsAnimator, weaponAnimator, FirstPersonWeaponGraph.CreateMask(hands.transform, asset.OverlayBones));
             _hasLoop = false;
+        }
+
+        private void ApplySilencerVisual()
+        {
+            FirstPersonWeaponView view = _model.GetComponent<FirstPersonWeaponView>();
+
+            if (view != null)
+            {
+                view.SetSilencer(IsSilenced);
+            }
+
+            Transform muzzle = view != null ? IsSilenced ? view.SilencedMuzzle : view.Muzzle : null;
+            _muzzleFromView = muzzle != null;
+            _muzzle = _muzzleFromView ? muzzle : FindBone(_model, ActiveWeapon.MuzzleBone);
         }
 
         private void RebuildVisuals()
@@ -1101,6 +1135,7 @@ namespace RaidIntoDarkness.Weapons
             public FirstPersonWeaponAsset Asset { get; set; }
             public object Key { get; set; }
             public WeaponState WeaponState { get; set; }
+            public bool Silenced { get; set; }
         }
 
         private sealed class WeaponState

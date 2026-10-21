@@ -126,6 +126,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
             }
 
             weapon.SetState(MAGAZINE_STATE, (magazine - 1).ToString(CultureInfo.InvariantCulture));
+            _model.NotifyItemChanged(weapon);
             return true;
         }
 
@@ -167,6 +168,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
             {
                 weapon.SetState(AMMO_SECTION_STATE, section);
                 weapon.SetState(MAGAZINE_STATE, (magazine + taken).ToString(CultureInfo.InvariantCulture));
+                _model.NotifyItemChanged(weapon);
             }
         }
 
@@ -218,13 +220,23 @@ namespace RaidIntoDarkness.Integrations.Inventory
             plan.AddContainer(new GridContainer(container.Id, container.Width, container.Height) { MaxWeight = container.MaxWeight });
             InventorySaveData snapshot = InventorySerializer.Capture(_model, new[] { _containerId });
 
-            if (InventorySerializer.Restore(plan, snapshot).IsClean == false || ReturnAmmo(plan, definition, magazine) != magazine)
+            if (InventorySerializer.Restore(plan, snapshot).IsClean == false)
             {
                 return false;
             }
 
+            plan.GetItem(weaponKey as string)?.SetState(MAGAZINE_STATE, "0");
+
+            if (ReturnAmmo(plan, definition, magazine) != magazine)
+            {
+                return false;
+            }
+
+            ItemInstance weapon = GetWeapon(weaponKey);
+            weapon.SetState(MAGAZINE_STATE, "0");
             int returned = ReturnAmmo(_model, definition, magazine);
-            GetWeapon(weaponKey).SetState(MAGAZINE_STATE, (magazine - returned).ToString(CultureInfo.InvariantCulture));
+            weapon.SetState(MAGAZINE_STATE, (magazine - returned).ToString(CultureInfo.InvariantCulture));
+            _model.NotifyItemChanged(weapon);
             return returned == magazine;
         }
 

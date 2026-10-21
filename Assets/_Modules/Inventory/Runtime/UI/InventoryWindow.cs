@@ -102,6 +102,7 @@ namespace Inventory.UI
         public Func<ItemInstance, InventoryItemDecoration> ItemDecorator { get; set; }
         public Action<ItemInstance, List<InventoryItemStat>> ItemStatsProvider { get; set; }
         public Func<ItemInstance, string> ItemDescriptionProvider { get; set; }
+        public Func<ItemInstance, string> ItemShortNameProvider { get; set; }
         public Func<InventoryActionContext, IInventoryItemAction, InventoryActionStyle> ActionStyleProvider { get; set; }
         public IInventoryEquipmentGate EquipmentGate { get; set; }
         public ItemInstance HoveredItem => _hovered != null ? _hovered.Item : null;

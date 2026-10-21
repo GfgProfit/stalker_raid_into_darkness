@@ -248,6 +248,7 @@ namespace Inventory.UI
             ItemDefinition definition = Item.Definition;
             InventoryTheme theme = _appliedTheme;
             bool showCount = definition.IsStackable && amount > 1;
+            string customName = _grid != null && _grid.Window != null && _grid.Window.ItemShortNameProvider != null ? _grid.Window.ItemShortNameProvider(Item) : null;
 
             if (theme == null)
             {
@@ -258,19 +259,20 @@ namespace Inventory.UI
                     _countText.SetText("{0}", amount);
                 }
 
-                _nameText.text = definition.ShortName;
-                _nameText.enabled = string.IsNullOrEmpty(definition.ShortName) == false;
+                _nameText.text = customName ?? definition.ShortName;
+                _nameText.alignment = customName != null ? TextAlignmentOptions.BottomRight : TextAlignmentOptions.TopLeft;
+                _nameText.enabled = string.IsNullOrEmpty(_nameText.text) == false;
                 return;
             }
 
             _countText.enabled = false;
             string count = showCount && theme.ShowItemCount ? theme.FormatCount(amount) : string.Empty;
             bool inSlot = _ghost == false && _grid != null && _grid.UsesSlotIcon(Item, out _);
-            string weight = theme.ShowItemWeight && inSlot == false ? theme.FormatItemWeight(definition.Weight * amount) : string.Empty;
+            string weight = theme.ShowItemWeight && inSlot == false ? theme.FormatItemWeight(Item.UnitWeight * amount) : string.Empty;
             string info = count.Length > 0 && weight.Length > 0 ? count + "\n" + weight : count + weight;
             SetLabel(_infoText, _infoShadow, info);
             LayoutInfoBackgrounds(theme);
-            SetLabel(_nameText, _nameShadow, theme.ShowsShortName(definition) ? definition.ShortName : string.Empty);
+            SetLabel(_nameText, _nameShadow, customName ?? (theme.ShowsShortName(definition) ? definition.ShortName : string.Empty));
             string condition = Item.GetState("condition");
             string conditionText = string.Empty;
 

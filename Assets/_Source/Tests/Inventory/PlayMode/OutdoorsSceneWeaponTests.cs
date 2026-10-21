@@ -34,6 +34,74 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
         }
 
         [UnityTest]
+        public IEnumerator LoadedAmmoContributesToWeaponCarryTransferAndSavedWeight()
+        {
+            SceneManager.LoadScene(SCENE, LoadSceneMode.Single);
+            yield return new WaitForSeconds(0.5f);
+            InventoryWindowController controller = Object.FindAnyObjectByType<InventoryWindowController>();
+            InventoryWindow window = controller.Window;
+            InventoryModel model = controller.Inventory.Model;
+            ItemInstance weapon = AddItem(model, FindWorldDefinition(AUG), window.PrimaryContainerId, 1);
+            ItemDefinition fmj = FindWorldDefinition("ammo_5.56x45_fmj");
+            ItemDefinition ep = FindWorldDefinition("ammo_5.56x45_ss190");
+            AddItem(model, fmj, window.PrimaryContainerId, 30);
+            AddItem(model, ep, window.PrimaryContainerId, 40);
+            InventoryContainer backpack = model.GetContainer(window.PrimaryContainerId);
+            InventoryContainer stash = model.GetContainer(window.SecondaryContainerId);
+            float initialWeight = model.GetOwnerWeight(backpack.OwnerId);
+            int notifications = 0;
+            System.Action<InventoryChange> onChanged = change => notifications += change.Kind == InventoryChangeKind.ItemStateChanged ? 1 : 0;
+            model.Changed += onChanged;
+
+            using (var source = new InventoryWeaponAmmoSource(model, backpack.Id))
+            {
+                source.Reload(weapon.InstanceId, 30);
+                Assert.That(weapon.TotalWeight, Is.EqualTo(weapon.Definition.Weight + fmj.Weight * 30).Within(0.0001f));
+                Assert.That(model.GetOwnerWeight(backpack.OwnerId), Is.EqualTo(initialWeight).Within(0.0001f));
+                Assert.That(source.TryShoot(weapon.InstanceId), Is.True);
+                Assert.That(weapon.TotalWeight, Is.EqualTo(weapon.Definition.Weight + fmj.Weight * 29).Within(0.0001f));
+                Assert.That(model.GetOwnerWeight(backpack.OwnerId), Is.EqualTo(initialWeight - fmj.Weight).Within(0.0001f));
+                Assert.That(source.TrySwitchAmmo(weapon.InstanceId), Is.True);
+                Assert.That(weapon.TotalWeight, Is.EqualTo(weapon.Definition.Weight));
+                Assert.That(model.GetOwnerWeight(backpack.OwnerId), Is.EqualTo(initialWeight - fmj.Weight).Within(0.0001f));
+                source.Reload(weapon.InstanceId, 30);
+                float loadedWeight = weapon.Definition.Weight + ep.Weight * 30;
+                Assert.That(weapon.TotalWeight, Is.EqualTo(loadedWeight).Within(0.0001f));
+                Assert.That(model.GetOwnerWeight(backpack.OwnerId), Is.EqualTo(initialWeight - fmj.Weight).Within(0.0001f));
+                stash.MaxWeight = weapon.Definition.Weight;
+                Assert.That(model.TryTransfer(weapon.InstanceId, stash.Id).Success, Is.False);
+                stash.MaxWeight = -1f;
+                Assert.That(model.TryTransfer(weapon.InstanceId, stash.Id).Success, Is.True);
+                InventorySaveData saved = InventorySerializer.Capture(model, new[] { backpack.Id, stash.Id });
+                var restored = new InventoryModel(model.Resolver);
+                restored.AddContainer(new GridContainer(backpack.Id, backpack.Width, backpack.Height, backpack.OwnerId));
+                restored.AddContainer(new GridContainer(stash.Id, stash.Width, stash.Height, stash.OwnerId));
+                Assert.That(InventorySerializer.Restore(restored, saved).IsClean, Is.True);
+                Assert.That(restored.GetItem(weapon.InstanceId).TotalWeight, Is.EqualTo(loadedWeight).Within(0.0001f));
+                Assert.That(model.TryTransfer(weapon.InstanceId, backpack.Id).Success, Is.True);
+                window.DropItemNow(weapon);
+                yield return null;
+                WorldItem dropped = null;
+
+                foreach (WorldItem candidate in Object.FindObjectsByType<WorldItem>(FindObjectsSortMode.None))
+                {
+                    if (candidate.Instance == weapon)
+                    {
+                        dropped = candidate;
+                    }
+                }
+
+                Assert.That(dropped, Is.Not.Null);
+                Assert.That(dropped.Instance.TotalWeight, Is.EqualTo(loadedWeight).Within(0.0001f));
+                Assert.That(Object.FindAnyObjectByType<WorldItemInteractor>().TryPickUp(dropped), Is.True);
+                Assert.That(weapon.TotalWeight, Is.EqualTo(loadedWeight).Within(0.0001f));
+                Assert.That(notifications, Is.GreaterThanOrEqualTo(4));
+            }
+
+            model.Changed -= onChanged;
+        }
+
+        [UnityTest]
         public IEnumerator AugDrawsFiresReloadsAimsAndHolsters()
         {
             SceneManager.LoadScene(SCENE, LoadSceneMode.Single);

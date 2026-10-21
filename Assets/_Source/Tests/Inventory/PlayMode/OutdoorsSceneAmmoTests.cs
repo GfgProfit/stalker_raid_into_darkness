@@ -4,6 +4,7 @@ using Inventory;
 using Inventory.UI;
 using NUnit.Framework;
 using RaidIntoDarkness.Player;
+using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
@@ -23,6 +24,55 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             _hoveredView = null;
             InputSystem.AddDevice<Keyboard>();
             InputSystem.AddDevice<Mouse>();
+        }
+
+        [UnityTest]
+        public IEnumerator AmmoStacksMergeBeyondBoxSizeAndShowWhiteTypeLabels()
+        {
+            SceneManager.LoadScene("OutdoorsScene", LoadSceneMode.Single);
+            yield return new WaitForSeconds(0.5f);
+            InventoryWindowController controller = Object.FindAnyObjectByType<InventoryWindowController>();
+            WorldItemInteractor interactor = Object.FindAnyObjectByType<WorldItemInteractor>();
+            InventoryWindow window = controller.Window;
+            InventoryModel model = controller.Inventory.Model;
+            ItemInstance first = AddItem(controller, "ammo_5.56x45_fmj", window.PrimaryContainerId);
+            ItemDefinition definition = first.Definition;
+            Assert.That(interactor.TryPickUp(interactor.Spawn(definition, 15)), Is.True);
+            Assert.That(interactor.TryPickUp(interactor.Spawn(definition, 1000)), Is.True);
+            Assert.That(first.Amount, Is.EqualTo(1016));
+            Assert.That(first.TotalWeight, Is.EqualTo(definition.Weight * 1016).Within(0.0001f));
+            ItemInstance ep = AddItem(controller, "ammo_5.56x45_ss190", window.PrimaryContainerId);
+            Assert.That(ep.Amount, Is.EqualTo(1));
+            Assert.That(model.TryTransfer(first.InstanceId, window.SecondaryContainerId).Success, Is.True);
+            ItemInstance more = model.CreateItem(definition, 500);
+            Assert.That(model.TryAddAuto(more, window.SecondaryContainerId).Success, Is.True);
+            Assert.That(first.Amount, Is.EqualTo(1516));
+            InventoryResult split = model.TrySplitAuto(first.InstanceId, 30, window.PrimaryContainerId);
+            Assert.That(split.Success, Is.True);
+            Assert.That(split.Item.Amount, Is.EqualTo(30));
+            Assert.That(model.TryTransfer(split.Item.InstanceId, window.SecondaryContainerId).Success, Is.True);
+            Assert.That(first.Amount, Is.EqualTo(1516));
+            Assert.That(model.GetItem(split.Item.InstanceId), Is.Null);
+            controller.Open(true);
+            yield return null;
+            yield return null;
+            InventoryItemView view = window.FindGrid(first.ContainerId).GetItemView(first);
+            TMP_Text label = view.transform.Find("Overlay/Name").GetComponent<TMP_Text>();
+            label.ForceMeshUpdate();
+            Assert.That(label.GetParsedText(), Is.EqualTo("FMJ"));
+            Assert.That(label.alignment, Is.EqualTo(TextAlignmentOptions.BottomRight));
+            Assert.That(label.textInfo.characterCount, Is.EqualTo(3));
+            Assert.That(label.textInfo.characterInfo[0].pointSize, Is.EqualTo(16f).Within(0.001f));
+            Assert.That(label.textInfo.characterInfo[0].color, Is.EqualTo(new Color32(255, 255, 255, 255)));
+            InventorySaveData saved = InventorySerializer.Capture(model, new[] { window.PrimaryContainerId, window.SecondaryContainerId });
+            var restored = new InventoryModel(model.Resolver);
+            InventoryContainer backpack = model.GetContainer(window.PrimaryContainerId);
+            InventoryContainer stash = model.GetContainer(window.SecondaryContainerId);
+            restored.AddContainer(new GridContainer(backpack.Id, backpack.Width, backpack.Height));
+            restored.AddContainer(new GridContainer(stash.Id, stash.Width, stash.Height));
+            Assert.That(InventorySerializer.Restore(restored, saved).IsClean, Is.True);
+            Assert.That(restored.GetItem(first.InstanceId).Amount, Is.EqualTo(1516));
+            controller.Close();
         }
 
         [UnityTest]
@@ -156,7 +206,8 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
                 Assert.That(item.Amount, Is.EqualTo(stats.BoxSize), stats.Section);
                 Assert.That(definition.Weight * stats.BoxSize, Is.EqualTo(stats.BoxWeight).Within(0.00001f), stats.Section);
                 Assert.That(definition.Size, Is.EqualTo(new Vector2Int(2, 1)), stats.Section);
-                Assert.That(definition.MaxStack, Is.EqualTo(stats.BoxSize), stats.Section);
+                Assert.That(definition.HasStackLimit, Is.False, stats.Section);
+                Assert.That(definition.MaxStack, Is.EqualTo(int.MaxValue), stats.Section);
                 Assert.That(definition.IconOverride, Is.Not.Null, stats.Section);
                 Assert.That(definition.IconOverride.rect.size, Is.EqualTo(new Vector2(200f, 100f)), stats.Section);
                 Assert.That(definition.IconOverride.texture.name, Is.EqualTo("ui_raid_hd_ammo"), stats.Section);

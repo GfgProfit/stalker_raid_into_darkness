@@ -61,6 +61,30 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
             EditorApplication.Exit(success ? 0 : 1);
         }
 
+        public static int UpdateInventorySettings()
+        {
+            int updated = 0;
+
+            foreach (string guid in AssetDatabase.FindAssets("t:ItemDefinition", new[] { DEFINITIONS_FOLDER }))
+            {
+                ItemDefinition definition = AssetDatabase.LoadAssetAtPath<ItemDefinition>(AssetDatabase.GUIDToAssetPath(guid));
+
+                if (definition == null || definition.GetComponent<AmmoStatsComponent>() == null)
+                {
+                    continue;
+                }
+
+                var serialized = new SerializedObject(definition);
+                serialized.FindProperty("_maxStack").intValue = 0;
+                serialized.ApplyModifiedPropertiesWithoutUndo();
+                EditorUtility.SetDirty(definition);
+                updated++;
+            }
+
+            AssetDatabase.SaveAssets();
+            return updated;
+        }
+
         public static string ImportModels()
         {
             CheckScene();
@@ -269,7 +293,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
             tags.GetArrayElementAtIndex(0).stringValue = CATEGORY;
             serialized.FindProperty("_size").vector2IntValue = GraWeaponAddonSetup.ToProjectSize((int)Number(system, section, "inv_grid_width", 2), (int)Number(system, section, "inv_grid_height", 2));
             serialized.FindProperty("_weight").floatValue = boxWeight / boxSize;
-            serialized.FindProperty("_maxStack").intValue = boxSize;
+            serialized.FindProperty("_maxStack").intValue = 0;
             serialized.FindProperty("_allowRotation").boolValue = true;
             serialized.FindProperty("_visualPrefab").objectReferenceValue = model;
             serialized.FindProperty("_iconOverride").objectReferenceValue = icon;

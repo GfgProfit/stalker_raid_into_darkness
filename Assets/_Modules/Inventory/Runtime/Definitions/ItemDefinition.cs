@@ -15,7 +15,7 @@ namespace Inventory
         [SerializeField] private List<string> _tags = new();
         [SerializeField] private Vector2Int _size = Vector2Int.one;
         [SerializeField] [Min(0f)] private float _weight;
-        [SerializeField] [Min(1)] private int _maxStack = 1;
+        [SerializeField] [Min(0)] private int _maxStack = 1;
         [SerializeField] private bool _allowRotation = true;
         [SerializeField] private Color _backgroundColor = new(1f, 1f, 1f, 0.04f);
         [SerializeField] private Sprite _fallbackIcon;
@@ -35,7 +35,8 @@ namespace Inventory
         public int Width => Size.x;
         public int Height => Size.y;
         public float Weight => Mathf.Max(0f, _weight);
-        public int MaxStack => Mathf.Max(1, _maxStack);
+        public int MaxStack => _maxStack <= 0 ? int.MaxValue : _maxStack;
+        public bool HasStackLimit => _maxStack > 0;
         public bool IsStackable => MaxStack > 1;
         public bool AllowRotation => _allowRotation && Width != Height;
         public Color BackgroundColor => _backgroundColor;
@@ -115,7 +116,7 @@ namespace Inventory
         protected virtual void OnValidate()
         {
             _size = new Vector2Int(Mathf.Max(1, _size.x), Mathf.Max(1, _size.y));
-            _maxStack = Mathf.Max(1, _maxStack);
+            _maxStack = Mathf.Max(0, _maxStack);
             _weight = Mathf.Max(0f, _weight);
             _icon ??= new ItemIconSettings();
             _icon.Validate();

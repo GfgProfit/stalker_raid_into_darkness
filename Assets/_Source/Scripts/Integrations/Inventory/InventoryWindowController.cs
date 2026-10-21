@@ -349,6 +349,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
             _statsFormatter = new EquipmentStatsFormatter(_window);
             _window.ItemStatsProvider = _statsFormatter.Collect;
             _window.ItemDescriptionProvider = _statsFormatter.Describe;
+            _window.ItemShortNameProvider = FormatAmmoShortName;
             _statusPresenter = _status != null ? new EquipmentStatusPresenter(_window, _status) : null;
             _inventory.Model.Changed += OnModelChanged;
 
@@ -419,6 +420,32 @@ namespace RaidIntoDarkness.Integrations.Inventory
             {
                 _sorting.ToggleFavorite(item.Definition);
             }
+        }
+
+        private static string FormatAmmoShortName(ItemInstance item)
+        {
+            if (item?.Definition.GetComponent<AmmoStatsComponent>() == null)
+            {
+                return null;
+            }
+
+            string name = item.Definition.ShortName;
+            int unit = name.IndexOf("мм", System.StringComparison.OrdinalIgnoreCase);
+            unit = unit >= 0 ? unit : name.IndexOf("mm", System.StringComparison.OrdinalIgnoreCase);
+            string label = unit >= 0 ? name.Substring(unit + 2).Trim() : name;
+
+            if (unit < 0 && name.Length > 0 && (char.IsDigit(name[0]) || name[0] == '.'))
+            {
+                int separator = name.IndexOf(' ');
+                label = separator >= 0 ? name.Substring(separator + 1).Trim() : name;
+            }
+
+            if (label.EndsWith(" FMJ", System.StringComparison.Ordinal))
+            {
+                label = "FMJ";
+            }
+
+            return "<size=16><color=#FFFFFF>" + label + "</color></size>";
         }
 
         private InventoryItemDecoration DecorateItem(ItemInstance item)

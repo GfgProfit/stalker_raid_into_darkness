@@ -9,7 +9,8 @@ namespace Inventory
         SlotStateChanged,
         ContainerAdded,
         ContainerRemoved,
-        Cleared
+        Cleared,
+        ItemStateChanged
     }
 
     public readonly struct InventoryChange

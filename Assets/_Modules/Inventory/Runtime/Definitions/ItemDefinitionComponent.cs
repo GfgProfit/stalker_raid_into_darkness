@@ -6,6 +6,7 @@ namespace Inventory
     [Serializable]
     public abstract class ItemDefinitionComponent
     {
+        public virtual float GetAdditionalWeight(ItemInstance item, IItemDefinitionResolver resolver) => 0f;
     }
 
     [Serializable]

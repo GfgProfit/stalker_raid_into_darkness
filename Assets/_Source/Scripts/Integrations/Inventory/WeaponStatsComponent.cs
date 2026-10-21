@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Globalization;
 using Inventory;
 using UnityEngine;
 
@@ -38,6 +40,9 @@ namespace RaidIntoDarkness.Integrations.Inventory
         [SerializeField] private WeaponAddonStatus _grenadeLauncherStatus;
         [SerializeField] private string _grenadeLauncherSection;
 
+        private ItemDatabase _ammoDatabase;
+        private Dictionary<string, ItemDefinition> _ammoDefinitions;
+
         public string Section => _section ?? string.Empty;
         public string WeaponClass => _weaponClass ?? string.Empty;
         public int Cost => _cost;
@@ -61,6 +66,35 @@ namespace RaidIntoDarkness.Integrations.Inventory
         public string[] Scopes => _scopes ?? Array.Empty<string>();
         public WeaponAddonStatus GrenadeLauncherStatus => _grenadeLauncherStatus;
         public string GrenadeLauncherSection => _grenadeLauncherSection ?? string.Empty;
+
+        public override float GetAdditionalWeight(ItemInstance item, IItemDefinitionResolver resolver)
+        {
+            string section = item.GetState(InventoryWeaponAmmoSource.AMMO_SECTION_STATE);
+
+            if (SupportsAmmo(section) == false || int.TryParse(item.GetState(InventoryWeaponAmmoSource.MAGAZINE_STATE), NumberStyles.Integer, CultureInfo.InvariantCulture, out int magazine) == false || resolver is not ItemDatabase database)
+            {
+                return 0f;
+            }
+
+            if (_ammoDatabase != database || _ammoDefinitions == null)
+            {
+                _ammoDatabase = database;
+                _ammoDefinitions = new Dictionary<string, ItemDefinition>(StringComparer.Ordinal);
+
+                for (int i = 0; i < database.Definitions.Count; i++)
+                {
+                    ItemDefinition definition = database.Definitions[i];
+                    AmmoStatsComponent ammo = definition != null ? definition.GetComponent<AmmoStatsComponent>() : null;
+
+                    if (ammo != null)
+                    {
+                        _ammoDefinitions[ammo.Section] = definition;
+                    }
+                }
+            }
+
+            return _ammoDefinitions.TryGetValue(section, out ItemDefinition loaded) ? loaded.Weight * Math.Clamp(magazine, 0, MagazineSize) : 0f;
+        }
 
         public bool SupportsAmmo(string section)
         {

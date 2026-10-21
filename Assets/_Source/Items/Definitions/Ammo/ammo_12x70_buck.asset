@@ -40,7 +40,7 @@ MonoBehaviour:
   - Ammo
   _size: {x: 2, y: 1}
   _weight: 0.044999998
-  _maxStack: 10
+  _maxStack: 0
   _allowRotation: 1
   _backgroundColor: {r: 1, g: 1, b: 1, a: 0.04}
   _fallbackIcon: {fileID: 0}

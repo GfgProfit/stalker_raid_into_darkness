@@ -108,7 +108,16 @@ namespace Inventory
         public void AddPlacementValidator(IInventoryPlacementValidator validator) => _placementValidators.Add(validator);
         public void RemovePlacementValidator(IInventoryPlacementValidator validator) => _placementValidators.Remove(validator);
 
-        public ItemInstance CreateItem(ItemDefinition definition, int amount = 1) => new(definition, amount);
+        public ItemInstance CreateItem(ItemDefinition definition, int amount = 1) => new(definition, amount) { Resolver = Resolver };
+
+        public void NotifyItemChanged(ItemInstance item)
+        {
+            if (ContainsItem(item))
+            {
+                Emit(new InventoryChange(InventoryChangeKind.ItemStateChanged, item, item.ContainerId, item.Location));
+                Flush();
+            }
+        }
 
         public InventoryResult CanAdd(ItemInstance item, string containerId, Vector2Int position, bool rotated)
         {
@@ -122,6 +131,7 @@ namespace Inventory
                 return InventoryResult.Fail(InventoryFailure.AlreadyInInventory);
             }
 
+            item.Resolver = Resolver;
             InventoryContainer container = GetContainer(containerId);
 
             if (container == null)
@@ -167,6 +177,7 @@ namespace Inventory
                 return InventoryResult.Fail(InventoryFailure.AlreadyInInventory);
             }
 
+            item.Resolver = Resolver;
             InventoryContainer container = GetContainer(containerId);
 
             if (container == null)
@@ -282,7 +293,7 @@ namespace Inventory
             InventoryContainer sourceContainer = GetContainer(source.ContainerId);
             InventoryContainer targetContainer = GetContainer(target.ContainerId);
 
-            if (sourceContainer != targetContainer && WeightAllows(targetContainer, source.Definition.Weight * moved) == false)
+            if (sourceContainer != targetContainer && WeightAllows(targetContainer, source.UnitWeight * moved) == false)
             {
                 return InventoryResult.Fail(InventoryFailure.NoSpace);
             }
@@ -404,7 +415,7 @@ namespace Inventory
                 return InventoryResult.Fail(releaseFailure);
             }
 
-            if (WeightAllows(target, item.Definition.Weight * moving) == false)
+            if (WeightAllows(target, item.UnitWeight * moving) == false)
             {
                 return InventoryResult.Fail(InventoryFailure.NoSpace);
             }
@@ -877,7 +888,7 @@ namespace Inventory
                     mergeTarget = candidate;
                     moved = Mathf.Min(amount, candidate.FreeStackSpace);
                     InventoryContainer mergeContainer = GetContainer(candidate.ContainerId);
-                    return mergeContainer != GetContainer(item.ContainerId) && WeightAllows(mergeContainer, item.Definition.Weight * moved) == false ? InventoryResult.Fail(InventoryFailure.NoSpace) : InventoryResult.Ok(candidate, moved);
+                    return mergeContainer != GetContainer(item.ContainerId) && WeightAllows(mergeContainer, item.UnitWeight * moved) == false ? InventoryResult.Fail(InventoryFailure.NoSpace) : InventoryResult.Ok(candidate, moved);
                 }
 
                 return InventoryResult.Fail(InventoryFailure.Occupied);
@@ -1020,6 +1031,7 @@ namespace Inventory
 
         private void OccupyInternal(ItemInstance item, InventoryContainer container, ItemPlacement placement)
         {
+            item.Resolver = Resolver;
             container.Occupy(item, placement);
 
             if (container is SlottedContainer slotted)

@@ -53,8 +53,27 @@ namespace Inventory
         public bool IsStackable => Definition.IsStackable;
         public bool IsFullStack => Amount >= MaxStack;
         public int FreeStackSpace => Mathf.Max(0, MaxStack - Amount);
-        public float TotalWeight => Definition.Weight * Amount;
+        public IItemDefinitionResolver Resolver { get; internal set; }
+        public float TotalWeight => UnitWeight * Amount;
         public string ContainerId => Location.ContainerId;
+
+        public float UnitWeight
+        {
+            get
+            {
+                float weight = Definition.Weight;
+
+                if (Definition.Components != null)
+                {
+                    for (int i = 0; i < Definition.Components.Count; i++)
+                    {
+                        weight += Definition.Components[i]?.GetAdditionalWeight(this, Resolver) ?? 0f;
+                    }
+                }
+
+                return Mathf.Max(0f, weight);
+            }
+        }
 
         public event Action<ItemInstance> StateChanged;
 
@@ -111,6 +130,7 @@ namespace Inventory
 
         internal void CopyStateFrom(ItemInstance source)
         {
+            Resolver = source.Resolver;
             _state.Clear();
 
             foreach (KeyValuePair<string, string> pair in source._state)

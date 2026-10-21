@@ -308,7 +308,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
             EditorUtility.SetDirty(definition);
         }
 
-        private static StalkerCollideSoundLibrary SetupCollideSounds(StalkerXRaySources sources, StringBuilder log)
+        internal static StalkerCollideSoundLibrary SetupCollideSounds(StalkerXRaySources sources, StringBuilder log)
         {
             StalkerGameMtlLibrary materials = StalkerGameMtlLibrary.Load(sources);
             foreach (string line in materials.Log)

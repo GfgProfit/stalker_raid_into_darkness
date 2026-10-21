@@ -1,0 +1,106 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da0f90c2955673d46b25d465cbe44ed0, type: 3}
+  m_Name: ammo_23x75_barrikada
+  m_EditorClassIdentifier: Inventory::Inventory.ItemDefinition
+  _definitionId: 06c706ac77fc94c40bf4d1138f29be81
+  _displayName: "\u041F\u0430\u0442\u0440\u043E\u043D\u044B 23x75 \u043C\u043C \"\u0411\u0430\u0440\u0440\u0438\u043A\u0430\u0434\u0430\""
+  _shortName: "23x75 \u043C\u043C \"\u0411\u0430\u0440\u0440\u0438\u043A\u0430\u0434\u0430\""
+  _description: "\u041F\u0430\u0442\u0440\u043E\u043D \u0441\u043E \u0441\u0442\u0430\u043B\u044C\u043D\u043E\u0439
+    \u043E\u0441\u0442\u0440\u043E\u043A\u043E\u043D\u0435\u0447\u043D\u043E\u0439
+    \u043F\u0443\u043B\u0435\u0439. \u041F\u0440\u0438\u043C\u0435\u043D\u044F\u0435\u0442\u0441\u044F
+    \u0434\u043B\u044F \u043F\u0440\u0438\u043D\u0443\u0434\u0438\u0442\u0435\u043B\u044C\u043D\u043E\u0439
+    \u043E\u0441\u0442\u0430\u043D\u043E\u0432\u043A\u0438 \u0430\u0432\u0442\u043E\u0442\u0440\u0430\u043D\u0441\u043F\u043E\u0440\u0442\u0430
+    \u043F\u0443\u0442\u0451\u043C \u0435\u0433\u043E \u043F\u043E\u0432\u0440\u0435\u0436\u0434\u0435\u043D\u0438\u044F.
+    \u0414\u0430\u043B\u044C\u043D\u043E\u0441\u0442\u044C \u043F\u0440\u0438\u043C\u0435\u043D\u0435\u043D\u0438\u044F
+    \u0434\u043E 100 \u043C\u0435\u0442\u0440\u043E\u0432. \u041F\u0440\u0438\u043C\u0435\u043D\u044F\u0435\u0442\u0441\u044F
+    \u0434\u043B\u044F \u0441\u0442\u0440\u0435\u043B\u044C\u0431\u044B \u0438\u0437
+    \u043A\u0430\u0440\u0430\u0431\u0438\u043D\u0430 \u041A\u0421-23.\n\n<color=#AAAAAA>\u041F\u0410\u0420\u0410\u041C\u0415\u0422\u0420\u042B:\n<color=#5D0074>
+    \u2022 <color=#8C8C8C> \u043F\u0440\u043E\u0431\u0438\u0432\u0430\u0435\u0442
+    \u0431\u0440\u043E\u043D\u044E \u043A\u043B\u0430\u0441\u0441\u0430: <color=#AAAAAA>II
+    (22)\n<color=#5D0074> \u2022 <color=#8C8C8C> \u043F\u043E\u0432\u0440\u0435\u0436\u0434\u0435\u043D\u0438\u0435
+    \u0442\u043A\u0430\u043D\u0435\u0439: <color=#AAAAAA>\u043E\u0447\u0435\u043D\u044C
+    \u0432\u044B\u0441\u043E\u043A\u043E\u0435 (296)"
+  _category: Ammo
+  _tags:
+  - Ammo
+  _size: {x: 2, y: 1}
+  _weight: 0.05
+  _maxStack: 10
+  _allowRotation: 1
+  _backgroundColor: {r: 1, g: 1, b: 1, a: 0.04}
+  _fallbackIcon: {fileID: 0}
+  _iconOverride: {fileID: 1522024333, guid: ffbb95c1826004343baca3d552702564, type: 3}
+  _visualPrefab: {fileID: 6026430210879233388, guid: e655cc2b88146d840b90e5a8b4d949e2, type: 3}
+  _defaultIconVariant: []
+  _icon:
+    _generateIcon: 0
+    _pixelsPerCell: 64
+    _antiAliasing: 1
+    _useOutline: 1
+    _outlineWidth: 2
+    _useShadow: 1
+    _shadowOffset: {x: 2, y: -2}
+    _shadowBlur: 2
+    _defaultView:
+      _modelEulerAngles: {x: 0, y: 0, z: 0}
+      _modelScale: {x: 1, y: 1, z: 1}
+      _cameraEulerAngles: {x: 25, y: -135, z: 0}
+      _padding: 1.15
+      _useDirectionalLight: 1
+      _lightIntensity: 10
+    _useCustomSlotView: 0
+    _slotView:
+      _modelEulerAngles: {x: 0, y: 0, z: 0}
+      _modelScale: {x: 1, y: 1, z: 1}
+      _cameraEulerAngles: {x: 25, y: -135, z: 0}
+      _padding: 1.15
+      _useDirectionalLight: 1
+      _lightIntensity: 10
+  _components:
+  - rid: 3479885513007301088
+  - rid: 3479885513007301133
+  - rid: 3479885513007301149
+  references:
+    version: 2
+    RefIds:
+    - rid: 3479885513007301088
+      type: {class: AmmoStatsComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      data:
+        _section: ammo_23x75_barrikada
+        _boxSize: 10
+        _boxWeight: 0.5
+        _cost: 1550
+        _armorPiercing: 0.33
+        _hitMultiplier: 4.2
+        _impulseMultiplier: 3.7
+        _speedMultiplier: 1.35
+        _dispersionMultiplier: 0.66
+        _airResistance: 0.85
+        _buckshot: 1
+        _averageWeaponHitPower: 0.48666668
+        _monsterDamageMultiplier: 3.2
+        _penetration: 22
+        _damagePerProjectile: 296
+        _hasTooltipParameters: 1
+    - rid: 3479885513007301133
+      type: {class: ItemTakeSoundComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      data:
+        _category: ammoshell
+        _clips:
+        - {fileID: 8300000, guid: ee0cb86bc88924746a52c92420023b4f, type: 3}
+        - {fileID: 8300000, guid: 8b13077925cc62648b059690f63ffb70, type: 3}
+        - {fileID: 8300000, guid: a7827b06c953fc04cbb67911402fc8c8, type: 3}
+    - rid: 3479885513007301149
+      type: {class: WorldItemComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      data:
+        _prefab: {fileID: 7588686108576939762, guid: 16d2220b9ec5c89469897f4f642b7d12, type: 3}

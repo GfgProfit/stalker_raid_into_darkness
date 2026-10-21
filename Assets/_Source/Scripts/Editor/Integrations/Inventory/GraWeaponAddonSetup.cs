@@ -285,7 +285,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
             return cls == SILENCER_CLASS || cls == SCOPE_CLASS || cls == GRENADE_LAUNCHER_CLASS;
         }
 
-        private static int SettleMaterials(List<string> models, StringBuilder log)
+        internal static int SettleMaterials(List<string> models, StringBuilder log)
         {
             XRayAssetSourceOptions options = XRayAssetSourceSettings.GetEffective();
 
@@ -451,7 +451,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
             return attached != null && sources.Exists(attached) ? attached : ModelPath(Get(system, section, "visual"));
         }
 
-        private static Dictionary<string, Sprite> ImportIcons(StalkerXRaySources sources, XRayLtxDatabase system, IEnumerable<string> sections, StringBuilder log)
+        internal static Dictionary<string, Sprite> ImportIcons(StalkerXRaySources sources, XRayLtxDatabase system, IEnumerable<string> sections, StringBuilder log)
         {
             var byTexture = new SortedDictionary<string, List<string>>(StringComparer.Ordinal);
 

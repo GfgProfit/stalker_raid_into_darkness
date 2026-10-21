@@ -1,0 +1,113 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da0f90c2955673d46b25d465cbe44ed0, type: 3}
+  m_Name: ammo_9x18_ap
+  m_EditorClassIdentifier: Inventory::Inventory.ItemDefinition
+  _definitionId: e8fbdbc1ea7a0f04fb66d4b5abc281fc
+  _displayName: "\u041F\u0430\u0442\u0440\u043E\u043D\u044B 9x18 \u043C\u043C \u0420\u0413028"
+  _shortName: "9x18 \u043C\u043C \u0420\u0413028"
+  _description: "\u0420\u0413028 - \u043F\u0430\u0442\u0440\u043E\u043D, \u0438\u0441\u043F\u043E\u043B\u044C\u0437\u0443\u0435\u043C\u044B\u0439
+    \u0434\u043B\u044F \u043F\u0440\u043E\u0431\u0438\u0432\u0430\u043D\u0438\u044F
+    \u043B\u0451\u0433\u043A\u043E\u0439 \u0431\u0440\u043E\u043D\u0438. \u0426\u0435\u043B\u044C
+    \u0441\u043E\u0437\u0434\u0430\u043D\u0438\u044F \u0420\u0413028 \u0441\u043E\u0441\u0442\u043E\u044F\u043B\u0430
+    \u0432 \u0442\u043E\u043C, \u0447\u0442\u043E\u0431\u044B \u043F\u0440\u043E\u0442\u0438\u0432\u043E\u0441\u0442\u043E\u044F\u0442\u044C
+    \u043F\u0440\u043E\u0442\u0438\u0432\u043D\u0438\u043A\u0430\u043C \u0432 \u0438\u043D\u0434\u0438\u0432\u0438\u0434\u0443\u0430\u043B\u044C\u043D\u044B\u0445
+    \u0441\u0440\u0435\u0434\u0441\u0442\u0432\u0430\u0445 \u0437\u0430\u0449\u0438\u0442\u044B;
+    \u043F\u043E \u044D\u0442\u043E\u0439 \u043F\u0440\u0438\u0447\u0438\u043D\u0435
+    \u043F\u0430\u0442\u0440\u043E\u043D \u043E\u0441\u043D\u0430\u0449\u0451\u043D
+    \u0443\u043F\u0440\u043E\u0447\u043D\u0451\u043D\u043D\u044B\u043C \u0441\u0442\u0430\u043B\u044C\u043D\u044B\u043C
+    \u0441\u0435\u0440\u0434\u0435\u0447\u043D\u0438\u043A\u043E\u043C. \u041A \u0441\u043E\u0436\u0430\u043B\u0435\u043D\u0438\u044E,
+    \u0441\u0430\u043C \u043F\u043E \u0441\u0435\u0431\u0435 \u043F\u0430\u0442\u0440\u043E\u043D
+    \u043D\u0435 \u0441\u0438\u043B\u044C\u043D\u043E \u043F\u0440\u0435\u0432\u043E\u0441\u0445\u043E\u0434\u0438\u0442
+    \u0441\u0442\u0430\u043D\u0434\u0430\u0440\u0442\u043D\u044B\u0439 9\u044518,
+    \u0430 \u0442\u043E\u043B\u044C\u043A\u043E \u0438\u043C\u0435\u0435\u0442 \u0443\u0432\u0435\u043B\u0438\u0447\u0435\u043D\u043D\u0443\u044E
+    \u043F\u0440\u043E\u0431\u0438\u0432\u043D\u0443\u044E \u0441\u043F\u043E\u0441\u043E\u0431\u043D\u043E\u0441\u0442\u044C.\n\n<color=#AAAAAA>\u041F\u0410\u0420\u0410\u041C\u0415\u0422\u0420\u042B:\n<color=#5D0074>
+    \u2022 <color=#8C8C8C> \u043F\u0440\u043E\u0431\u0438\u0432\u0430\u0435\u0442
+    \u0431\u0440\u043E\u043D\u044E \u043A\u043B\u0430\u0441\u0441\u0430: <color=#AAAAAA>II
+    (21)\n<color=#5D0074> \u2022 <color=#8C8C8C> \u043F\u043E\u0432\u0440\u0435\u0436\u0434\u0435\u043D\u0438\u0435
+    \u0442\u043A\u0430\u043D\u0435\u0439: <color=#AAAAAA>\u043D\u0438\u0436\u0435
+    \u0441\u0440\u0435\u0434\u043D\u0435\u0433\u043E (20)"
+  _category: Ammo
+  _tags:
+  - Ammo
+  _size: {x: 2, y: 1}
+  _weight: 0.011333333
+  _maxStack: 15
+  _allowRotation: 1
+  _backgroundColor: {r: 1, g: 1, b: 1, a: 0.04}
+  _fallbackIcon: {fileID: 0}
+  _iconOverride: {fileID: -207629534, guid: ffbb95c1826004343baca3d552702564, type: 3}
+  _visualPrefab: {fileID: -3737697402774154958, guid: 545a0d948e2e47343a0d989415ccc375, type: 3}
+  _defaultIconVariant: []
+  _icon:
+    _generateIcon: 0
+    _pixelsPerCell: 64
+    _antiAliasing: 1
+    _useOutline: 1
+    _outlineWidth: 2
+    _useShadow: 1
+    _shadowOffset: {x: 2, y: -2}
+    _shadowBlur: 2
+    _defaultView:
+      _modelEulerAngles: {x: 0, y: 0, z: 0}
+      _modelScale: {x: 1, y: 1, z: 1}
+      _cameraEulerAngles: {x: 25, y: -135, z: 0}
+      _padding: 1.15
+      _useDirectionalLight: 1
+      _lightIntensity: 10
+    _useCustomSlotView: 0
+    _slotView:
+      _modelEulerAngles: {x: 0, y: 0, z: 0}
+      _modelScale: {x: 1, y: 1, z: 1}
+      _cameraEulerAngles: {x: 25, y: -135, z: 0}
+      _padding: 1.15
+      _useDirectionalLight: 1
+      _lightIntensity: 10
+  _components:
+  - rid: 3479885513007301050
+  - rid: 3479885513007301095
+  - rid: 3479885513007301172
+  references:
+    version: 2
+    RefIds:
+    - rid: 3479885513007301050
+      type: {class: AmmoStatsComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      data:
+        _section: ammo_9x18_ap
+        _boxSize: 15
+        _boxWeight: 0.17
+        _cost: 780
+        _armorPiercing: 0.31
+        _hitMultiplier: 0.64
+        _impulseMultiplier: 0.55
+        _speedMultiplier: 1.875
+        _dispersionMultiplier: 0.66
+        _airResistance: 0.8
+        _buckshot: 1
+        _averageWeaponHitPower: 0.45535713
+        _monsterDamageMultiplier: 0.9
+        _penetration: 21
+        _damagePerProjectile: 20
+        _hasTooltipParameters: 1
+    - rid: 3479885513007301095
+      type: {class: ItemTakeSoundComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      data:
+        _category: ammosmall
+        _clips:
+        - {fileID: 8300000, guid: 6d01b45f4ddb34847bce1d10655e3e8d, type: 3}
+        - {fileID: 8300000, guid: 0a207c05869e09d4786fd829669a9b8b, type: 3}
+        - {fileID: 8300000, guid: c5d1a105e54168a4f9c985446ff0cfb3, type: 3}
+        - {fileID: 8300000, guid: 278278c282293684bb7769060b5ea82d, type: 3}
+    - rid: 3479885513007301172
+      type: {class: WorldItemComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      data:
+        _prefab: {fileID: 4801230016280542763, guid: 0752b81dca008e342beb31bcc95282c1, type: 3}

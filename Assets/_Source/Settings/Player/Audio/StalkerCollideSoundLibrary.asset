@@ -378,6 +378,298 @@ MonoBehaviour:
     - {fileID: 8300000, guid: 83ef78074ffb1e04a9b52d55bce3ce73, type: 3}
     - {fileID: 8300000, guid: 478b7c98396b1714ca16d7a70b2ec1cc, type: 3}
     - {fileID: 8300000, guid: 61c515b80aa9859449ebf28bd46bc196, type: 3}
+  - _objectMaterial: objects\large_weapon
+    _surface: 0
+    _origin: gamemtl.xr
+    _clips:
+    - {fileID: 8300000, guid: d67573b89f8fbc544ba85c603c4defb5, type: 3}
+    - {fileID: 8300000, guid: c30069bfd51642e47956bb435ef065c4, type: 3}
+  - _objectMaterial: objects\large_weapon
+    _surface: 1
+    _origin: gamemtl.xr
+    _clips:
+    - {fileID: 8300000, guid: d67573b89f8fbc544ba85c603c4defb5, type: 3}
+    - {fileID: 8300000, guid: c30069bfd51642e47956bb435ef065c4, type: 3}
+  - _objectMaterial: objects\large_weapon
+    _surface: 2
+    _origin: gamemtl.xr
+    _clips:
+    - {fileID: 8300000, guid: d67573b89f8fbc544ba85c603c4defb5, type: 3}
+    - {fileID: 8300000, guid: c30069bfd51642e47956bb435ef065c4, type: 3}
+  - _objectMaterial: objects\large_weapon
+    _surface: 3
+    _origin: gamemtl.xr
+    _clips:
+    - {fileID: 8300000, guid: d67573b89f8fbc544ba85c603c4defb5, type: 3}
+    - {fileID: 8300000, guid: c30069bfd51642e47956bb435ef065c4, type: 3}
+  - _objectMaterial: objects\large_weapon
+    _surface: 4
+    _origin: gamemtl.xr
+    _clips:
+    - {fileID: 8300000, guid: d67573b89f8fbc544ba85c603c4defb5, type: 3}
+    - {fileID: 8300000, guid: c30069bfd51642e47956bb435ef065c4, type: 3}
+  - _objectMaterial: objects\large_weapon
+    _surface: 5
+    _origin: gamemtl.xr
+    _clips:
+    - {fileID: 8300000, guid: d67573b89f8fbc544ba85c603c4defb5, type: 3}
+    - {fileID: 8300000, guid: c30069bfd51642e47956bb435ef065c4, type: 3}
+  - _objectMaterial: objects\large_weapon
+    _surface: 6
+    _origin: gamemtl.xr
+    _clips:
+    - {fileID: 8300000, guid: 3e7c15a019f3d5c4eb58548912f837b7, type: 3}
+    - {fileID: 8300000, guid: 1fa1032e370d220448e82e12307fdbba, type: 3}
+  - _objectMaterial: objects\large_weapon
+    _surface: 7
+    _origin: gamemtl.xr
+    _clips:
+    - {fileID: 8300000, guid: d67573b89f8fbc544ba85c603c4defb5, type: 3}
+    - {fileID: 8300000, guid: c30069bfd51642e47956bb435ef065c4, type: 3}
+  - _objectMaterial: objects\large_weapon
+    _surface: 8
+    _origin: gamemtl.xr
+    _clips:
+    - {fileID: 8300000, guid: d67573b89f8fbc544ba85c603c4defb5, type: 3}
+    - {fileID: 8300000, guid: c30069bfd51642e47956bb435ef065c4, type: 3}
+  - _objectMaterial: objects\large_weapon
+    _surface: 9
+    _origin: gamemtl.xr
+    _clips:
+    - {fileID: 8300000, guid: d67573b89f8fbc544ba85c603c4defb5, type: 3}
+    - {fileID: 8300000, guid: c30069bfd51642e47956bb435ef065c4, type: 3}
+  - _objectMaterial: objects\large_weapon
+    _surface: 10
+    _origin: gamemtl.xr
+    _clips:
+    - {fileID: 8300000, guid: d67573b89f8fbc544ba85c603c4defb5, type: 3}
+    - {fileID: 8300000, guid: c30069bfd51642e47956bb435ef065c4, type: 3}
+  - _objectMaterial: objects\large_weapon
+    _surface: 11
+    _origin: gamemtl.xr
+    _clips:
+    - {fileID: 8300000, guid: d7d15f6d5f42c5546b16a3f53add0565, type: 3}
+    - {fileID: 8300000, guid: 9fd1fb8567dc4e342bd05883b8a21dab, type: 3}
+  - _objectMaterial: objects\large_weapon
+    _surface: 12
+    _origin: gamemtl.xr
+    _clips:
+    - {fileID: 8300000, guid: d7d15f6d5f42c5546b16a3f53add0565, type: 3}
+    - {fileID: 8300000, guid: 9fd1fb8567dc4e342bd05883b8a21dab, type: 3}
+  - _objectMaterial: objects\large_weapon
+    _surface: 13
+    _origin: gamemtl.xr
+    _clips:
+    - {fileID: 8300000, guid: d7d15f6d5f42c5546b16a3f53add0565, type: 3}
+    - {fileID: 8300000, guid: 9fd1fb8567dc4e342bd05883b8a21dab, type: 3}
+  - _objectMaterial: objects\large_weapon
+    _surface: 14
+    _origin: gamemtl.xr
+    _clips:
+    - {fileID: 8300000, guid: d7d15f6d5f42c5546b16a3f53add0565, type: 3}
+    - {fileID: 8300000, guid: 9fd1fb8567dc4e342bd05883b8a21dab, type: 3}
+  - _objectMaterial: objects\large_weapon
+    _surface: 15
+    _origin: gamemtl.xr
+    _clips:
+    - {fileID: 8300000, guid: d67573b89f8fbc544ba85c603c4defb5, type: 3}
+    - {fileID: 8300000, guid: c30069bfd51642e47956bb435ef065c4, type: 3}
+  - _objectMaterial: objects\large_weapon
+    _surface: 16
+    _origin: gamemtl.xr
+    _clips:
+    - {fileID: 8300000, guid: d67573b89f8fbc544ba85c603c4defb5, type: 3}
+    - {fileID: 8300000, guid: c30069bfd51642e47956bb435ef065c4, type: 3}
+  - _objectMaterial: objects\large_weapon
+    _surface: 17
+    _origin: gamemtl.xr
+    _clips:
+    - {fileID: 8300000, guid: d67573b89f8fbc544ba85c603c4defb5, type: 3}
+    - {fileID: 8300000, guid: c30069bfd51642e47956bb435ef065c4, type: 3}
+  - _objectMaterial: objects\large_weapon
+    _surface: 18
+    _origin: gamemtl.xr
+    _clips:
+    - {fileID: 8300000, guid: d67573b89f8fbc544ba85c603c4defb5, type: 3}
+    - {fileID: 8300000, guid: c30069bfd51642e47956bb435ef065c4, type: 3}
+  - _objectMaterial: objects\large_weapon
+    _surface: 19
+    _origin: gamemtl.xr
+    _clips:
+    - {fileID: 8300000, guid: 3aebfa8082c204d458cf45b2b1575208, type: 3}
+    - {fileID: 8300000, guid: 413113388f70997498bc357da105c0ec, type: 3}
+  - _objectMaterial: objects\large_weapon
+    _surface: 20
+    _origin: gamemtl.xr
+    _clips:
+    - {fileID: 8300000, guid: d67573b89f8fbc544ba85c603c4defb5, type: 3}
+    - {fileID: 8300000, guid: c30069bfd51642e47956bb435ef065c4, type: 3}
+  - _objectMaterial: objects\large_weapon
+    _surface: 21
+    _origin: gamemtl.xr
+    _clips:
+    - {fileID: 8300000, guid: d67573b89f8fbc544ba85c603c4defb5, type: 3}
+    - {fileID: 8300000, guid: c30069bfd51642e47956bb435ef065c4, type: 3}
+  - _objectMaterial: objects\large_weapon
+    _surface: 22
+    _origin: gamemtl.xr
+    _clips:
+    - {fileID: 8300000, guid: d67573b89f8fbc544ba85c603c4defb5, type: 3}
+    - {fileID: 8300000, guid: c30069bfd51642e47956bb435ef065c4, type: 3}
+  - _objectMaterial: objects\large_weapon
+    _surface: 23
+    _origin: gamemtl.xr
+    _clips:
+    - {fileID: 8300000, guid: 0ab869a60a52bc24ea9180d3462069a4, type: 3}
+    - {fileID: 8300000, guid: 83ef78074ffb1e04a9b52d55bce3ce73, type: 3}
+    - {fileID: 8300000, guid: 478b7c98396b1714ca16d7a70b2ec1cc, type: 3}
+    - {fileID: 8300000, guid: 61c515b80aa9859449ebf28bd46bc196, type: 3}
+  - _objectMaterial: objects\small_box
+    _surface: 0
+    _origin: gamemtl.xr
+    _clips:
+    - {fileID: 8300000, guid: 269a6f202088fc449a0c90a50c0a27e1, type: 3}
+    - {fileID: 8300000, guid: 04a599d0381975b4a97da0fd699a1386, type: 3}
+  - _objectMaterial: objects\small_box
+    _surface: 1
+    _origin: gamemtl.xr
+    _clips:
+    - {fileID: 8300000, guid: 269a6f202088fc449a0c90a50c0a27e1, type: 3}
+    - {fileID: 8300000, guid: 04a599d0381975b4a97da0fd699a1386, type: 3}
+  - _objectMaterial: objects\small_box
+    _surface: 2
+    _origin: gamemtl.xr
+    _clips:
+    - {fileID: 8300000, guid: 269a6f202088fc449a0c90a50c0a27e1, type: 3}
+    - {fileID: 8300000, guid: 04a599d0381975b4a97da0fd699a1386, type: 3}
+  - _objectMaterial: objects\small_box
+    _surface: 3
+    _origin: gamemtl.xr
+    _clips:
+    - {fileID: 8300000, guid: 269a6f202088fc449a0c90a50c0a27e1, type: 3}
+    - {fileID: 8300000, guid: 04a599d0381975b4a97da0fd699a1386, type: 3}
+  - _objectMaterial: objects\small_box
+    _surface: 4
+    _origin: gamemtl.xr
+    _clips:
+    - {fileID: 8300000, guid: 269a6f202088fc449a0c90a50c0a27e1, type: 3}
+    - {fileID: 8300000, guid: 04a599d0381975b4a97da0fd699a1386, type: 3}
+  - _objectMaterial: objects\small_box
+    _surface: 5
+    _origin: gamemtl.xr
+    _clips:
+    - {fileID: 8300000, guid: 269a6f202088fc449a0c90a50c0a27e1, type: 3}
+    - {fileID: 8300000, guid: 04a599d0381975b4a97da0fd699a1386, type: 3}
+  - _objectMaterial: objects\small_box
+    _surface: 6
+    _origin: gamemtl.xr
+    _clips:
+    - {fileID: 8300000, guid: 269a6f202088fc449a0c90a50c0a27e1, type: 3}
+    - {fileID: 8300000, guid: 04a599d0381975b4a97da0fd699a1386, type: 3}
+  - _objectMaterial: objects\small_box
+    _surface: 7
+    _origin: gamemtl.xr
+    _clips:
+    - {fileID: 8300000, guid: 269a6f202088fc449a0c90a50c0a27e1, type: 3}
+    - {fileID: 8300000, guid: 04a599d0381975b4a97da0fd699a1386, type: 3}
+  - _objectMaterial: objects\small_box
+    _surface: 8
+    _origin: gamemtl.xr
+    _clips:
+    - {fileID: 8300000, guid: 269a6f202088fc449a0c90a50c0a27e1, type: 3}
+    - {fileID: 8300000, guid: 04a599d0381975b4a97da0fd699a1386, type: 3}
+  - _objectMaterial: objects\small_box
+    _surface: 9
+    _origin: gamemtl.xr
+    _clips:
+    - {fileID: 8300000, guid: 269a6f202088fc449a0c90a50c0a27e1, type: 3}
+    - {fileID: 8300000, guid: 04a599d0381975b4a97da0fd699a1386, type: 3}
+  - _objectMaterial: objects\small_box
+    _surface: 10
+    _origin: gamemtl.xr
+    _clips:
+    - {fileID: 8300000, guid: 269a6f202088fc449a0c90a50c0a27e1, type: 3}
+    - {fileID: 8300000, guid: 04a599d0381975b4a97da0fd699a1386, type: 3}
+  - _objectMaterial: objects\small_box
+    _surface: 11
+    _origin: gamemtl.xr
+    _clips:
+    - {fileID: 8300000, guid: 269a6f202088fc449a0c90a50c0a27e1, type: 3}
+    - {fileID: 8300000, guid: 04a599d0381975b4a97da0fd699a1386, type: 3}
+  - _objectMaterial: objects\small_box
+    _surface: 12
+    _origin: gamemtl.xr
+    _clips:
+    - {fileID: 8300000, guid: 269a6f202088fc449a0c90a50c0a27e1, type: 3}
+    - {fileID: 8300000, guid: 04a599d0381975b4a97da0fd699a1386, type: 3}
+  - _objectMaterial: objects\small_box
+    _surface: 13
+    _origin: gamemtl.xr
+    _clips:
+    - {fileID: 8300000, guid: 269a6f202088fc449a0c90a50c0a27e1, type: 3}
+    - {fileID: 8300000, guid: 04a599d0381975b4a97da0fd699a1386, type: 3}
+  - _objectMaterial: objects\small_box
+    _surface: 14
+    _origin: gamemtl.xr
+    _clips:
+    - {fileID: 8300000, guid: 269a6f202088fc449a0c90a50c0a27e1, type: 3}
+    - {fileID: 8300000, guid: 04a599d0381975b4a97da0fd699a1386, type: 3}
+  - _objectMaterial: objects\small_box
+    _surface: 15
+    _origin: gamemtl.xr
+    _clips:
+    - {fileID: 8300000, guid: 269a6f202088fc449a0c90a50c0a27e1, type: 3}
+    - {fileID: 8300000, guid: 04a599d0381975b4a97da0fd699a1386, type: 3}
+  - _objectMaterial: objects\small_box
+    _surface: 16
+    _origin: gamemtl.xr
+    _clips:
+    - {fileID: 8300000, guid: 269a6f202088fc449a0c90a50c0a27e1, type: 3}
+    - {fileID: 8300000, guid: 04a599d0381975b4a97da0fd699a1386, type: 3}
+  - _objectMaterial: objects\small_box
+    _surface: 17
+    _origin: gamemtl.xr
+    _clips:
+    - {fileID: 8300000, guid: 269a6f202088fc449a0c90a50c0a27e1, type: 3}
+    - {fileID: 8300000, guid: 04a599d0381975b4a97da0fd699a1386, type: 3}
+  - _objectMaterial: objects\small_box
+    _surface: 18
+    _origin: gamemtl.xr
+    _clips:
+    - {fileID: 8300000, guid: 269a6f202088fc449a0c90a50c0a27e1, type: 3}
+    - {fileID: 8300000, guid: 04a599d0381975b4a97da0fd699a1386, type: 3}
+  - _objectMaterial: objects\small_box
+    _surface: 19
+    _origin: gamemtl.xr
+    _clips:
+    - {fileID: 8300000, guid: 3aebfa8082c204d458cf45b2b1575208, type: 3}
+    - {fileID: 8300000, guid: 413113388f70997498bc357da105c0ec, type: 3}
+  - _objectMaterial: objects\small_box
+    _surface: 20
+    _origin: gamemtl.xr
+    _clips:
+    - {fileID: 8300000, guid: 269a6f202088fc449a0c90a50c0a27e1, type: 3}
+    - {fileID: 8300000, guid: 04a599d0381975b4a97da0fd699a1386, type: 3}
+  - _objectMaterial: objects\small_box
+    _surface: 21
+    _origin: gamemtl.xr
+    _clips:
+    - {fileID: 8300000, guid: 269a6f202088fc449a0c90a50c0a27e1, type: 3}
+    - {fileID: 8300000, guid: 04a599d0381975b4a97da0fd699a1386, type: 3}
+  - _objectMaterial: objects\small_box
+    _surface: 22
+    _origin: gamemtl.xr
+    _clips:
+    - {fileID: 8300000, guid: 269a6f202088fc449a0c90a50c0a27e1, type: 3}
+    - {fileID: 8300000, guid: 04a599d0381975b4a97da0fd699a1386, type: 3}
+  - _objectMaterial: objects\small_box
+    _surface: 23
+    _origin: gamemtl.xr
+    _clips:
+    - {fileID: 8300000, guid: 0ab869a60a52bc24ea9180d3462069a4, type: 3}
+    - {fileID: 8300000, guid: 83ef78074ffb1e04a9b52d55bce3ce73, type: 3}
+    - {fileID: 8300000, guid: 478b7c98396b1714ca16d7a70b2ec1cc, type: 3}
+    - {fileID: 8300000, guid: 61c515b80aa9859449ebf28bd46bc196, type: 3}
   - _objectMaterial: objects\small_weapon
     _surface: 0
     _origin: gamemtl.xr
@@ -569,26 +861,14 @@ MonoBehaviour:
     - {fileID: 8300000, guid: 478b7c98396b1714ca16d7a70b2ec1cc, type: 3}
     - {fileID: 8300000, guid: 61c515b80aa9859449ebf28bd46bc196, type: 3}
   _sourceReport: "MO2 profile: 1v2(DX11) (v_12gb) 2.5, \u0412\u0441\u0435 \u0432\u043A\u043B\u044E\u0447\u0435\u043D\u043E
-    (168), active mods: 173, indexed files: 35236\r\nscripts/ui_inventory.script
-    ([\u0418\u043D\u0442\u0435\u0440\u0444\u0435\u0439\u0441_\u0438\u043D\u0432\u0435\u043D\u0442]
-    UI Rework Sota + \u0428\u0430\u0431\u0430\u0448): PlaySND anti spam 0,5 s\r\nsnd_open
-    = interface\\inv_open <- [\u0417\u0432\u0443\u043A_\u04321] Audio Expansion 29.10.25\r\nsnd_close
-    = interface\\inv_close <- [\u0417\u0432\u0443\u043A_\u04321] Audio Expansion
-    29.10.25\r\nsnd_item_to_slot = interface\\inv_slot <- [\u0417\u0432\u0443\u043A_\u04321]
-    Audio Expansion 29.10.25\r\nsnd_item_to_ruck = interface\\inv_ruck <- [\u0417\u0432\u0443\u043A_\u04321]
-    Audio Expansion 29.10.25\r\nsnd_properties = interface\\inv_properties_2 <- [\u0417\u0432\u0443\u043A_\u04321]
-    Audio Expansion 29.10.25\r\nsnd_drop_item = interface\\inv_drop <- [\u0417\u0432\u0443\u043A_\u04321]
-    Audio Expansion 29.10.25\r\nsnd_item_use = interface\\inv_none <- Base Anomaly\r\nconfigs/items/settings/item_sounds/base_item_sound.ltx:
-    134 snd_on_take categories\r\nsnd_on_take exoarmor = interface\\items\\inv_items_exoarmor:
-    1 files\r\nsnd_on_take lightarmor = interface\\items\\inv_items_lightarmor: 1
-    files\r\nsnd_on_take armor = interface\\items\\efp_armor_pickup: 1 files\r\nsnd_on_take
-    mediumarmor = interface\\items\\inv_items_mediumarmor: 1 files\r\nhybrid_outfit:
-    no snd_on_take sound (heavyarmor)\r\nmerc_ace_outfit: no snd_on_take sound (heavyarmor)\r\nmerc_combat_scientific_outfit:
-    no snd_on_take sound (heavyarmor)\r\nsnd_on_take backpack = interface\\items\\efp_backpack_pickup:
-    1 files\r\nsnd_on_take huntkit = interface\\items\\inv_items_huntkit: 1 files\r\nsnd_on_take
-    helmet = interface\\items\\efp_helmet_pickup: 1 files\r\nItem definitions with
-    snd_on_take sounds: 185\r\ngamemtl.xr <- Base Anomaly\r\ngamemtl.xr: 65 materials,
-    1550 pairs\r\nmaterials\\material_pairs.ltx comes from db/mods/00_modded_exes_gamedata.db0
+    (168), active mods: 173, indexed files: 36434\r\nIcons: Assets/_Source/Items/Icons/ui_raid_hd_ammo.png
+    (2048x2048), 45 sprites.\r\nconfigs/items/settings/item_sounds/base_item_sound.ltx:
+    134 snd_on_take categories\r\nsnd_on_take ammosmall = interface\\items\\inv_items_ammosmall_,1,4:
+    4 files\r\nsnd_on_take ammolarge = interface\\items\\inv_items_ammolarge_,1,3:
+    3 files\r\nsnd_on_take ammoshell = interface\\items\\inv_items_shotshell_,1,3:
+    3 files\r\nsnd_on_take ammo = interface\\items\\inv_items_ammo_,1,3: 3 files\r\nItem
+    definitions with snd_on_take sounds: 45\r\ngamemtl.xr <- Base Anomaly\r\ngamemtl.xr:
+    65 materials, 1550 pairs\r\nmaterials\\material_pairs.ltx comes from db/mods/00_modded_exes_gamedata.db0
     (archive, not indexed); its body is '#include \"material_pairs_*.ltx\"', so the
     loose includes are applied in name order.\r\nmaterials/material_pairs_footsteps.ltx
     ([\u0428\u0430\u0433\u0438_\u04321] NPC Movement Sound [ RMS ]): 59 pair step/collide
@@ -645,6 +925,40 @@ MonoBehaviour:
     @ materials\\bush: 2 sounds (gamemtl.xr)\r\nobjects\\clothes @ materials\\cloth:
     4 sounds (gamemtl.xr)\r\nobjects\\clothes @ materials\\setka_rabica: 4 sounds
     (gamemtl.xr)\r\nobjects\\clothes @ materials\\glass: 4 sounds (gamemtl.xr)\r\nobjects\\clothes
+    @ materials\\water: 4 sounds (gamemtl.xr)\r\nobjects\\large_weapon @ default:
+    2 sounds (gamemtl.xr)\r\nobjects\\large_weapon @ materials\\earth: 2 sounds (gamemtl.xr)\r\nobjects\\large_weapon
+    @ materials\\grass: 2 sounds (gamemtl.xr)\r\nobjects\\large_weapon @ materials\\gravel:
+    2 sounds (gamemtl.xr)\r\nobjects\\large_weapon @ materials\\sand: 2 sounds (gamemtl.xr)\r\nobjects\\large_weapon
+    @ materials\\dirt: 2 sounds (gamemtl.xr)\r\nobjects\\large_weapon @ materials\\asphalt:
+    2 sounds (gamemtl.xr)\r\nobjects\\large_weapon @ materials\\concrete: 2 sounds
+    (gamemtl.xr)\r\nobjects\\large_weapon @ materials\\bricks: 2 sounds (gamemtl.xr)\r\nobjects\\large_weapon
+    @ materials\\stucco: 2 sounds (gamemtl.xr)\r\nobjects\\large_weapon @ materials\\flooring_tile:
+    2 sounds (gamemtl.xr)\r\nobjects\\large_weapon @ materials\\metal: 2 sounds (gamemtl.xr)\r\nobjects\\large_weapon
+    @ materials\\metal_pipe: 2 sounds (gamemtl.xr)\r\nobjects\\large_weapon @ materials\\metal_plate:
+    2 sounds (gamemtl.xr)\r\nobjects\\large_weapon @ materials\\tin: 2 sounds (gamemtl.xr)\r\nobjects\\large_weapon
+    @ materials\\shifer: 2 sounds (gamemtl.xr)\r\nobjects\\large_weapon @ materials\\wood:
+    2 sounds (gamemtl.xr)\r\nobjects\\large_weapon @ materials\\wooden_board: 2 sounds
+    (gamemtl.xr)\r\nobjects\\large_weapon @ materials\\tree_trunk: 2 sounds (gamemtl.xr)\r\nobjects\\large_weapon
+    @ materials\\bush: 2 sounds (gamemtl.xr)\r\nobjects\\large_weapon @ materials\\cloth:
+    2 sounds (gamemtl.xr)\r\nobjects\\large_weapon @ materials\\setka_rabica: 2 sounds
+    (gamemtl.xr)\r\nobjects\\large_weapon @ materials\\glass: 2 sounds (gamemtl.xr)\r\nobjects\\large_weapon
+    @ materials\\water: 4 sounds (gamemtl.xr)\r\nobjects\\small_box @ default: 2
+    sounds (gamemtl.xr)\r\nobjects\\small_box @ materials\\earth: 2 sounds (gamemtl.xr)\r\nobjects\\small_box
+    @ materials\\grass: 2 sounds (gamemtl.xr)\r\nobjects\\small_box @ materials\\gravel:
+    2 sounds (gamemtl.xr)\r\nobjects\\small_box @ materials\\sand: 2 sounds (gamemtl.xr)\r\nobjects\\small_box
+    @ materials\\dirt: 2 sounds (gamemtl.xr)\r\nobjects\\small_box @ materials\\asphalt:
+    2 sounds (gamemtl.xr)\r\nobjects\\small_box @ materials\\concrete: 2 sounds (gamemtl.xr)\r\nobjects\\small_box
+    @ materials\\bricks: 2 sounds (gamemtl.xr)\r\nobjects\\small_box @ materials\\stucco:
+    2 sounds (gamemtl.xr)\r\nobjects\\small_box @ materials\\flooring_tile: 2 sounds
+    (gamemtl.xr)\r\nobjects\\small_box @ materials\\metal: 2 sounds (gamemtl.xr)\r\nobjects\\small_box
+    @ materials\\metal_pipe: 2 sounds (gamemtl.xr)\r\nobjects\\small_box @ materials\\metal_plate:
+    2 sounds (gamemtl.xr)\r\nobjects\\small_box @ materials\\tin: 2 sounds (gamemtl.xr)\r\nobjects\\small_box
+    @ materials\\shifer: 2 sounds (gamemtl.xr)\r\nobjects\\small_box @ materials\\wood:
+    2 sounds (gamemtl.xr)\r\nobjects\\small_box @ materials\\wooden_board: 2 sounds
+    (gamemtl.xr)\r\nobjects\\small_box @ materials\\tree_trunk: 2 sounds (gamemtl.xr)\r\nobjects\\small_box
+    @ materials\\bush: 2 sounds (gamemtl.xr)\r\nobjects\\small_box @ materials\\cloth:
+    2 sounds (gamemtl.xr)\r\nobjects\\small_box @ materials\\setka_rabica: 2 sounds
+    (gamemtl.xr)\r\nobjects\\small_box @ materials\\glass: 2 sounds (gamemtl.xr)\r\nobjects\\small_box
     @ materials\\water: 4 sounds (gamemtl.xr)\r\nobjects\\small_weapon @ default:
     4 sounds (gamemtl.xr)\r\nobjects\\small_weapon @ materials\\earth: 4 sounds (gamemtl.xr)\r\nobjects\\small_weapon
     @ materials\\grass: 4 sounds (gamemtl.xr)\r\nobjects\\small_weapon @ materials\\gravel:

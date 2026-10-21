@@ -266,7 +266,9 @@ PrefabInstance:
       value: bossxe
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 9143361871581054315, guid: c40a984564394e5438817ab8cc8404cd, type: 3}
+    - {fileID: 7755414635045704313, guid: c40a984564394e5438817ab8cc8404cd, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: -9137962142385034750, guid: c40a984564394e5438817ab8cc8404cd, type: 3}

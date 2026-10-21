@@ -1,0 +1,114 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da0f90c2955673d46b25d465cbe44ed0, type: 3}
+  m_Name: ammo_12x76_bull
+  m_EditorClassIdentifier: Inventory::Inventory.ItemDefinition
+  _definitionId: c709a9333fee5aa42b7deec19e1ae2f2
+  _displayName: "\u041F\u0430\u0442\u0440\u043E\u043D\u044B 12x76 \u043C\u043C \xABBull\xBB"
+  _shortName: "12x76 \u043C\u043C \xABBull\xBB"
+  _description: "\u041A\u0443\u0441\u0442\u0430\u0440\u043D\u044B\u0439 \u043F\u0430\u0442\u0440\u043E\u043D,
+    \u0430 \u0442\u043E\u0447\u043D\u0435\u0435 \u0431\u0443\u0434\u0435\u0442 \u0441\u043A\u0430\u0437\u0430\u0442\u044C
+    \u043F\u0443\u043B\u044F 12-\u0433\u043E \u043A\u0430\u043B\u0438\u0431\u0440\u0430
+    \u0434\u043B\u044F \u043E\u0445\u043E\u0442\u044B \u043D\u0430 \u0434\u0438\u043D\u043E\u0437\u0430\u0432\u0440\u043E\u0432,
+    \u043D\u043E \u0441\u043E\u0439\u0434\u0451\u0442 \u0438 \u043F\u0440\u043E\u0442\u0438\u0432
+    \u043C\u0443\u0442\u0430\u043D\u0442\u043E\u0432. \u0412\u043D\u0443\u0442\u0440\u0435\u043D\u043D\u044F\u044F
+    \u0447\u0430\u0441\u0442\u044C \u043F\u0443\u043B\u0438 \u0438\u0437\u0433\u043E\u0442\u043E\u0432\u043B\u0435\u043D\u0430
+    \u0438\u0437 \u0441\u0432\u0438\u043D\u0446\u0430, \u043F\u043E\u043A\u0440\u044B\u0442\u043E\u0433\u043E
+    \u043C\u0435\u0434\u044C\u044E, \u0432\u043D\u0443\u0442\u0440\u0438 \u043A\u043E\u0442\u043E\u0440\u043E\u0433\u043E,
+    \u0432 \u0441\u0432\u043E\u044E \u043E\u0447\u0435\u0440\u0435\u0434\u044C, \u0438\u043C\u0435\u0435\u0442\u0441\u044F
+    \u0441\u0442\u0430\u043B\u044C\u043D\u0430\u044F, \u043F\u043E\u0445\u043E\u0436\u0430\u044F
+    \u043D\u0430 \u0434\u0440\u043E\u0442\u0438\u043A, \u0432\u0441\u0442\u0430\u0432\u043A\u0430.
+    \u041F\u0443\u043B\u044F \u043D\u0430\u0441\u0442\u043E\u043B\u044C\u043A\u043E
+    \u0432\u043F\u0435\u0447\u0430\u0442\u043B\u044F\u0435\u0442 \u0441\u0432\u043E\u0438\u043C\u0438
+    \u0440\u0430\u0437\u043C\u0435\u0440\u0430\u043C\u0438 \u0438 \u043E\u0431\u044A\u0451\u043C\u043E\u043C
+    \u043F\u043E\u0440\u043E\u0445\u0430, \u0447\u0442\u043E \u0432\u044B\u0441\u043E\u043A\u0430
+    \u0432\u0435\u0440\u043E\u044F\u0442\u043D\u043E\u0441\u0442\u044C \u043F\u0440\u043E\u0441\u0442\u043E
+    \u043E\u0441\u0442\u0430\u0442\u044C\u0441\u044F \u0431\u0435\u0437 \u0440\u0443\u043A.\n\n<color=#AAAAAA>\u041F\u0410\u0420\u0410\u041C\u0415\u0422\u0420\u042B:\n<color=#5D0074>
+    \u2022 <color=#8C8C8C> \u043F\u0440\u043E\u0431\u0438\u0432\u0430\u0435\u0442
+    \u0431\u0440\u043E\u043D\u044E \u043A\u043B\u0430\u0441\u0441\u0430: <color=#AAAAAA>II
+    (27)\n<color=#5D0074> \u2022 <color=#8C8C8C> \u043F\u043E\u0432\u0440\u0435\u0436\u0434\u0435\u043D\u0438\u0435
+    \u0442\u043A\u0430\u043D\u0435\u0439: <color=#AAAAAA>\u043E\u0447\u0435\u043D\u044C
+    \u0432\u044B\u0441\u043E\u043A\u043E\u0435 (446)"
+  _category: Ammo
+  _tags:
+  - Ammo
+  _size: {x: 2, y: 1}
+  _weight: 0.060000002
+  _maxStack: 10
+  _allowRotation: 1
+  _backgroundColor: {r: 1, g: 1, b: 1, a: 0.04}
+  _fallbackIcon: {fileID: 0}
+  _iconOverride: {fileID: 1103194783, guid: ffbb95c1826004343baca3d552702564, type: 3}
+  _visualPrefab: {fileID: -7722877421052614751, guid: 1747b04cc854c034a9164eddb4e11fbf, type: 3}
+  _defaultIconVariant: []
+  _icon:
+    _generateIcon: 0
+    _pixelsPerCell: 64
+    _antiAliasing: 1
+    _useOutline: 1
+    _outlineWidth: 2
+    _useShadow: 1
+    _shadowOffset: {x: 2, y: -2}
+    _shadowBlur: 2
+    _defaultView:
+      _modelEulerAngles: {x: 0, y: 0, z: 0}
+      _modelScale: {x: 1, y: 1, z: 1}
+      _cameraEulerAngles: {x: 25, y: -135, z: 0}
+      _padding: 1.15
+      _useDirectionalLight: 1
+      _lightIntensity: 10
+    _useCustomSlotView: 0
+    _slotView:
+      _modelEulerAngles: {x: 0, y: 0, z: 0}
+      _modelScale: {x: 1, y: 1, z: 1}
+      _cameraEulerAngles: {x: 25, y: -135, z: 0}
+      _padding: 1.15
+      _useDirectionalLight: 1
+      _lightIntensity: 10
+  _components:
+  - rid: 3479885513007301071
+  - rid: 3479885513007301116
+  - rid: 3479885513007301145
+  references:
+    version: 2
+    RefIds:
+    - rid: 3479885513007301071
+      type: {class: AmmoStatsComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      data:
+        _section: ammo_12x76_bull
+        _boxSize: 10
+        _boxWeight: 0.6
+        _cost: 1200
+        _armorPiercing: 0.4
+        _hitMultiplier: 2.5
+        _impulseMultiplier: 1
+        _speedMultiplier: 1
+        _dispersionMultiplier: 0.5
+        _airResistance: 1
+        _buckshot: 1
+        _averageWeaponHitPower: 1
+        _monsterDamageMultiplier: 4.2
+        _penetration: 27
+        _damagePerProjectile: 446
+        _hasTooltipParameters: 1
+    - rid: 3479885513007301116
+      type: {class: ItemTakeSoundComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      data:
+        _category: ammoshell
+        _clips:
+        - {fileID: 8300000, guid: ee0cb86bc88924746a52c92420023b4f, type: 3}
+        - {fileID: 8300000, guid: 8b13077925cc62648b059690f63ffb70, type: 3}
+        - {fileID: 8300000, guid: a7827b06c953fc04cbb67911402fc8c8, type: 3}
+    - rid: 3479885513007301145
+      type: {class: WorldItemComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      data:
+        _prefab: {fileID: 5501626516769899973, guid: 6c20c2e61b7806240988a1e98b6d10f6, type: 3}

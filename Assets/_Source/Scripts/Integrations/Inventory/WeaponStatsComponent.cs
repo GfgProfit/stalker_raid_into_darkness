@@ -22,7 +22,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
         [SerializeField] private string _repairType;
         [SerializeField] private float _hitPower;
         [SerializeField] private float _hitImpulse;
-        [SerializeField] private float _bulletSpeed;
+        [SerializeField] [InspectorName("Flatness (m/s)")] [Min(1f)] private float _bulletSpeed;
         [SerializeField] private float _fireDistance;
         [SerializeField] private float _rpm;
         [SerializeField] private int[] _fireModes = Array.Empty<int>();

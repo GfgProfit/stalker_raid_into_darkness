@@ -12,7 +12,7 @@ namespace RaidIntoDarkness.Weapons
 
         public Transform Muzzle => _muzzle;
         public GameObject SilencerVisual => _silencerVisual;
-        public Transform SilencedMuzzle => _silencedMuzzle != null ? _silencedMuzzle : _muzzle;
+        public Transform SilencedMuzzle => _silencedMuzzle;
 
         public void SetMuzzle(Transform muzzle)
         {

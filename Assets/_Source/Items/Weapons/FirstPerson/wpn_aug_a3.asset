@@ -18,6 +18,8 @@ MonoBehaviour:
   _aimOffsetPosition: {x: 0.0127, y: -0.006, z: 0}
   _aimOffsetRotation: {x: 0, y: 0, z: 0}
   _aimTime: 0.25
+  _aimCameraRoll: 1
+  _aimCameraBlendTime: 0.15
   _muzzleBone: wpn_silencer
   _overlayBones:
   - l_clavicle
@@ -197,6 +199,12 @@ MonoBehaviour:
   _silencedSmokeParticles: {fileID: 6292335335723028336, guid: 3e67f16876bef364ca7d91540a96b1ee, type: 3}
   _lastShotHoldFrame: 1
   _emptyShotStrength: 0.15
+  _ballistics:
+    _bulletPrefab: {fileID: 4022291978906581112, guid: 8899b2fbc46efff4389c602431eecefa, type: 3}
+    _ballisticHitMask:
+      serializedVersion: 2
+      m_Bits: 4294967291
+    _drawBallisticDebug: 0
   _recoil: {x: 4, y: 4, z: 2}
   _recoilSnappiness: 13
   _recoilReturnSpeed: 9

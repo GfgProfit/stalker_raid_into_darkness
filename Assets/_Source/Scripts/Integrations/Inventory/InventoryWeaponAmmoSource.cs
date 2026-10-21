@@ -59,6 +59,28 @@ namespace RaidIntoDarkness.Integrations.Inventory
 
         public string GetAmmoName(object weaponKey) => FindDefinition(GetAmmoSection(weaponKey))?.ShortName ?? string.Empty;
 
+        public BallisticAmmoData GetBallistics(object weaponKey) => FindDefinition(GetAmmoSection(weaponKey))?.GetComponent<AmmoBallisticsComponent>()?.Data;
+
+        public float GetBulletSpeed(object weaponKey)
+        {
+            ItemInstance weapon = GetWeapon(weaponKey);
+            WeaponStatsComponent stats = weapon?.Definition.GetComponent<WeaponStatsComponent>();
+            AmmoStatsComponent ammo = FindDefinition(GetAmmoSection(weaponKey))?.GetComponent<AmmoStatsComponent>();
+            WeaponAddonComponent silencer = stats?.GetSilencer(weapon, _model.Resolver)?.GetComponent<WeaponAddonComponent>();
+            return (stats?.BulletSpeed ?? 0f) * (ammo?.SpeedMultiplier ?? 1f) * (silencer?.BulletSpeedFactor ?? 1f);
+        }
+
+        public float GetFireDistance(object weaponKey) => GetWeapon(weaponKey)?.Definition.GetComponent<WeaponStatsComponent>()?.FireDistance ?? 0f;
+
+        public float GetDispersionDegrees(object weaponKey)
+        {
+            ItemInstance weapon = GetWeapon(weaponKey);
+            WeaponStatsComponent stats = weapon?.Definition.GetComponent<WeaponStatsComponent>();
+            AmmoStatsComponent ammo = FindDefinition(GetAmmoSection(weaponKey))?.GetComponent<AmmoStatsComponent>();
+            WeaponAddonComponent silencer = stats?.GetSilencer(weapon, _model.Resolver)?.GetComponent<WeaponAddonComponent>();
+            return (stats?.FireDispersionBase ?? 0f) * (ammo?.DispersionMultiplier ?? 1f) * (silencer?.FireDispersionBaseFactor ?? 1f);
+        }
+
         public bool TryStartReload(object weaponKey)
         {
             ItemInstance weapon = GetWeapon(weaponKey);

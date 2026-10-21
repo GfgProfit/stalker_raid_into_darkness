@@ -202,6 +202,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
 
             AssetDatabase.SaveAssets();
             Debug.Log(LOG + log);
+            AmmoBallisticsSetup.Configure();
             return $"Created {definitions.Count} definitions, HD sprites and full-box world prefabs with pickup and impact sounds.";
         }
 

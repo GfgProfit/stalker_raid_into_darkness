@@ -48,6 +48,7 @@ namespace RaidIntoDarkness.Weapons
         private Transform _modelRoot;
         private Transform _muzzle;
         private bool _muzzleFromView;
+        private bool _ballisticsWarningLogged;
         private XRayParticleGroupPlayer _flame;
         private Vector3 _savedHandsPosition;
         private Quaternion _savedHandsRotation;
@@ -66,6 +67,8 @@ namespace RaidIntoDarkness.Weapons
         private int _redrawSlot = -1;
         private float _handsFreeTime;
         private float _aim;
+        private float _aimCameraRoll;
+        private float _aimCameraVelocity;
         private bool _aiming;
         private AimPhase _aimPhase;
         private float _aimBlendTime;
@@ -221,6 +224,8 @@ namespace RaidIntoDarkness.Weapons
 
         public void Hide()
         {
+            ResetAimCamera();
+
             if (State == FirstPersonWeaponState.Hidden)
             {
                 return;
@@ -447,6 +452,7 @@ namespace RaidIntoDarkness.Weapons
             _player.Combat = true;
             _aim = 0.0f;
             _aiming = false;
+            ResetAimCamera();
             _aimPhase = AimPhase.Hip;
             _aimBlendTime = 0f;
             _hasLoop = false;
@@ -528,12 +534,34 @@ namespace RaidIntoDarkness.Weapons
 
         private void Shoot(FirstPersonWeaponAsset asset)
         {
+            BallisticAmmoData ammo = _ammoSource != null ? _ammoSource.GetBallistics(_slots[ActiveSlot].Key) : null;
+            float bulletSpeed = _ammoSource?.GetBulletSpeed(_slots[ActiveSlot].Key) ?? 0f;
+            float fireDistance = _ammoSource?.GetFireDistance(_slots[ActiveSlot].Key) ?? 0f;
+            float dispersion = _ammoSource?.GetDispersionDegrees(_slots[ActiveSlot].Key) ?? 0f;
+
+            if (!_muzzleFromView || _muzzle == null || ammo == null || !ammo.IsConfigured || bulletSpeed <= 0f || fireDistance <= 0f || asset.Ballistics == null || asset.Ballistics.BulletPrefab == null)
+            {
+                _burstLeft = 0;
+
+                if (!_ballisticsWarningLogged)
+                {
+                    _ballisticsWarningLogged = true;
+                    Debug.LogError($"{asset.name}: configure loaded ammo ballistics, bullet prefab and {(IsSilenced ? "SilencedMuzzlePoint" : "MuzzlePoint")} before firing.", this);
+                }
+
+                return;
+            }
+
+            Vector3 launchPosition = _muzzle.position;
+            Quaternion launchRotation = Quaternion.LookRotation(_muzzle.TransformVector(Vector3.forward).normalized, Vector3.up);
+
             if (_ammoSource == null || _ammoSource.TryShoot(_slots[ActiveSlot].Key) == false)
             {
                 _burstLeft = 0;
                 return;
             }
 
+            SpawnProjectiles(asset.Ballistics, ammo, launchPosition, launchRotation, bulletSpeed, fireDistance, dispersion);
             _burstLeft--;
             _nextShotTime = Time.time + asset.ShotInterval;
             FirstPersonWeaponMotion motion = _aiming ? asset.FindRandom(FirstPersonWeaponMotionKind.ShootAim) : null;
@@ -563,6 +591,27 @@ namespace RaidIntoDarkness.Weapons
 
             SpawnShotEffects(asset);
             NotifyAmmo();
+        }
+
+        private void SpawnProjectiles(WeaponBallisticsSettings settings, BallisticAmmoData ammo, Vector3 position, Quaternion rotation, float speed, float distance, float dispersionDegrees)
+        {
+            float tangent = Mathf.Tan(dispersionDegrees * Mathf.Deg2Rad);
+            Transform owner = _player != null ? _player.transform.root : transform.root;
+
+            for (int i = 0; i < ammo.ProjectileCount; i++)
+            {
+                Vector2 dispersion = UnityEngine.Random.insideUnitCircle * tangent;
+                Vector3 direction = rotation * new Vector3(dispersion.x, dispersion.y, 1f).normalized;
+                GameObject projectileObject = Instantiate(settings.BulletPrefab, position, rotation);
+                BallisticProjectile projectile = projectileObject.GetComponent<BallisticProjectile>();
+
+                if (projectile == null)
+                {
+                    projectile = projectileObject.AddComponent<BallisticProjectile>();
+                }
+
+                projectile.Initialize(settings, ammo, position, direction, speed, distance * ammo.DistanceMultiplier, owner, _model.transform);
+            }
         }
 
         private void PlayShotSounds(FirstPersonWeaponAsset asset, int magazine)
@@ -930,6 +979,7 @@ namespace RaidIntoDarkness.Weapons
             FirstPersonWeaponAsset asset = ActiveWeapon;
             float aimTime = asset != null ? asset.AimTime : 0.25f;
             _aim = Mathf.MoveTowards(_aim, _aiming ? 1f : 0f, deltaTime / aimTime);
+            TickAimCamera(asset, deltaTime);
 
             if (asset == null)
             {
@@ -952,6 +1002,35 @@ namespace RaidIntoDarkness.Weapons
             {
                 _aimPhase = _aiming ? AimPhase.Aimed : AimPhase.Hip;
                 _aimBlendTime = 0f;
+            }
+        }
+
+        private void TickAimCamera(FirstPersonWeaponAsset asset, float deltaTime)
+        {
+            float target = asset != null ? asset.AimCameraRoll * 4f * _aim * (1f - _aim) * (_aiming ? 1f : -1f) : 0f;
+            float blendTime = asset != null ? asset.AimCameraBlendTime : 0.15f;
+            _aimCameraRoll = Mathf.SmoothDamp(_aimCameraRoll, target, ref _aimCameraVelocity, blendTime, Mathf.Infinity, deltaTime);
+
+            if (Mathf.Abs(_aimCameraRoll - target) < 0.0001f && Mathf.Abs(_aimCameraVelocity) < 0.001f)
+            {
+                _aimCameraRoll = target;
+                _aimCameraVelocity = 0f;
+            }
+
+            if (_player != null && _player.CameraEffects != null)
+            {
+                _player.CameraEffects.SetWeaponAimRotation(Quaternion.AngleAxis(_aimCameraRoll, Vector3.forward));
+            }
+        }
+
+        private void ResetAimCamera()
+        {
+            _aimCameraRoll = 0f;
+            _aimCameraVelocity = 0f;
+
+            if (_player != null && _player.CameraEffects != null)
+            {
+                _player.CameraEffects.SetWeaponAimRotation(Quaternion.identity);
             }
         }
 
@@ -1060,6 +1139,7 @@ namespace RaidIntoDarkness.Weapons
 
         private void ApplySilencerVisual()
         {
+            _ballisticsWarningLogged = false;
             FirstPersonWeaponView view = _model.GetComponent<FirstPersonWeaponView>();
 
             if (view != null)

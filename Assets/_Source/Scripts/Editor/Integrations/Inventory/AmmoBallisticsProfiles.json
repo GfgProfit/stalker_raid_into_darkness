@@ -1,0 +1,949 @@
+{
+  "_entries": [
+    {
+      "_section": "ammo_11.43x23_fmj",
+      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
+      "_data": {
+        "_allowRicochet": true,
+        "_distanceMultiplier": 1,
+        "_projectileCount": 1,
+        "_ammoTracerEnabled": false,
+        "_ammoTracerWidthMeters": 0.225,
+        "_ammoTracerTrailDurationSeconds": 0.025,
+        "_ammoTracerIgnitionDistanceMeters": 10,
+        "_ammoTracerBurnDurationSeconds": 1.5,
+        "_ammoTracerEmissionIntensity": 8,
+        "_ammoTracerColor": {
+          "r": 1,
+          "g": 0.35,
+          "b": 0.015,
+          "a": 1
+        }
+      }
+    },
+    {
+      "_section": "ammo_11.43x23_hydro",
+      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
+      "_data": {
+        "_allowRicochet": true,
+        "_distanceMultiplier": 1,
+        "_projectileCount": 1,
+        "_ammoTracerEnabled": false,
+        "_ammoTracerWidthMeters": 0.225,
+        "_ammoTracerTrailDurationSeconds": 0.025,
+        "_ammoTracerIgnitionDistanceMeters": 10,
+        "_ammoTracerBurnDurationSeconds": 1.5,
+        "_ammoTracerEmissionIntensity": 8,
+        "_ammoTracerColor": {
+          "r": 1,
+          "g": 0.35,
+          "b": 0.015,
+          "a": 1
+        }
+      }
+    },
+    {
+      "_section": "ammo_12.7x55_ap",
+      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
+      "_data": {
+        "_allowRicochet": true,
+        "_distanceMultiplier": 1,
+        "_projectileCount": 1,
+        "_ammoTracerEnabled": true,
+        "_ammoTracerWidthMeters": 0.225,
+        "_ammoTracerTrailDurationSeconds": 0.02,
+        "_ammoTracerIgnitionDistanceMeters": 70,
+        "_ammoTracerBurnDurationSeconds": 3,
+        "_ammoTracerEmissionIntensity": 12,
+        "_ammoTracerColor": {
+          "r": 1,
+          "g": 0.35,
+          "b": 0.015,
+          "a": 1
+        }
+      }
+    },
+    {
+      "_section": "ammo_12.7x55_fmj",
+      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
+      "_data": {
+        "_allowRicochet": true,
+        "_distanceMultiplier": 1,
+        "_projectileCount": 1,
+        "_ammoTracerEnabled": true,
+        "_ammoTracerWidthMeters": 0.225,
+        "_ammoTracerTrailDurationSeconds": 0.02,
+        "_ammoTracerIgnitionDistanceMeters": 70,
+        "_ammoTracerBurnDurationSeconds": 3,
+        "_ammoTracerEmissionIntensity": 12,
+        "_ammoTracerColor": {
+          "r": 1,
+          "g": 0.35,
+          "b": 0.015,
+          "a": 1
+        }
+      }
+    },
+    {
+      "_section": "ammo_12x70_buck",
+      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
+      "_data": {
+        "_allowRicochet": true,
+        "_distanceMultiplier": 0.75,
+        "_projectileCount": 9,
+        "_ammoTracerEnabled": false,
+        "_ammoTracerWidthMeters": 0.225,
+        "_ammoTracerTrailDurationSeconds": 0.025,
+        "_ammoTracerIgnitionDistanceMeters": 10,
+        "_ammoTracerBurnDurationSeconds": 3,
+        "_ammoTracerEmissionIntensity": 8,
+        "_ammoTracerColor": {
+          "r": 1,
+          "g": 0.35,
+          "b": 0.015,
+          "a": 1
+        }
+      }
+    },
+    {
+      "_section": "ammo_12x70_buck_self",
+      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
+      "_data": {
+        "_allowRicochet": true,
+        "_distanceMultiplier": 0.7,
+        "_projectileCount": 11,
+        "_ammoTracerEnabled": false,
+        "_ammoTracerWidthMeters": 0.225,
+        "_ammoTracerTrailDurationSeconds": 0.025,
+        "_ammoTracerIgnitionDistanceMeters": 10,
+        "_ammoTracerBurnDurationSeconds": 3,
+        "_ammoTracerEmissionIntensity": 8,
+        "_ammoTracerColor": {
+          "r": 1,
+          "g": 0.35,
+          "b": 0.015,
+          "a": 1
+        }
+      }
+    },
+    {
+      "_section": "ammo_12x70_raid",
+      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
+      "_data": {
+        "_allowRicochet": true,
+        "_distanceMultiplier": 0.75,
+        "_projectileCount": 9,
+        "_ammoTracerEnabled": false,
+        "_ammoTracerWidthMeters": 0.225,
+        "_ammoTracerTrailDurationSeconds": 0.025,
+        "_ammoTracerIgnitionDistanceMeters": 10,
+        "_ammoTracerBurnDurationSeconds": 3,
+        "_ammoTracerEmissionIntensity": 8,
+        "_ammoTracerColor": {
+          "r": 1,
+          "g": 0.35,
+          "b": 0.015,
+          "a": 1
+        }
+      }
+    },
+    {
+      "_section": "ammo_12x76_bull",
+      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
+      "_data": {
+        "_allowRicochet": true,
+        "_distanceMultiplier": 1,
+        "_projectileCount": 1,
+        "_ammoTracerEnabled": false,
+        "_ammoTracerWidthMeters": 0.225,
+        "_ammoTracerTrailDurationSeconds": 0.025,
+        "_ammoTracerIgnitionDistanceMeters": 10,
+        "_ammoTracerBurnDurationSeconds": 3,
+        "_ammoTracerEmissionIntensity": 8,
+        "_ammoTracerColor": {
+          "r": 1,
+          "g": 0.35,
+          "b": 0.015,
+          "a": 1
+        }
+      }
+    },
+    {
+      "_section": "ammo_12x76_dart",
+      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
+      "_data": {
+        "_allowRicochet": true,
+        "_distanceMultiplier": 1,
+        "_projectileCount": 1,
+        "_ammoTracerEnabled": false,
+        "_ammoTracerWidthMeters": 0.225,
+        "_ammoTracerTrailDurationSeconds": 0.025,
+        "_ammoTracerIgnitionDistanceMeters": 10,
+        "_ammoTracerBurnDurationSeconds": 3,
+        "_ammoTracerEmissionIntensity": 8,
+        "_ammoTracerColor": {
+          "r": 1,
+          "g": 0.35,
+          "b": 0.015,
+          "a": 1
+        }
+      }
+    },
+    {
+      "_section": "ammo_12x76_zhekan",
+      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
+      "_data": {
+        "_allowRicochet": true,
+        "_distanceMultiplier": 0.9,
+        "_projectileCount": 1,
+        "_ammoTracerEnabled": false,
+        "_ammoTracerWidthMeters": 0.225,
+        "_ammoTracerTrailDurationSeconds": 0.025,
+        "_ammoTracerIgnitionDistanceMeters": 10,
+        "_ammoTracerBurnDurationSeconds": 3,
+        "_ammoTracerEmissionIntensity": 8,
+        "_ammoTracerColor": {
+          "r": 1,
+          "g": 0.35,
+          "b": 0.015,
+          "a": 1
+        }
+      }
+    },
+    {
+      "_section": "ammo_20x70_buck",
+      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
+      "_data": {
+        "_allowRicochet": true,
+        "_distanceMultiplier": 0.75,
+        "_projectileCount": 9,
+        "_ammoTracerEnabled": false,
+        "_ammoTracerWidthMeters": 0.225,
+        "_ammoTracerTrailDurationSeconds": 0.025,
+        "_ammoTracerIgnitionDistanceMeters": 10,
+        "_ammoTracerBurnDurationSeconds": 3,
+        "_ammoTracerEmissionIntensity": 8,
+        "_ammoTracerColor": {
+          "r": 1,
+          "g": 0.35,
+          "b": 0.015,
+          "a": 1
+        }
+      }
+    },
+    {
+      "_section": "ammo_23x75_barrikada",
+      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
+      "_data": {
+        "_allowRicochet": true,
+        "_distanceMultiplier": 1,
+        "_projectileCount": 1,
+        "_ammoTracerEnabled": false,
+        "_ammoTracerWidthMeters": 0.225,
+        "_ammoTracerTrailDurationSeconds": 0.025,
+        "_ammoTracerIgnitionDistanceMeters": 10,
+        "_ammoTracerBurnDurationSeconds": 3,
+        "_ammoTracerEmissionIntensity": 8,
+        "_ammoTracerColor": {
+          "r": 1,
+          "g": 0.35,
+          "b": 0.015,
+          "a": 1
+        }
+      }
+    },
+    {
+      "_section": "ammo_23x75_shrapnel",
+      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
+      "_data": {
+        "_allowRicochet": true,
+        "_distanceMultiplier": 0.8,
+        "_projectileCount": 6,
+        "_ammoTracerEnabled": false,
+        "_ammoTracerWidthMeters": 0.225,
+        "_ammoTracerTrailDurationSeconds": 0.025,
+        "_ammoTracerIgnitionDistanceMeters": 10,
+        "_ammoTracerBurnDurationSeconds": 3,
+        "_ammoTracerEmissionIntensity": 8,
+        "_ammoTracerColor": {
+          "r": 1,
+          "g": 0.35,
+          "b": 0.015,
+          "a": 1
+        }
+      }
+    },
+    {
+      "_section": "ammo_338_federal",
+      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
+      "_data": {
+        "_allowRicochet": true,
+        "_distanceMultiplier": 1,
+        "_projectileCount": 1,
+        "_ammoTracerEnabled": true,
+        "_ammoTracerWidthMeters": 0.225,
+        "_ammoTracerTrailDurationSeconds": 0.02,
+        "_ammoTracerIgnitionDistanceMeters": 50,
+        "_ammoTracerBurnDurationSeconds": 3,
+        "_ammoTracerEmissionIntensity": 14,
+        "_ammoTracerColor": {
+          "r": 1,
+          "g": 0.65,
+          "b": 0.03,
+          "a": 1
+        }
+      }
+    },
+    {
+      "_section": "ammo_357_hp_mag",
+      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
+      "_data": {
+        "_allowRicochet": true,
+        "_distanceMultiplier": 1,
+        "_projectileCount": 1,
+        "_ammoTracerEnabled": false,
+        "_ammoTracerWidthMeters": 0.225,
+        "_ammoTracerTrailDurationSeconds": 0.025,
+        "_ammoTracerIgnitionDistanceMeters": 10,
+        "_ammoTracerBurnDurationSeconds": 1.5,
+        "_ammoTracerEmissionIntensity": 8,
+        "_ammoTracerColor": {
+          "r": 1,
+          "g": 0.65,
+          "b": 0.03,
+          "a": 1
+        }
+      }
+    },
+    {
+      "_section": "ammo_5.45x39_ap",
+      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
+      "_data": {
+        "_allowRicochet": true,
+        "_distanceMultiplier": 1,
+        "_projectileCount": 1,
+        "_ammoTracerEnabled": true,
+        "_ammoTracerWidthMeters": 0.225,
+        "_ammoTracerTrailDurationSeconds": 0.02,
+        "_ammoTracerIgnitionDistanceMeters": 70,
+        "_ammoTracerBurnDurationSeconds": 3,
+        "_ammoTracerEmissionIntensity": 12,
+        "_ammoTracerColor": {
+          "r": 0.1,
+          "g": 1,
+          "b": 0.05,
+          "a": 1
+        }
+      }
+    },
+    {
+      "_section": "ammo_5.45x39_ep",
+      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
+      "_data": {
+        "_allowRicochet": true,
+        "_distanceMultiplier": 1,
+        "_projectileCount": 1,
+        "_ammoTracerEnabled": true,
+        "_ammoTracerWidthMeters": 0.225,
+        "_ammoTracerTrailDurationSeconds": 0.02,
+        "_ammoTracerIgnitionDistanceMeters": 70,
+        "_ammoTracerBurnDurationSeconds": 3,
+        "_ammoTracerEmissionIntensity": 12,
+        "_ammoTracerColor": {
+          "r": 0.1,
+          "g": 1,
+          "b": 0.05,
+          "a": 1
+        }
+      }
+    },
+    {
+      "_section": "ammo_5.45x39_fmj",
+      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
+      "_data": {
+        "_allowRicochet": true,
+        "_distanceMultiplier": 1,
+        "_projectileCount": 1,
+        "_ammoTracerEnabled": true,
+        "_ammoTracerWidthMeters": 0.225,
+        "_ammoTracerTrailDurationSeconds": 0.02,
+        "_ammoTracerIgnitionDistanceMeters": 70,
+        "_ammoTracerBurnDurationSeconds": 3,
+        "_ammoTracerEmissionIntensity": 12,
+        "_ammoTracerColor": {
+          "r": 0.1,
+          "g": 1,
+          "b": 0.05,
+          "a": 1
+        }
+      }
+    },
+    {
+      "_section": "ammo_5.56x45_ap",
+      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
+      "_data": {
+        "_allowRicochet": true,
+        "_distanceMultiplier": 1,
+        "_projectileCount": 1,
+        "_ammoTracerEnabled": true,
+        "_ammoTracerWidthMeters": 0.225,
+        "_ammoTracerTrailDurationSeconds": 0.02,
+        "_ammoTracerIgnitionDistanceMeters": 70,
+        "_ammoTracerBurnDurationSeconds": 3,
+        "_ammoTracerEmissionIntensity": 12,
+        "_ammoTracerColor": {
+          "r": 1,
+          "g": 0.12,
+          "b": 0.02,
+          "a": 1
+        }
+      }
+    },
+    {
+      "_section": "ammo_5.56x45_fmj",
+      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
+      "_data": {
+        "_allowRicochet": true,
+        "_distanceMultiplier": 1,
+        "_projectileCount": 1,
+        "_ammoTracerEnabled": true,
+        "_ammoTracerWidthMeters": 0.225,
+        "_ammoTracerTrailDurationSeconds": 0.02,
+        "_ammoTracerIgnitionDistanceMeters": 70,
+        "_ammoTracerBurnDurationSeconds": 3,
+        "_ammoTracerEmissionIntensity": 12,
+        "_ammoTracerColor": {
+          "r": 1,
+          "g": 0.12,
+          "b": 0.02,
+          "a": 1
+        }
+      }
+    },
+    {
+      "_section": "ammo_5.56x45_ss190",
+      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
+      "_data": {
+        "_allowRicochet": true,
+        "_distanceMultiplier": 1,
+        "_projectileCount": 1,
+        "_ammoTracerEnabled": true,
+        "_ammoTracerWidthMeters": 0.225,
+        "_ammoTracerTrailDurationSeconds": 0.02,
+        "_ammoTracerIgnitionDistanceMeters": 70,
+        "_ammoTracerBurnDurationSeconds": 3,
+        "_ammoTracerEmissionIntensity": 12,
+        "_ammoTracerColor": {
+          "r": 1,
+          "g": 0.12,
+          "b": 0.02,
+          "a": 1
+        }
+      }
+    },
+    {
+      "_section": "ammo_5.7x28_ss190",
+      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
+      "_data": {
+        "_allowRicochet": true,
+        "_distanceMultiplier": 1,
+        "_projectileCount": 1,
+        "_ammoTracerEnabled": true,
+        "_ammoTracerWidthMeters": 0.225,
+        "_ammoTracerTrailDurationSeconds": 0.02,
+        "_ammoTracerIgnitionDistanceMeters": 20,
+        "_ammoTracerBurnDurationSeconds": 2.5,
+        "_ammoTracerEmissionIntensity": 12,
+        "_ammoTracerColor": {
+          "r": 1,
+          "g": 0.12,
+          "b": 0.02,
+          "a": 1
+        }
+      }
+    },
+    {
+      "_section": "ammo_5.7x28_ss195",
+      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
+      "_data": {
+        "_allowRicochet": true,
+        "_distanceMultiplier": 1,
+        "_projectileCount": 1,
+        "_ammoTracerEnabled": true,
+        "_ammoTracerWidthMeters": 0.225,
+        "_ammoTracerTrailDurationSeconds": 0.02,
+        "_ammoTracerIgnitionDistanceMeters": 20,
+        "_ammoTracerBurnDurationSeconds": 2.5,
+        "_ammoTracerEmissionIntensity": 12,
+        "_ammoTracerColor": {
+          "r": 1,
+          "g": 0.12,
+          "b": 0.02,
+          "a": 1
+        }
+      }
+    },
+    {
+      "_section": "ammo_7.62x25_p",
+      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
+      "_data": {
+        "_allowRicochet": true,
+        "_distanceMultiplier": 1,
+        "_projectileCount": 1,
+        "_ammoTracerEnabled": false,
+        "_ammoTracerWidthMeters": 0.225,
+        "_ammoTracerTrailDurationSeconds": 0.025,
+        "_ammoTracerIgnitionDistanceMeters": 10,
+        "_ammoTracerBurnDurationSeconds": 1.5,
+        "_ammoTracerEmissionIntensity": 8,
+        "_ammoTracerColor": {
+          "r": 0.1,
+          "g": 1,
+          "b": 0.05,
+          "a": 1
+        }
+      }
+    },
+    {
+      "_section": "ammo_7.62x25_ps",
+      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
+      "_data": {
+        "_allowRicochet": true,
+        "_distanceMultiplier": 1,
+        "_projectileCount": 1,
+        "_ammoTracerEnabled": false,
+        "_ammoTracerWidthMeters": 0.225,
+        "_ammoTracerTrailDurationSeconds": 0.025,
+        "_ammoTracerIgnitionDistanceMeters": 10,
+        "_ammoTracerBurnDurationSeconds": 1.5,
+        "_ammoTracerEmissionIntensity": 8,
+        "_ammoTracerColor": {
+          "r": 0.1,
+          "g": 1,
+          "b": 0.05,
+          "a": 1
+        }
+      }
+    },
+    {
+      "_section": "ammo_7.62x39_ap",
+      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
+      "_data": {
+        "_allowRicochet": true,
+        "_distanceMultiplier": 1,
+        "_projectileCount": 1,
+        "_ammoTracerEnabled": true,
+        "_ammoTracerWidthMeters": 0.225,
+        "_ammoTracerTrailDurationSeconds": 0.02,
+        "_ammoTracerIgnitionDistanceMeters": 50,
+        "_ammoTracerBurnDurationSeconds": 3,
+        "_ammoTracerEmissionIntensity": 12,
+        "_ammoTracerColor": {
+          "r": 0.1,
+          "g": 1,
+          "b": 0.05,
+          "a": 1
+        }
+      }
+    },
+    {
+      "_section": "ammo_7.62x39_fmj",
+      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
+      "_data": {
+        "_allowRicochet": true,
+        "_distanceMultiplier": 1,
+        "_projectileCount": 1,
+        "_ammoTracerEnabled": true,
+        "_ammoTracerWidthMeters": 0.225,
+        "_ammoTracerTrailDurationSeconds": 0.02,
+        "_ammoTracerIgnitionDistanceMeters": 50,
+        "_ammoTracerBurnDurationSeconds": 3,
+        "_ammoTracerEmissionIntensity": 12,
+        "_ammoTracerColor": {
+          "r": 0.1,
+          "g": 1,
+          "b": 0.05,
+          "a": 1
+        }
+      }
+    },
+    {
+      "_section": "ammo_7.62x51_ap",
+      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
+      "_data": {
+        "_allowRicochet": true,
+        "_distanceMultiplier": 1,
+        "_projectileCount": 1,
+        "_ammoTracerEnabled": true,
+        "_ammoTracerWidthMeters": 0.225,
+        "_ammoTracerTrailDurationSeconds": 0.02,
+        "_ammoTracerIgnitionDistanceMeters": 50,
+        "_ammoTracerBurnDurationSeconds": 3,
+        "_ammoTracerEmissionIntensity": 12,
+        "_ammoTracerColor": {
+          "r": 1,
+          "g": 0.65,
+          "b": 0.03,
+          "a": 1
+        }
+      }
+    },
+    {
+      "_section": "ammo_7.62x51_fmj",
+      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
+      "_data": {
+        "_allowRicochet": true,
+        "_distanceMultiplier": 1,
+        "_projectileCount": 1,
+        "_ammoTracerEnabled": true,
+        "_ammoTracerWidthMeters": 0.225,
+        "_ammoTracerTrailDurationSeconds": 0.02,
+        "_ammoTracerIgnitionDistanceMeters": 50,
+        "_ammoTracerBurnDurationSeconds": 3,
+        "_ammoTracerEmissionIntensity": 12,
+        "_ammoTracerColor": {
+          "r": 1,
+          "g": 0.65,
+          "b": 0.03,
+          "a": 1
+        }
+      }
+    },
+    {
+      "_section": "ammo_7.62x54_7h1",
+      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
+      "_data": {
+        "_allowRicochet": true,
+        "_distanceMultiplier": 1,
+        "_projectileCount": 1,
+        "_ammoTracerEnabled": true,
+        "_ammoTracerWidthMeters": 0.225,
+        "_ammoTracerTrailDurationSeconds": 0.025,
+        "_ammoTracerIgnitionDistanceMeters": 50,
+        "_ammoTracerBurnDurationSeconds": 3.5,
+        "_ammoTracerEmissionIntensity": 14,
+        "_ammoTracerColor": {
+          "r": 0.1,
+          "g": 1,
+          "b": 0.05,
+          "a": 1
+        }
+      }
+    },
+    {
+      "_section": "ammo_7.62x54_7h14",
+      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
+      "_data": {
+        "_allowRicochet": true,
+        "_distanceMultiplier": 1,
+        "_projectileCount": 1,
+        "_ammoTracerEnabled": true,
+        "_ammoTracerWidthMeters": 0.225,
+        "_ammoTracerTrailDurationSeconds": 0.025,
+        "_ammoTracerIgnitionDistanceMeters": 50,
+        "_ammoTracerBurnDurationSeconds": 3.5,
+        "_ammoTracerEmissionIntensity": 14,
+        "_ammoTracerColor": {
+          "r": 0.1,
+          "g": 1,
+          "b": 0.05,
+          "a": 1
+        }
+      }
+    },
+    {
+      "_section": "ammo_7.62x54_ap",
+      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
+      "_data": {
+        "_allowRicochet": true,
+        "_distanceMultiplier": 1,
+        "_projectileCount": 1,
+        "_ammoTracerEnabled": true,
+        "_ammoTracerWidthMeters": 0.225,
+        "_ammoTracerTrailDurationSeconds": 0.025,
+        "_ammoTracerIgnitionDistanceMeters": 50,
+        "_ammoTracerBurnDurationSeconds": 3.5,
+        "_ammoTracerEmissionIntensity": 14,
+        "_ammoTracerColor": {
+          "r": 0.1,
+          "g": 1,
+          "b": 0.05,
+          "a": 1
+        }
+      }
+    },
+    {
+      "_section": "ammo_7.92x33_ap",
+      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
+      "_data": {
+        "_allowRicochet": true,
+        "_distanceMultiplier": 1,
+        "_projectileCount": 1,
+        "_ammoTracerEnabled": true,
+        "_ammoTracerWidthMeters": 0.225,
+        "_ammoTracerTrailDurationSeconds": 0.02,
+        "_ammoTracerIgnitionDistanceMeters": 70,
+        "_ammoTracerBurnDurationSeconds": 3,
+        "_ammoTracerEmissionIntensity": 12,
+        "_ammoTracerColor": {
+          "r": 1,
+          "g": 0.35,
+          "b": 0.015,
+          "a": 1
+        }
+      }
+    },
+    {
+      "_section": "ammo_7.92x33_fmj",
+      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
+      "_data": {
+        "_allowRicochet": true,
+        "_distanceMultiplier": 1,
+        "_projectileCount": 1,
+        "_ammoTracerEnabled": true,
+        "_ammoTracerWidthMeters": 0.225,
+        "_ammoTracerTrailDurationSeconds": 0.02,
+        "_ammoTracerIgnitionDistanceMeters": 70,
+        "_ammoTracerBurnDurationSeconds": 3,
+        "_ammoTracerEmissionIntensity": 12,
+        "_ammoTracerColor": {
+          "r": 1,
+          "g": 0.35,
+          "b": 0.015,
+          "a": 1
+        }
+      }
+    },
+    {
+      "_section": "ammo_9x18_ap",
+      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
+      "_data": {
+        "_allowRicochet": true,
+        "_distanceMultiplier": 1,
+        "_projectileCount": 1,
+        "_ammoTracerEnabled": false,
+        "_ammoTracerWidthMeters": 0.225,
+        "_ammoTracerTrailDurationSeconds": 0.025,
+        "_ammoTracerIgnitionDistanceMeters": 10,
+        "_ammoTracerBurnDurationSeconds": 1.5,
+        "_ammoTracerEmissionIntensity": 8,
+        "_ammoTracerColor": {
+          "r": 0.1,
+          "g": 1,
+          "b": 0.05,
+          "a": 1
+        }
+      }
+    },
+    {
+      "_section": "ammo_9x18_fmj",
+      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
+      "_data": {
+        "_allowRicochet": true,
+        "_distanceMultiplier": 1,
+        "_projectileCount": 1,
+        "_ammoTracerEnabled": false,
+        "_ammoTracerWidthMeters": 0.225,
+        "_ammoTracerTrailDurationSeconds": 0.025,
+        "_ammoTracerIgnitionDistanceMeters": 10,
+        "_ammoTracerBurnDurationSeconds": 1.5,
+        "_ammoTracerEmissionIntensity": 8,
+        "_ammoTracerColor": {
+          "r": 0.1,
+          "g": 1,
+          "b": 0.05,
+          "a": 1
+        }
+      }
+    },
+    {
+      "_section": "ammo_9x18_pmm",
+      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
+      "_data": {
+        "_allowRicochet": true,
+        "_distanceMultiplier": 1,
+        "_projectileCount": 1,
+        "_ammoTracerEnabled": false,
+        "_ammoTracerWidthMeters": 0.225,
+        "_ammoTracerTrailDurationSeconds": 0.025,
+        "_ammoTracerIgnitionDistanceMeters": 10,
+        "_ammoTracerBurnDurationSeconds": 1.5,
+        "_ammoTracerEmissionIntensity": 8,
+        "_ammoTracerColor": {
+          "r": 0.1,
+          "g": 1,
+          "b": 0.05,
+          "a": 1
+        }
+      }
+    },
+    {
+      "_section": "ammo_9x19_ap",
+      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
+      "_data": {
+        "_allowRicochet": true,
+        "_distanceMultiplier": 1,
+        "_projectileCount": 1,
+        "_ammoTracerEnabled": false,
+        "_ammoTracerWidthMeters": 0.225,
+        "_ammoTracerTrailDurationSeconds": 0.025,
+        "_ammoTracerIgnitionDistanceMeters": 10,
+        "_ammoTracerBurnDurationSeconds": 1.5,
+        "_ammoTracerEmissionIntensity": 8,
+        "_ammoTracerColor": {
+          "r": 1,
+          "g": 0.12,
+          "b": 0.02,
+          "a": 1
+        }
+      }
+    },
+    {
+      "_section": "ammo_9x19_fmj",
+      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
+      "_data": {
+        "_allowRicochet": true,
+        "_distanceMultiplier": 1,
+        "_projectileCount": 1,
+        "_ammoTracerEnabled": false,
+        "_ammoTracerWidthMeters": 0.225,
+        "_ammoTracerTrailDurationSeconds": 0.025,
+        "_ammoTracerIgnitionDistanceMeters": 10,
+        "_ammoTracerBurnDurationSeconds": 1.5,
+        "_ammoTracerEmissionIntensity": 8,
+        "_ammoTracerColor": {
+          "r": 1,
+          "g": 0.12,
+          "b": 0.02,
+          "a": 1
+        }
+      }
+    },
+    {
+      "_section": "ammo_9x19_pbp",
+      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
+      "_data": {
+        "_allowRicochet": true,
+        "_distanceMultiplier": 1,
+        "_projectileCount": 1,
+        "_ammoTracerEnabled": false,
+        "_ammoTracerWidthMeters": 0.225,
+        "_ammoTracerTrailDurationSeconds": 0.025,
+        "_ammoTracerIgnitionDistanceMeters": 10,
+        "_ammoTracerBurnDurationSeconds": 1.5,
+        "_ammoTracerEmissionIntensity": 8,
+        "_ammoTracerColor": {
+          "r": 1,
+          "g": 0.12,
+          "b": 0.02,
+          "a": 1
+        }
+      }
+    },
+    {
+      "_section": "ammo_9x21_sp10",
+      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
+      "_data": {
+        "_allowRicochet": true,
+        "_distanceMultiplier": 1,
+        "_projectileCount": 1,
+        "_ammoTracerEnabled": false,
+        "_ammoTracerWidthMeters": 0.225,
+        "_ammoTracerTrailDurationSeconds": 0.025,
+        "_ammoTracerIgnitionDistanceMeters": 10,
+        "_ammoTracerBurnDurationSeconds": 1.5,
+        "_ammoTracerEmissionIntensity": 8,
+        "_ammoTracerColor": {
+          "r": 1,
+          "g": 0.12,
+          "b": 0.02,
+          "a": 1
+        }
+      }
+    },
+    {
+      "_section": "ammo_9x39_ap",
+      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
+      "_data": {
+        "_allowRicochet": true,
+        "_distanceMultiplier": 1,
+        "_projectileCount": 1,
+        "_ammoTracerEnabled": true,
+        "_ammoTracerWidthMeters": 0.225,
+        "_ammoTracerTrailDurationSeconds": 0.025,
+        "_ammoTracerIgnitionDistanceMeters": 10,
+        "_ammoTracerBurnDurationSeconds": 2,
+        "_ammoTracerEmissionIntensity": 10,
+        "_ammoTracerColor": {
+          "r": 0.1,
+          "g": 1,
+          "b": 0.05,
+          "a": 1
+        }
+      }
+    },
+    {
+      "_section": "ammo_9x39_pab9",
+      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
+      "_data": {
+        "_allowRicochet": true,
+        "_distanceMultiplier": 1,
+        "_projectileCount": 1,
+        "_ammoTracerEnabled": true,
+        "_ammoTracerWidthMeters": 0.225,
+        "_ammoTracerTrailDurationSeconds": 0.025,
+        "_ammoTracerIgnitionDistanceMeters": 10,
+        "_ammoTracerBurnDurationSeconds": 2,
+        "_ammoTracerEmissionIntensity": 10,
+        "_ammoTracerColor": {
+          "r": 0.1,
+          "g": 1,
+          "b": 0.05,
+          "a": 1
+        }
+      }
+    },
+    {
+      "_section": "ammo_magnum_300",
+      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
+      "_data": {
+        "_allowRicochet": true,
+        "_distanceMultiplier": 1,
+        "_projectileCount": 1,
+        "_ammoTracerEnabled": true,
+        "_ammoTracerWidthMeters": 0.225,
+        "_ammoTracerTrailDurationSeconds": 0.02,
+        "_ammoTracerIgnitionDistanceMeters": 50,
+        "_ammoTracerBurnDurationSeconds": 3,
+        "_ammoTracerEmissionIntensity": 14,
+        "_ammoTracerColor": {
+          "r": 1,
+          "g": 0.65,
+          "b": 0.03,
+          "a": 1
+        }
+      }
+    },
+    {
+      "_section": "ammo_pkm_100",
+      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
+      "_data": {
+        "_allowRicochet": true,
+        "_distanceMultiplier": 1,
+        "_projectileCount": 1,
+        "_ammoTracerEnabled": true,
+        "_ammoTracerWidthMeters": 0.225,
+        "_ammoTracerTrailDurationSeconds": 0.025,
+        "_ammoTracerIgnitionDistanceMeters": 50,
+        "_ammoTracerBurnDurationSeconds": 3.5,
+        "_ammoTracerEmissionIntensity": 14,
+        "_ammoTracerColor": {
+          "r": 0.1,
+          "g": 1,
+          "b": 0.05,
+          "a": 1
+        }
+      }
+    }
+  ]
+}

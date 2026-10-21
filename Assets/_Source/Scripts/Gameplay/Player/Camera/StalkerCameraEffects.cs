@@ -48,6 +48,8 @@ namespace RaidIntoDarkness.Player
         private float _landingReadyTime;
         private float _time;
         private StalkerMoveFlags _previousFlags;
+        private Quaternion _baseMotionRotation = Quaternion.identity;
+        private Quaternion _weaponAimRotation = Quaternion.identity;
 
         public StalkerCameraEffectsProfile Profile => _profile;
         public Transform Pivot => _pivot;
@@ -61,6 +63,12 @@ namespace RaidIntoDarkness.Player
         public bool IsPlaying(StalkerCameraEffectSlot slot)
         {
             return _effects[(int)slot].Asset != null;
+        }
+
+        public void SetWeaponAimRotation(Quaternion rotation)
+        {
+            _weaponAimRotation = rotation;
+            ApplyRotation();
         }
 
         public void PlayItemEffect(XRayAnmAsset asset)
@@ -101,9 +109,9 @@ namespace RaidIntoDarkness.Player
             Quaternion itemRotation = Quaternion.identity;
             TickAnm(_itemEffects, 0, deltaTime, 0.0f, ref itemLocal, ref itemRotation);
             MotionOffset = (local + up * worldUp) * intensity + itemLocal;
-            MotionRotation = Quaternion.SlerpUnclamped(Quaternion.identity, rotation, intensity) * itemRotation;
+            _baseMotionRotation = Quaternion.SlerpUnclamped(Quaternion.identity, rotation, intensity) * itemRotation;
             _pivot.localPosition = MotionOffset;
-            _pivot.localRotation = MotionRotation;
+            ApplyRotation();
         }
 
         public void OnFootstep(StalkerMovementState state, float power)
@@ -165,6 +173,16 @@ namespace RaidIntoDarkness.Player
             if (_profile != null && _profile.CrouchEffectsEnabled)
             {
                 Play(pressed ? StalkerCameraEffectSlot.Crouch : StalkerCameraEffectSlot.Stand, pressed ? _profile.Anm.Crouch : _profile.Anm.Stand, 1.0f, 1.0f);
+            }
+        }
+
+        private void ApplyRotation()
+        {
+            MotionRotation = _baseMotionRotation * _weaponAimRotation;
+
+            if (_pivot != null)
+            {
+                _pivot.localRotation = MotionRotation;
             }
         }
 

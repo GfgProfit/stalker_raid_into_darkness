@@ -134,6 +134,90 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
         }
 
         [UnityTest]
+        public IEnumerator AimCameraPulseReturnsToNeutralWhileAimingAndAfterRelease()
+        {
+            SceneManager.LoadScene(SCENE, LoadSceneMode.Single);
+            yield return new WaitForSeconds(0.6f);
+            InventoryWindowController controller = Object.FindAnyObjectByType<InventoryWindowController>();
+            StalkerPlayerController player = controller.Player;
+            FirstPersonWeaponController weapons = player.GetComponentInChildren<FirstPersonWeaponController>();
+            ItemInstance weapon = AddItem(controller.Inventory.Model, FindWorldDefinition(AUG), controller.Window.PrimaryContainerId, 1);
+            Assert.That(controller.Inventory.Model.TryEquip(weapon.InstanceId, controller.Window.EquipmentContainerId).Success, Is.True);
+            player.CameraController.SetCursorLocked(true);
+            yield return Tap(_keyboard.digit3Key);
+            yield return WaitWhile(() => weapons.State != FirstPersonWeaponState.Ready);
+            FirstPersonWeaponAsset asset = weapons.ActiveWeapon;
+            StalkerCameraEffects effects = player.CameraEffects;
+            effects.EffectsEnabled = false;
+            effects.StopItemEffect();
+            yield return null;
+            Transform camera = player.CameraController.Camera.transform;
+            Assert.That(camera.IsChildOf(effects.Pivot), Is.True);
+            Quaternion neutral = Quaternion.Inverse(player.CameraController.CameraRoot.rotation) * camera.rotation;
+            Assert.That(Mathf.Abs(asset.AimCameraRoll), Is.GreaterThan(0f));
+            foreach (bool aiming in new[] { true, false })
+            {
+                if (aiming)
+                {
+                    Press(_mouse.rightButton, queueEventOnly: true);
+                }
+                else
+                {
+                    Release(_mouse.rightButton, queueEventOnly: true);
+                }
+
+                float peak = 0f;
+                float until = Time.time + asset.AimTime + asset.AimCameraBlendTime * 8f;
+
+                while (Time.time < until)
+                {
+                    yield return null;
+                    Quaternion relative = Quaternion.Inverse(player.CameraController.CameraRoot.rotation) * camera.rotation;
+                    Quaternion delta = Quaternion.Inverse(neutral) * relative;
+                    float roll = Mathf.DeltaAngle(0f, delta.eulerAngles.z);
+                    peak = Mathf.Max(peak, roll * Mathf.Sign(asset.AimCameraRoll) * (aiming ? 1f : -1f));
+                }
+
+                Assert.That(peak, Is.GreaterThan(Mathf.Abs(asset.AimCameraRoll) * 0.1f));
+                Assert.That(peak, Is.LessThanOrEqualTo(Mathf.Abs(asset.AimCameraRoll) + 0.05f));
+                Quaternion settledPose = Quaternion.Inverse(player.CameraController.CameraRoot.rotation) * camera.rotation;
+                Assert.That(Quaternion.Angle(neutral, settledPose), Is.LessThan(0.05f));
+                Assert.That(weapons.IsAiming, Is.EqualTo(aiming));
+            }
+
+            Quaternion previous = Quaternion.Inverse(player.CameraController.CameraRoot.rotation) * camera.rotation;
+
+            for (int i = 0; i < 24; i++)
+            {
+                if (i % 2 == 0)
+                {
+                    Press(_mouse.rightButton, queueEventOnly: true);
+                }
+                else
+                {
+                    Release(_mouse.rightButton, queueEventOnly: true);
+                }
+
+                yield return null;
+                yield return new WaitForEndOfFrame();
+                Quaternion current = Quaternion.Inverse(player.CameraController.CameraRoot.rotation) * camera.rotation;
+                Assert.That(Quaternion.Angle(previous, current), Is.LessThan(Mathf.Abs(asset.AimCameraRoll) * 0.5f));
+                previous = current;
+            }
+
+            Release(_mouse.rightButton, queueEventOnly: true);
+            yield return new WaitForSeconds(asset.AimCameraBlendTime * 6f);
+            Quaternion settled = Quaternion.Inverse(player.CameraController.CameraRoot.rotation) * camera.rotation;
+            Assert.That(Quaternion.Angle(neutral, settled), Is.LessThan(0.05f));
+            Press(_mouse.rightButton, queueEventOnly: true);
+            yield return new WaitForSeconds(asset.AimTime * 0.5f);
+            Assert.That(Quaternion.Angle(effects.Pivot.localRotation, Quaternion.identity), Is.GreaterThan(0.05f));
+            weapons.Hide();
+            Assert.That(Quaternion.Angle(effects.Pivot.localRotation, Quaternion.identity), Is.LessThan(0.05f));
+            Release(_mouse.rightButton, queueEventOnly: true);
+        }
+
+        [UnityTest]
         public IEnumerator AugAimTransitionsReverseTheActiveAnmWithoutRemappingTime()
         {
             SceneManager.LoadScene(SCENE, LoadSceneMode.Single);
@@ -778,6 +862,77 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             Vector3 expected = asset.AimOffsetPosition * weapons.AimFactor + aimRotation * asset.HandsPosition + basis * offset;
             Assert.That(Vector3.Distance(player.Rig.Hands.transform.localPosition, expected), Is.LessThan(0.00001f));
             Assert.That(Quaternion.Angle(player.Rig.Hands.transform.localRotation, basis * rotation), Is.LessThan(0.05f));
+        }
+
+        [UnityTest]
+        public IEnumerator BallisticsUseLoadedAmmoAndExactMuzzleWithAndWithoutSilencerInHipAndAim()
+        {
+            SceneManager.LoadScene(SCENE, LoadSceneMode.Single);
+            yield return new WaitForSeconds(0.6f);
+            InventoryWindowController controller = Object.FindAnyObjectByType<InventoryWindowController>();
+            InventoryModel model = controller.Inventory.Model;
+            StalkerPlayerController player = controller.Player;
+            FirstPersonWeaponController weapons = player.GetComponentInChildren<FirstPersonWeaponController>();
+            ItemInstance weapon = AddItem(model, FindWorldDefinition(AUG), controller.Window.PrimaryContainerId, 1);
+            ItemDefinition fmj = FindWorldDefinition("ammo_5.56x45_fmj");
+            AddItem(model, fmj, controller.Window.PrimaryContainerId, 12);
+            Assert.That(model.TryEquip(weapon.InstanceId, controller.Window.EquipmentContainerId).Success, Is.True);
+            player.CameraController.SetCursorLocked(true);
+            yield return Tap(_keyboard.digit3Key);
+            yield return WaitWhile(() => weapons.State != FirstPersonWeaponState.Ready);
+            using var source = new InventoryWeaponAmmoSource(model, controller.Window.PrimaryContainerId);
+            source.Reload(weapon.InstanceId, 30);
+            Assert.That(source.GetBulletSpeed(weapon.InstanceId), Is.EqualTo(1488f).Within(0.01f));
+            var shoot = typeof(FirstPersonWeaponController).GetMethod("Shoot", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+
+            foreach (bool silenced in new[] { false, true })
+            {
+                if (silenced)
+                {
+                    ItemInstance silencer = AddItem(model, FindWorldDefinition("wpn_sil_nato"), controller.Window.PrimaryContainerId, 1);
+                    Assert.That(controller.WeaponAttachments.Install(silencer, weapon).Success, Is.True);
+                }
+
+                foreach (bool aiming in new[] { false, true })
+                {
+                    if (aiming)
+                    {
+                        Press(_mouse.rightButton, queueEventOnly: true);
+                    }
+                    else
+                    {
+                        Release(_mouse.rightButton, queueEventOnly: true);
+                    }
+
+                    yield return new WaitForSeconds(0.5f);
+                    Assert.That(weapons.IsAiming, Is.EqualTo(aiming));
+                    Assert.That(weapons.IsSilenced, Is.EqualTo(silenced));
+                    FirstPersonWeaponView view = weapons.Model.GetComponent<FirstPersonWeaponView>();
+                    Transform muzzle = silenced ? view.SilencedMuzzle : view.Muzzle;
+                    Assert.That(weapons.Muzzle, Is.SameAs(muzzle));
+                    Vector3 position = muzzle.position;
+                    Vector3 forward = muzzle.TransformVector(Vector3.forward).normalized;
+                    int magazine = weapons.Magazine;
+                    shoot.Invoke(weapons, new object[] { weapons.ActiveWeapon });
+                    BallisticProjectile newest = null;
+
+                    foreach (BallisticProjectile projectile in Object.FindObjectsByType<BallisticProjectile>(FindObjectsSortMode.None))
+                    {
+                        if (Vector3.Distance(projectile.LaunchPosition, position) < 0.000001f)
+                        {
+                            newest = projectile;
+                        }
+                    }
+
+                    Assert.That(newest, Is.Not.Null);
+                    Assert.That(weapons.Magazine, Is.EqualTo(magazine - 1));
+                    Assert.That(newest.AmmoData, Is.SameAs(fmj.GetComponent<AmmoBallisticsComponent>().Data));
+                    Assert.That(newest.SpeedMetersPerSecond, Is.EqualTo(source.GetBulletSpeed(weapon.InstanceId)).Within(0.01f));
+                    Assert.That(Vector3.Angle(newest.LaunchDirection, forward), Is.LessThanOrEqualTo(source.GetDispersionDegrees(weapon.InstanceId) + 0.01f));
+                }
+            }
+
+            Release(_mouse.rightButton, queueEventOnly: true);
         }
 
         private static void AssertBoltPose(Transform bolt, Vector3 position, Quaternion rotation)

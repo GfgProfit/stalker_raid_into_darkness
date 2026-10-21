@@ -73,6 +73,7 @@ MonoBehaviour:
   - rid: 3479885513007301052
   - rid: 3479885513007301097
   - rid: 3479885513007301177
+  - rid: 3479885521787027806
   references:
     version: 2
     RefIds:
@@ -108,3 +109,18 @@ MonoBehaviour:
       type: {class: WorldItemComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
       data:
         _prefab: {fileID: 2171193340141828869, guid: 1f6cb78eea1430744b7aa50402d9040b, type: 3}
+    - rid: 3479885521787027806
+      type: {class: AmmoBallisticsComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      data:
+        _data:
+          _allowRicochet: 1
+          _distanceMultiplier: 1
+          _ammoTracerEnabled: 0
+          _ammoTracerMaterial: {fileID: 2100000, guid: 63245ef99c06fa845abd38f65c194c7c, type: 2}
+          _ammoTracerColor: {r: 1, g: 0.12, b: 0.02, a: 1}
+          _ammoTracerWidthMeters: 0.225
+          _ammoTracerTrailDurationSeconds: 0.025
+          _ammoTracerIgnitionDistanceMeters: 10
+          _ammoTracerBurnDurationSeconds: 1.5
+          _ammoTracerEmissionIntensity: 8
+          _projectileCount: 1

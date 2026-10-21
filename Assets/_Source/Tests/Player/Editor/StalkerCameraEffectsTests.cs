@@ -43,6 +43,20 @@ namespace RaidIntoDarkness.Player.Tests
         }
 
         [Test]
+        public void WeaponAimRotationComposesWithMotionWithoutAccumulating()
+        {
+            Quaternion aim = Quaternion.AngleAxis(1f, Vector3.forward);
+            _effects.SetWeaponAimRotation(aim);
+            Assert.That(Quaternion.Angle(_pivot.localRotation, aim), Is.LessThan(0.05f));
+            Run(StalkerMoveFlags.Forward, 0.5f, DT);
+            Quaternion combined = _pivot.localRotation;
+            _effects.SetWeaponAimRotation(aim);
+            Assert.That(Quaternion.Angle(_pivot.localRotation, combined), Is.LessThan(0.05f));
+            _effects.SetWeaponAimRotation(Quaternion.identity);
+            Assert.That(Quaternion.Angle(_pivot.localRotation, combined * Quaternion.Inverse(aim)), Is.LessThan(0.05f));
+        }
+
+        [Test]
         public void IdlePlayerHasNoBob()
         {
             Run(StalkerMoveFlags.None, 2.0f, DT);

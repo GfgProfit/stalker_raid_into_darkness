@@ -23,6 +23,8 @@ namespace RaidIntoDarkness.Weapons
         [SerializeField] private Vector3 _aimOffsetRotation;
         [Tooltip("Weapon section 'zoom_rotate_time'.")]
         [SerializeField] [Min(0.01f)] private float _aimTime = 0.25f;
+        [SerializeField] [Range(-10f, 10f)] private float _aimCameraRoll = 1f;
+        [SerializeField] [Min(0.01f)] private float _aimCameraBlendTime = 0.15f;
         [SerializeField] private string _muzzleBone = DEFAULT_MUZZLE_BONE;
         [Tooltip("Hands bones animated by the left-hand pickup overlay.")]
         [SerializeField] private string[] _overlayBones = Array.Empty<string>();
@@ -43,6 +45,7 @@ namespace RaidIntoDarkness.Weapons
         [SerializeField] private GameObject _silencedSmokeParticles;
         [SerializeField] [Min(0)] private int _lastShotHoldFrame;
         [SerializeField] [Range(0f, 1f)] private float _emptyShotStrength = 0.15f;
+        [SerializeField] [HideInInspector] private WeaponBallisticsSettings _ballistics = new WeaponBallisticsSettings();
         [Header("Recoil")]
         [SerializeField] private Vector3 _recoil = new Vector3(4.0f, 4.0f, 2.0f);
         [SerializeField] [Range(0.0f, 50.0f)] private float _recoilSnappiness = 13.0f;
@@ -62,6 +65,8 @@ namespace RaidIntoDarkness.Weapons
         public Vector3 AimOffsetPosition => _aimOffsetPosition;
         public Vector3 AimOffsetRotation => _aimOffsetRotation;
         public float AimTime => _aimTime;
+        public float AimCameraRoll => _aimCameraRoll;
+        public float AimCameraBlendTime => Mathf.Max(0.01f, _aimCameraBlendTime);
         public string MuzzleBone => _muzzleBone;
         public IReadOnlyList<string> OverlayBones => _overlayBones ?? Array.Empty<string>();
         public IReadOnlyList<FirstPersonWeaponMotion> Motions => _motions;
@@ -80,6 +85,7 @@ namespace RaidIntoDarkness.Weapons
         public GameObject SilencedSmokeParticles => _silencedSmokeParticles;
         public int LastShotHoldFrame => _lastShotHoldFrame;
         public float EmptyShotStrength => Mathf.Clamp01(_emptyShotStrength);
+        public WeaponBallisticsSettings Ballistics => _ballistics;
         public Vector3 Recoil => _recoil;
         public float RecoilSnappiness => _recoilSnappiness;
         public float RecoilReturnSpeed => _recoilReturnSpeed;

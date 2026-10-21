@@ -14,9 +14,9 @@ namespace RaidIntoDarkness.Integrations.Inventory
         [SerializeField] private float _armorPiercing;
         [SerializeField] private float _hitMultiplier;
         [SerializeField] private float _impulseMultiplier;
-        [SerializeField] private float _speedMultiplier;
-        [SerializeField] private float _dispersionMultiplier;
-        [SerializeField] private float _airResistance;
+        [SerializeField] [HideInInspector] private float _speedMultiplier;
+        [SerializeField] [HideInInspector] private float _dispersionMultiplier;
+        [SerializeField] [HideInInspector] private float _airResistance;
         [SerializeField] private int _buckshot;
         [SerializeField] private float _averageWeaponHitPower;
         [SerializeField] private float _monsterDamageMultiplier;

@@ -95,6 +95,8 @@ MonoBehaviour:
         _cost: 29500
         _repairType: outfit_medium
         _community: bandit
+        _communityIcon: {fileID: -452201656, guid: d56bb8268bdae76448be8781bc547c55, type: 3}
+        _communityIconSize: {x: 17, y: 20}
         _burnProtection: 0.22
         _shockProtection: 1.1
         _chemicalBurnProtection: 0.12

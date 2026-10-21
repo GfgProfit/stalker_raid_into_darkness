@@ -64,6 +64,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             Assert.That(label.textInfo.characterCount, Is.EqualTo(3));
             Assert.That(label.textInfo.characterInfo[0].pointSize, Is.EqualTo(16f).Within(0.001f));
             Assert.That(label.textInfo.characterInfo[0].color, Is.EqualTo(new Color32(255, 255, 255, 255)));
+            AssertNameBackground(view, "FMJ");
             InventorySaveData saved = InventorySerializer.Capture(model, new[] { window.PrimaryContainerId, window.SecondaryContainerId });
             var restored = new InventoryModel(model.Resolver);
             InventoryContainer backpack = model.GetContainer(window.PrimaryContainerId);
@@ -87,6 +88,10 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             ItemInstance leftWeapon = AddItem(controller, "wpn_aug_a3", window.SecondaryContainerId);
             ItemInstance equippedWeapon = AddItem(controller, "wpn_aug_a3", window.PrimaryContainerId);
             Assert.That(model.TryEquip(equippedWeapon.InstanceId, window.EquipmentContainerId).Success, Is.True);
+            ItemInstance outfit = AddItem(controller, "dolg_outfit", window.PrimaryContainerId);
+            Assert.That(model.TryEquip(outfit.InstanceId, window.EquipmentContainerId).Success, Is.True);
+            ItemInstance helmet = AddItem(controller, "helm_battle", window.PrimaryContainerId);
+            Assert.That(model.TryEquip(helmet.InstanceId, window.EquipmentContainerId).Success, Is.True);
             ItemInstance fmj = AddItem(controller, "ammo_5.56x45_fmj", window.PrimaryContainerId);
             ItemInstance ep = AddItem(controller, "ammo_5.56x45_ss190", window.SecondaryContainerId);
             ItemInstance epr = AddItem(controller, "ammo_5.56x45_ap", window.PrimaryContainerId);
@@ -114,6 +119,32 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             Assert.That(equipment, Is.Not.Null);
             InventoryEquipmentSlot weaponSlot = equipment.GetSlotView(equippedWeapon.Location.SlotId);
             Image slotHighlight = equippedView.Background;
+            AssertNameBackground(weaponView, weapon.Definition.ShortName);
+            AssertNameBackground(leftWeaponView, leftWeapon.Definition.ShortName);
+            AssertNameBackground(equippedView, equippedWeapon.Definition.ShortName);
+            InventoryItemView outfitView = window.FindGrid(outfit.ContainerId).GetItemView(outfit);
+            InventoryItemView helmetView = window.FindGrid(helmet.ContainerId).GetItemView(helmet);
+            AssertNameBackground(outfitView, "MEDIUM");
+            AssertNameBackground(helmetView, "HEAVY");
+            TMP_Text equippedName = equippedView.transform.Find("Overlay/Name").GetComponent<TMP_Text>();
+            Assert.That(equippedName.alignment, Is.EqualTo(TextAlignmentOptions.Top));
+            Assert.That(equippedName.canvasRenderer.absoluteDepth, Is.GreaterThan(weaponSlot.Icon.canvasRenderer.absoluteDepth));
+
+            foreach (InventoryItemView slotView in new[] { equippedView, outfitView, helmetView })
+            {
+                TMP_Text info = slotView.transform.Find("Overlay/Info").GetComponent<TMP_Text>();
+                Assert.That(info.isActiveAndEnabled, Is.True);
+                Assert.That(info.alignment, Is.EqualTo(TextAlignmentOptions.TopLeft));
+                Assert.That(info.text, Is.EqualTo(window.Theme.FormatItemWeight(slotView.Item.TotalWeight)));
+            }
+
+            Image community = outfitView.transform.Find("Overlay/CommunityIcon").GetComponent<Image>();
+            Image classBackground = outfitView.transform.Find("Overlay/NameBackground").GetComponent<Image>();
+            Assert.That(community.isActiveAndEnabled, Is.True);
+            Assert.That(community.sprite.name, Is.EqualTo("ui_dyn_eq_dolg"));
+            Assert.That(community.rectTransform.sizeDelta, Is.EqualTo(new Vector2(20f, 19f)));
+            Assert.That(community.rectTransform.anchoredPosition.y, Is.EqualTo(outfitView.RectTransform.rect.height + classBackground.rectTransform.anchoredPosition.y + 5f).Within(0.01f));
+            Assert.That(helmetView.transform.Find("Overlay/CommunityIcon").GetComponent<Image>().enabled, Is.False);
             Assert.That(slotHighlight.transform.parent, Is.SameAs(weaponSlot.Icon.transform.parent));
             Assert.That(slotHighlight.transform.GetSiblingIndex(), Is.LessThan(weaponSlot.Icon.transform.GetSiblingIndex()));
 
@@ -324,6 +355,40 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
 
             Object.Destroy(surfaceObject);
             controller.Close();
+        }
+
+        private static void AssertNameBackground(InventoryItemView view, string expected)
+        {
+            TMP_Text label = view.transform.Find("Overlay/Name").GetComponent<TMP_Text>();
+            Image background = view.transform.Find("Overlay/NameBackground").GetComponent<Image>();
+            label.ForceMeshUpdate();
+            Assert.That(label.GetParsedText(), Is.EqualTo(expected));
+            Assert.That(label.isActiveAndEnabled, Is.True);
+            Assert.That(label.canvasRenderer.GetInheritedAlpha(), Is.GreaterThan(0f));
+            Assert.That(background.isActiveAndEnabled, Is.True);
+            Assert.That(background.color, Is.EqualTo(view.Grid.Window.Theme.ItemInfoBackground));
+            Assert.That(background.raycastTarget, Is.False);
+            Assert.That(background.transform.GetSiblingIndex(), Is.LessThan(label.transform.GetSiblingIndex()));
+            Rect area = background.rectTransform.rect;
+            Assert.That(area.width, Is.GreaterThan(0f));
+            Assert.That(area.height, Is.GreaterThan(0f));
+
+            for (int i = 0; i < label.textInfo.characterCount; i++)
+            {
+                TMP_CharacterInfo character = label.textInfo.characterInfo[i];
+
+                if (character.isVisible == false)
+                {
+                    continue;
+                }
+
+                Vector3 min = background.rectTransform.InverseTransformPoint(label.rectTransform.TransformPoint(character.bottomLeft));
+                Vector3 max = background.rectTransform.InverseTransformPoint(label.rectTransform.TransformPoint(character.topRight));
+                Assert.That(min.x, Is.GreaterThanOrEqualTo(area.xMin - 0.01f));
+                Assert.That(min.y, Is.GreaterThanOrEqualTo(area.yMin - 0.01f));
+                Assert.That(max.x, Is.LessThanOrEqualTo(area.xMax + 0.01f));
+                Assert.That(max.y, Is.LessThanOrEqualTo(area.yMax + 0.01f));
+            }
         }
 
         private static ItemInstance AddItem(InventoryWindowController controller, string section, string containerId)

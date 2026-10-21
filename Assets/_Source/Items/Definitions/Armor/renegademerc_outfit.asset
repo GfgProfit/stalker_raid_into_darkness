@@ -91,6 +91,8 @@ MonoBehaviour:
         _cost: 17800
         _repairType: outfit_light
         _community: renegade
+        _communityIcon: {fileID: -1259342822, guid: d56bb8268bdae76448be8781bc547c55, type: 3}
+        _communityIconSize: {x: 16, y: 20}
         _burnProtection: 0.156
         _shockProtection: 0.36
         _chemicalBurnProtection: 0.042

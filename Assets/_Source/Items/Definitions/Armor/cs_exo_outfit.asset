@@ -93,6 +93,8 @@ MonoBehaviour:
         _cost: 125300
         _repairType: outfit_exo
         _community: csky
+        _communityIcon: {fileID: -955415911, guid: d56bb8268bdae76448be8781bc547c55, type: 3}
+        _communityIconSize: {x: 19, y: 20}
         _burnProtection: 0.84
         _shockProtection: 4.4
         _chemicalBurnProtection: 0.5

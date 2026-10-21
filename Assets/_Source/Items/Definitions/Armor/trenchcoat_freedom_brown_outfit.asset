@@ -86,6 +86,8 @@ MonoBehaviour:
         _cost: 13200
         _repairType: outfit_light
         _community: freedom
+        _communityIcon: {fileID: 1617118781, guid: d56bb8268bdae76448be8781bc547c55, type: 3}
+        _communityIconSize: {x: 19, y: 20}
         _burnProtection: 0.157
         _shockProtection: 0.88
         _chemicalBurnProtection: 0.073

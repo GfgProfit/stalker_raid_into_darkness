@@ -349,7 +349,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
             _statsFormatter = new EquipmentStatsFormatter(_window);
             _window.ItemStatsProvider = _statsFormatter.Collect;
             _window.ItemDescriptionProvider = _statsFormatter.Describe;
-            _window.ItemShortNameProvider = FormatAmmoShortName;
+            _window.ItemShortNameProvider = FormatItemShortName;
             _statusPresenter = _status != null ? new EquipmentStatusPresenter(_window, _status) : null;
             _inventory.Model.Changed += OnModelChanged;
 
@@ -422,8 +422,15 @@ namespace RaidIntoDarkness.Integrations.Inventory
             }
         }
 
-        private static string FormatAmmoShortName(ItemInstance item)
+        private static string FormatItemShortName(ItemInstance item)
         {
+            string armorType = item?.Definition.GetComponent<EquipmentStatsComponent>()?.ArmorTypeLabel;
+
+            if (armorType != null)
+            {
+                return FormatShortNameLabel(armorType);
+            }
+
             if (item?.Definition.GetComponent<AmmoStatsComponent>() == null)
             {
                 return null;
@@ -445,12 +452,16 @@ namespace RaidIntoDarkness.Integrations.Inventory
                 label = "FMJ";
             }
 
-            return "<size=16><color=#FFFFFF>" + label + "</color></size>";
+            return FormatShortNameLabel(label);
         }
+
+        private static string FormatShortNameLabel(string label) => "<size=16><color=#FFFFFF>" + label + "</color></size>";
 
         private InventoryItemDecoration DecorateItem(ItemInstance item)
         {
             InventoryItemDecoration decoration = _sorting != null ? _sorting.Decorate(item) : InventoryItemDecoration.None;
+            EquipmentStatsComponent equipment = item?.Definition.GetComponent<EquipmentStatsComponent>();
+            decoration = new InventoryItemDecoration(decoration.Tint, decoration.Badge, equipment?.CommunityIcon, equipment != null ? equipment.CommunityIconSize : Vector2.zero);
 
             if (_compatibilityHovered == null || item == null || item == _compatibilityHovered)
             {
@@ -466,7 +477,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
                 ammo = _compatibilityHovered.Definition.GetComponent<AmmoStatsComponent>();
             }
 
-            return weapon != null && ammo != null && weapon.SupportsAmmo(ammo.Section) ? new InventoryItemDecoration(_compatibleAmmoTint, decoration.Badge) : decoration;
+            return weapon != null && ammo != null && weapon.SupportsAmmo(ammo.Section) ? new InventoryItemDecoration(_compatibleAmmoTint, decoration.Badge, decoration.CommunityIcon, decoration.CommunityIconSize) : decoration;
         }
 
         private void UpdateCompatibilityHighlight()

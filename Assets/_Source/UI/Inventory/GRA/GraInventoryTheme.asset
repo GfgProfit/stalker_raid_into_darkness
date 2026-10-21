@@ -41,7 +41,7 @@ MonoBehaviour:
   _itemShadowColor: {r: 0, g: 0, b: 0, a: 0.9}
   _conditionColor: {r: 0.39215687, g: 1, b: 0.5882353, a: 1}
   _itemWeightColor: {r: 0.9411765, g: 0.8509804, b: 0.7137255, a: 1}
-  _itemInfoBackground: {r: 0, g: 0, b: 0, a: 0.65}
+  _itemInfoBackground: {r: 0, g: 0, b: 0, a: 0.75}
   _shortNameCategories:
   - Weapon
   _labels:

@@ -100,6 +100,8 @@ MonoBehaviour:
         _cost: 36810
         _repairType: outfit_medium
         _community: csky
+        _communityIcon: {fileID: -955415911, guid: d56bb8268bdae76448be8781bc547c55, type: 3}
+        _communityIconSize: {x: 19, y: 20}
         _burnProtection: 0.54
         _shockProtection: 2.8
         _chemicalBurnProtection: 0.278

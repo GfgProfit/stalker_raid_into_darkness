@@ -108,6 +108,8 @@ MonoBehaviour:
         _cost: 187420
         _repairType: outfit_exo
         _community: killer
+        _communityIcon: {fileID: -856896013, guid: d56bb8268bdae76448be8781bc547c55, type: 3}
+        _communityIconSize: {x: 20, y: 19}
         _burnProtection: 0.4
         _shockProtection: 1.6
         _chemicalBurnProtection: 0.34

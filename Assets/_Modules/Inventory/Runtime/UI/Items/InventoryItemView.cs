@@ -13,6 +13,7 @@ namespace Inventory.UI
         private const float DIMMED_ALPHA = 0.25f;
         private const float INFO_BACKGROUND_PADDING_X = 3f;
         private const float INFO_BACKGROUND_PADDING_Y = 1f;
+        private const float COMMUNITY_ICON_GAP = 5f;
 
         private RectTransform _rectTransform;
         private RectTransform _content;
@@ -26,9 +27,11 @@ namespace Inventory.UI
         private TextMeshProUGUI _conditionText;
         private TextMeshProUGUI _conditionShadow;
         private Image[] _infoBackgrounds;
+        private Image[] _nameBackgrounds;
         private InventoryTheme _appliedTheme;
         private Image _indicator;
         private Image _badge;
+        private Image _communityIcon;
         private Image _iconTarget;
         private Image _backgroundTarget;
         private RectTransform _overlay;
@@ -132,10 +135,12 @@ namespace Inventory.UI
                 _content.sizeDelta = iconArea.size;
                 _content.anchoredPosition = new Vector2(iconArea.center.x - topLeftArea.center.x, topLeftArea.center.y - iconArea.center.y);
                 _content.localRotation = Quaternion.identity;
+                LayoutTextBackgrounds();
                 return;
             }
 
             ApplyContent(Item.Definition.Size, _grid.CellSize, Item.Location.Rotated);
+            LayoutTextBackgrounds();
         }
 
         public void SetDragSource(bool dragging)
@@ -171,7 +176,7 @@ namespace Inventory.UI
             _backgroundTarget = backgroundTarget;
             bool external = target != null;
             _background.enabled = external == false;
-            _overlay.gameObject.SetActive(external == false);
+            _overlay.gameObject.SetActive(true);
 
             if (external)
             {
@@ -249,6 +254,9 @@ namespace Inventory.UI
             InventoryTheme theme = _appliedTheme;
             bool showCount = definition.IsStackable && amount > 1;
             string customName = _grid != null && _grid.Window != null && _grid.Window.ItemShortNameProvider != null ? _grid.Window.ItemShortNameProvider(Item) : null;
+            bool inSlot = _ghost == false && _grid != null && _grid.UsesSlotIcon(Item, out _);
+            _nameText.alignment = inSlot && customName == null ? TextAlignmentOptions.Top : TextAlignmentOptions.BottomRight;
+            _nameShadow.alignment = _nameText.alignment;
 
             if (theme == null)
             {
@@ -260,18 +268,16 @@ namespace Inventory.UI
                 }
 
                 _nameText.text = customName ?? definition.ShortName;
-                _nameText.alignment = customName != null ? TextAlignmentOptions.BottomRight : TextAlignmentOptions.TopLeft;
+                _nameText.alignment = inSlot && customName == null ? TextAlignmentOptions.Top : customName != null ? TextAlignmentOptions.BottomRight : TextAlignmentOptions.TopLeft;
                 _nameText.enabled = string.IsNullOrEmpty(_nameText.text) == false;
                 return;
             }
 
             _countText.enabled = false;
             string count = showCount && theme.ShowItemCount ? theme.FormatCount(amount) : string.Empty;
-            bool inSlot = _ghost == false && _grid != null && _grid.UsesSlotIcon(Item, out _);
-            string weight = theme.ShowItemWeight && inSlot == false ? theme.FormatItemWeight(Item.UnitWeight * amount) : string.Empty;
+            string weight = theme.ShowItemWeight ? theme.FormatItemWeight(Item.UnitWeight * amount) : string.Empty;
             string info = count.Length > 0 && weight.Length > 0 ? count + "\n" + weight : count + weight;
             SetLabel(_infoText, _infoShadow, info);
-            LayoutInfoBackgrounds(theme);
             SetLabel(_nameText, _nameShadow, customName ?? (theme.ShowsShortName(definition) ? definition.ShortName : string.Empty));
             string condition = Item.GetState("condition");
             string conditionText = string.Empty;
@@ -282,6 +288,7 @@ namespace Inventory.UI
             }
 
             SetLabel(_conditionText, _conditionShadow, conditionText);
+            LayoutTextBackgrounds();
         }
 
         private void ApplyTheme(InventoryTheme theme)
@@ -296,12 +303,12 @@ namespace Inventory.UI
             _infoText.gameObject.SetActive(themed);
             _conditionText.gameObject.SetActive(themed);
             _infoShadow.gameObject.SetActive(themed && theme.ItemTextShadow && theme.ItemInfoBackground.a <= 0f);
-            _nameShadow.gameObject.SetActive(themed && theme.ItemTextShadow);
+            _nameShadow.gameObject.SetActive(themed && theme.ItemTextShadow && theme.ItemInfoBackground.a <= 0f);
             _conditionShadow.gameObject.SetActive(themed && theme.ItemTextShadow);
 
             if (themed == false)
             {
-                HideInfoBackgrounds();
+                HideTextBackgrounds();
                 _nameText.alignment = TextAlignmentOptions.TopLeft;
                 return;
             }
@@ -337,20 +344,36 @@ namespace Inventory.UI
             shadow.enabled = label.enabled;
         }
 
-        private void LayoutInfoBackgrounds(InventoryTheme theme)
+        private void LayoutTextBackgrounds()
         {
-            if (theme.ItemInfoBackground.a <= 0f || _infoText.enabled == false)
+            LayoutTextBackgrounds(_infoText, _infoBackgrounds, _appliedTheme);
+            LayoutTextBackgrounds(_nameText, _nameBackgrounds, _appliedTheme);
+
+            if (_communityIcon.enabled)
             {
-                HideInfoBackgrounds();
+                float nameTop = _nameBackgrounds[0].enabled ? _overlay.rect.height + _nameBackgrounds[0].rectTransform.anchoredPosition.y : _nameText.rectTransform.offsetMin.y + _nameText.preferredHeight;
+                _communityIcon.rectTransform.anchoredPosition = new Vector2(_nameText.rectTransform.offsetMax.x, nameTop + COMMUNITY_ICON_GAP);
+            }
+        }
+
+        private static void LayoutTextBackgrounds(TextMeshProUGUI label, Image[] backgrounds, InventoryTheme theme)
+        {
+            if (theme == null || theme.ItemInfoBackground.a <= 0f || label.enabled == false)
+            {
+                for (int i = 0; i < backgrounds.Length; i++)
+                {
+                    backgrounds[i].enabled = false;
+                }
+
                 return;
             }
 
-            _infoText.ForceMeshUpdate();
-            TMP_TextInfo textInfo = _infoText.textInfo;
+            label.ForceMeshUpdate();
+            TMP_TextInfo textInfo = label.textInfo;
 
-            for (int i = 0; i < _infoBackgrounds.Length; i++)
+            for (int i = 0; i < backgrounds.Length; i++)
             {
-                Image background = _infoBackgrounds[i];
+                Image background = backgrounds[i];
 
                 if (i >= textInfo.lineCount || textInfo.lineInfo[i].characterCount == 0)
                 {
@@ -359,8 +382,8 @@ namespace Inventory.UI
                 }
 
                 Extents extents = textInfo.lineInfo[i].lineExtents;
-                Rect textRect = _infoText.rectTransform.rect;
-                Vector2 textOffset = new Vector2(_infoText.rectTransform.offsetMin.x, _infoText.rectTransform.offsetMax.y);
+                Rect textRect = label.rectTransform.rect;
+                Vector2 textOffset = new Vector2(label.rectTransform.offsetMin.x, label.rectTransform.offsetMax.y);
                 RectTransform rect = background.rectTransform;
                 rect.anchorMin = new Vector2(0f, 1f);
                 rect.anchorMax = new Vector2(0f, 1f);
@@ -372,11 +395,16 @@ namespace Inventory.UI
             }
         }
 
-        private void HideInfoBackgrounds()
+        private void HideTextBackgrounds()
         {
             for (int i = 0; i < _infoBackgrounds.Length; i++)
             {
                 _infoBackgrounds[i].enabled = false;
+            }
+
+            for (int i = 0; i < _nameBackgrounds.Length; i++)
+            {
+                _nameBackgrounds[i].enabled = false;
             }
         }
 
@@ -389,13 +417,16 @@ namespace Inventory.UI
             _conditionText.enabled = false;
             _conditionShadow.enabled = false;
             _countText.enabled = false;
-            HideInfoBackgrounds();
+            HideTextBackgrounds();
         }
 
         private void ApplyDecoration()
         {
             InventoryWindow window = _grid != null ? _grid.Window : null;
             InventoryItemDecoration decoration = _ghost == false && window != null && window.ItemDecorator != null ? window.ItemDecorator(Item) : InventoryItemDecoration.None;
+            _communityIcon.sprite = decoration.CommunityIcon;
+            _communityIcon.rectTransform.sizeDelta = decoration.CommunityIconSize;
+            _communityIcon.enabled = decoration.CommunityIcon != null;
             Color background = decoration.HasTint ? decoration.Tint : BackgroundColor(Item.Definition);
             _background.color = _hovered && _ghost == false ? HoverColor(background, decoration.HasTint) : background;
             _background.enabled = _iconTarget == null;
@@ -560,6 +591,7 @@ namespace Inventory.UI
             RectTransform overlay = CreateChild("Overlay", hideFlags, _rectTransform, false);
             _overlay = overlay;
             _infoBackgrounds = new Image[2];
+            _nameBackgrounds = new Image[1];
 
             for (int i = 0; i < _infoBackgrounds.Length; i++)
             {
@@ -568,6 +600,16 @@ namespace Inventory.UI
                 _infoBackgrounds[i].enabled = false;
             }
 
+            _nameBackgrounds[0] = CreateChild("NameBackground", hideFlags, overlay, true).gameObject.AddComponent<Image>();
+            _nameBackgrounds[0].raycastTarget = false;
+            _nameBackgrounds[0].enabled = false;
+            _communityIcon = CreateChild("CommunityIcon", hideFlags, overlay, true).gameObject.AddComponent<Image>();
+            _communityIcon.rectTransform.anchorMin = new Vector2(1f, 0f);
+            _communityIcon.rectTransform.anchorMax = new Vector2(1f, 0f);
+            _communityIcon.rectTransform.pivot = new Vector2(1f, 0f);
+            _communityIcon.preserveAspect = true;
+            _communityIcon.raycastTarget = false;
+            _communityIcon.enabled = false;
             _infoShadow = CreateShadow("InfoShadow", hideFlags, overlay, TextAlignmentOptions.TopLeft);
             _infoText = CreateText("Info", hideFlags, overlay, TextAlignmentOptions.TopLeft, 15f);
             _conditionShadow = CreateShadow("ConditionShadow", hideFlags, overlay, TextAlignmentOptions.BottomLeft);

@@ -90,6 +90,8 @@ MonoBehaviour:
         _cost: 86350
         _repairType: outfit_medium
         _community: stalker
+        _communityIcon: {fileID: 164985583, guid: d56bb8268bdae76448be8781bc547c55, type: 3}
+        _communityIconSize: {x: 20, y: 20}
         _burnProtection: 1
         _shockProtection: 2
         _chemicalBurnProtection: 1.3

@@ -519,7 +519,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
             return icons;
         }
 
-        private static void ConfigureSprites(string assetPath, int maxSize, List<KeyValuePair<string, Rect>> rects)
+        internal static void ConfigureSprites(string assetPath, int maxSize, List<KeyValuePair<string, Rect>> rects)
         {
             var importer = (TextureImporter)AssetImporter.GetAtPath(assetPath);
             importer.textureType = TextureImporterType.Sprite;
@@ -561,7 +561,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
             importer.SaveAndReimport();
         }
 
-        private static byte[] EncodePng(byte[] topDownRgba, int width, int height)
+        internal static byte[] EncodePng(byte[] topDownRgba, int width, int height)
         {
             var bottomUp = new byte[topDownRgba.Length];
             int stride = width * 4;

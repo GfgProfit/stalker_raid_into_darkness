@@ -95,6 +95,8 @@ MonoBehaviour:
         _cost: 76350
         _repairType: outfit_heavy
         _community: monolith
+        _communityIcon: {fileID: -2048233369, guid: d56bb8268bdae76448be8781bc547c55, type: 3}
+        _communityIconSize: {x: 20, y: 20}
         _burnProtection: 0.34
         _shockProtection: 1.6
         _chemicalBurnProtection: 0.48

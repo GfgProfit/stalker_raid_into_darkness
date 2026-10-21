@@ -30,6 +30,8 @@ namespace RaidIntoDarkness.Integrations.Inventory
         [SerializeField] private int _cost;
         [SerializeField] private string _repairType;
         [SerializeField] private string _community;
+        [SerializeField] private Sprite _communityIcon;
+        [SerializeField] private Vector2 _communityIconSize;
         [SerializeField] private float _burnProtection;
         [SerializeField] private float _shockProtection;
         [SerializeField] private float _chemicalBurnProtection;
@@ -54,6 +56,23 @@ namespace RaidIntoDarkness.Integrations.Inventory
         public int Cost => _cost;
         public string RepairType => _repairType ?? string.Empty;
         public string Community => _community ?? string.Empty;
+        public Sprite CommunityIcon => _communityIcon;
+        public Vector2 CommunityIconSize => _communityIconSize;
+        public string ArmorTypeLabel => RepairType switch
+        {
+            "outfit_novice" or "outfit_light" or "helmet_light" => "LIGHT",
+            "outfit_medium" or "helmet_medium" => "MEDIUM",
+            "outfit_heavy" or "helmet_heavy" => "HEAVY",
+            "outfit_exo" or "helmet_exo" => "EXO",
+            _ => Section switch
+            {
+                "helm_hardhat" or "helm_hardhat_snag" => "LIGHT",
+                "helm_m40" or "helm_ach7" or "helm_ach7ex" or "helm_protective" or "helm_ppm88" => "MEDIUM",
+                "helm_tactic" or "helm_m50" or "helm_ranger" or "helm_battle" or "helm_metro" => "HEAVY",
+                "helm_exo" or "helm_spartan" => "EXO",
+                _ => null
+            }
+        };
         public float BurnProtection => _burnProtection;
         public float ShockProtection => _shockProtection;
         public float ChemicalBurnProtection => _chemicalBurnProtection;

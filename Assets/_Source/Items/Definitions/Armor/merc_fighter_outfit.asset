@@ -98,6 +98,8 @@ MonoBehaviour:
         _cost: 19780
         _repairType: outfit_light
         _community: killer
+        _communityIcon: {fileID: -856896013, guid: d56bb8268bdae76448be8781bc547c55, type: 3}
+        _communityIconSize: {x: 20, y: 19}
         _burnProtection: 0.16
         _shockProtection: 0.4
         _chemicalBurnProtection: 0.048

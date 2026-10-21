@@ -106,6 +106,8 @@ MonoBehaviour:
         _cost: 38300
         _repairType: outfit_medium
         _community: ecolog
+        _communityIcon: {fileID: -693060421, guid: d56bb8268bdae76448be8781bc547c55, type: 3}
+        _communityIconSize: {x: 20, y: 20}
         _burnProtection: 0.52
         _shockProtection: 3.2
         _chemicalBurnProtection: 0.22

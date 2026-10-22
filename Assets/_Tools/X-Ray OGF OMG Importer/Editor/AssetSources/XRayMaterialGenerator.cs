@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using XRay.Importer.Sources;
 using XRay.Importer.Sources.Shaders;
+using XRay.Importer.Sources.Textures;
 #if XRAY_HDRP
 using UnityEngine.Rendering.HighDefinition;
 #endif
@@ -34,9 +35,21 @@ namespace XRay.Importer.Editor
             _warnings = warnings;
         }
 
-        public XRayMaterialResult GetOrCreate(string key, string nameSource, string shaderName, XRaySurfaceDescription surface, Texture2D albedo, Texture2D normal, string folder)
+        public XRayMaterialResult GetOrCreate(string key, string nameSource, string shaderName, XRaySurfaceDescription surface, Texture2D albedo, Texture2D normal, string folder, XRayMaterialGenerationMode mode = XRayMaterialGenerationMode.HdrpLitLegacy, XRayTextureDescription description = null, Texture2D packedBump = null, Texture2D packedCorrection = null, bool flipGreen = true)
         {
+            bool monolith = mode == XRayMaterialGenerationMode.MonolithHdrp && IsDefaultSurface(surface);
+            if (mode == XRayMaterialGenerationMode.MonolithHdrp && !monolith)
+            {
+                _warnings.Add($"Monolith HDRP prototype supports opaque single-sided surfaces; '{shaderName}' retains HDRP/Lit.");
+            }
+
+            if (monolith)
+            {
+                key += "#monolith";
+            }
+
             string suffix = IsDefaultSurface(surface) ? string.Empty : "_" + GetShaderLeaf(shaderName);
+            suffix += monolith ? "_monolith" : string.Empty;
             List<string> candidates = XRayAssetNaming.CreateCandidates(nameSource, suffix);
             string path = XRayAssetNaming.Place(folder, candidates, ".mat", key, XRayAssetMarker.ReadKey, _claimed);
             var existing = AssetDatabase.LoadAssetAtPath<Material>(path);
@@ -48,6 +61,10 @@ namespace XRay.Importer.Editor
                 }
 
                 Configure(existing, surface, albedo, normal);
+                if (monolith)
+                {
+                    MonolithMaterialConfigurator.Configure(existing, description, albedo, packedBump, packedCorrection, flipGreen);
+                }
                 EditorUtility.SetDirty(existing);
                 AssetDatabase.SaveAssetIfDirty(existing);
                 return new XRayMaterialResult { Material = existing, AssetPath = path, Status = XRayResourceStatus.Updated };
@@ -63,6 +80,10 @@ namespace XRay.Importer.Editor
 
             var material = new Material(shader) { name = Path.GetFileNameWithoutExtension(path) };
             Configure(material, surface, albedo, normal);
+            if (monolith)
+            {
+                MonolithMaterialConfigurator.Configure(material, description, albedo, packedBump, packedCorrection, flipGreen);
+            }
             Directory.CreateDirectory(folder);
             AssetDatabase.CreateAsset(material, path);
             XRayAssetMarker.Write(path, new XRayAssetMarker(key, MATERIAL_ROLE, surface.RuleName, shaderName, string.Empty));

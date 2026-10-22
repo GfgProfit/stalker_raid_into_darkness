@@ -6,7 +6,8 @@ namespace XRay.Importer.Editor
     public enum XRayTextureRole
     {
         Albedo,
-        Normal
+        Normal,
+        Packed
     }
 
     public sealed class XRayTextureImportRequest
@@ -59,13 +60,19 @@ namespace XRay.Importer.Editor
             {
                 textureImporter.textureType = request.Role == XRayTextureRole.Normal ? TextureImporterType.NormalMap : TextureImporterType.Default;
                 textureImporter.sRGBTexture = request.Role == XRayTextureRole.Albedo;
-                textureImporter.alphaSource = request.Role == XRayTextureRole.Albedo ? TextureImporterAlphaSource.FromInput : TextureImporterAlphaSource.None;
+                textureImporter.alphaSource = request.Role != XRayTextureRole.Normal ? TextureImporterAlphaSource.FromInput : TextureImporterAlphaSource.None;
                 textureImporter.mipmapEnabled = true;
-                textureImporter.textureCompression = TextureImporterCompression.CompressedHQ;
+                textureImporter.textureCompression = request.Role == XRayTextureRole.Packed ? TextureImporterCompression.Uncompressed : TextureImporterCompression.CompressedHQ;
             }
             else if (importer is IHVImageFormatImporter ddsImporter)
             {
                 ddsImporter.isReadable = false;
+                if (request.Role == XRayTextureRole.Packed)
+                {
+                    var serialized = new SerializedObject(ddsImporter);
+                    serialized.FindProperty("m_sRGBTexture").boolValue = false;
+                    serialized.ApplyModifiedPropertiesWithoutUndo();
+                }
             }
         }
     }

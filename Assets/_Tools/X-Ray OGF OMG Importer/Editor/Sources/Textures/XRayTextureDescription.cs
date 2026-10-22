@@ -29,6 +29,10 @@ namespace XRay.Importer.Sources.Textures
         public string DetailName { get; internal set; }
         public double DetailScale { get; internal set; }
         public double Material { get; internal set; }
+        public uint MaterialId { get; internal set; } = 1;
+        public double MaterialWeight { get; internal set; }
+        public bool HasMaterial { get; internal set; }
+        public double VirtualHeight { get; internal set; } = 0.05;
         public uint Flags { get; internal set; }
         public uint PixelFormat { get; internal set; }
         public XRayThmTextureType TextureType { get; internal set; }

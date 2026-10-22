@@ -136,6 +136,7 @@ namespace XRay.Importer.Editor
             XRayImportOptions options = user.OverrideImportOptions ? user.ImportOptions : project.ImportOptions;
             options.AutoImportTextures = EditorGUILayout.Toggle("Automatically Import Textures", options.AutoImportTextures);
             options.GenerateMaterials = EditorGUILayout.Toggle("Generate HDRP Materials", options.GenerateMaterials);
+            options.MaterialGenerationMode = (XRayMaterialGenerationMode)EditorGUILayout.EnumPopup("Material Generation Mode", options.MaterialGenerationMode);
             options.CreateTexturesFolder = EditorGUILayout.Toggle("Create Textures Folder", options.CreateTexturesFolder);
             options.CreateMaterialsFolder = EditorGUILayout.Toggle("Create Materials Folder", options.CreateMaterialsFolder);
             options.PreserveExistingMaterials = EditorGUILayout.Toggle("Preserve Existing Materials", options.PreserveExistingMaterials);

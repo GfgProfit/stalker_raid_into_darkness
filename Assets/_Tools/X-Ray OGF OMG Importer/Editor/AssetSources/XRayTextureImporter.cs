@@ -122,6 +122,55 @@ namespace XRay.Importer.Editor
             }
         }
 
+        public XRayTextureAssetResult ImportPacked(XRayResolvedFile file, string folder)
+        {
+            if (file == null || !file.IsResolved)
+            {
+                return new XRayTextureAssetResult { Status = XRayResourceStatus.Missing };
+            }
+
+            byte[] source;
+            DdsHeader header;
+            try
+            {
+                source = File.ReadAllBytes(file.Winner.FullPath);
+                header = DdsHeader.Parse(source);
+            }
+            catch (Exception exception) when (exception is IOException || exception is FormatException)
+            {
+                return new XRayTextureAssetResult { Status = XRayResourceStatus.Unsupported, Note = $"Cannot read packed texture '{file.Winner.FullPath}': {exception.Message}" };
+            }
+            var marker = new XRayAssetMarker(file.VirtualPath + "#packed", XRayTextureRole.Packed.ToString(), file.Winner.SourceName, file.Winner.FullPath, XRayAssetMarker.CreateStamp(file.Winner.FullPath));
+            if (IsUnityNative(header))
+            {
+                return EnsurePackedLinear(Store(marker, file.Winner.RelativePath, "_packed", ".dds", folder, XRayTextureRole.Packed, header.Description, () => DdsColorSpace.TryGetDxgiFormat(header.Format, false, out uint dxgi) ? DdsColorSpace.WithDx10Header(source, header, dxgi) : source, "Packed linear X-Ray channels; no normal conversion."));
+            }
+
+            if (!DdsDecoder.CanDecode(header))
+            {
+                return new XRayTextureAssetResult { Status = XRayResourceStatus.Unsupported, Note = "Packed DDS format cannot be decoded." };
+            }
+
+            return Store(marker, file.Winner.RelativePath, "_packed", ".png", folder, XRayTextureRole.Packed, header.Description, () => EncodePng(DdsDecoder.DecodeTopLevel(source, header), header.Width, header.Height, true), "Packed mip0 converted losslessly to PNG; Unity generates remaining mips.");
+        }
+
+        private static XRayTextureAssetResult EnsurePackedLinear(XRayTextureAssetResult result)
+        {
+            if (AssetImporter.GetAtPath(result.AssetPath) is IHVImageFormatImporter importer)
+            {
+                var serialized = new SerializedObject(importer);
+                SerializedProperty srgb = serialized.FindProperty("m_sRGBTexture");
+                if (srgb.boolValue)
+                {
+                    srgb.boolValue = false;
+                    serialized.ApplyModifiedPropertiesWithoutUndo();
+                    importer.SaveAndReimport();
+                }
+            }
+
+            return result;
+        }
+
         public static bool IsUnityNative(DdsHeader header)
         {
             if (header.IsCubemap || header.IsVolume || header.ArraySize > 1)

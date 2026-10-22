@@ -125,6 +125,9 @@ namespace XRay.Importer.Editor
             List<XRayMaterialSlot> slots = XRayMaterialSlot.Collect(model);
             var albedoPaths = new string[slots.Count];
             var normalPaths = new string[slots.Count];
+            var bumpPaths = new string[slots.Count];
+            var correctionPaths = new string[slots.Count];
+            var descriptions = new XRayTextureDescription[slots.Count];
             for (int i = 0; i < slots.Count; i++)
             {
                 XRayReportMaterial entry = CreateEntry(i, slots[i]);
@@ -136,6 +139,7 @@ namespace XRay.Importer.Editor
                 }
 
                 XRayTextureResolution resolution = resolver.Resolve(slots[i].Texture);
+                descriptions[i] = resolution.Description;
                 entry.DescriptionOrigin = resolution.DescriptionOrigin;
                 entry.Notes.AddRange(resolution.Notes);
                 XRayTextureAssetResult albedo = textureImporter.ImportAlbedo(resolution.Diffuse, texturesFolder);
@@ -148,6 +152,22 @@ namespace XRay.Importer.Editor
 
                 if (options.Import.ResolveBumpMaps)
                 {
+                    if (options.Import.MaterialGenerationMode == XRayMaterialGenerationMode.MonolithHdrp && XRayMaterialGenerator.IsDefaultSurface(_shaderRules.Resolve(slots[i].Shader)))
+                    {
+                        XRayTextureAssetResult packed = textureImporter.ImportPacked(resolution.Bump, texturesFolder);
+                        XRayTextureAssetResult correction = textureImporter.ImportPacked(resolution.BumpCorrection, texturesFolder);
+                        bumpPaths[i] = packed.AssetPath;
+                        correctionPaths[i] = correction.AssetPath;
+                        entry.Textures.Add(CreateTextureEntry("Packed Bump", resolution.Bump, packed));
+                        entry.Textures.Add(CreateTextureEntry("Packed Bump Correction", resolution.BumpCorrection, correction));
+                        if (resolution.Description == null || !resolution.Description.HasMaterial)
+                        {
+                            entry.Notes.Add("Monolith fallback: no THM material chunk; Material ID 1, Weight 0. Missing bump uses geometric normal and configurable fallback gloss 0.1.");
+                        }
+
+                        continue;
+                    }
+
                     XRayTextureAssetResult normal = textureImporter.ImportNormal(resolution.Bump, resolution.BumpCorrection, texturesFolder);
                     entry.Textures.Add(CreateTextureEntry("Normal", resolution.Bump, normal));
                     normalPaths[i] = normal.AssetPath;
@@ -156,7 +176,7 @@ namespace XRay.Importer.Editor
 
             textureImporter.ImportPending();
             var awaited = new List<string>();
-            foreach (string path in CollectPaths(albedoPaths, normalPaths))
+            foreach (string path in CollectPaths(albedoPaths, normalPaths, bumpPaths, correctionPaths))
             {
                 if (AssetDatabase.LoadAssetAtPath<Texture2D>(path) != null)
                 {
@@ -180,7 +200,7 @@ namespace XRay.Importer.Editor
 
             if (options.Import.GenerateMaterials)
             {
-                GenerateMaterials(importer, slots, albedoPaths, normalPaths, materialsFolder, options, claimed, report);
+                GenerateMaterials(importer, slots, albedoPaths, normalPaths, bumpPaths, correctionPaths, descriptions, materialsFolder, options, claimed, report);
             }
 
             report.IsComplete = true;
@@ -189,7 +209,7 @@ namespace XRay.Importer.Editor
             return XRayGenerationOutcome.Completed;
         }
 
-        private static void GenerateMaterials(XRayOgfImporter importer, List<XRayMaterialSlot> slots, string[] albedoPaths, string[] normalPaths, string materialsFolder, XRayAssetSourceOptions options, HashSet<string> claimed, XRayResourceReport report)
+        private static void GenerateMaterials(XRayOgfImporter importer, List<XRayMaterialSlot> slots, string[] albedoPaths, string[] normalPaths, string[] bumpPaths, string[] correctionPaths, XRayTextureDescription[] descriptions, string materialsFolder, XRayAssetSourceOptions options, HashSet<string> claimed, XRayResourceReport report)
         {
             var generator = new XRayMaterialGenerator(options.Import.PreserveExistingMaterials, claimed, report.Warnings);
             Dictionary<AssetImporter.SourceAssetIdentifier, UnityEngine.Object> map = importer.GetExternalObjectMap();
@@ -208,7 +228,9 @@ namespace XRay.Importer.Editor
                 Texture2D albedo = albedoPaths[i] != null ? AssetDatabase.LoadAssetAtPath<Texture2D>(albedoPaths[i]) : null;
                 Texture2D normal = normalPaths[i] != null ? AssetDatabase.LoadAssetAtPath<Texture2D>(normalPaths[i]) : null;
                 string nameSource = albedoPaths[i] ?? "textures/" + (string.IsNullOrEmpty(slots[i].Texture) ? "xray_default" : slots[i].Texture);
-                XRayMaterialResult result = generator.GetOrCreate(slots[i].Key, nameSource, slots[i].Shader, surface, albedo, normal, materialsFolder);
+                Texture2D bump = bumpPaths[i] != null ? AssetDatabase.LoadAssetAtPath<Texture2D>(bumpPaths[i]) : null;
+                Texture2D correction = correctionPaths[i] != null ? AssetDatabase.LoadAssetAtPath<Texture2D>(correctionPaths[i]) : null;
+                XRayMaterialResult result = generator.GetOrCreate(slots[i].Key, nameSource, slots[i].Shader, surface, albedo, normal, materialsFolder, options.Import.MaterialGenerationMode, descriptions[i], bump, correction, options.Import.FlipNormalGreen);
                 entry.MaterialPath = result.AssetPath;
                 entry.MaterialStatus = result.Status;
                 AssetImporter.SourceAssetIdentifier identifier = XRayMaterialSlot.MakeIdentifier(slots[i].Key);
@@ -261,22 +283,17 @@ namespace XRay.Importer.Editor
             XRayTextureImportQueue.Complete(assetPath);
         }
 
-        private static List<string> CollectPaths(string[] albedoPaths, string[] normalPaths)
+        private static List<string> CollectPaths(params string[][] groups)
         {
             var paths = new List<string>();
-            foreach (string path in albedoPaths)
+            foreach (string[] group in groups)
             {
-                if (path != null && !paths.Contains(path))
+                foreach (string path in group)
                 {
-                    paths.Add(path);
-                }
-            }
-
-            foreach (string path in normalPaths)
-            {
-                if (path != null && !paths.Contains(path))
-                {
-                    paths.Add(path);
+                    if (path != null && !paths.Contains(path))
+                    {
+                        paths.Add(path);
+                    }
                 }
             }
 

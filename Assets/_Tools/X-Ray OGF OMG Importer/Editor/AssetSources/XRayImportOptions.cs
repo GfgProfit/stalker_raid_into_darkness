@@ -3,6 +3,12 @@ using UnityEngine;
 
 namespace XRay.Importer.Editor
 {
+    public enum XRayMaterialGenerationMode
+    {
+        [InspectorName("HDRP Lit (Legacy)")] HdrpLitLegacy,
+        [InspectorName("Monolith HDRP")] MonolithHdrp
+    }
+
     [Serializable]
     public sealed class XRayImportOptions
     {
@@ -15,6 +21,13 @@ namespace XRay.Importer.Editor
         [SerializeField] private bool _resolveBumpMaps = true;
         [SerializeField] private bool _logMissingTextures = true;
         [SerializeField] private bool _flipNormalGreen = true;
+        [SerializeField] private XRayMaterialGenerationMode _materialGenerationMode;
+
+        public XRayMaterialGenerationMode MaterialGenerationMode
+        {
+            get => _materialGenerationMode;
+            set => _materialGenerationMode = value;
+        }
 
         public bool AutoImportTextures
         {

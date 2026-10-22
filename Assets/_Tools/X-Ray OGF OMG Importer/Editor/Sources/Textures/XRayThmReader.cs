@@ -49,12 +49,15 @@ namespace XRay.Importer.Sources.Textures
                 uint kind = reader.ReadUInt32();
                 double weight = reader.Remaining >= 4 ? reader.ReadSingle() : 0.0;
                 description.Material = kind + weight;
+                description.MaterialId = kind;
+                description.MaterialWeight = weight;
+                description.HasMaterial = true;
             }
 
             if (chunks.TryGetValue(CHUNK_BUMP, out XRayChunk bump))
             {
                 XRayReader reader = bump.CreateReader(context + " BUMP");
-                reader.ReadSingle();
+                description.VirtualHeight = reader.ReadSingle();
                 description.BumpMode = (XRayBumpMode)reader.ReadUInt32();
                 description.BumpName = reader.ReadStringZ();
             }

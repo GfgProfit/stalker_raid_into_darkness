@@ -20,6 +20,7 @@ MonoBehaviour:
   _aimTime: 0.25
   _aimCameraRoll: 1
   _aimCameraBlendTime: 0.15
+  _aimZoom: 1.15
   _muzzleBone: wpn_silencer
   _overlayBones:
   - l_clavicle
@@ -36,14 +37,14 @@ MonoBehaviour:
     _hands: {fileID: 596992341022164678, guid: 2ab83c2c707a9c24dbaeeadd5aae2a22, type: 3}
     _weapon: {fileID: 9082258452575739102, guid: 3ea6104573210fe4590eae40fa98f15c, type: 3}
     _cameraEffect: {fileID: 4908183818744415850, guid: ad196fcd4ab46b349b1cb4d57186f382, type: 3}
-    _sound: {fileID: 8300000, guid: 375611bcfb5956140bf08281487c5272, type: 3}
+    _sound: {fileID: 8300000, guid: ecb1909613ebcae4498f3d4a39ea1467, type: 3}
     _speed: 1
   - _kind: 1
     _handsName: aug_holster
     _hands: {fileID: -6007806299299499327, guid: 2ab83c2c707a9c24dbaeeadd5aae2a22, type: 3}
     _weapon: {fileID: -1965084331185687820, guid: de218cc4279183b42bbc34ce8ff53704, type: 3}
     _cameraEffect: {fileID: 0}
-    _sound: {fileID: 8300000, guid: 64e63f964aab0d644a843484deb7c64c, type: 3}
+    _sound: {fileID: 8300000, guid: 4b8a38a4abc6f9e4187bc6cb03f8a74b, type: 3}
     _speed: 1
   - _kind: 2
     _handsName: aug_idle
@@ -224,6 +225,28 @@ MonoBehaviour:
   - {fileID: 8300000, guid: a1f7e8048032bd942b06d8711da98ea9, type: 3}
   - {fileID: 8300000, guid: c3d06aff7be4f614abb09b0509a1c468, type: 3}
   - {fileID: 8300000, guid: 21497ad247e6c064f9b0dd4b66f7cba4, type: 3}
+  _aimInSounds:
+  - {fileID: 8300000, guid: 3adc181589402d34da990f66a694f551, type: 3}
+  - {fileID: 8300000, guid: 489860fcc7dfdbb4b9c7d717b57ced0c, type: 3}
+  - {fileID: 8300000, guid: 210c195e0e94da64bab5c831526482d1, type: 3}
+  - {fileID: 8300000, guid: 2f7c4772bf30fff4ab5beeac0caf6953, type: 3}
+  - {fileID: 8300000, guid: 3735b4ee6da5c7a4cbeca3c1cedbde11, type: 3}
+  - {fileID: 8300000, guid: d335b48a29bd16a4ba4a4025527ce5f8, type: 3}
+  - {fileID: 8300000, guid: 645c26d6b23f4b74bb298e92781115fd, type: 3}
+  - {fileID: 8300000, guid: edfc78d0e8b92a041b8b3bfbfb91c7d8, type: 3}
+  - {fileID: 8300000, guid: 31d9852bb65416146ab40d41a876a31f, type: 3}
+  - {fileID: 8300000, guid: 87c446c45c54f554e98614297b661251, type: 3}
+  _aimOutSounds:
+  - {fileID: 8300000, guid: c32ecd92829f0364aa9d62c63201425a, type: 3}
+  - {fileID: 8300000, guid: b79c40a8e1c113846a29177ef59664f4, type: 3}
+  - {fileID: 8300000, guid: d00d1111a9740624ca3a5b65e2734ba8, type: 3}
+  - {fileID: 8300000, guid: 81c6ba29df9ec10428f25a0cbeb3c2ec, type: 3}
+  - {fileID: 8300000, guid: 5a5ff437c11eb9043af0b5f6f599ed57, type: 3}
+  - {fileID: 8300000, guid: 915a9dbd33738f64b8559edcd66fb8f5, type: 3}
+  - {fileID: 8300000, guid: 0a3fd8357db5f054bbe579cbc750d484, type: 3}
+  - {fileID: 8300000, guid: 22712efba62a5dc4aa7b755e35373b5c, type: 3}
+  - {fileID: 8300000, guid: c0251717b78577340ae21d59f0b3e686, type: 3}
+  - {fileID: 8300000, guid: d7e04e2b4bc590d4ea1cb86dbd830631, type: 3}
   _emptySound: {fileID: 8300000, guid: beed662d175cb774388aee8f2717b3d9, type: 3}
   _lastShellSound: {fileID: 8300000, guid: d286791b4c88ef743b8c13eb99af7d1f, type: 3}
   _lowAmmoSound: {fileID: 8300000, guid: f3393a0a5214d2e40803bde39b842922, type: 3}

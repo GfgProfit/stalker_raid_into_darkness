@@ -152,6 +152,14 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             effects.StopItemEffect();
             yield return null;
             Transform camera = player.CameraController.Camera.transform;
+            float baseFov = player.CameraController.Camera.fieldOfView;
+            float zoomedFov = 2f * Mathf.Atan(Mathf.Tan(baseFov * 0.5f * Mathf.Deg2Rad) / asset.AimZoom) * Mathf.Rad2Deg;
+            var audio = (AudioSource)typeof(FirstPersonWeaponController).GetField("_audio", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic).GetValue(weapons);
+            Assert.That(asset.AimZoom, Is.GreaterThan(1f));
+            Assert.That(asset.AimInSounds.Count, Is.EqualTo(10));
+            Assert.That(asset.AimOutSounds.Count, Is.EqualTo(10));
+            Assert.That(asset.Find(FirstPersonWeaponMotionKind.Draw, 0).Sound.name, Is.EqualTo("generic_draw"));
+            Assert.That(asset.Find(FirstPersonWeaponMotionKind.Holster, 0).Sound.name, Is.EqualTo("generic_holster"));
             Assert.That(camera.IsChildOf(effects.Pivot), Is.True);
             Quaternion neutral = Quaternion.Inverse(player.CameraController.CameraRoot.rotation) * camera.rotation;
             Assert.That(Mathf.Abs(asset.AimCameraRoll), Is.GreaterThan(0f));
@@ -167,11 +175,18 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
                 }
 
                 float peak = 0f;
+                bool checkedSound = false;
                 float until = Time.time + asset.AimTime + asset.AimCameraBlendTime * 8f;
 
                 while (Time.time < until)
                 {
                     yield return null;
+                    if (!checkedSound && weapons.IsAiming == aiming)
+                    {
+                        CollectionAssert.Contains(aiming ? asset.AimInSounds : asset.AimOutSounds, audio.clip);
+                        checkedSound = true;
+                    }
+
                     Quaternion relative = Quaternion.Inverse(player.CameraController.CameraRoot.rotation) * camera.rotation;
                     Quaternion delta = Quaternion.Inverse(neutral) * relative;
                     float roll = Mathf.DeltaAngle(0f, delta.eulerAngles.z);
@@ -183,6 +198,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
                 Quaternion settledPose = Quaternion.Inverse(player.CameraController.CameraRoot.rotation) * camera.rotation;
                 Assert.That(Quaternion.Angle(neutral, settledPose), Is.LessThan(0.05f));
                 Assert.That(weapons.IsAiming, Is.EqualTo(aiming));
+                Assert.That(player.CameraController.Camera.fieldOfView, Is.EqualTo(aiming ? zoomedFov : baseFov).Within(0.001f));
             }
 
             Quaternion previous = Quaternion.Inverse(player.CameraController.CameraRoot.rotation) * camera.rotation;
@@ -213,6 +229,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             yield return new WaitForSeconds(asset.AimTime * 0.5f);
             Assert.That(Quaternion.Angle(effects.Pivot.localRotation, Quaternion.identity), Is.GreaterThan(0.05f));
             weapons.Hide();
+            Assert.That(player.CameraController.Camera.fieldOfView, Is.EqualTo(baseFov).Within(0.001f));
             Assert.That(Quaternion.Angle(effects.Pivot.localRotation, Quaternion.identity), Is.LessThan(0.05f));
             Release(_mouse.rightButton, queueEventOnly: true);
         }

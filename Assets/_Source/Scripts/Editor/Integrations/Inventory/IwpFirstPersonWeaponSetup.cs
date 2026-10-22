@@ -40,6 +40,9 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
         private const int LOW_AMMO_THRESHOLD = 5;
         private const int MAX_SHOT_VARIANTS = 6;
         private const float AMMO_FONT_SIZE = 32f;
+        private const int AIM_SOUND_VARIANTS = 10;
+        private const string DRAW_SOUND = "generic_draw";
+        private const string HOLSTER_SOUND = "generic_holster";
 
         private static readonly string[] GRA_SCOPE = { "configs" };
         private static readonly string[] CAMERA_EFFECTS = { "aug_a3_reload", "aug_a3_reload_empty", "aug_draw", "aug_firemode", "aug_misfire", "aug_shoot", "aug_shoot1", "aug_shoot2", "aug_shoot_aim", "aug_shoot_aim1", "aug_shoot_aim2" };
@@ -67,6 +70,74 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
             }
 
             EditorApplication.Exit(success ? 0 : 1);
+        }
+
+        [MenuItem("Tools/Inventory/Setup IWP Weapon Aim and Sounds (AUG A3)")]
+        public static void SetupAimAndSoundsFromMenu()
+        {
+            SetupAimAndSounds();
+        }
+
+        public static bool SetupAimAndSounds()
+        {
+            var asset = AssetDatabase.LoadAssetAtPath<FirstPersonWeaponAsset>(ASSET_PATH);
+
+            if (asset == null)
+            {
+                Debug.LogError(LOG + "First person weapon asset is missing: " + ASSET_PATH);
+                return false;
+            }
+
+            var sources = new List<string>();
+            var targets = new List<string>();
+            AddCopy(sources, targets, IWP_SOUNDS + DRAW_SOUND + ".ogg", SoundPath(DRAW_SOUND));
+            AddCopy(sources, targets, IWP_SOUNDS + HOLSTER_SOUND + ".ogg", SoundPath(HOLSTER_SOUND));
+
+            for (int i = 1; i <= AIM_SOUND_VARIANTS; i++)
+            {
+                foreach (string name in new[] { "aimin/aim_in_" + i, "aimout/aim_out_" + i })
+                {
+                    AddCopy(sources, targets, IWP_SOUNDS + name + ".ogg", SoundPath(name));
+                }
+            }
+
+            if (!IwpWeaponSetup.CopyFromIwp(sources, targets))
+            {
+                return false;
+            }
+
+            Undo.RecordObject(asset, "Configure IWP weapon aim and sounds");
+            var serialized = new SerializedObject(asset);
+            serialized.FindProperty("_aimZoom").floatValue = 1.15f;
+
+            foreach (string direction in new[] { "In", "Out" })
+            {
+                SerializedProperty sounds = serialized.FindProperty("_aim" + direction + "Sounds");
+                sounds.arraySize = AIM_SOUND_VARIANTS;
+
+                for (int i = 0; i < AIM_SOUND_VARIANTS; i++)
+                {
+                    sounds.GetArrayElementAtIndex(i).objectReferenceValue = LoadSound("aim" + direction.ToLowerInvariant() + "/aim_" + direction.ToLowerInvariant() + "_" + (i + 1));
+                }
+            }
+
+            SerializedProperty motions = serialized.FindProperty("_motions");
+
+            for (int i = 0; i < motions.arraySize; i++)
+            {
+                SerializedProperty motion = motions.GetArrayElementAtIndex(i);
+                var kind = (FirstPersonWeaponMotionKind)motion.FindPropertyRelative("_kind").intValue;
+
+                if (kind == FirstPersonWeaponMotionKind.Draw || kind == FirstPersonWeaponMotionKind.Holster)
+                {
+                    motion.FindPropertyRelative("_sound").objectReferenceValue = LoadSound(kind == FirstPersonWeaponMotionKind.Draw ? DRAW_SOUND : HOLSTER_SOUND);
+                }
+            }
+
+            serialized.ApplyModifiedProperties();
+            AssetDatabase.SaveAssetIfDirty(asset);
+            Debug.Log(LOG + "Configured 1.15x aim zoom, 20 IWP aim sounds and IWP draw/holster sounds.");
+            return true;
         }
 
         public static FirstPersonWeaponAsset Setup()
@@ -115,8 +186,8 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
                 }
             }
 
-            string drawSound = ResolveSound(Get(system, HUD_SECTION, "snd_draw"), "assault_draw");
-            string holsterSound = ResolveSound(Get(system, HUD_SECTION, "snd_holster"), "assault_holster");
+            string drawSound = DRAW_SOUND;
+            string holsterSound = HOLSTER_SOUND;
             string emptySound = ResolveSound(Get(system, HUD_SECTION, "snd_empty"), "aug/aug_empty");
             var sounds = new List<string>(shotNames) { drawSound, holsterSound, emptySound, "aug/aug_reload", "aug/aug_a3_reload_empty", "aug/aug_reload_empty", "aug/aug_firemode", "aug/aug_misfire", "last_shell_out", "mag_shot" };
 
@@ -207,6 +278,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
             bool assigned = AssignToDefinition(asset, log);
             bool configured = ConfigurePrefab(log);
             AssetDatabase.SaveAssets();
+            SetupAimAndSounds();
             Debug.Log($"{LOG}{ASSET_PATH}: {motions.Count} motions, missing {missing}, rpm {rpm}, magazine {magazine}, shots {shots.Count}, flame '{flamePath}', smoke '{smokePath}', hands {handsPosition}/{handsOrientation}, aim {aimPosition}/{aimRotation}, overlay bones {overlayBones.Length}, definition {assigned}, prefab {configured}.\n{log}");
             return assigned && configured ? asset : null;
         }

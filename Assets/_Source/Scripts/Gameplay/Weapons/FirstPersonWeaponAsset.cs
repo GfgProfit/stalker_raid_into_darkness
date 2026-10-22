@@ -25,6 +25,7 @@ namespace RaidIntoDarkness.Weapons
         [SerializeField] [Min(0.01f)] private float _aimTime = 0.25f;
         [SerializeField] [Range(-10f, 10f)] private float _aimCameraRoll = 1f;
         [SerializeField] [Min(0.01f)] private float _aimCameraBlendTime = 0.15f;
+        [SerializeField] [Range(1f, 2f)] private float _aimZoom = 1.15f;
         [SerializeField] private string _muzzleBone = DEFAULT_MUZZLE_BONE;
         [Tooltip("Hands bones animated by the left-hand pickup overlay.")]
         [SerializeField] private string[] _overlayBones = Array.Empty<string>();
@@ -53,6 +54,8 @@ namespace RaidIntoDarkness.Weapons
         [Header("Sounds")]
         [SerializeField] private AudioClip[] _shotSounds = Array.Empty<AudioClip>();
         [SerializeField] private AudioClip[] _silencedShotSounds = Array.Empty<AudioClip>();
+        [SerializeField] private AudioClip[] _aimInSounds = Array.Empty<AudioClip>();
+        [SerializeField] private AudioClip[] _aimOutSounds = Array.Empty<AudioClip>();
         [SerializeField] private AudioClip _emptySound;
         [SerializeField] private AudioClip _lastShellSound;
         [SerializeField] private AudioClip _lowAmmoSound;
@@ -67,6 +70,7 @@ namespace RaidIntoDarkness.Weapons
         public float AimTime => _aimTime;
         public float AimCameraRoll => _aimCameraRoll;
         public float AimCameraBlendTime => Mathf.Max(0.01f, _aimCameraBlendTime);
+        public float AimZoom => Mathf.Clamp(_aimZoom, 1f, 2f);
         public string MuzzleBone => _muzzleBone;
         public IReadOnlyList<string> OverlayBones => _overlayBones ?? Array.Empty<string>();
         public IReadOnlyList<FirstPersonWeaponMotion> Motions => _motions;
@@ -91,6 +95,8 @@ namespace RaidIntoDarkness.Weapons
         public float RecoilReturnSpeed => _recoilReturnSpeed;
         public IReadOnlyList<AudioClip> ShotSounds => _shotSounds ?? Array.Empty<AudioClip>();
         public IReadOnlyList<AudioClip> SilencedShotSounds => _silencedShotSounds ?? Array.Empty<AudioClip>();
+        public IReadOnlyList<AudioClip> AimInSounds => _aimInSounds ?? Array.Empty<AudioClip>();
+        public IReadOnlyList<AudioClip> AimOutSounds => _aimOutSounds ?? Array.Empty<AudioClip>();
         public AudioClip EmptySound => _emptySound;
         public AudioClip LastShellSound => _lastShellSound;
         public AudioClip LowAmmoSound => _lowAmmoSound;

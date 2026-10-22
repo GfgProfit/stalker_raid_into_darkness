@@ -231,7 +231,7 @@ namespace RaidIntoDarkness.Weapons
                 return;
             }
 
-            SetAiming(false);
+            _aiming = false;
             _aim = 0.0f;
             DestroyVisuals(true);
             if (_player != null)
@@ -962,6 +962,15 @@ namespace RaidIntoDarkness.Weapons
                 return;
             }
 
+            IReadOnlyList<AudioClip> sounds = aiming ? asset.AimInSounds : asset.AimOutSounds;
+
+            if (_audio != null && sounds.Count > 0)
+            {
+                _audio.Stop();
+                _audio.clip = sounds[UnityEngine.Random.Range(0, sounds.Count)];
+                _audio.Play();
+            }
+
             if (aiming && _aimPhase == AimPhase.Hip)
             {
                 _aimPhase = asset.AimStart != null ? AimPhase.Entering : asset.AimEnd != null ? AimPhase.Leaving : AimPhase.Aimed;
@@ -1007,6 +1016,11 @@ namespace RaidIntoDarkness.Weapons
 
         private void TickAimCamera(FirstPersonWeaponAsset asset, float deltaTime)
         {
+            if (_player != null && _player.CameraController != null)
+            {
+                _player.CameraController.SetWeaponZoom(Mathf.Lerp(1f, asset != null ? asset.AimZoom : 1f, _aim));
+            }
+
             float target = asset != null ? asset.AimCameraRoll * 4f * _aim * (1f - _aim) * (_aiming ? 1f : -1f) : 0f;
             float blendTime = asset != null ? asset.AimCameraBlendTime : 0.15f;
             _aimCameraRoll = Mathf.SmoothDamp(_aimCameraRoll, target, ref _aimCameraVelocity, blendTime, Mathf.Infinity, deltaTime);
@@ -1027,6 +1041,11 @@ namespace RaidIntoDarkness.Weapons
         {
             _aimCameraRoll = 0f;
             _aimCameraVelocity = 0f;
+
+            if (_player != null && _player.CameraController != null)
+            {
+                _player.CameraController.SetWeaponZoom(1f);
+            }
 
             if (_player != null && _player.CameraEffects != null)
             {

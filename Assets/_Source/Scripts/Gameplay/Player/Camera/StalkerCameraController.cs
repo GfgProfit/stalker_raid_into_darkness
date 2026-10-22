@@ -60,6 +60,16 @@ namespace RaidIntoDarkness.Player
             }
         }
 
+        public void SetWeaponZoom(float zoom)
+        {
+            if (_camera != null && _profile != null)
+            {
+                float halfTangent = Mathf.Tan(_profile.Camera.FieldOfView * 0.5f * Mathf.Deg2Rad);
+                _camera.fieldOfView = 2f * Mathf.Atan(halfTangent / Mathf.Max(1f, zoom)) * Mathf.Rad2Deg;
+                ApplyHudFieldOfView();
+            }
+        }
+
         public void SetCursorLocked(bool locked)
         {
             Cursor.lockState = locked ? CursorLockMode.Locked : CursorLockMode.None;

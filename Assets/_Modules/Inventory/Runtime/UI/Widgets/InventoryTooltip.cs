@@ -155,6 +155,7 @@ namespace Inventory.UI
             bool anyBar = false;
             float labelWidth = 0f;
             float valueWidth = 0f;
+            float comparisonWidth = 0f;
 
             for (int i = 0; i < _statRows.Count; i++)
             {
@@ -168,7 +169,6 @@ namespace Inventory.UI
                 }
 
                 InventoryItemStat stat = stats[i];
-                row.Root.anchoredPosition = new Vector2(0f, (StatCount - 1 - i) * STAT_ROW_HEIGHT);
                 row.Icon.sprite = stat.Icon;
                 row.Icon.enabled = stat.Icon != null;
                 row.Label.font = _body.font;
@@ -183,25 +183,37 @@ namespace Inventory.UI
                 row.Fill.color = Theme != null ? Theme.AccentColor : InventoryUIFactory.AccentColor;
                 labelWidth = Mathf.Max(labelWidth, MeasureWidth(row.Label));
                 valueWidth = Mathf.Max(valueWidth, MeasureWidth(row.Value));
+                comparisonWidth = Mathf.Max(comparisonWidth, MeasureWidth(row.Comparison));
                 anyIcon |= stat.Icon != null;
                 anyBar |= stat.HasBar;
             }
 
             float labelStart = anyIcon ? STAT_ICON_SIZE + STAT_ICON_GAP : 0f;
+            float contentWidth = WIDTH - PADDING * 2f - labelStart;
+            float comparisonGap = comparisonWidth > 0f ? STAT_VALUE_GAP : 0f;
+            valueWidth = Mathf.Min(valueWidth, contentWidth * 0.35f);
+            comparisonWidth = Mathf.Min(comparisonWidth, contentWidth * 0.25f);
+            float remainingWidth = contentWidth - valueWidth - comparisonWidth - STAT_VALUE_GAP - comparisonGap;
+            float barWidth = anyBar ? Mathf.Min(STAT_BAR_WIDTH, remainingWidth * 0.4f) : 0f;
+            labelWidth = Mathf.Min(labelWidth, remainingWidth - (anyBar ? barWidth + STAT_VALUE_GAP : 0f));
             float barStart = labelStart + labelWidth + STAT_VALUE_GAP;
-            float valueStart = anyBar ? barStart + STAT_BAR_WIDTH + STAT_VALUE_GAP : barStart;
-            float comparisonStart = valueStart + valueWidth + STAT_VALUE_GAP;
+            float valueStart = anyBar ? barStart + barWidth + STAT_VALUE_GAP : barStart;
+            float comparisonStart = valueStart + valueWidth + comparisonGap;
+            float height = 0f;
 
             for (int i = 0; i < StatCount; i++)
             {
                 StatRow row = _statRows[i];
+                float rowHeight = Mathf.Max(STAT_ROW_HEIGHT, row.Label.GetPreferredValues(row.Label.text, labelWidth, 0f).y);
+                row.Root.sizeDelta = new Vector2(0f, rowHeight);
+                row.Root.anchoredPosition = new Vector2(0f, -height);
+                height += rowHeight;
                 InventoryUIFactory.SetLayout(row.Label.rectTransform, Vector2.zero, new Vector2(0f, 1f), new Vector2(labelStart, 0f), new Vector2(labelStart + labelWidth, 0f));
-                InventoryUIFactory.SetLayout((RectTransform)row.Back.transform, new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(barStart, -BAR_HEIGHT * 0.5f), new Vector2(barStart + STAT_BAR_WIDTH, BAR_HEIGHT * 0.5f));
+                InventoryUIFactory.SetLayout((RectTransform)row.Back.transform, new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(barStart, -BAR_HEIGHT * 0.5f), new Vector2(barStart + barWidth, BAR_HEIGHT * 0.5f));
                 InventoryUIFactory.SetLayout(row.Value.rectTransform, Vector2.zero, new Vector2(0f, 1f), new Vector2(valueStart, 0f), new Vector2(valueStart + valueWidth, 0f));
-                InventoryUIFactory.SetLayout(row.Comparison.rectTransform, Vector2.zero, Vector2.one, new Vector2(comparisonStart, 0f), Vector2.zero);
+                InventoryUIFactory.SetLayout(row.Comparison.rectTransform, Vector2.zero, new Vector2(0f, 1f), new Vector2(comparisonStart, 0f), new Vector2(comparisonStart + comparisonWidth, 0f));
             }
 
-            float height = StatCount * STAT_ROW_HEIGHT;
             _stats.sizeDelta = new Vector2(_stats.sizeDelta.x, height);
             _stats.gameObject.SetActive(StatCount > 0);
             return height;
@@ -210,9 +222,9 @@ namespace Inventory.UI
         private StatRow CreateStatRow(int index)
         {
             RectTransform root = InventoryUIFactory.CreateRect("Stat " + index, _stats);
-            root.anchorMin = new Vector2(0f, 0f);
-            root.anchorMax = new Vector2(1f, 0f);
-            root.pivot = new Vector2(0.5f, 0f);
+            root.anchorMin = new Vector2(0f, 1f);
+            root.anchorMax = new Vector2(1f, 1f);
+            root.pivot = new Vector2(0.5f, 1f);
             root.sizeDelta = new Vector2(0f, STAT_ROW_HEIGHT);
             RectTransform icon = InventoryUIFactory.CreateRect("Icon", root);
             InventoryUIFactory.SetLayout(icon, new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(0f, -STAT_ICON_SIZE * 0.5f), new Vector2(STAT_ICON_SIZE, STAT_ICON_SIZE * 0.5f));
@@ -220,6 +232,7 @@ namespace Inventory.UI
             iconImage.raycastTarget = false;
             iconImage.preserveAspect = true;
             TextMeshProUGUI label = CreateRowText("Label", root, STAT_LABEL_COLOR);
+            label.textWrappingMode = TextWrappingModes.Normal;
             RectTransform back = InventoryUIFactory.CreateRect("Bar", root);
             Image backImage = InventoryUIFactory.AddPanel(back.gameObject, BAR_BACK_COLOR, false);
             RectTransform fill = InventoryUIFactory.CreateRect("Fill", back);
@@ -234,7 +247,7 @@ namespace Inventory.UI
         {
             TextMeshProUGUI text = InventoryUIFactory.CreateText(name, root, string.Empty, STAT_FONT_SIZE, TextAlignmentOptions.MidlineLeft, color);
             text.textWrappingMode = TextWrappingModes.NoWrap;
-            text.overflowMode = TextOverflowModes.Overflow;
+            text.overflowMode = TextOverflowModes.Ellipsis;
             return text;
         }
 

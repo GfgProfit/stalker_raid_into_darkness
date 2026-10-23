@@ -232,6 +232,7 @@ namespace Inventory.UI
         private void OnDisable()
         {
             SetHovered(false);
+            _grid?.Window?.HandleItemPointerExit(this, null);
 
             if (_backgroundTarget != null)
             {

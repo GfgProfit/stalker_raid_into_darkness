@@ -72,6 +72,8 @@ namespace Inventory.UI
         private float _hoverStart;
         private Vector2 _hoverPosition;
         private Camera _hoverCamera;
+        private PointerEventData _hoverPointer;
+        private EventSystem _hoverEventSystem;
         private float _statusUntil;
         private string _hint = string.Empty;
         private bool _initialized;
@@ -356,6 +358,11 @@ namespace Inventory.UI
                 return;
             }
 
+            if (_hovered != view)
+            {
+                _tooltip?.Hide();
+            }
+
             _hovered = view;
             _hoverStart = Time.unscaledTime;
             _hoverPosition = eventData.position;
@@ -364,6 +371,7 @@ namespace Inventory.UI
             if (_drag == null && HasModalWidget == false && _input.TransferHeld && CanHoverTransfer(view.Item))
             {
                 _hovered = null;
+                _tooltip?.Hide();
                 QuickTransfer(view.Item);
             }
         }
@@ -1104,29 +1112,66 @@ namespace Inventory.UI
 
                 QuickTransfer(item);
             }
+        }
 
-            if (_hovered != null && _drag == null && HasModalWidget == false && _tooltip != null)
+        private void LateUpdate()
+        {
+            if (IsOpen == false || _drag != null || HasModalWidget || _hovered == null || _tooltip == null)
             {
-                if (_hovered.Item == null || Model == null || Model.ContainsItem(_hovered.Item) == false)
-                {
-                    _hovered = null;
-                    _tooltip.Hide();
-                }
-                else if (Time.unscaledTime - _hoverStart >= _tooltipDelay)
-                {
-                    Vector2 pointer = UnityEngine.InputSystem.Pointer.current != null ? UnityEngine.InputSystem.Pointer.current.position.ReadValue() : _hoverPosition;
-
-                    if (_tooltip.IsVisible == false)
-                    {
-                        _tooltip.Show(_hovered.Item, pointer, _hoverCamera, CollectStats(_hovered.Item), CollectDescription(_hovered.Item));
-                        ApplyThemeTo(_tooltip);
-                    }
-                    else
-                    {
-                        _tooltip.Follow(pointer, _hoverCamera);
-                    }
-                }
+                _tooltip?.Hide();
+                return;
             }
+
+            Vector2 pointer = UnityEngine.InputSystem.Pointer.current != null ? UnityEngine.InputSystem.Pointer.current.position.ReadValue() : _hoverPosition;
+
+            if (IsHoveredItemAt(pointer) == false)
+            {
+                _hovered = null;
+                _tooltip.Hide();
+                return;
+            }
+
+            if (Time.unscaledTime - _hoverStart < _tooltipDelay)
+            {
+                return;
+            }
+
+            if (_tooltip.IsVisible == false)
+            {
+                _tooltip.Show(_hovered.Item, pointer, _hoverCamera, CollectStats(_hovered.Item), CollectDescription(_hovered.Item));
+                ApplyThemeTo(_tooltip);
+            }
+            else
+            {
+                _tooltip.Follow(pointer, _hoverCamera);
+            }
+        }
+
+        private bool IsHoveredItemAt(Vector2 screenPosition)
+        {
+            if (_hovered.isActiveAndEnabled == false || _hovered.Item == null || Model == null || Model.ContainsItem(_hovered.Item) == false || _hovered.Grid == null || _hovered.Grid.Container == null || _hovered.Grid.Container.Contains(_hovered.Item) == false)
+            {
+                return false;
+            }
+
+            EventSystem eventSystem = EventSystem.current;
+
+            if (eventSystem == null)
+            {
+                return false;
+            }
+
+            if (_hoverPointer == null || _hoverEventSystem != eventSystem)
+            {
+                _hoverEventSystem = eventSystem;
+                _hoverPointer = new PointerEventData(eventSystem);
+            }
+
+            _hoverPointer.Reset();
+            _hoverPointer.position = screenPosition;
+            _raycastResults.Clear();
+            eventSystem.RaycastAll(_hoverPointer, _raycastResults);
+            return _raycastResults.Count > 0 && _raycastResults[0].gameObject != null && _raycastResults[0].gameObject.GetComponentInParent<InventoryItemView>() == _hovered;
         }
 
         private void OnModelChanged(InventoryChange change)

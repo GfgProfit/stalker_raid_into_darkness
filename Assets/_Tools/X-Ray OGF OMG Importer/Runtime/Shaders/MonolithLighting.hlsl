@@ -54,6 +54,11 @@ CBSDF MonolithEvaluateBSDF(float3 V, float3 L, PreLightData preLightData, BSDFDa
 
 DirectLighting EvaluateBSDF_Directional(LightLoopContext lightLoopContext, float3 V, PositionInputs posInput, PreLightData preLightData, DirectionalLightData lightData, BSDFData bsdfData, BuiltinData builtinData)
 {
+    if (_MonolithDebug > 62.5 && _MonolithDebug < 63.5)
+    {
+        _MonolithDiagnosticValue = EvaluateShadow_Directional(lightLoopContext, posInput, lightData, builtinData, GetNormalForShadowBias(bsdfData));
+    }
+
     return MonolithShadeSurface_Directional(lightLoopContext, posInput, builtinData, preLightData, lightData, bsdfData, V);
 }
 
@@ -77,8 +82,63 @@ void PostEvaluateBSDF(LightLoopContext lightLoopContext, float3 V, PositionInput
         lighting.indirect.specularTransmitted = 0.0;
     }
     #endif
+    #if defined(_MONOLITH_LEVEL) || defined(_MONOLITH_LEVEL_DETAIL) || defined(_MONOLITH_LEVEL_LOD)
+    bool levelAmbientHemi = _MonolithLevelAmbientHemi > 0.5;
+    #ifdef _MONOLITH_ORIGINAL_ENVIRONMENT
+    levelAmbientHemi = levelAmbientHemi && !originalEnvironment;
+    #endif
+    if (levelAmbientHemi)
+    {
+        builtinData.bakeDiffuseLighting *= _MonolithLevelHemiValue;
+        lighting.indirect.specularReflected *= _MonolithLevelHemiValue;
+    }
+    #endif
+    if (_MonolithDiagnosticOptions.z > 0.5)
+    {
+        builtinData.bakeDiffuseLighting = 0.0;
+        lighting.indirect.specularReflected = 0.0;
+    }
+    if (_MonolithDiagnosticOptions.w > 0.5)
+    {
+        lighting.direct.diffuse = 0.0;
+        lighting.direct.specular = 0.0;
+    }
     MonolithLegacyPostEvaluateBSDF(lightLoopContext, V, posInput, preLightData, bsdfData, builtinData, lighting, lightLoopOutput);
     #ifdef _MONOLITH_ORIGINAL_ENVIRONMENT
-    if (originalEnvironment) lightLoopOutput.diffuseLighting += environmentData.combined;
+    if (originalEnvironment && _MonolithDiagnosticOptions.z < 0.5) lightLoopOutput.diffuseLighting += environmentData.combined;
+    #endif
+    if (_MonolithDebug > 0.5 && _MonolithDebug < 19.5)
+    {
+        lightLoopOutput.diffuseLighting = _MonolithDiagnosticValue * GetInverseCurrentExposureMultiplier();
+        lightLoopOutput.specularLighting = 0.0;
+    }
+    if (_MonolithDebug >= 19.5)
+    {
+        float3 diagnostic = float3(bsdfData.perceptualRoughness, bsdfData.fresnel0.r, bsdfData.diffuseColor.r);
+        if (_MonolithDebug > 20.5) diagnostic = bsdfData.fresnel0;
+        if (_MonolithDebug > 21.5) diagnostic = bsdfData.normalWS * 0.5 + 0.5;
+        if (_MonolithDebug > 22.5) diagnostic = float3(preLightData.diffuseFGD, preLightData.specularFGD.r, preLightData.energyCompensation);
+        if (_MonolithDebug > 23.5) diagnostic = float3(0.125, 0.5, 0.875);
+        if (_MonolithDebug > 29.5) diagnostic = bsdfData.diffuseColor * lighting.direct.diffuse;
+        if (_MonolithDebug > 30.5) diagnostic = lighting.direct.specular;
+        if (_MonolithDebug > 31.5) diagnostic = builtinData.bakeDiffuseLighting;
+        if (_MonolithDebug > 32.5) diagnostic = lighting.indirect.specularReflected;
+        if ((_MonolithDebug > 33.5 && _MonolithDebug < 35.5) || (_MonolithDebug > 36.5 && _MonolithDebug < 38.5)) diagnostic = _MonolithDiagnosticValue;
+        #ifdef _MONOLITH_ORIGINAL_ENVIRONMENT
+        if (originalEnvironment && _MonolithDebug > 31.5 && _MonolithDebug < 33.5) diagnostic = _MonolithDebug > 32.5 ? environmentData.specular : environmentData.diffuse;
+        if (originalEnvironment && _MonolithDebug >= 39.5) diagnostic = MonolithEnvironmentDiagnostic(environmentData, (int)round(_MonolithDebug));
+        if (originalEnvironment && _MonolithDebug > 60.5 && _MonolithDebug < 61.5) diagnostic = GetCurrentExposureMultiplier().xxx;
+        if (originalEnvironment && _MonolithDebug > 61.5 && _MonolithDebug < 62.5) diagnostic = lightLoopOutput.specularLighting;
+        #endif
+        if (_MonolithDebug > 62.5 && _MonolithDebug < 63.5) diagnostic = _MonolithDiagnosticValue;
+        lightLoopOutput.diffuseLighting = diagnostic * GetInverseCurrentExposureMultiplier();
+        lightLoopOutput.specularLighting = 0.0;
+    }
+    #if defined(_MONOLITH_LEVEL) || defined(_MONOLITH_LEVEL_DETAIL) || defined(_MONOLITH_LEVEL_LOD)
+    if (_MonolithDebug > 35.5 && _MonolithDebug < 36.5)
+    {
+        lightLoopOutput.diffuseLighting = _MonolithLevelHemiValue.xxx * GetInverseCurrentExposureMultiplier();
+        lightLoopOutput.specularLighting = 0.0;
+    }
     #endif
 }

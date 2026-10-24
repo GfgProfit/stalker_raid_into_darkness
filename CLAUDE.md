@@ -36,6 +36,19 @@ If a rule conflicts with a generic best practice, personal preference, or defaul
 
 If the user explicitly asks for something that conflicts with this file, follow the explicit user request.
 
+## Misc
+
+All reports, validation results, diagnostic EXR/PNG/CSV files, logs, temporary Player Builds, benchmarks, and other generated artifacts must be stored **exclusively outside both Unity projects**:
+
+`E:\Projects\stalker_raid_into_darkness_Archive`
+
+- Do not create diagnostic directories or temporary builds in the project root or inside `Assets`.
+- Production code, essential automated regression tests, required production Unity Assets, `.meta` files, and configuration files must remain inside the production project.
+- Create a separate subdirectory in the archive for each task, for example, `XRayMO2LevelImporter_Validation`.
+- Always include absolute paths to reports and validation results in the final response.
+- Do not delete or overwrite previously saved results from other tasks.
+- If a tool requires temporarily creating files inside the project, remove them after validation only if they were created by the current task and are no longer required for the project to function.
+
 ## Hard Constraints
 
 These rules override all implementation preferences.
@@ -100,12 +113,96 @@ For documentation, UI text, descriptions, and other prose writing or editing tas
 
 Project constraints and explicit user instructions take precedence over these style preferences.
 
+## Project Directories and Testing Policy
+
+### A. Canonical Paths
+
+Always use these exact locations:
+
+```text
+Production:
+E:\Projects\stalker_raid_into_darkness
+
+Clean Tests:
+E:\Projects\stalker_raid_into_darkness_clean_tests
+
+Archive:
+E:\Projects\stalker_raid_into_darkness_Archive
+```
+
+Production is the authoritative source of production code and assets. Clean Tests is an isolated snapshot, not an automatically synchronized mirror or a source of authoritative production changes.
+
+If a required directory is missing, incomplete, or not a valid Unity project, report which operation cannot proceed and continue independent work. Never silently create an alternative Unity project. The user creates the canonical clean test copy.
+
+`CleanProject`, `TestMirror`, `UnityTestProject`, and temporary project paths are legacy aliases, not additional destinations. Report existing legacy projects and recommend their disposition; do not automatically use, delete, migrate, or synchronize them. This policy takes precedence over legacy mirror instructions, scripts, and remembered temporary paths, including `unity-batch-mirror`. Do not run legacy full-sync or copy-back workflows without explicit authorization for the exact operation.
+
+### B. Directory Roles
+
+- Production code, required Runtime/Editor systems, X-Ray importers, Monolith shaders, required scenes/assets/configuration, and essential automated regression tests belong in Production.
+- Isolated shader/rendering experiments, temporary fixtures, risky import/reimport and GUID experiments, destructive tests, and Editor lifecycle investigations belong in Clean Tests when isolation is needed.
+- Reports, validation results, PNG/EXR captures, CSV measurements, logs, temporary Player Builds, benchmark outputs, GPU/CPU readbacks, diagnostic JSON, temporary exports, and historical investigations belong in Archive when they are not required Unity assets.
+
+Keep these roles separate. Clean Tests is not a permanent artifact archive.
+
+### C. Production Safety
+
+Never modify production scenes, materials, imported levels, ProjectSettings, or other important assets merely to run an experimental test. Use the dedicated clean test project for potentially unsafe changes.
+
+Do not unexpectedly change the active Unity project. Verify its absolute path before using Unity tools. Respect existing dirty-scene protections and user instructions before opening or replacing scenes, saving changes, or discarding unsaved state.
+
+### D. Clean Test Project Lifecycle
+
+Before using Clean Tests:
+
+1. Confirm the directory exists and contains a valid Unity project.
+2. Read `ProjectSettings/ProjectVersion.txt` and verify Unity/HDRP compatibility with the intended test.
+3. Confirm that isolation is necessary and identify the exact files, assets, and systems being tested.
+4. Compare the relevant production code, assets, `.meta` files, and configuration with the snapshot; record differences and the production revision under test.
+
+Do not assume synchronization or copy completion. Production changes made after the snapshot may be absent. A clean test result validates current production only when the relevant implementations and assets match.
+
+### E. Synchronization
+
+Never automatically copy the entire Production project over Clean Tests or the entire Clean Tests project into Production. Never overwrite a project directory without explicit user authorization.
+
+When synchronization is required, identify and compare the exact source and destination files, preserve required `.meta` files and GUIDs, and protect unrelated experimental changes. Do not unnecessarily synchronize `Library`, `Temp`, `Obj`, or other regenerated Unity caches. Record the production revision and relevant file/content differences used for testing.
+
+### F. Test Results and Archive
+
+Configure diagnostic output paths under Archive before running tools. Use a task-specific subdirectory and unique run directories or filenames; never overwrite previous results. Categories such as `CleanupAudits`, `ShaderValidation`, `RendererLifecycle`, `MO2ImporterValidation`, and `PerformanceBenchmarks` are illustrative, not alternate project roots.
+
+Do not store permanent reports or large diagnostic artifacts in `Assets`, either Unity project's root, or the clean test project. Preserve required Unity fixtures and their `.meta` files inside the appropriate project. Keep unrelated historical reports unchanged.
+
+### G. Production Regression Tests
+
+Keep essential automated regression tests in Production unless an audit proves relocation safe and the user explicitly approves it. The existence of Clean Tests does not justify removing required tests.
+
+This includes X-Ray format parsing, importer correctness, material generation, Original TBN, Hemisphere, Flora, MT_LOD, Decals, renderer lifecycle, MO2 resolution, and GUID preservation. Specialized one-time diagnostic tools may be proposed for relocation only with dependency evidence and explicit approval; move complete assembly/asset dependency groups, never isolated pieces that break compilation.
+
+### H. Final Reporting
+
+Within the existing final response sections, state which Unity project was modified, which project was used for testing, and which tests ran. State whether the relevant Clean Tests code/assets match the tested production revision, or that comparison/testing was not performed.
+
+Report the absolute Windows paths of reports and diagnostic results. State whether any task changes remain only in Clean Tests. Do not claim that an untested or materially different snapshot validates Production.
+
+### I. Git Safety
+
+Before Git commands that inspect or modify repository state, verify the intended repository root. Prefer an explicit working directory or `git -C`. Do not confuse a copied Clean Tests repository with the production repository; a copied directory without Git metadata has no independently verified commit identity.
+
+Do not perform Git cleanup without explicit permission. Do not automatically stage, unstage, commit, reset, restore, delete untracked files, or rewrite history. During a read-only audit, modify only the instruction files explicitly authorized by that task; do not start cleanup until the user reviews and approves the audit.
+
+### J. Production Integration
+
+When an experimental change succeeds in Clean Tests, identify the minimal production change and confirm reproducibility. Obtain approval when required by the task, apply only the necessary implementation to Production, preserve GUIDs and serialized references, run the relevant production regression tests, and document the production result.
+
+Never silently merge experimental changes into Production or present a change that exists only in Clean Tests as a completed production implementation.
+
 ## Unity MCP Workflow
 
 - Use Unity Open MCP for Unity Editor inspection and validation.
 - Verify the active Unity project before modifying assets.
 - Use the main project for normal development and validation.
-- Use CleanProject only for risky or experimental changes.
+- Use `E:\Projects\stalker_raid_into_darkness_clean_tests` only for risky or experimental changes, following Project Directories and Testing Policy.
 - Prefer read-only MCP operations during investigation.
 - Do not modify scenes, prefabs, materials, shaders, or project settings unless required by the task.
 - Never execute destructive MCP operations without explicit authorization.

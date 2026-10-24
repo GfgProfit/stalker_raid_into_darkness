@@ -218,3 +218,15 @@ Unity.exe -batchmode -projectPath <project> -runTests -testPlatform EditMode -te
 * Изменение файла глубоко в моде без изменения времени папок требует **Rebuild Index**.
 * Текстуры и материалы создаются отдельно для каждой папки с моделями (структура «рядом с OGF»).
 * ANM: shape вне диапазона 0..5 вычисляется как 0 (как в движке) с предупреждением; Reset-скачок на границе ключей в клипе сглаживается адаптивной выборкой. ANM не содержит FOV и других параметров камеры.
+
+## Imported level reconstruction
+
+Use Unity 6000.3.4f1 and HDRP 17.3.0 with the committed package manifest and lock. The current HEAD does not contain the complete Level Importer implementation: include the Runtime, Editor, Sources, shaders, tests, required fixtures, assembly definitions and paired metadata in the future source commit before attempting reconstruction.
+
+External inputs are not distributed with this repository: True Stalker Unpacked Patch 1.5 at `E:\True Stalker Unpacked Patch 1.5`; MO2 at `D:\GRA2.5\MO2`; Anomaly at `D:\GRA2.5\Anomaly 1.5.3 up`. The imported Anomaly namespace is `1v2_DX11_v_12gb_2.5_168_662acc8d`, from profile `1v2(DX11) (v_12gb) 2.5, Все включено (168)`. Resolve the actual active profile and preserve its enabled mod order, Overwrite, archives and loose winners. Local `UserSettings/XRayAssetSources.asset` is not supplied by Git.
+
+Open Tools > X-Ray > Level Importer. For GamedataFolder select the unpacked True Stalker root, validate and rebuild the level index; import escape and labx18. For Mo2Profile select the MO2 root, game folder and matching profile, validate the profile and build/refresh the virtual index; import l01_escape, collaider and l10_radar as needed. Retain each LevelImportManifest and its settings, profile namespace, materials, scenes, prefabs, baking data and metadata. Preserve mode can keep manual material overrides; regenerating a material does not reconstruct those overrides.
+
+Git excludes only the scoped reserved bump# packed copies and optional native level source copies. Native copies are reproduced by CopySourceFiles; packed copies are produced from the effective source winners by the existing texture importer. They have no serialized consumers in the audited project. Fresh generation assigns new GUIDs when metadata is absent; restore asset/meta pairs to preserve existing GUID links. Other textures, materials, meshes, scenes and manifests remain Git-visible.
+
+The ImportedLevelIntegration category requires optional imported fixtures: LevelDecalTests uses the True Stalker escape prefab; MonolithFloraLodTests uses available trees packed bump textures or escape level_lods_nm_packed.png under Assets/_Source/Levels/Textures. Missing fixtures produce explicit skips, never passing functional results. The remaining unit tests use their own fixtures. A Clean Tests run with Levels detached is a simulation using an existing Library, not proof of a fresh clone or complete level regeneration. Write diagnostics exclusively under `E:\Projects\stalker_raid_into_darkness_Archive`.

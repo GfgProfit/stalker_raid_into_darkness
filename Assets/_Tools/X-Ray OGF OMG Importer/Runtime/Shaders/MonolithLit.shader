@@ -26,9 +26,35 @@ Shader "HDRP/MonolithLit"
         _MonolithEnvHudMask("Original HUD Mask", Float) = 0
         _MonolithEnvHudHemi("Original ssfx_hud_hemi.x", Float) = 0
         [Toggle] _MonolithEnvCombineClamp("Original combine_1 Environment Clamp", Float) = 1
+        [HideInInspector] _MonolithEnvTestNormal("Environment Diagnostic Normal", Vector) = (0,0,1,0)
+        [HideInInspector] _MonolithEnvTestView("Environment Diagnostic View and Roughness", Vector) = (0,0,1,-1)
         _MonolithAlbedoSrgb("Albedo Uses Hardware sRGB Decode", Float) = 1
+        _MonolithDebug("Debug: 0 Lit 1 Albedo 2 Normal 3 Gloss 4 Metal 5 Rough 6 F0 7 ID", Float) = 0
+        _MonolithDiagnosticOptions("Diagnostics: Skip Quantization, Disable Normal, Disable Environment, Disable Direct", Vector) = (0,0,0,0)
         _MonolithLightSetup("ssfx_lightsetup_1", Vector) = (0.5,1,0,0)
         _MonolithSourceLight("Source Ldynamic RGB (Unit Adaptation)", Color) = (1,1,1,1)
+        [Toggle(_MONOLITH_LEVEL)] _MonolithLevel("X-Ray Level Static Stream", Float) = 0
+        [Toggle(_MONOLITH_LEVEL_DETAIL)] _MonolithLevelDetail("X-Ray Level Detail Object", Float) = 0
+        [Toggle(_MONOLITH_LEVEL_LOD)] _MonolithLevelLod("X-Ray Level MT_LOD Impostor", Float) = 0
+        [Toggle(_MONOLITH_LEVEL_FLORA)] _MonolithLevelFlora("X-Ray Flora Normal (TS deffer_base_aref_bump-hq)", Float) = 0
+        _MonolithLevelHemiMode("Level Hemisphere: 0 Constant 1 Lightmap 2 Vertex 3 Albedo Alpha", Float) = 0
+        _MonolithLevelHemiMap("Level Hemisphere Lightmap (A)", 2D) = "white" {}
+        _MonolithLevelHemiFlipV("Level Lightmap V Flip", Float) = 1
+        [HideInInspector] _MonolithInstanceData("Level Instance Hemisphere Scale Bias", Vector) = (1,0,0,0)
+        _MonolithLevelAmbientHemi("Scale HDRP Ambient By Level Hemisphere", Float) = 1
+        _MonolithLevelWind("Detail Wind", Float) = 1
+        [Toggle(_MONOLITH_LEVEL_TERRAIN)] _MonolithLevelTerrain("X-Ray Terrain 4-Detail Splat", Float) = 0
+        _MonolithTerrainMask("Terrain Mask (Linear)", 2D) = "black" {}
+        _MonolithTerrainDetailR("Terrain Detail R", 2D) = "grey" {}
+        _MonolithTerrainDetailG("Terrain Detail G", 2D) = "grey" {}
+        _MonolithTerrainDetailB("Terrain Detail B", 2D) = "grey" {}
+        _MonolithTerrainDetailA("Terrain Detail A", 2D) = "grey" {}
+        _MonolithTerrainBumpR("Terrain Detail Bump R (Linear)", 2D) = "grey" {}
+        _MonolithTerrainBumpG("Terrain Detail Bump G (Linear)", 2D) = "grey" {}
+        _MonolithTerrainBumpB("Terrain Detail Bump B (Linear)", 2D) = "grey" {}
+        _MonolithTerrainBumpA("Terrain Detail Bump A (Linear)", 2D) = "grey" {}
+        _MonolithTerrainDetailScale("Terrain Detail Scale (dt_params)", Float) = 1
+        _MonolithTerrainBumpScale("Terrain Bump XY Intensity", Float) = 0.6
         [MainColor] _BaseColor("BaseColor", Color) = (1,1,1,1)
         [MainTexture] _BaseColorMap("BaseColorMap", 2D) = "white" {}
         _Metallic("_Metallic", Range(0.0, 1.0)) = 0
@@ -187,7 +213,15 @@ Shader "HDRP/MonolithLit"
         #pragma shader_feature_local _MONOLITH_ORIGINAL_ENVIRONMENT
         #pragma shader_feature_local _MONOLITH_ORIGINAL_TBN
         #pragma shader_feature_local _MONOLITH_SKINNED_TBN
+        #pragma shader_feature_local _MONOLITH_LEVEL
+        #pragma shader_feature_local _MONOLITH_LEVEL_DETAIL
+        #pragma shader_feature_local _MONOLITH_LEVEL_LOD
+        #pragma shader_feature_local_fragment _MONOLITH_LEVEL_FLORA
+        #pragma shader_feature_local_fragment _MONOLITH_LEVEL_TERRAIN
         #ifdef _MONOLITH_ORIGINAL_TBN
+        #define _REQUIRE_UV3
+        #endif
+        #if (defined(_MONOLITH_LEVEL) || defined(_MONOLITH_LEVEL_DETAIL) || defined(_MONOLITH_LEVEL_LOD)) && !defined(_REQUIRE_UV3)
         #define _REQUIRE_UV3
         #endif
     #pragma target 4.5
@@ -233,6 +267,9 @@ Shader "HDRP/MonolithLit"
     #define HAVE_RECURSIVE_RENDERING
     #define HAVE_VERTEX_MODIFICATION
     #define SUPPORT_BLENDMODE_PRESERVE_SPECULAR_LIGHTING
+    #ifndef _SURFACE_TYPE_TRANSPARENT
+    #undef _ENABLE_FOG_ON_TRANSPARENT
+    #endif
     #if defined(_MATERIAL_FEATURE_SUBSURFACE_SCATTERING) && !defined(_SURFACE_TYPE_TRANSPARENT)
     #define OUTPUT_SPLIT_LIGHTING
     #endif
@@ -553,7 +590,7 @@ Shader "HDRP/MonolithLit"
             #endif
             #endif
             #define SHADERPASS SHADERPASS_FORWARD
-            #if !defined(_SURFACE_TYPE_TRANSPARENT) && !defined(DEBUG_DISPLAY)
+            #if !defined(_SURFACE_TYPE_TRANSPARENT) && !defined(DEBUG_DISPLAY) && !defined(_ALPHATEST_ON)
                 #define SHADERPASS_FORWARD_BYPASS_ALPHA_TEST
             #endif
             #include "Packages/com.unity.render-pipelines.high-definition/Runtime/Material/Material.hlsl"

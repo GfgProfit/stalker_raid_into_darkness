@@ -6,7 +6,8 @@ namespace XRay.Importer.Sources.Vfs
     {
         BaseAnomalyOnly,
         Mo2AndBaseAnomaly,
-        CustomFolder
+        CustomFolder,
+        Mo2Effective
     }
 
     public sealed class XRaySourceConfiguration
@@ -18,7 +19,11 @@ namespace XRay.Importer.Sources.Vfs
         public string Mo2Folder { get; set; }
         public string Mo2Instance { get; set; }
         public string Mo2Profile { get; set; }
+        public string ModsFolder { get; set; }
+        public string ProfilesFolder { get; set; }
+        public string OverwriteFolder { get; set; }
         public string CustomFolder { get; set; }
+        public string GameFolder { get; set; }
         public string LocalAppDataFolder { get; set; }
         public bool IncludeGameGamedata { get; set; } = true;
         public bool TreatModRootAsGamedata { get; set; }
@@ -26,7 +31,7 @@ namespace XRay.Importer.Sources.Vfs
 
         public string Describe()
         {
-            return string.Join("|", Mode.ToString(), BaseAnomalyFolder ?? string.Empty, Mo2Folder ?? string.Empty, Mo2Instance ?? string.Empty, Mo2Profile ?? string.Empty, CustomFolder ?? string.Empty, IncludeGameGamedata.ToString(), TreatModRootAsGamedata.ToString(), string.Join(",", IndexScope));
+            return string.Join("|", Mode.ToString(), BaseAnomalyFolder ?? string.Empty, Mo2Folder ?? string.Empty, Mo2Instance ?? string.Empty, Mo2Profile ?? string.Empty, CustomFolder ?? string.Empty, GameFolder ?? string.Empty, ModsFolder ?? string.Empty, ProfilesFolder ?? string.Empty, OverwriteFolder ?? string.Empty, IncludeGameGamedata.ToString(), TreatModRootAsGamedata.ToString(), string.Join(",", IndexScope));
         }
     }
 }

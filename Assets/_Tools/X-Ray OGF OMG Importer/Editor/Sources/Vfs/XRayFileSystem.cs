@@ -16,10 +16,12 @@ namespace XRay.Importer.Sources.Vfs
                 return null;
             }
 
-            string direct = Path.Combine(parent, name);
-            if (Directory.Exists(direct))
+            string relative = name.Replace('\\', '/');
+            int separator = relative.IndexOf('/');
+            if (separator >= 0)
             {
-                return direct;
+                string child = FindChildDirectory(parent, relative.Substring(0, separator));
+                return child == null ? null : FindChildDirectory(child, relative.Substring(separator + 1));
             }
 
             foreach (string directory in Directory.GetDirectories(parent))
@@ -40,10 +42,12 @@ namespace XRay.Importer.Sources.Vfs
                 return null;
             }
 
-            string direct = Path.Combine(parent, name);
-            if (File.Exists(direct))
+            string relative = name.Replace('\\', '/');
+            int separator = relative.LastIndexOf('/');
+            if (separator >= 0)
             {
-                return direct;
+                string directory = FindChildDirectory(parent, relative.Substring(0, separator));
+                return directory == null ? null : FindChildFile(directory, relative.Substring(separator + 1));
             }
 
             foreach (string file in Directory.GetFiles(parent))
@@ -163,6 +167,41 @@ namespace XRay.Importer.Sources.Vfs
                 foreach (string child in directories)
                 {
                     if (skipDirectories == null || !Contains(skipDirectories, Path.GetFileName(child)))
+                    {
+                        pending.Push(child);
+                    }
+                }
+            }
+        }
+
+        public static IEnumerable<FileInfo> EnumerateFileInfosSafe(string root, ICollection<string> skipDirectories, List<string> warnings)
+        {
+            var pending = new Stack<DirectoryInfo>();
+            pending.Push(new DirectoryInfo(root));
+            while (pending.Count > 0)
+            {
+                DirectoryInfo directory = pending.Pop();
+                FileInfo[] files;
+                DirectoryInfo[] directories;
+                try
+                {
+                    files = directory.GetFiles();
+                    directories = directory.GetDirectories();
+                }
+                catch (Exception exception) when (exception is IOException || exception is UnauthorizedAccessException)
+                {
+                    warnings?.Add($"Cannot read '{directory.FullName}': {exception.Message}");
+                    continue;
+                }
+
+                foreach (FileInfo file in files)
+                {
+                    yield return file;
+                }
+
+                foreach (DirectoryInfo child in directories)
+                {
+                    if (skipDirectories == null || !Contains(skipDirectories, child.Name))
                     {
                         pending.Push(child);
                     }

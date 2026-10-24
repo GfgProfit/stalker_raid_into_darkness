@@ -71,6 +71,26 @@ SAMPLER(sampler_LayerInfluenceMaskMap);
 TEXTURE2D(_MonolithBump);
 SAMPLER(sampler_MonolithBump);
 TEXTURE2D(_MonolithBumpCorrection);
+TEXTURE2D(_MonolithLevelHemiMap);
+SAMPLER(sampler_MonolithLevelHemiMap);
+TEXTURE2D(_MonolithTerrainMask);
+SAMPLER(sampler_MonolithTerrainMask);
+TEXTURE2D(_MonolithTerrainDetailR);
+SAMPLER(sampler_MonolithTerrainDetailR);
+TEXTURE2D(_MonolithTerrainDetailG);
+TEXTURE2D(_MonolithTerrainDetailB);
+TEXTURE2D(_MonolithTerrainDetailA);
+TEXTURE2D(_MonolithTerrainBumpR);
+SAMPLER(sampler_MonolithTerrainBumpR);
+TEXTURE2D(_MonolithTerrainBumpG);
+TEXTURE2D(_MonolithTerrainBumpB);
+TEXTURE2D(_MonolithTerrainBumpA);
+static float3 _MonolithDiagnosticValue;
+static float _MonolithLevelHemiValue = 1.0;
+float4 _MonolithDetailWave1;
+float4 _MonolithDetailWind1;
+float4 _MonolithDetailWave2;
+float4 _MonolithDetailWind2;
 
 CBUFFER_START(UnityPerMaterial)
 float _MonolithHasBump;
@@ -92,9 +112,22 @@ float _MonolithEnvHemisphere;
 float _MonolithEnvHudMask;
 float _MonolithEnvHudHemi;
 float _MonolithEnvCombineClamp;
+float4 _MonolithEnvTestNormal;
+float4 _MonolithEnvTestView;
 float _MonolithAlbedoSrgb;
+float _MonolithDebug;
+float4 _MonolithDiagnosticOptions;
 float4 _MonolithLightSetup;
 float4 _MonolithSourceLight;
+float _MonolithLevel;
+float _MonolithLevelDetail;
+float _MonolithLevelHemiMode;
+float _MonolithLevelHemiFlipV;
+float _MonolithLevelAmbientHemi;
+float _MonolithLevelWind;
+float _MonolithLevelTerrain;
+float _MonolithTerrainDetailScale;
+float _MonolithTerrainBumpScale;
 float _AlphaCutoff;
 float _UseShadowThreshold;
 float _AlphaCutoffShadow;
@@ -232,6 +265,27 @@ float _TessellationBackFaceCullEpsilon;
 #endif
 UNITY_TEXTURE_STREAMING_DEBUG_VARS;
 CBUFFER_END
+#if defined(UNITY_INSTANCING_ENABLED)
+UNITY_INSTANCING_BUFFER_START(MonolithInstance)
+UNITY_DEFINE_INSTANCED_PROP(float4, _MonolithInstanceData)
+UNITY_INSTANCING_BUFFER_END(MonolithInstance)
+#endif
+float4 MonolithInstanceData()
+{
+    #if defined(UNITY_INSTANCING_ENABLED)
+    return UNITY_ACCESS_INSTANCED_PROP(MonolithInstance, _MonolithInstanceData);
+    #else
+    return float4(1.0, 0.0, 0.0, 0.0);
+    #endif
+}
+float MonolithBaseHemisphere()
+{
+    #if defined(_MONOLITH_LEVEL) || defined(_MONOLITH_LEVEL_DETAIL) || defined(_MONOLITH_LEVEL_LOD)
+    return _MonolithLevelHemiValue;
+    #else
+    return _MonolithEnvHemisphere;
+    #endif
+}
 int _ObjectId;
 int _PassValue;
 float4 _SelectionID;

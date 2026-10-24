@@ -51,6 +51,24 @@ float3 MonolithDecodeNormal(float4 packed, float flipGreen)
     return dot(normal, normal) > 1e-8 ? normalize(normal) : float3(0.0, 0.0, 1.0);
 }
 
+float MonolithFloraGloss(float packedGloss, float glossScale)
+{
+    return saturate(packedGloss * packedGloss * glossScale);
+}
+
+float3 MonolithFloraNormal(float2 packedBump)
+{
+    float2 floraBump = (packedBump - 0.5 + 0.02) * 3.0;
+    return normalize(float3(floraBump.x, 1.0, floraBump.y));
+}
+
+float3 MonolithLodNormal(float3 packedNormal, float3 viewRight, float3 viewUp, float3 viewBack)
+{
+    float3 lodView = packedNormal * 2.0 - 1.0;
+    lodView = dot(lodView, lodView) > 1e-8 ? normalize(lodView) : float3(0.0, 1.0, 0.0);
+    return normalize(viewRight * lodView.x + viewUp * lodView.y - viewBack * lodView.z);
+}
+
 float MonolithBurley(float nl, float nv, float vh, float rough)
 {
     float fd90 = 0.5 + 2.0 * vh * vh * rough;

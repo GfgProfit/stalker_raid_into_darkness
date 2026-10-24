@@ -12,6 +12,7 @@ namespace XRay.Importer.Sources.Vfs
         public const string GAME_GAMEDATA_NAME = "Game gamedata";
         public const string BASE_ANOMALY_NAME = "Base Anomaly";
         public const string CUSTOM_FOLDER_NAME = "Custom folder";
+        public const string META_FILE_NAME = "meta.ini";
 
         private static readonly string[] GAMEDATA_CHILD_FOLDERS = { "textures", "meshes", "configs", "scripts", "sounds", "anims", "shaders", "spawns", "levels" };
 
@@ -24,12 +25,24 @@ namespace XRay.Importer.Sources.Vfs
                 case XRaySourceMode.Mo2AndBaseAnomaly:
                     PlanMo2(configuration, plan, stamp);
                     break;
+                case XRaySourceMode.Mo2Effective:
+                    PlanMo2(configuration, plan, stamp);
+                    if (plan.Errors.Count == 0)
+                    {
+                        Mo2ArchiveLayout.Plan(plan, stamp);
+                    }
+
+                    break;
                 case XRaySourceMode.CustomFolder:
                     AddFolderSource(plan, configuration.CustomFolder, CUSTOM_FOLDER_NAME, XRayAssetSourceKind.Custom, "Custom Folder", stamp);
                     break;
             }
 
-            AddFolderSource(plan, configuration.BaseAnomalyFolder, BASE_ANOMALY_NAME, XRayAssetSourceKind.BaseAnomaly, "Base Anomaly Folder", stamp);
+            if (configuration.Mode != XRaySourceMode.Mo2Effective)
+            {
+                AddFolderSource(plan, configuration.BaseAnomalyFolder, BASE_ANOMALY_NAME, XRayAssetSourceKind.BaseAnomaly, "Base Anomaly Folder", stamp);
+            }
+
             if (plan.SkipFileSuffixes.Count == 0)
             {
                 plan.SkipFileSuffixes.Add(".mohidden");
@@ -37,10 +50,25 @@ namespace XRay.Importer.Sources.Vfs
 
             foreach (XRayAssetSource source in plan.Sources)
             {
+                if (source.IsArchive)
+                {
+                    continue;
+                }
+
                 XRayFileSystem.AppendStamp(stamp, source.GamedataRoot);
                 foreach (string scope in configuration.IndexScope)
                 {
-                    XRayFileSystem.AppendStamp(stamp, Path.Combine(source.GamedataRoot, scope));
+                    string path = Path.Combine(source.GamedataRoot, scope);
+                    XRayFileSystem.AppendStamp(stamp, path);
+                    if (configuration.Mode == XRaySourceMode.Mo2Effective && Directory.Exists(path))
+                    {
+                        var files = new System.Collections.Generic.List<FileInfo>(XRayFileSystem.EnumerateFileInfosSafe(path, plan.SkipDirectories, plan.Warnings));
+                        files.Sort((a, b) => string.CompareOrdinal(a.FullName, b.FullName));
+                        foreach (FileInfo file in files)
+                        {
+                            stamp.Append('|').Append(file.FullName).Append(':').Append(file.Length).Append(':').Append(file.LastWriteTimeUtc.Ticks);
+                        }
+                    }
                 }
             }
 
@@ -62,6 +90,23 @@ namespace XRay.Importer.Sources.Vfs
             }
 
             plan.Installation = installation;
+            if (!string.IsNullOrWhiteSpace(configuration.ModsFolder))
+            {
+                installation.ModsDirectory = Path.GetFullPath(configuration.ModsFolder);
+            }
+
+            if (!string.IsNullOrWhiteSpace(configuration.ProfilesFolder))
+            {
+                installation.ProfilesDirectory = Path.GetFullPath(configuration.ProfilesFolder);
+                installation.Profiles.Clear();
+                installation.Profiles.AddRange(Mo2ProfileReader.ListProfiles(installation.ProfilesDirectory));
+            }
+
+            if (!string.IsNullOrWhiteSpace(configuration.OverwriteFolder))
+            {
+                installation.OverwriteDirectory = Path.GetFullPath(configuration.OverwriteFolder);
+            }
+
             plan.Warnings.AddRange(installation.Warnings);
             plan.SkipFileSuffixes.AddRange(installation.SkipFileSuffixes);
             plan.SkipDirectories.AddRange(installation.SkipDirectories);
@@ -92,6 +137,7 @@ namespace XRay.Importer.Sources.Vfs
             foreach (Mo2ModEntry entry in plan.ModList.GetActiveModsByPriorityDescending())
             {
                 plan.ActiveModCount++;
+                plan.ActiveModOrder.Add(entry.Name);
                 string container = Path.Combine(installation.ModsDirectory, entry.Name);
                 if (!Directory.Exists(container))
                 {
@@ -100,7 +146,16 @@ namespace XRay.Importer.Sources.Vfs
                 }
 
                 XRayFileSystem.AppendStamp(stamp, container);
+                XRayFileSystem.AppendStamp(stamp, Path.Combine(container, META_FILE_NAME));
                 AddMo2Source(plan, configuration, entry.Name, XRayAssetSourceKind.Mod, entry.Priority, container);
+            }
+
+            plan.ModOrderFingerprint = XRayFileSystem.Hash(installation.InstanceFolder + "|" + profile + "|" + string.Join("\n", plan.ActiveModOrder));
+            plan.GameFolder = string.IsNullOrEmpty(configuration.GameFolder) ? installation.GamePath : Path.GetFullPath(configuration.GameFolder).TrimEnd('\\', '/');
+            if (configuration.Mode == XRaySourceMode.Mo2Effective && (string.IsNullOrEmpty(plan.GameFolder) || !Directory.Exists(plan.GameFolder)))
+            {
+                plan.Errors.Add($"Anomaly game folder '{plan.GameFolder}' does not exist. Set it manually (MO2 gamePath is '{installation.GamePath}').");
+                return;
             }
 
             if (plan.MissingModFolders.Count > 0)
@@ -113,12 +168,12 @@ namespace XRay.Importer.Sources.Vfs
                 plan.Warnings.Add($"{plan.ModsWithoutGamedataCount} enabled mods keep game folders (textures, meshes, ...) directly in the mod root. MO2 maps a mod root to the game root for {installation.GameName ?? "this game"}, so these files are outside gamedata and are ignored. Enable 'Treat Mod Root As Gamedata' only if your MO2 game plugin maps mods into gamedata.");
             }
 
-            if (configuration.IncludeGameGamedata && !string.IsNullOrEmpty(installation.GamePath))
+            if (configuration.IncludeGameGamedata && !string.IsNullOrEmpty(plan.GameFolder))
             {
-                string gameGamedata = XRayFileSystem.FindChildDirectory(installation.GamePath, GAMEDATA_FOLDER);
+                string gameGamedata = XRayFileSystem.FindChildDirectory(plan.GameFolder, GAMEDATA_FOLDER);
                 if (gameGamedata != null)
                 {
-                    plan.Sources.Add(new XRayAssetSource(GAME_GAMEDATA_NAME, XRayAssetSourceKind.GameGamedata, -1, gameGamedata, installation.GamePath));
+                    plan.Sources.Add(new XRayAssetSource(GAME_GAMEDATA_NAME, XRayAssetSourceKind.GameGamedata, -1, gameGamedata, plan.GameFolder, Mo2ArchiveLayout.GAME_FOLDER_ORIGIN));
                 }
             }
         }

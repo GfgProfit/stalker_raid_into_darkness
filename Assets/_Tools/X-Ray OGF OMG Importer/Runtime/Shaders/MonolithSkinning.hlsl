@@ -27,4 +27,32 @@ AttributesMesh ApplyMeshModification(AttributesMesh input, float3 timeParameters
     input.uv3 = n.yz;
     return input;
 }
+#elif defined(_MONOLITH_LEVEL_DETAIL)
+#define HAVE_MESH_MODIFICATION
+
+float MonolithDetailCyclic(float x)
+{
+    float f = 2.8284271 * frac(x) - 1.4142136;
+    return f * f - 1.0;
+}
+
+AttributesMesh ApplyMeshModification(AttributesMesh input, float3 timeParameters)
+{
+    float4 instance = MonolithInstanceData();
+    if (_MonolithLevelWind < 0.5 || instance.z < 0.5)
+    {
+        return input;
+    }
+    float4 wave = instance.z > 1.5 ? _MonolithDetailWave2 : _MonolithDetailWave1;
+    float4 wind = instance.z > 1.5 ? _MonolithDetailWind2 : _MonolithDetailWind1;
+    float3 positionWS = TransformObjectToWorld(input.positionOS);
+    float3 originWS = GetObjectToWorldMatrix()._m03_m13_m23;
+    float3 absolutePosition = GetAbsolutePositionWS(positionWS);
+    float dp = MonolithDetailCyclic(dot(absolutePosition, wave.xyz) + wave.w);
+    float height = positionWS.y - originWS.y;
+    float fraction = input.positionOS.y * instance.y;
+    float2 offset = wind.xz * (height * dp) * fraction;
+    input.positionOS += mul((float3x3)GetWorldToObjectMatrix(), float3(offset.x, 0.0, offset.y));
+    return input;
+}
 #endif

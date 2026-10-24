@@ -20,6 +20,8 @@ namespace XRay.Importer.Sources.Textures
             _index = index;
         }
 
+        public string LevelFolder { get; set; }
+
         public XRayTexturesLtx TexturesLtx
         {
             get
@@ -33,13 +35,13 @@ namespace XRay.Importer.Sources.Textures
         {
             string name = StripExtension(textureName);
             var resolution = new XRayTextureResolution { TextureName = name };
-            resolution.Diffuse = ResolveFile(XRayVirtualPath.TextureToVirtualPath(name, ".dds"));
+            resolution.Diffuse = ResolveTexture(name, ".dds");
             ResolveDescription(name, resolution);
             if (resolution.Description != null && resolution.Description.HasBump)
             {
                 string bumpName = StripExtension(resolution.Description.BumpName);
-                resolution.Bump = ResolveFile(XRayVirtualPath.TextureToVirtualPath(bumpName, ".dds"));
-                resolution.BumpCorrection = ResolveFile(XRayVirtualPath.TextureToVirtualPath(bumpName + BUMP_CORRECTION_SUFFIX, ".dds"));
+                resolution.Bump = ResolveTexture(bumpName, ".dds");
+                resolution.BumpCorrection = ResolveTexture(bumpName + BUMP_CORRECTION_SUFFIX, ".dds");
                 if (!resolution.Bump.IsResolved)
                 {
                     resolution.Notes.Add($"Declared bump map '{bumpName}' ({resolution.DescriptionOrigin}) was not found.");
@@ -57,6 +59,20 @@ namespace XRay.Importer.Sources.Textures
             }
 
             return resolution;
+        }
+
+        public XRayResolvedFile ResolveTexture(string name, string extension)
+        {
+            if (!string.IsNullOrEmpty(LevelFolder))
+            {
+                XRayResolvedFile level = ResolveFile(XRayVirtualPath.Normalize(LevelFolder + "\\" + StripExtension(name) + extension));
+                if (level.IsResolved)
+                {
+                    return level;
+                }
+            }
+
+            return ResolveFile(XRayVirtualPath.TextureToVirtualPath(name, extension));
         }
 
         public XRayResolvedFile ResolveFile(string virtualPath)
@@ -85,7 +101,12 @@ namespace XRay.Importer.Sources.Textures
             {
                 try
                 {
-                    XRayTextureDescription description = XRayThmReader.Read(File.ReadAllBytes(thm.Winner.FullPath), thm.Winner.FullPath);
+                    XRayTextureDescription description = XRayThmReader.Read(thm.Winner.ReadAllBytes(), thm.Winner.Location);
+                    foreach (string correction in description.CorrectedChunks)
+                    {
+                        resolution.Notes.Add($"THM chunk size corrected in '{thm.Winner.Location}': {correction}.");
+                    }
+
                     if (XRayThmReader.IsUsedByEngine(description))
                     {
                         resolution.Description = description;
@@ -93,9 +114,9 @@ namespace XRay.Importer.Sources.Textures
                         return;
                     }
                 }
-                catch (Exception exception) when (exception is XRayFormatException || exception is IOException)
+                catch (Exception exception) when (exception is XRayFormatException || exception is IOException || exception is XRaySourceException)
                 {
-                    resolution.Notes.Add($"Cannot read '{thm.Winner.FullPath}': {exception.Message}");
+                    resolution.Notes.Add($"Cannot read '{thm.Winner.Location}': {exception.Message}");
                 }
             }
 
@@ -127,18 +148,20 @@ namespace XRay.Importer.Sources.Textures
 
             try
             {
-                _ltx = XRayTexturesLtx.Parse(File.ReadAllBytes(file.Winner.FullPath), file.Winner.SourceName);
+                _ltx = XRayTexturesLtx.Parse(file.Winner.ReadAllBytes(), file.Winner.SourceName);
             }
-            catch (IOException exception)
+            catch (Exception exception) when (exception is IOException || exception is XRaySourceException)
             {
-                _ltxError = $"Cannot read '{file.Winner.FullPath}': {exception.Message}";
+                _ltxError = $"Cannot read '{file.Winner.Location}': {exception.Message}";
             }
         }
 
         private XRayResolvedSource CreateSource(XRayIndexCandidate candidate)
         {
             XRayAssetSource source = _index.GetSource(candidate);
-            return new XRayResolvedSource { SourceName = source.Name, Kind = source.Kind, Priority = source.DisplayPriority, FullPath = _index.GetFullPath(candidate), RelativePath = candidate.RelativePath };
+            var resolved = new XRayResolvedSource { SourceName = source.Name, Origin = source.Origin, Kind = source.Kind, Priority = source.DisplayPriority, RelativePath = candidate.RelativePath };
+            resolved.Bind(_index, candidate);
+            return resolved;
         }
 
         private static string StripExtension(string name)

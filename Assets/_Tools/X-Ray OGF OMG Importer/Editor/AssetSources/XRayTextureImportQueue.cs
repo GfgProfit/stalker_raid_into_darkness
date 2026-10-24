@@ -21,10 +21,13 @@ namespace XRay.Importer.Editor
         public XRayTextureRole Role { get; }
         public XRayAssetMarker Marker { get; }
         public bool WasImported { get; set; }
+        public bool ResetSettings { get; set; }
     }
 
     public static class XRayTextureImportQueue
     {
+        private const int MAX_TEXTURE_SIZE = 8192;
+
         private static readonly Dictionary<string, XRayTextureImportRequest> _requests = new Dictionary<string, XRayTextureImportRequest>();
 
         public static void Enqueue(string assetPath, XRayTextureImportRequest request)
@@ -51,17 +54,19 @@ namespace XRay.Importer.Editor
 
             request.WasImported = true;
             importer.userData = request.Marker.Serialize();
-            if (!importer.importSettingsMissing)
+            if (!importer.importSettingsMissing && !request.ResetSettings)
             {
                 return;
             }
 
             if (importer is TextureImporter textureImporter)
             {
+                textureImporter.textureShape = TextureImporterShape.Texture2D;
                 textureImporter.textureType = request.Role == XRayTextureRole.Normal ? TextureImporterType.NormalMap : TextureImporterType.Default;
                 textureImporter.sRGBTexture = request.Role == XRayTextureRole.Albedo;
                 textureImporter.alphaSource = request.Role != XRayTextureRole.Normal ? TextureImporterAlphaSource.FromInput : TextureImporterAlphaSource.None;
                 textureImporter.mipmapEnabled = true;
+                textureImporter.maxTextureSize = MAX_TEXTURE_SIZE;
                 textureImporter.textureCompression = request.Role == XRayTextureRole.Packed ? TextureImporterCompression.Uncompressed : TextureImporterCompression.CompressedHQ;
             }
             else if (importer is IHVImageFormatImporter ddsImporter)

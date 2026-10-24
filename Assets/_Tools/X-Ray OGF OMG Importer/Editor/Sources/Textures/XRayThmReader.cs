@@ -13,11 +13,14 @@ namespace XRay.Importer.Sources.Textures
         public const uint CHUNK_DETAIL_EXT = 0x0815;
         public const uint CHUNK_MATERIAL = 0x0816;
         public const uint CHUNK_BUMP = 0x0817;
+        public const int PARSER_VERSION = 2;
+        public const uint THM_CHUNK_MASK = 0x7FFFFFF0;
+        public const uint THM_CHUNK_BASE = 0x0810;
 
         public static XRayTextureDescription Read(byte[] data, string context)
         {
-            Dictionary<uint, XRayChunk> chunks = XRayChunks.ReadMap(new XRayReader(data, context));
             var description = new XRayTextureDescription { Origin = context };
+            Dictionary<uint, XRayChunk> chunks = ReadChunks(data, context, description.CorrectedChunks);
             if (chunks.TryGetValue(CHUNK_TEXTURE_PARAM, out XRayChunk parameters))
             {
                 XRayReader reader = parameters.CreateReader(context + " TEXTUREPARAM");
@@ -68,6 +71,53 @@ namespace XRay.Importer.Sources.Textures
             }
 
             return description;
+        }
+
+        public static Dictionary<uint, XRayChunk> ReadChunks(byte[] data, string context, List<string> corrections)
+        {
+            var chunks = new Dictionary<uint, XRayChunk>();
+            int position = 0;
+            while (position + 8 <= data.Length)
+            {
+                uint id = ReadUInt32(data, position);
+                uint declared = ReadUInt32(data, position + 4);
+                int start = position + 8;
+                long length = declared;
+                if (start + length != data.Length && !IsThmChunkAt(data, start + length))
+                {
+                    length = 0;
+                    while (start + length < data.Length && !IsThmChunkAt(data, start + length))
+                    {
+                        length++;
+                    }
+
+                    corrections?.Add($"chunk 0x{id:X} declares {declared} bytes, corrected to {length} like the engine THM reader (IReader::find_chunk)");
+                }
+
+                if ((id & XRayChunks.COMPRESSED_MASK) != 0 && (id & ~XRayChunks.COMPRESSED_MASK) != CHUNK_DATA)
+                {
+                    throw new XRayFormatException($"{context}: chunk 0x{id & ~XRayChunks.COMPRESSED_MASK:X} is compressed; compressed THM parameter chunks are not supported.");
+                }
+
+                if ((id & XRayChunks.COMPRESSED_MASK) == 0 && !chunks.ContainsKey(id))
+                {
+                    chunks.Add(id, new XRayChunk(id, data, start, (int)length));
+                }
+
+                position = start + (int)length;
+            }
+
+            return chunks;
+        }
+
+        private static bool IsThmChunkAt(byte[] data, long position)
+        {
+            return position >= 0 && position <= data.Length - 8 && (ReadUInt32(data, (int)position) & THM_CHUNK_MASK) == THM_CHUNK_BASE;
+        }
+
+        private static uint ReadUInt32(byte[] data, int position)
+        {
+            return (uint)(data[position] | (data[position + 1] << 8) | (data[position + 2] << 16) | (data[position + 3] << 24));
         }
 
         public static bool IsUsedByEngine(XRayTextureDescription description)

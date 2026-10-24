@@ -39,6 +39,40 @@ namespace XRay.Importer.Sources.Vfs
             return builder.ToString();
         }
 
+        public static bool TryNormalizeSafe(string path, out string normalized)
+        {
+            normalized = Normalize(path);
+            if (normalized.IndexOf(':') >= 0)
+            {
+                return false;
+            }
+
+            string[] segments = normalized.Split('/');
+            var builder = new StringBuilder(normalized.Length);
+            foreach (string segment in segments)
+            {
+                if (segment.Length == 0 || segment == ".")
+                {
+                    continue;
+                }
+
+                if (segment.Trim('.').Length == 0)
+                {
+                    return false;
+                }
+
+                if (builder.Length > 0)
+                {
+                    builder.Append('/');
+                }
+
+                builder.Append(segment);
+            }
+
+            normalized = builder.ToString();
+            return true;
+        }
+
         public static string ToDisplay(string normalizedPath)
         {
             return normalizedPath.Replace('/', '\\');

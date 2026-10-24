@@ -1,0 +1,22 @@
+fileFormatVersion: 2
+guid: 8f6cdbf9109924f4fad29fd9fb662105
+IHVImageFormatImporter:
+  externalObjects: {}
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 0
+    wrapV: 0
+    wrapW: 0
+  isReadable: 0
+  sRGBTexture: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  ignoreMipmapLimit: 0
+  mipmapLimitGroupName: 
+  userData: xray-asset:{"_key":"textures/wpn/aug_a3/aug_a3_bump.dds#packed","_role":"Packed","_source":"Custom
+    folder","_sourcePath":"E:\\STALKER CoC IWP Unpacked pacth 16.03.2026\\textures\\wpn\\aug_a3\\aug_a3_bump.dds","_stamp":"22369796:639282041224998553"}
+  assetBundleName: 
+  assetBundleVariant: 

@@ -38,6 +38,7 @@ namespace XRay.Importer.Sources.Textures
         public XRayThmTextureType TextureType { get; internal set; }
         public int Width { get; internal set; }
         public int Height { get; internal set; }
+        public System.Collections.Generic.List<string> CorrectedChunks { get; } = new System.Collections.Generic.List<string>();
         public bool HasBump => (BumpMode == XRayBumpMode.Use || BumpMode == XRayBumpMode.UseParallax) && !string.IsNullOrEmpty(BumpName);
         public bool HasAlpha => (Flags & FLAG_HAS_ALPHA) != 0;
     }

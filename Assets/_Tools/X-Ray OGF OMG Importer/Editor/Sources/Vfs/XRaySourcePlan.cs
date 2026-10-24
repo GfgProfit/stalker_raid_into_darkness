@@ -10,9 +10,15 @@ namespace XRay.Importer.Sources.Vfs
         public Mo2ModList ModList { get; internal set; }
         public string ProfileName { get; internal set; }
         public string Fingerprint { get; internal set; }
+        public string ModOrderFingerprint { get; internal set; }
+        public string GameFolder { get; internal set; }
+        public string FsGamePath { get; internal set; }
+        public XRayFsGame FsGame { get; internal set; }
         public int ActiveModCount { get; internal set; }
         public int ModsWithoutGamedataCount { get; internal set; }
         public List<XRayAssetSource> Sources { get; } = new List<XRayAssetSource>();
+        public List<string> ActiveModOrder { get; } = new List<string>();
+        public List<string> ShadowedArchives { get; } = new List<string>();
         public List<string> SkipFileSuffixes { get; } = new List<string>();
         public List<string> SkipDirectories { get; } = new List<string>();
         public List<string> MissingModFolders { get; } = new List<string>();

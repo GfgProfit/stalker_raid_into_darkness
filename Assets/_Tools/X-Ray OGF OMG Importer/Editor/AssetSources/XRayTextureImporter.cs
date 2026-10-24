@@ -36,6 +36,7 @@ namespace XRay.Importer.Editor
         }
 
         public IReadOnlyList<string> PendingImports => _pendingImports;
+        public bool ContentKeys { get; set; }
 
         public XRayTextureAssetResult ImportAlbedo(XRayResolvedFile file, string folder)
         {
@@ -48,17 +49,17 @@ namespace XRay.Importer.Editor
             DdsHeader header;
             try
             {
-                source = File.ReadAllBytes(file.Winner.FullPath);
+                source = file.Winner.ReadAllBytes();
                 header = DdsHeader.Parse(source);
             }
-            catch (Exception exception) when (exception is IOException || exception is FormatException)
+            catch (Exception exception) when (exception is IOException || exception is FormatException || exception is XRaySourceException)
             {
-                return new XRayTextureAssetResult { Status = XRayResourceStatus.Unsupported, Note = $"Cannot read '{file.Winner.FullPath}': {exception.Message}" };
+                return new XRayTextureAssetResult { Status = XRayResourceStatus.Unsupported, Note = $"Cannot read '{file.Winner.Location}': {exception.Message}" };
             }
 
-            string stamp = XRayAssetMarker.CreateStamp(file.Winner.FullPath);
-            var marker = new XRayAssetMarker(file.VirtualPath + ALBEDO_KEY_SUFFIX, XRayTextureRole.Albedo.ToString(), file.Winner.SourceName, file.Winner.FullPath, stamp);
-            if (IsUnityNative(header))
+            string stamp = file.Winner.Stamp;
+            var marker = new XRayAssetMarker(file.VirtualPath + ALBEDO_KEY_SUFFIX + ContentQualifier(source), XRayTextureRole.Albedo.ToString(), file.Winner.SourceName, file.Winner.Location, stamp);
+            if (IsUnityNative(header) && HasExactPayload(source, header))
             {
                 return Store(marker, file.Winner.RelativePath, string.Empty, ".dds", folder, XRayTextureRole.Albedo, header.Description, () => ToSrgbDds(source, header), null);
             }
@@ -87,12 +88,12 @@ namespace XRay.Importer.Editor
             DdsHeader bumpHeader;
             try
             {
-                bumpData = File.ReadAllBytes(bump.Winner.FullPath);
+                bumpData = bump.Winner.ReadAllBytes();
                 bumpHeader = DdsHeader.Parse(bumpData);
             }
-            catch (Exception exception) when (exception is IOException || exception is FormatException)
+            catch (Exception exception) when (exception is IOException || exception is FormatException || exception is XRaySourceException)
             {
-                return new XRayTextureAssetResult { Status = XRayResourceStatus.Unsupported, Note = $"Cannot read '{bump.Winner.FullPath}': {exception.Message}" };
+                return new XRayTextureAssetResult { Status = XRayResourceStatus.Unsupported, Note = $"Cannot read '{bump.Winner.Location}': {exception.Message}" };
             }
 
             if (!DdsDecoder.CanDecode(bumpHeader))
@@ -101,8 +102,8 @@ namespace XRay.Importer.Editor
             }
 
             bool useCorrection = correction != null && correction.IsResolved;
-            string stamp = XRayAssetMarker.CreateStamp(bump.Winner.FullPath) + (useCorrection ? "|" + XRayAssetMarker.CreateStamp(correction.Winner.FullPath) : string.Empty) + (_options.FlipNormalGreen ? "|flipY" : string.Empty);
-            var marker = new XRayAssetMarker(bump.VirtualPath + NORMAL_KEY_SUFFIX, XRayTextureRole.Normal.ToString(), bump.Winner.SourceName, bump.Winner.FullPath, stamp);
+            string stamp = bump.Winner.Stamp + (useCorrection ? "|" + correction.Winner.Stamp : string.Empty) + (_options.FlipNormalGreen ? "|flipY" : string.Empty);
+            var marker = new XRayAssetMarker(bump.VirtualPath + NORMAL_KEY_SUFFIX, XRayTextureRole.Normal.ToString(), bump.Winner.SourceName, bump.Winner.Location, stamp);
             var producer = new NormalMapProducer(bumpData, bumpHeader, useCorrection ? correction : null, _options.FlipNormalGreen);
             string note = useCorrection ? "Converted from X-Ray bump + bump# (normal = bump.agb + bump#.rgb - 1, bump# sampled with the same UV)." : "Converted from X-Ray bump (normal = bump.agb); bump# was not found.";
             XRayTextureAssetResult result = Store(marker, bump.Winner.RelativePath, NORMAL_NAME_SUFFIX, ".png", folder, XRayTextureRole.Normal, bumpHeader.Description, producer.Produce, note);
@@ -112,6 +113,43 @@ namespace XRay.Importer.Editor
             }
 
             return result;
+        }
+
+        public void ImportPendingBatched()
+        {
+            if (_pendingImports.Count == 0)
+            {
+                return;
+            }
+
+            AssetDatabase.StartAssetEditing();
+            try
+            {
+                foreach (string path in _pendingImports)
+                {
+                    AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate);
+                }
+            }
+            finally
+            {
+                AssetDatabase.StopAssetEditing();
+            }
+
+            _pendingImports.Clear();
+        }
+
+        private string ContentQualifier(byte[] source)
+        {
+            if (!ContentKeys)
+            {
+                return string.Empty;
+            }
+
+            using (System.Security.Cryptography.SHA256 sha = System.Security.Cryptography.SHA256.Create())
+            {
+                byte[] hash = sha.ComputeHash(source);
+                return "@" + BitConverter.ToString(hash, 0, 8).Replace("-", string.Empty).ToLowerInvariant();
+            }
         }
 
         public void ImportPending()
@@ -133,15 +171,15 @@ namespace XRay.Importer.Editor
             DdsHeader header;
             try
             {
-                source = File.ReadAllBytes(file.Winner.FullPath);
+                source = file.Winner.ReadAllBytes();
                 header = DdsHeader.Parse(source);
             }
-            catch (Exception exception) when (exception is IOException || exception is FormatException)
+            catch (Exception exception) when (exception is IOException || exception is FormatException || exception is XRaySourceException)
             {
-                return new XRayTextureAssetResult { Status = XRayResourceStatus.Unsupported, Note = $"Cannot read packed texture '{file.Winner.FullPath}': {exception.Message}" };
+                return new XRayTextureAssetResult { Status = XRayResourceStatus.Unsupported, Note = $"Cannot read packed texture '{file.Winner.Location}': {exception.Message}" };
             }
-            var marker = new XRayAssetMarker(file.VirtualPath + "#packed", XRayTextureRole.Packed.ToString(), file.Winner.SourceName, file.Winner.FullPath, XRayAssetMarker.CreateStamp(file.Winner.FullPath));
-            if (IsUnityNative(header))
+            var marker = new XRayAssetMarker(file.VirtualPath + "#packed" + ContentQualifier(source), XRayTextureRole.Packed.ToString(), file.Winner.SourceName, file.Winner.Location, file.Winner.Stamp);
+            if (IsUnityNative(header) && HasExactPayload(source, header))
             {
                 return EnsurePackedLinear(Store(marker, file.Winner.RelativePath, "_packed", ".dds", folder, XRayTextureRole.Packed, header.Description, () => DdsColorSpace.TryGetDxgiFormat(header.Format, false, out uint dxgi) ? DdsColorSpace.WithDx10Header(source, header, dxgi) : source, "Packed linear X-Ray channels; no normal conversion."));
             }
@@ -178,6 +216,11 @@ namespace XRay.Importer.Editor
                 return false;
             }
 
+            if (header.IsBlockCompressed && (header.Width % 4 != 0 || header.Height % 4 != 0))
+            {
+                return false;
+            }
+
             if (header.MipCount > 1 && header.MipCount != GetFullMipCount(header.Width, header.Height))
             {
                 return false;
@@ -197,6 +240,21 @@ namespace XRay.Importer.Editor
             }
         }
 
+        public static bool HasExactPayload(byte[] source, DdsHeader header)
+        {
+            long expected = 0;
+            int width = header.Width;
+            int height = header.Height;
+            for (int mip = 0; mip < Math.Max(1, header.MipCount); mip++)
+            {
+                expected += DdsHeader.GetLevelSize(header.Format, Math.Max(1, width), Math.Max(1, height));
+                width >>= 1;
+                height >>= 1;
+            }
+
+            return source.Length - header.DataOffset == expected;
+        }
+
         private static int GetFullMipCount(int width, int height)
         {
             int size = Math.Max(width, height);
@@ -212,14 +270,31 @@ namespace XRay.Importer.Editor
 
         private XRayTextureAssetResult Store(XRayAssetMarker marker, string relativePath, string nameSuffix, string extension, string folder, XRayTextureRole role, string format, Func<byte[]> produce, string note)
         {
-            string assetPath = XRayAssetNaming.Place(folder, XRayAssetNaming.CreateCandidates(relativePath, nameSuffix), extension, marker.Key, XRayAssetMarker.ReadKey, _claimed);
+            List<string> candidates = XRayAssetNaming.CreateCandidates(relativePath, nameSuffix);
+            string assetPath = XRayAssetNaming.Place(folder, candidates, extension, marker.Key, XRayAssetMarker.ReadKey, _claimed);
+            string previousPath = null;
+            if (!ContentKeys && _options.OverwriteExistingTextures && !File.Exists(assetPath))
+            {
+                string previousExtension = extension == ".dds" ? ".png" : ".dds";
+                foreach (string candidate in candidates)
+                {
+                    string path = folder + "/" + candidate + previousExtension;
+                    if (File.Exists(path) && XRayAssetMarker.ReadKey(path) == marker.Key)
+                    {
+                        previousPath = path;
+                        break;
+                    }
+                }
+            }
+
             var result = new XRayTextureAssetResult { AssetPath = assetPath, Format = format, Note = note };
             bool exists = File.Exists(assetPath);
+            bool invalidShape = exists && AssetImporter.GetAtPath(assetPath) is TextureImporter textureImporter && textureImporter.textureShape != TextureImporterShape.Texture2D;
             if (exists)
             {
                 XRayAssetMarker existing = XRayAssetMarker.ReadEffective(assetPath);
                 bool sameSource = existing != null && existing.Stamp == marker.Stamp && existing.SourcePath == marker.SourcePath;
-                if (sameSource || (!_options.OverwriteExistingTextures && !_forceUpdate))
+                if (!invalidShape && (sameSource || (!_options.OverwriteExistingTextures && !_forceUpdate)))
                 {
                     result.Status = XRayResourceStatus.Reused;
                     if (!sameSource)
@@ -236,15 +311,42 @@ namespace XRay.Importer.Editor
             {
                 bytes = produce();
             }
-            catch (Exception exception) when (exception is IOException || exception is FormatException || exception is NotSupportedException || exception is ArgumentException)
+            catch (Exception exception) when (exception is IOException || exception is FormatException || exception is NotSupportedException || exception is ArgumentException || exception is XRaySourceException)
             {
                 return new XRayTextureAssetResult { Status = XRayResourceStatus.Unsupported, Format = format, Note = exception.Message };
             }
 
             Directory.CreateDirectory(folder);
-            File.WriteAllBytes(assetPath, bytes);
-            XRayTextureImportQueue.Enqueue(assetPath, new XRayTextureImportRequest(role, marker));
-            _pendingImports.Add(assetPath);
+            if (previousPath != null)
+            {
+                AssetDatabase.StartAssetEditing();
+            }
+
+            try
+            {
+                if (previousPath != null)
+                {
+                    string error = AssetDatabase.MoveAsset(previousPath, assetPath);
+                    if (!string.IsNullOrEmpty(error))
+                    {
+                        throw new XRaySourceException($"Cannot preserve the texture GUID while moving '{previousPath}' to '{assetPath}': {error}");
+                    }
+
+                    exists = true;
+                }
+
+                File.WriteAllBytes(assetPath, bytes);
+                XRayTextureImportQueue.Enqueue(assetPath, new XRayTextureImportRequest(role, marker) { ResetSettings = previousPath != null || invalidShape });
+                _pendingImports.Add(assetPath);
+            }
+            finally
+            {
+                if (previousPath != null)
+                {
+                    AssetDatabase.StopAssetEditing();
+                }
+            }
+
             result.Status = exists ? XRayResourceStatus.Updated : extension == ".png" ? XRayResourceStatus.Converted : XRayResourceStatus.Imported;
             return result;
         }
@@ -284,7 +386,7 @@ namespace XRay.Importer.Editor
                 int correctionHeight = 0;
                 if (_correction != null)
                 {
-                    byte[] data = File.ReadAllBytes(_correction.Winner.FullPath);
+                    byte[] data = _correction.Winner.ReadAllBytes();
                     DdsHeader header = DdsHeader.Parse(data);
                     if (DdsDecoder.CanDecode(header))
                     {

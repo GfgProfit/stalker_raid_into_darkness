@@ -51,6 +51,11 @@ MonolithEnvironmentData MonolithEvaluateEnvironment(float3 normal, float3 view, 
     ZERO_INITIALIZE(MonolithEnvironmentData, data);
     normal = normalize(normal);
     view = normalize(view);
+    if (_MonolithDebug >= 39.5 && _MonolithEnvTestNormal.w > 0.5)
+    {
+        normal = normalize(_MonolithEnvTestNormal.xyz);
+        view = normalize(_MonolithEnvTestView.xyz);
+    }
     float material = MonolithDecodeMaterial(_MonolithMaterialId, _MonolithMaterialWeight);
     bool flora = abs(material - 0.15) <= 0.04;
     if (abs(material - 0.95) <= 0.04) material = 0.0;
@@ -58,6 +63,7 @@ MonolithEnvironmentData MonolithEvaluateEnvironment(float3 normal, float3 view, 
     data.albedo = MonolithAlbedo(albedoGloss.rgb, metalness);
     data.f0 = MonolithSpecular(albedoGloss.rgb, albedoGloss.w, material);
     float rough = MonolithRoughness(albedoGloss.w, material, _MonolithDynamicGloss);
+    if (_MonolithDebug >= 39.5 && _MonolithEnvTestView.w >= 0.0) rough = _MonolithEnvTestView.w;
     float mip = 6.0 - ((1.0 - rough) * 6.0);
     data.normalRemap = MonolithEnvironmentRemap(normal);
     data.reflection = reflect(-view, normal);
@@ -74,7 +80,8 @@ MonolithEnvironmentData MonolithEvaluateEnvironment(float3 normal, float3 view, 
     data.diffuseSample = lerp(data.cube0Diffuse, data.cube1Diffuse, _MonolithEnvColor.w);
     data.specularSample = lerp(data.cube0Specular, data.cube1Specular, _MonolithEnvColor.w);
     float factor = 1.0 - saturate(dot(_MonolithEnvColor.rgb, 0.15));
-    float hemi = lerp(_MonolithEnvHemisphere, _MonolithEnvHemisphere + _MonolithEnvHudHemi * factor, _MonolithEnvHudMask);
+    float baseHemi = MonolithBaseHemisphere();
+    float hemi = lerp(baseHemi, baseHemi + _MonolithEnvHudHemi * factor, _MonolithEnvHudMask);
     data.mipViewHemi = float3(mip, dot(normal, view), hemi);
     data.diffuseIrradiance = pow(max(0.0, data.diffuseSample * _MonolithEnvColor.rgb * hemi + _MonolithEnvAmbient.rgb), 2.2);
     data.specularIrradiance = pow(max(0.0, data.specularSample * _MonolithEnvColor.rgb * hemi + _MonolithEnvAmbient.rgb), 2.2) * (flora ? 0.25 : 1.0);
@@ -89,5 +96,29 @@ MonolithEnvironmentData MonolithEvaluateEnvironment(float3 normal, float3 view, 
     return data;
 }
 
+float3 MonolithEnvironmentDiagnostic(MonolithEnvironmentData data, int stage)
+{
+    if (stage == 40) return data.normalRemap;
+    if (stage == 41) return data.reflection;
+    if (stage == 42) return data.reflectionRemap;
+    if (stage == 43) return data.dominant;
+    if (stage == 44) return data.mipViewHemi;
+    if (stage == 45) return data.cube0Diffuse;
+    if (stage == 46) return data.cube1Diffuse;
+    if (stage == 47) return data.cube0Specular;
+    if (stage == 48) return data.cube1Specular;
+    if (stage == 49) return data.diffuseSample;
+    if (stage == 50) return data.specularSample;
+    if (stage == 51) return data.diffuseIrradiance;
+    if (stage == 52) return data.specularIrradiance;
+    if (stage == 53) return data.albedo;
+    if (stage == 54) return data.f0;
+    if (stage == 55) return data.diffuseBrdf.xxx;
+    if (stage == 56) return data.specularBrdf;
+    if (stage == 57) return data.diffuse;
+    if (stage == 58) return data.specular;
+    if (stage == 59) return data.total;
+    return data.combined;
+}
 #endif
 #endif

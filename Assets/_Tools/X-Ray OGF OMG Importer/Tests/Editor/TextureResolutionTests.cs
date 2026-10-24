@@ -34,6 +34,66 @@ namespace XRay.Importer.Tests
         }
 
         [Test]
+        public void ThmChunkSizesAreCorrectedLikeTheEngine()
+        {
+            byte[] valid = XRayTestBinaries.Thm("floor\\floor_dirty1_gr_bump", 0x4800001);
+            int detail = FindChunk(valid, XRayThmReader.CHUNK_DETAIL_EXT);
+            byte[] broken = (byte[])valid.Clone();
+            System.BitConverter.GetBytes(29u).CopyTo(broken, detail + 4);
+            var thumbnail = new BinaryBuffer();
+            thumbnail.Writer.Write(XRayThmReader.CHUNK_DATA | 0x80000000u);
+            thumbnail.Writer.Write(6u);
+            thumbnail.Writer.Write(new byte[] { 1, 2, 3, 4, 5, 6 });
+            var file = new List<byte>(thumbnail.ToArray());
+            file.AddRange(broken);
+            XRayTextureDescription reference = XRayThmReader.Read(valid, "valid");
+            XRayTextureDescription repaired = XRayThmReader.Read(file.ToArray(), "broken");
+            Assert.IsEmpty(reference.CorrectedChunks);
+            Assert.AreEqual(1, repaired.CorrectedChunks.Count);
+            StringAssert.Contains("0x815 declares 29 bytes, corrected to 5", repaired.CorrectedChunks[0]);
+            Assert.AreEqual(reference.BumpName, repaired.BumpName);
+            Assert.AreEqual(reference.BumpMode, repaired.BumpMode);
+            Assert.AreEqual(reference.MaterialId, repaired.MaterialId);
+            Assert.AreEqual(reference.MaterialWeight, repaired.MaterialWeight);
+            Assert.AreEqual(reference.DetailScale, repaired.DetailScale);
+            Assert.IsTrue(repaired.HasBump);
+        }
+
+        [Test]
+        public void RealAdegaThmIsReadWithEngineCorrection()
+        {
+            string path = System.IO.Path.Combine(XRay.Importer.Editor.XRayAssetSourceUserSettings.DEFAULT_MO2_FOLDER, "mods", "[Ретекстур_в2] Adega full retexture optimized", "gamedata", "textures", "floor", "floor_dirty1_gr.thm");
+            if (!System.IO.File.Exists(path))
+            {
+                Assert.Ignore("The Adega retexture THM is not available on this machine.");
+            }
+
+            XRayTextureDescription description = XRayThmReader.Read(System.IO.File.ReadAllBytes(path), path);
+            Assert.AreEqual(1, description.CorrectedChunks.Count);
+            Assert.AreEqual("floor\\floor_dirty1_gr_bump", description.BumpName);
+            Assert.AreEqual(XRayBumpMode.Use, description.BumpMode);
+            Assert.AreEqual(0u, description.MaterialId);
+            Assert.AreEqual(0.5, description.MaterialWeight, 1e-6);
+        }
+
+        private static int FindChunk(byte[] data, uint id)
+        {
+            int position = 0;
+            while (position + 8 <= data.Length)
+            {
+                if (System.BitConverter.ToUInt32(data, position) == id)
+                {
+                    return position;
+                }
+
+                position += 8 + (int)System.BitConverter.ToUInt32(data, position + 4);
+            }
+
+            Assert.Fail($"chunk 0x{id:X} not found");
+            return -1;
+        }
+
+        [Test]
         public void TexturesLtxSpecificationIsUsedWithoutThm()
         {
             using (var directory = new TestDirectory())

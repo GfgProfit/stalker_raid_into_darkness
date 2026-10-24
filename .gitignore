@@ -73,5 +73,14 @@ crashlytics-build.properties
 # Temporary auto-generated Android Assets
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
+
 /.vscode
 /scratchpad
+
+/MonolithHDRP_*/
+/XRay*_Validation/
+/XRay*_Report.md
+/ProfilerCaptures/
+/Assets/_Source/Levels/
+/Assets/_Source/Levels.meta
+*.slnx

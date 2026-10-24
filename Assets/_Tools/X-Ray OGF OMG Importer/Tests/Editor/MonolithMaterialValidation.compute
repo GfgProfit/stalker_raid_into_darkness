@@ -1,0 +1,45 @@
+#pragma kernel ValidateMaterial
+#pragma kernel ValidateFlora
+#include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Common.hlsl"
+#include "../../Runtime/Shaders/MonolithMaterial.hlsl"
+
+StructuredBuffer<float4> _Inputs;
+RWStructuredBuffer<float4> _Outputs;
+RWStructuredBuffer<float4> _Normals;
+RWStructuredBuffer<float4> _Packed;
+Texture2D<float4> _FloraBump;
+float4 _ViewRight;
+float4 _ViewUp;
+float4 _ViewBack;
+float _GlossScale;
+uint _FloraWidth;
+uint _FloraHeight;
+uint _FloraCount;
+
+[numthreads(1, 1, 1)]
+void ValidateMaterial(uint3 dispatchId : SV_DispatchThreadID)
+{
+    float4 input = _Inputs[dispatchId.x];
+    float material = MonolithDecodeMaterial(input.x, input.y);
+    _Outputs[dispatchId.x] = float4(material, MonolithMetalness(input.z, material), MonolithRoughness(input.z, material, input.w), MonolithSpecular(0.5.xxx, input.z, material).r);
+    _Normals[dispatchId.x] = float4(MonolithDecodeNormal(float4(0.25, 1.0, 0.5, 0.5), 1.0), 0.0);
+}
+
+[numthreads(64, 1, 1)]
+void ValidateFlora(uint3 dispatchId : SV_DispatchThreadID)
+{
+    uint index = dispatchId.x;
+    if (index >= _FloraCount)
+    {
+        return;
+    }
+
+    float4 packed = index < _FloraCount / 2 ? _Inputs[index] : _FloraBump.Load(int3((index * 7919u) % _FloraWidth, (index * 104729u) % _FloraHeight, 0));
+    float material = MonolithDecodeMaterial(0.0, 0.1);
+    float gloss = MonolithFloraGloss(packed.r, _GlossScale);
+    float quantized = round(gloss * 255.0) / 255.0;
+    _Packed[index] = packed;
+    _Outputs[index] = float4(quantized, MonolithRoughness(quantized, material, 0.0), MonolithSpecular(0.5.xxx, quantized, material).r, material);
+    _Normals[index] = float4(MonolithFloraNormal(packed.ab), 0.0);
+    _Outputs[index + _FloraCount] = float4(MonolithLodNormal(packed.rgb, _ViewRight.xyz, _ViewUp.xyz, _ViewBack.xyz), gloss);
+}

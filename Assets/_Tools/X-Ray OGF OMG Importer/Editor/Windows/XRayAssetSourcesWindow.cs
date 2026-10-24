@@ -43,6 +43,8 @@ namespace XRay.Importer.Editor
             DrawSources(project, user);
             EditorGUILayout.Space();
             DrawImportOptions(project, user);
+            EditorGUILayout.Space();
+            Levels.XRayLevelImporterWindow.DrawSource(user);
             if (EditorGUI.EndChangeCheck())
             {
                 project.SaveSettings();

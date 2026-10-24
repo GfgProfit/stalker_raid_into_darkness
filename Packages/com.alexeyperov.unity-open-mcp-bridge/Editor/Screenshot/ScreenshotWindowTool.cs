@@ -240,14 +240,25 @@ namespace UnityOpenMcpBridge.Screenshot
                     $"Window '{window.titleContent.text}' has no visible rect to capture.");
 
             var prevActive = RenderTexture.active;
+            if (prevActive == null)
+            {
+                throw new InvalidOperationException($"Cannot capture window '{window.titleContent.text}': no render target is bound during this request. The Editor window backbuffer is unavailable. Use an OS window capture or the rendered Game/Scene capture instead.");
+            }
+
+            var readRect = new Rect(rect.x, Screen.height - rect.y - captureH, captureW, captureH);
+            int sourceWidth = prevActive.width;
+            int sourceHeight = prevActive.height;
+            if (readRect.xMin < 0.0f || readRect.yMin < 0.0f || readRect.xMax > sourceWidth || readRect.yMax > sourceHeight)
+            {
+                throw new InvalidOperationException($"Cannot capture window '{window.titleContent.text}': its screen rectangle is outside the current {sourceWidth}x{sourceHeight} render target. The Editor window backbuffer is unavailable during this request. Use an OS window capture or the rendered Game/Scene capture instead.");
+            }
+
             Texture2D tex = null;
             try
             {
                 tex = new Texture2D(captureW, captureH, TextureFormat.RGBA32, false);
                 // Screen origin is bottom-left; GUI rect origin is top-left.
-                tex.ReadPixels(
-                    new Rect(rect.x, Screen.height - rect.y - captureH, captureW, captureH),
-                    0, 0);
+                tex.ReadPixels(readRect, 0, 0);
                 tex.Apply();
                 var isSolid = IsSolidColor(tex);
                 return (ImageConversion.EncodeToPNG(tex), captureW, captureH, isSolid);

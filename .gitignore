@@ -84,3 +84,4 @@ crashlytics-build.properties
 /Assets/_Source/Levels/
 /Assets/_Source/Levels.meta
 *.slnx
+/graphify-out

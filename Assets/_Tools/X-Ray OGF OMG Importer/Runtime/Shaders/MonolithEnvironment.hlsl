@@ -62,7 +62,7 @@ MonolithEnvironmentData MonolithEvaluateEnvironment(float3 normal, float3 view, 
     float metalness = MonolithMetalness(albedoGloss.w, material);
     data.albedo = MonolithAlbedo(albedoGloss.rgb, metalness);
     data.f0 = MonolithSpecular(albedoGloss.rgb, albedoGloss.w, material);
-    float rough = MonolithRoughness(albedoGloss.w, material, _MonolithDynamicGloss);
+    float rough = MonolithRoughness(albedoGloss.w, material, MonolithDynamicGlossInput());
     if (_MonolithDebug >= 39.5 && _MonolithEnvTestView.w >= 0.0) rough = _MonolithEnvTestView.w;
     float mip = 6.0 - ((1.0 - rough) * 6.0);
     data.normalRemap = MonolithEnvironmentRemap(normal);

@@ -56,13 +56,19 @@ namespace XRay.Importer.Editor.Levels
 
         private readonly XRayLevelImportRecord _record;
         private readonly XRayLevelMaterialUpdateMode _updateMode;
+        private readonly bool _sourceBindings;
         private readonly HashSet<string> _claimed = new HashSet<string>();
         private readonly Dictionary<string, Material> _cache = new Dictionary<string, Material>();
 
-        public XRayLevelMaterialLibrary(XRayLevelImportRecord record, XRayLevelMaterialUpdateMode updateMode)
+        public XRayLevelMaterialLibrary(XRayLevelImportRecord record, XRayLevelMaterialUpdateMode updateMode) : this(record, updateMode, false)
+        {
+        }
+
+        public XRayLevelMaterialLibrary(XRayLevelImportRecord record, XRayLevelMaterialUpdateMode updateMode, bool sourceBindings)
         {
             _record = record;
             _updateMode = updateMode;
+            _sourceBindings = sourceBindings;
         }
 
         public int Created { get; private set; }
@@ -117,6 +123,10 @@ namespace XRay.Importer.Editor.Levels
                 {
                     Configure(material, request);
                     EditorUtility.SetDirty(material);
+                }
+                else if (_sourceBindings && !surface.IsFallback && !surface.IsDecal && !request.Detail)
+                {
+                    ConfigureSourceBindings(material, request);
                 }
 
                 if (regenerated)
@@ -369,7 +379,7 @@ namespace XRay.Importer.Editor.Levels
                 return;
             }
 
-            MonolithMaterialConfigurator.Configure(material, textures?.Description, albedo, bump, null, !request.Detail);
+            MonolithMaterialConfigurator.Configure(material, textures?.Description, albedo, bump, _sourceBindings ? material.GetTexture(XRayLevelSourceBindings.CORRECTION) as Texture2D : null, !request.Detail);
             material.enableInstancing = true;
             if (request.Detail)
             {
@@ -415,6 +425,7 @@ namespace XRay.Importer.Editor.Levels
             }
 
             bool flora = surface.Flora && bump != null && UsesFloraNormal(textures?.Description);
+            material.SetFloat("_MonolithFloraSubsurface", surface.Flora || request.Detail ? 1.0f : 0.0f);
             material.SetFloat("_MonolithLevelFlora", flora ? 1.0f : 0.0f);
             if (flora)
             {
@@ -438,6 +449,11 @@ namespace XRay.Importer.Editor.Levels
                 SetDoubleSided(material);
             }
 
+            if (_sourceBindings)
+            {
+                ConfigureSourceBindings(material, request);
+            }
+
 #if XRAY_HDRP
             if (surface.Kind == XRayLevelSurfaceKind.Emissive && albedo != null)
             {
@@ -448,6 +464,18 @@ namespace XRay.Importer.Editor.Levels
                 HDMaterial.SetEmissiveIntensity(material, 6.0f, EmissiveIntensityUnit.EV100);
             }
 #endif
+        }
+
+        private void ConfigureSourceBindings(Material material, XRayLevelMaterialRequest request)
+        {
+            XRayLevelTextureSet textures = request.Textures;
+            XRayLevelSurface surface = request.Surface;
+            XRayLevelSourceBinding binding = XRayLevelSourceBindings.Resolve(textures?.Description, surface.BlenderClass, surface.Kind, surface.Flora, request.Detail, material.GetTexture("_MonolithBump") != null && material.GetFloat("_MonolithHasBump") > 0.5f, material.GetFloat("_MonolithBumpFlipV"), textures?.CorrectionPath, textures?.DetailPath, textures?.DetailBumpPath, textures?.DetailCorrectionPath);
+            XRayLevelBindingPlan plan = MonolithMaterialConfigurator.ConfigureSourceBindings(material, binding);
+            if (plan.HasUserOverrides)
+            {
+                _record.Warnings.Add($"Material '{AssetDatabase.GetAssetPath(material)}' keeps user-authored X-Ray source binding values: {string.Join(", ", plan.Changes.FindAll(change => change.Ownership == XRayLevelBindingOwnership.UserOverride).ConvertAll(change => change.Property))}.");
+            }
         }
 
         public static bool UsesFloraNormal(XRay.Importer.Sources.Textures.XRayTextureDescription description)

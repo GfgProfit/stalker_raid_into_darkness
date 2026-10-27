@@ -101,4 +101,57 @@ float MonolithEnvBurley(float rough, float nv)
     return lerp(d0, d1, rough);
 }
 
+float MonolithSourceMaterial(float material)
+{
+    return abs(material - 0.95) <= 0.04 ? 0.0 : material;
+}
+
+bool MonolithSourceFlora(float material, float epsilon)
+{
+    return abs(material - 0.15) <= epsilon;
+}
+
+float MonolithSourceAmbientSpecularScale(float material)
+{
+    return MonolithSourceFlora(material, 0.04) ? 0.25 : 1.0;
+}
+
+float3 MonolithFloraSubsurface(float3 normal, float3 view, float3 light, float3 sunColor, float4 floraFixes)
+{
+    return saturate(dot(view, -(light + normal))) * floraFixes.x * lerp(float3(1.0, 1.0, 1.0), sunColor, floraFixes.y);
+}
+
+void MonolithSourceDirect(float3 normal, float3 view, float3 light, float3 encodedAlbedo, float gloss, float rawMaterial, float dynamicGloss, float3 sourceLight, float4 lightSetup, float3 sunColor, float4 floraFixes, float localMode, out float3 diffuse, out float3 specular)
+{
+    if (localMode > 0.5 && MonolithSourceFlora(rawMaterial, 0.05))
+    {
+        normal = localMode > 1.5 ? light : lerp(normal, light, 0.5);
+        gloss *= localMode > 1.5 ? 0.3 : 0.5;
+    }
+
+    normal = normalize(normal);
+    float material = MonolithSourceMaterial(rawMaterial);
+    bool flora = MonolithSourceFlora(material, 0.04);
+    float rough = MonolithRoughness(gloss, material, dynamicGloss);
+    float3 f0 = flora ? (encodedAlbedo.g * 0.05).xxx : MonolithSpecular(encodedAlbedo, gloss, material);
+    float3 halfVector = SafeNormalize(view + light);
+    float dotNV = dot(normal, view);
+    float nl = saturate(dot(normal, light));
+    float nh = saturate(dot(normal, halfVector));
+    float nv = max(1e-5, dotNV);
+    float vh = saturate(dot(view, halfVector));
+    float horizon = saturate(dotNV * 2.0);
+    float3 lightClamp = saturate(sourceLight);
+    float3 spec = MonolithGGX(nl, nh, nv, vh, f0, rough) * horizon * horizon;
+    spec *= 1.0 - (lightClamp.r + lightClamp.g + lightClamp.b) / 3.0 * (1.0 - lightSetup.x);
+    spec *= lerp(float3(1.0, 1.0, 1.0), sourceLight, lightSetup.y);
+    float smoothShading = nl * nl * PI;
+    diffuse = (MonolithBurley(nl, nv, vh, rough) * smoothShading).xxx;
+    specular = spec * smoothShading;
+    if (flora)
+    {
+        diffuse += MonolithFloraSubsurface(normal, view, light, sunColor, floraFixes);
+    }
+}
+
 #endif

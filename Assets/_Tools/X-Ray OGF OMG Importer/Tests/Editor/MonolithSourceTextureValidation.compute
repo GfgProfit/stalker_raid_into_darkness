@@ -1,0 +1,106 @@
+#pragma kernel Evaluate
+#include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Common.hlsl"
+#include "../../Runtime/Shaders/MonolithMaterial.hlsl"
+#include "../../Runtime/Shaders/MonolithSourceTexture.hlsl"
+
+StructuredBuffer<float4> _Cases;
+RWStructuredBuffer<float4> _Results;
+uint _CaseCount;
+TEXTURE2D(_Base);
+TEXTURE2D(_Bump);
+TEXTURE2D(_BumpX);
+TEXTURE2D(_Detail);
+TEXTURE2D(_DetailBump);
+TEXTURE2D(_DetailBumpX);
+SAMPLER(linear_repeat_sampler);
+float _Parallax;
+float _DetailMode;
+float _ParallaxHeight;
+float _DetailScale;
+float4 _Pom;
+float _FlipV;
+float _FlipGreen;
+
+[numthreads(64, 1, 1)]
+void Evaluate(uint3 id : SV_DispatchThreadID)
+{
+    uint i = id.x;
+    if (i >= _CaseCount)
+    {
+        return;
+    }
+
+    float2 tc = _Cases[i * 6 + 0].xy;
+    float4 position = _Cases[i * 6 + 1];
+    float3 m1 = _Cases[i * 6 + 2].xyz;
+    float3 m2 = _Cases[i * 6 + 3].xyz;
+    float3 m3 = _Cases[i * 6 + 4].xyz;
+    float4 lightMaterial = _Cases[i * 6 + 5];
+    float3 tangent = float3(m1.x, m2.x, m3.x);
+    float3 bitangent = float3(m1.y, m2.y, m3.y) * (_FlipGreen > 0.5 ? -1.0 : 1.0);
+    float3 normal = float3(m1.z, m2.z, m3.z);
+    float3 eye = MonolithSourceEye(tangent, bitangent, normal, -position.xyz, _FlipGreen);
+    float height = 0.0;
+    bool steep = false;
+    float2 sourceTc = tc;
+    if (_Parallax > 1.5)
+    {
+        sourceTc = MonolithSourceSteepParallax(TEXTURE2D_ARGS(_BumpX, linear_repeat_sampler), tc, eye, position.z, _Pom, _FlipV);
+        height = SAMPLE_TEXTURE2D_LOD(_BumpX, linear_repeat_sampler, MonolithSourceTextureUv(sourceTc, _FlipV), 0.0).r;
+        steep = true;
+    }
+    else if (_Parallax > 0.5)
+    {
+        height = SAMPLE_TEXTURE2D_LOD(_BumpX, linear_repeat_sampler, MonolithSourceTextureUv(tc, _FlipV), 0.0).a;
+        sourceTc = MonolithSourceParallax(tc, height, eye, float2(_ParallaxHeight, -0.5 * _ParallaxHeight));
+    }
+
+    float2 detailTc = sourceTc * _DetailScale;
+    float2 uv = MonolithSourceTextureUv(sourceTc, _FlipV);
+    float2 detailUv = MonolithSourceTextureUv(detailTc, _FlipV);
+    float3 encodedAlbedo = saturate(SAMPLE_TEXTURE2D_LOD(_Base, linear_repeat_sampler, uv, 0.0).rgb);
+    if (steep)
+    {
+        encodedAlbedo = MonolithSourceSteepOcclusion(encodedAlbedo, height, _Pom.w);
+    }
+
+    float4 packed = SAMPLE_TEXTURE2D_LOD(_Bump, linear_repeat_sampler, uv, 0.0);
+    float gloss = packed.r;
+    float3 tangentNormal = MonolithDecodeNormal(packed, _FlipGreen);
+    if (_DetailMode > 0.5)
+    {
+        float4 detail = SAMPLE_TEXTURE2D_LOD(_Detail, linear_repeat_sampler, detailUv, 0.0);
+        encodedAlbedo = saturate(encodedAlbedo * detail.rgb * 2.0);
+        if (_DetailMode > 1.5)
+        {
+            float4 detailBump = SAMPLE_TEXTURE2D_LOD(_DetailBump, linear_repeat_sampler, detailUv, 0.0);
+            float4 detailCorrection = SAMPLE_TEXTURE2D_LOD(_DetailBumpX, linear_repeat_sampler, detailUv, 0.0);
+            gloss *= detailBump.r * 2.0;
+            tangentNormal = MonolithSourceDetailNormal(packed, detailBump, detailCorrection);
+            tangentNormal.y *= _FlipGreen > 0.5 ? -1.0 : 1.0;
+        }
+        else
+        {
+            gloss *= detail.a * 2.0;
+        }
+    }
+
+    float rawGloss = gloss;
+    gloss = round(saturate(gloss) * 255.0) / 255.0;
+    float3 normalView = normalize(tangent * tangentNormal.x + bitangent * tangentNormal.y + normal * tangentNormal.z);
+    float3 view = -normalize(position.xyz);
+    float rawMaterial = lightMaterial.w;
+    float metalness = MonolithMetalness(gloss, MonolithSourceMaterial(rawMaterial));
+    float3 albedo = MonolithAlbedo(encodedAlbedo, metalness);
+    float3 diffuse;
+    float3 specular;
+    MonolithSourceDirect(normalView, view, lightMaterial.xyz, encodedAlbedo, gloss, rawMaterial, 0.71864, float3(1.0, 1.0, 1.0), float4(0.5, 1.0, 0.0, 0.0), float3(1.0, 1.0, 1.0), float4(1.5, 1.0, 0.0, 0.0), 0.0, diffuse, specular);
+    float3 xrayNormal = float3(tangentNormal.x, tangentNormal.y * (_FlipGreen > 0.5 ? -1.0 : 1.0), tangentNormal.z);
+    uint o = i * 6;
+    _Results[o + 0] = float4(sourceTc, detailTc);
+    _Results[o + 1] = float4(encodedAlbedo, rawGloss);
+    _Results[o + 2] = float4(xrayNormal, height);
+    _Results[o + 3] = float4(normalView, height);
+    _Results[o + 4] = float4(diffuse * albedo + specular, gloss);
+    _Results[o + 5] = float4(encodedAlbedo, 0.0);
+}

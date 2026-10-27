@@ -22,6 +22,7 @@ namespace XRay.Importer.Editor
             material.SetColor("_BaseColor", Color.white);
             material.SetTexture("_MonolithBump", bump);
             material.SetTexture("_MonolithBumpCorrection", correction);
+            material.SetFloat("_MonolithHasBumpCorrection", bump != null && correction != null ? 1.0f : 0.0f);
             material.SetFloat("_MonolithHasBump", bump != null ? 1.0f : 0.0f);
             material.SetFloat("_MonolithBumpFlipV", bump != null && (bump.format == TextureFormat.BC7 || bump.format == TextureFormat.BC6H) ? 1.0f : 0.0f);
             material.SetFloat("_MonolithMaterialId", description != null && description.HasMaterial ? description.MaterialId : 1);
@@ -48,6 +49,13 @@ namespace XRay.Importer.Editor
             material.DisableKeyword("_NORMALMAP");
             material.renderQueue = 2000;
             EditorUtility.SetDirty(material);
+        }
+
+        public static Levels.XRayLevelBindingPlan ConfigureSourceBindings(Material material, Levels.XRayLevelSourceBinding binding)
+        {
+            Levels.XRayLevelBindingPlan plan = Levels.XRayLevelSourceBindings.Plan(material, binding);
+            Levels.XRayLevelSourceBindings.Apply(material, plan);
+            return plan;
         }
     }
 }

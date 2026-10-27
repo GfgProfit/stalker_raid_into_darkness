@@ -61,12 +61,43 @@ namespace XRay.Importer.Tests
                 Assert.AreEqual(XRayLevelMaterialLibrary.FLORA_MATERIAL_WEIGHT, leaves.GetFloat("_MonolithMaterialWeight"), 1e-6f);
                 Assert.IsFalse(trunk.IsKeywordEnabled("_MONOLITH_LEVEL_FLORA"));
                 Assert.AreEqual(0.5f, trunk.GetFloat("_MonolithMaterialWeight"), 1e-6f);
+                Assert.AreEqual(1, leaves.GetFloat("_MonolithFloraSubsurface"));
+                Assert.AreEqual(0, trunk.GetFloat("_MonolithFloraSubsurface"));
             }
             finally
             {
                 Object.DestroyImmediate(leaves);
                 Object.DestroyImmediate(trunk);
                 AssetDatabase.DeleteAsset(bumpPath);
+            }
+        }
+
+        [Test]
+        public void WoodMaterialKeepsThmIdWithoutLeafSubsurface()
+        {
+            var material = new Material(Shader.Find("HDRP/MonolithLit"));
+            try
+            {
+                XRayTextureDescription description = Description(null, XRayBumpMode.Use, null, 0u);
+                Set(description, "HasMaterial", true);
+                Set(description, "MaterialId", 0u);
+                Set(description, "MaterialWeight", 0.05);
+                var resolution = new XRayTextureResolution();
+                Set(resolution, "Description", description);
+                var textures = new XRayLevelTextureSet { Resolution = resolution };
+                var library = new XRayLevelMaterialLibrary(new XRayLevelImportRecord(), XRayLevelMaterialUpdateMode.Update);
+                XRayLevelSurface surface = XRayLevelSurfaceRules.Classify(new XRayLevelShader(1, "default/wood\\wood_old"), null, true);
+                MethodInfo configure = typeof(XRayLevelMaterialLibrary).GetMethod("Configure", BindingFlags.NonPublic | BindingFlags.Instance);
+                configure.Invoke(library, new object[] { material, new XRayLevelMaterialRequest { ShaderName = "default", Surface = surface, Textures = textures } });
+                Assert.IsFalse(surface.Flora);
+                Assert.AreEqual(0, material.GetFloat("_MonolithMaterialId"));
+                Assert.AreEqual(0.05f, material.GetFloat("_MonolithMaterialWeight"), 1e-6f);
+                Assert.AreEqual(0, material.GetFloat("_MonolithFloraSubsurface"));
+                Assert.AreEqual(0, material.GetFloat("_MonolithSourceProfile"));
+            }
+            finally
+            {
+                Object.DestroyImmediate(material);
             }
         }
 

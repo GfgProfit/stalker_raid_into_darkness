@@ -192,6 +192,34 @@ namespace XRay.Importer.Editor
             return Store(marker, file.Winner.RelativePath, "_packed", ".png", folder, XRayTextureRole.Packed, header.Description, () => EncodePng(DdsDecoder.DecodeTopLevel(source, header), header.Width, header.Height, true), "Packed mip0 converted losslessly to PNG; Unity generates remaining mips.");
         }
 
+        public string FindPacked(XRayResolvedFile file, string folder, out bool upToDate)
+        {
+            upToDate = false;
+            if (file == null || !file.IsResolved)
+            {
+                return null;
+            }
+
+            string key = file.VirtualPath + "#packed" + (ContentKeys ? ContentQualifier(file.Winner.ReadAllBytes()) : string.Empty);
+            foreach (string candidate in XRayAssetNaming.CreateCandidates(file.Winner.RelativePath, "_packed"))
+            {
+                foreach (string extension in new[] { ".dds", ".png" })
+                {
+                    string path = folder + "/" + candidate + extension;
+                    if (XRayAssetMarker.ReadKey(path) != key)
+                    {
+                        continue;
+                    }
+
+                    XRayAssetMarker marker = XRayAssetMarker.ReadEffective(path);
+                    upToDate = marker != null && marker.Stamp == file.Winner.Stamp && marker.SourcePath == file.Winner.Location;
+                    return path;
+                }
+            }
+
+            return null;
+        }
+
         private static XRayTextureAssetResult EnsurePackedLinear(XRayTextureAssetResult result)
         {
             if (AssetImporter.GetAtPath(result.AssetPath) is IHVImageFormatImporter importer)

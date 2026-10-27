@@ -1,0 +1,62 @@
+#pragma kernel EvaluateProfile
+#pragma kernel EvaluateTerms
+#include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Common.hlsl"
+#include "../../Runtime/Shaders/MonolithMaterial.hlsl"
+
+StructuredBuffer<float4> _Cases;
+RWStructuredBuffer<float4> _Results;
+uint _CaseCount;
+float4 _SourceLight;
+float4 _SunColor;
+float4 _LightSetup;
+float4 _FloraFixes;
+
+[numthreads(64, 1, 1)]
+void EvaluateProfile(uint3 id : SV_DispatchThreadID)
+{
+    uint i = id.x;
+    if (i >= _CaseCount)
+    {
+        return;
+    }
+
+    float4 surface = _Cases[i * 4 + 0];
+    float4 normalMaterial = _Cases[i * 4 + 1];
+    float4 viewLocal = _Cases[i * 4 + 2];
+    float3 light = _Cases[i * 4 + 3].xyz;
+    float rawMaterial = normalMaterial.w;
+    float material = MonolithSourceMaterial(rawMaterial);
+    float metalness = MonolithMetalness(surface.w, material);
+    float rough = MonolithRoughness(surface.w, material, _SourceLight.w);
+    float3 albedo = MonolithAlbedo(surface.rgb, metalness);
+    float3 f0 = MonolithSpecular(surface.rgb, surface.w, material);
+    float3 normal = normalize(normalMaterial.xyz);
+    float3 view = viewLocal.xyz;
+    float3 diffuse;
+    float3 specular;
+    MonolithSourceDirect(normal, view, light, surface.rgb, surface.w, rawMaterial, _SourceLight.w, _SourceLight.rgb, _LightSetup, _SunColor.rgb, _FloraFixes, viewLocal.w, diffuse, specular);
+    float dotNV = dot(normal, view);
+    float nv = max(1e-5, dotNV);
+    float horizon = saturate(dotNV * 2.0);
+    uint o = i * 6;
+    _Results[o + 0] = float4(metalness, rough, material, MonolithSourceFlora(rawMaterial, 0.04) ? 1.0 : 0.0);
+    _Results[o + 1] = float4(albedo, 0.0);
+    _Results[o + 2] = float4(f0, 0.0);
+    _Results[o + 3] = float4(diffuse * albedo + specular, 0.0);
+    _Results[o + 4] = float4(MonolithEnvBurley(rough, nv) * albedo, 0.0);
+    _Results[o + 5] = float4(MonolithEnvGGX(f0, rough, nv) * horizon * horizon * MonolithSourceAmbientSpecularScale(rawMaterial), 0.0);
+}
+
+[numthreads(64, 1, 1)]
+void EvaluateTerms(uint3 id : SV_DispatchThreadID)
+{
+    uint i = id.x;
+    if (i >= _CaseCount)
+    {
+        return;
+    }
+
+    float4 angles = _Cases[i * 2 + 0];
+    float4 f0Rough = _Cases[i * 2 + 1];
+    _Results[i] = float4(MonolithGGX(angles.x, angles.y, angles.z, angles.w, f0Rough.rgb, f0Rough.w), MonolithBurley(angles.x, angles.z, angles.w, f0Rough.w));
+}

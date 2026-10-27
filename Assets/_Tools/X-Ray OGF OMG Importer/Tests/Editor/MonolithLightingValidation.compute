@@ -1,0 +1,50 @@
+#pragma kernel Lighting
+#pragma kernel Weather
+#pragma kernel Terrain
+#pragma kernel FloraMask
+#include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Common.hlsl"
+#include "../../Runtime/Shaders/MonolithLightInputs.hlsl"
+#include "../../Runtime/Shaders/MonolithMaterial.hlsl"
+
+StructuredBuffer<float4> Input;
+RWStructuredBuffer<float4> Output;
+float _MonolithWeatherActive;
+float4 _MonolithWeatherState;
+float _LocalGloss;
+float _Profile;
+
+[numthreads(1, 1, 1)]
+void Lighting(uint3 id : SV_DispatchThreadID)
+{
+    uint i = id.x;
+    float4 a = Input[i * 3];
+    float4 b = Input[i * 3 + 1];
+    float4 c = Input[i * 3 + 2];
+    Output[i] = float4(MonolithSourceAttenuation(a.x, a.y), MonolithSourceAccumulation(b.rgb, c.rgb, a.z));
+}
+
+[numthreads(1, 1, 1)]
+void Weather(uint3 id : SV_DispatchThreadID)
+{
+    float wetness = id.x / 4.0;
+    float effectiveGloss = MonolithResolveDynamicGloss(_Profile, _MonolithWeatherActive, _LocalGloss, _MonolithWeatherState.x);
+    Output[id.x] = float4(MonolithWeatherGloss(0.65, 0.76, 1.0, wetness), effectiveGloss, _MonolithWeatherActive, _MonolithWeatherState.y);
+}
+
+[numthreads(1, 1, 1)]
+void Terrain(uint3 id : SV_DispatchThreadID)
+{
+    float material = Input[id.x].x;
+    Output[id.x] = float4(MonolithSourceMaterial(material), MonolithSourceAmbientSpecularScale(material), MonolithMetalness(0.5, material), MonolithMetalness(0.5, MonolithSourceMaterial(material)));
+}
+
+[numthreads(1, 1, 1)]
+void FloraMask(uint3 id : SV_DispatchThreadID)
+{
+    float4 test = Input[id.x];
+    float4 fixes = MonolithResolveFloraFixes(float4(1.5, 1, 0, 0), float4(2, 1, 0, 0), test.z, test.y, test.x);
+    float3 diffuse;
+    float3 specular;
+    MonolithSourceDirect(float3(0, 1, 0), float3(0, 0, 1), float3(0, 0, -1), 0.5, 0.2, 0.15, 0.71864, 1, float4(0.5, 1, 0, 0), 1, fixes, 0, diffuse, specular);
+    Output[id.x] = float4(diffuse, fixes.x);
+}

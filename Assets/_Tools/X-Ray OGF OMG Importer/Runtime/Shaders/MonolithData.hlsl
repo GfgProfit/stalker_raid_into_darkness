@@ -57,15 +57,90 @@ float MonolithLevelHemisphere(FragInputs input, float4 baseSample)
 }
 #endif
 
+#if (SHADERPASS == SHADERPASS_FORWARD || defined(WRITE_NORMAL_BUFFER)) && !defined(_MONOLITH_LEVEL_DETAIL) && !defined(_MONOLITH_LEVEL_LOD) && !defined(_MONOLITH_LEVEL_TERRAIN) && !defined(_MONOLITH_LEVEL_FLORA)
+#define MONOLITH_SOURCE_TEXTURE
+void MonolithSourceBasis(FragInputs input, out float3 tangent, out float3 bitangent, out float3 normal)
+{
+    tangent = input.tangentToWorld[0];
+    bitangent = input.tangentToWorld[1];
+    normal = input.tangentToWorld[2];
+    #ifdef _MONOLITH_ORIGINAL_TBN
+    if (_MonolithOriginalTbn > 0.5 && input.color.a > 1.5)
+    {
+        #ifdef _MONOLITH_SKINNED_TBN
+        tangent = input.color.rgb;
+        bitangent = float3(input.texCoord1.xy, input.texCoord2.x);
+        normal = float3(input.texCoord2.y, input.texCoord3.xy);
+        #else
+        tangent = TransformObjectToWorldDir(input.color.rgb, false);
+        bitangent = TransformObjectToWorldDir(float3(input.texCoord1.xy, input.texCoord2.x), false);
+        normal = TransformObjectToWorldDir(float3(input.texCoord2.y, input.texCoord3.xy), false);
+        #endif
+    }
+    #endif
+    #ifdef _MONOLITH_LEVEL
+    float3x3 levelObjectToWorld = (float3x3)GetObjectToWorldMatrix();
+    tangent = mul(levelObjectToWorld, input.color.rgb * 2.0 - 1.0);
+    bitangent = mul(levelObjectToWorld, 1.0 - float3(input.texCoord1.xy, input.texCoord2.x) * 2.0);
+    normal = mul(levelObjectToWorld, normalize(mul(transpose(levelObjectToWorld), input.tangentToWorld[2])));
+    #endif
+}
+#endif
+
 void GetSurfaceAndBuiltinData(FragInputs input, float3 V, inout PositionInputs posInput, out SurfaceData surfaceData, out BuiltinData builtinData)
 {
     if (_MonolithDebug > 62.5 && _MonolithDebug < 63.5)
     {
         _MonolithDiagnosticValue = 1.0;
     }
+    if (_MonolithDebug > 68.5 && _MonolithDebug < 69.5) _MonolithDiagnosticValue = 0.0;
 
     MonolithLegacyGetSurfaceAndBuiltinData(input, V, posInput, surfaceData, builtinData);
     float2 uv = input.texCoord0.xy * _BaseColorMap_ST.xy + _BaseColorMap_ST.zw;
+    #ifdef MONOLITH_SOURCE_TEXTURE
+    float sourceHeight = 0.0;
+    bool sourceSteep = false;
+    bool sourceDetail = false;
+    float2 sourceDetailUv = float2(0.0, 0.0);
+    float4 sourceDetailBump = float4(0.5, 0.5, 0.5, 0.5);
+    float4 sourceDetailCorrection = float4(0.5, 0.5, 0.5, 0.5);
+    float sourceDetailMode = _MonolithHasDetail > 0.5 ? min(_MonolithSourceDetail, _MonolithHasDetailBump > 0.5 ? 2.0 : 1.0) : 0.0;
+    if (_MonolithSourceProfile > 0.5)
+    {
+        bool sourceRange = _MonolithSourceTextureRange <= 0.0 || length(posInput.positionWS) < _MonolithSourceTextureRange;
+        float2 sourceTc = MonolithSourceXRayUv(uv);
+        if (_MonolithSourceParallax > 0.5 && _MonolithHasBump > 0.5 && _MonolithHasBumpCorrection > 0.5)
+        {
+            float3 sourceTangent;
+            float3 sourceBitangent;
+            float3 sourceNormal;
+            MonolithSourceBasis(input, sourceTangent, sourceBitangent, sourceNormal);
+            float3 sourceEye = MonolithSourceEye(sourceTangent, sourceBitangent, sourceNormal, -posInput.positionWS, _MonolithFlipGreen);
+            float2 parallaxTc = sourceTc;
+            if (_MonolithSourceParallax > 1.5)
+            {
+                parallaxTc = MonolithSourceSteepParallax(TEXTURE2D_ARGS(_MonolithBumpCorrection, sampler_MonolithBump), sourceTc, sourceEye, dot(posInput.positionWS, -UNITY_MATRIX_V[2].xyz), _MonolithPom, _MonolithBumpFlipV);
+                sourceHeight = SAMPLE_TEXTURE2D(_MonolithBumpCorrection, sampler_MonolithBump, MonolithSourceTextureUv(parallaxTc, _MonolithBumpFlipV)).r;
+                sourceSteep = sourceRange;
+            }
+            else
+            {
+                sourceHeight = SAMPLE_TEXTURE2D(_MonolithBumpCorrection, sampler_MonolithBump, MonolithSourceTextureUv(sourceTc, _MonolithBumpFlipV)).a;
+                parallaxTc = MonolithSourceParallax(sourceTc, sourceHeight, sourceEye, float2(_MonolithParallaxHeight, -0.5 * _MonolithParallaxHeight));
+            }
+            sourceHeight = sourceRange ? sourceHeight : 0.0;
+            sourceTc = sourceRange ? parallaxTc : sourceTc;
+            uv = sourceRange ? MonolithSourceXRayUv(parallaxTc) : uv;
+        }
+        sourceDetail = sourceDetailMode > 0.5 && sourceRange;
+        sourceDetailUv = MonolithSourceTextureUv(sourceTc * _MonolithDetailScale, _MonolithDetailFlipV);
+        if (sourceDetailMode > 1.5 && _MonolithHasBump > 0.5)
+        {
+            sourceDetailBump = SAMPLE_TEXTURE2D(_MonolithDetailBump, sampler_MonolithDetailMap, sourceDetailUv);
+            sourceDetailCorrection = SAMPLE_TEXTURE2D(_MonolithDetailBumpCorrection, sampler_MonolithDetailMap, sourceDetailUv);
+        }
+    }
+    #endif
     float4 baseSample = SAMPLE_TEXTURE2D(_BaseColorMap, sampler_BaseColorMap, uv);
     #ifdef _MONOLITH_LEVEL_LOD
     float lodFactor = input.texCoord2.x;
@@ -79,6 +154,20 @@ void GetSurfaceAndBuiltinData(FragInputs input, float3 V, inout PositionInputs p
     #endif
     float3 encodedAlbedo = _MonolithAlbedoSrgb > 0.5 ? LinearToSRGB(baseSample.rgb) : baseSample.rgb;
     encodedAlbedo = saturate(encodedAlbedo * _BaseColor.rgb);
+    #ifdef MONOLITH_SOURCE_TEXTURE
+    float sourceDetailGloss = 1.0;
+    if (sourceSteep)
+    {
+        encodedAlbedo = MonolithSourceSteepOcclusion(encodedAlbedo, sourceHeight, _MonolithPom.w);
+    }
+    if (_MonolithSourceProfile > 0.5 && sourceDetailMode > 0.5)
+    {
+        float4 sourceDetailSample = SAMPLE_TEXTURE2D(_MonolithDetailMap, sampler_MonolithDetailMap, sourceDetailUv);
+        float3 sourceDetailColor = _MonolithDetailSrgb > 0.5 ? LinearToSRGB(sourceDetailSample.rgb) : sourceDetailSample.rgb;
+        encodedAlbedo = sourceDetail ? saturate(encodedAlbedo * sourceDetailColor * 2.0) : encodedAlbedo;
+        sourceDetailGloss = sourceDetailSample.a * 2.0;
+    }
+    #endif
     #ifdef _MONOLITH_LEVEL_TERRAIN
     float3 terrainNormal;
     float terrainGloss;
@@ -100,6 +189,12 @@ void GetSurfaceAndBuiltinData(FragInputs input, float3 V, inout PositionInputs p
     float2 bumpUv = float2(uv.x, _MonolithBumpFlipV > 0.5 ? 1.0 - uv.y : uv.y);
     float4 packed = SAMPLE_TEXTURE2D(_MonolithBump, sampler_MonolithBump, bumpUv);
     float gloss = _MonolithHasBump > 0.5 ? packed.r : _MonolithFallbackGloss;
+    #ifdef MONOLITH_SOURCE_TEXTURE
+    if (sourceDetail && _MonolithHasBump > 0.5)
+    {
+        gloss *= sourceDetailMode > 1.5 ? sourceDetailBump.r * 2.0 : sourceDetailGloss;
+    }
+    #endif
     gloss = saturate(gloss * _MonolithGlossScale);
     #ifdef _MONOLITH_LEVEL_DETAIL
     gloss = _MonolithFallbackGloss;
@@ -125,9 +220,22 @@ void GetSurfaceAndBuiltinData(FragInputs input, float3 V, inout PositionInputs p
     _MonolithEnvironmentAlbedoGloss = float4(encodedAlbedo, gloss);
     #endif
     float material = MonolithDecodeMaterial(_MonolithMaterialId, _MonolithMaterialWeight);
+    _MonolithSourceAlbedoGloss = float4(encodedAlbedo, gloss);
+    _MonolithSourceRawMaterial = material;
+    if (_MonolithSourceProfile > 0.5 || _MonolithTrueStalkerTerrain > 0.5)
+    {
+        material = MonolithSourceMaterial(material);
+    }
     float metalness = MonolithMetalness(gloss, material);
-    float rough = MonolithRoughness(gloss, material, _MonolithDynamicGloss);
+    float rough = MonolithRoughness(gloss, material, MonolithDynamicGlossInput());
     float3 tangentNormal = _MonolithHasBump > 0.5 ? MonolithDecodeNormal(packed, _MonolithFlipGreen) : float3(0.0, 0.0, 1.0);
+    #ifdef MONOLITH_SOURCE_TEXTURE
+    if (sourceDetail && sourceDetailMode > 1.5 && _MonolithHasBump > 0.5)
+    {
+        tangentNormal = MonolithSourceDetailNormal(packed, sourceDetailBump, sourceDetailCorrection);
+        tangentNormal.y *= _MonolithFlipGreen > 0.5 ? -1.0 : 1.0;
+    }
+    #endif
     #ifdef _MONOLITH_LEVEL_TERRAIN
     tangentNormal = terrainNormal;
     #endif
@@ -211,6 +319,15 @@ void GetSurfaceAndBuiltinData(FragInputs input, float3 V, inout PositionInputs p
     surfaceData.ambientOcclusion = 1.0;
     surfaceData.specularOcclusion = 1.0;
     GetBuiltinData(input, V, posInput, surfaceData, baseSample.a * _BaseColor.a, surfaceData.normalWS, 0.0, builtinData);
+    #if defined(MONOLITH_SOURCE_TEXTURE) && SHADERPASS == SHADERPASS_FORWARD
+    if (_MonolithSourceProfile > 0.5 && _MonolithSourceVirtualHeight > 0.5)
+    {
+        float3 sourceForward = -UNITY_MATRIX_V[2].xyz;
+        float sourceDepth = dot(posInput.positionWS, sourceForward);
+        float sourceVirtualHeight = _MonolithHasBump > 0.5 ? sourceHeight : 0.5;
+        posInput.positionWS *= (sourceDepth + dot(surfaceData.normalWS, sourceForward) * sourceVirtualHeight * 0.05) / sourceDepth;
+    }
+    #endif
     if (_MonolithDebug > 33.5 && _MonolithDebug < 34.5) _MonolithDiagnosticValue = GetAbsolutePositionWS(posInput.positionWS);
     if (_MonolithDebug > 34.5 && _MonolithDebug < 35.5) _MonolithDiagnosticValue = float3(uv, 0.0);
     if (_MonolithDebug > 36.5 && _MonolithDebug < 37.5) _MonolithDiagnosticValue = MonolithInstanceData().xyz;

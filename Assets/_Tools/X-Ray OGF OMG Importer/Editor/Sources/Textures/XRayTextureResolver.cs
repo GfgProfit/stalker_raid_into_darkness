@@ -50,7 +50,7 @@ namespace XRay.Importer.Sources.Textures
 
             if (resolution.Description != null && !string.IsNullOrEmpty(resolution.Description.DetailName))
             {
-                resolution.Notes.Add($"Detail texture '{resolution.Description.DetailName}' (scale {resolution.Description.DetailScale:0.###}) is declared; it is not applied because the HDRP detail map layout differs from X-Ray detail textures.");
+                resolution.Notes.Add($"Detail texture '{resolution.Description.DetailName}' (scale {resolution.Description.DetailScale:0.###}) is declared; renderer-specific source binding determines its use.");
             }
 
             if (!resolution.Diffuse.IsResolved && _index.ArchiveSources.Count > 0)

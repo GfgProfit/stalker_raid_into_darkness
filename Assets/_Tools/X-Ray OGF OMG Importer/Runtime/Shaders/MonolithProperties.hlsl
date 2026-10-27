@@ -1,4 +1,5 @@
 #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/DebugMipmapStreamingMacros.hlsl"
+#include "MonolithLightInputs.hlsl"
 TEXTURE2D(_EmissiveColorMap);
 SAMPLER(sampler_EmissiveColorMap);
 #ifndef LAYERED_LIT_SHADER
@@ -71,6 +72,10 @@ SAMPLER(sampler_LayerInfluenceMaskMap);
 TEXTURE2D(_MonolithBump);
 SAMPLER(sampler_MonolithBump);
 TEXTURE2D(_MonolithBumpCorrection);
+TEXTURE2D(_MonolithDetailMap);
+SAMPLER(sampler_MonolithDetailMap);
+TEXTURE2D(_MonolithDetailBump);
+TEXTURE2D(_MonolithDetailBumpCorrection);
 TEXTURE2D(_MonolithLevelHemiMap);
 SAMPLER(sampler_MonolithLevelHemiMap);
 TEXTURE2D(_MonolithTerrainMask);
@@ -87,6 +92,23 @@ TEXTURE2D(_MonolithTerrainBumpB);
 TEXTURE2D(_MonolithTerrainBumpA);
 static float3 _MonolithDiagnosticValue;
 static float _MonolithLevelHemiValue = 1.0;
+static float4 _MonolithSourceAlbedoGloss;
+static float _MonolithSourceRawMaterial;
+static float _MonolithSourceLocalLight = 0.0;
+static float3 _MonolithCurrentSourceLight = 0.0;
+static float _MonolithCurrentSourceLightActive = 0.0;
+float _MonolithWeatherActive;
+float4 _MonolithWeatherState;
+float4 _MonolithWeatherSun;
+float4 _MonolithWeatherLightSetup;
+float4 _MonolithWeatherFloraFixes;
+float _MonolithSourceLightingMode;
+float _MonolithBoundRadianceScale;
+float4 _MonolithLightCalibration;
+int _MonolithBoundLightCount;
+float4 _MonolithBoundPositionType64[64];
+float4 _MonolithBoundDirectionRange64[64];
+float4 _MonolithBoundColor64[64];
 float4 _MonolithDetailWave1;
 float4 _MonolithDetailWind1;
 float4 _MonolithDetailWave2;
@@ -119,6 +141,23 @@ float _MonolithDebug;
 float4 _MonolithDiagnosticOptions;
 float4 _MonolithLightSetup;
 float4 _MonolithSourceLight;
+float _MonolithSourceProfile;
+float _MonolithTrueStalkerTerrain;
+float4 _MonolithSunColor;
+float4 _MonolithFloraFixes2;
+float _MonolithFloraSubsurface;
+float _MonolithSourceDetail;
+float _MonolithSourceParallax;
+float _MonolithSourceVirtualHeight;
+float _MonolithSourceTextureRange;
+float _MonolithHasBumpCorrection;
+float _MonolithHasDetail;
+float _MonolithHasDetailBump;
+float _MonolithDetailScale;
+float _MonolithDetailSrgb;
+float _MonolithDetailFlipV;
+float _MonolithParallaxHeight;
+float4 _MonolithPom;
 float _MonolithLevel;
 float _MonolithLevelDetail;
 float _MonolithLevelHemiMode;
@@ -265,6 +304,26 @@ float _TessellationBackFaceCullEpsilon;
 #endif
 UNITY_TEXTURE_STREAMING_DEBUG_VARS;
 CBUFFER_END
+
+float MonolithDynamicGlossInput()
+{
+    return MonolithResolveDynamicGloss(_MonolithSourceProfile, _MonolithWeatherActive, _MonolithDynamicGloss, _MonolithWeatherState.x);
+}
+
+float3 MonolithSunColorInput()
+{
+    return _MonolithSourceProfile > 0.5 && _MonolithWeatherActive > 0.5 ? _MonolithWeatherSun.rgb : _MonolithSunColor.rgb;
+}
+
+float4 MonolithLightSetupInput()
+{
+    return _MonolithSourceProfile > 0.5 && _MonolithWeatherActive > 0.5 ? _MonolithWeatherLightSetup : _MonolithLightSetup;
+}
+
+float4 MonolithFloraFixesInput()
+{
+    return MonolithResolveFloraFixes(_MonolithFloraFixes2, _MonolithWeatherFloraFixes, _MonolithSourceProfile, _MonolithWeatherActive, _MonolithFloraSubsurface);
+}
 #if defined(UNITY_INSTANCING_ENABLED)
 UNITY_INSTANCING_BUFFER_START(MonolithInstance)
 UNITY_DEFINE_INSTANCED_PROP(float4, _MonolithInstanceData)

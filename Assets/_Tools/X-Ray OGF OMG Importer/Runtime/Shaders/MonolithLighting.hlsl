@@ -15,6 +15,10 @@ PreLightData GetPreLightData(float3 V, PositionInputs posInput, inout BSDFData b
     data.specularFGD = MonolithEnvGGX(bsdfData.fresnel0, bsdfData.perceptualRoughness, nv) * Sq(saturate(dot(bsdfData.normalWS, V) * 2.0));
     data.diffuseFGD = MonolithEnvBurley(bsdfData.perceptualRoughness, nv);
     data.energyCompensation = 0.0;
+    if (_MonolithSourceProfile > 0.5)
+    {
+        data.specularFGD *= MonolithSourceAmbientSpecularScale(_MonolithSourceRawMaterial);
+    }
     return data;
 }
 
@@ -22,6 +26,12 @@ CBSDF MonolithEvaluateBSDF(float3 V, float3 L, PreLightData preLightData, BSDFDa
 {
     CBSDF data;
     ZERO_INITIALIZE(CBSDF, data);
+    if (_MonolithSourceProfile > 0.5)
+    {
+        float3 sourceColor = _MonolithCurrentSourceLightActive > 0.5 ? _MonolithCurrentSourceLight : _MonolithSourceLight.rgb;
+        MonolithSourceDirect(bsdfData.normalWS, V, L, _MonolithSourceAlbedoGloss.rgb, _MonolithSourceAlbedoGloss.a, _MonolithSourceRawMaterial, MonolithDynamicGlossInput(), sourceColor, MonolithLightSetupInput(), MonolithSunColorInput(), MonolithFloraFixesInput(), _MonolithSourceLocalLight, data.diffR, data.specR);
+        return data;
+    }
     float3 N = bsdfData.normalWS;
     float3 H = SafeNormalize(V + L);
     float dotNV = dot(N, V);
@@ -52,19 +62,114 @@ CBSDF MonolithEvaluateBSDF(float3 V, float3 L, PreLightData preLightData, BSDFDa
 #undef EvaluateTransmittance_Punctual
 #undef ShadeSurface_Punctual
 
+bool MonolithFindBoundLight(float type, float3 positionRWS, float3 forward, float range, out float3 sourceColor, out float localMode)
+{
+    sourceColor = 0.0;
+    localMode = 1.0;
+    if (_MonolithSourceProfile < 0.5 || _MonolithSourceLightingMode < 1.5) return false;
+    float3 position = GetAbsolutePositionWS(positionRWS);
+    int matches = 0;
+    for (int i = 0; i < min(_MonolithBoundLightCount, 64); i++)
+    {
+        float4 p = _MonolithBoundPositionType64[i];
+        float4 d = _MonolithBoundDirectionRange64[i];
+        bool samePosition = type < 0.5 || dot(position - p.xyz, position - p.xyz) < 0.000001;
+        bool sameDirection = type > 0.5 && type < 1.5 || dot(forward - d.xyz, forward - d.xyz) < 0.000001;
+        if (abs(type - p.w) < 0.1 && samePosition && sameDirection && (type < 0.5 || abs(range - d.w) < 0.0001))
+        {
+            sourceColor = _MonolithBoundColor64[i].rgb;
+            localMode = _MonolithBoundColor64[i].w;
+            matches++;
+        }
+    }
+    return matches == 1;
+}
+
+DirectLighting MonolithBoundLighting(float3 V, float3 L, PreLightData preLightData, BSDFData bsdfData, float3 sourceColor, float3 lightmap, float3 shadow, float attenuation, float diffuseDimmer, float specularDimmer)
+{
+    _MonolithCurrentSourceLight = sourceColor;
+    _MonolithCurrentSourceLightActive = 1.0;
+    CBSDF data = MonolithEvaluateBSDF(V, L, preLightData, bsdfData);
+    float3 color = MonolithSourceAccumulation(sourceColor, lightmap, shadow) * attenuation * _MonolithBoundRadianceScale;
+    DirectLighting lighting;
+    ZERO_INITIALIZE(DirectLighting, lighting);
+    lighting.diffuse = data.diffR * color * diffuseDimmer;
+    lighting.specular = data.specR * color * specularDimmer;
+    _MonolithCurrentSourceLightActive = 0.0;
+    return lighting;
+}
+
 DirectLighting EvaluateBSDF_Directional(LightLoopContext lightLoopContext, float3 V, PositionInputs posInput, PreLightData preLightData, DirectionalLightData lightData, BSDFData bsdfData, BuiltinData builtinData)
 {
+    float3 sourceColor = 0.0;
+    float localMode = 1.0;
+    if (MonolithFindBoundLight(0.0, lightData.positionRWS, lightData.forward, 0.0, sourceColor, localMode))
+    {
+        float3 shadow = EvaluateShadow_Directional(lightLoopContext, posInput, lightData, builtinData, GetNormalForShadowBias(bsdfData));
+        if (_MonolithDebug > 62.5 && _MonolithDebug < 63.5) _MonolithDiagnosticValue = shadow;
+        float3 cookie = 1.0;
+        if (lightData.cookieMode != COOKIEMODE_NONE) cookie = EvaluateCookie_Directional(lightLoopContext, lightData, posInput.positionWS - lightData.positionRWS);
+        return MonolithBoundLighting(V, -lightData.forward, preLightData, bsdfData, sourceColor, cookie, shadow, 1.0, lightData.diffuseDimmer, lightData.specularDimmer);
+    }
+    if (_MonolithSourceProfile > 0.5 && _MonolithSourceLightingMode > 0.5 && _MonolithSourceLightingMode < 1.5)
+    {
+        _MonolithCurrentSourceLight = MonolithCalibratedSourceColor(lightData.color, _MonolithLightCalibration.x);
+        _MonolithCurrentSourceLightActive = 1.0;
+    }
     if (_MonolithDebug > 62.5 && _MonolithDebug < 63.5)
     {
         _MonolithDiagnosticValue = EvaluateShadow_Directional(lightLoopContext, posInput, lightData, builtinData, GetNormalForShadowBias(bsdfData));
     }
 
-    return MonolithShadeSurface_Directional(lightLoopContext, posInput, builtinData, preLightData, lightData, bsdfData, V);
+    DirectLighting lighting = MonolithShadeSurface_Directional(lightLoopContext, posInput, builtinData, preLightData, lightData, bsdfData, V);
+    _MonolithCurrentSourceLightActive = 0.0;
+    return lighting;
 }
 
 DirectLighting EvaluateBSDF_Punctual(LightLoopContext lightLoopContext, float3 V, PositionInputs posInput, PreLightData preLightData, LightData lightData, BSDFData bsdfData, BuiltinData builtinData)
 {
-    return MonolithShadeSurface_Punctual(lightLoopContext, posInput, builtinData, preLightData, lightData, bsdfData, V);
+    _MonolithSourceLocalLight = lightData.lightType == GPULIGHTTYPE_POINT && lightData.shadowIndex < 0 ? 2.0 : 1.0;
+    float3 terrainDiffuseScale = 1.0;
+    if (_MonolithSourceProfile < 0.5 && _MonolithTrueStalkerTerrain > 0.5)
+    {
+        float material = _MonolithSourceRawMaterial;
+        float gloss = _MonolithSourceAlbedoGloss.a;
+        float3 originalDiffuse = MonolithAlbedo(_MonolithSourceAlbedoGloss.rgb, MonolithMetalness(gloss, material));
+        terrainDiffuseScale = originalDiffuse / max(bsdfData.diffuseColor, 1e-20);
+        bsdfData.diffuseColor = originalDiffuse;
+        bsdfData.fresnel0 = MonolithSpecular(_MonolithSourceAlbedoGloss.rgb, gloss, material);
+        bsdfData.perceptualRoughness = MonolithRoughness(gloss, material, _MonolithDynamicGloss);
+    }
+    float3 sourceColor = 0.0;
+    float localMode = 1.0;
+    bool bound = lightData.lightType <= GPULIGHTTYPE_SPOT && MonolithFindBoundLight(lightData.lightType, lightData.positionRWS, lightData.forward, lightData.range, sourceColor, localMode);
+    if (_MonolithDebug > 68.5 && _MonolithDebug < 69.5) _MonolithDiagnosticValue += float3(1.0, bound ? 1.0 : 0.0, lightData.shadowIndex >= 0 ? 1.0 : 0.0) * 0.125;
+    if (bound)
+    {
+        _MonolithSourceLocalLight = localMode;
+        float3 L = 0.0;
+        float4 distances = 0.0;
+        GetPunctualLightVectors(posInput.positionWS, lightData, L, distances);
+        float3 delta = posInput.positionWS - lightData.positionRWS;
+        float attenuation = MonolithSourceAttenuation(dot(delta, delta), lightData.range);
+        float3 shadow = EvaluateShadow_Punctual(lightLoopContext, posInput, lightData, builtinData, GetNormalForShadowBias(bsdfData), L, distances);
+        float4 cookie = 1.0;
+        if (lightData.cookieMode != COOKIEMODE_NONE) cookie = EvaluateCookie_Punctual(lightLoopContext, lightData, delta);
+        if (lightData.lightType == GPULIGHTTYPE_SPOT) cookie.rgb *= AngleAttenuation(dot(-L, lightData.forward), lightData.angleScale, lightData.angleOffset);
+        DirectLighting lighting = MonolithBoundLighting(V, L, preLightData, bsdfData, sourceColor, cookie.rgb * cookie.a, shadow, attenuation, lightData.diffuseDimmer, lightData.specularDimmer);
+        _MonolithSourceLocalLight = 0.0;
+        return lighting;
+    }
+    if (_MonolithSourceProfile > 0.5 && _MonolithSourceLightingMode > 0.5 && _MonolithSourceLightingMode < 1.5)
+    {
+        _MonolithCurrentSourceLight = MonolithCalibratedSourceColor(lightData.color, _MonolithLightCalibration.y);
+        _MonolithCurrentSourceLightActive = 1.0;
+    }
+    DirectLighting lighting = MonolithShadeSurface_Punctual(lightLoopContext, posInput, builtinData, preLightData, lightData, bsdfData, V);
+    lighting.diffuse *= terrainDiffuseScale;
+    _MonolithCurrentSourceLightActive = 0.0;
+    _MonolithSourceLocalLight = 0.0;
+    return lighting;
 }
 
 void PostEvaluateBSDF(LightLoopContext lightLoopContext, float3 V, PositionInputs posInput, PreLightData preLightData, BSDFData bsdfData, BuiltinData builtinData, AggregateLighting lighting, out LightLoopOutput lightLoopOutput)
@@ -89,7 +194,7 @@ void PostEvaluateBSDF(LightLoopContext lightLoopContext, float3 V, PositionInput
     #endif
     if (levelAmbientHemi)
     {
-        builtinData.bakeDiffuseLighting *= _MonolithLevelHemiValue;
+        if (_MonolithSourceProfile < 0.5 || _IndirectDiffuseMode == INDIRECTDIFFUSEMODE_OFF) builtinData.bakeDiffuseLighting *= _MonolithLevelHemiValue;
         lighting.indirect.specularReflected *= _MonolithLevelHemiValue;
     }
     #endif
@@ -131,6 +236,16 @@ void PostEvaluateBSDF(LightLoopContext lightLoopContext, float3 V, PositionInput
         if (originalEnvironment && _MonolithDebug > 61.5 && _MonolithDebug < 62.5) diagnostic = lightLoopOutput.specularLighting;
         #endif
         if (_MonolithDebug > 62.5 && _MonolithDebug < 63.5) diagnostic = _MonolithDiagnosticValue;
+        if (_MonolithDebug > 64.5 && _MonolithDebug < 65.5) diagnostic = builtinData.bakeDiffuseLighting * GetCurrentExposureMultiplier();
+        if (_MonolithDebug > 65.5 && _MonolithDebug < 66.5) diagnostic = LOAD_TEXTURE2D_X(_IndirectDiffuseTexture, posInput.positionSS).xyz;
+        if (_MonolithDebug > 66.5 && _MonolithDebug < 67.5) diagnostic = (LinearEyeDepth(LoadCameraDepth(posInput.positionSS), _ZBufferParams) * 0.05).xxx;
+        if (_MonolithDebug > 67.5 && _MonolithDebug < 68.5)
+        {
+            NormalData normalData;
+            DecodeFromNormalBuffer(posInput.positionSS, normalData);
+            diagnostic = normalData.normalWS * 0.5 + 0.5;
+        }
+        if (_MonolithDebug > 68.5 && _MonolithDebug < 69.5) diagnostic = _MonolithDiagnosticValue;
         lightLoopOutput.diffuseLighting = diagnostic * GetInverseCurrentExposureMultiplier();
         lightLoopOutput.specularLighting = 0.0;
     }

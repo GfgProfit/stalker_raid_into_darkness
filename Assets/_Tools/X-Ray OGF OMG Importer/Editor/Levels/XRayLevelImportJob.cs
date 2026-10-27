@@ -840,7 +840,7 @@ namespace XRay.Importer.Editor.Levels
 
         private IEnumerable CreateMaterials()
         {
-            _materials = new XRayLevelMaterialLibrary(_record, _request.Settings.MaterialUpdateMode);
+            _materials = new XRayLevelMaterialLibrary(_record, _request.Settings.MaterialUpdateMode, _effective);
             var slots = new List<(int Shader, bool Tree)>();
             var seen = new HashSet<long>();
             foreach (XRayLevelVisual visual in _level.Visuals)

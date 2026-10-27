@@ -14,6 +14,10 @@ namespace XRay.Importer.Editor.Levels
         public string AlbedoPath { get; set; }
         public string BumpPath { get; set; }
         public string CorrectionPath { get; set; }
+        public XRayTextureResolution DetailResolution { get; set; }
+        public string DetailPath { get; set; }
+        public string DetailBumpPath { get; set; }
+        public string DetailCorrectionPath { get; set; }
         public XRayResourceStatus AlbedoStatus { get; set; }
         public XRayResourceStatus BumpStatus { get; set; }
         public XRayTextureDescription Description => Resolution?.Description;
@@ -25,6 +29,7 @@ namespace XRay.Importer.Editor.Levels
         private readonly XRayTextureResolver _resolver;
         private readonly XRayTextureImporter _importer;
         private readonly XRayLevelImportRecord _record;
+        private readonly bool _sourceDetails;
         private readonly HashSet<string> _claimed = new HashSet<string>();
         private readonly HashSet<string> _folders = new HashSet<string>();
         private readonly Dictionary<string, XRayLevelTextureSet> _sets = new Dictionary<string, XRayLevelTextureSet>(StringComparer.OrdinalIgnoreCase);
@@ -39,6 +44,7 @@ namespace XRay.Importer.Editor.Levels
         {
             _resolver = new XRayTextureResolver(index) { LevelFolder = "levels\\" + levelName };
             _record = record;
+            _sourceDetails = followWinners;
             var options = new XRayImportOptions { FlipNormalGreen = flipNormalGreen, OverwriteExistingTextures = followWinners };
             _importer = new XRayTextureImporter(options, false, _claimed) { ContentKeys = !followWinners };
         }
@@ -76,7 +82,7 @@ namespace XRay.Importer.Editor.Levels
                 }
             }
 
-            if (resolution.Description != null && !string.IsNullOrEmpty(resolution.Description.DetailName))
+            if (resolution.Description != null && !string.IsNullOrEmpty(resolution.Description.DetailName) && !(resolveBump && _sourceDetails && XRayLevelSourceBindings.DeclaresDetail(resolution.Description)))
             {
                 _record.AddDependency(XRayLevelDependencyCategory.Materials, "Detail texture (THM)", resolution.Description.DetailName, null, "textures\\" + resolution.Description.DetailName + ".dds", XRayLevelDependencyStatus.Described, "X-Ray detail texture; MonolithLit has no detail layer, not applied", null, $"scale {resolution.Description.DetailScale:0.###}, referenced by {textureName}");
             }
@@ -88,12 +94,23 @@ namespace XRay.Importer.Editor.Levels
                 set.BumpStatus = bump.Status;
                 if (resolution.BumpCorrection != null && resolution.BumpCorrection.IsResolved)
                 {
-                    XRayTextureAssetResult correction = RequestPacked(resolution.BumpCorrection.VirtualPath, XRayLevelDependencyCategory.Materials, "Bump correction (bump#)", "Reserved source data; not sampled by the active Monolith path");
+                    XRayTextureAssetResult correction = RequestPacked(resolution.BumpCorrection.VirtualPath, XRayLevelDependencyCategory.Materials, "Bump correction (bump#)", _sourceDetails ? "s_bumpX: A height for USE_PARALLAX / USE_STEEPPARALLAX, R for steep AO" : "Reserved source data; not sampled by the active Monolith path");
                     set.CorrectionPath = correction.AssetPath;
                 }
             }
 
+            if (resolveBump && _sourceDetails && XRayLevelSourceBindings.DeclaresDetail(resolution.Description))
+            {
+                RequestDetail(set);
+            }
+
             return set;
+        }
+
+        public string FindPacked(XRayResolvedFile file, out bool upToDate)
+        {
+            upToDate = false;
+            return file != null && file.IsResolved ? _importer.FindPacked(file, XRayLevelPaths.TextureFolder(XRayVirtualPath.Normalize(file.VirtualPath)), out upToDate) : null;
         }
 
         public bool Exists(string textureName)
@@ -134,6 +151,25 @@ namespace XRay.Importer.Editor.Levels
 
                     XRayTextureImportQueue.Complete(path);
                 }
+            }
+        }
+
+        private void RequestDetail(XRayLevelTextureSet set)
+        {
+            XRayTextureResolution detail = _resolver.Resolve(set.Description.DetailName);
+            set.DetailResolution = detail;
+            XRayResolvedFile metadata = _resolver.ResolveFile(XRayVirtualPath.TextureToVirtualPath(detail.TextureName, ".thm"));
+            _record.AddDependency(XRayLevelDependencyCategory.Materials, "Detail THM metadata", metadata.DisplayPath, metadata.IsResolved ? metadata.Winner.Location : null, metadata.VirtualPath, metadata.IsResolved ? XRayLevelDependencyStatus.Found : XRayLevelDependencyStatus.Skipped, "Optional detail bump declaration; reimport when the effective detail THM changes or appears", null, detail.DescriptionOrigin);
+            set.DetailPath = RequestPacked(detail.Diffuse.VirtualPath, XRayLevelDependencyCategory.Materials, "Detail texture (THM detail_name)", "s_detail: rgb x2 colour, a x2 gloss (USE_TDETAIL)").AssetPath;
+            if (detail.Bump == null)
+            {
+                return;
+            }
+
+            set.DetailBumpPath = RequestPacked(detail.Bump.VirtualPath, XRayLevelDependencyCategory.Materials, "Detail bump", "s_detailBump: ABG normal, R gloss x2 (USE_TDETAIL_BUMP)").AssetPath;
+            if (detail.BumpCorrection != null)
+            {
+                set.DetailCorrectionPath = RequestPacked(detail.BumpCorrection.VirtualPath, XRayLevelDependencyCategory.Materials, "Detail bump correction (detail bump#)", "s_detailBumpX: rgb added to the detail normal").AssetPath;
             }
         }
 

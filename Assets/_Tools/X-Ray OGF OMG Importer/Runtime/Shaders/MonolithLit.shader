@@ -33,6 +33,28 @@ Shader "HDRP/MonolithLit"
         _MonolithDiagnosticOptions("Diagnostics: Skip Quantization, Disable Normal, Disable Environment, Disable Direct", Vector) = (0,0,0,0)
         _MonolithLightSetup("ssfx_lightsetup_1", Vector) = (0.5,1,0,0)
         _MonolithSourceLight("Source Ldynamic RGB (Unit Adaptation)", Color) = (1,1,1,1)
+        _MonolithSourceProfile("Source Profile: 0 Monolith 1 Anomaly SSS 23.5 + ES 1.10 lmodel", Float) = 0
+        [Toggle] _MonolithTrueStalkerTerrain("True Stalker Terrain ID Correction (Directional and Environment)", Float) = 0
+        _MonolithSunColor("Source L_sun_color (Flora SSS)", Vector) = (1,1,1,0)
+        _MonolithFloraFixes2("ssfx_florafixes_2", Vector) = (1.5,1,0,0)
+        _MonolithFloraSubsurface("Flora Subsurface Mask", Range(0,1)) = 1
+        _MonolithSourceDetail("Source Detail (Profile 1): 0 Off 1 USE_TDETAIL 2 USE_TDETAIL_BUMP", Float) = 0
+        _MonolithSourceParallax("Source Parallax (Profile 1): 0 Off 1 USE_PARALLAX 2 USE_STEEPPARALLAX", Float) = 0
+        [Toggle] _MonolithSourceVirtualHeight("Source def_virtualh Lighting Position (Profile 1)", Float) = 0
+        _MonolithSourceTextureRange("Source HQ Element Range (r_dtex_range, 0 Unlimited)", Float) = 50
+        [HideInInspector] _MonolithSourceDetailRecommended("Source Detail Recommended By THM", Float) = 0
+        [HideInInspector] _MonolithSourceParallaxRecommended("Source Parallax Recommended By THM And Blender", Float) = 0
+        [HideInInspector] _MonolithHasBumpCorrection("Bump Correction Bound (bump#)", Float) = 0
+        [HideInInspector] _MonolithHasDetail("Detail Texture Bound", Float) = 0
+        [HideInInspector] _MonolithHasDetailBump("Detail Bump And Detail Bump# Bound", Float) = 0
+        _MonolithDetailMap("X-Ray Detail Texture (THM detail_name)", 2D) = "grey" {}
+        _MonolithDetailBump("X-Ray Detail Packed Bump (Linear)", 2D) = "grey" {}
+        _MonolithDetailBumpCorrection("X-Ray Detail Bump Correction (Linear)", 2D) = "grey" {}
+        _MonolithDetailScale("Detail Scale (dt_params)", Float) = 1
+        _MonolithDetailSrgb("Detail Uses Hardware sRGB Decode", Float) = 0
+        _MonolithDetailFlipV("Detail DDS Requires V Flip", Float) = 0
+        _MonolithParallaxHeight("r2_parallax_h", Float) = 0.02
+        _MonolithPom("ssfx_pom (Samples, Range, Height, AO)", Vector) = (36,12,0.035,0.5)
         [Toggle(_MONOLITH_LEVEL)] _MonolithLevel("X-Ray Level Static Stream", Float) = 0
         [Toggle(_MONOLITH_LEVEL_DETAIL)] _MonolithLevelDetail("X-Ray Level Detail Object", Float) = 0
         [Toggle(_MONOLITH_LEVEL_LOD)] _MonolithLevelLod("X-Ray Level MT_LOD Impostor", Float) = 0
@@ -285,7 +307,9 @@ Shader "HDRP/MonolithLit"
     #include "Packages/com.unity.render-pipelines.high-definition/Runtime/RenderPipeline/ShaderPass/FragInputs.hlsl"
     #include "Packages/com.unity.render-pipelines.high-definition/Runtime/RenderPipeline/ShaderPass/ShaderPass.cs.hlsl"
     #include "MonolithProperties.hlsl"
+    #include "MonolithLightInputs.hlsl"
     #include "MonolithMaterial.hlsl"
+    #include "MonolithSourceTexture.hlsl"
     #include "MonolithEnvironment.hlsl"
     ENDHLSL
     SubShader
@@ -437,7 +461,7 @@ Shader "HDRP/MonolithLit"
             #pragma instancing_options renderinglayer
             #pragma multi_compile _ DOTS_INSTANCING_ON
             #pragma multi_compile _ LOD_FADE_CROSSFADE
-            #pragma multi_compile _ WRITE_NORMAL_BUFFER
+            #define WRITE_NORMAL_BUFFER
             #pragma multi_compile_fragment _ WRITE_MSAA_DEPTH
             #pragma multi_compile _ WRITE_DECAL_BUFFER WRITE_RENDERING_LAYER
             #pragma shader_feature_local_fragment _MATERIAL_FEATURE_CLEAR_COAT
@@ -481,7 +505,7 @@ Shader "HDRP/MonolithLit"
             #pragma instancing_options renderinglayer
             #pragma multi_compile _ DOTS_INSTANCING_ON
             #pragma multi_compile _ LOD_FADE_CROSSFADE
-            #pragma multi_compile _ WRITE_NORMAL_BUFFER
+            #define WRITE_NORMAL_BUFFER
             #pragma multi_compile_fragment _ WRITE_MSAA_DEPTH
             #pragma multi_compile _ WRITE_DECAL_BUFFER_AND_RENDERING_LAYER
             #pragma shader_feature_local _DISABLE_DECALS
@@ -610,5 +634,6 @@ Shader "HDRP/MonolithLit"
             ENDHLSL
         }
     }
+    CustomEditor "XRay.Importer.Editor.MonolithMaterialInspector"
     Fallback Off
 }

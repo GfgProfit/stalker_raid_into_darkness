@@ -13,6 +13,52 @@ struct MonolithTerrainLayer
     float2 tc;
 };
 
+float MonolithTerrainQualityMode(float requested, float midAvailable, float lowAvailable)
+{
+    if (requested > 1.5 && requested < 2.5 && lowAvailable > 0.5) return 2.0;
+    if (requested > 0.5 && requested < 1.5 && midAvailable > 0.5) return 1.0;
+    return 0.0;
+}
+
+void MonolithTerrainLodUv(float2 tc, float4 weights, out float2 selected, out float2 previous, out float factor)
+{
+    float2 offsets[4] = { float2(0.15, 0.15), float2(0.65, 0.15), float2(0.15, 0.65), float2(0.65, 0.65) };
+    selected = 0.0;
+    previous = 0.0;
+    factor = 0.0;
+    tc = frac(tc * 100.0) * 0.35;
+    for (int i = 0; i <= 3; i++)
+    {
+        if (weights[i] > factor)
+        {
+            previous = selected;
+            selected = offsets[i] + tc;
+            factor = weights[i];
+        }
+    }
+}
+
+float3 MonolithTerrainMidColor(float3 baseColor, float3 selectedColor, float3 previousColor, float factor, float distanceToEye)
+{
+    float3 atlas = selectedColor * factor;
+    atlas += previousColor * (1.0 - factor);
+    return lerp(2.0 * baseColor * atlas, baseColor, saturate(-2.4 + distanceToEye * 0.013));
+}
+
+float4 MonolithTerrainWeights(float4 mask);
+
+float3 MonolithTerrainMid(TEXTURE2D_PARAM(maskMap, baseSampler), TEXTURE2D_PARAM(atlasMap, linearSampler), float2 tc, float3 baseColor, float distanceToEye, float maskFlipV, float atlasFlipV)
+{
+    float4 weights = MonolithTerrainWeights(SAMPLE_TEXTURE2D(maskMap, baseSampler, MonolithSourceTextureUv(tc, maskFlipV)));
+    float2 selected;
+    float2 previous;
+    float factor;
+    MonolithTerrainLodUv(tc, weights, selected, previous, factor);
+    float3 selectedColor = SAMPLE_TEXTURE2D(atlasMap, baseSampler, MonolithSourceTextureUv(selected, atlasFlipV)).rgb;
+    float3 previousColor = SAMPLE_TEXTURE2D(atlasMap, linearSampler, MonolithSourceTextureUv(previous, atlasFlipV)).rgb;
+    return MonolithTerrainMidColor(baseColor, selectedColor, previousColor, factor, distanceToEye);
+}
+
 float4 MonolithTerrainWeights(float4 mask)
 {
     float sum = dot(mask, 1.0);

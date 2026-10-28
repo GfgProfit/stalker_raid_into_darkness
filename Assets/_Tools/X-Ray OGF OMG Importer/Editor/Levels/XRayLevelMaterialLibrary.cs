@@ -32,7 +32,9 @@ namespace XRay.Importer.Editor.Levels
         public string[] HeightPaths { get; } = new string[4];
         public string[] SourceColorPaths { get; } = new string[4];
         public string SourceBasePath { get; set; }
+        public string LodAtlasPath { get; set; }
         public XRayTerrainSourceBinding Source { get; set; }
+        public XRayTerrainSourceParameters Parameters { get; set; }
         public float DetailScale { get; set; } = 1.0f;
 
         public string Key()
@@ -61,6 +63,8 @@ namespace XRay.Importer.Editor.Levels
         private readonly XRayLevelImportRecord _record;
         private readonly XRayLevelMaterialUpdateMode _updateMode;
         private readonly bool _sourceBindings;
+        private readonly XRayTerrainImportMode _terrainMode;
+        private readonly XRayTerrainQuality _terrainQuality;
         private readonly HashSet<string> _claimed = new HashSet<string>();
         private readonly Dictionary<string, Material> _cache = new Dictionary<string, Material>();
 
@@ -68,14 +72,21 @@ namespace XRay.Importer.Editor.Levels
         {
         }
 
-        public XRayLevelMaterialLibrary(XRayLevelImportRecord record, XRayLevelMaterialUpdateMode updateMode, bool sourceBindings)
+        public XRayLevelMaterialLibrary(XRayLevelImportRecord record, XRayLevelMaterialUpdateMode updateMode, bool sourceBindings) : this(record, updateMode, sourceBindings, XRayTerrainImportMode.Preserve)
+        {
+        }
+
+        public XRayLevelMaterialLibrary(XRayLevelImportRecord record, XRayLevelMaterialUpdateMode updateMode, bool sourceBindings, XRayTerrainImportMode terrainMode, XRayTerrainQuality terrainQuality = XRayTerrainQuality.High)
         {
             _record = record;
             _updateMode = updateMode;
             _sourceBindings = sourceBindings;
+            _terrainMode = terrainMode;
+            _terrainQuality = terrainQuality;
         }
 
         public int Created { get; private set; }
+        public bool Changed { get; private set; }
         public int Reused { get; private set; }
         public int Fallbacks { get; private set; }
         public int MigratedDecals { get; private set; }
@@ -93,6 +104,7 @@ namespace XRay.Importer.Editor.Levels
 
             parts[4] = "*";
             parts[5] = "*";
+            if (parts[1] == "terrain" && parts.Length == 16) parts[15] = "*";
             return string.Join("|", parts);
         }
 
@@ -123,7 +135,11 @@ namespace XRay.Importer.Editor.Levels
             if (material != null)
             {
                 Reused++;
-                if (_updateMode == XRayLevelMaterialUpdateMode.Update || migrated || regenerated)
+                if (surface.Kind == XRayLevelSurfaceKind.Terrain && !surface.IsFallback)
+                {
+                    if (_terrainMode != XRayTerrainImportMode.Preserve || _updateMode == XRayLevelMaterialUpdateMode.Update || regenerated) ConfigureTerrainBindings(material, request.Terrain, false);
+                }
+                else if (_updateMode == XRayLevelMaterialUpdateMode.Update || migrated || regenerated)
                 {
                     Configure(material, request);
                     EditorUtility.SetDirty(material);
@@ -152,6 +168,7 @@ namespace XRay.Importer.Editor.Levels
 
                 material = new Material(shader) { name = Path.GetFileNameWithoutExtension(path) };
                 Configure(material, request);
+                if (surface.Kind == XRayLevelSurfaceKind.Terrain && !surface.IsFallback) ConfigureTerrainBindings(material, request.Terrain, true);
                 AssetDatabase.CreateAsset(material, path);
                 XRayAssetMarker.Write(path, new XRayAssetMarker(key, MATERIAL_ROLE, surface.RuleName, request.ShaderName, string.Empty));
                 Created++;
@@ -163,6 +180,7 @@ namespace XRay.Importer.Editor.Levels
             }
 
             _cache[key] = material;
+            Changed |= Created > 0 || EditorUtility.IsDirty(material);
             Paths.Add(path);
             return material;
         }
@@ -197,6 +215,13 @@ namespace XRay.Importer.Editor.Levels
             }
 
             return match;
+        }
+
+        private void ConfigureTerrainBindings(Material material, XRayLevelTerrainTextures terrain, bool created)
+        {
+            XRayLevelBindingPlan plan = XRayTerrainMaterialBindings.Plan(material, terrain, _terrainMode, created, _terrainQuality);
+            XRayTerrainMaterialBindings.Apply(material, terrain, plan);
+            if (plan.HasUserOverrides) _record.Warnings.Add($"Terrain material '{AssetDatabase.GetAssetPath(material)}' keeps user overrides: {string.Join(", ", plan.Changes.FindAll(change => change.Ownership == XRayLevelBindingOwnership.UserOverride).ConvertAll(change => change.Property))}.");
         }
 
         private static string Describe(string key)

@@ -24,6 +24,8 @@ namespace XRay.Importer.Editor.Levels
         public string DroppedAssetPath { get; set; }
         public string Identification { get; set; }
         public XRayLevelImportSettings Settings { get; set; }
+        public XRaySourcePlan SourcePlan { get; set; }
+        public string OutputRoot { get; set; }
     }
 
     public enum XRayLevelJobState
@@ -76,6 +78,9 @@ namespace XRay.Importer.Editor.Levels
         private string _levelPath;
         private XRayLevelImportRecord _previous;
         private bool _resourcesOnly;
+        private XRaySourcePlan _sourcePlan;
+        private XRayAssetIndex _sourceIndex;
+        private string _previousRoot;
 
         private XRayLevelImportJob(XRayLevelImportRequest request)
         {
@@ -112,6 +117,8 @@ namespace XRay.Importer.Editor.Levels
 
         public static bool Enqueue(XRayLevelImportRequest request)
         {
+            if (request.SourcePlan != null && string.IsNullOrEmpty(request.OutputRoot)) throw new ArgumentException("An explicit source plan requires an isolated output root.", nameof(request));
+            if (request.OutputRoot != null && (!request.OutputRoot.StartsWith("Assets/", StringComparison.Ordinal) || request.OutputRoot.Split('/').Length < 3 || request.OutputRoot.Contains("..") || request.OutputRoot.Contains("\\") || Array.Exists(request.OutputRoot.Split('/'), part => string.IsNullOrEmpty(part) || part.TrimEnd(' ', '.') != part) || request.OutputRoot.StartsWith(XRayLevelPaths.ROOT, StringComparison.OrdinalIgnoreCase))) throw new ArgumentException("An output override must be a dedicated Assets subdirectory outside Levels.", nameof(request));
             if (string.IsNullOrEmpty(request.LevelName) || IsBusy(request.LevelName))
             {
                 Debug.LogWarning($"[X-Ray Level] Import of '{request.LevelName}' is already running or queued.");
@@ -149,6 +156,7 @@ namespace XRay.Importer.Editor.Levels
 
         private void Begin()
         {
+            _previousRoot = XRayLevelPaths.Root;
             _routine = Run();
             _progressId = UnityEditor.Progress.Start($"X-Ray Level Import: {LevelName}", null, UnityEditor.Progress.Options.None);
             UnityEditor.Progress.RegisterCancelCallback(_progressId, () =>
@@ -234,7 +242,7 @@ namespace XRay.Importer.Editor.Levels
                 Debug.LogWarning($"[X-Ray Level] Import of '{LevelName}' was cancelled at '{Stage}'. Generated assets are kept and will be reused by the next import.");
             }
 
-            XRayLevelPaths.UseRoot(null);
+            XRayLevelPaths.UseRoot(_previousRoot);
             Finished?.Invoke(_record, state);
             StartNext();
         }
@@ -309,14 +317,22 @@ namespace XRay.Importer.Editor.Levels
 
         private void Prepare()
         {
-            _effective = XRayLevelSourceCache.IsMo2;
+            _sourcePlan = _request.SourcePlan;
+            _effective = _sourcePlan != null ? _sourcePlan.Installation != null : XRayLevelSourceCache.IsMo2;
             var notes = new List<string>();
-            if (_effective && XRayLevelSourceCache.GetMo2Index(false, notes) == null)
+            if (_sourcePlan != null)
+            {
+                if (!_sourcePlan.IsValid) throw new XRaySourceException(string.Join("; ", _sourcePlan.Errors));
+                _sourceIndex = XRayAssetIndex.Build(_sourcePlan);
+                _info = _effective ? XRayLevelEffectiveCatalog.Inspect(_sourceIndex, _sourcePlan.ProfileName) : XRayLevelGamedata.Inspect(_sourcePlan.Configuration.CustomFolder);
+            }
+            else if (_effective && XRayLevelSourceCache.GetMo2Index(false, notes) == null)
             {
                 throw new XRaySourceException("MO2 virtual index could not be built: " + string.Join("; ", XRayLevelSourceCache.LastPlan?.Errors ?? new List<string>()));
             }
 
-            _info = XRayLevelSourceCache.Inspect(true);
+            _info = _info ?? XRayLevelSourceCache.Inspect(true);
+            _sourcePlan = _sourcePlan ?? (_effective ? XRayLevelSourceCache.Mo2Plan : null);
             if (!_info.IsValid)
             {
                 throw new XRaySourceException(string.Join("\n", _info.Errors));
@@ -328,13 +344,14 @@ namespace XRay.Importer.Editor.Levels
                 throw new XRaySourceException($"Level '{_request.LevelName}' was not found in '{_info.LevelsFolder}'.");
             }
 
+            XRayLevelPaths.UseRoot(_request.OutputRoot ?? (_effective ? XRayLevelSourceCache.AssetRoot : _previousRoot));
+            _previous = AssetDatabase.LoadAssetAtPath<XRayLevelImportManifest>(XRayLevelPaths.ManifestPath(_entry.Name))?.Record;
             if (_effective)
             {
-                XRayLevelPaths.UseRoot(XRayLevelSourceCache.AssetRoot);
-                _previous = AssetDatabase.LoadAssetAtPath<XRayLevelImportManifest>(XRayLevelPaths.ManifestPath(_entry.Name))?.Record;
                 _record.Warnings.AddRange(notes);
-                XRayLevelSourceManifest.FillHeader(_record.Source, XRayLevelSourceCache.Mo2Plan, _info.Effective.Index, _entry, XRayLevelSourceCache.ProfileId);
-                XRayLevelSourceDiff diff = XRayLevelSourceManifest.Compare(_previous, _info.Effective, _entry, XRayLevelSourceCache.Mo2Plan);
+                string profileId = XRayLevelSourceCache.CreateProfileId(_sourcePlan.Installation.InstanceFolder, _sourcePlan.ProfileName);
+                XRayLevelSourceManifest.FillHeader(_record.Source, _sourcePlan, _info.Effective.Index, _entry, profileId);
+                XRayLevelSourceDiff diff = XRayLevelSourceManifest.Compare(_previous, _info.Effective, _entry, _sourcePlan);
                 _resourcesOnly = CanReuseGeometry(_previous, diff, JsonUtility.ToJson(_request.Settings));
                 foreach (XRayLevelSourceChange change in diff.Changes)
                 {
@@ -349,6 +366,12 @@ namespace XRay.Importer.Editor.Levels
             else
             {
                 XRayLevelSourceManifest.FillFolderHeader(_record.Source, _info);
+                _sourceIndex = _sourceIndex ?? XRayLevelSourceCache.GetIndex(false);
+                _sourcePlan = _sourcePlan ?? XRayLevelSourceCache.LastPlan;
+                XRayLevelSourceDiff diff = XRayLevelSourceManifest.Compare(_previous, new XRayEffectiveGamedata(_sourceIndex), _entry, _sourcePlan);
+                _resourcesOnly = CanReuseGeometry(_previous, diff, JsonUtility.ToJson(_request.Settings));
+                foreach (XRayLevelSourceChange change in diff.Changes) _record.Source.ChangesSincePrevious.Add(change.ToString());
+                foreach (string thm in diff.MetadataReparse) _record.Source.ChangesSincePrevious.Add("MetadataReparse [THM] " + thm);
             }
 
             _levelPath = LevelFile(XRayLevelPaths.LEVEL_FILE);
@@ -706,7 +729,7 @@ namespace XRay.Importer.Editor.Levels
 
         private IEnumerable ResolveTextures()
         {
-            XRayAssetIndex index = _info.Effective?.Index ?? XRayLevelSourceCache.GetIndex(false);
+            XRayAssetIndex index = _sourceIndex ?? _info.Effective?.Index ?? XRayLevelSourceCache.GetIndex(false);
             if (index == null)
             {
                 throw new XRaySourceException("Level texture index could not be built: " + string.Join("; ", XRayLevelSourceCache.LastPlan?.Errors ?? new List<string>()));
@@ -770,7 +793,7 @@ namespace XRay.Importer.Editor.Levels
 
                 if (staticSurface.Kind == XRayLevelSurfaceKind.Terrain && blender != null)
                 {
-                    _terrain[id] = RequestTerrain(shader, blender);
+                    _terrain[id] = _textures.RequestTerrain(shader, blender);
                 }
 
                 processed++;
@@ -808,52 +831,9 @@ namespace XRay.Importer.Editor.Levels
             _lodNormalPath = normal.IsResolved ? _textures.RequestPacked(normal.VirtualPath, XRayLevelDependencyCategory.VisualObjects, "LOD normal/hemi atlas", "s_hemi of " + shader.Raw + ": rgb = normal, a = hemisphere").AssetPath : null;
         }
 
-        private XRayLevelTerrainTextures RequestTerrain(XRayLevelShader shader, XRayBlender blender)
-        {
-            var terrain = new XRayLevelTerrainTextures { Source = XRayTerrainSourceBinding.Resolve(_textures.Resolver) };
-            XRayTextureResolution terrainBase = _textures.Resolver.Resolve(shader.Texture);
-            if (terrain.Source.UsesHeight) terrain.SourceBasePath = _textures.RequestPacked(terrainBase.Diffuse.VirtualPath, XRayLevelDependencyCategory.Materials, "Terrain source base UNORM", "s_base encoded color and alpha hemisphere; independent of legacy hardware sRGB albedo").AssetPath;
-            _record.Source.TerrainProfile = terrain.Source.Profile.ToString();
-            _record.Source.TerrainShaderPath = terrain.Source.Shader?.VirtualPath;
-            _record.Source.TerrainShaderHash = terrain.Source.ShaderHash;
-            _record.Source.TerrainBrdfHash = terrain.Source.BrdfHash;
-            _record.AddDependency(XRayLevelDependencyCategory.Materials, "Terrain source shader", terrain.Source.Shader?.VirtualPath, terrain.Source.Shader?.Winner?.Location, terrain.Source.Shader?.VirtualPath, terrain.Source.Shader?.IsResolved == true ? XRayLevelDependencyStatus.Found : XRayLevelDependencyStatus.Missing, "Source-specific terrain data contract; activation remains separate", null, terrain.Source.ShaderHash);
-            _record.AddDependency(XRayLevelDependencyCategory.Materials, "Terrain source BRDF", terrain.Source.Brdf?.VirtualPath, terrain.Source.Brdf?.Winner?.Location, terrain.Source.Brdf?.VirtualPath, terrain.Source.Brdf?.IsResolved == true ? XRayLevelDependencyStatus.Found : XRayLevelDependencyStatus.Missing, "Source-specific terrain BRDF identity; activation remains separate", null, terrain.Source.BrdfHash);
-            XRayTextureAssetResult mask = _textures.RequestPacked(XRayVirtualPath.TextureToVirtualPath(shader.Texture + "_mask", ".dds"), XRayLevelDependencyCategory.Materials, "Terrain mask", "s_mask: per-channel weights of the 4 detail layers");
-            terrain.MaskPath = mask.AssetPath;
-            string[] channels = { "R2-R", "R2-G", "R2-B", "R2-A" };
-            for (int i = 0; i < channels.Length; i++)
-            {
-                string detail = blender.GetString("Detail map/" + channels[i]);
-                if (string.IsNullOrEmpty(detail))
-                {
-                    continue;
-                }
-
-                XRayLevelTextureSet set = _textures.Request(detail, false, "Terrain detail " + channels[i] + " (s_dt_*)");
-                terrain.DetailPaths[i] = set.AlbedoPath;
-                XRayTextureAssetResult bump = _textures.RequestPacked(XRayVirtualPath.TextureToVirtualPath(detail + "_bump", ".dds"), XRayLevelDependencyCategory.Materials, "Terrain detail bump " + channels[i], "s_dn_*: .wzyx normal + gloss");
-                terrain.BumpPaths[i] = bump.AssetPath;
-                if (terrain.Source.UsesHeight)
-                {
-                    terrain.SourceColorPaths[i] = _textures.RequestPacked(set.Resolution.Diffuse.VirtualPath, XRayLevelDependencyCategory.Materials, "Terrain source color " + channels[i], "s_dt_* encoded UNORM filtering; legacy albedo references remain separate").AssetPath;
-                    terrain.HeightPaths[i] = _textures.RequestPacked(XRayVirtualPath.TextureToVirtualPath(detail + "_height", ".dds"), XRayLevelDependencyCategory.Materials, "Terrain source height " + channels[i], "s_height_*: R height, independent of bump#; source terrain POM and initial-height AO").AssetPath;
-                }
-            }
-
-            XRayTextureDescription description = terrainBase.Description;
-            terrain.DetailScale = description != null && description.DetailScale > 0.0 ? (float)description.DetailScale : 1.0f;
-            if (description == null || description.DetailScale <= 0.0)
-            {
-                _record.Warnings.Add($"Terrain '{shader.Texture}': no THM detail scale; dt_params = 1 is used.");
-            }
-
-            return terrain;
-        }
-
         private IEnumerable CreateMaterials()
         {
-            _materials = new XRayLevelMaterialLibrary(_record, _request.Settings.MaterialUpdateMode, _effective);
+            _materials = new XRayLevelMaterialLibrary(_record, _request.Settings.MaterialUpdateMode, _effective, _request.Settings.TerrainImportMode, _request.Settings.TerrainQuality);
             var slots = new List<(int Shader, bool Tree)>();
             var seen = new HashSet<long>();
             foreach (XRayLevelVisual visual in _level.Visuals)
@@ -1653,7 +1633,10 @@ namespace XRay.Importer.Editor.Levels
             _record.SetMetric("TextureAssets", _textures?.RequestedAssets.Count ?? 0);
             if (_textures != null)
             {
-                _record.GeneratedAssets.AddRange(_textures.RequestedAssets);
+                foreach (string asset in _textures.RequestedAssets)
+                {
+                    if (!_record.GeneratedAssets.Contains(asset)) _record.GeneratedAssets.Add(asset);
+                }
             }
 
             XRayLevelSharedAssets.Count(_record);
@@ -1665,9 +1648,15 @@ namespace XRay.Importer.Editor.Levels
                 return;
             }
 
-            if (_effective)
+            XRayLevelSourceManifest.Collect(_record, _info.Effective ?? new XRayEffectiveGamedata(_sourceIndex), _entry);
+
+            bool unchanged = _record.Completed && _resourcesOnly && _previous != null && !_materials.Changed && _textures.Imported == 0 && _previous.Settings == _record.Settings && _record.Source.ChangesSincePrevious.Count == 0 && _record.Source.ProfileFingerprint == _previous.Source.ProfileFingerprint && _record.Source.IndexFingerprint == _previous.Source.IndexFingerprint;
+            string reportPath = XRayLevelPaths.AttemptReportPath(_record.LevelName, _record.Source.ProfileId);
+            if (unchanged)
             {
-                XRayLevelSourceManifest.Collect(_record, _info.Effective, _entry);
+                _record.SetMetric("PreservedManifest", 1);
+                File.WriteAllText(reportPath, _record.ToJson());
+                return;
             }
 
             string manifestPath = XRayLevelPaths.ManifestPath(_record.LevelName);
@@ -1685,7 +1674,6 @@ namespace XRay.Importer.Editor.Levels
                 AssetDatabase.SaveAssetIfDirty(manifest);
             }
 
-            string reportPath = XRayLevelPaths.AttemptReportPath(_record.LevelName, _record.Source.ProfileId);
             File.WriteAllText(reportPath, _record.ToJson());
         }
 

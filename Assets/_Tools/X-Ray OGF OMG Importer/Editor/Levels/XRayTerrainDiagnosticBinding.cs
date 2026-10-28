@@ -20,6 +20,8 @@ namespace XRay.Importer.Editor.Levels
         private readonly Dictionary<string, Texture2D> _textures = new Dictionary<string, Texture2D>(StringComparer.OrdinalIgnoreCase);
         private readonly List<XRayResolvedFile> _sources = new List<XRayResolvedFile>();
 
+        private XRayTerrainSourceParameters _parameters;
+
         public XRayTerrainDiagnosticBinding(XRayAssetIndex index, string root, string level)
         {
             _root = root;
@@ -64,7 +66,7 @@ namespace XRay.Importer.Editor.Levels
             {
                 throw new InvalidOperationException(string.Join("; ", plan.Errors));
             }
-            return new XRayTerrainDiagnosticBinding(XRayAssetIndex.Build(plan), root, level);
+            return new XRayTerrainDiagnosticBinding(XRayAssetIndex.Build(plan), root, level) { _parameters = XRayTerrainSourceParameters.FromSource(provenance) };
         }
 
         public void Bind(Material source, Material preview)
@@ -81,7 +83,7 @@ namespace XRay.Importer.Editor.Levels
             }
             string original = path.Replace(_root + "/" + _level + "/LightingPreview/Materials/", _root + "/Materials/");
             string[] key = XRayAssetMarker.Read(original)?.Key.Split('|');
-            if (key == null || key.Length < XRayLevelMaterialLibrary.METADATA_KEY_PARTS || !_shaders.TryGet(key[11], out XRayBlender blender) || XRayLevelSurfaceRules.Classify(new XRayLevelShader(0, key[11]), blender, false).Kind != XRayLevelSurfaceKind.Terrain)
+            if (key == null || key.Length < XRayLevelMaterialLibrary.METADATA_KEY_PARTS || !_shaders.TryGet(key[11], out XRayBlender blender) || !XRayTerrainSourceBinding.IsTerrainBlender(blender) || XRayLevelSurfaceRules.Classify(new XRayLevelShader(0, key[11]), blender, false).Kind != XRayLevelSurfaceKind.Terrain)
             {
                 throw new InvalidOperationException("Effective terrain blender provenance is missing for " + original);
             }
@@ -112,6 +114,19 @@ namespace XRay.Importer.Editor.Levels
             preview.SetFloat("_MonolithHasTerrainHeight", 1.0f);
             preview.SetFloat("_MonolithHasTerrainSourceColor", 1.0f);
             preview.SetFloat("_MonolithTerrainSource", (float)Source.Profile);
+            if (_parameters?.Pom != null) preview.SetVector("_MonolithTerrainPom", _parameters.Pom.Value);
+            if (_parameters?.Offset != null) preview.SetVector("_MonolithTerrainOffset", _parameters.Offset.Value);
+            if (Source.VerifiedMid)
+            {
+                XRayResolvedFile atlas = _resolver.ResolveTexture(resolution.TextureName + "_lod_textures", ".dds");
+                if (!atlas.IsResolved) atlas = _resolver.ResolveTexture("terrain/default_lod_textures", ".dds");
+                preview.SetTexture("_MonolithTerrainLodAtlas", atlas.IsResolved ? Load(atlas) : null);
+                preview.SetFloat("_MonolithTerrainLodFlipV", 1.0f);
+                preview.SetFloat("_MonolithTerrainMidAvailable", atlas.IsResolved ? 1.0f : 0.0f);
+            }
+            preview.SetFloat("_MonolithTerrainLowAvailable", Source.VerifiedLow ? 1.0f : 0.0f);
+            preview.SetOverrideTag("XRayTerrainMidSHA256", Source.MidHash);
+            preview.SetOverrideTag("XRayTerrainLowSHA256", Source.LowHash);
         }
 
         public void Dispose()
@@ -143,7 +158,7 @@ namespace XRay.Importer.Editor.Levels
                 default: format = TextureFormat.RGBA32; break;
             }
             bool native = format != TextureFormat.RGBA32;
-            var texture = new Texture2D(header.Width, header.Height, format, native ? header.MipCount : 1, true) { name = file.VirtualPath + " (Diagnostic)", hideFlags = HideFlags.HideAndDontSave, wrapMode = TextureWrapMode.Repeat, filterMode = FilterMode.Trilinear, anisoLevel = 16, mipMapBias = -0.5f };
+            var texture = new Texture2D(header.Width, header.Height, format, native ? header.MipCount : 1, true) { name = file.VirtualPath + " (Diagnostic)", hideFlags = HideFlags.HideAndDontSave, wrapMode = TextureWrapMode.Repeat, filterMode = FilterMode.Trilinear, anisoLevel = (int)(_parameters?.Anisotropy ?? 16.0f), mipMapBias = _parameters?.MipBias ?? -0.5f };
             try
             {
                 if (native)

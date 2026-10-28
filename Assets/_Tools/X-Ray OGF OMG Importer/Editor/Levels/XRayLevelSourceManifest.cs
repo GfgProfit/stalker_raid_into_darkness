@@ -334,7 +334,7 @@ namespace XRay.Importer.Editor.Levels
         public static void Collect(XRayLevelImportRecord record, XRayEffectiveGamedata gamedata, XRayLevelEntry entry)
         {
             var files = new Dictionary<string, XRayLevelSourceFile>(StringComparer.Ordinal);
-            foreach (XRayEffectiveFile file in gamedata.Enumerate(entry.VirtualFolder, true))
+            foreach (XRayEffectiveFile file in gamedata.Enumerate(entry.VirtualFolder ?? "levels/" + entry.Name, true))
             {
                 Add(files, gamedata, file.VirtualPath, "Level folder", null);
             }
@@ -376,7 +376,7 @@ namespace XRay.Importer.Editor.Levels
         public static XRayLevelSourceDiff Compare(XRayLevelImportRecord previous, XRayEffectiveGamedata gamedata, XRayLevelEntry entry, XRaySourcePlan plan)
         {
             var diff = new XRayLevelSourceDiff { Level = entry?.Name ?? previous?.LevelName };
-            if (previous == null || previous.Source == null || previous.Source.SourceType != SOURCE_TYPE_MO2 || previous.Source.Files.Count == 0)
+            if (previous == null || previous.Source == null || (previous.Source.SourceType != SOURCE_TYPE_MO2 && previous.Source.SourceType != SOURCE_TYPE_FOLDER) || previous.Source.Files.Count == 0)
             {
                 return diff;
             }
@@ -439,7 +439,7 @@ namespace XRay.Importer.Editor.Levels
 
             if (entry != null)
             {
-                foreach (XRayEffectiveFile file in gamedata.Enumerate(entry.VirtualFolder, true))
+                foreach (XRayEffectiveFile file in gamedata.Enumerate(entry.VirtualFolder ?? "levels/" + entry.Name, true))
                 {
                     if (!known.Contains(file.VirtualPath))
                     {

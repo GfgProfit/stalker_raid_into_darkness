@@ -19,6 +19,7 @@ namespace XRay.Importer.Editor.Levels
         public XRayResolvedFile Source { get; set; }
         public string AssetPath { get; set; }
         public string SourceHash { get; set; }
+        public string ExternalSourcePath { get; set; }
         public string AssetHash { get; set; }
         public string MetaHash { get; set; }
         public string Reason { get; set; }
@@ -40,6 +41,7 @@ namespace XRay.Importer.Editor.Levels
         public XRayLevelSourceBinding Binding { get; set; }
         public XRayLevelSourceBinding ProjectedBinding { get; set; }
         public XRayLevelBindingPlan Plan { get; set; }
+        public XRayLevelTerrainTextures Terrain { get; set; }
         public List<XRayLevelBindingDependency> Dependencies { get; } = new List<XRayLevelBindingDependency>();
         public bool CanApply => Error == null && !Dependencies.Exists(dependency => dependency.BlocksRefresh);
     }
@@ -52,6 +54,8 @@ namespace XRay.Importer.Editor.Levels
         private readonly string _root;
         private readonly Dictionary<string, XRayLevelBindingDependency> _dependencies = new Dictionary<string, XRayLevelBindingDependency>(StringComparer.OrdinalIgnoreCase);
         private readonly Dictionary<string, string> _metadataHashes = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+        private XRayTerrainSourceParameters _terrainParameters;
 
         public XRayLevelSourceRefresh(XRayAssetIndex index, string root)
         {
@@ -70,11 +74,12 @@ namespace XRay.Importer.Editor.Levels
             }
         }
 
-        public static XRayLevelSourceRefresh Open(string root)
+        public static XRayLevelSourceRefresh Open(string root, string level = null)
         {
             XRaySourceConfiguration configuration = XRayLevelSourceCache.CreateMo2Configuration();
             configuration.IndexScope.Clear();
-            configuration.IndexScope.AddRange(new[] { "textures", "textures.ltx", "shaders.xr" });
+            configuration.IndexScope.AddRange(new[] { "textures", "textures.ltx", "shaders.xr", "shaders" });
+            if (!string.IsNullOrEmpty(level)) configuration.IndexScope.Add("levels/" + level);
             XRaySourcePlan plan = Mo2VirtualFileSystem.Plan(configuration);
             if (!plan.IsValid)
             {
@@ -87,7 +92,7 @@ namespace XRay.Importer.Editor.Levels
                 throw new InvalidOperationException($"Requested root '{root}' does not match effective MO2 profile '{expected}'.");
             }
 
-            return new XRayLevelSourceRefresh(XRayAssetIndex.Build(plan), root);
+            return new XRayLevelSourceRefresh(XRayAssetIndex.Build(plan), root) { _terrainParameters = XRayTerrainSourceParameters.FromSource(new XRayLevelSourceProvenance { GameFolder = plan.GameFolder, FsGame = plan.FsGamePath }) };
         }
 
         public static string PreviewTargets(string root, string level, string[] targets, string outputFolder, bool apply)
@@ -98,7 +103,7 @@ namespace XRay.Importer.Editor.Levels
             }
 
             RequireArchive(outputFolder);
-            var refresh = Open(root);
+            var refresh = Open(root, level);
             var entries = new List<XRayLevelSourceRefreshEntry>();
             foreach (string target in targets)
             {
@@ -143,7 +148,7 @@ namespace XRay.Importer.Editor.Levels
                 foreach (XRayLevelBindingDependency dependency in entry.Dependencies)
                 {
                     XRayTextureDescription description = entry.Resolution?.Description;
-                    Csv(csv, entry.MaterialPath, dependency.Property, dependency.Source?.VirtualPath, dependency.Source?.Winner?.SourceName, dependency.Source?.Winner?.Location, dependency.SourceHash, dependency.AssetPath, dependency.AssetPath != null ? AssetDatabase.AssetPathToGUID(dependency.AssetPath) : string.Empty, description?.DetailName, description?.DetailScale, description?.Flags, description?.BumpMode, entry.Surface?.BlenderClass, dependency.Reason);
+                    Csv(csv, entry.MaterialPath, dependency.Property, dependency.Source?.VirtualPath, dependency.Source?.Winner?.SourceName, dependency.Source?.Winner?.Location ?? dependency.ExternalSourcePath, dependency.SourceHash, dependency.AssetPath, dependency.AssetPath != null ? AssetDatabase.AssetPathToGUID(dependency.AssetPath) : string.Empty, description?.DetailName, description?.DetailScale, description?.Flags, description?.BumpMode, entry.Surface?.BlenderClass, dependency.Reason);
                 }
             }
 
@@ -200,6 +205,18 @@ namespace XRay.Importer.Editor.Levels
             {
                 AddMetadata(entry, entry.Resolution.Bump);
             }
+            if (entry.Surface.Kind == XRayLevelSurfaceKind.Terrain)
+            {
+                if (!XRayTerrainSourceBinding.IsTerrainBlender(blender))
+                {
+                    entry.Error = "Source terrain binding requires BmmD or BmmDold metadata; a shader name alone is insufficient.";
+                    return entry;
+                }
+                InspectTerrain(entry, blender, material);
+                Replan(entry, material);
+                entry.State = EditorJsonUtility.ToJson(material);
+                return entry;
+            }
             AddTexture(entry, XRayLevelSourceBindings.CORRECTION, entry.Resolution.BumpCorrection);
             if (XRayLevelSourceBindings.DeclaresDetail(entry.Resolution.Description))
             {
@@ -217,6 +234,23 @@ namespace XRay.Importer.Editor.Levels
 
         public void Replan(XRayLevelSourceRefreshEntry entry, Material material)
         {
+            if (entry.Terrain != null)
+            {
+                entry.Terrain.MaskPath = PathFor(entry, "_MonolithTerrainMask");
+                entry.Terrain.SourceBasePath = PathFor(entry, "_MonolithTerrainSourceBase");
+                entry.Terrain.LodAtlasPath = PathFor(entry, "_MonolithTerrainLodAtlas");
+                string[] channels = { "R", "G", "B", "A" };
+                for (int i = 0; i < channels.Length; i++)
+                {
+                    entry.Terrain.BumpPaths[i] = PathFor(entry, "_MonolithTerrainBump" + channels[i]);
+                    entry.Terrain.SourceColorPaths[i] = PathFor(entry, "_MonolithTerrainSourceColor" + channels[i]);
+                    entry.Terrain.HeightPaths[i] = PathFor(entry, "_MonolithTerrainHeight" + channels[i]);
+                }
+                entry.Plan = XRayTerrainMaterialBindings.Plan(material, entry.Terrain, XRayTerrainImportMode.Bind);
+                entry.ProjectedBinding = new XRayLevelSourceBinding();
+                entry.ProjectedBinding.Reasons.Add("Terrain resource-only plan; activation and quality are preserved; presence is recomputed after importing missing resources");
+                return;
+            }
             entry.Binding = XRayLevelSourceBindings.Resolve(entry.Resolution.Description, entry.Surface.BlenderClass, entry.Surface.Kind, entry.Surface.Flora, false, material.GetTexture("_MonolithBump") != null && material.GetFloat("_MonolithHasBump") > 0.5f, material.GetFloat("_MonolithBumpFlipV"), PathFor(entry, XRayLevelSourceBindings.CORRECTION), PathFor(entry, XRayLevelSourceBindings.DETAIL), PathFor(entry, XRayLevelSourceBindings.DETAIL_BUMP), PathFor(entry, XRayLevelSourceBindings.DETAIL_CORRECTION));
             entry.ProjectedBinding = XRayLevelSourceBindings.Resolve(entry.Resolution.Description, entry.Surface.BlenderClass, entry.Surface.Kind, entry.Surface.Flora, false, material.GetTexture("_MonolithBump") != null && material.GetFloat("_MonolithHasBump") > 0.5f, material.GetFloat("_MonolithBumpFlipV"), ProjectedPath(entry, XRayLevelSourceBindings.CORRECTION), ProjectedPath(entry, XRayLevelSourceBindings.DETAIL), ProjectedPath(entry, XRayLevelSourceBindings.DETAIL_BUMP), ProjectedPath(entry, XRayLevelSourceBindings.DETAIL_CORRECTION), path => entry.Dependencies.Find(dependency => dependency.AssetPath == path || "planned:" + dependency.Source?.VirtualPath == path)?.FlipV ?? XRayLevelSourceBindings.PackedFlipV(path));
             entry.Plan = XRayLevelSourceBindings.Plan(material, entry.Binding);
@@ -288,6 +322,7 @@ namespace XRay.Importer.Editor.Levels
 
         public void Apply(IReadOnlyList<XRayLevelSourceRefreshEntry> entries, string archiveFolder)
         {
+            if (entries == null || entries.Count == 0 || entries.Count > 32) throw new ArgumentException("A saved refresh requires 1 to 32 explicit materials.", nameof(entries));
             RequireCleanEditor();
             RequireArchive(archiveFolder);
             foreach (XRayLevelSourceRefreshEntry entry in entries)
@@ -303,6 +338,7 @@ namespace XRay.Importer.Editor.Levels
 
                 foreach (XRayLevelBindingDependency dependency in entry.Dependencies)
                 {
+                    if (dependency.ExternalSourcePath != null && HashFile(dependency.ExternalSourcePath) != dependency.SourceHash) throw new IOException("Source settings changed after dry run: " + dependency.ExternalSourcePath);
                     if (dependency.Source != null && dependency.Source.IsResolved && HashBytes(dependency.Source.Winner.ReadAllBytes()) != dependency.SourceHash)
                     {
                         throw new IOException($"Source changed after dry run: {dependency.Source.VirtualPath}");
@@ -331,7 +367,8 @@ namespace XRay.Importer.Editor.Levels
             {
                 Material material = AssetDatabase.LoadAssetAtPath<Material>(entry.MaterialPath);
                 Replan(entry, material);
-                MonolithMaterialConfigurator.ConfigureSourceBindings(material, entry.Binding);
+                if (entry.Terrain != null) XRayTerrainMaterialBindings.Apply(material, entry.Terrain, entry.Plan);
+                else MonolithMaterialConfigurator.ConfigureSourceBindings(material, entry.Binding);
                 AssetDatabase.SaveAssetIfDirty(material);
                 if (entry.Guid != AssetDatabase.AssetPathToGUID(entry.MaterialPath) || entry.MetaHash != HashFile(entry.MaterialPath + ".meta"))
                 {
@@ -343,12 +380,12 @@ namespace XRay.Importer.Editor.Levels
         public static void WritePreview(IReadOnlyList<XRayLevelSourceRefreshEntry> entries, string path)
         {
             RequireArchive(Path.GetDirectoryName(path));
-            var csv = new StringBuilder("Material,GUID,Property,Current,PreviousGenerated,Intended,Final,Ownership,SourcePath,MO2Winner,SHA256,CreateTexture,ReuseTexture,Modifies,Reason\n");
+            var csv = new StringBuilder("Material,GUID,Property,Current,PreviousGenerated,Intended,Final,Ownership,SourcePath,MO2Winner,SHA256,CreateTexture,ReuseTexture,Modifies,Reason,CanApply,Error\n");
             foreach (XRayLevelSourceRefreshEntry entry in entries)
             {
                 if (entry.Plan == null)
                 {
-                    Csv(csv, entry.MaterialPath, entry.Guid, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, false, false, false, entry.Error);
+                    Csv(csv, entry.MaterialPath, entry.Guid, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, false, false, false, entry.Error, false, entry.Error);
                     continue;
                 }
 
@@ -356,9 +393,9 @@ namespace XRay.Importer.Editor.Levels
                 {
                     XRayLevelBindingDependency dependency = entry.Dependencies.Find(item => item.Property == change.Property);
                     bool creates = dependency != null && dependency.CreatesAsset;
-                    string intended = creates ? dependency.Source.VirtualPath + " (import required)" : ProjectedValue(entry, change);
+                    string intended = creates ? dependency.Source.VirtualPath + " (import required)" : entry.Terrain != null ? change.Desired : ProjectedValue(entry, change);
                     string final = change.Ownership == XRayLevelBindingOwnership.UserOverride ? change.Current : intended;
-                    Csv(csv, entry.MaterialPath, entry.Guid, change.Property, change.Current, change.Previous, intended, final, change.Ownership, dependency?.Source?.Winner?.Location, dependency?.Source?.Winner?.SourceName, dependency?.SourceHash, creates, dependency?.AssetPath != null && !dependency.BlocksRefresh, final != change.Current, dependency?.Reason ?? string.Join("; ", entry.ProjectedBinding.Reasons));
+                    Csv(csv, entry.MaterialPath, entry.Guid, change.Property, change.Current, change.Previous, intended, final, change.Ownership, dependency?.Source?.Winner?.Location ?? dependency?.ExternalSourcePath, dependency?.Source?.Winner?.SourceName, dependency?.SourceHash, creates, dependency?.AssetPath != null && !dependency.BlocksRefresh, final != change.Current, dependency?.Reason ?? string.Join("; ", entry.ProjectedBinding.Reasons), entry.CanApply, entry.Error);
                 }
             }
 
@@ -432,6 +469,50 @@ namespace XRay.Importer.Editor.Levels
             return path.StartsWith("Assets/", StringComparison.Ordinal) && (asset is AssetImporter || extension == ".mat" || extension == ".asset" || extension == ".prefab" || extension == ".unity" || extension == ".anim" || extension == ".controller" || extension == ".overridecontroller" || extension == ".playable" || extension == ".terrainlayer" || extension == ".rendertexture" || extension == ".cubemap" || extension == ".shadervariants" || extension == ".spriteatlas" || extension == ".lighting");
         }
 
+        private void InspectTerrain(XRayLevelSourceRefreshEntry entry, XRayBlender blender, Material material)
+        {
+            XRayTerrainSourceBinding source = XRayTerrainSourceBinding.Resolve(_resolver);
+            entry.Terrain = new XRayLevelTerrainTextures { Source = source, Parameters = _terrainParameters };
+            if (source.Profile != XRayTerrainSourceProfile.AnomalyAtmospherics)
+            {
+                entry.Error = "Saved terrain refresh requires the verified Anomaly shader and BRDF contract.";
+                return;
+            }
+            AddMetadata(entry, source.Shader);
+            AddMetadata(entry, source.Brdf);
+            AddMetadata(entry, source.MidShader);
+            AddMetadata(entry, source.LowShader);
+            if (_terrainParameters != null)
+            {
+                entry.Dependencies.Add(new XRayLevelBindingDependency { Property = "_MonolithTerrainPom", ExternalSourcePath = _terrainParameters.Path, SourceHash = _terrainParameters.Hash, Reason = "Source appdata terrain parameters; external file hash is checked before a saved refresh" });
+            }
+            AddTexture(entry, "_MonolithTerrainMask", _resolver.ResolveTexture(entry.Resolution.TextureName + "_mask", ".dds"));
+            AddTexture(entry, "_MonolithTerrainSourceBase", entry.Resolution.Diffuse);
+            if (source.VerifiedMid)
+            {
+                XRayResolvedFile atlas = _resolver.ResolveTexture(entry.Resolution.TextureName + "_lod_textures", ".dds");
+                if (!atlas.IsResolved)
+                {
+                    AddMetadata(entry, atlas);
+                    atlas = _resolver.ResolveTexture("terrain/default_lod_textures", ".dds");
+                }
+                AddTexture(entry, "_MonolithTerrainLodAtlas", atlas);
+            }
+            string[] channels = { "R", "G", "B", "A" };
+            for (int i = 0; i < channels.Length; i++)
+            {
+                string detail = blender.GetString("Detail map/R2-" + channels[i]);
+                entry.Terrain.DetailPaths[i] = AssetDatabase.GetAssetPath(material.GetTexture("_MonolithTerrainDetail" + channels[i]));
+                if (string.IsNullOrEmpty(detail)) continue;
+                AddTexture(entry, "_MonolithTerrainBump" + channels[i], _resolver.ResolveTexture(detail + "_bump", ".dds"));
+                AddTexture(entry, "_MonolithTerrainSourceColor" + channels[i], _resolver.ResolveTexture(detail, ".dds"));
+                AddTexture(entry, "_MonolithTerrainHeight" + channels[i], _resolver.ResolveTexture(detail + "_height", ".dds"));
+                AddMetadata(entry, _resolver.ResolveFile(XRayVirtualPath.TextureToVirtualPath(detail, ".thm")));
+            }
+            double scale = entry.Resolution.Description?.DetailScale ?? 1.0;
+            entry.Terrain.DetailScale = !double.IsNaN(scale) && !double.IsInfinity(scale) && scale > 0.0 && scale <= float.MaxValue ? (float)scale : 1.0f;
+        }
+
         private void AddTexture(XRayLevelSourceRefreshEntry entry, string property, XRayResolvedFile file)
         {
             if (file == null || !file.IsResolved)
@@ -481,7 +562,9 @@ namespace XRay.Importer.Editor.Levels
 
         private string TextureFolder(string virtualPath)
         {
-            string directory = Path.GetDirectoryName(XRayVirtualPath.Normalize(virtualPath).Substring("textures/".Length))?.Replace('\\', '/');
+            string normalized = XRayVirtualPath.Normalize(virtualPath);
+            if (normalized.StartsWith("textures/", StringComparison.Ordinal)) normalized = normalized.Substring("textures/".Length);
+            string directory = Path.GetDirectoryName(normalized)?.Replace('\\', '/');
             return _root + "/Textures" + (string.IsNullOrEmpty(directory) ? string.Empty : "/" + string.Join("/", Array.ConvertAll(directory.Split('/'), XRayLevelPaths.SanitizeName)));
         }
 

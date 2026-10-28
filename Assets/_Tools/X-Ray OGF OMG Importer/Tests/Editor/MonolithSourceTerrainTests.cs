@@ -82,6 +82,8 @@ namespace XRay.Importer.Tests
             {
                 material.SetFloat("_MonolithTerrainSource", (float)XRayTerrainSourceProfile.AnomalyAtmospherics);
                 material.SetTexture("_MonolithTerrainSourceBase", height);
+                material.SetTexture("_MonolithTerrainMask", height);
+                foreach (string channel in new[] { "R", "G", "B", "A" }) material.SetTexture("_MonolithTerrainBump" + channel, height);
                 foreach (string channel in new[] { "R", "G", "B", "A" }) material.SetTexture("_MonolithTerrainSourceColor" + channel, height);
                 foreach (string channel in new[] { "R", "G", "B", "A" }) material.SetTexture("_MonolithTerrainHeight" + channel, height);
                 MonolithMaterialInspector.UpdateTexturePresence(material);

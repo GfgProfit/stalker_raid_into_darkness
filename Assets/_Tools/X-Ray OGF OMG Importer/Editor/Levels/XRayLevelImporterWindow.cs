@@ -175,6 +175,8 @@ namespace XRay.Importer.Editor.Levels
             settings.ImportLights = EditorGUILayout.Toggle("Import Static Lights", settings.ImportLights);
             settings.StaticLightShadows = EditorGUILayout.Toggle(new GUIContent("Static Light Shadows", "Off by default: dozens of shadowed point lights are the measured main cost."), settings.StaticLightShadows);
             settings.MaterialUpdateMode = (XRayLevelMaterialUpdateMode)EditorGUILayout.EnumPopup("Existing Materials", settings.MaterialUpdateMode);
+            settings.TerrainImportMode = (XRayTerrainImportMode)EditorGUILayout.EnumPopup("Source Terrain", settings.TerrainImportMode);
+            settings.TerrainQuality = (XRayTerrainQuality)EditorGUILayout.EnumPopup("Source Terrain Quality", settings.TerrainQuality);
             settings.CopySourceFiles = EditorGUILayout.Toggle("Copy level.geom/geomx/cform/details", settings.CopySourceFiles);
             settings.OpenSceneAfterImport = EditorGUILayout.Toggle("Open Scene After Import", settings.OpenSceneAfterImport);
             settings.AutoImportDroppedLevels = EditorGUILayout.Toggle(new GUIContent("Auto Import Dropped 'level'", "Import extensionless 'level' files dropped into the Project window."), settings.AutoImportDroppedLevels);

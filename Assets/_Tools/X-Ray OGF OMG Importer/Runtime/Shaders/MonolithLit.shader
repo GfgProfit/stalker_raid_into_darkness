@@ -77,7 +77,12 @@ Shader "HDRP/MonolithLit"
         _MonolithTerrainBumpA("Terrain Detail Bump A (Linear)", 2D) = "grey" {}
         _MonolithTerrainDetailScale("Terrain Detail Scale (dt_params)", Float) = 1
         _MonolithTerrainBumpScale("Terrain Bump XY Intensity", Float) = 0.6
-        [Toggle] _MonolithSourceTerrain("Source Terrain HQ (Profile 1, Explicit Bindings)", Float) = 0
+        [Toggle] _MonolithSourceTerrain("Source Terrain (Profile 1, Explicit Bindings)", Float) = 0
+        [Enum(HQ, 0, MID, 1, LOW, 2)] _MonolithTerrainQuality("Source Terrain Quality (Explicit)", Float) = 0
+        [HideInInspector] _MonolithTerrainMidAvailable("Verified MID Atlas Bound", Float) = 0
+        [HideInInspector] _MonolithTerrainLowAvailable("Verified LOW Source", Float) = 0
+        [HideInInspector] _MonolithTerrainLodFlipV("Source Terrain Atlas Flip V", Float) = 0
+        _MonolithTerrainLodAtlas("Source Terrain MID Atlas (Linear Encoded)", 2D) = "grey" {}
         [HideInInspector] _MonolithTerrainSource("Terrain Source: 0 Unknown 1 Anomaly Atmospherics 2 True Stalker", Float) = 0
         [Toggle] _MonolithTerrainParallax("Source Terrain POM", Float) = 0
         [Toggle] _MonolithTerrainOcclusion("Source Terrain Height AO", Float) = 0

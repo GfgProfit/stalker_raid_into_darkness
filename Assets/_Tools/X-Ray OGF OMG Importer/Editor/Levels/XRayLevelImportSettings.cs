@@ -15,6 +15,20 @@ namespace XRay.Importer.Editor.Levels
         [InspectorName("Update Generated Properties")] Update
     }
 
+    public enum XRayTerrainImportMode
+    {
+        [InspectorName("Preserve Existing Rendering")] Preserve,
+        [InspectorName("Bind Source Terrain Data")] Bind,
+        [InspectorName("Enable Verified Anomaly Terrain")] EnableVerifiedAnomaly
+    }
+
+    public enum XRayTerrainQuality
+    {
+        [InspectorName("HQ")] High,
+        [InspectorName("MID")] Medium,
+        [InspectorName("LOW")] Low
+    }
+
     [Serializable]
     public sealed class XRayLevelImportSettings
     {
@@ -29,6 +43,8 @@ namespace XRay.Importer.Editor.Levels
         [SerializeField] private bool _importLights = true;
         [SerializeField] private bool _staticLightShadows;
         [SerializeField] private XRayLevelMaterialUpdateMode _materialUpdateMode = XRayLevelMaterialUpdateMode.Preserve;
+        [SerializeField] private XRayTerrainImportMode _terrainImportMode;
+        [SerializeField] private XRayTerrainQuality _terrainQuality;
         [SerializeField] private bool _openSceneAfterImport = true;
         [SerializeField] private bool _copySourceFiles = true;
         [SerializeField] private bool _autoImportDroppedLevels = true;
@@ -97,6 +113,18 @@ namespace XRay.Importer.Editor.Levels
         {
             get => _materialUpdateMode;
             set => _materialUpdateMode = value;
+        }
+
+        public XRayTerrainImportMode TerrainImportMode
+        {
+            get => _terrainImportMode;
+            set => _terrainImportMode = value;
+        }
+
+        public XRayTerrainQuality TerrainQuality
+        {
+            get => _terrainQuality;
+            set => _terrainQuality = value;
         }
 
         public bool OpenSceneAfterImport

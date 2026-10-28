@@ -260,7 +260,22 @@ void GetSurfaceAndBuiltinData(FragInputs input, float3 V, inout PositionInputs p
     if (sourceTerrain)
     {
         float3 eyeVector = float3(dot(terrainTangent, -posInput.positionWS), dot(terrainBitangent, -posInput.positionWS), dot(terrainGeometric, -posInput.positionWS));
-        MonolithSourceTerrainSplat(uv, eyeVector, dot(posInput.positionWS, -UNITY_MATRIX_V[2].xyz), encodedAlbedo, terrainNormal, terrainGloss, terrainHeight, terrainAo);
+        float terrainQuality = MonolithTerrainQualityMode(_MonolithTerrainQuality, _MonolithTerrainMidAvailable, _MonolithTerrainLowAvailable);
+        [branch]
+        if (terrainQuality > 0.5)
+        {
+            terrainNormal = float3(0.0, 0.0, 1.0);
+            terrainGloss = 0.001;
+            [branch]
+            if (terrainQuality < 1.5)
+            {
+                float2 tc = MonolithSourceXRayUv(uv);
+                encodedAlbedo = MonolithTerrainMid(TEXTURE2D_ARGS(_MonolithTerrainMask, sampler_MonolithTerrainBumpR), TEXTURE2D_ARGS(_MonolithTerrainLodAtlas, sampler_LinearRepeat), tc, encodedAlbedo, length(posInput.positionWS), _MonolithTerrainMaskFlipV, _MonolithTerrainLodFlipV);
+            }
+            encodedAlbedo = saturate(encodedAlbedo);
+            if (_MonolithDebug < 0.5 || _MonolithDiagnosticOptions.x < 0.5) encodedAlbedo = round(encodedAlbedo * 255.0) / 255.0;
+        }
+        else MonolithSourceTerrainSplat(uv, eyeVector, dot(posInput.positionWS, -UNITY_MATRIX_V[2].xyz), encodedAlbedo, terrainNormal, terrainGloss, terrainHeight, terrainAo);
     }
     else
     #endif
@@ -427,7 +442,7 @@ void GetSurfaceAndBuiltinData(FragInputs input, float3 V, inout PositionInputs p
     #endif
     GetBuiltinData(input, V, posInput, surfaceData, baseSample.a * _BaseColor.a, surfaceData.normalWS, 0.0, builtinData);
     #if defined(MONOLITH_SOURCE_TERRAIN) && SHADERPASS == SHADERPASS_FORWARD
-    if (sourceTerrain && _MonolithHasTerrainHeight > 0.5 && _MonolithTerrainVirtualHeight > 0.5)
+    if (sourceTerrain && _MonolithHasTerrainHeight > 0.5 && _MonolithTerrainVirtualHeight > 0.5 && MonolithTerrainQualityMode(_MonolithTerrainQuality, _MonolithTerrainMidAvailable, _MonolithTerrainLowAvailable) < 0.5)
     {
         posInput.positionWS = MonolithTerrainPosition(posInput.positionWS, surfaceData.geomNormalWS, terrainHeight);
     }

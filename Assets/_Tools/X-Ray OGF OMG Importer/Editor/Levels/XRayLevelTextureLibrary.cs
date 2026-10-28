@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using XRay.Importer.Sources.Textures;
+using XRay.Importer.Core.Level;
 using XRay.Importer.Sources.Vfs;
 
 namespace XRay.Importer.Editor.Levels
@@ -35,6 +36,10 @@ namespace XRay.Importer.Editor.Levels
         private readonly Dictionary<string, XRayLevelTextureSet> _sets = new Dictionary<string, XRayLevelTextureSet>(StringComparer.OrdinalIgnoreCase);
         private readonly Dictionary<string, XRayTextureAssetResult> _packed = new Dictionary<string, XRayTextureAssetResult>(StringComparer.OrdinalIgnoreCase);
         private readonly List<string> _requested = new List<string>();
+        private readonly Dictionary<string, Vector2> _terrainSamplerAssets = new Dictionary<string, Vector2>();
+
+        private XRayTerrainSourceParameters _terrainParameters;
+        private bool _sourceTerrainSampler;
 
         public XRayLevelTextureLibrary(XRayAssetIndex index, string levelName, XRayLevelImportRecord record, bool flipNormalGreen) : this(index, levelName, record, flipNormalGreen, false)
         {
@@ -133,6 +138,73 @@ namespace XRay.Importer.Editor.Levels
             return result;
         }
 
+        public XRayLevelTerrainTextures RequestTerrain(XRayLevelShader shader, XRayBlender blender)
+        {
+            var terrain = new XRayLevelTerrainTextures { Source = XRayTerrainSourceBinding.IsTerrainBlender(blender) ? XRayTerrainSourceBinding.Resolve(_resolver) : new XRayTerrainSourceBinding() };
+            _sourceTerrainSampler = terrain.Source.UsesHeight;
+            terrain.Parameters = terrain.Source.UsesHeight ? XRayTerrainSourceParameters.FromSource(_record.Source) : null;
+            _terrainParameters = terrain.Parameters;
+            if (terrain.Parameters != null) _record.AddDependency(XRayLevelDependencyCategory.Materials, "Terrain user settings", terrain.Parameters.Path, terrain.Parameters.Path, null, XRayLevelDependencyStatus.Found, "Source terrain POM, layer offsets and source sampler settings", null, "SHA256=" + terrain.Parameters.Hash);
+            else if (terrain.Source.UsesHeight && !string.IsNullOrEmpty(_record.Source.GameFolder)) _record.Warnings.Add("Terrain user settings are unavailable or use an external app_data_root; shader defaults remain active and source parameter parity is unverified.");
+            XRayTextureResolution terrainBase = _resolver.Resolve(shader.Texture);
+            RecordTerrainFile(terrainBase.Diffuse, "Terrain base", Request(shader.Texture, false, "Terrain base").AlbedoPath);
+            RecordTerrainFile(_resolver.ResolveFile(XRayVirtualPath.TextureToVirtualPath(terrainBase.TextureName, ".thm")), "Terrain THM", null);
+            foreach (XRayResolvedFile source in new[] { terrain.Source.Shader, terrain.Source.Brdf, terrain.Source.MidShader, terrain.Source.LowShader }) RecordTerrainFile(source, "Terrain shader contract", null);
+            if (terrain.Source.UsesHeight) terrain.SourceBasePath = RequestTerrainPacked(terrainBase.Diffuse.VirtualPath, XRayLevelDependencyCategory.Materials, "Terrain source base UNORM", "s_base encoded color and alpha hemisphere; independent of legacy hardware sRGB albedo").AssetPath;
+            _record.Source.TerrainProfile = terrain.Source.Profile.ToString();
+            _record.Source.TerrainShaderPath = terrain.Source.Shader?.VirtualPath;
+            _record.Source.TerrainShaderHash = terrain.Source.ShaderHash;
+            _record.Source.TerrainBrdfHash = terrain.Source.BrdfHash;
+            _record.AddDependency(XRayLevelDependencyCategory.Materials, "Terrain source shader", terrain.Source.Shader?.VirtualPath, terrain.Source.Shader?.Winner?.Location, terrain.Source.Shader?.VirtualPath, terrain.Source.Shader?.IsResolved == true ? XRayLevelDependencyStatus.Found : XRayLevelDependencyStatus.Missing, "Source-specific terrain data contract; activation remains separate", null, terrain.Source.ShaderHash);
+            _record.AddDependency(XRayLevelDependencyCategory.Materials, "Terrain source BRDF", terrain.Source.Brdf?.VirtualPath, terrain.Source.Brdf?.Winner?.Location, terrain.Source.Brdf?.VirtualPath, terrain.Source.Brdf?.IsResolved == true ? XRayLevelDependencyStatus.Found : XRayLevelDependencyStatus.Missing, "Source-specific terrain BRDF identity; activation remains separate", null, terrain.Source.BrdfHash);
+            foreach (var variant in new[] { terrain.Source.MidShader, terrain.Source.LowShader })
+            {
+                _record.AddDependency(XRayLevelDependencyCategory.Materials, "Terrain quality shader", variant?.VirtualPath, variant?.Winner?.Location, variant?.VirtualPath, variant?.IsResolved == true ? XRayLevelDependencyStatus.Found : XRayLevelDependencyStatus.Missing, "Explicit quality variant; original visual sphere selector is not inferred from mesh chunks", null, variant == terrain.Source.MidShader ? terrain.Source.MidHash : terrain.Source.LowHash);
+            }
+            if (terrain.Source.VerifiedMid)
+            {
+                var atlas = _resolver.ResolveTexture(shader.Texture + "_lod_textures", ".dds");
+                if (!atlas.IsResolved)
+                {
+                    _record.AddDependency(XRayLevelDependencyCategory.Materials, "Terrain level LOD atlas", atlas.DisplayPath, null, atlas.VirtualPath, XRayLevelDependencyStatus.Missing, "Blender_BmmD selects terrain/default_lod_textures when this atlas is absent");
+                    atlas = _resolver.ResolveTexture("terrain/default_lod_textures", ".dds");
+                }
+                terrain.LodAtlasPath = RequestTerrainPacked(atlas.VirtualPath, XRayLevelDependencyCategory.Materials, "Terrain MID atlas", "s_lod_texture: encoded UNORM; smp_base for selected UV, smp_linear for previous UV").AssetPath;
+            }
+            XRayTextureAssetResult mask = RequestTerrainPacked(XRayVirtualPath.TextureToVirtualPath(shader.Texture + "_mask", ".dds"), XRayLevelDependencyCategory.Materials, "Terrain mask", "s_mask: per-channel weights of the 4 detail layers");
+            terrain.MaskPath = mask.AssetPath;
+            string[] channels = { "R2-R", "R2-G", "R2-B", "R2-A" };
+            for (int i = 0; i < channels.Length; i++)
+            {
+                string detail = blender.GetString("Detail map/" + channels[i]);
+                if (string.IsNullOrEmpty(detail))
+                {
+                    continue;
+                }
+
+                XRayLevelTextureSet set = Request(detail, false, "Terrain detail " + channels[i] + " (s_dt_*)");
+                terrain.DetailPaths[i] = set.AlbedoPath;
+                RecordTerrainFile(set.Resolution.Diffuse, "Terrain layer color " + channels[i], set.AlbedoPath);
+                RecordTerrainFile(_resolver.ResolveFile(XRayVirtualPath.TextureToVirtualPath(set.Resolution.TextureName, ".thm")), "Terrain layer THM " + channels[i], null);
+                XRayTextureAssetResult bump = RequestTerrainPacked(XRayVirtualPath.TextureToVirtualPath(detail + "_bump", ".dds"), XRayLevelDependencyCategory.Materials, "Terrain detail bump " + channels[i], "s_dn_*: .wzyx normal + gloss");
+                terrain.BumpPaths[i] = bump.AssetPath;
+                if (terrain.Source.UsesHeight)
+                {
+                    terrain.SourceColorPaths[i] = RequestTerrainPacked(set.Resolution.Diffuse.VirtualPath, XRayLevelDependencyCategory.Materials, "Terrain source color " + channels[i], "s_dt_* encoded UNORM filtering; legacy albedo references remain separate").AssetPath;
+                    terrain.HeightPaths[i] = RequestTerrainPacked(XRayVirtualPath.TextureToVirtualPath(detail + "_height", ".dds"), XRayLevelDependencyCategory.Materials, "Terrain source height " + channels[i], "s_height_*: R height, independent of bump#; source terrain POM and initial-height AO").AssetPath;
+                }
+            }
+
+            XRayTextureDescription description = terrainBase.Description;
+            terrain.DetailScale = description != null && !double.IsNaN(description.DetailScale) && !double.IsInfinity(description.DetailScale) && description.DetailScale > 0.0 && description.DetailScale <= float.MaxValue ? (float)description.DetailScale : 1.0f;
+            if (description == null || double.IsNaN(description.DetailScale) || double.IsInfinity(description.DetailScale) || description.DetailScale <= 0.0 || description.DetailScale > float.MaxValue)
+            {
+                _record.Warnings.Add($"Terrain '{shader.Texture}': no THM detail scale; dt_params = 1 is used.");
+            }
+
+            return terrain;
+        }
+
         public void ImportAll()
         {
             _importer.ImportPendingBatched();
@@ -152,6 +224,62 @@ namespace XRay.Importer.Editor.Levels
                     XRayTextureImportQueue.Complete(path);
                 }
             }
+            foreach (KeyValuePair<string, Vector2> sampler in _terrainSamplerAssets)
+            {
+                string path = sampler.Key;
+                AssetImporter importer = AssetImporter.GetAtPath(path);
+                if (importer == null) continue;
+                var settings = new SerializedObject(importer);
+                string[] names = { "m_TextureSettings.m_FilterMode", "m_TextureSettings.m_Aniso", "m_TextureSettings.m_MipBias", "m_TextureSettings.m_WrapU", "m_TextureSettings.m_WrapV" };
+                float[] values = { (float)FilterMode.Trilinear, sampler.Value.x, sampler.Value.y, (float)TextureWrapMode.Repeat, (float)TextureWrapMode.Repeat };
+                bool changed = false;
+                for (int i = 0; i < names.Length; i++)
+                {
+                    SerializedProperty property = settings.FindProperty(names[i]);
+                    if (property == null)
+                    {
+                        _record.Warnings.Add($"Terrain sampler setting '{names[i]}' is unavailable for '{path}'; source sampling parity is unverified.");
+                        continue;
+                    }
+                    if (i == 2)
+                    {
+                        changed |= property.floatValue != values[i];
+                        property.floatValue = values[i];
+                    }
+                    else
+                    {
+                        changed |= property.intValue != (int)values[i];
+                        property.intValue = (int)values[i];
+                    }
+                }
+                if (!changed) continue;
+                settings.ApplyModifiedPropertiesWithoutUndo();
+                importer.SaveAndReimport();
+            }
+            _terrainSamplerAssets.Clear();
+            foreach (XRayLevelSourceFile file in _record.Source.Files)
+            {
+                if (!string.IsNullOrEmpty(file.AssetPath)) file.AssetGuid = AssetDatabase.AssetPathToGUID(file.AssetPath);
+            }
+        }
+
+        private XRayTextureAssetResult RequestTerrainPacked(string virtualPath, XRayLevelDependencyCategory category, string role, string purpose)
+        {
+            XRayTextureAssetResult result = RequestPacked(virtualPath, category, role, purpose);
+            RecordTerrainFile(_resolver.ResolveFile(virtualPath), role, result.AssetPath);
+            if (_sourceTerrainSampler && result.AssetPath != null && (result.Status == XRayResourceStatus.Imported || result.Status == XRayResourceStatus.Converted)) _terrainSamplerAssets[result.AssetPath] = new Vector2(_terrainParameters?.Anisotropy ?? 16.0f, _terrainParameters?.MipBias ?? -0.5f);
+            return result;
+        }
+
+        private void RecordTerrainFile(XRayResolvedFile resolved, string role, string assetPath)
+        {
+            if (resolved == null || !resolved.IsResolved) return;
+            XRayLevelSourceFile existing = _record.Source.Files.Find(file => file.VirtualPath == resolved.VirtualPath && file.AssetPath == assetPath);
+            if (existing != null) return;
+            XRayResolvedSource winner = resolved.Winner;
+            var source = new XRayLevelSourceFile { VirtualPath = resolved.VirtualPath, Role = role, Source = winner.SourceName, Origin = winner.Origin, Kind = winner.Kind.ToString(), Priority = winner.Priority, Size = winner.Size, Location = winner.Location, ContentHash = "sha256:" + XRayTerrainSourceBinding.Hash(resolved), AssetPath = assetPath };
+            foreach (XRayResolvedSource loser in resolved.Losers) source.Losers.Add(loser.Location);
+            _record.Source.Files.Add(source);
         }
 
         private void RequestDetail(XRayLevelTextureSet set)

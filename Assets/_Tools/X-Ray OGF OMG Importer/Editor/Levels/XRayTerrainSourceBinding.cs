@@ -1,5 +1,9 @@
 using System;
 using System.Security.Cryptography;
+using System.Globalization;
+using System.IO;
+using UnityEngine;
+using XRay.Importer.Core.Level;
 using XRay.Importer.Sources.Textures;
 using XRay.Importer.Sources.Vfs;
 
@@ -19,13 +23,26 @@ namespace XRay.Importer.Editor.Levels
         public const string ANOMALY_BRDF_HASH = "28f5979d56ed51d3e6260f461bcede914ebe1e01d99991b90a8747b5410c0b6a";
         public const string TRUE_STALKER_SHADER_HASH = "a7f772699db1146b67d48a178afc99dd42a200e34cc1d6246cddddabdfd9045a";
         public const string TRUE_STALKER_BRDF_HASH = "c1445208b47479905e319cc879c33f86bc9eb0ffb0a8f68a66720c9c6c646fa4";
+        public const string ANOMALY_MID_HASH = "6004039018428d0f122f35050b0cd7c3375a215f2123c9fb828396eae78e6aed";
+        public const string ANOMALY_LOW_HASH = "e1440dc306646c1c7fb66ab2a7a4399cb9a98eb33d1d520fe59b248bc19033e6";
 
         public XRayTerrainSourceProfile Profile { get; private set; }
         public XRayResolvedFile Shader { get; private set; }
         public XRayResolvedFile Brdf { get; private set; }
         public string ShaderHash { get; private set; }
         public string BrdfHash { get; private set; }
+        public XRayResolvedFile MidShader { get; private set; }
+        public XRayResolvedFile LowShader { get; private set; }
+        public string MidHash { get; private set; }
+        public string LowHash { get; private set; }
         public bool UsesHeight => Profile == XRayTerrainSourceProfile.AnomalyAtmospherics;
+        public bool VerifiedMid => UsesHeight && MidHash == ANOMALY_MID_HASH;
+        public bool VerifiedLow => UsesHeight && LowHash == ANOMALY_LOW_HASH;
+
+        public static bool IsTerrainBlender(XRayBlender blender)
+        {
+            return blender != null && (blender.ClassId == "BmmD" || blender.ClassId == "BmmDold");
+        }
 
         public static XRayTerrainSourceProfile Identify(string shaderHash, string brdfHash)
         {
@@ -46,16 +63,89 @@ namespace XRay.Importer.Editor.Levels
             binding.Shader = trueStalker || !high.IsResolved ? legacy : high;
             binding.ShaderHash = trueStalker || !high.IsResolved ? legacyHash : highHash;
             binding.Profile = Identify(binding.ShaderHash, binding.BrdfHash);
+            binding.MidShader = resolver.ResolveFile("shaders/r3/deffer_terrain_mid_flat.ps");
+            binding.LowShader = resolver.ResolveFile("shaders/r3/deffer_terrain_low_flat.ps");
+            binding.MidHash = Hash(binding.MidShader);
+            binding.LowHash = Hash(binding.LowShader);
             return binding;
         }
 
-        private static string Hash(XRayResolvedFile file)
+        internal static string Hash(XRayResolvedFile file)
         {
             if (file == null || !file.IsResolved) return string.Empty;
             using (SHA256 sha = SHA256.Create())
             {
                 return BitConverter.ToString(sha.ComputeHash(file.Winner.ReadAllBytes())).Replace("-", string.Empty).ToLowerInvariant();
             }
+        }
+    }
+
+    public sealed class XRayTerrainSourceParameters
+    {
+        public Vector4? Pom { get; private set; }
+        public Vector4? Offset { get; private set; }
+        public float? Anisotropy { get; private set; }
+        public float? MipBias { get; private set; }
+        public string Path { get; private set; }
+        public string Hash { get; private set; }
+
+        public static XRayTerrainSourceParameters Read(string path)
+        {
+            byte[] bytes = File.ReadAllBytes(path);
+            XRayTerrainSourceParameters result = Parse(System.Text.Encoding.UTF8.GetString(bytes).TrimStart('\uFEFF'));
+            result.Path = path;
+            using (SHA256 sha = SHA256.Create()) result.Hash = BitConverter.ToString(sha.ComputeHash(bytes)).Replace("-", string.Empty).ToLowerInvariant();
+            return result;
+        }
+
+        public static XRayTerrainSourceParameters FromSource(XRayLevelSourceProvenance source)
+        {
+            if (string.IsNullOrEmpty(source?.GameFolder)) return null;
+            XRayFsGame fs = File.Exists(source.FsGame) ? XRayFsGame.Parse(File.ReadAllBytes(source.FsGame), source.FsGame) : XRayFsGame.CreateDefault();
+            XRayFsPath appData = fs.Paths.Find(path => path.Alias == XRayFsGame.APP_DATA_ROOT);
+            if (appData == null || appData.IsExternal) return null;
+            string root = System.IO.Path.GetFullPath(source.GameFolder).TrimEnd('\\', '/') + System.IO.Path.DirectorySeparatorChar;
+            string settings = System.IO.Path.GetFullPath(System.IO.Path.Combine(root, appData.RelativePath, "user.ltx"));
+            return settings.StartsWith(root, StringComparison.OrdinalIgnoreCase) && File.Exists(settings) ? Read(settings) : null;
+        }
+
+        public static XRayTerrainSourceParameters Parse(string text)
+        {
+            var result = new XRayTerrainSourceParameters();
+            foreach (string line in text.Split('\n'))
+            {
+                string trimmed = line.Trim();
+                int separator = trimmed.IndexOfAny(new[] { ' ', '\t' });
+                if (separator < 0) continue;
+                string key = trimmed.Substring(0, separator);
+                string value = trimmed.Substring(separator).Trim();
+                if (key == "ssfx_terrain_pom") result.Pom = ReadVector(value);
+                else if (key == "ssfx_terrain_offset") result.Offset = ReadVector(value);
+                else if (key == "r__tf_aniso") result.Anisotropy = ReadNumber(value);
+                else if (key == "r__tf_mipbias") result.MipBias = ReadNumber(value);
+            }
+            if (result.Pom.HasValue && (result.Pom.Value.x < 1.0f || result.Pom.Value.y <= 0.0f || result.Pom.Value.z < 0.0f)) result.Pom = null;
+            if (result.Anisotropy.HasValue && (result.Anisotropy.Value < 1.0f || result.Anisotropy.Value > 16.0f || result.Anisotropy.Value != Mathf.Floor(result.Anisotropy.Value))) result.Anisotropy = null;
+            return result;
+        }
+
+        private static Vector4? ReadVector(string text)
+        {
+            string[] parts = text.Trim('(', ')', ' ').Split(',');
+            if (parts.Length != 4) return null;
+            var value = Vector4.zero;
+            for (int i = 0; i < parts.Length; i++)
+            {
+                float? number = ReadNumber(parts[i]);
+                if (!number.HasValue) return null;
+                value[i] = number.Value;
+            }
+            return value;
+        }
+
+        private static float? ReadNumber(string text)
+        {
+            return float.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out float value) && !float.IsNaN(value) && !float.IsInfinity(value) ? value : (float?)null;
         }
     }
 }

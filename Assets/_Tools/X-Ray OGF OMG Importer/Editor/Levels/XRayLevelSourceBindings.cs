@@ -310,7 +310,7 @@ namespace XRay.Importer.Editor.Levels
             return AssetDatabase.TryGetGUIDAndLocalFileIdentifier(texture, out string guid, out long _) ? guid : "instance:" + texture.GetInstanceID();
         }
 
-        private static XRayLevelBindingChange Decide(string property, string current, string defaultValue, Dictionary<string, string> previous, string desired)
+        internal static XRayLevelBindingChange Decide(string property, string current, string defaultValue, Dictionary<string, string> previous, string desired)
         {
             var change = new XRayLevelBindingChange { Property = property, Current = current, Desired = desired };
             if (previous != null && previous.TryGetValue(property, out string generated))
@@ -331,7 +331,7 @@ namespace XRay.Importer.Editor.Levels
             return change;
         }
 
-        private static void AppendOwnership(StringBuilder tag, XRayLevelBindingChange change)
+        internal static void AppendOwnership(StringBuilder tag, XRayLevelBindingChange change)
         {
             string generated = change.Ownership == XRayLevelBindingOwnership.UserOverride ? "!" + (change.Previous ?? change.Desired).TrimStart('!') : change.Desired;
             tag.Append(';').Append(change.Property).Append('=').Append(generated);

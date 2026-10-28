@@ -144,7 +144,7 @@ namespace XRay.Importer.Editor.Levels
             string folder = Path.GetDirectoryName(path)?.Replace('\\', '/');
             string parent = folder != null ? Path.GetDirectoryName(folder)?.Replace('\\', '/') : null;
             string space = parent != null ? Path.GetDirectoryName(parent)?.Replace('\\', '/') : null;
-            return string.Equals(parent, XRayLevelPaths.ROOT, StringComparison.OrdinalIgnoreCase) || string.Equals(space, XRayLevelPaths.ANOMALY_ROOT, StringComparison.OrdinalIgnoreCase);
+            return string.Equals(parent, XRayLevelPaths.Root, StringComparison.OrdinalIgnoreCase) || string.Equals(parent, XRayLevelPaths.ROOT, StringComparison.OrdinalIgnoreCase) || string.Equals(space, XRayLevelPaths.ANOMALY_ROOT, StringComparison.OrdinalIgnoreCase) || File.Exists(folder + "/" + XRayLevelPaths.MANIFEST_NAME);
         }
     }
 }

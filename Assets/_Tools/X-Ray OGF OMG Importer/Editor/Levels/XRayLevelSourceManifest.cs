@@ -122,6 +122,10 @@ namespace XRay.Importer.Editor.Levels
         [SerializeField] private int _thmParserVersion;
         [SerializeField] private string _levelVirtualPath;
         [SerializeField] private string _levelOrigin;
+        [SerializeField] private string _terrainProfile;
+        [SerializeField] private string _terrainShaderPath;
+        [SerializeField] private string _terrainShaderHash;
+        [SerializeField] private string _terrainBrdfHash;
         [SerializeField] private bool _levelRegistered;
         [SerializeField] private List<string> _modOrder = new List<string>();
         [SerializeField] private List<XRayLevelSourceFile> _files = new List<XRayLevelSourceFile>();
@@ -131,6 +135,27 @@ namespace XRay.Importer.Editor.Levels
         {
             get => _sourceType;
             set => _sourceType = value;
+        }
+
+        public string TerrainProfile
+        {
+            get => _terrainProfile;
+            set => _terrainProfile = value;
+        }
+        public string TerrainShaderPath
+        {
+            get => _terrainShaderPath;
+            set => _terrainShaderPath = value;
+        }
+        public string TerrainShaderHash
+        {
+            get => _terrainShaderHash;
+            set => _terrainShaderHash = value;
+        }
+        public string TerrainBrdfHash
+        {
+            get => _terrainBrdfHash;
+            set => _terrainBrdfHash = value;
         }
 
         public string SourceFolder

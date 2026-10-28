@@ -810,7 +810,15 @@ namespace XRay.Importer.Editor.Levels
 
         private XRayLevelTerrainTextures RequestTerrain(XRayLevelShader shader, XRayBlender blender)
         {
-            var terrain = new XRayLevelTerrainTextures();
+            var terrain = new XRayLevelTerrainTextures { Source = XRayTerrainSourceBinding.Resolve(_textures.Resolver) };
+            XRayTextureResolution terrainBase = _textures.Resolver.Resolve(shader.Texture);
+            if (terrain.Source.UsesHeight) terrain.SourceBasePath = _textures.RequestPacked(terrainBase.Diffuse.VirtualPath, XRayLevelDependencyCategory.Materials, "Terrain source base UNORM", "s_base encoded color and alpha hemisphere; independent of legacy hardware sRGB albedo").AssetPath;
+            _record.Source.TerrainProfile = terrain.Source.Profile.ToString();
+            _record.Source.TerrainShaderPath = terrain.Source.Shader?.VirtualPath;
+            _record.Source.TerrainShaderHash = terrain.Source.ShaderHash;
+            _record.Source.TerrainBrdfHash = terrain.Source.BrdfHash;
+            _record.AddDependency(XRayLevelDependencyCategory.Materials, "Terrain source shader", terrain.Source.Shader?.VirtualPath, terrain.Source.Shader?.Winner?.Location, terrain.Source.Shader?.VirtualPath, terrain.Source.Shader?.IsResolved == true ? XRayLevelDependencyStatus.Found : XRayLevelDependencyStatus.Missing, "Source-specific terrain data contract; activation remains separate", null, terrain.Source.ShaderHash);
+            _record.AddDependency(XRayLevelDependencyCategory.Materials, "Terrain source BRDF", terrain.Source.Brdf?.VirtualPath, terrain.Source.Brdf?.Winner?.Location, terrain.Source.Brdf?.VirtualPath, terrain.Source.Brdf?.IsResolved == true ? XRayLevelDependencyStatus.Found : XRayLevelDependencyStatus.Missing, "Source-specific terrain BRDF identity; activation remains separate", null, terrain.Source.BrdfHash);
             XRayTextureAssetResult mask = _textures.RequestPacked(XRayVirtualPath.TextureToVirtualPath(shader.Texture + "_mask", ".dds"), XRayLevelDependencyCategory.Materials, "Terrain mask", "s_mask: per-channel weights of the 4 detail layers");
             terrain.MaskPath = mask.AssetPath;
             string[] channels = { "R2-R", "R2-G", "R2-B", "R2-A" };
@@ -826,9 +834,14 @@ namespace XRay.Importer.Editor.Levels
                 terrain.DetailPaths[i] = set.AlbedoPath;
                 XRayTextureAssetResult bump = _textures.RequestPacked(XRayVirtualPath.TextureToVirtualPath(detail + "_bump", ".dds"), XRayLevelDependencyCategory.Materials, "Terrain detail bump " + channels[i], "s_dn_*: .wzyx normal + gloss");
                 terrain.BumpPaths[i] = bump.AssetPath;
+                if (terrain.Source.UsesHeight)
+                {
+                    terrain.SourceColorPaths[i] = _textures.RequestPacked(set.Resolution.Diffuse.VirtualPath, XRayLevelDependencyCategory.Materials, "Terrain source color " + channels[i], "s_dt_* encoded UNORM filtering; legacy albedo references remain separate").AssetPath;
+                    terrain.HeightPaths[i] = _textures.RequestPacked(XRayVirtualPath.TextureToVirtualPath(detail + "_height", ".dds"), XRayLevelDependencyCategory.Materials, "Terrain source height " + channels[i], "s_height_*: R height, independent of bump#; source terrain POM and initial-height AO").AssetPath;
+                }
             }
 
-            XRayTextureDescription description = _textures.Resolver.Resolve(shader.Texture).Description;
+            XRayTextureDescription description = terrainBase.Description;
             terrain.DetailScale = description != null && description.DetailScale > 0.0 ? (float)description.DetailScale : 1.0f;
             if (description == null || description.DetailScale <= 0.0)
             {

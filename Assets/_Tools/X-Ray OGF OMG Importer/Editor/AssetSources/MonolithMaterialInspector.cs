@@ -32,6 +32,18 @@ namespace XRay.Importer.Editor
             SetPresence(material, Levels.XRayLevelSourceBindings.HAS_CORRECTION, hasBump && correction != null && !correction.isDataSRGB && FlipV(correction) == (material.GetFloat("_MonolithBumpFlipV") > 0.5f));
             SetPresence(material, Levels.XRayLevelSourceBindings.HAS_DETAIL, hasDetail);
             SetPresence(material, Levels.XRayLevelSourceBindings.HAS_DETAIL_BUMP, hasBump && hasDetail && detailBump != null && detailCorrection != null && !detailBump.isDataSRGB && !detailCorrection.isDataSRGB && FlipV(detailBump) == FlipV(detail) && FlipV(detailCorrection) == FlipV(detail));
+            bool hasTerrainHeight = Mathf.RoundToInt(material.GetFloat("_MonolithTerrainSource")) == (int)Levels.XRayTerrainSourceProfile.AnomalyAtmospherics;
+            Texture2D terrainBase = material.GetTexture("_MonolithTerrainSourceBase") as Texture2D;
+            bool hasTerrainColor = hasTerrainHeight && terrainBase != null && !terrainBase.isDataSRGB;
+            foreach (string channel in new[] { "R", "G", "B", "A" })
+            {
+                Texture2D height = material.GetTexture("_MonolithTerrainHeight" + channel) as Texture2D;
+                hasTerrainHeight &= height != null && !height.isDataSRGB;
+                Texture2D color = material.GetTexture("_MonolithTerrainSourceColor" + channel) as Texture2D;
+                hasTerrainColor &= color != null && !color.isDataSRGB;
+            }
+            SetPresence(material, "_MonolithHasTerrainHeight", hasTerrainHeight);
+            SetPresence(material, "_MonolithHasTerrainSourceColor", hasTerrainColor);
         }
 
         private static bool FlipV(Texture2D texture)

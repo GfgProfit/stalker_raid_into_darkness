@@ -3,6 +3,66 @@
 #undef GetSurfaceAndBuiltinData
 #include "MonolithSkinning.hlsl"
 
+#if defined(_MONOLITH_LEVEL_TERRAIN) && (SHADERPASS == SHADERPASS_FORWARD || defined(WRITE_NORMAL_BUFFER))
+#define MONOLITH_SOURCE_TERRAIN
+#include "MonolithSourceTerrain.hlsl"
+
+void MonolithSourceTerrainSplat(float2 uv, float3 eyeVector, float viewDepth, inout float3 color, out float3 normal, out float gloss, out float height, out float ao)
+{
+    float2 tc = MonolithSourceXRayUv(uv);
+    float4 weights = MonolithTerrainWeights(SAMPLE_TEXTURE2D(_MonolithTerrainMask, sampler_MonolithTerrainBumpR, MonolithSourceTextureUv(tc, _MonolithTerrainMaskFlipV)));
+    tc *= _MonolithTerrainDetailScale;
+    float4 heights = 0.0;
+    bool useHeight = _MonolithHasTerrainHeight > 0.5 && (_MonolithTerrainParallax > 0.5 || _MonolithTerrainOcclusion > 0.5 || _MonolithTerrainVirtualHeight > 0.5 || _MonolithDebug > 69.5);
+    [branch]
+    if (useHeight)
+    {
+        heights.r = SAMPLE_TEXTURE2D(_MonolithTerrainHeightR, sampler_MonolithTerrainBumpR, MonolithSourceTextureUv(tc, _MonolithTerrainHeightFlipV.r)).r;
+        heights.g = SAMPLE_TEXTURE2D(_MonolithTerrainHeightG, sampler_MonolithTerrainBumpR, MonolithSourceTextureUv(tc, _MonolithTerrainHeightFlipV.g)).r;
+        heights.b = SAMPLE_TEXTURE2D(_MonolithTerrainHeightB, sampler_MonolithTerrainBumpR, MonolithSourceTextureUv(tc, _MonolithTerrainHeightFlipV.b)).r;
+        heights.a = SAMPLE_TEXTURE2D(_MonolithTerrainHeightA, sampler_MonolithTerrainBumpR, MonolithSourceTextureUv(tc, _MonolithTerrainHeightFlipV.a)).r;
+    }
+    float occlusion = useHeight && _MonolithTerrainOcclusion > 0.5 ? 1.0 : 0.0;
+    MonolithTerrainLayer r = MonolithTerrainInitialize(heights.r, _MonolithTerrainOffset.r, weights.r, tc, occlusion);
+    MonolithTerrainLayer g = MonolithTerrainInitialize(heights.g, _MonolithTerrainOffset.g, weights.g, tc, occlusion);
+    MonolithTerrainLayer b = MonolithTerrainInitialize(heights.b, _MonolithTerrainOffset.b, weights.b, tc, occlusion);
+    MonolithTerrainLayer a = MonolithTerrainInitialize(heights.a, _MonolithTerrainOffset.a, weights.a, tc, occlusion);
+    [branch]
+    if (useHeight && _MonolithTerrainParallax > 0.5)
+    {
+        float2 tcStep;
+        float stepSize;
+        MonolithTerrainRay(eyeVector, viewDepth, _MonolithTerrainPom, tcStep, stepSize);
+        MonolithTerrainParallax(TEXTURE2D_ARGS(_MonolithTerrainHeightR, sampler_MonolithTerrainBumpR), r, tcStep, stepSize, viewDepth, _MonolithTerrainPom, _MonolithTerrainOffset.r, _MonolithTerrainHeightFlipV.r);
+        MonolithTerrainParallax(TEXTURE2D_ARGS(_MonolithTerrainHeightG, sampler_MonolithTerrainBumpR), g, tcStep, stepSize, viewDepth, _MonolithTerrainPom, _MonolithTerrainOffset.g, _MonolithTerrainHeightFlipV.g);
+        MonolithTerrainParallax(TEXTURE2D_ARGS(_MonolithTerrainHeightB, sampler_MonolithTerrainBumpR), b, tcStep, stepSize, viewDepth, _MonolithTerrainPom, _MonolithTerrainOffset.b, _MonolithTerrainHeightFlipV.b);
+        MonolithTerrainParallax(TEXTURE2D_ARGS(_MonolithTerrainHeightA, sampler_MonolithTerrainBumpR), a, tcStep, stepSize, viewDepth, _MonolithTerrainPom, _MonolithTerrainOffset.a, _MonolithTerrainHeightFlipV.a);
+    }
+    MonolithTerrainTextures(TEXTURE2D_ARGS(_MonolithTerrainSourceColorR, sampler_MonolithTerrainBumpR), TEXTURE2D_ARGS(_MonolithTerrainBumpR, sampler_MonolithTerrainBumpR), r, _MonolithTerrainColorFlipV.r, _MonolithTerrainBumpFlipV.r, _MonolithTerrainColorSrgb.r);
+    MonolithTerrainTextures(TEXTURE2D_ARGS(_MonolithTerrainSourceColorG, sampler_MonolithTerrainBumpR), TEXTURE2D_ARGS(_MonolithTerrainBumpG, sampler_MonolithTerrainBumpR), g, _MonolithTerrainColorFlipV.g, _MonolithTerrainBumpFlipV.g, _MonolithTerrainColorSrgb.g);
+    MonolithTerrainTextures(TEXTURE2D_ARGS(_MonolithTerrainSourceColorB, sampler_MonolithTerrainBumpR), TEXTURE2D_ARGS(_MonolithTerrainBumpB, sampler_MonolithTerrainBumpR), b, _MonolithTerrainColorFlipV.b, _MonolithTerrainBumpFlipV.b, _MonolithTerrainColorSrgb.b);
+    MonolithTerrainTextures(TEXTURE2D_ARGS(_MonolithTerrainSourceColorA, sampler_MonolithTerrainBumpR), TEXTURE2D_ARGS(_MonolithTerrainBumpA, sampler_MonolithTerrainBumpR), a, _MonolithTerrainColorFlipV.a, _MonolithTerrainBumpFlipV.a, _MonolithTerrainColorSrgb.a);
+    MonolithTerrainMix(r, g, b, a, color, color, normal, gloss, height, ao);
+    color = saturate(color);
+    if (_MonolithDebug < 0.5 || _MonolithDiagnosticOptions.x < 0.5) color = round(color * 255.0) / 255.0;
+    if (_MonolithDebug > 69.5 && _MonolithDebug < 70.5) _MonolithDiagnosticValue = weights.rgb;
+    if (_MonolithDebug > 70.5 && _MonolithDebug < 71.5) _MonolithDiagnosticValue = weights.aaa;
+    if (_MonolithDebug > 71.5 && _MonolithDebug < 72.5) _MonolithDiagnosticValue = r.color;
+    if (_MonolithDebug > 72.5 && _MonolithDebug < 73.5) _MonolithDiagnosticValue = g.color;
+    if (_MonolithDebug > 73.5 && _MonolithDebug < 74.5) _MonolithDiagnosticValue = b.color;
+    if (_MonolithDebug > 74.5 && _MonolithDebug < 75.5) _MonolithDiagnosticValue = a.color;
+    if (_MonolithDebug > 75.5 && _MonolithDebug < 76.5) _MonolithDiagnosticValue = color;
+    if (_MonolithDebug > 76.5 && _MonolithDebug < 77.5) _MonolithDiagnosticValue = r.normal * 0.5 + 0.5;
+    if (_MonolithDebug > 77.5 && _MonolithDebug < 78.5) _MonolithDiagnosticValue = g.normal * 0.5 + 0.5;
+    if (_MonolithDebug > 78.5 && _MonolithDebug < 79.5) _MonolithDiagnosticValue = b.normal * 0.5 + 0.5;
+    if (_MonolithDebug > 79.5 && _MonolithDebug < 80.5) _MonolithDiagnosticValue = a.normal * 0.5 + 0.5;
+    if (_MonolithDebug > 80.5 && _MonolithDebug < 81.5) _MonolithDiagnosticValue = normal * 0.5 + 0.5;
+    if (_MonolithDebug > 81.5 && _MonolithDebug < 82.5) _MonolithDiagnosticValue = height.xxx;
+    if (_MonolithDebug > 82.5 && _MonolithDebug < 83.5) _MonolithDiagnosticValue = float3((r.tc - tc) * 32.0 + 0.5, 0.0);
+    if (_MonolithDebug > 83.5 && _MonolithDebug < 84.5) _MonolithDiagnosticValue = ao.xxx;
+}
+#endif
+
 #ifdef _MONOLITH_LEVEL_TERRAIN
 float3 MonolithTerrainEncoded(float4 value)
 {
@@ -141,7 +201,21 @@ void GetSurfaceAndBuiltinData(FragInputs input, float3 V, inout PositionInputs p
         }
     }
     #endif
-    float4 baseSample = SAMPLE_TEXTURE2D(_BaseColorMap, sampler_BaseColorMap, uv);
+    float2 baseUv = uv;
+    float4 baseSample;
+    #ifdef MONOLITH_SOURCE_TERRAIN
+    bool sourceTerrainActive = _MonolithSourceProfile > 0.5 && _MonolithSourceTerrain > 0.5 && _MonolithTerrainSource > 0.5 && _MonolithTerrainSource < 1.5 && _MonolithHasTerrainSourceColor > 0.5;
+    [branch]
+    if (sourceTerrainActive)
+    {
+        baseUv = MonolithSourceTextureUv(MonolithSourceXRayUv(uv), _MonolithTerrainBaseFlipV);
+        baseSample = SAMPLE_TEXTURE2D(_MonolithTerrainSourceBase, sampler_MonolithTerrainBumpR, baseUv);
+    }
+    else
+    #endif
+    {
+        baseSample = SAMPLE_TEXTURE2D(_BaseColorMap, sampler_BaseColorMap, baseUv);
+    }
     #ifdef _MONOLITH_LEVEL_LOD
     float lodFactor = input.texCoord2.x;
     float2 lodUv = input.texCoord1.xy * _BaseColorMap_ST.xy + _BaseColorMap_ST.zw;
@@ -153,6 +227,9 @@ void GetSurfaceAndBuiltinData(FragInputs input, float3 V, inout PositionInputs p
     float4 lodNormal = lerp(lodNormal0, lodNormal1, lodFactor);
     #endif
     float3 encodedAlbedo = _MonolithAlbedoSrgb > 0.5 ? LinearToSRGB(baseSample.rgb) : baseSample.rgb;
+    #ifdef MONOLITH_SOURCE_TERRAIN
+    if (sourceTerrainActive) encodedAlbedo = baseSample.rgb;
+    #endif
     encodedAlbedo = saturate(encodedAlbedo * _BaseColor.rgb);
     #ifdef MONOLITH_SOURCE_TEXTURE
     float sourceDetailGloss = 1.0;
@@ -171,7 +248,25 @@ void GetSurfaceAndBuiltinData(FragInputs input, float3 V, inout PositionInputs p
     #ifdef _MONOLITH_LEVEL_TERRAIN
     float3 terrainNormal;
     float terrainGloss;
-    MonolithTerrainSplat(uv, encodedAlbedo, terrainNormal, terrainGloss);
+    bool sourceTerrain = false;
+    #ifdef MONOLITH_SOURCE_TERRAIN
+    float terrainHeight = 0.0;
+    float terrainAo = 1.0;
+    float3 terrainTangent = mul((float3x3)GetObjectToWorldMatrix(), input.color.rgb * 4.0 - 2.0);
+    float3 terrainBitangent = mul((float3x3)GetObjectToWorldMatrix(), float3(input.texCoord1.xy, input.texCoord2.x) * 4.0 - 2.0);
+    float3 terrainGeometric = mul((float3x3)GetObjectToWorldMatrix(), float3(input.color.a, input.texCoord3.xy) * 2.0);
+    sourceTerrain = sourceTerrainActive;
+    [branch]
+    if (sourceTerrain)
+    {
+        float3 eyeVector = float3(dot(terrainTangent, -posInput.positionWS), dot(terrainBitangent, -posInput.positionWS), dot(terrainGeometric, -posInput.positionWS));
+        MonolithSourceTerrainSplat(uv, eyeVector, dot(posInput.positionWS, -UNITY_MATRIX_V[2].xyz), encodedAlbedo, terrainNormal, terrainGloss, terrainHeight, terrainAo);
+    }
+    else
+    #endif
+    {
+        MonolithTerrainSplat(uv, encodedAlbedo, terrainNormal, terrainGloss);
+    }
     #endif
     #if HAVE_DECALS
     if (_EnableDecals)
@@ -220,6 +315,9 @@ void GetSurfaceAndBuiltinData(FragInputs input, float3 V, inout PositionInputs p
     _MonolithEnvironmentAlbedoGloss = float4(encodedAlbedo, gloss);
     #endif
     float material = MonolithDecodeMaterial(_MonolithMaterialId, _MonolithMaterialWeight);
+    #ifdef MONOLITH_SOURCE_TERRAIN
+    if (sourceTerrain) material = 22.0 / 31.0 * 1.333333333;
+    #endif
     _MonolithSourceAlbedoGloss = float4(encodedAlbedo, gloss);
     _MonolithSourceRawMaterial = material;
     if (_MonolithSourceProfile > 0.5 || _MonolithTrueStalkerTerrain > 0.5)
@@ -318,7 +416,22 @@ void GetSurfaceAndBuiltinData(FragInputs input, float3 V, inout PositionInputs p
     #endif
     surfaceData.ambientOcclusion = 1.0;
     surfaceData.specularOcclusion = 1.0;
+    #ifdef MONOLITH_SOURCE_TERRAIN
+    if (sourceTerrain)
+    {
+        float3 terrainWorldNormal = terrainTangent * tangentNormal.x + terrainBitangent * tangentNormal.y + terrainGeometric * tangentNormal.z;
+        surfaceData.normalWS = dot(terrainWorldNormal, terrainWorldNormal) > 0.0 ? normalize(terrainWorldNormal) : normalize(terrainGeometric);
+        surfaceData.geomNormalWS = normalize(terrainGeometric);
+        surfaceData.tangentWS = Orthonormalize(terrainTangent, surfaceData.normalWS);
+    }
+    #endif
     GetBuiltinData(input, V, posInput, surfaceData, baseSample.a * _BaseColor.a, surfaceData.normalWS, 0.0, builtinData);
+    #if defined(MONOLITH_SOURCE_TERRAIN) && SHADERPASS == SHADERPASS_FORWARD
+    if (sourceTerrain && _MonolithHasTerrainHeight > 0.5 && _MonolithTerrainVirtualHeight > 0.5)
+    {
+        posInput.positionWS = MonolithTerrainPosition(posInput.positionWS, surfaceData.geomNormalWS, terrainHeight);
+    }
+    #endif
     #if defined(MONOLITH_SOURCE_TEXTURE) && SHADERPASS == SHADERPASS_FORWARD
     if (_MonolithSourceProfile > 0.5 && _MonolithSourceVirtualHeight > 0.5)
     {

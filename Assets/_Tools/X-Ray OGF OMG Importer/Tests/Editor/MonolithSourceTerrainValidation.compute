@@ -1,0 +1,105 @@
+#pragma kernel Evaluate
+#include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Common.hlsl"
+#include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Color.hlsl"
+#include "../../Runtime/Shaders/MonolithMaterial.hlsl"
+#undef SAMPLE_TEXTURE2D
+#define SAMPLE_TEXTURE2D(textureName, samplerName, coord2) textureName.SampleLevel(samplerName, coord2, 0)
+#include "../../Runtime/Shaders/MonolithSourceTerrain.hlsl"
+
+StructuredBuffer<float4> _Cases;
+RWStructuredBuffer<float4> _Results;
+uint _CaseCount;
+Texture2D _ColorR;
+Texture2D _ColorG;
+Texture2D _ColorB;
+Texture2D _ColorA;
+Texture2D _BumpR;
+Texture2D _BumpG;
+Texture2D _BumpB;
+Texture2D _BumpA;
+Texture2D _HeightR;
+Texture2D _HeightG;
+Texture2D _HeightB;
+Texture2D _HeightA;
+SamplerState linear_repeat_sampler;
+
+[numthreads(64, 1, 1)]
+void Evaluate(uint3 id : SV_DispatchThreadID)
+{
+    uint i = id.x;
+    if (i >= _CaseCount) return;
+    uint c = i * 8;
+    float4 uvMode = _Cases[c];
+    float4 position = _Cases[c + 1];
+    float3 m1 = _Cases[c + 2].xyz;
+    float3 m2 = _Cases[c + 3].xyz;
+    float3 m3 = _Cases[c + 4].xyz;
+    float4 weights = MonolithTerrainWeights(_Cases[c + 5]);
+    float4 pom = _Cases[c + 6];
+    float4 offsets = _Cases[c + 7];
+    float2 tc = uvMode.xy * uvMode.z;
+    float aoMode = uvMode.w == 1.0 || uvMode.w == 3.0 ? 1.0 : 0.0;
+    MonolithTerrainLayer r = MonolithTerrainInitialize(_HeightR.SampleLevel(linear_repeat_sampler, tc, 0).r, offsets.r, weights.r, tc, aoMode);
+    MonolithTerrainLayer g = MonolithTerrainInitialize(_HeightG.SampleLevel(linear_repeat_sampler, tc, 0).r, offsets.g, weights.g, tc, aoMode);
+    MonolithTerrainLayer b = MonolithTerrainInitialize(_HeightB.SampleLevel(linear_repeat_sampler, tc, 0).r, offsets.b, weights.b, tc, aoMode);
+    MonolithTerrainLayer a = MonolithTerrainInitialize(_HeightA.SampleLevel(linear_repeat_sampler, tc, 0).r, offsets.a, weights.a, tc, aoMode);
+    if (uvMode.w >= 2.0)
+    {
+        float3 eye = mul(transpose(float3x3(m1, m2, m3)), -position.xyz);
+        float2 tcStep;
+        float stepSize;
+        MonolithTerrainRay(eye, position.z, pom, tcStep, stepSize);
+        MonolithTerrainParallax(TEXTURE2D_ARGS(_HeightR, linear_repeat_sampler), r, tcStep, stepSize, position.z, pom, offsets.r, 1.0);
+        MonolithTerrainParallax(TEXTURE2D_ARGS(_HeightG, linear_repeat_sampler), g, tcStep, stepSize, position.z, pom, offsets.g, 1.0);
+        MonolithTerrainParallax(TEXTURE2D_ARGS(_HeightB, linear_repeat_sampler), b, tcStep, stepSize, position.z, pom, offsets.b, 1.0);
+        MonolithTerrainParallax(TEXTURE2D_ARGS(_HeightA, linear_repeat_sampler), a, tcStep, stepSize, position.z, pom, offsets.a, 1.0);
+    }
+    MonolithTerrainTextures(TEXTURE2D_ARGS(_ColorR, linear_repeat_sampler), TEXTURE2D_ARGS(_BumpR, linear_repeat_sampler), r, 1.0, 1.0, 0.0);
+    MonolithTerrainTextures(TEXTURE2D_ARGS(_ColorG, linear_repeat_sampler), TEXTURE2D_ARGS(_BumpG, linear_repeat_sampler), g, 1.0, 1.0, 0.0);
+    MonolithTerrainTextures(TEXTURE2D_ARGS(_ColorB, linear_repeat_sampler), TEXTURE2D_ARGS(_BumpB, linear_repeat_sampler), b, 1.0, 1.0, 0.0);
+    MonolithTerrainTextures(TEXTURE2D_ARGS(_ColorA, linear_repeat_sampler), TEXTURE2D_ARGS(_BumpA, linear_repeat_sampler), a, 1.0, 1.0, 0.0);
+    float3 color;
+    float3 normal;
+    float gloss;
+    float height;
+    float ao;
+    MonolithTerrainMix(r, g, b, a, float3(0.3, 0.4, 0.5), color, normal, gloss, height, ao);
+    float3 geometricNormal = normalize(float3(m1.z, m2.z, m3.z));
+    float3 worldNormal = mul(float3x3(m1, m2, m3), normal);
+    worldNormal = dot(worldNormal, worldNormal) > 0.0 ? normalize(worldNormal) : geometricNormal;
+    float3 offsetPosition = MonolithTerrainPosition(position.xyz, geometricNormal, height);
+    float4 materialInput = round(saturate(float4(color, gloss)) * 255.0) / 255.0;
+    float material = 22.0 / 31.0 * 1.333333333;
+    float3 view = -normalize(offsetPosition);
+    float3 diffuse;
+    float3 specular;
+    MonolithSourceDirect(worldNormal, view, normalize(float3(0.3, 0.5, -0.8)), materialInput.rgb, materialInput.a, material, 0.71864, 1.0, float4(0.5, 1, 0, 0), 1.0, float4(1.5, 1, 0, 0), 0.0, diffuse, specular);
+    float rough = MonolithRoughness(materialInput.a, 0.0, 0.71864);
+    float3 albedo = MonolithAlbedo(materialInput.rgb, 0.0);
+    float3 f0 = MonolithSpecular(materialInput.rgb, materialInput.a, 0.0);
+    float dotNV = dot(worldNormal, view);
+    float nv = max(1e-5, dotNV);
+    float horizon = saturate(dotNV * 2.0);
+    uint o = i * 21;
+    _Results[o] = weights;
+    _Results[o + 1] = float4(r.tc, g.tc);
+    _Results[o + 2] = float4(b.tc, a.tc);
+    _Results[o + 3] = float4(r.height, g.height, b.height, a.height);
+    _Results[o + 4] = float4(r.occlusion, g.occlusion, b.occlusion, a.occlusion);
+    _Results[o + 5] = float4(color, gloss);
+    _Results[o + 6] = float4(normal, ao);
+    _Results[o + 7] = float4(worldNormal, height);
+    _Results[o + 8] = float4(offsetPosition, 0.95);
+    _Results[o + 9] = float4(r.normal, r.weight);
+    _Results[o + 10] = float4(g.normal, g.weight);
+    _Results[o + 11] = float4(b.normal, b.weight);
+    _Results[o + 12] = float4(a.normal, a.weight);
+    _Results[o + 13] = float4(r.color, r.gloss);
+    _Results[o + 14] = float4(g.color, g.gloss);
+    _Results[o + 15] = float4(b.color, b.gloss);
+    _Results[o + 16] = float4(a.color, a.gloss);
+    _Results[o + 17] = materialInput;
+    _Results[o + 18] = float4(diffuse * albedo + specular, 0.0);
+    _Results[o + 19] = float4(MonolithEnvBurley(rough, nv) * albedo, rough);
+    _Results[o + 20] = float4(MonolithEnvGGX(f0, rough, nv) * horizon * horizon, 0.0);
+}

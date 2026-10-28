@@ -246,6 +246,7 @@ void PostEvaluateBSDF(LightLoopContext lightLoopContext, float3 V, PositionInput
             diagnostic = normalData.normalWS * 0.5 + 0.5;
         }
         if (_MonolithDebug > 68.5 && _MonolithDebug < 69.5) diagnostic = _MonolithDiagnosticValue;
+        if (_MonolithDebug > 69.5 && _MonolithDebug < 84.5) diagnostic = _MonolithDiagnosticValue;
         lightLoopOutput.diffuseLighting = diagnostic * GetInverseCurrentExposureMultiplier();
         lightLoopOutput.specularLighting = 0.0;
     }

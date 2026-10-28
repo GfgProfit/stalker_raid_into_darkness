@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO;
 using System.Linq;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -18,7 +19,11 @@ namespace XRay.Importer.Editor.Levels
         DetailBump,
         SimpleParallax,
         SteepParallax,
-        Combined
+        Combined,
+        TerrainBlend,
+        TerrainAo,
+        TerrainPom,
+        TerrainCombined
     }
 
     [InitializeOnLoad]
@@ -31,6 +36,7 @@ namespace XRay.Importer.Editor.Levels
         private static readonly Dictionary<Material, XRayLevelSourceRefreshEntry> _entries = new Dictionary<Material, XRayLevelSourceRefreshEntry>();
 
         private static XRayLevelSourceRefresh _refresh;
+        private static XRayTerrainDiagnosticBinding _terrain;
         private static string _root;
         private static string _level;
         private static Scene _scene;
@@ -87,6 +93,45 @@ namespace XRay.Importer.Editor.Levels
         public static void Combined()
         {
             SetMode(XRaySourceTexturePreviewMode.Combined);
+        }
+
+        [MenuItem("Tools/X-Ray/Levels/Source Texture Preview/Modes/Terrain Blend")]
+        public static void TerrainBlend()
+        {
+            SetMode(XRaySourceTexturePreviewMode.TerrainBlend);
+        }
+
+        [MenuItem("Tools/X-Ray/Levels/Source Texture Preview/Modes/Terrain AO")]
+        public static void TerrainAo()
+        {
+            SetMode(XRaySourceTexturePreviewMode.TerrainAo);
+        }
+
+        [MenuItem("Tools/X-Ray/Levels/Source Texture Preview/Modes/Terrain POM")]
+        public static void TerrainPom()
+        {
+            SetMode(XRaySourceTexturePreviewMode.TerrainPom);
+        }
+
+        [MenuItem("Tools/X-Ray/Levels/Source Texture Preview/Modes/Terrain POM And AO")]
+        public static void TerrainCombined()
+        {
+            SetMode(XRaySourceTexturePreviewMode.TerrainCombined);
+        }
+
+        [MenuItem("Tools/X-Ray/Levels/Source Texture Preview/Terrain Active Imported Level")]
+        public static void PreviewTerrainActiveLevel()
+        {
+            string scene = SceneManager.GetActiveScene().path;
+            string folder = Path.GetDirectoryName(Path.GetDirectoryName(scene) ?? string.Empty)?.Replace('\\', '/');
+            XRayLevelImportManifest manifest = AssetDatabase.LoadAssetAtPath<XRayLevelImportManifest>((folder ?? string.Empty) + "/" + XRayLevelPaths.MANIFEST_NAME);
+            if (manifest == null) throw new InvalidOperationException("Open an imported level with source provenance before starting terrain preview.");
+            string root = Path.GetDirectoryName(folder)?.Replace('\\', '/');
+            using (XRayTerrainDiagnosticBinding binding = XRayTerrainDiagnosticBinding.Open(root, manifest.Record.LevelName))
+            {
+                if (binding.Source.Profile != XRayTerrainSourceProfile.AnomalyAtmospherics) throw new NotSupportedException("The source-specific terrain path remains unchanged; this preview supports only verified Atmospherics HQ: " + binding.Source.Profile);
+            }
+            Start(root, manifest.Record.LevelName, XRaySourceTexturePreviewMode.TerrainCombined);
         }
 
         [MenuItem("Tools/X-Ray/Levels/Source Texture Preview/l01_escape")]
@@ -146,6 +191,8 @@ namespace XRay.Importer.Editor.Levels
             _temporary.Clear();
             _materials.Clear();
             _entries.Clear();
+            _terrain?.Dispose();
+            _terrain = null;
             _refresh = null;
             SceneView.RepaintAll();
         }
@@ -155,7 +202,7 @@ namespace XRay.Importer.Editor.Levels
             Stop();
             XRayLevelSourceRefresh.RequireCleanEditor();
             Scene scene = SceneManager.GetActiveScene();
-            if ((level != "l01_escape" && level != "collaider") || scene.path != XRayLevelPaths.ScenePath(root, level))
+            if (AssetDatabase.LoadAssetAtPath<XRayLevelImportManifest>(XRayLevelPaths.ManifestPath(root, level)) == null || scene.path != XRayLevelPaths.ScenePath(root, level))
             {
                 throw new InvalidOperationException("Open the explicitly selected Anomaly level before starting its source material preview.");
             }
@@ -227,6 +274,27 @@ namespace XRay.Importer.Editor.Levels
                 copy.CopyPropertiesFromMaterial(pair.Key);
                 if (mode == XRaySourceTexturePreviewMode.Existing)
                 {
+                    continue;
+                }
+
+                if (mode >= XRaySourceTexturePreviewMode.TerrainBlend)
+                {
+                    if (!copy.IsKeywordEnabled("_MONOLITH_LEVEL_TERRAIN")) continue;
+                    try
+                    {
+                        _terrain = _terrain ?? XRayTerrainDiagnosticBinding.Open(_root, _level);
+                        _terrain.Bind(pair.Key, copy);
+                        copy.SetFloat("_MonolithSourceProfile", 1.0f);
+                        copy.SetFloat("_MonolithSourceTerrain", 1.0f);
+                        copy.SetFloat("_MonolithTerrainParallax", mode == XRaySourceTexturePreviewMode.TerrainPom || mode == XRaySourceTexturePreviewMode.TerrainCombined ? 1.0f : 0.0f);
+                        copy.SetFloat("_MonolithTerrainOcclusion", mode == XRaySourceTexturePreviewMode.TerrainAo || mode == XRaySourceTexturePreviewMode.TerrainCombined ? 1.0f : 0.0f);
+                        copy.SetFloat("_MonolithTerrainVirtualHeight", 1.0f);
+                    }
+                    catch
+                    {
+                        Stop();
+                        throw;
+                    }
                     continue;
                 }
 

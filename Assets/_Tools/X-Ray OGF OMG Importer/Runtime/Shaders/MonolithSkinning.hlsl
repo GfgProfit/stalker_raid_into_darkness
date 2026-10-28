@@ -55,4 +55,16 @@ AttributesMesh ApplyMeshModification(AttributesMesh input, float3 timeParameters
     input.positionOS += mul((float3x3)GetWorldToObjectMatrix(), float3(offset.x, 0.0, offset.y));
     return input;
 }
+#elif defined(_MONOLITH_LEVEL) && defined(ATTRIBUTES_NEED_COLOR) && defined(ATTRIBUTES_NEED_TEXCOORD3)
+#define HAVE_MESH_MODIFICATION
+
+AttributesMesh ApplyMeshModification(AttributesMesh input, float3 timeParameters)
+{
+    if (_MonolithSourceProfile > 0.5 && _MonolithSourceTerrain > 0.5 && _MonolithLevelTerrain > 0.5 && _MonolithTerrainSource > 0.5 && _MonolithTerrainSource < 1.5 && _MonolithHasTerrainSourceColor > 0.5)
+    {
+        input.color.a = input.normalOS.x;
+        input.uv3 = input.normalOS.yz;
+    }
+    return input;
+}
 #endif

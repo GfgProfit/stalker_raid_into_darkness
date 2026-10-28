@@ -29,6 +29,10 @@ namespace XRay.Importer.Editor.Levels
         public string MaskPath { get; set; }
         public string[] DetailPaths { get; } = new string[4];
         public string[] BumpPaths { get; } = new string[4];
+        public string[] HeightPaths { get; } = new string[4];
+        public string[] SourceColorPaths { get; } = new string[4];
+        public string SourceBasePath { get; set; }
+        public XRayTerrainSourceBinding Source { get; set; }
         public float DetailScale { get; set; } = 1.0f;
 
         public string Key()
@@ -542,6 +546,46 @@ namespace XRay.Importer.Editor.Levels
 
             material.SetFloat("_MonolithTerrainDetailScale", terrain.DetailScale);
             material.SetFloat("_MonolithTerrainBumpScale", 0.6f);
+            ConfigureTerrainSource(material, terrain);
+        }
+
+        private static void ConfigureTerrainSource(Material material, XRayLevelTerrainTextures terrain)
+        {
+            if (terrain.Source == null) return;
+            string[] channels = { "R", "G", "B", "A" };
+            var colorFlip = Vector4.zero;
+            var bumpFlip = Vector4.zero;
+            var heightFlip = Vector4.zero;
+            bool hasHeight = terrain.Source.UsesHeight;
+            Texture2D sourceBase = XRayLevelTextureLibrary.Load(terrain.SourceBasePath);
+            bool hasColor = sourceBase != null && !sourceBase.isDataSRGB;
+            material.SetTexture("_MonolithTerrainSourceBase", sourceBase);
+            for (int i = 0; i < channels.Length; i++)
+            {
+                Texture2D detail = XRayLevelTextureLibrary.Load(terrain.SourceColorPaths[i]);
+                Texture2D bump = XRayLevelTextureLibrary.Load(terrain.BumpPaths[i]);
+                Texture2D height = XRayLevelTextureLibrary.Load(terrain.HeightPaths[i]);
+                material.SetTexture("_MonolithTerrainHeight" + channels[i], height);
+                material.SetTexture("_MonolithTerrainSourceColor" + channels[i], detail);
+                colorFlip[i] = detail != null && (detail.format == TextureFormat.BC7 || detail.format == TextureFormat.BC6H) ? 1.0f : 0.0f;
+                bumpFlip[i] = bump != null && (bump.format == TextureFormat.BC7 || bump.format == TextureFormat.BC6H) ? 1.0f : 0.0f;
+                heightFlip[i] = height != null && (height.format == TextureFormat.BC7 || height.format == TextureFormat.BC6H) ? 1.0f : 0.0f;
+                hasHeight &= height != null;
+                hasColor &= detail != null && !detail.isDataSRGB;
+            }
+            Texture2D mask = XRayLevelTextureLibrary.Load(terrain.MaskPath);
+            material.SetFloat("_MonolithTerrainMaskFlipV", mask != null && (mask.format == TextureFormat.BC7 || mask.format == TextureFormat.BC6H) ? 1.0f : 0.0f);
+            material.SetVector("_MonolithTerrainColorFlipV", colorFlip);
+            material.SetVector("_MonolithTerrainBumpFlipV", bumpFlip);
+            material.SetVector("_MonolithTerrainHeightFlipV", heightFlip);
+            material.SetFloat("_MonolithHasTerrainHeight", hasHeight ? 1.0f : 0.0f);
+            material.SetFloat("_MonolithHasTerrainSourceColor", hasColor ? 1.0f : 0.0f);
+            material.SetVector("_MonolithTerrainColorSrgb", Vector4.zero);
+            material.SetFloat("_MonolithTerrainSource", (float)terrain.Source.Profile);
+            material.SetFloat("_MonolithTerrainBaseFlipV", sourceBase != null && (sourceBase.format == TextureFormat.BC7 || sourceBase.format == TextureFormat.BC6H) ? 1.0f : 0.0f);
+            material.SetOverrideTag("XRayTerrainBinding", XRayTerrainSourceBinding.VERSION);
+            material.SetOverrideTag("XRayTerrainShaderSHA256", terrain.Source.ShaderHash);
+            material.SetOverrideTag("XRayTerrainBrdfSHA256", terrain.Source.BrdfHash);
         }
 
         private static void SetAlphaTest(Material material, float cutoff)

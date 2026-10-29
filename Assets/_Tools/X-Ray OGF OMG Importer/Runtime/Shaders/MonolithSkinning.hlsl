@@ -60,7 +60,7 @@ AttributesMesh ApplyMeshModification(AttributesMesh input, float3 timeParameters
 
 AttributesMesh ApplyMeshModification(AttributesMesh input, float3 timeParameters)
 {
-    if (_MonolithSourceProfile > 0.5 && _MonolithSourceTerrain > 0.5 && _MonolithLevelTerrain > 0.5 && _MonolithTerrainSource > 0.5 && _MonolithTerrainSource < 1.5 && _MonolithHasTerrainSourceColor > 0.5)
+    if ((_MonolithSourceProfile > 0.5 && _MonolithSourceTerrain > 0.5 && _MonolithLevelTerrain > 0.5 && _MonolithTerrainSource > 0.5 && _MonolithTerrainSource < 1.5 && _MonolithHasTerrainSourceColor > 0.5) || MonolithTrueStalkerTerrainEnabled())
     {
         input.color.a = input.normalOS.x;
         input.uv3 = input.normalOS.yz;

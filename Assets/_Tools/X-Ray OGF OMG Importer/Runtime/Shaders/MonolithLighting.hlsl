@@ -11,6 +11,11 @@
 PreLightData GetPreLightData(float3 V, PositionInputs posInput, inout BSDFData bsdfData)
 {
     PreLightData data = MonolithLegacyGetPreLightData(V, posInput, bsdfData);
+    if (_MonolithTrueStalkerActive > 0.5)
+    {
+        if (_MonolithTrueStalkerHasLookup > 0.5) data.energyCompensation = 0.0;
+        return data;
+    }
     float nv = max(1e-5, dot(bsdfData.normalWS, V));
     data.specularFGD = MonolithEnvGGX(bsdfData.fresnel0, bsdfData.perceptualRoughness, nv) * Sq(saturate(dot(bsdfData.normalWS, V) * 2.0));
     data.diffuseFGD = MonolithEnvBurley(bsdfData.perceptualRoughness, nv);
@@ -26,6 +31,14 @@ CBSDF MonolithEvaluateBSDF(float3 V, float3 L, PreLightData preLightData, BSDFDa
 {
     CBSDF data;
     ZERO_INITIALIZE(CBSDF, data);
+    if (_MonolithTrueStalkerActive > 0.5)
+    {
+        if (_MonolithTrueStalkerHasLookup < 0.5) return EvaluateBSDF(V, L, preLightData, bsdfData);
+        float4 lookup = MonolithTrueStalkerDirect(_MonolithTrueStalkerMaterialLut, s_trilinear_clamp_sampler, _MonolithSourceRawMaterial, bsdfData.normalWS, V, L, _MonolithSourceLocalLight > 0.5, 1.0);
+        data.diffR = lookup.rgb;
+        data.specR = (lookup.w * _MonolithSourceAlbedoGloss.a).xxx;
+        return data;
+    }
     if (_MonolithSourceProfile > 0.5)
     {
         float3 sourceColor = _MonolithCurrentSourceLightActive > 0.5 ? _MonolithCurrentSourceLight : _MonolithSourceLight.rgb;
@@ -66,7 +79,7 @@ bool MonolithFindBoundLight(float type, float3 positionRWS, float3 forward, floa
 {
     sourceColor = 0.0;
     localMode = 1.0;
-    if (_MonolithSourceProfile < 0.5 || _MonolithSourceLightingMode < 1.5) return false;
+    if ((_MonolithSourceProfile < 0.5 && !(_MonolithTrueStalkerActive > 0.5 && _MonolithTrueStalkerHasLookup > 0.5)) || _MonolithSourceLightingMode < 1.5) return false;
     float3 position = GetAbsolutePositionWS(positionRWS);
     int matches = 0;
     for (int i = 0; i < min(_MonolithBoundLightCount, 64); i++)
@@ -90,7 +103,7 @@ DirectLighting MonolithBoundLighting(float3 V, float3 L, PreLightData preLightDa
     _MonolithCurrentSourceLight = sourceColor;
     _MonolithCurrentSourceLightActive = 1.0;
     CBSDF data = MonolithEvaluateBSDF(V, L, preLightData, bsdfData);
-    float3 color = MonolithSourceAccumulation(sourceColor, lightmap, shadow) * attenuation * _MonolithBoundRadianceScale;
+    float3 color = (_MonolithTrueStalkerActive > 0.5 ? sourceColor * lightmap * shadow : MonolithSourceAccumulation(sourceColor, lightmap, shadow)) * attenuation * _MonolithBoundRadianceScale;
     DirectLighting lighting;
     ZERO_INITIALIZE(DirectLighting, lighting);
     lighting.diffuse = data.diffR * color * diffuseDimmer;
@@ -130,7 +143,7 @@ DirectLighting EvaluateBSDF_Punctual(LightLoopContext lightLoopContext, float3 V
 {
     _MonolithSourceLocalLight = lightData.lightType == GPULIGHTTYPE_POINT && lightData.shadowIndex < 0 ? 2.0 : 1.0;
     float3 terrainDiffuseScale = 1.0;
-    if (_MonolithSourceProfile < 0.5 && _MonolithTrueStalkerTerrain > 0.5)
+    if (_MonolithSourceProfile < 0.5 && _MonolithTrueStalkerTerrain > 0.5 && _MonolithTrueStalkerActive < 0.5)
     {
         float material = _MonolithSourceRawMaterial;
         float gloss = _MonolithSourceAlbedoGloss.a;
@@ -177,7 +190,7 @@ void PostEvaluateBSDF(LightLoopContext lightLoopContext, float3 V, PositionInput
     #ifdef _MONOLITH_ORIGINAL_ENVIRONMENT
     MonolithEnvironmentData environmentData;
     ZERO_INITIALIZE(MonolithEnvironmentData, environmentData);
-    bool originalEnvironment = _MonolithEnvironmentMode > 0.5;
+    bool originalEnvironment = _MonolithEnvironmentMode > 0.5 && (_MonolithTrueStalkerActive < 0.5 || _MonolithTrueStalkerHasLookup > 0.5);
     if (originalEnvironment)
     {
         environmentData = MonolithEvaluateEnvironment(bsdfData.normalWS, V, _MonolithEnvironmentAlbedoGloss);

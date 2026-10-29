@@ -138,9 +138,15 @@ namespace XRay.Importer.Editor.Levels
             return result;
         }
 
-        public XRayLevelTerrainTextures RequestTerrain(XRayLevelShader shader, XRayBlender blender)
+        public XRayLevelTerrainTextures RequestTerrain(XRayLevelShader shader, XRayBlender blender, bool trueStalkerSource = false)
         {
             var terrain = new XRayLevelTerrainTextures { Source = XRayTerrainSourceBinding.IsTerrainBlender(blender) ? XRayTerrainSourceBinding.Resolve(_resolver) : new XRayTerrainSourceBinding() };
+            trueStalkerSource &= terrain.Source.VerifiedTrueStalker;
+            bool sourceColors = terrain.Source.UsesHeight || trueStalkerSource;
+            if (trueStalkerSource)
+            {
+                foreach (string path in XRayTerrainSourceBinding.TrueStalkerFiles) RecordTerrainFile(_resolver.ResolveFile(path), "TS terrain source contract", null);
+            }
             _sourceTerrainSampler = terrain.Source.UsesHeight;
             terrain.Parameters = terrain.Source.UsesHeight ? XRayTerrainSourceParameters.FromSource(_record.Source) : null;
             _terrainParameters = terrain.Parameters;
@@ -150,7 +156,7 @@ namespace XRay.Importer.Editor.Levels
             RecordTerrainFile(terrainBase.Diffuse, "Terrain base", Request(shader.Texture, false, "Terrain base").AlbedoPath);
             RecordTerrainFile(_resolver.ResolveFile(XRayVirtualPath.TextureToVirtualPath(terrainBase.TextureName, ".thm")), "Terrain THM", null);
             foreach (XRayResolvedFile source in new[] { terrain.Source.Shader, terrain.Source.Brdf, terrain.Source.MidShader, terrain.Source.LowShader }) RecordTerrainFile(source, "Terrain shader contract", null);
-            if (terrain.Source.UsesHeight) terrain.SourceBasePath = RequestTerrainPacked(terrainBase.Diffuse.VirtualPath, XRayLevelDependencyCategory.Materials, "Terrain source base UNORM", "s_base encoded color and alpha hemisphere; independent of legacy hardware sRGB albedo").AssetPath;
+            if (sourceColors) terrain.SourceBasePath = RequestTerrainPacked(terrainBase.Diffuse.VirtualPath, XRayLevelDependencyCategory.Materials, "Terrain source base UNORM", "s_base encoded color and alpha hemisphere; independent of legacy hardware sRGB albedo").AssetPath;
             _record.Source.TerrainProfile = terrain.Source.Profile.ToString();
             _record.Source.TerrainShaderPath = terrain.Source.Shader?.VirtualPath;
             _record.Source.TerrainShaderHash = terrain.Source.ShaderHash;
@@ -188,10 +194,10 @@ namespace XRay.Importer.Editor.Levels
                 RecordTerrainFile(_resolver.ResolveFile(XRayVirtualPath.TextureToVirtualPath(set.Resolution.TextureName, ".thm")), "Terrain layer THM " + channels[i], null);
                 XRayTextureAssetResult bump = RequestTerrainPacked(XRayVirtualPath.TextureToVirtualPath(detail + "_bump", ".dds"), XRayLevelDependencyCategory.Materials, "Terrain detail bump " + channels[i], "s_dn_*: .wzyx normal + gloss");
                 terrain.BumpPaths[i] = bump.AssetPath;
-                if (terrain.Source.UsesHeight)
+                if (sourceColors)
                 {
                     terrain.SourceColorPaths[i] = RequestTerrainPacked(set.Resolution.Diffuse.VirtualPath, XRayLevelDependencyCategory.Materials, "Terrain source color " + channels[i], "s_dt_* encoded UNORM filtering; legacy albedo references remain separate").AssetPath;
-                    terrain.HeightPaths[i] = RequestTerrainPacked(XRayVirtualPath.TextureToVirtualPath(detail + "_height", ".dds"), XRayLevelDependencyCategory.Materials, "Terrain source height " + channels[i], "s_height_*: R height, independent of bump#; source terrain POM and initial-height AO").AssetPath;
+                    if (terrain.Source.UsesHeight) terrain.HeightPaths[i] = RequestTerrainPacked(XRayVirtualPath.TextureToVirtualPath(detail + "_height", ".dds"), XRayLevelDependencyCategory.Materials, "Terrain source height " + channels[i], "s_height_*: R height, independent of bump#; source terrain POM and initial-height AO").AssetPath;
                 }
             }
 
@@ -254,6 +260,7 @@ namespace XRay.Importer.Editor.Levels
                 }
                 if (!changed) continue;
                 settings.ApplyModifiedPropertiesWithoutUndo();
+                AssetDatabase.ReleaseCachedFileHandles();
                 importer.SaveAndReimport();
             }
             _terrainSamplerAssets.Clear();

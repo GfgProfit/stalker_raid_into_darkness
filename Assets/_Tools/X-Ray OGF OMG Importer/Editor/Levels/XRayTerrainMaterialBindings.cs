@@ -38,7 +38,8 @@ namespace XRay.Importer.Editor.Levels
                 bound[pair.Key] = change.Final == change.Current ? material.GetTexture(pair.Key) as Texture2D : XRayLevelTextureLibrary.Load(AssetDatabase.GUIDToAssetPath(change.Final));
             }
             bool anomaly = terrain?.Source?.Profile == XRayTerrainSourceProfile.AnomalyAtmospherics;
-            bool colors = anomaly && Linear(bound["_MonolithTerrainSourceBase"]);
+            bool trueStalker = terrain?.Source?.VerifiedTrueStalker == true;
+            bool colors = (anomaly || trueStalker) && Linear(bound["_MonolithTerrainSourceBase"]);
             bool height = anomaly;
             bool complete = Linear(bound["_MonolithTerrainMask"]);
             Vector4 colorFlip = Vector4.zero;
@@ -70,6 +71,8 @@ namespace XRay.Importer.Editor.Levels
             values["_MonolithTerrainLowAvailable"] = terrain?.Source?.VerifiedLow == true ? 1.0f : 0.0f;
             values["_MonolithTerrainLodFlipV"] = Flip(bound["_MonolithTerrainLodAtlas"]);
             bool enable = mode == XRayTerrainImportMode.EnableVerifiedAnomaly && anomaly && colors && complete;
+            values["_MonolithTrueStalkerVerified"] = trueStalker ? 1.0f : 0.0f;
+            values["_MonolithTrueStalkerSourceTerrain"] = !trueStalker ? 0.0f : mode == XRayTerrainImportMode.EnableVerifiedTrueStalker && colors && complete ? 1.0f : material.GetFloat("_MonolithTrueStalkerSourceTerrain");
             values["_MonolithTerrainQuality"] = created || enable ? (float)quality : material.GetFloat("_MonolithTerrainQuality");
             foreach (string property in new[] { "_MonolithSourceProfile", "_MonolithSourceTerrain", "_MonolithTerrainParallax", "_MonolithTerrainOcclusion", "_MonolithTerrainVirtualHeight" })
             {
@@ -82,7 +85,7 @@ namespace XRay.Importer.Editor.Levels
             {
                 int index = material.shader.FindPropertyIndex(pair.Key);
                 float defaultValue = index >= 0 ? material.shader.GetPropertyDefaultFloatValue(index) : 0.0f;
-                bool safety = pair.Key == "_MonolithTerrainSource" || pair.Key == "_MonolithTerrainMidAvailable" || pair.Key == "_MonolithTerrainLowAvailable" || pair.Key.StartsWith("_MonolithHasTerrain", StringComparison.Ordinal) || !anomaly && (pair.Key == "_MonolithSourceProfile" || pair.Key == "_MonolithSourceTerrain" || pair.Key == "_MonolithTerrainParallax" || pair.Key == "_MonolithTerrainOcclusion" || pair.Key == "_MonolithTerrainVirtualHeight");
+                bool safety = pair.Key == "_MonolithTrueStalkerVerified" || pair.Key == "_MonolithTrueStalkerSourceTerrain" && !trueStalker || pair.Key == "_MonolithTerrainSource" || pair.Key == "_MonolithTerrainMidAvailable" || pair.Key == "_MonolithTerrainLowAvailable" || pair.Key.StartsWith("_MonolithHasTerrain", StringComparison.Ordinal) || !anomaly && (pair.Key == "_MonolithSourceProfile" || pair.Key == "_MonolithSourceTerrain" || pair.Key == "_MonolithTerrainParallax" || pair.Key == "_MonolithTerrainOcclusion" || pair.Key == "_MonolithTerrainVirtualHeight");
                 Decide(material, plan, previous, pair.Key, Number(material.GetFloat(pair.Key)), Number(defaultValue), Number(pair.Value), created || safety);
             }
             Vector4[] vectors = { colorFlip, bumpFlip, heightFlip, Vector4.zero, terrain?.Parameters?.Pom ?? material.GetVector("_MonolithTerrainPom"), terrain?.Parameters?.Offset ?? material.GetVector("_MonolithTerrainOffset") };
@@ -117,6 +120,7 @@ namespace XRay.Importer.Editor.Levels
                 else material.SetFloat(change.Property, Parse(change.Final));
             }
             if (plan.Modifies) material.SetOverrideTag(TAG, plan.Tag);
+            modifies |= SetTag(material, "XRayTrueStalkerTerrainSHA256", terrain?.Source?.TrueStalkerHash ?? string.Empty);
             modifies |= SetTag(material, "XRayTerrainBinding", XRayTerrainSourceBinding.VERSION);
             modifies |= SetTag(material, "XRayTerrainShaderSHA256", terrain?.Source?.ShaderHash ?? string.Empty);
             modifies |= SetTag(material, "XRayTerrainBrdfSHA256", terrain?.Source?.BrdfHash ?? string.Empty);

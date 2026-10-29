@@ -61,6 +61,37 @@ void MonolithSourceTerrainSplat(float2 uv, float3 eyeVector, float viewDepth, in
     if (_MonolithDebug > 82.5 && _MonolithDebug < 83.5) _MonolithDiagnosticValue = float3((r.tc - tc) * 32.0 + 0.5, 0.0);
     if (_MonolithDebug > 83.5 && _MonolithDebug < 84.5) _MonolithDiagnosticValue = ao.xxx;
 }
+void MonolithTrueStalkerSplat(float2 uv, inout float3 color, out float3 normal, out float gloss)
+{
+    float2 tc = MonolithSourceXRayUv(uv);
+    float4 weights = MonolithTrueStalkerWeights(SAMPLE_TEXTURE2D(_MonolithTerrainMask, sampler_MonolithTerrainBumpR, MonolithSourceTextureUv(tc, _MonolithTerrainMaskFlipV)));
+    tc *= _MonolithTerrainDetailScale;
+    float4 bumpR = SAMPLE_TEXTURE2D(_MonolithTerrainBumpR, sampler_MonolithTerrainBumpR, MonolithSourceTextureUv(tc, _MonolithTerrainBumpFlipV.r));
+    float4 bumpG = SAMPLE_TEXTURE2D(_MonolithTerrainBumpG, sampler_MonolithTerrainBumpR, MonolithSourceTextureUv(tc, _MonolithTerrainBumpFlipV.g));
+    float4 bumpB = SAMPLE_TEXTURE2D(_MonolithTerrainBumpB, sampler_MonolithTerrainBumpR, MonolithSourceTextureUv(tc, _MonolithTerrainBumpFlipV.b));
+    float4 bumpA = SAMPLE_TEXTURE2D(_MonolithTerrainBumpA, sampler_MonolithTerrainBumpR, MonolithSourceTextureUv(tc, _MonolithTerrainBumpFlipV.a));
+    float3 colorR = SAMPLE_TEXTURE2D(_MonolithTerrainSourceColorR, sampler_MonolithTerrainBumpR, MonolithSourceTextureUv(tc, _MonolithTerrainColorFlipV.r)).rgb;
+    float3 colorG = SAMPLE_TEXTURE2D(_MonolithTerrainSourceColorG, sampler_MonolithTerrainBumpR, MonolithSourceTextureUv(tc, _MonolithTerrainColorFlipV.g)).rgb;
+    float3 colorB = SAMPLE_TEXTURE2D(_MonolithTerrainSourceColorB, sampler_MonolithTerrainBumpR, MonolithSourceTextureUv(tc, _MonolithTerrainColorFlipV.b)).rgb;
+    float3 colorA = SAMPLE_TEXTURE2D(_MonolithTerrainSourceColorA, sampler_MonolithTerrainBumpR, MonolithSourceTextureUv(tc, _MonolithTerrainColorFlipV.a)).rgb;
+    MonolithTrueStalkerBlend(color, weights, colorR, colorG, colorB, colorA, bumpR, bumpG, bumpB, bumpA, color, normal, gloss);
+    if (_MonolithDebug > 69.5 && _MonolithDebug < 70.5) _MonolithDiagnosticValue = weights.rgb;
+    if (_MonolithDebug > 70.5 && _MonolithDebug < 71.5) _MonolithDiagnosticValue = weights.aaa;
+    if (_MonolithDebug > 71.5 && _MonolithDebug < 72.5) _MonolithDiagnosticValue = colorR;
+    if (_MonolithDebug > 72.5 && _MonolithDebug < 73.5) _MonolithDiagnosticValue = colorG;
+    if (_MonolithDebug > 73.5 && _MonolithDebug < 74.5) _MonolithDiagnosticValue = colorB;
+    if (_MonolithDebug > 74.5 && _MonolithDebug < 75.5) _MonolithDiagnosticValue = colorA;
+    if (_MonolithDebug > 75.5 && _MonolithDebug < 76.5) _MonolithDiagnosticValue = color;
+    if (_MonolithDebug > 76.5 && _MonolithDebug < 77.5) _MonolithDiagnosticValue = MonolithTrueStalkerLayerNormal(bumpR) + 0.5;
+    if (_MonolithDebug > 77.5 && _MonolithDebug < 78.5) _MonolithDiagnosticValue = MonolithTrueStalkerLayerNormal(bumpG) + 0.5;
+    if (_MonolithDebug > 78.5 && _MonolithDebug < 79.5) _MonolithDiagnosticValue = MonolithTrueStalkerLayerNormal(bumpB) + 0.5;
+    if (_MonolithDebug > 79.5 && _MonolithDebug < 80.5) _MonolithDiagnosticValue = MonolithTrueStalkerLayerNormal(bumpA) + 0.5;
+    if (_MonolithDebug > 80.5 && _MonolithDebug < 81.5) _MonolithDiagnosticValue = normal + 0.5;
+    if (_MonolithDebug > 81.5 && _MonolithDebug < 82.5) _MonolithDiagnosticValue = float3(0.95, MonolithTrueStalkerQuantizeMaterial(0.95), 0.0);
+    if (_MonolithDebug > 82.5 && _MonolithDebug < 83.5) _MonolithDiagnosticValue = float3(frac(tc), 0.0);
+    if (_MonolithDebug > 83.5 && _MonolithDebug < 84.5) _MonolithDiagnosticValue = gloss.xxx;
+}
+
 #endif
 
 #ifdef _MONOLITH_LEVEL_TERRAIN
@@ -155,6 +186,7 @@ void GetSurfaceAndBuiltinData(FragInputs input, float3 V, inout PositionInputs p
     }
     if (_MonolithDebug > 68.5 && _MonolithDebug < 69.5) _MonolithDiagnosticValue = 0.0;
 
+    _MonolithTrueStalkerActive = 0.0;
     MonolithLegacyGetSurfaceAndBuiltinData(input, V, posInput, surfaceData, builtinData);
     float2 uv = input.texCoord0.xy * _BaseColorMap_ST.xy + _BaseColorMap_ST.zw;
     #ifdef MONOLITH_SOURCE_TEXTURE
@@ -204,9 +236,11 @@ void GetSurfaceAndBuiltinData(FragInputs input, float3 V, inout PositionInputs p
     float2 baseUv = uv;
     float4 baseSample;
     #ifdef MONOLITH_SOURCE_TERRAIN
+    bool trueStalkerTerrain = MonolithTrueStalkerTerrainEnabled();
+    _MonolithTrueStalkerActive = trueStalkerTerrain ? 1.0 : 0.0;
     bool sourceTerrainActive = _MonolithSourceProfile > 0.5 && _MonolithSourceTerrain > 0.5 && _MonolithTerrainSource > 0.5 && _MonolithTerrainSource < 1.5 && _MonolithHasTerrainSourceColor > 0.5;
     [branch]
-    if (sourceTerrainActive)
+    if (sourceTerrainActive || trueStalkerTerrain)
     {
         baseUv = MonolithSourceTextureUv(MonolithSourceXRayUv(uv), _MonolithTerrainBaseFlipV);
         baseSample = SAMPLE_TEXTURE2D(_MonolithTerrainSourceBase, sampler_MonolithTerrainBumpR, baseUv);
@@ -228,7 +262,7 @@ void GetSurfaceAndBuiltinData(FragInputs input, float3 V, inout PositionInputs p
     #endif
     float3 encodedAlbedo = _MonolithAlbedoSrgb > 0.5 ? LinearToSRGB(baseSample.rgb) : baseSample.rgb;
     #ifdef MONOLITH_SOURCE_TERRAIN
-    if (sourceTerrainActive) encodedAlbedo = baseSample.rgb;
+    if (sourceTerrainActive || trueStalkerTerrain) encodedAlbedo = baseSample.rgb;
     #endif
     encodedAlbedo = saturate(encodedAlbedo * _BaseColor.rgb);
     #ifdef MONOLITH_SOURCE_TEXTURE
@@ -277,6 +311,7 @@ void GetSurfaceAndBuiltinData(FragInputs input, float3 V, inout PositionInputs p
         }
         else MonolithSourceTerrainSplat(uv, eyeVector, dot(posInput.positionWS, -UNITY_MATRIX_V[2].xyz), encodedAlbedo, terrainNormal, terrainGloss, terrainHeight, terrainAo);
     }
+    else if (trueStalkerTerrain) MonolithTrueStalkerSplat(uv, encodedAlbedo, terrainNormal, terrainGloss);
     else
     #endif
     {
@@ -314,6 +349,9 @@ void GetSurfaceAndBuiltinData(FragInputs input, float3 V, inout PositionInputs p
     #endif
     #if defined(_MONOLITH_LEVEL) || defined(_MONOLITH_LEVEL_DETAIL)
     _MonolithLevelHemiValue = MonolithLevelHemisphere(input, baseSample);
+    #ifdef MONOLITH_SOURCE_TERRAIN
+    if (trueStalkerTerrain) _MonolithLevelHemiValue = baseSample.a;
+    #endif
     #endif
     #ifdef _MONOLITH_LEVEL_LOD
     gloss = _MonolithFallbackGloss;
@@ -322,7 +360,11 @@ void GetSurfaceAndBuiltinData(FragInputs input, float3 V, inout PositionInputs p
     #ifdef _MONOLITH_LEVEL_FLORA
     gloss = MonolithFloraGloss(packed.r, _MonolithGlossScale);
     #endif
+    #ifdef MONOLITH_SOURCE_TERRAIN
+    if (!trueStalkerTerrain && (_MonolithDebug < 0.5 || _MonolithDiagnosticOptions.x < 0.5))
+    #else
     if (_MonolithDebug < 0.5 || _MonolithDiagnosticOptions.x < 0.5)
+    #endif
     {
         gloss = round(gloss * 255.0) / 255.0;
     }
@@ -332,6 +374,7 @@ void GetSurfaceAndBuiltinData(FragInputs input, float3 V, inout PositionInputs p
     float material = MonolithDecodeMaterial(_MonolithMaterialId, _MonolithMaterialWeight);
     #ifdef MONOLITH_SOURCE_TERRAIN
     if (sourceTerrain) material = 22.0 / 31.0 * 1.333333333;
+    if (trueStalkerTerrain) material = 0.95;
     #endif
     _MonolithSourceAlbedoGloss = float4(encodedAlbedo, gloss);
     _MonolithSourceRawMaterial = material;
@@ -432,16 +475,25 @@ void GetSurfaceAndBuiltinData(FragInputs input, float3 V, inout PositionInputs p
     surfaceData.ambientOcclusion = 1.0;
     surfaceData.specularOcclusion = 1.0;
     #ifdef MONOLITH_SOURCE_TERRAIN
-    if (sourceTerrain)
+    if (sourceTerrain || trueStalkerTerrain)
     {
         float3 terrainWorldNormal = terrainTangent * tangentNormal.x + terrainBitangent * tangentNormal.y + terrainGeometric * tangentNormal.z;
-        surfaceData.normalWS = dot(terrainWorldNormal, terrainWorldNormal) > 0.0 ? normalize(terrainWorldNormal) : normalize(terrainGeometric);
+        surfaceData.normalWS = trueStalkerTerrain ? MonolithTrueStalkerNormal(terrainTangent, terrainBitangent, terrainGeometric, tangentNormal) : dot(terrainWorldNormal, terrainWorldNormal) > 0.0 ? normalize(terrainWorldNormal) : normalize(terrainGeometric);
         surfaceData.geomNormalWS = normalize(terrainGeometric);
         surfaceData.tangentWS = Orthonormalize(terrainTangent, surfaceData.normalWS);
     }
     #endif
+    #ifdef MONOLITH_SOURCE_TERRAIN
+    if (trueStalkerTerrain)
+    {
+        surfaceData.baseColor = _MonolithTrueStalkerHasLookup > 0.5 ? encodedAlbedo : SRGBToLinear(encodedAlbedo);
+        surfaceData.specularColor = 0.04;
+        surfaceData.perceptualSmoothness = saturate(gloss);
+    }
+    #endif
     GetBuiltinData(input, V, posInput, surfaceData, baseSample.a * _BaseColor.a, surfaceData.normalWS, 0.0, builtinData);
     #if defined(MONOLITH_SOURCE_TERRAIN) && SHADERPASS == SHADERPASS_FORWARD
+    if (trueStalkerTerrain) posInput.positionWS = MonolithTrueStalkerPosition(posInput.positionWS, surfaceData.normalWS);
     if (sourceTerrain && _MonolithHasTerrainHeight > 0.5 && _MonolithTerrainVirtualHeight > 0.5 && MonolithTerrainQualityMode(_MonolithTerrainQuality, _MonolithTerrainMidAvailable, _MonolithTerrainLowAvailable) < 0.5)
     {
         posInput.positionWS = MonolithTerrainPosition(posInput.positionWS, surfaceData.geomNormalWS, terrainHeight);

@@ -96,6 +96,7 @@ TEXTURE2D(_MonolithTerrainHeightB);
 TEXTURE2D(_MonolithTerrainHeightA);
 TEXTURE2D(_MonolithTerrainSourceBase);
 TEXTURE2D(_MonolithTerrainLodAtlas);
+TEXTURE3D(_MonolithTrueStalkerMaterialLut);
 TEXTURE2D(_MonolithTerrainSourceColorR);
 TEXTURE2D(_MonolithTerrainSourceColorG);
 TEXTURE2D(_MonolithTerrainSourceColorB);
@@ -104,6 +105,7 @@ static float3 _MonolithDiagnosticValue;
 static float _MonolithLevelHemiValue = 1.0;
 static float4 _MonolithSourceAlbedoGloss;
 static float _MonolithSourceRawMaterial;
+static float _MonolithTrueStalkerActive = 0.0;
 static float _MonolithSourceLocalLight = 0.0;
 static float3 _MonolithCurrentSourceLight = 0.0;
 static float _MonolithCurrentSourceLightActive = 0.0;
@@ -153,6 +155,9 @@ float4 _MonolithLightSetup;
 float4 _MonolithSourceLight;
 float _MonolithSourceProfile;
 float _MonolithTrueStalkerTerrain;
+float _MonolithTrueStalkerSourceTerrain;
+float _MonolithTrueStalkerVerified;
+float _MonolithTrueStalkerHasLookup;
 float4 _MonolithSunColor;
 float4 _MonolithFloraFixes2;
 float _MonolithFloraSubsurface;
@@ -333,6 +338,11 @@ float _TessellationBackFaceCullEpsilon;
 #endif
 UNITY_TEXTURE_STREAMING_DEBUG_VARS;
 CBUFFER_END
+
+bool MonolithTrueStalkerTerrainEnabled()
+{
+    return _MonolithLevelTerrain > 0.5 && _MonolithSourceProfile < 0.5 && _MonolithTrueStalkerSourceTerrain > 0.5 && _MonolithTrueStalkerVerified > 0.5 && _MonolithTerrainSource > 1.5 && _MonolithTerrainSource < 2.5 && _MonolithHasTerrainSourceColor > 0.5;
+}
 
 float MonolithDynamicGlossInput()
 {

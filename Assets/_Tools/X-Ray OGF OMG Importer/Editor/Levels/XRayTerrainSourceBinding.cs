@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Text;
 using System.Security.Cryptography;
 using System.Globalization;
 using System.IO;
@@ -25,6 +27,45 @@ namespace XRay.Importer.Editor.Levels
         public const string TRUE_STALKER_BRDF_HASH = "c1445208b47479905e319cc879c33f86bc9eb0ffb0a8f68a66720c9c6c646fa4";
         public const string ANOMALY_MID_HASH = "6004039018428d0f122f35050b0cd7c3375a215f2123c9fb828396eae78e6aed";
         public const string ANOMALY_LOW_HASH = "e1440dc306646c1c7fb66ab2a7a4399cb9a98eb33d1d520fe59b248bc19033e6";
+        public const string TRUE_STALKER_CONTRACT_HASH = "7c080c55a46766d5e184db31906a5b8b8dee07a3b4cd042d0709d69ca8554a7a";
+
+        private static readonly string[] TRUE_STALKER_FILES =
+        {
+            "shaders/r3/combine_1.ps",
+            "shaders/r3/common.h",
+            "shaders/r3/common_cbuffers.h",
+            "shaders/r3/common_defines.h",
+            "shaders/r3/common_functions.h",
+            "shaders/r3/common_iostructs.h",
+            "shaders/r3/common_policies.h",
+            "shaders/r3/common_samplers.h",
+            "shaders/r3/deffer_base_bump.vs",
+            "shaders/r3/deffer_base_flat.ps",
+            "shaders/r3/deffer_base_flat.vs",
+            "shaders/r3/deffer_impl_flat.ps",
+            "shaders/r3/deffer_impl_flat_d.ps",
+            "shaders/r3/deffer_impl_flat_d.vs",
+            "shaders/r3/hmodel.h",
+            "shaders/r3/lmodel.h",
+            "shaders/r3/screenspace_common.h",
+            "shaders/r3/screenspace_common_noise.h",
+            "shaders/r3/screenspace_common_ripples.h",
+            "shaders/r3/screenspace_fog.h",
+            "shaders/r3/screenspace_reflections.h",
+            "shaders/r3/settings_screenspace_fog.h",
+            "shaders/r3/settings_screenspace_puddles.h",
+            "shaders/r3/settings_screenspace_ssr.h",
+            "shaders/r3/shadow_direct_base.ps",
+            "shaders/r3/shadow_direct_base.vs",
+            "shaders/r3/shared/common.h",
+            "shaders/r3/sload.h",
+            "shaders/r3/ssao.ps",
+            "shaders/r3/ssao_hbao.ps",
+            "shaders/r3/ssao_hdao.ps",
+            "shaders/r3/ssao_hdao_new.ps"
+        };
+
+        public static IReadOnlyList<string> TrueStalkerFiles => TRUE_STALKER_FILES;
 
         public XRayTerrainSourceProfile Profile { get; private set; }
         public XRayResolvedFile Shader { get; private set; }
@@ -35,9 +76,11 @@ namespace XRay.Importer.Editor.Levels
         public XRayResolvedFile LowShader { get; private set; }
         public string MidHash { get; private set; }
         public string LowHash { get; private set; }
+        public string TrueStalkerHash { get; private set; }
         public bool UsesHeight => Profile == XRayTerrainSourceProfile.AnomalyAtmospherics;
         public bool VerifiedMid => UsesHeight && MidHash == ANOMALY_MID_HASH;
         public bool VerifiedLow => UsesHeight && LowHash == ANOMALY_LOW_HASH;
+        public bool VerifiedTrueStalker => Profile == XRayTerrainSourceProfile.TrueStalker && TrueStalkerHash == TRUE_STALKER_CONTRACT_HASH;
 
         public static bool IsTerrainBlender(XRayBlender blender)
         {
@@ -67,6 +110,12 @@ namespace XRay.Importer.Editor.Levels
             binding.LowShader = resolver.ResolveFile("shaders/r3/deffer_terrain_low_flat.ps");
             binding.MidHash = Hash(binding.MidShader);
             binding.LowHash = Hash(binding.LowShader);
+            if (binding.Profile == XRayTerrainSourceProfile.TrueStalker)
+            {
+                var contract = new StringBuilder();
+                foreach (string path in TRUE_STALKER_FILES) contract.Append(path).Append(':').Append(Hash(resolver.ResolveFile(path))).Append('\n');
+                using (SHA256 sha = SHA256.Create()) binding.TrueStalkerHash = BitConverter.ToString(sha.ComputeHash(Encoding.UTF8.GetBytes(contract.ToString().TrimEnd('\n')))).Replace("-", string.Empty).ToLowerInvariant();
+            }
             return binding;
         }
 

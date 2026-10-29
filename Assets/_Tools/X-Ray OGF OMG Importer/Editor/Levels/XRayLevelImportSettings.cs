@@ -19,7 +19,8 @@ namespace XRay.Importer.Editor.Levels
     {
         [InspectorName("Preserve Existing Rendering")] Preserve,
         [InspectorName("Bind Source Terrain Data")] Bind,
-        [InspectorName("Enable Verified Anomaly Terrain")] EnableVerifiedAnomaly
+        [InspectorName("Enable Verified Anomaly Terrain")] EnableVerifiedAnomaly,
+        [InspectorName("Enable Verified TS Dry Surface (HDRP Lighting)")] EnableVerifiedTrueStalker
     }
 
     public enum XRayTerrainQuality

@@ -363,6 +363,7 @@ namespace XRay.Importer.Editor
                     exists = true;
                 }
 
+                if (exists) AssetDatabase.ReleaseCachedFileHandles();
                 File.WriteAllBytes(assetPath, bytes);
                 XRayTextureImportQueue.Enqueue(assetPath, new XRayTextureImportRequest(role, marker) { ResetSettings = previousPath != null || invalidShape });
                 _pendingImports.Add(assetPath);

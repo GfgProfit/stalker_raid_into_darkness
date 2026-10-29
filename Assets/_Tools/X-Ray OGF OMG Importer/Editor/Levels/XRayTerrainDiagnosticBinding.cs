@@ -69,9 +69,9 @@ namespace XRay.Importer.Editor.Levels
             return new XRayTerrainDiagnosticBinding(XRayAssetIndex.Build(plan), root, level) { _parameters = XRayTerrainSourceParameters.FromSource(provenance) };
         }
 
-        public void Bind(Material source, Material preview)
+        public void Bind(Material source, Material preview, bool trueStalker = false)
         {
-            if (Source.Profile != XRayTerrainSourceProfile.AnomalyAtmospherics) throw new NotSupportedException("This terrain preview implements only the verified Atmospherics contract; the source-specific terrain path remains unchanged: " + Source.Profile);
+            if (trueStalker ? !Source.VerifiedTrueStalker : Source.Profile != XRayTerrainSourceProfile.AnomalyAtmospherics) throw new NotSupportedException("The requested terrain preview requires a verified source contract: " + Source.Profile);
             if (source == null || preview == null || source == preview || EditorUtility.IsPersistent(preview) || preview.shader.name != MonolithMaterialConfigurator.SHADER_NAME || !source.IsKeywordEnabled("_MONOLITH_LEVEL_TERRAIN"))
             {
                 throw new InvalidOperationException("Terrain diagnostics require a transient copy of an imported terrain material.");
@@ -101,7 +101,7 @@ namespace XRay.Importer.Editor.Levels
                 if (string.IsNullOrEmpty(detail)) throw new InvalidOperationException("Terrain layer name is missing: " + channel);
                 preview.SetTexture("_MonolithTerrainSourceColor" + channel, Load(_resolver.ResolveTexture(detail, ".dds")));
                 preview.SetTexture("_MonolithTerrainBump" + channel, Load(_resolver.ResolveTexture(detail + "_bump", ".dds")));
-                preview.SetTexture("_MonolithTerrainHeight" + channel, Load(_resolver.ResolveTexture(detail + "_height", ".dds")));
+                preview.SetTexture("_MonolithTerrainHeight" + channel, trueStalker ? null : Load(_resolver.ResolveTexture(detail + "_height", ".dds")));
             }
             if (resolution.Description == null || resolution.Description.DetailScale <= 0.0) throw new InvalidOperationException("Terrain THM detail scale is missing.");
             preview.SetFloat("_MonolithTerrainDetailScale", (float)resolution.Description.DetailScale);
@@ -111,9 +111,16 @@ namespace XRay.Importer.Editor.Levels
             preview.SetVector("_MonolithTerrainBumpFlipV", Vector4.one);
             preview.SetVector("_MonolithTerrainHeightFlipV", Vector4.one);
             preview.SetVector("_MonolithTerrainColorSrgb", Vector4.zero);
-            preview.SetFloat("_MonolithHasTerrainHeight", 1.0f);
+            preview.SetFloat("_MonolithHasTerrainHeight", trueStalker ? 0.0f : 1.0f);
             preview.SetFloat("_MonolithHasTerrainSourceColor", 1.0f);
             preview.SetFloat("_MonolithTerrainSource", (float)Source.Profile);
+            preview.SetFloat("_MonolithTrueStalkerVerified", trueStalker ? 1.0f : 0.0f);
+            preview.SetFloat("_MonolithTrueStalkerSourceTerrain", trueStalker ? 1.0f : 0.0f);
+            if (trueStalker)
+            {
+                foreach (string property in new[] { "_MonolithSourceProfile", "_MonolithSourceTerrain", "_MonolithTerrainParallax", "_MonolithTerrainOcclusion", "_MonolithTerrainVirtualHeight" }) preview.SetFloat(property, 0.0f);
+                preview.SetOverrideTag("XRayTrueStalkerTerrainSHA256", Source.TrueStalkerHash);
+            }
             if (_parameters?.Pom != null) preview.SetVector("_MonolithTerrainPom", _parameters.Pom.Value);
             if (_parameters?.Offset != null) preview.SetVector("_MonolithTerrainOffset", _parameters.Offset.Value);
             if (Source.VerifiedMid)

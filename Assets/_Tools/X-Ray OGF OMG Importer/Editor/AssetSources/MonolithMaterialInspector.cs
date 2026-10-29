@@ -35,7 +35,10 @@ namespace XRay.Importer.Editor
             bool hasTerrainHeight = Mathf.RoundToInt(material.GetFloat("_MonolithTerrainSource")) == (int)Levels.XRayTerrainSourceProfile.AnomalyAtmospherics;
             Texture2D terrainBase = material.GetTexture("_MonolithTerrainSourceBase") as Texture2D;
             Texture2D terrainMask = material.GetTexture("_MonolithTerrainMask") as Texture2D;
-            bool hasTerrainColor = hasTerrainHeight && terrainBase != null && !terrainBase.isDataSRGB && terrainMask != null && !terrainMask.isDataSRGB;
+            bool trueStalker = material.GetFloat("_MonolithTerrainSource") == 2.0f && material.GetTag("XRayTrueStalkerTerrainSHA256", false) == Levels.XRayTerrainSourceBinding.TRUE_STALKER_CONTRACT_HASH;
+            SetPresence(material, "_MonolithTrueStalkerVerified", trueStalker);
+            SetPresence(material, "_MonolithTrueStalkerHasLookup", material.GetTexture("_MonolithTrueStalkerMaterialLut") is Texture3D);
+            bool hasTerrainColor = (hasTerrainHeight || trueStalker) && terrainBase != null && !terrainBase.isDataSRGB && terrainMask != null && !terrainMask.isDataSRGB;
             foreach (string channel in new[] { "R", "G", "B", "A" })
             {
                 Texture2D height = material.GetTexture("_MonolithTerrainHeight" + channel) as Texture2D;

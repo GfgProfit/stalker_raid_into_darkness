@@ -77,6 +77,10 @@ Shader "HDRP/MonolithLit"
         _MonolithTerrainBumpA("Terrain Detail Bump A (Linear)", 2D) = "grey" {}
         _MonolithTerrainDetailScale("Terrain Detail Scale (dt_params)", Float) = 1
         _MonolithTerrainBumpScale("Terrain Bump XY Intensity", Float) = 0.6
+        [Toggle] _MonolithTrueStalkerSourceTerrain("True Stalker Dry Source Surface (HDRP Lighting)", Float) = 0
+        [HideInInspector] _MonolithTrueStalkerVerified("Verified TS HLSL Contract", Float) = 0
+        [HideInInspector] _MonolithTrueStalkerHasLookup("Explicit TS Material LUT Bound", Float) = 0
+        _MonolithTrueStalkerMaterialLut("TS Material LUT (Explicit Source Input)", 3D) = "" {}
         [Toggle] _MonolithSourceTerrain("Source Terrain (Profile 1, Explicit Bindings)", Float) = 0
         [Enum(HQ, 0, MID, 1, LOW, 2)] _MonolithTerrainQuality("Source Terrain Quality (Explicit)", Float) = 0
         [HideInInspector] _MonolithTerrainMidAvailable("Verified MID Atlas Bound", Float) = 0
@@ -338,6 +342,7 @@ Shader "HDRP/MonolithLit"
     #include "MonolithProperties.hlsl"
     #include "MonolithLightInputs.hlsl"
     #include "MonolithMaterial.hlsl"
+    #include "MonolithTrueStalkerTerrain.hlsl"
     #include "MonolithSourceTexture.hlsl"
     #include "MonolithEnvironment.hlsl"
     ENDHLSL

@@ -247,6 +247,10 @@ namespace XRay.Importer.Tests
                 }
             }
             foreach (string file in trueStalker ? new[] { "shaders/r3/deffer_impl_flat.ps", "shaders/r3/lmodel.h" } : new[] { "shaders/r3/deffer_terrain_high_flat_d.ps", "shaders/r3/deffer_terrain_mid_flat.ps", "shaders/r3/deffer_terrain_low_flat.ps", "shaders/r3/lmodel.h" }) result.Files[file] = effective.ReadAllBytes(file);
+            if (trueStalker)
+            {
+                foreach (string path in XRayTerrainSourceBinding.TrueStalkerFiles) result.Files[path] = effective.ReadAllBytes(path);
+            }
             foreach (KeyValuePair<string, byte[]> file in result.Files)
             {
                 if (!effective.Exists(file.Key)) continue;

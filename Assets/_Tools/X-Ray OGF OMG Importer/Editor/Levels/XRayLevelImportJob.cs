@@ -793,7 +793,7 @@ namespace XRay.Importer.Editor.Levels
 
                 if (staticSurface.Kind == XRayLevelSurfaceKind.Terrain && blender != null)
                 {
-                    _terrain[id] = _textures.RequestTerrain(shader, blender);
+                    _terrain[id] = _textures.RequestTerrain(shader, blender, _request.Settings.TerrainImportMode == XRayTerrainImportMode.EnableVerifiedTrueStalker);
                 }
 
                 processed++;

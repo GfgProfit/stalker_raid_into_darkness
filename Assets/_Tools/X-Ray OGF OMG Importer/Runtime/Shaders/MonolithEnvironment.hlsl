@@ -56,6 +56,20 @@ MonolithEnvironmentData MonolithEvaluateEnvironment(float3 normal, float3 view, 
         normal = normalize(_MonolithEnvTestNormal.xyz);
         view = normalize(_MonolithEnvTestView.xyz);
     }
+    if (_MonolithTrueStalkerActive > 0.5 && _MonolithTrueStalkerHasLookup > 0.5)
+    {
+        data.reflection = MonolithTrueStalkerReflection(normal, view);
+        data.cube0Diffuse = SAMPLE_TEXTURECUBE_LOD(_MonolithEnv0, s_trilinear_clamp_sampler, normal, 0.0).rgb;
+        data.cube1Diffuse = SAMPLE_TEXTURECUBE_LOD(_MonolithEnv1, s_trilinear_clamp_sampler, normal, 0.0).rgb;
+        data.cube0Specular = SAMPLE_TEXTURECUBE_LOD(_MonolithEnv0, s_trilinear_clamp_sampler, data.reflection, 0.0).rgb;
+        data.cube1Specular = SAMPLE_TEXTURECUBE_LOD(_MonolithEnv1, s_trilinear_clamp_sampler, data.reflection, 0.0).rgb;
+        MonolithTrueStalkerEnvironment(_MonolithTrueStalkerMaterialLut, s_trilinear_clamp_sampler, _MonolithSourceRawMaterial, MonolithBaseHemisphere(), albedoGloss.w, normal, view, false, data.cube0Diffuse, data.cube1Diffuse, data.cube0Specular, data.cube1Specular, _MonolithEnvColor, _MonolithEnvAmbient.rgb, data.diffuseIrradiance, data.specularIrradiance);
+        data.diffuse = data.diffuseIrradiance * albedoGloss.rgb;
+        data.specular = data.specularIrradiance;
+        data.total = data.diffuse + data.specular;
+        data.combined = _MonolithEnvCombineClamp > 0.5 ? saturate(data.total) : data.total;
+        return data;
+    }
     float material = MonolithDecodeMaterial(_MonolithMaterialId, _MonolithMaterialWeight);
     bool flora = abs(material - 0.15) <= 0.04;
     if (abs(material - 0.95) <= 0.04) material = 0.0;

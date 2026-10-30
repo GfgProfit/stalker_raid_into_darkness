@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using UnityEditor;
 using UnityEngine;
 using XRay.Importer.Sources.Textures;
@@ -132,6 +133,10 @@ namespace XRay.Importer.Editor.Levels
             {
                 XRayTerrainSourceParameters parameters = XRayTerrainSourceParameters.FromSource(_record.Source);
                 _floraSampler = new Vector2(parameters?.Anisotropy ?? 16.0f, parameters?.MipBias ?? -0.5f);
+                string anisotropy = parameters?.Anisotropy != null ? parameters.Anisotropy.Value.ToString(CultureInfo.InvariantCulture) + " (user.ltx)" : "16 (importer fallback)";
+                string mipBias = parameters?.MipBias != null ? parameters.MipBias.Value.ToString("R", CultureInfo.InvariantCulture) + " (user.ltx)" : "-0.5 (importer fallback)";
+                string origin = "r__tf_aniso=" + anisotropy + "; r__tf_mipbias=" + mipBias;
+                _record.AddDependency(XRayLevelDependencyCategory.Materials, "Flora sampler settings", parameters?.Path ?? "user.ltx", parameters?.Path, null, parameters != null ? XRayLevelDependencyStatus.Found : XRayLevelDependencyStatus.Described, "smp_base anisotropy and mip bias of authored flora albedo; a changed value is applied to importer-owned sampler settings on the next import", null, parameters != null ? "SHA256=" + parameters.Hash + "; " + origin : origin);
             }
 
             XRayResolvedFile diffuse = set.Resolution.Diffuse;

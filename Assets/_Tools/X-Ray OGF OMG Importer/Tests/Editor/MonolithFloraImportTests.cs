@@ -28,8 +28,10 @@ namespace XRay.Importer.Tests
     {
         private const string TEMP_PARENT = "Assets/__XRayFloraUnitTests_tmp";
         private const string ANOMALY_ROOT = "Assets/_Source/Levels/Anomaly/1v2_DX11_v_12gb_2.5_168_662acc8d";
+        private const string TRUE_STALKER_ROOT = "E:/True Stalker Unpacked Patch 1.5";
         private static readonly string[] AUTHORED_TEXTURES = { "textures/lfo/lfo_trees/adler/trees_atp_alder_a.dds", "textures/lfo/lfo_trees/spruce/trees_atp_spruce_broken.dds" };
         private static readonly int[] PROJECTED = { 2048, 1024, 512, 256, 128, 64, 32, 16 };
+        private static readonly string[] TRUE_STALKER_TEXTURES = { "textures/props/props_stone_02.dds", "textures/trees/trees_vetkaryabina_green.dds", "textures/trees/trees_dub.dds", "textures/trees/trees_fuflo.dds" };
 
         private readonly List<UnityEngine.Object> _owned = new List<UnityEngine.Object>();
         private string _temp;
@@ -310,6 +312,277 @@ namespace XRay.Importer.Tests
             Assert.AreEqual((float)CullMode.Back, trueStalker.GetFloat("_CullMode"));
             Assert.AreEqual(legacyAlbedo, trueStalker.GetTexture("_BaseColorMap"));
             File.WriteAllText(Path.Combine(Output(), "Flora_Leaf_Plans.csv"), rows.ToString());
+        }
+
+        [Test]
+        public void DdsValidationRejectsCorruptInputsWithoutExceptions()
+        {
+            var random = new System.Random(6611);
+            var cases = new List<(string Name, bool Valid, byte[] Data)>
+            {
+                ("BC1 full chain 16x8", true, Dds(16, 8, "DXT1", Levels(random, 16, 8, 8, 5))),
+                ("BC2 partial chain 32x32 3 of 6", true, Dds(32, 32, "DXT3", Levels(random, 32, 32, 16, 3))),
+                ("BC3 partial chain 64x16 2 of 7", true, Dds(64, 16, "DXT5", Levels(random, 64, 16, 16, 2))),
+                ("BC3 single level 16x16", true, Dds(16, 16, "DXT5", Levels(random, 16, 16, 16, 1))),
+                ("Excessive MipCount 20 for 16x16", false, Patch(Dds(16, 16, "DXT1", Levels(random, 16, 16, 8, 5)), 28, 20)),
+                ("MipCount 5 with 2 levels of payload", false, Patch(Dds(16, 16, "DXT1", Levels(random, 16, 16, 8, 2)), 28, 5)),
+                ("Truncated top level", false, Truncate(Dds(64, 64, "DXT5", Levels(random, 64, 64, 16, 1)), DdsHeader.HEADER_SIZE + 100)),
+                ("Header without payload", false, Truncate(Dds(16, 16, "DXT1", Levels(random, 16, 16, 8, 1)), DdsHeader.HEADER_SIZE)),
+                ("Top level 6x6 not a multiple of 4", false, Dds(6, 6, "DXT1", new List<byte[]> { new byte[32] })),
+                ("Zero width", false, Patch(Dds(16, 16, "DXT1", Levels(random, 16, 16, 8, 1)), 16, 0)),
+                ("Negative width 0x80000000", false, Patch(Dds(16, 16, "DXT1", Levels(random, 16, 16, 8, 1)), 16, 0x80000000)),
+                ("65536x65536 overflow request", false, Patch(Patch(Dds(16, 16, "DXT5", Levels(random, 16, 16, 16, 1)), 16, 65536), 12, 65536)),
+                ("Cubemap", false, Patch(Dds(16, 16, "DXT1", Levels(random, 16, 16, 8, 1)), 112, 0xFE00)),
+                ("Volume", false, Patch(Dds(16, 16, "DXT1", Levels(random, 16, 16, 8, 1)), 112, 0x200000)),
+                ("BC5 ATI2", false, Dds(16, 16, "ATI2", Levels(random, 16, 16, 16, 1))),
+                ("DX10 BC7", false, Dx10(16, 16, DdsHeader.DXGI_BC7_UNORM, Levels(random, 16, 16, 16, 1))),
+                ("Not a DDS", false, Levels(random, 64, 64, 16, 1)[0]),
+                ("Shorter than the header", false, new byte[64]),
+                ("Raw MipCount uint.MaxValue", false, Patch(Dds(16, 16, "DXT1", Levels(random, 16, 16, 8, 5)), 28, uint.MaxValue)),
+                ("Raw MipCount 0x80000000", false, Patch(Dds(16, 16, "DXT1", Levels(random, 16, 16, 8, 5)), 28, 0x80000000)),
+                ("Legacy MipCount 0 without DDSD_MIPMAPCOUNT", true, Patch(Dds(16, 16, "DXT5", Levels(random, 16, 16, 16, 1)), 28, 0)),
+                ("MipCount 1 without DDSD_MIPMAPCOUNT", true, Dds(16, 16, "DXT1", Levels(random, 16, 16, 8, 1))),
+                ("MipCount 0 with DDSD_MIPMAPCOUNT", true, Patch(Patch(Dds(16, 16, "DXT1", Levels(random, 16, 16, 8, 1)), 8, 0x1 | 0x2 | 0x4 | 0x1000 | 0x20000 | 0x80000), 28, 0)),
+                ("MipCount 3 without DDSD_MIPMAPCOUNT", false, Patch(Dds(16, 16, "DXT1", Levels(random, 16, 16, 8, 3)), 8, 0x1 | 0x2 | 0x4 | 0x1000 | 0x80000)),
+                ("Full chain with truncated last level", false, Truncate(Dds(16, 16, "DXT3", Levels(random, 16, 16, 16, 5)), DdsHeader.HEADER_SIZE + 4 * 16 + 16 + 16 + 16 + 8)),
+                ("NPOT 12x12 single level", true, Dds(12, 12, "DXT1", Levels(random, 12, 12, 8, 1))),
+                ("NPOT 12x12 partial chain with 6-pixel mip 1", false, Dds(12, 12, "DXT1", Levels(random, 12, 12, 8, 2)))
+            };
+            var rows = new StringBuilder("Case,Expected,Stage,Accepted,Levels,Reason\n");
+            foreach ((string name, bool valid, byte[] data) in cases)
+            {
+                string stage = "Validate";
+                string reason = null;
+                bool accepted = false;
+                int count = 0;
+                DdsHeader header = null;
+                try
+                {
+                    header = DdsHeader.Parse(data);
+                }
+                catch (FormatException exception)
+                {
+                    stage = "Parse";
+                    reason = exception.Message;
+                }
+
+                if (header != null)
+                {
+                    accepted = DdsMipChain.TryReadFlipped(data, header, out List<byte[]> levels, out reason);
+                    count = levels.Count;
+                }
+
+                rows.AppendLine(string.Join(",", Csv(name), valid ? "Accept" : "Reject", stage, accepted, count, Csv(reason)));
+                Assert.AreEqual(valid, accepted, name + ": " + reason);
+                if (!accepted)
+                {
+                    Assert.IsNotEmpty(reason, name);
+                    Assert.AreEqual(0, count, name);
+                }
+            }
+
+            File.WriteAllText(Path.Combine(Output(), "DDS_Negative_Test_Results.csv"), rows.ToString());
+        }
+
+        [Test]
+        public void RealBcSourcesKeepAuthoredChainsAfterValidation()
+        {
+            XRaySourceConfiguration configuration = XRayLevelSourceCache.CreateMo2Configuration();
+            configuration.IndexScope.Clear();
+            configuration.IndexScope.AddRange(new[] { "textures" });
+            XRaySourcePlan plan = Mo2VirtualFileSystem.Plan(configuration);
+            Assert.IsTrue(plan.IsValid, string.Join("; ", plan.Errors));
+            var resolver = new XRayTextureResolver(new XRayEffectiveGamedata(XRayAssetIndex.Build(plan)).Index);
+            var files = new List<(string Name, byte[] Data)>();
+            foreach (string virtualPath in AUTHORED_TEXTURES) files.Add((virtualPath, resolver.ResolveFile(virtualPath).Winner.ReadAllBytes()));
+            foreach (string relative in TRUE_STALKER_TEXTURES)
+            {
+                string path = Path.Combine(TRUE_STALKER_ROOT, relative);
+                Assert.IsTrue(File.Exists(path), path);
+                files.Add(("TrueStalker/" + relative, File.ReadAllBytes(path)));
+            }
+
+            var formats = new HashSet<DdsFormat>();
+            var rows = new StringBuilder("Texture,Format,Width,Height,MipCount,FullChain,Levels,Bytes,SourceSHA256\n");
+            foreach ((string name, byte[] data) in files)
+            {
+                DdsHeader header = DdsHeader.Parse(data);
+                Assert.IsTrue(DdsMipChain.TryReadFlipped(data, header, out List<byte[]> levels, out string reason), name + ": " + reason);
+                Assert.AreEqual(header.MipCount, levels.Count, name);
+                int offset = header.DataOffset;
+                int width = header.Width;
+                int height = header.Height;
+                for (int mip = 0; mip < levels.Count; mip++)
+                {
+                    int size = DdsHeader.GetLevelSize(header.Format, width, height);
+                    Assert.AreEqual(size, levels[mip].Length, name + " mip " + mip);
+                    Assert.IsTrue(Matches(DdsMipChain.Flip(levels[mip], 0, header.Format, width, height), data, offset), name + " mip " + mip + " must restore the source blocks");
+                    offset += size;
+                    width = Math.Max(1, width >> 1);
+                    height = Math.Max(1, height >> 1);
+                }
+
+                formats.Add(header.Format);
+                rows.AppendLine(string.Join(",", Csv(name), header.Format, header.Width, header.Height, header.MipCount, DdsMipChain.FullChainLength(header.Width, header.Height), levels.Count, offset, XRayLevelSourceRefresh.HashBytes(data)));
+            }
+
+            CollectionAssert.IsSubsetOf(new[] { DdsFormat.BC1, DdsFormat.BC2, DdsFormat.BC3 }, formats);
+            File.WriteAllText(Path.Combine(Output(), "DDS_Real_Source_Validation.csv"), rows.ToString());
+        }
+
+        [Test]
+        public void AuthoredSamplerRefreshFollowsUserLtxAndKeepsPayloadAndOverrides()
+        {
+            _temp = TempFolder();
+            var random = new System.Random(4242);
+            var rows = new StringBuilder("Step,Status,Anisotropy,MipBias,Record,AssetSHA256,MetaSHA256,PayloadSHA256,GUID,Note\n");
+            using (var directory = new TestDirectory())
+            {
+                var fixture = new Mo2Fixture(directory);
+                fixture.WriteIni("Profile");
+                fixture.AddProfile("Profile", "+Flora");
+                fixture.AddModFile("Flora", "textures/flora/leaf.dds", Dds(64, 64, "DXT1", Levels(random, 64, 64, 8, 4)));
+                Func<int, float, XRayTextureAssetResult> import = (anisotropy, mipBias) =>
+                {
+                    XRayResolvedFile file = new XRayTextureResolver(XRayAssetIndex.Build(Mo2VirtualFileSystem.Plan(fixture.CreateConfiguration("Profile")))).ResolveFile("textures/flora/leaf.dds");
+                    return new XRayTextureImporter(new XRayImportOptions { OverwriteExistingTextures = true }, false, new HashSet<string>()).ImportAuthoredMips(file, _temp, anisotropy, mipBias);
+                };
+                void Row(string step, XRayTextureAssetResult result)
+                {
+                    string path = result.AssetPath;
+                    var texture = path != null ? AssetDatabase.LoadAssetAtPath<Texture2D>(path) : null;
+                    rows.AppendLine(string.Join(",", step, result.Status, texture != null ? texture.anisoLevel.ToString(CultureInfo.InvariantCulture) : string.Empty, texture != null ? texture.mipMapBias.ToString("R", CultureInfo.InvariantCulture) : string.Empty, Csv(path != null ? XRayAuthoredSampler.ReadRecord(path) : null), path != null ? XRayLevelSourceRefresh.HashFile(path) : string.Empty, path != null ? XRayLevelSourceRefresh.HashFile(path + ".meta") : string.Empty, path != null ? Payload(path) : string.Empty, path != null ? AssetDatabase.AssetPathToGUID(path) : string.Empty, Csv(result.Note)));
+                }
+
+                XRayTextureAssetResult created = import(16, -0.5f);
+                Assert.AreEqual(XRayResourceStatus.Imported, created.Status, created.Note);
+                Row("Created", created);
+                string assetPath = created.AssetPath;
+                string guid = AssetDatabase.AssetPathToGUID(assetPath);
+                string payload = Payload(assetPath);
+                Assert.AreEqual(XRayAuthoredSampler.Record(16, -0.5f), XRayAuthoredSampler.ReadRecord(assetPath));
+                Dictionary<string, string> state = Files(assetPath);
+                XRayTextureAssetResult noop = import(16, -0.5f);
+                Row("NoOpRefresh", noop);
+                Assert.AreEqual(XRayResourceStatus.Reused, noop.Status, noop.Note);
+                CollectionAssert.AreEquivalent(state, Files(assetPath), "A refresh without source changes must not touch the asset or .meta.");
+
+                XRayTerrainSourceParameters userLtx = XRayTerrainSourceParameters.Parse("r__tf_aniso 8\nr__tf_mipbias 0\n");
+                XRayTextureAssetResult refreshed = import((int)userLtx.Anisotropy.Value, userLtx.MipBias.Value);
+                Row("UserLtxChanged", refreshed);
+                Assert.AreEqual(XRayResourceStatus.Updated, refreshed.Status, refreshed.Note);
+                Assert.AreEqual(assetPath, refreshed.AssetPath);
+                Texture2D texture = AssetDatabase.LoadAssetAtPath<Texture2D>(assetPath);
+                Assert.AreEqual(8, texture.anisoLevel);
+                Assert.AreEqual(0.0f, texture.mipMapBias);
+                Assert.AreEqual(4, texture.mipmapCount);
+                Assert.AreEqual(guid, AssetDatabase.AssetPathToGUID(assetPath));
+                Assert.AreEqual(payload, Payload(assetPath), "A sampler-only refresh must keep the authored mip payload.");
+                Assert.AreEqual(XRayAuthoredSampler.Record(8, 0.0f), XRayAuthoredSampler.ReadRecord(assetPath));
+                state = Files(assetPath);
+                XRayTextureAssetResult repeated = import(8, 0.0f);
+                Row("NoOpAfterUserLtx", repeated);
+                Assert.AreEqual(XRayResourceStatus.Reused, repeated.Status, repeated.Note);
+                CollectionAssert.AreEquivalent(state, Files(assetPath));
+
+                texture.anisoLevel = 4;
+                EditorUtility.SetDirty(texture);
+                AssetDatabase.SaveAssetIfDirty(texture);
+                XRayTextureAssetResult overridden = import(16, -0.5f);
+                Row("UserOverrideAnisotropy", overridden);
+                texture = AssetDatabase.LoadAssetAtPath<Texture2D>(assetPath);
+                Assert.AreEqual(4, texture.anisoLevel);
+                Assert.AreEqual(-0.5f, texture.mipMapBias);
+                StringAssert.Contains(XRayAuthoredSampler.ANISOTROPY, overridden.Note);
+                Assert.AreEqual(XRayAuthoredSampler.Record(8, -0.5f), XRayAuthoredSampler.ReadRecord(assetPath));
+                Assert.AreEqual(payload, Payload(assetPath));
+                XRayAuthoredSamplerPlan preview = XRayAuthoredSampler.Plan(assetPath, 16, -0.5f);
+                Assert.IsTrue(preview.Eligible);
+                Assert.IsFalse(preview.ChangesTexture);
+                Assert.IsFalse(preview.ChangesRecord);
+                CollectionAssert.AreEqual(new[] { XRayAuthoredSampler.ANISOTROPY }, preview.Overrides);
+                state = Files(assetPath);
+                XRayTextureAssetResult kept = import(16, -0.5f);
+                Row("NoOpWithOverride", kept);
+                Assert.AreEqual(XRayResourceStatus.Reused, kept.Status, kept.Note);
+                CollectionAssert.AreEquivalent(state, Files(assetPath));
+
+                Texture2D foreign = Asset(new Texture2D(4, 4, TextureFormat.RGBA32, false, false), "foreign.asset");
+                XRayAuthoredSamplerPlan foreignPlan = XRayAuthoredSampler.Plan(AssetDatabase.GetAssetPath(foreign), 8, 0.0f);
+                Assert.IsFalse(foreignPlan.Eligible);
+                Assert.IsFalse(XRayAuthoredSampler.Apply(foreignPlan));
+
+                var corrupt = new List<(string Name, byte[] Data)>
+                {
+                    ("Truncated payload", Truncate(Dds(64, 64, "DXT1", Levels(random, 64, 64, 8, 4)), DdsHeader.HEADER_SIZE + 1000)),
+                    ("Excessive MipCount", Patch(Dds(64, 64, "DXT1", Levels(random, 64, 64, 8, 4)), 28, 40)),
+                    ("Unsupported BC5", Dds(64, 64, "ATI2", Levels(random, 64, 64, 16, 4))),
+                    ("Not a DDS", Levels(random, 64, 64, 8, 1)[0])
+                };
+                foreach ((string name, byte[] data) in corrupt)
+                {
+                    fixture.AddModFile("Flora", "textures/flora/leaf.dds", data);
+                    XRayTextureAssetResult failed = import(16, -0.5f);
+                    Row("Corrupt: " + name, failed);
+                    Assert.AreEqual(XRayResourceStatus.Unsupported, failed.Status, name);
+                    Assert.IsNull(failed.AssetPath, name);
+                    Assert.IsNotEmpty(failed.Note, name);
+                    CollectionAssert.AreEquivalent(state, Files(assetPath), name + " must not modify the existing authored asset.");
+                    Assert.AreEqual(guid, AssetDatabase.AssetPathToGUID(assetPath), name);
+                }
+
+                fixture.AddModFile("Flora", "textures/flora/leaf.dds", Dds(64, 64, "DXT1", Levels(random, 64, 64, 8, 3)));
+                XRayTextureAssetResult updated = import(16, -0.5f);
+                Row("SourcePayloadChanged", updated);
+                Assert.AreEqual(XRayResourceStatus.Updated, updated.Status, updated.Note);
+                Assert.AreEqual(assetPath, updated.AssetPath);
+                Assert.AreEqual(guid, AssetDatabase.AssetPathToGUID(assetPath));
+                texture = AssetDatabase.LoadAssetAtPath<Texture2D>(assetPath);
+                Assert.AreEqual(3, texture.mipmapCount);
+                Assert.AreEqual(4, texture.anisoLevel, "A payload update must keep the user sampler override.");
+                Assert.AreEqual(-0.5f, texture.mipMapBias);
+                Assert.AreNotEqual(payload, Payload(assetPath));
+            }
+
+            File.WriteAllText(Path.Combine(Output(), "UserLtx_Refresh_Results.csv"), rows.ToString());
+        }
+
+        [UnityTest]
+        [Timeout(900000)]
+        public IEnumerator PreserveKeepsSourceModeOverridesAndRecordsSamplerProvenance()
+        {
+            string root;
+            using (var fixture = new XRayFloraLevelFixture(false))
+            {
+                root = fixture.Root;
+                yield return Import(fixture, XRayFloraImportMode.EnableVerifiedAnomaly);
+                Assert.IsTrue(XRayLevelImportJob.LastRecord.Dependencies.Exists(dependency => dependency.Role == "Flora sampler settings"));
+                Material material = fixture.Material();
+                Assert.AreEqual(1.0f, material.GetFloat("_MonolithFloraSource"));
+                material.SetFloat("_MonolithFloraSource", 0.0f);
+                AssetDatabase.SaveAssetIfDirty(material);
+                yield return Import(fixture, XRayFloraImportMode.EnableVerifiedAnomaly);
+                material = fixture.Material();
+                Assert.AreEqual(0.0f, material.GetFloat("_MonolithFloraSource"), "A user source-mode override must survive a verified source import.");
+                Assert.Greater(XRayLevelImportJob.LastRecord.GetMetric("FloraUserOverrides"), 0.0);
+                AssetDatabase.SaveAssets();
+                Dictionary<string, string> before = Snapshot(root);
+                string materialPath = AssetDatabase.GetAssetPath(material);
+                string albedoPath = AssetDatabase.GetAssetPath(material.GetTexture("_BaseColorMap"));
+                StringAssert.EndsWith("_authored.asset", albedoPath);
+                string[] watched = { materialPath, materialPath + ".meta", albedoPath, albedoPath + ".meta" };
+                var hashes = new List<string>();
+                foreach (string file in watched) hashes.Add(XRayLevelSourceRefresh.HashFile(file));
+                yield return Import(fixture, XRayFloraImportMode.Preserve);
+                AssetDatabase.SaveAssets();
+                WriteComparison(fixture, before, Snapshot(root), "PreserveAfterSource");
+                for (int i = 0; i < watched.Length; i++) Assert.AreEqual(hashes[i], XRayLevelSourceRefresh.HashFile(watched[i]), "Preserve must not touch " + watched[i]);
+                material = fixture.Material();
+                Assert.AreEqual(0.0f, material.GetFloat("_MonolithFloraSource"));
+                Assert.AreEqual((float)CullMode.Back, material.GetFloat("_CullMode"));
+                StringAssert.StartsWith(XRayFloraMaterialBindings.VERSION, material.GetTag(XRayFloraMaterialBindings.TAG, false, string.Empty));
+            }
+            Assert.IsFalse(Directory.Exists(root) || File.Exists(root + ".meta"));
         }
 
         [UnityTest]
@@ -919,6 +1192,71 @@ namespace XRay.Importer.Tests
         {
             _owned.Add(item);
             return item;
+        }
+
+        private static List<byte[]> Levels(System.Random random, int width, int height, int blockSize, int count)
+        {
+            var levels = new List<byte[]>();
+            for (int mip = 0; mip < count; mip++)
+            {
+                var level = new byte[Math.Max(1, (Math.Max(1, width >> mip) + 3) / 4) * Math.Max(1, (Math.Max(1, height >> mip) + 3) / 4) * blockSize];
+                random.NextBytes(level);
+                levels.Add(level);
+            }
+
+            return levels;
+        }
+
+        private static byte[] Patch(byte[] data, int offset, uint value)
+        {
+            var result = (byte[])data.Clone();
+            Write(result, offset, value);
+            return result;
+        }
+
+        private static byte[] Truncate(byte[] data, int length)
+        {
+            var result = new byte[length];
+            Buffer.BlockCopy(data, 0, result, 0, length);
+            return result;
+        }
+
+        private static byte[] Dx10(int width, int height, uint dxgi, List<byte[]> levels)
+        {
+            byte[] legacy = Dds(width, height, "DX10", levels);
+            var extension = new byte[DdsHeader.DX10_HEADER_SIZE];
+            Write(extension, 0, dxgi);
+            Write(extension, 4, 3);
+            Write(extension, 12, 1);
+            var result = new byte[legacy.Length + extension.Length];
+            Buffer.BlockCopy(legacy, 0, result, 0, DdsHeader.HEADER_SIZE);
+            Buffer.BlockCopy(extension, 0, result, DdsHeader.HEADER_SIZE, extension.Length);
+            Buffer.BlockCopy(legacy, DdsHeader.HEADER_SIZE, result, DdsHeader.HEADER_SIZE + extension.Length, legacy.Length - DdsHeader.HEADER_SIZE);
+            return result;
+        }
+
+        private static bool Matches(byte[] level, byte[] source, int offset)
+        {
+            for (int i = 0; i < level.Length; i++)
+            {
+                if (level[i] != source[offset + i]) return false;
+            }
+
+            return true;
+        }
+
+        private static string Payload(string assetPath)
+        {
+            string text = File.ReadAllText(assetPath);
+            int start = text.IndexOf("_typelessdata: ", StringComparison.Ordinal);
+            Assert.GreaterOrEqual(start, 0, assetPath);
+            int end = text.IndexOf('\n', start);
+            return XRayLevelSourceRefresh.HashBytes(Encoding.ASCII.GetBytes(end < 0 ? text.Substring(start) : text.Substring(start, end - start)));
+        }
+
+        private static Dictionary<string, string> Files(string assetPath)
+        {
+            return new Dictionary<string, string> { { assetPath, XRayLevelSourceRefresh.HashFile(assetPath) }, { assetPath + ".meta", XRayLevelSourceRefresh.HashFile(assetPath + ".meta") } };
         }
 
         private static byte[] Dds(int width, int height, string fourCC, List<byte[]> levels)

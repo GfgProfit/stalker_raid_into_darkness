@@ -228,24 +228,40 @@ namespace XRay.Importer.Editor
             string assetPath = XRayAssetNaming.Place(folder, XRayAssetNaming.CreateCandidates(file.Winner.RelativePath, AUTHORED_NAME_SUFFIX), ".asset", marker.Key, XRayAssetMarker.ReadKey, _claimed);
             string note = $"Authored {levels.Count}-level {header.Description} mip chain kept block-exact (vertical block flip, no recompression, UNorm sampling of the encoded values).";
             var existing = AssetDatabase.LoadAssetAtPath<Texture2D>(assetPath);
+            XRayAuthoredSamplerPlan sampler = null;
             if (existing != null)
             {
                 XRayAssetMarker previous = XRayAssetMarker.ReadEffective(assetPath);
                 bool sameSource = previous != null && previous.Stamp == marker.Stamp && previous.SourcePath == marker.SourcePath;
+                sampler = XRayAuthoredSampler.Plan(assetPath, anisotropy, mipBias);
                 if (sameSource || !_options.OverwriteExistingTextures && !_forceUpdate)
                 {
-                    return new XRayTextureAssetResult { AssetPath = assetPath, Status = XRayResourceStatus.Reused, Format = header.Description, Note = sameSource ? note : $"Source changed ({previous?.Source ?? "unknown"} -> {marker.Source}); kept the existing authored texture because 'Overwrite Existing Textures' is off." };
+                    bool refreshed = XRayAuthoredSampler.Apply(sampler) && sampler.ChangesTexture;
+                    string kept = sameSource ? note : $"Source changed ({previous?.Source ?? "unknown"} -> {marker.Source}); kept the existing authored texture because 'Overwrite Existing Textures' is off.";
+                    return new XRayTextureAssetResult { AssetPath = assetPath, Status = refreshed ? XRayResourceStatus.Updated : XRayResourceStatus.Reused, Format = header.Description, Note = refreshed || sampler.Overrides.Count > 0 ? kept + " " + sampler.Note : kept };
                 }
             }
 
             GraphicsFormat format = header.Format == DdsFormat.BC1 ? GraphicsFormat.RGBA_DXT1_UNorm : header.Format == DdsFormat.BC2 ? GraphicsFormat.RGBA_DXT3_UNorm : GraphicsFormat.RGBA_DXT5_UNorm;
-            var texture = new Texture2D(header.Width, header.Height, format, levels.Count, TextureCreationFlags.None) { name = Path.GetFileNameWithoutExtension(assetPath), filterMode = FilterMode.Trilinear, anisoLevel = anisotropy, mipMapBias = mipBias, wrapMode = TextureWrapMode.Repeat };
-            for (int mip = 0; mip < levels.Count; mip++)
+            int finalAnisotropy = sampler != null && sampler.Eligible ? sampler.FinalAnisotropy : anisotropy;
+            float finalMipBias = sampler != null && sampler.Eligible ? sampler.FinalMipBias : mipBias;
+            Texture2D texture = null;
+            try
             {
-                texture.SetPixelData(levels[mip], mip);
+                texture = new Texture2D(header.Width, header.Height, format, levels.Count, TextureCreationFlags.None) { name = Path.GetFileNameWithoutExtension(assetPath), filterMode = FilterMode.Trilinear, anisoLevel = finalAnisotropy, mipMapBias = finalMipBias, wrapMode = TextureWrapMode.Repeat };
+                for (int mip = 0; mip < levels.Count; mip++)
+                {
+                    texture.SetPixelData(levels[mip], mip);
+                }
+
+                texture.Apply(false, false);
+            }
+            catch (Exception exception) when (exception is ArgumentException || exception is UnityException)
+            {
+                if (texture != null) UnityEngine.Object.DestroyImmediate(texture);
+                return new XRayTextureAssetResult { Status = XRayResourceStatus.Unsupported, Format = header.Description, Note = "Authored mip chain cannot be preserved: " + exception.Message };
             }
 
-            texture.Apply(false, false);
             Directory.CreateDirectory(folder);
             if (existing != null)
             {
@@ -268,8 +284,8 @@ namespace XRay.Importer.Editor
             }
 
             AssetDatabase.SaveAssetIfDirty(texture);
-            XRayAssetMarker.Write(assetPath, marker);
-            return new XRayTextureAssetResult { AssetPath = assetPath, Status = existing != null ? XRayResourceStatus.Updated : XRayResourceStatus.Imported, Format = header.Description, Note = note };
+            XRayAuthoredSampler.WriteMarker(assetPath, marker, sampler != null && sampler.Eligible ? sampler.FinalRecord : XRayAuthoredSampler.Record(anisotropy, mipBias));
+            return new XRayTextureAssetResult { AssetPath = assetPath, Status = existing != null ? XRayResourceStatus.Updated : XRayResourceStatus.Imported, Format = header.Description, Note = sampler != null && sampler.Overrides.Count > 0 ? note + " " + sampler.Note : note };
         }
 
         public string FindPacked(XRayResolvedFile file, string folder, out bool upToDate)

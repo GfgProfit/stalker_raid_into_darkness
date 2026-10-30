@@ -21,6 +21,9 @@ namespace XRay.Importer.Editor.Levels
         public const string TRUE_STALKER_CONTRACT_HASH = "13d1c2aae3714299c9d2d0c5429f7ffa26306ac12b62befae2b0245fb060843d";
         public const float AREF = 200.0f / 255.0f;
         public const float GRASS_AREF = 170.0f / 255.0f;
+        public const string ANOMALY_WIND_CONTRACT_HASH = "bf458cc9ae3f6f5a29fff39c857386c0018886cbd9954eab361087ec302fcf13";
+        public const string TRUE_STALKER_WIND_CONTRACT_HASH = "5797ad01668d5c28013707909190194c8f2f2e141b2931b3470ab2e7e1b463d9";
+        public const string ANOMALY_WIND_WAVES = "textures/fx/wind_wave.dds";
 
         private static readonly string[] ANOMALY_FILES =
         {
@@ -58,12 +61,40 @@ namespace XRay.Importer.Editor.Levels
             "shaders/r3/details_blend.s"
         };
 
+        private static readonly string[] ANOMALY_WIND_FILES =
+        {
+            "shaders/r3/screenspace_wind.h",
+            "shaders/r3/check_screenspace_wind.h",
+            "shaders/r3/deffer_tree_branch_bump-hq.vs",
+            "shaders/r3/deffer_tree_bump-hq.vs",
+            "shaders/r3/shadow_direct_tree.vs",
+            "shaders/r3/shadow_direct_tree_aref.vs",
+            ANOMALY_WIND_WAVES
+        };
+
+        private static readonly string[] TRUE_STALKER_WIND_FILES =
+        {
+            "shaders/r3/shared/common.h",
+            "shaders/r3/deffer_tree_branch_bump-hq.vs",
+            "shaders/r3/deffer_tree_bump-hq.vs",
+            "shaders/r3/deffer_tree_bump.vs",
+            "shaders/r3/shadow_direct_tree.vs",
+            "shaders/r3/shadow_direct_tree_aref.vs"
+        };
+
         public static IReadOnlyList<string> AnomalyFiles => ANOMALY_FILES;
+        public static IReadOnlyList<string> AnomalyWindFiles => ANOMALY_WIND_FILES;
+        public static IReadOnlyList<string> TrueStalkerWindFiles => TRUE_STALKER_WIND_FILES;
         public static IReadOnlyList<string> TrueStalkerFiles => TRUE_STALKER_FILES;
 
         public XRayFloraSourceProfile Profile { get; private set; }
         public string AnomalyHash { get; private set; }
         public string TrueStalkerHash { get; private set; }
+        public XRayFloraSourceProfile WindProfile { get; private set; }
+        public string AnomalyWindHash { get; private set; }
+        public string TrueStalkerWindHash { get; private set; }
+        public List<XRayResolvedFile> WindFiles { get; } = new List<XRayResolvedFile>();
+        public string WindContractHash => WindProfile == XRayFloraSourceProfile.AnomalySss ? AnomalyWindHash : WindProfile == XRayFloraSourceProfile.TrueStalker ? TrueStalkerWindHash : string.Empty;
         public List<XRayResolvedFile> Files { get; } = new List<XRayResolvedFile>();
         public string ContractHash => Profile == XRayFloraSourceProfile.AnomalySss ? AnomalyHash : Profile == XRayFloraSourceProfile.TrueStalker ? TrueStalkerHash : string.Empty;
 
@@ -75,12 +106,22 @@ namespace XRay.Importer.Editor.Levels
             if (binding.AnomalyHash == ANOMALY_CONTRACT_HASH) binding.Profile = XRayFloraSourceProfile.AnomalySss;
             else if (binding.TrueStalkerHash == TRUE_STALKER_CONTRACT_HASH) binding.Profile = XRayFloraSourceProfile.TrueStalker;
             if (binding.Profile != XRayFloraSourceProfile.Unknown) Contract(resolver, binding.Profile == XRayFloraSourceProfile.AnomalySss ? ANOMALY_FILES : TRUE_STALKER_FILES, binding.Files);
+            binding.AnomalyWindHash = Contract(resolver, ANOMALY_WIND_FILES, null);
+            binding.TrueStalkerWindHash = Contract(resolver, TRUE_STALKER_WIND_FILES, null);
+            if (binding.Profile == XRayFloraSourceProfile.AnomalySss && binding.AnomalyWindHash == ANOMALY_WIND_CONTRACT_HASH) binding.WindProfile = XRayFloraSourceProfile.AnomalySss;
+            else if (binding.Profile == XRayFloraSourceProfile.TrueStalker && binding.TrueStalkerWindHash == TRUE_STALKER_WIND_CONTRACT_HASH) binding.WindProfile = XRayFloraSourceProfile.TrueStalker;
+            if (binding.WindProfile != XRayFloraSourceProfile.Unknown) Contract(resolver, binding.WindProfile == XRayFloraSourceProfile.AnomalySss ? ANOMALY_WIND_FILES : TRUE_STALKER_WIND_FILES, binding.WindFiles);
             return binding;
         }
 
         public static bool Accepts(XRayFloraImportMode mode, XRayFloraSourceProfile profile)
         {
             return mode == XRayFloraImportMode.EnableVerifiedAnomaly && profile == XRayFloraSourceProfile.AnomalySss || mode == XRayFloraImportMode.EnableVerifiedTrueStalker && profile == XRayFloraSourceProfile.TrueStalker;
+        }
+
+        public static bool AcceptsWind(XRayFloraWindImportMode mode, XRayFloraSourceProfile profile)
+        {
+            return mode == XRayFloraWindImportMode.EnableVerifiedAnomaly && profile == XRayFloraSourceProfile.AnomalySss || mode == XRayFloraWindImportMode.EnableVerifiedTrueStalker && profile == XRayFloraSourceProfile.TrueStalker;
         }
 
         private static string Contract(XRayTextureResolver resolver, string[] files, List<XRayResolvedFile> resolved)

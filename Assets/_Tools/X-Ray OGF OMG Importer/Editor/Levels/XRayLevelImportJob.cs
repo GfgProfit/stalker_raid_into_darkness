@@ -71,6 +71,8 @@ namespace XRay.Importer.Editor.Levels
         private readonly XRayLevelSceneContent _content = new XRayLevelSceneContent();
         private readonly Dictionary<int, XRayLevelTerrainTextures> _terrain = new Dictionary<int, XRayLevelTerrainTextures>();
         private XRayFloraSourceBinding _floraSource;
+        private bool _windAccepted;
+        private string _windWavesPath;
         private XRayLevelTextureSet _lodAlbedo;
         private string _lodNormalPath;
         private string _lodShader;
@@ -806,6 +808,43 @@ namespace XRay.Importer.Editor.Levels
             }
 
             RequestLodTextures();
+            if (_request.Settings.FloraWindMode != XRayFloraWindImportMode.Disabled)
+            {
+                RequestFloraWind();
+            }
+        }
+
+        private void RequestFloraWind()
+        {
+            if (_floraSource == null)
+            {
+                ResolveFloraSource();
+            }
+
+            _record.Source.FloraWindProfile = _floraSource.WindProfile.ToString();
+            _record.Source.FloraWindContractHash = _floraSource.WindProfile != XRayFloraSourceProfile.Unknown ? _floraSource.WindContractHash : "anomaly:" + _floraSource.AnomalyWindHash + ";ts:" + _floraSource.TrueStalkerWindHash;
+            foreach (XRayResolvedFile file in _floraSource.WindFiles)
+            {
+                _record.AddDependency(XRayLevelDependencyCategory.Materials, "Flora wind contract", file.DisplayPath, file.IsResolved ? file.Winner.Location : null, file.VirtualPath, file.IsResolved ? XRayLevelDependencyStatus.Found : XRayLevelDependencyStatus.Missing, "Verified tree wind HLSL contract; tree WindFactor storage and wind material binding depend on its SHA-256", null, "sha256:" + XRayTerrainSourceBinding.Hash(file));
+            }
+
+            _windAccepted = XRayFloraSourceBinding.AcceptsWind(_request.Settings.FloraWindMode, _floraSource.WindProfile);
+            if (!_windAccepted)
+            {
+                _record.Warnings.Add($"Source flora wind mode '{_request.Settings.FloraWindMode}' was requested, but the effective wind shader contract is '{_floraSource.WindProfile}'; trees stay static and meshes keep the legacy vertex data.");
+                return;
+            }
+
+            if (_floraSource.WindProfile == XRayFloraSourceProfile.AnomalySss)
+            {
+                XRayTextureAssetResult waves = _textures.RequestPacked(XRayFloraSourceBinding.ANOMALY_WIND_WAVES.Replace('/', '\\'), XRayLevelDependencyCategory.Materials, "Wind waves (s_waves)", "SSFX tree branch flow map, sampled with smp_linear2 (wrap, linear) at mip 0");
+                _windWavesPath = waves.AssetPath;
+                if (_windWavesPath == null)
+                {
+                    _windAccepted = false;
+                    _record.Warnings.Add("Anomaly wind flow map 'textures\\fx\\wind_wave.dds' could not be imported; trees stay static.");
+                }
+            }
         }
 
         private void ResolveFloraSource()
@@ -818,7 +857,7 @@ namespace XRay.Importer.Editor.Levels
                 _record.AddDependency(XRayLevelDependencyCategory.Materials, "Flora source contract", file.DisplayPath, file.IsResolved ? file.Winner.Location : null, file.VirtualPath, file.IsResolved ? XRayLevelDependencyStatus.Found : XRayLevelDependencyStatus.Missing, "Verified flora HLSL contract; source flora activation depends on its SHA-256", null, "sha256:" + XRayTerrainSourceBinding.Hash(file));
             }
 
-            if (!XRayFloraSourceBinding.Accepts(_request.Settings.FloraImportMode, _floraSource.Profile))
+            if (_request.Settings.FloraImportMode != XRayFloraImportMode.Preserve && !XRayFloraSourceBinding.Accepts(_request.Settings.FloraImportMode, _floraSource.Profile))
             {
                 _record.Warnings.Add($"Source flora mode '{_request.Settings.FloraImportMode}' was requested, but the effective flora shader contract is '{_floraSource.Profile}'; flora materials keep legacy rendering.");
             }
@@ -850,13 +889,17 @@ namespace XRay.Importer.Editor.Levels
 
         private IEnumerable CreateMaterials()
         {
-            if (_request.Settings.FloraImportMode != XRayFloraImportMode.Preserve)
+            if (_request.Settings.FloraImportMode != XRayFloraImportMode.Preserve && _floraSource == null)
             {
                 ResolveFloraSource();
             }
 
             bool floraAccepted = _floraSource != null && XRayFloraSourceBinding.Accepts(_request.Settings.FloraImportMode, _floraSource.Profile);
             _materials = new XRayLevelMaterialLibrary(_record, _request.Settings.MaterialUpdateMode, _effective, _request.Settings.TerrainImportMode, _request.Settings.TerrainQuality, _request.Settings.FloraImportMode, _floraSource);
+            if (_request.Settings.FloraWindMode != XRayFloraWindImportMode.Disabled)
+            {
+                _materials.ConfigureWind(_windAccepted ? _floraSource.WindProfile : XRayFloraSourceProfile.Unknown, _windWavesPath, XRayLevelSourceBindings.PackedFlipV(_windWavesPath), _floraSource?.WindContractHash);
+            }
             var slots = new List<(int Shader, bool Tree)>();
             var seen = new HashSet<long>();
             foreach (XRayLevelVisual visual in _level.Visuals)
@@ -927,6 +970,10 @@ namespace XRay.Importer.Editor.Levels
             _record.SetMetric("FloraMaterials", _materials.FloraMaterials);
             _record.SetMetric("FloraSourceMaterials", _materials.FloraSourceMaterials);
             _record.SetMetric("FloraUserOverrides", _materials.FloraUserOverrides);
+            if (_request.Settings.FloraWindMode != XRayFloraWindImportMode.Disabled)
+            {
+                _record.SetMetric("FloraWindMaterials", _materials.FloraWindMaterials);
+            }
             _record.GeneratedAssets.AddRange(_materials.Paths);
         }
 
@@ -1132,7 +1179,7 @@ namespace XRay.Importer.Editor.Levels
 
         private IEnumerable BuildInstances()
         {
-            var builder = new XRayLevelMeshBuilder(_level, _geometry);
+            var builder = new XRayLevelMeshBuilder(_level, _geometry) { TreeWindFactor = _windAccepted };
             var meshes = new Dictionary<string, (Mesh Mesh, int Shader)>();
             var instances = new Dictionary<string, List<XRayLevelVisual>>();
             int lods = 0;

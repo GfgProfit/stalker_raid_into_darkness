@@ -126,6 +126,37 @@ namespace XRay.Importer.Tests
             return reference.Replace("Hidden/XRay/MonolithFloraValidation", "Hidden/XRay/MonolithFloraReference_" + NAMES[group]);
         }
 
+        public static string BuildShadow(bool trueStalker, bool aref, string template, out string manifest)
+        {
+            var hashes = new StringBuilder();
+            var source = new StringBuilder();
+            source.AppendLine(DEFINES);
+            source.AppendLine("#define USE_HWSMAP");
+            if (!trueStalker) source.AppendLine("#define SSFX_WIND");
+            if (aref) source.AppendLine("#define USE_AREF");
+            source.AppendLine(STRUCTURES);
+            source.AppendLine("struct v_shadow_direct_aref { float4 P; int4 tc; };\nstruct v_shadow_direct { float4 P; };\nstruct v2p_shadow_direct_aref { float2 tc0; float4 hpos; };\nstruct v2p_shadow_direct { float4 hpos; };");
+            List<string> files = trueStalker ? new List<string> { TS + "common_defines.h", TS + "shared/common.h", TS + "shadow_direct_tree.vs" } : new List<string> { ANOMALY_BASE + "common_defines.h", SSS + "screenspace_wind.h", SSS + "shadow_direct_tree.vs" };
+            var visited = new HashSet<string>();
+            foreach (string file in files)
+            {
+                string text = Expand(file, new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase), visited, hashes);
+                string name = Path.GetFileName(file);
+                if (name == "common.h") text = string.Join("\n", Functions(text, "calc_cyclic").Concat(Functions(text, "calc_xz_wave")));
+                if (name.EndsWith(".vs", StringComparison.Ordinal)) text = Regex.Replace(text, @"\bmain\s*\(", "SourceVertex(");
+                source.AppendLine("#line 1 \"" + name + "\"");
+                source.AppendLine(text);
+            }
+
+            source.AppendLine(aref ? "float4 Evaluate(float2 tc)\n{\n    v_shadow_direct_aref I;\n    I.P = float4(_Vertex.xyz, 1.0);\n    I.tc = int4((int)round(_VertexData.y / _Consts.x), (int)round(_VertexData.z / _Consts.y), (int)_VertexData.w, 0);\n    v2p_shadow_direct_aref O = SourceVertex(I);\n    return float4(O.hpos.xyz, 1.0);\n}\n" : "float4 Evaluate(float2 tc)\n{\n    v_shadow_direct I;\n    I.P = float4(_Vertex.xyz, 1.0);\n    v2p_shadow_direct O = SourceVertex(I);\n    return float4(O.hpos.xyz, 1.0);\n}\n");
+            manifest = hashes.ToString();
+            int start = template.IndexOf("            float3 TreeWorld()", StringComparison.Ordinal);
+            int end = template.IndexOf("            float4 Frag(", start, StringComparison.Ordinal);
+            if (start < 0 || end < 0) throw new InvalidOperationException("Validation template markers are missing.");
+            string shaderName = (trueStalker ? "TrueStalker" : "Anomaly") + (aref ? "_ShadowAref_VS" : "_Shadow_VS");
+            return (template.Substring(0, start) + source + template.Substring(end)).Replace("Hidden/XRay/MonolithFloraValidation", "Hidden/XRay/MonolithFloraReference_" + shaderName);
+        }
+
         private static string Evaluate(int group)
         {
             const string PIXEL = "    p_bumped I = (p_bumped)0;\n    I.tcdh = tc;\n    I.position = _Position;\n    I.M1 = float3(_Terrain.w, 0.0, _Terrain.x);\n    I.M2 = float3(0.0, 0.0, _Terrain.y);\n    I.M3 = float3(0.0, 0.0, _Terrain.z);\n    I.sss_extra = float4(0.0, 0.0, _Extra.x, _Extra.y);\n    f_deffer O = SourceMain(I);\n    float packedHemiMaterial = gbuf_pack_hemi_mtl(O.Ne.w, O.P.w);\n";

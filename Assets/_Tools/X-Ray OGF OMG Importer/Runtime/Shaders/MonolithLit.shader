@@ -39,6 +39,10 @@ Shader "HDRP/MonolithLit"
         _MonolithFloraFixes2("ssfx_florafixes_2", Vector) = (1.5,1,0,0)
         _MonolithFloraSubsurface("Flora Subsurface Mask", Range(0,1)) = 1
         [Enum(Legacy, 0, Anomaly SSS 23.5, 1, True Stalker 1.5, 2)] _MonolithFloraSource("Flora Source Surface (Explicit, 0 Legacy)", Float) = 0
+        [Enum(Disabled, 0, Verified Anomaly SSFX Wind, 1, Verified True Stalker X Ray Wind, 2)] _MonolithFloraWind("Flora Wind Animation (Explicit, 0 Disabled)", Float) = 0
+        [Enum(Branch, 0, Trunk, 1)] _MonolithFloraWindPart("Flora Wind Vertex Shader (tree_branch or tree)", Float) = 0
+        [NoScaleOffset] _MonolithWindWaves("SSFX s_waves (fx wind_wave, Linear)", 2D) = "grey" {}
+        _MonolithWindWavesFlipV("Wind Waves Require V Flip", Float) = 0
         _MonolithFloraWetness("Flora rain_params.y (Explicit Wetness)", Range(0,1)) = 0
         _MonolithFloraFixes1("ssfx_florafixes_1", Vector) = (0.3,0.38,0.5,0.55)
         _MonolithFloraVariation("ssfx_floravariation", Vector) = (0.025,0.1,0.025,0.05)
@@ -282,6 +286,11 @@ Shader "HDRP/MonolithLit"
         #endif
         #if (defined(_MONOLITH_LEVEL) || defined(_MONOLITH_LEVEL_DETAIL) || defined(_MONOLITH_LEVEL_LOD)) && !defined(_REQUIRE_UV3)
         #define _REQUIRE_UV3
+        #endif
+        #define MONOLITH_PREVIOUS_FRAME_TIME (-1048576.0)
+        #if defined(_MONOLITH_LEVEL) && !defined(_MONOLITH_SKINNED_TBN) && !defined(_MONOLITH_LEVEL_DETAIL)
+        #define ATTRIBUTES_NEED_TEXCOORD0
+        #define ATTRIBUTES_NEED_TEXCOORD3
         #endif
     #pragma target 4.5
     #pragma shader_feature_local _DEPTHOFFSET_ON
@@ -569,6 +578,7 @@ Shader "HDRP/MonolithLit"
             #include "Packages/com.unity.render-pipelines.high-definition/Runtime/Material/Lit/ShaderPass/LitMotionVectorPass.hlsl"
             #endif
             #include "MonolithData.hlsl"
+            #define _LastTimeParameters float4(MONOLITH_PREVIOUS_FRAME_TIME, 0.0, 0.0, 0.0)
             #include "Packages/com.unity.render-pipelines.high-definition/Runtime/RenderPipeline/ShaderPass/ShaderPassMotionVectors.hlsl"
             #pragma vertex Vert
             #pragma fragment Frag

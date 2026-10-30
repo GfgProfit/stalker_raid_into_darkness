@@ -118,7 +118,7 @@ namespace XRay.Importer.Editor.Levels
             return plan;
         }
 
-        private static XRayLevelBindingChange Decide(XRayLevelBindingPlan plan, Dictionary<string, string> previous, string property, string current, string legacy, string desired, bool generated)
+        internal static XRayLevelBindingChange Decide(XRayLevelBindingPlan plan, Dictionary<string, string> previous, string property, string current, string legacy, string desired, bool generated)
         {
             XRayLevelBindingChange change;
             if (previous == null && !generated)

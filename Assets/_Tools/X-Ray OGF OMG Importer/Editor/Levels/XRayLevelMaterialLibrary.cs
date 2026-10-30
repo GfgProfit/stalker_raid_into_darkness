@@ -68,6 +68,11 @@ namespace XRay.Importer.Editor.Levels
         private readonly XRayTerrainQuality _terrainQuality;
         private readonly XRayFloraImportMode _floraMode;
         private readonly XRayFloraSourceBinding _floraSource;
+        private bool _windConfigured;
+        private XRayFloraSourceProfile _windProfile;
+        private string _windWavesPath;
+        private bool _windWavesFlipV;
+        private string _windContractHash;
         private readonly HashSet<string> _claimed = new HashSet<string>();
         private readonly Dictionary<string, Material> _cache = new Dictionary<string, Material>();
 
@@ -96,6 +101,7 @@ namespace XRay.Importer.Editor.Levels
 
         public int FloraSourceMaterials { get; private set; }
         public int FloraUserOverrides { get; private set; }
+        public int FloraWindMaterials { get; private set; }
         public int Created { get; private set; }
         public bool Changed { get; private set; }
         public int Reused { get; private set; }
@@ -155,15 +161,18 @@ namespace XRay.Importer.Editor.Levels
                     Configure(material, request);
                     EditorUtility.SetDirty(material);
                     ConfigureFloraBindings(material, request, true);
+                    ConfigureWindBindings(material, request, true);
                 }
                 else if (_sourceBindings && !surface.IsFallback && !surface.IsDecal && !request.Detail)
                 {
                     ConfigureSourceBindings(material, request);
                     ConfigureFloraBindings(material, request, false);
+                    ConfigureWindBindings(material, request, false);
                 }
                 else
                 {
                     ConfigureFloraBindings(material, request, false);
+                    ConfigureWindBindings(material, request, false);
                 }
 
                 if (regenerated)
@@ -187,6 +196,7 @@ namespace XRay.Importer.Editor.Levels
                 Configure(material, request);
                 if (surface.Kind == XRayLevelSurfaceKind.Terrain && !surface.IsFallback) ConfigureTerrainBindings(material, request.Terrain, true);
                 ConfigureFloraBindings(material, request, true);
+                ConfigureWindBindings(material, request, true);
                 AssetDatabase.CreateAsset(material, path);
                 XRayAssetMarker.Write(path, new XRayAssetMarker(key, MATERIAL_ROLE, surface.RuleName, request.ShaderName, string.Empty));
                 Created++;
@@ -233,6 +243,35 @@ namespace XRay.Importer.Editor.Levels
             }
 
             return match;
+        }
+
+        public void ConfigureWind(XRayFloraSourceProfile profile, string wavesPath, bool wavesFlipV, string contractHash)
+        {
+            _windConfigured = true;
+            _windProfile = profile;
+            _windWavesPath = wavesPath;
+            _windWavesFlipV = wavesFlipV;
+            _windContractHash = contractHash;
+        }
+
+        private void ConfigureWindBindings(Material material, XRayLevelMaterialRequest request, bool created)
+        {
+            if (!_windConfigured || !XRayFloraWindBindings.Applies(material, request))
+            {
+                return;
+            }
+
+            XRayLevelBindingPlan plan = XRayFloraWindBindings.Plan(material, request, _windProfile, _windWavesPath, _windWavesFlipV, created);
+            XRayFloraWindBindings.Apply(material, plan, _windProfile != XRayFloraSourceProfile.Unknown ? _windContractHash : string.Empty);
+            if (material.GetFloat(XRayFloraWindBindings.WIND) > 0.5f)
+            {
+                FloraWindMaterials++;
+            }
+
+            if (plan.HasUserOverrides)
+            {
+                _record.Warnings.Add($"Flora wind material '{AssetDatabase.GetAssetPath(material)}' keeps user-authored values: {string.Join(", ", plan.Changes.FindAll(change => change.Ownership == XRayLevelBindingOwnership.UserOverride).ConvertAll(change => change.Property))}.");
+            }
         }
 
         private void ConfigureFloraBindings(Material material, XRayLevelMaterialRequest request, bool created)

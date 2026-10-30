@@ -96,22 +96,29 @@ namespace XRay.Importer.Levels
             }
 
             IReadOnlyList<XRayInstanceBatch> batches = _batchSet.Batches;
+            XRayFloraWindState wind = XRayFloraWindBounds.ActiveState();
             for (int i = 0; i < batches.Count; i++)
             {
                 XRayInstanceBatch batch = batches[i];
-                if (batch.Mesh == null || batch.Count == 0 || batch.Bounds.SqrDistance(eye) > maxDistanceSqr)
+                if (batch.Mesh == null || batch.Count == 0)
                 {
                     continue;
                 }
 
-                bool visible = GeometryUtility.TestPlanesAABB(_planes, batch.Bounds);
+                Bounds bounds = XRayFloraWindBounds.Uses(batch.Materials, wind) ? XRayFloraWindBounds.Expand(batch.Bounds, wind) : batch.Bounds;
+                if (bounds.SqrDistance(eye) > maxDistanceSqr)
+                {
+                    continue;
+                }
+
+                bool visible = GeometryUtility.TestPlanesAABB(_planes, bounds);
                 bool castShadows = _castShadows && batch.CastShadows;
                 if (!visible && !castShadows)
                 {
                     continue;
                 }
 
-                if (!visible && ExperimentalShadowInfluence != null && !ExperimentalShadowInfluence.Intersects(batch.Bounds))
+                if (!visible && ExperimentalShadowInfluence != null && !ExperimentalShadowInfluence.Intersects(bounds))
                 {
                     rejectedShadowBatches++;
                     continue;
@@ -127,7 +134,7 @@ namespace XRay.Importer.Levels
                     shadowOnlyBatches++;
                 }
 
-                if (visible && states != null && batch.HasLods && RenderLodBatch(camera, i, batch, states, castShadows, ref lodShadowOnly, ref lodDiscarded))
+                if (visible && states != null && batch.HasLods && RenderLodBatch(camera, i, batch, bounds, wind, states, castShadows, ref lodShadowOnly, ref lodDiscarded))
                 {
                     continue;
                 }
@@ -144,7 +151,8 @@ namespace XRay.Importer.Levels
                     var parameters = new RenderParams(material)
                     {
                         camera = camera,
-                        worldBounds = batch.Bounds,
+                        worldBounds = bounds,
+                        motionVectorMode = XRayFloraWindBounds.Uses(material, wind) ? MotionVectorGenerationMode.Object : MotionVectorGenerationMode.Camera,
                         layer = gameObject.layer,
                         shadowCastingMode = castShadows ? visible ? ShadowCastingMode.On : ShadowCastingMode.ShadowsOnly : ShadowCastingMode.Off,
                         receiveShadows = true,
@@ -168,7 +176,7 @@ namespace XRay.Importer.Levels
             LastRejectedShadowBatches = rejectedShadowBatches;
         }
 
-        private bool RenderLodBatch(Camera camera, int index, XRayInstanceBatch batch, byte[] states, bool castShadows, ref int lodShadowOnly, ref int lodDiscarded)
+        private bool RenderLodBatch(Camera camera, int index, XRayInstanceBatch batch, Bounds bounds, XRayFloraWindState wind, byte[] states, bool castShadows, ref int lodShadowOnly, ref int lodDiscarded)
         {
             int full = 0;
             for (int instance = 0; instance < batch.Count; instance++)
@@ -195,7 +203,7 @@ namespace XRay.Importer.Levels
             {
                 if (castShadows)
                 {
-                    Submit(camera, batch, _properties[index], batch.Matrices, batch.Count, ShadowCastingMode.ShadowsOnly);
+                    Submit(camera, batch, bounds, wind, _properties[index], batch.Matrices, batch.Count, ShadowCastingMode.ShadowsOnly);
                 }
 
                 return true;
@@ -232,17 +240,17 @@ namespace XRay.Importer.Levels
             }
 
             scratch.ColorBlock.SetVectorArray(_propertyId, scratch.ColorData);
-            Submit(camera, batch, scratch.ColorBlock, scratch.ColorMatrices, colorCount, castShadows ? ShadowCastingMode.On : ShadowCastingMode.Off);
+            Submit(camera, batch, bounds, wind, scratch.ColorBlock, scratch.ColorMatrices, colorCount, castShadows ? ShadowCastingMode.On : ShadowCastingMode.Off);
             if (castShadows)
             {
                 scratch.ShadowBlock.SetVectorArray(_propertyId, scratch.ShadowData);
-                Submit(camera, batch, scratch.ShadowBlock, scratch.ShadowMatrices, shadowCount, ShadowCastingMode.ShadowsOnly);
+                Submit(camera, batch, bounds, wind, scratch.ShadowBlock, scratch.ShadowMatrices, shadowCount, ShadowCastingMode.ShadowsOnly);
             }
 
             return true;
         }
 
-        private void Submit(Camera camera, XRayInstanceBatch batch, MaterialPropertyBlock block, Matrix4x4[] matrices, int count, ShadowCastingMode mode)
+        private void Submit(Camera camera, XRayInstanceBatch batch, Bounds bounds, XRayFloraWindState wind, MaterialPropertyBlock block, Matrix4x4[] matrices, int count, ShadowCastingMode mode)
         {
             int submeshes = Mathf.Min(batch.Mesh.subMeshCount, batch.Materials.Length);
             for (int submesh = 0; submesh < submeshes; submesh++)
@@ -253,7 +261,7 @@ namespace XRay.Importer.Levels
                     continue;
                 }
 
-                var parameters = new RenderParams(material) { camera = camera, worldBounds = batch.Bounds, layer = gameObject.layer, shadowCastingMode = mode, receiveShadows = true, matProps = block };
+                var parameters = new RenderParams(material) { camera = camera, worldBounds = bounds, motionVectorMode = XRayFloraWindBounds.Uses(material, wind) ? MotionVectorGenerationMode.Object : MotionVectorGenerationMode.Camera, layer = gameObject.layer, shadowCastingMode = mode, receiveShadows = true, matProps = block };
                 Graphics.RenderMeshInstanced(parameters, batch.Mesh, submesh, matrices, count);
             }
         }

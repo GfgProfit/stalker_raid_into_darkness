@@ -85,7 +85,12 @@ namespace XRay.Importer.Tests
 
         public XRayLevelImportRequest Request(XRayFloraImportMode mode)
         {
-            var settings = new XRayLevelImportSettings { ImportCollision = false, ImportDetails = false, ImportLights = false, OpenSceneAfterImport = false, CopySourceFiles = true, FloraImportMode = mode };
+            return Request(mode, XRayFloraWindImportMode.Disabled);
+        }
+
+        public XRayLevelImportRequest Request(XRayFloraImportMode mode, XRayFloraWindImportMode wind)
+        {
+            var settings = new XRayLevelImportSettings { ImportCollision = false, ImportDetails = false, ImportLights = false, OpenSceneAfterImport = false, CopySourceFiles = true, FloraImportMode = mode, FloraWindMode = wind };
             return new XRayLevelImportRequest { LevelName = LevelName, Settings = settings, SourcePlan = Plan(), OutputRoot = Root, Identification = "Isolated full-job flora acceptance" };
         }
 
@@ -222,8 +227,11 @@ namespace XRay.Importer.Tests
                 result.AlbedoPath = selectedTextures.Diffuse.VirtualPath;
                 result.CorrectionPath = selectedTextures.BumpCorrection != null && selectedTextures.BumpCorrection.IsResolved ? selectedTextures.BumpCorrection.VirtualPath : null;
             }
-            foreach (string file in trueStalker ? XRayFloraSourceBinding.TrueStalkerFiles : XRayFloraSourceBinding.AnomalyFiles)
+            var contractFiles = new List<string>(trueStalker ? XRayFloraSourceBinding.TrueStalkerFiles : XRayFloraSourceBinding.AnomalyFiles);
+            contractFiles.AddRange(trueStalker ? XRayFloraSourceBinding.TrueStalkerWindFiles : XRayFloraSourceBinding.AnomalyWindFiles);
+            foreach (string file in contractFiles)
             {
+                if (result.Files.ContainsKey(file)) continue;
                 if (!effective.Exists(file)) continue;
                 result.Files[file] = effective.ReadAllBytes(file);
                 result.Provenance.Add(Csv(file) + "," + Csv(effective.Resolve(file).Location) + "," + Hash(result.Files[file]) + "," + Csv(file) + "," + Hash(result.Files[file]) + ",ExactSourceBytes");

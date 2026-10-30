@@ -67,6 +67,7 @@ namespace XRay.Importer.Editor.Levels
             new VertexAttributeDescriptor(VertexAttribute.TexCoord3, VertexAttributeFormat.Float32, 2)
         };
 
+        public const string TREE_WIND_LAYOUT_DESCRIPTION = "Tree meshes imported with source flora wind: TEXCOORD3 Float32x2 = (WindFactor = tc.z short / 2048, 1 = wind data present); tree vertex formats carry no lightmap uv.";
         public const string LAYOUT_DESCRIPTION = "POSITION Float32x3 (X-Ray world/local, identity axes); NORMAL Float32x3 (N = NORMAL.bgr*2-1); TANGENT Float16x4 (normalized T, w = sign(dot(cross(N,T), -B))); COLOR UNorm8x4 (exact T bytes, rgb = T.xyz); TEXCOORD0 Float32x2 (u, 1-v) with T.w/B.w correction; TEXCOORD1 UNorm16x2 (exact B.x, B.y bytes); TEXCOORD2 UNorm16x2 (exact B.z byte, NORMAL.w hemi byte); TEXCOORD3 Float32x2 (lightmap uv = short/32768, D3D orientation)";
 
         private readonly XRayLevelData _level;
@@ -77,6 +78,8 @@ namespace XRay.Importer.Editor.Levels
             _level = level;
             _geometry = geometry;
         }
+
+        public bool TreeWindFactor { get; set; }
 
         public XRayLevelGeometrySlice ReadSlice(XRayLevelVisual visual)
         {
@@ -152,7 +155,7 @@ namespace XRay.Importer.Editor.Levels
                     {
                         for (int v = 0; v < slice.VertexCount; v++)
                         {
-                            XRayLevelMeshVertex vertex = Convert(slice.Vertices, v);
+                            XRayLevelMeshVertex vertex = Convert(slice.Vertices, v, TreeWindFactor);
                             vertices[vertexBase + v] = vertex;
                             groupMin = Vector3.Min(groupMin, vertex.Position);
                             groupMax = Vector3.Max(groupMax, vertex.Position);
@@ -210,6 +213,11 @@ namespace XRay.Importer.Editor.Levels
 
         public static XRayLevelMeshVertex Convert(XRayLevelVertexBlock block, int v)
         {
+            return Convert(block, v, false);
+        }
+
+        public static XRayLevelMeshVertex Convert(XRayLevelVertexBlock block, int v, bool treeWindFactor)
+        {
             int p = v * 3;
             int c = v * 4;
             Vector3 normal = Decode(block.Normals, c);
@@ -220,7 +228,7 @@ namespace XRay.Importer.Editor.Levels
             var position = new Vector3(block.Positions[p], block.Positions[p + 1], block.Positions[p + 2]);
             var color = new Color32(block.Tangents[c + 2], block.Tangents[c + 1], block.Tangents[c], 255);
             var uv = new Vector2(block.Uv[v * 2], 1.0f - block.Uv[v * 2 + 1]);
-            Vector2 lightmap = block.HasLightmap ? new Vector2(block.Lightmap[v * 2], block.Lightmap[v * 2 + 1]) : Vector2.zero;
+            Vector2 lightmap = block.HasLightmap ? new Vector2(block.Lightmap[v * 2], block.Lightmap[v * 2 + 1]) : treeWindFactor && block.Kind == XRayLevelVertexKind.Tree ? new Vector2(block.WindFactor[v], 1.0f) : Vector2.zero;
             return new XRayLevelMeshVertex(position, normal, new Vector4(unitTangent.x, unitTangent.y, unitTangent.z, sign), color, uv, (ushort)(block.Binormals[c + 2] * 257), (ushort)(block.Binormals[c + 1] * 257), (ushort)(block.Binormals[c] * 257), (ushort)(block.Normals[c + 3] * 257), lightmap);
         }
 

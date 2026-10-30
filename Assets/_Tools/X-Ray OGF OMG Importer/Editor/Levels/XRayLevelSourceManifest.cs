@@ -128,6 +128,8 @@ namespace XRay.Importer.Editor.Levels
         [SerializeField] private string _terrainBrdfHash;
         [SerializeField] private string _floraProfile;
         [SerializeField] private string _floraContractHash;
+        [SerializeField] private string _floraWindProfile;
+        [SerializeField] private string _floraWindContractHash;
         [SerializeField] private bool _levelRegistered;
         [SerializeField] private List<string> _modOrder = new List<string>();
         [SerializeField] private List<XRayLevelSourceFile> _files = new List<XRayLevelSourceFile>();
@@ -168,6 +170,16 @@ namespace XRay.Importer.Editor.Levels
         {
             get => _floraContractHash;
             set => _floraContractHash = value;
+        }
+        public string FloraWindProfile
+        {
+            get => _floraWindProfile;
+            set => _floraWindProfile = value;
+        }
+        public string FloraWindContractHash
+        {
+            get => _floraWindContractHash;
+            set => _floraWindContractHash = value;
         }
 
         public string SourceFolder

@@ -30,6 +30,13 @@ namespace XRay.Importer.Editor.Levels
         [InspectorName("Enable Verified True Stalker Flora")] EnableVerifiedTrueStalker
     }
 
+    public enum XRayFloraWindImportMode
+    {
+        [InspectorName("Disabled / Static Legacy Trees")] Disabled,
+        [InspectorName("Enable Verified Anomaly SSFX Wind")] EnableVerifiedAnomaly,
+        [InspectorName("Enable Verified True Stalker X-Ray Wind")] EnableVerifiedTrueStalker
+    }
+
     public enum XRayTerrainQuality
     {
         [InspectorName("HQ")] High,
@@ -54,6 +61,7 @@ namespace XRay.Importer.Editor.Levels
         [SerializeField] private XRayTerrainImportMode _terrainImportMode;
         [SerializeField] private XRayTerrainQuality _terrainQuality;
         [SerializeField] private XRayFloraImportMode _floraImportMode;
+        [SerializeField] private XRayFloraWindImportMode _floraWindMode;
         [SerializeField] private bool _openSceneAfterImport = true;
         [SerializeField] private bool _copySourceFiles = true;
         [SerializeField] private bool _autoImportDroppedLevels = true;
@@ -140,6 +148,12 @@ namespace XRay.Importer.Editor.Levels
         {
             get => _floraImportMode;
             set => _floraImportMode = value;
+        }
+
+        public XRayFloraWindImportMode FloraWindMode
+        {
+            get => _floraWindMode;
+            set => _floraWindMode = value;
         }
 
         public bool OpenSceneAfterImport

@@ -55,15 +55,27 @@ AttributesMesh ApplyMeshModification(AttributesMesh input, float3 timeParameters
     input.positionOS += mul((float3x3)GetWorldToObjectMatrix(), float3(offset.x, 0.0, offset.y));
     return input;
 }
-#elif defined(_MONOLITH_LEVEL) && defined(ATTRIBUTES_NEED_COLOR) && defined(ATTRIBUTES_NEED_TEXCOORD3)
+#elif defined(_MONOLITH_LEVEL) && defined(ATTRIBUTES_NEED_TEXCOORD0) && defined(ATTRIBUTES_NEED_TEXCOORD3)
 #define HAVE_MESH_MODIFICATION
+#include "MonolithFloraWind.hlsl"
 
 AttributesMesh ApplyMeshModification(AttributesMesh input, float3 timeParameters)
 {
+#if defined(ATTRIBUTES_NEED_COLOR)
     if ((_MonolithSourceProfile > 0.5 && _MonolithSourceTerrain > 0.5 && _MonolithLevelTerrain > 0.5 && _MonolithTerrainSource > 0.5 && _MonolithTerrainSource < 1.5 && _MonolithHasTerrainSourceColor > 0.5) || MonolithTrueStalkerTerrainEnabled())
     {
         input.color.a = input.normalOS.x;
         input.uv3 = input.normalOS.yz;
+        return input;
+    }
+#endif
+    if (MonolithFloraWindEnabled(_MonolithFloraWind, input.uv3.y))
+    {
+        bool previous = timeParameters.x == MONOLITH_PREVIOUS_FRAME_TIME;
+        float3 positionAWS = GetAbsolutePositionWS(TransformObjectToWorld(input.positionOS));
+        float baseHeight = GetAbsolutePositionWS(GetObjectToWorldMatrix()._m03_m13_m23).y;
+        float3 offset = MonolithFloraWindOffset(_MonolithFloraWind, _MonolithFloraWindPart, SHADERPASS == SHADERPASS_SHADOWS, previous, positionAWS, baseHeight, 1.0 - input.uv0.y, input.uv3.x);
+        input.positionOS += mul((float3x3)GetWorldToObjectMatrix(), offset);
     }
     return input;
 }

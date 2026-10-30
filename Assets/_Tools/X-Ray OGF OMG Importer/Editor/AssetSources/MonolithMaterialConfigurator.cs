@@ -8,6 +8,9 @@ namespace XRay.Importer.Editor
     public static class MonolithMaterialConfigurator
     {
         public const string SHADER_NAME = "HDRP/MonolithLit";
+        public const float FLORA_SOURCE_LEGACY = 0.0f;
+        public const float FLORA_SOURCE_ANOMALY = 1.0f;
+        public const float FLORA_SOURCE_TRUE_STALKER = 2.0f;
 
         public static void Configure(Material material, XRayTextureDescription description, Texture2D albedo, Texture2D bump, Texture2D correction, bool flipGreen)
         {
@@ -49,6 +52,21 @@ namespace XRay.Importer.Editor
             material.DisableKeyword("_NORMALMAP");
             material.renderQueue = 2000;
             EditorUtility.SetDirty(material);
+        }
+
+        public static bool ConfigureFloraSource(Material material, float source, Texture2D correction)
+        {
+            bool flora = material.IsKeywordEnabled("_MONOLITH_LEVEL_FLORA") && material.GetTexture("_MonolithBump") != null && material.GetFloat("_MonolithHasBump") > 0.5f;
+            bool enabled = flora && (source == FLORA_SOURCE_ANOMALY || (source == FLORA_SOURCE_TRUE_STALKER && correction != null));
+            if (enabled && source == FLORA_SOURCE_TRUE_STALKER)
+            {
+                material.SetTexture("_MonolithBumpCorrection", correction);
+                material.SetFloat("_MonolithHasBumpCorrection", 1.0f);
+            }
+
+            material.SetFloat("_MonolithFloraSource", enabled ? source : FLORA_SOURCE_LEGACY);
+            EditorUtility.SetDirty(material);
+            return enabled;
         }
 
         public static Levels.XRayLevelBindingPlan ConfigureSourceBindings(Material material, Levels.XRayLevelSourceBinding binding)

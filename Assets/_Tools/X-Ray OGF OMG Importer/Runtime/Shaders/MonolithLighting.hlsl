@@ -43,9 +43,15 @@ CBSDF MonolithEvaluateBSDF(float3 V, float3 L, PreLightData preLightData, BSDFDa
     {
         float3 sourceColor = _MonolithCurrentSourceLightActive > 0.5 ? _MonolithCurrentSourceLight : _MonolithSourceLight.rgb;
         MonolithSourceDirect(bsdfData.normalWS, V, L, _MonolithSourceAlbedoGloss.rgb, _MonolithSourceAlbedoGloss.a, _MonolithSourceRawMaterial, MonolithDynamicGlossInput(), sourceColor, MonolithLightSetupInput(), MonolithSunColorInput(), MonolithFloraFixesInput(), _MonolithSourceLocalLight, data.diffR, data.specR);
+        if (_MonolithDebug > 87.5 && _MonolithDebug < 88.5)
+        {
+            data.diffR = MonolithSourceFlora(MonolithSourceMaterial(_MonolithSourceRawMaterial), 0.04) ? MonolithFloraSubsurface(normalize(bsdfData.normalWS), V, L, MonolithSunColorInput(), MonolithFloraFixesInput()) : 0.0;
+            data.specR = 0.0;
+        }
         return data;
     }
     float3 N = bsdfData.normalWS;
+    if (_MonolithFloraSourceActive > 1.5 && _MonolithSourceLocalLight > 1.5) N = L;
     float3 H = SafeNormalize(V + L);
     float dotNV = dot(N, V);
     float nv = max(1e-5, dotNV);
@@ -259,7 +265,8 @@ void PostEvaluateBSDF(LightLoopContext lightLoopContext, float3 V, PositionInput
             diagnostic = normalData.normalWS * 0.5 + 0.5;
         }
         if (_MonolithDebug > 68.5 && _MonolithDebug < 69.5) diagnostic = _MonolithDiagnosticValue;
-        if (_MonolithDebug > 69.5 && _MonolithDebug < 84.5) diagnostic = _MonolithDiagnosticValue;
+        if (_MonolithDebug > 69.5 && _MonolithDebug < 87.5) diagnostic = _MonolithDiagnosticValue;
+        if (_MonolithDebug > 87.5 && _MonolithDebug < 88.5) diagnostic = bsdfData.diffuseColor * lighting.direct.diffuse;
         lightLoopOutput.diffuseLighting = diagnostic * GetInverseCurrentExposureMultiplier();
         lightLoopOutput.specularLighting = 0.0;
     }

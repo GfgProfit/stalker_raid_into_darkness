@@ -187,6 +187,7 @@ void GetSurfaceAndBuiltinData(FragInputs input, float3 V, inout PositionInputs p
     if (_MonolithDebug > 68.5 && _MonolithDebug < 69.5) _MonolithDiagnosticValue = 0.0;
 
     _MonolithTrueStalkerActive = 0.0;
+    _MonolithFloraSourceActive = 0.0;
     MonolithLegacyGetSurfaceAndBuiltinData(input, V, posInput, surfaceData, builtinData);
     float2 uv = input.texCoord0.xy * _BaseColorMap_ST.xy + _BaseColorMap_ST.zw;
     #ifdef MONOLITH_SOURCE_TEXTURE
@@ -265,6 +266,18 @@ void GetSurfaceAndBuiltinData(FragInputs input, float3 V, inout PositionInputs p
     if (sourceTerrainActive || trueStalkerTerrain) encodedAlbedo = baseSample.rgb;
     #endif
     encodedAlbedo = saturate(encodedAlbedo * _BaseColor.rgb);
+    #ifdef _MONOLITH_LEVEL_FLORA
+    float floraSource = MonolithFloraSourceMode(_MonolithFloraSource, _MonolithHasBump, _MonolithHasBumpCorrection);
+    float floraVariation = 0.0;
+    _MonolithFloraSourceActive = floraSource;
+    if (floraSource > 0.5 && floraSource < 1.5)
+    {
+        float4x4 floraObjectToWorld = GetObjectToWorldMatrix();
+        floraVariation = MonolithAnomalyTreeVariation(GetAbsolutePositionWS(floraObjectToWorld._m03_m13_m23), floraObjectToWorld._m00, _MonolithFloraVariation.w);
+        encodedAlbedo = MonolithFloraColorVariation(encodedAlbedo, floraVariation, _MonolithFloraVariation.z);
+    }
+    if (floraSource > 0.5) encodedAlbedo = MonolithFloraUnorm8(encodedAlbedo);
+    #endif
     #ifdef MONOLITH_SOURCE_TEXTURE
     float sourceDetailGloss = 1.0;
     if (sourceSteep)
@@ -358,7 +371,7 @@ void GetSurfaceAndBuiltinData(FragInputs input, float3 V, inout PositionInputs p
     _MonolithLevelHemiValue = saturate(lodNormal.a * input.texCoord3.x);
     #endif
     #ifdef _MONOLITH_LEVEL_FLORA
-    gloss = MonolithFloraGloss(packed.r, _MonolithGlossScale);
+    gloss = floraSource > 1.5 ? MonolithTrueStalkerFloraGloss(packed) : floraSource > 0.5 ? MonolithAnomalyFloraGloss(_MonolithFloraFixes1, _MonolithFloraWetness, false) : MonolithFloraGloss(packed.r, _MonolithGlossScale);
     #endif
     #ifdef MONOLITH_SOURCE_TERRAIN
     if (!trueStalkerTerrain && (_MonolithDebug < 0.5 || _MonolithDiagnosticOptions.x < 0.5))
@@ -375,6 +388,9 @@ void GetSurfaceAndBuiltinData(FragInputs input, float3 V, inout PositionInputs p
     #ifdef MONOLITH_SOURCE_TERRAIN
     if (sourceTerrain) material = 22.0 / 31.0 * 1.333333333;
     if (trueStalkerTerrain) material = 0.95;
+    #endif
+    #ifdef _MONOLITH_LEVEL_FLORA
+    if (floraSource > 0.5) material = MonolithFloraMaterial();
     #endif
     _MonolithSourceAlbedoGloss = float4(encodedAlbedo, gloss);
     _MonolithSourceRawMaterial = material;
@@ -444,10 +460,15 @@ void GetSurfaceAndBuiltinData(FragInputs input, float3 V, inout PositionInputs p
     #ifdef _MONOLITH_LEVEL_FLORA
     {
         float3 floraNormal = MonolithFloraNormal(packed.ab);
+        if (floraSource > 1.5) floraNormal = MonolithTrueStalkerFloraNormal(packed, SAMPLE_TEXTURE2D(_MonolithBumpCorrection, sampler_MonolithBump, bumpUv), _MonolithFloraWetness, 0.02);
+        else if (floraSource > 0.5) floraNormal = MonolithAnomalyFloraNormal(packed, _MonolithFloraWetness);
         surfaceData.normalWS = floraNormal;
         surfaceData.geomNormalWS = floraNormal;
         surfaceData.tangentWS = Orthonormalize(abs(floraNormal.x) < 0.99 ? float3(1.0, 0.0, 0.0) : float3(0.0, 0.0, 1.0), floraNormal);
-        _MonolithLevelHemiValue = saturate(_MonolithLevelHemiValue);
+        _MonolithLevelHemiValue = floraSource > 0.5 ? MonolithFloraPackedHemisphere(clamp(_MonolithLevelHemiValue, 0.3, 1.0)) : saturate(_MonolithLevelHemiValue);
+        if (_MonolithDebug > 84.5 && _MonolithDebug < 85.5) _MonolithDiagnosticValue = float3(baseSample.a * _BaseColor.a, baseSample.a * _BaseColor.a >= _AlphaCutoff ? 1.0 : 0.0, floraSource * 0.5);
+        if (_MonolithDebug > 85.5 && _MonolithDebug < 86.5) _MonolithDiagnosticValue = float3(floraVariation, _MonolithLevelHemiValue, material);
+        if (_MonolithDebug > 86.5 && _MonolithDebug < 87.5) _MonolithDiagnosticValue = float3(gloss, encodedAlbedo.g, floraSource > 0.5 ? 1.0 : 0.0);
     }
     #endif
     #ifdef _MONOLITH_LEVEL_DETAIL

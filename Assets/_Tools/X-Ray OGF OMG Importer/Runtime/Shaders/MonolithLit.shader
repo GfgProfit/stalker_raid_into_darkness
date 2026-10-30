@@ -38,6 +38,10 @@ Shader "HDRP/MonolithLit"
         _MonolithSunColor("Source L_sun_color (Flora SSS)", Vector) = (1,1,1,0)
         _MonolithFloraFixes2("ssfx_florafixes_2", Vector) = (1.5,1,0,0)
         _MonolithFloraSubsurface("Flora Subsurface Mask", Range(0,1)) = 1
+        [Enum(Legacy, 0, Anomaly SSS 23.5, 1, True Stalker 1.5, 2)] _MonolithFloraSource("Flora Source Surface (Explicit, 0 Legacy)", Float) = 0
+        _MonolithFloraWetness("Flora rain_params.y (Explicit Wetness)", Range(0,1)) = 0
+        _MonolithFloraFixes1("ssfx_florafixes_1", Vector) = (0.3,0.38,0.5,0.55)
+        _MonolithFloraVariation("ssfx_floravariation", Vector) = (0.025,0.1,0.025,0.05)
         _MonolithSourceDetail("Source Detail (Profile 1): 0 Off 1 USE_TDETAIL 2 USE_TDETAIL_BUMP", Float) = 0
         _MonolithSourceParallax("Source Parallax (Profile 1): 0 Off 1 USE_PARALLAX 2 USE_STEEPPARALLAX", Float) = 0
         [Toggle] _MonolithSourceVirtualHeight("Source def_virtualh Lighting Position (Profile 1)", Float) = 0
@@ -342,6 +346,7 @@ Shader "HDRP/MonolithLit"
     #include "MonolithProperties.hlsl"
     #include "MonolithLightInputs.hlsl"
     #include "MonolithMaterial.hlsl"
+    #include "MonolithFlora.hlsl"
     #include "MonolithTrueStalkerTerrain.hlsl"
     #include "MonolithSourceTexture.hlsl"
     #include "MonolithEnvironment.hlsl"

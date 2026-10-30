@@ -35,11 +35,13 @@ namespace XRay.Importer.Editor.Levels
         private readonly HashSet<string> _folders = new HashSet<string>();
         private readonly Dictionary<string, XRayLevelTextureSet> _sets = new Dictionary<string, XRayLevelTextureSet>(StringComparer.OrdinalIgnoreCase);
         private readonly Dictionary<string, XRayTextureAssetResult> _packed = new Dictionary<string, XRayTextureAssetResult>(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<string, XRayTextureAssetResult> _authored = new Dictionary<string, XRayTextureAssetResult>(StringComparer.OrdinalIgnoreCase);
         private readonly List<string> _requested = new List<string>();
         private readonly Dictionary<string, Vector2> _terrainSamplerAssets = new Dictionary<string, Vector2>();
 
         private XRayTerrainSourceParameters _terrainParameters;
         private bool _sourceTerrainSampler;
+        private Vector2? _floraSampler;
 
         public XRayLevelTextureLibrary(XRayAssetIndex index, string levelName, XRayLevelImportRecord record, bool flipNormalGreen) : this(index, levelName, record, flipNormalGreen, false)
         {
@@ -110,6 +112,50 @@ namespace XRay.Importer.Editor.Levels
             }
 
             return set;
+        }
+
+        public XRayLevelFloraTextures RequestFlora(XRayLevelTextureSet set, XRayFloraSourceBinding source)
+        {
+            var flora = new XRayLevelFloraTextures { Profile = source?.Profile ?? XRayFloraSourceProfile.Unknown };
+            if (set?.Resolution?.Diffuse == null || flora.Profile == XRayFloraSourceProfile.Unknown)
+            {
+                return flora;
+            }
+
+            if (flora.Profile == XRayFloraSourceProfile.TrueStalker)
+            {
+                flora.CorrectionPath = set.CorrectionPath;
+                return flora;
+            }
+
+            if (_floraSampler == null)
+            {
+                XRayTerrainSourceParameters parameters = XRayTerrainSourceParameters.FromSource(_record.Source);
+                _floraSampler = new Vector2(parameters?.Anisotropy ?? 16.0f, parameters?.MipBias ?? -0.5f);
+            }
+
+            XRayResolvedFile diffuse = set.Resolution.Diffuse;
+            string authoredKey = XRayVirtualPath.Normalize(diffuse.VirtualPath);
+            if (_authored.TryGetValue(authoredKey, out XRayTextureAssetResult cached))
+            {
+                flora.AuthoredAlbedoPath = cached.Status == XRayResourceStatus.Skipped || cached.Status == XRayResourceStatus.Unsupported ? null : cached.AssetPath;
+                flora.AuthoredNote = cached.Note;
+                return flora;
+            }
+
+            XRayTextureAssetResult result = _importer.ImportAuthoredMips(diffuse, PrepareFolder(diffuse.VirtualPath), (int)_floraSampler.Value.x, _floraSampler.Value.y);
+            _authored[authoredKey] = result;
+            if (result.Status == XRayResourceStatus.Skipped || result.Status == XRayResourceStatus.Unsupported)
+            {
+                _record.AddDependency(XRayLevelDependencyCategory.Materials, "Flora authored albedo mips", diffuse.DisplayPath, diffuse.IsResolved ? diffuse.Winner.Location : null, diffuse.VirtualPath, XRayLevelDependencyStatus.Described, "Legacy albedo keeps the source mip chain or the format has no authored-mip path", null, result.Note);
+                flora.AuthoredNote = result.Note;
+                return flora;
+            }
+
+            Track(XRayLevelDependencyCategory.Materials, "Flora authored albedo mips", diffuse, result, "s_base with the authored DDS mip chain, encoded UNorm sampling, smp_base anisotropy and mip bias");
+            flora.AuthoredAlbedoPath = result.AssetPath;
+            flora.AuthoredNote = result.Note;
+            return flora;
         }
 
         public string FindPacked(XRayResolvedFile file, out bool upToDate)

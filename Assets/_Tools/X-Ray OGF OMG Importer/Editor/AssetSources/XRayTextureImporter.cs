@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Experimental.Rendering;
 using XRay.Importer.Sources;
 using XRay.Importer.Sources.Dds;
 using XRay.Importer.Sources.Textures;
@@ -22,6 +23,8 @@ namespace XRay.Importer.Editor
         public const string ALBEDO_KEY_SUFFIX = "#albedo";
         public const string NORMAL_KEY_SUFFIX = "#normal";
         public const string NORMAL_NAME_SUFFIX = "_normal";
+        public const string AUTHORED_KEY_SUFFIX = "#authored";
+        public const string AUTHORED_NAME_SUFFIX = "_authored";
 
         private readonly XRayImportOptions _options;
         private readonly bool _forceUpdate;
@@ -190,6 +193,83 @@ namespace XRay.Importer.Editor
             }
 
             return Store(marker, file.Winner.RelativePath, "_packed", ".png", folder, XRayTextureRole.Packed, header.Description, () => EncodePng(DdsDecoder.DecodeTopLevel(source, header), header.Width, header.Height, true), "Packed mip0 converted losslessly to PNG; Unity generates remaining mips.");
+        }
+
+        public XRayTextureAssetResult ImportAuthoredMips(XRayResolvedFile file, string folder, int anisotropy, float mipBias)
+        {
+            if (file == null || !file.IsResolved)
+            {
+                return new XRayTextureAssetResult { Status = XRayResourceStatus.Missing };
+            }
+
+            byte[] source;
+            DdsHeader header;
+            try
+            {
+                source = file.Winner.ReadAllBytes();
+                header = DdsHeader.Parse(source);
+            }
+            catch (Exception exception) when (exception is IOException || exception is FormatException || exception is XRaySourceException)
+            {
+                return new XRayTextureAssetResult { Status = XRayResourceStatus.Unsupported, Note = $"Cannot read '{file.Winner.Location}': {exception.Message}" };
+            }
+
+            if (IsUnityNative(header) && HasExactPayload(source, header))
+            {
+                return new XRayTextureAssetResult { Status = XRayResourceStatus.Skipped, Format = header.Description, Note = "The DDS is imported natively with its own mip chain; the albedo texture already keeps the authored mips." };
+            }
+
+            if (!DdsMipChain.TryReadFlipped(source, header, out List<byte[]> levels, out string reason))
+            {
+                return new XRayTextureAssetResult { Status = XRayResourceStatus.Unsupported, Format = header.Description, Note = "Authored mip chain cannot be preserved: " + reason };
+            }
+
+            var marker = new XRayAssetMarker(file.VirtualPath + AUTHORED_KEY_SUFFIX + ContentQualifier(source), XRayTextureRole.Albedo.ToString(), file.Winner.SourceName, file.Winner.Location, file.Winner.Stamp);
+            string assetPath = XRayAssetNaming.Place(folder, XRayAssetNaming.CreateCandidates(file.Winner.RelativePath, AUTHORED_NAME_SUFFIX), ".asset", marker.Key, XRayAssetMarker.ReadKey, _claimed);
+            string note = $"Authored {levels.Count}-level {header.Description} mip chain kept block-exact (vertical block flip, no recompression, UNorm sampling of the encoded values).";
+            var existing = AssetDatabase.LoadAssetAtPath<Texture2D>(assetPath);
+            if (existing != null)
+            {
+                XRayAssetMarker previous = XRayAssetMarker.ReadEffective(assetPath);
+                bool sameSource = previous != null && previous.Stamp == marker.Stamp && previous.SourcePath == marker.SourcePath;
+                if (sameSource || !_options.OverwriteExistingTextures && !_forceUpdate)
+                {
+                    return new XRayTextureAssetResult { AssetPath = assetPath, Status = XRayResourceStatus.Reused, Format = header.Description, Note = sameSource ? note : $"Source changed ({previous?.Source ?? "unknown"} -> {marker.Source}); kept the existing authored texture because 'Overwrite Existing Textures' is off." };
+                }
+            }
+
+            GraphicsFormat format = header.Format == DdsFormat.BC1 ? GraphicsFormat.RGBA_DXT1_UNorm : header.Format == DdsFormat.BC2 ? GraphicsFormat.RGBA_DXT3_UNorm : GraphicsFormat.RGBA_DXT5_UNorm;
+            var texture = new Texture2D(header.Width, header.Height, format, levels.Count, TextureCreationFlags.None) { name = Path.GetFileNameWithoutExtension(assetPath), filterMode = FilterMode.Trilinear, anisoLevel = anisotropy, mipMapBias = mipBias, wrapMode = TextureWrapMode.Repeat };
+            for (int mip = 0; mip < levels.Count; mip++)
+            {
+                texture.SetPixelData(levels[mip], mip);
+            }
+
+            texture.Apply(false, false);
+            Directory.CreateDirectory(folder);
+            if (existing != null)
+            {
+                EditorUtility.CopySerialized(texture, existing);
+                UnityEngine.Object.DestroyImmediate(texture);
+                texture = existing;
+                EditorUtility.SetDirty(existing);
+            }
+            else
+            {
+                AssetDatabase.CreateAsset(texture, assetPath);
+            }
+
+            var serialized = new SerializedObject(texture);
+            SerializedProperty readable = serialized.FindProperty("m_IsReadable");
+            if (readable != null && readable.boolValue)
+            {
+                readable.boolValue = false;
+                serialized.ApplyModifiedPropertiesWithoutUndo();
+            }
+
+            AssetDatabase.SaveAssetIfDirty(texture);
+            XRayAssetMarker.Write(assetPath, marker);
+            return new XRayTextureAssetResult { AssetPath = assetPath, Status = existing != null ? XRayResourceStatus.Updated : XRayResourceStatus.Imported, Format = header.Description, Note = note };
         }
 
         public string FindPacked(XRayResolvedFile file, string folder, out bool upToDate)

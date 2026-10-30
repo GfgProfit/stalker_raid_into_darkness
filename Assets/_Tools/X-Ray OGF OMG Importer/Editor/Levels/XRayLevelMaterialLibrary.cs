@@ -22,6 +22,7 @@ namespace XRay.Importer.Editor.Levels
         public string LightmapLabel { get; set; }
         public bool Detail { get; set; }
         public XRayLevelTerrainTextures Terrain { get; set; }
+        public XRayLevelFloraTextures Flora { get; set; }
     }
 
     public sealed class XRayLevelTerrainTextures
@@ -65,6 +66,8 @@ namespace XRay.Importer.Editor.Levels
         private readonly bool _sourceBindings;
         private readonly XRayTerrainImportMode _terrainMode;
         private readonly XRayTerrainQuality _terrainQuality;
+        private readonly XRayFloraImportMode _floraMode;
+        private readonly XRayFloraSourceBinding _floraSource;
         private readonly HashSet<string> _claimed = new HashSet<string>();
         private readonly Dictionary<string, Material> _cache = new Dictionary<string, Material>();
 
@@ -76,15 +79,23 @@ namespace XRay.Importer.Editor.Levels
         {
         }
 
-        public XRayLevelMaterialLibrary(XRayLevelImportRecord record, XRayLevelMaterialUpdateMode updateMode, bool sourceBindings, XRayTerrainImportMode terrainMode, XRayTerrainQuality terrainQuality = XRayTerrainQuality.High)
+        public XRayLevelMaterialLibrary(XRayLevelImportRecord record, XRayLevelMaterialUpdateMode updateMode, bool sourceBindings, XRayTerrainImportMode terrainMode, XRayTerrainQuality terrainQuality = XRayTerrainQuality.High) : this(record, updateMode, sourceBindings, terrainMode, terrainQuality, XRayFloraImportMode.Preserve, null)
+        {
+        }
+
+        public XRayLevelMaterialLibrary(XRayLevelImportRecord record, XRayLevelMaterialUpdateMode updateMode, bool sourceBindings, XRayTerrainImportMode terrainMode, XRayTerrainQuality terrainQuality, XRayFloraImportMode floraMode, XRayFloraSourceBinding floraSource)
         {
             _record = record;
             _updateMode = updateMode;
             _sourceBindings = sourceBindings;
             _terrainMode = terrainMode;
             _terrainQuality = terrainQuality;
+            _floraMode = floraMode;
+            _floraSource = floraSource;
         }
 
+        public int FloraSourceMaterials { get; private set; }
+        public int FloraUserOverrides { get; private set; }
         public int Created { get; private set; }
         public bool Changed { get; private set; }
         public int Reused { get; private set; }
@@ -143,10 +154,16 @@ namespace XRay.Importer.Editor.Levels
                 {
                     Configure(material, request);
                     EditorUtility.SetDirty(material);
+                    ConfigureFloraBindings(material, request, true);
                 }
                 else if (_sourceBindings && !surface.IsFallback && !surface.IsDecal && !request.Detail)
                 {
                     ConfigureSourceBindings(material, request);
+                    ConfigureFloraBindings(material, request, false);
+                }
+                else
+                {
+                    ConfigureFloraBindings(material, request, false);
                 }
 
                 if (regenerated)
@@ -169,6 +186,7 @@ namespace XRay.Importer.Editor.Levels
                 material = new Material(shader) { name = Path.GetFileNameWithoutExtension(path) };
                 Configure(material, request);
                 if (surface.Kind == XRayLevelSurfaceKind.Terrain && !surface.IsFallback) ConfigureTerrainBindings(material, request.Terrain, true);
+                ConfigureFloraBindings(material, request, true);
                 AssetDatabase.CreateAsset(material, path);
                 XRayAssetMarker.Write(path, new XRayAssetMarker(key, MATERIAL_ROLE, surface.RuleName, request.ShaderName, string.Empty));
                 Created++;
@@ -215,6 +233,28 @@ namespace XRay.Importer.Editor.Levels
             }
 
             return match;
+        }
+
+        private void ConfigureFloraBindings(Material material, XRayLevelMaterialRequest request, bool created)
+        {
+            if (_floraMode == XRayFloraImportMode.Preserve || !XRayFloraMaterialBindings.Applies(material, request))
+            {
+                return;
+            }
+
+            XRayFloraSourceProfile profile = _floraSource?.Profile ?? XRayFloraSourceProfile.Unknown;
+            XRayLevelBindingPlan plan = XRayFloraMaterialBindings.Plan(material, request, _floraMode, profile, created);
+            XRayFloraMaterialBindings.Apply(material, plan, _floraSource?.ContractHash);
+            if (material.GetFloat(XRayFloraMaterialBindings.FLORA_SOURCE) > 0.5f)
+            {
+                FloraSourceMaterials++;
+            }
+
+            if (plan.HasUserOverrides)
+            {
+                FloraUserOverrides++;
+                _record.Warnings.Add($"Flora material '{AssetDatabase.GetAssetPath(material)}' keeps user-authored values: {string.Join(", ", plan.Changes.FindAll(change => change.Ownership == XRayLevelBindingOwnership.UserOverride).ConvertAll(change => change.Property))}.");
+            }
         }
 
         private void ConfigureTerrainBindings(Material material, XRayLevelTerrainTextures terrain, bool created)

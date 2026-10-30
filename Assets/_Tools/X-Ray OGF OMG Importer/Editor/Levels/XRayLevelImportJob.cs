@@ -70,6 +70,7 @@ namespace XRay.Importer.Editor.Levels
         private readonly Dictionary<int, XRayLevelSurface> _surfaces = new Dictionary<int, XRayLevelSurface>();
         private readonly XRayLevelSceneContent _content = new XRayLevelSceneContent();
         private readonly Dictionary<int, XRayLevelTerrainTextures> _terrain = new Dictionary<int, XRayLevelTerrainTextures>();
+        private XRayFloraSourceBinding _floraSource;
         private XRayLevelTextureSet _lodAlbedo;
         private string _lodNormalPath;
         private string _lodShader;
@@ -807,6 +808,22 @@ namespace XRay.Importer.Editor.Levels
             RequestLodTextures();
         }
 
+        private void ResolveFloraSource()
+        {
+            _floraSource = XRayFloraSourceBinding.Resolve(_textures.Resolver);
+            _record.Source.FloraProfile = _floraSource.Profile.ToString();
+            _record.Source.FloraContractHash = _floraSource.Profile != XRayFloraSourceProfile.Unknown ? _floraSource.ContractHash : "anomaly:" + _floraSource.AnomalyHash + ";ts:" + _floraSource.TrueStalkerHash;
+            foreach (XRayResolvedFile file in _floraSource.Files)
+            {
+                _record.AddDependency(XRayLevelDependencyCategory.Materials, "Flora source contract", file.DisplayPath, file.IsResolved ? file.Winner.Location : null, file.VirtualPath, file.IsResolved ? XRayLevelDependencyStatus.Found : XRayLevelDependencyStatus.Missing, "Verified flora HLSL contract; source flora activation depends on its SHA-256", null, "sha256:" + XRayTerrainSourceBinding.Hash(file));
+            }
+
+            if (!XRayFloraSourceBinding.Accepts(_request.Settings.FloraImportMode, _floraSource.Profile))
+            {
+                _record.Warnings.Add($"Source flora mode '{_request.Settings.FloraImportMode}' was requested, but the effective flora shader contract is '{_floraSource.Profile}'; flora materials keep legacy rendering.");
+            }
+        }
+
         private void RequestLodTextures()
         {
             XRayLevelVisual lod = null;
@@ -833,7 +850,13 @@ namespace XRay.Importer.Editor.Levels
 
         private IEnumerable CreateMaterials()
         {
-            _materials = new XRayLevelMaterialLibrary(_record, _request.Settings.MaterialUpdateMode, _effective, _request.Settings.TerrainImportMode, _request.Settings.TerrainQuality);
+            if (_request.Settings.FloraImportMode != XRayFloraImportMode.Preserve)
+            {
+                ResolveFloraSource();
+            }
+
+            bool floraAccepted = _floraSource != null && XRayFloraSourceBinding.Accepts(_request.Settings.FloraImportMode, _floraSource.Profile);
+            _materials = new XRayLevelMaterialLibrary(_record, _request.Settings.MaterialUpdateMode, _effective, _request.Settings.TerrainImportMode, _request.Settings.TerrainQuality, _request.Settings.FloraImportMode, _floraSource);
             var slots = new List<(int Shader, bool Tree)>();
             var seen = new HashSet<long>();
             foreach (XRayLevelVisual visual in _level.Visuals)
@@ -862,6 +885,10 @@ namespace XRay.Importer.Editor.Levels
                 if (_terrain.TryGetValue(shaderId, out XRayLevelTerrainTextures terrain))
                 {
                     request.Terrain = terrain;
+                }
+                if (floraAccepted && surface.Flora && textures.BumpPath != null && XRayLevelMaterialLibrary.UsesFloraNormal(textures.Description))
+                {
+                    request.Flora = _textures.RequestFlora(textures, _floraSource);
                 }
                 if (surface.HemiMode == XRayLevelHemiMode.Lightmap && shader.Lightmaps.Count >= 2)
                 {
@@ -898,6 +925,8 @@ namespace XRay.Importer.Editor.Levels
             _record.SetMetric("FallbackMaterials", _materials.Fallbacks);
             _record.SetMetric("DecalMaterialsMigrated", _materials.MigratedDecals);
             _record.SetMetric("FloraMaterials", _materials.FloraMaterials);
+            _record.SetMetric("FloraSourceMaterials", _materials.FloraSourceMaterials);
+            _record.SetMetric("FloraUserOverrides", _materials.FloraUserOverrides);
             _record.GeneratedAssets.AddRange(_materials.Paths);
         }
 

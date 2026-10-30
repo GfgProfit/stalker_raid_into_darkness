@@ -177,6 +177,7 @@ namespace XRay.Importer.Editor.Levels
             settings.MaterialUpdateMode = (XRayLevelMaterialUpdateMode)EditorGUILayout.EnumPopup("Existing Materials", settings.MaterialUpdateMode);
             settings.TerrainImportMode = (XRayTerrainImportMode)EditorGUILayout.EnumPopup("Source Terrain", settings.TerrainImportMode);
             settings.TerrainQuality = (XRayTerrainQuality)EditorGUILayout.EnumPopup("Source Terrain Quality", settings.TerrainQuality);
+            settings.FloraImportMode = (XRayFloraImportMode)EditorGUILayout.EnumPopup(new GUIContent("Source Flora", "Applies only when the effective flora shader contract matches the selected game; other sources keep legacy flora."), settings.FloraImportMode);
             settings.CopySourceFiles = EditorGUILayout.Toggle("Copy level.geom/geomx/cform/details", settings.CopySourceFiles);
             settings.OpenSceneAfterImport = EditorGUILayout.Toggle("Open Scene After Import", settings.OpenSceneAfterImport);
             settings.AutoImportDroppedLevels = EditorGUILayout.Toggle(new GUIContent("Auto Import Dropped 'level'", "Import extensionless 'level' files dropped into the Project window."), settings.AutoImportDroppedLevels);

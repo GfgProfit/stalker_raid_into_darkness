@@ -23,6 +23,13 @@ namespace XRay.Importer.Editor.Levels
         [InspectorName("Enable Verified TS Dry Surface (HDRP Lighting)")] EnableVerifiedTrueStalker
     }
 
+    public enum XRayFloraImportMode
+    {
+        [InspectorName("Legacy / Preserve Existing Rendering")] Preserve,
+        [InspectorName("Enable Verified Anomaly Flora")] EnableVerifiedAnomaly,
+        [InspectorName("Enable Verified True Stalker Flora")] EnableVerifiedTrueStalker
+    }
+
     public enum XRayTerrainQuality
     {
         [InspectorName("HQ")] High,
@@ -46,6 +53,7 @@ namespace XRay.Importer.Editor.Levels
         [SerializeField] private XRayLevelMaterialUpdateMode _materialUpdateMode = XRayLevelMaterialUpdateMode.Preserve;
         [SerializeField] private XRayTerrainImportMode _terrainImportMode;
         [SerializeField] private XRayTerrainQuality _terrainQuality;
+        [SerializeField] private XRayFloraImportMode _floraImportMode;
         [SerializeField] private bool _openSceneAfterImport = true;
         [SerializeField] private bool _copySourceFiles = true;
         [SerializeField] private bool _autoImportDroppedLevels = true;
@@ -126,6 +134,12 @@ namespace XRay.Importer.Editor.Levels
         {
             get => _terrainQuality;
             set => _terrainQuality = value;
+        }
+
+        public XRayFloraImportMode FloraImportMode
+        {
+            get => _floraImportMode;
+            set => _floraImportMode = value;
         }
 
         public bool OpenSceneAfterImport

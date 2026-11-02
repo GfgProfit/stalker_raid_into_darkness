@@ -24,6 +24,11 @@ namespace XRay.Importer.Editor.Levels
         public const string ANOMALY_WIND_CONTRACT_HASH = "bf458cc9ae3f6f5a29fff39c857386c0018886cbd9954eab361087ec302fcf13";
         public const string TRUE_STALKER_WIND_CONTRACT_HASH = "5797ad01668d5c28013707909190194c8f2f2e141b2931b3470ab2e7e1b463d9";
         public const string ANOMALY_WIND_WAVES = "textures/fx/wind_wave.dds";
+        public const string ANOMALY_DETAIL_CONTRACT_HASH = "7e6799f789c9c508c1fecbcd7b9d455ee4c72ab91f801bdfab7cfb186b4f6614";
+        public const string TRUE_STALKER_DETAIL_CONTRACT_HASH = "ad8af0d5d42b5fa05e72a2fd2a8850ecef8a7c50c8b118cda2681b1c1ddd6fbf";
+
+        private static readonly string[] ANOMALY_DETAIL_FILES = { "shaders/r3/deffer_grass.vs", "shaders/r3/deffer_grass.ps", "shaders/r3/details_blend.s", "shaders/r3/screenspace_wind.h", "shaders/r3/common_defines.h" };
+        private static readonly string[] TRUE_STALKER_DETAIL_FILES = { "shaders/r3/deffer_grass.vs", "shaders/r3/deffer_grass.ps", "shaders/r3/details_blend.s", "shaders/r3/common_defines.h", "shaders/r3/sload.h" };
 
         private static readonly string[] ANOMALY_FILES =
         {
@@ -83,6 +88,8 @@ namespace XRay.Importer.Editor.Levels
         };
 
         public static IReadOnlyList<string> AnomalyFiles => ANOMALY_FILES;
+        public static IReadOnlyList<string> AnomalyDetailFiles => ANOMALY_DETAIL_FILES;
+        public static IReadOnlyList<string> TrueStalkerDetailFiles => TRUE_STALKER_DETAIL_FILES;
         public static IReadOnlyList<string> AnomalyWindFiles => ANOMALY_WIND_FILES;
         public static IReadOnlyList<string> TrueStalkerWindFiles => TRUE_STALKER_WIND_FILES;
         public static IReadOnlyList<string> TrueStalkerFiles => TRUE_STALKER_FILES;
@@ -124,6 +131,11 @@ namespace XRay.Importer.Editor.Levels
             return mode == XRayFloraWindImportMode.EnableVerifiedAnomaly && profile == XRayFloraSourceProfile.AnomalySss || mode == XRayFloraWindImportMode.EnableVerifiedTrueStalker && profile == XRayFloraSourceProfile.TrueStalker;
         }
 
+        public static bool AcceptsDetails(XRayTextureResolver resolver, XRayFloraSourceProfile profile)
+        {
+            return profile == XRayFloraSourceProfile.AnomalySss && Contract(resolver, ANOMALY_DETAIL_FILES, null) == ANOMALY_DETAIL_CONTRACT_HASH || profile == XRayFloraSourceProfile.TrueStalker && Contract(resolver, TRUE_STALKER_DETAIL_FILES, null) == TRUE_STALKER_DETAIL_CONTRACT_HASH;
+        }
+
         private static string Contract(XRayTextureResolver resolver, string[] files, List<XRayResolvedFile> resolved)
         {
             var contract = new StringBuilder();
@@ -147,5 +159,6 @@ namespace XRay.Importer.Editor.Levels
         public string AuthoredAlbedoPath { get; set; }
         public string AuthoredNote { get; set; }
         public string CorrectionPath { get; set; }
+        public string GrassWavesPath { get; set; }
     }
 }

@@ -5,9 +5,9 @@
 This is a Unity game project.
 
 Primary stack:
-- Unity 6000.x
+- Unity 6000.6.7f1 (Production)
 - C#
-- HDRP
+- HDRP 17.6.0 (Production)
 - TextMeshPro
 - DOTween, only if already present in the project
 - R3, only if already present in the project
@@ -23,6 +23,8 @@ Assets/_Source/Scripts
 The project contains gameplay systems, inventory, equipment, UI, item configs, rendering tools, editor tools, and asset import workflows.
 
 Work narrowly.
+
+Clean Tests remains on Unity 6000.3.4f1 / HDRP 17.3.0. It is an unsynchronized snapshot; do not upgrade or mass-sync it without explicit authorization.
 
 ## Instruction Priority
 

@@ -9,6 +9,8 @@ namespace XRay.Importer.Levels
     {
         public const string INSTANCE_DATA_PROPERTY = "_MonolithInstanceData";
 
+        private const int MAX_MOTION_INSTANCES = 511;
+
         [SerializeField] private XRayInstanceBatchSet _batchSet;
         [SerializeField] private float _maxDistance;
         [SerializeField] private bool _castShadows = true;
@@ -17,6 +19,9 @@ namespace XRay.Importer.Levels
         private readonly Plane[] _planes = new Plane[6];
         private readonly List<MaterialPropertyBlock> _properties = new List<MaterialPropertyBlock>();
         private readonly List<LodScratch> _lodScratch = new List<LodScratch>();
+        private readonly List<InstanceHistory> _histories = new List<InstanceHistory>();
+        private readonly Vector4[] _submissionData = new Vector4[MAX_MOTION_INSTANCES];
+        private MaterialPropertyBlock _submissionBlock;
         private XRayLevelLodRenderer _lodRenderer;
         private int _propertyId;
 
@@ -28,6 +33,7 @@ namespace XRay.Importer.Levels
                 _batchSet = value;
                 _properties.Clear();
                 _lodScratch.Clear();
+                _histories.Clear();
             }
         }
 
@@ -50,7 +56,9 @@ namespace XRay.Importer.Levels
         private void OnEnable()
         {
             _propertyId = Shader.PropertyToID(INSTANCE_DATA_PROPERTY);
+            _submissionBlock = new MaterialPropertyBlock();
             _properties.Clear();
+            _histories.Clear();
             RenderPipelineManager.beginCameraRendering += OnBeginCameraRendering;
         }
 
@@ -59,8 +67,10 @@ namespace XRay.Importer.Levels
             RenderPipelineManager.beginCameraRendering -= OnBeginCameraRendering;
             _properties.Clear();
             _lodScratch.Clear();
+            _histories.Clear();
             _lodRenderer?.Dispose();
             _lodRenderer = null;
+            _submissionBlock = null;
         }
 
         private void OnBeginCameraRendering(ScriptableRenderContext context, Camera camera)
@@ -100,6 +110,7 @@ namespace XRay.Importer.Levels
             for (int i = 0; i < batches.Count; i++)
             {
                 XRayInstanceBatch batch = batches[i];
+                InstanceHistory history = History(i, batch);
                 if (batch.Mesh == null || batch.Count == 0)
                 {
                     continue;
@@ -134,32 +145,12 @@ namespace XRay.Importer.Levels
                     shadowOnlyBatches++;
                 }
 
-                if (visible && states != null && batch.HasLods && RenderLodBatch(camera, i, batch, bounds, wind, states, castShadows, ref lodShadowOnly, ref lodDiscarded))
+                if (visible && states != null && batch.HasLods && RenderLodBatch(camera, i, batch, history, bounds, wind, states, castShadows, ref lodShadowOnly, ref lodDiscarded))
                 {
                     continue;
                 }
 
-                int submeshes = Mathf.Min(batch.Mesh.subMeshCount, batch.Materials.Length);
-                for (int submesh = 0; submesh < submeshes; submesh++)
-                {
-                    Material material = batch.Materials[submesh];
-                    if (material == null)
-                    {
-                        continue;
-                    }
-
-                    var parameters = new RenderParams(material)
-                    {
-                        camera = camera,
-                        worldBounds = bounds,
-                        motionVectorMode = XRayFloraWindBounds.Uses(material, wind) ? MotionVectorGenerationMode.Object : MotionVectorGenerationMode.Camera,
-                        layer = gameObject.layer,
-                        shadowCastingMode = castShadows ? visible ? ShadowCastingMode.On : ShadowCastingMode.ShadowsOnly : ShadowCastingMode.Off,
-                        receiveShadows = true,
-                        matProps = _properties[i]
-                    };
-                    Graphics.RenderMeshInstanced(parameters, batch.Mesh, submesh, batch.Matrices);
-                }
+                Submit(camera, batch, bounds, wind, _properties[i], history.Instances, batch.Data, batch.Count, castShadows ? visible ? ShadowCastingMode.On : ShadowCastingMode.ShadowsOnly : ShadowCastingMode.Off, history.Moving);
             }
 
             if (states != null)
@@ -176,7 +167,7 @@ namespace XRay.Importer.Levels
             LastRejectedShadowBatches = rejectedShadowBatches;
         }
 
-        private bool RenderLodBatch(Camera camera, int index, XRayInstanceBatch batch, Bounds bounds, XRayFloraWindState wind, byte[] states, bool castShadows, ref int lodShadowOnly, ref int lodDiscarded)
+        private bool RenderLodBatch(Camera camera, int index, XRayInstanceBatch batch, InstanceHistory history, Bounds bounds, XRayFloraWindState wind, byte[] states, bool castShadows, ref int lodShadowOnly, ref int lodDiscarded)
         {
             int full = 0;
             for (int instance = 0; instance < batch.Count; instance++)
@@ -203,7 +194,7 @@ namespace XRay.Importer.Levels
             {
                 if (castShadows)
                 {
-                    Submit(camera, batch, bounds, wind, _properties[index], batch.Matrices, batch.Count, ShadowCastingMode.ShadowsOnly);
+                    Submit(camera, batch, bounds, wind, _properties[index], history.Instances, batch.Data, batch.Count, ShadowCastingMode.ShadowsOnly, history.Moving);
                 }
 
                 return true;
@@ -230,27 +221,27 @@ namespace XRay.Importer.Levels
                 Vector4 data = batch.Data != null && instance < batch.Data.Length ? batch.Data[instance] : new Vector4(1.0f, 0.0f, 0.0f, 0.0f);
                 if (state > XRayLevelLodRenderer.STATE_BOTH)
                 {
-                    scratch.ShadowMatrices[shadowCount] = batch.Matrices[instance];
+                    scratch.ShadowMatrices[shadowCount] = history.Instances[instance];
                     scratch.ShadowData[shadowCount++] = data;
                     continue;
                 }
 
-                scratch.ColorMatrices[colorCount] = batch.Matrices[instance];
+                scratch.ColorMatrices[colorCount] = history.Instances[instance];
                 scratch.ColorData[colorCount++] = data;
             }
 
             scratch.ColorBlock.SetVectorArray(_propertyId, scratch.ColorData);
-            Submit(camera, batch, bounds, wind, scratch.ColorBlock, scratch.ColorMatrices, colorCount, castShadows ? ShadowCastingMode.On : ShadowCastingMode.Off);
+            Submit(camera, batch, bounds, wind, scratch.ColorBlock, scratch.ColorMatrices, scratch.ColorData, colorCount, castShadows ? ShadowCastingMode.On : ShadowCastingMode.Off, history.Moving);
             if (castShadows)
             {
                 scratch.ShadowBlock.SetVectorArray(_propertyId, scratch.ShadowData);
-                Submit(camera, batch, bounds, wind, scratch.ShadowBlock, scratch.ShadowMatrices, shadowCount, ShadowCastingMode.ShadowsOnly);
+                Submit(camera, batch, bounds, wind, scratch.ShadowBlock, scratch.ShadowMatrices, scratch.ShadowData, shadowCount, ShadowCastingMode.ShadowsOnly, history.Moving);
             }
 
             return true;
         }
 
-        private void Submit(Camera camera, XRayInstanceBatch batch, Bounds bounds, XRayFloraWindState wind, MaterialPropertyBlock block, Matrix4x4[] matrices, int count, ShadowCastingMode mode)
+        private void Submit(Camera camera, XRayInstanceBatch batch, Bounds bounds, XRayFloraWindState wind, MaterialPropertyBlock block, InstanceData[] matrices, Vector4[] data, int count, ShadowCastingMode mode, bool moving)
         {
             int submeshes = Mathf.Min(batch.Mesh.subMeshCount, batch.Materials.Length);
             for (int submesh = 0; submesh < submeshes; submesh++)
@@ -261,9 +252,74 @@ namespace XRay.Importer.Levels
                     continue;
                 }
 
-                var parameters = new RenderParams(material) { camera = camera, worldBounds = bounds, motionVectorMode = XRayFloraWindBounds.Uses(material, wind) ? MotionVectorGenerationMode.Object : MotionVectorGenerationMode.Camera, layer = gameObject.layer, shadowCastingMode = mode, receiveShadows = true, matProps = block };
-                Graphics.RenderMeshInstanced(parameters, batch.Mesh, submesh, matrices, count);
+                for (int start = 0; start < count; start += MAX_MOTION_INSTANCES)
+                {
+                    int length = Mathf.Min(MAX_MOTION_INSTANCES, count - start);
+                    MaterialPropertyBlock properties = block;
+                    if (count > MAX_MOTION_INSTANCES)
+                    {
+                        for (int i = 0; i < length; i++) _submissionData[i] = data != null && start + i < data.Length ? data[start + i] : new Vector4(1.0f, 0.0f, 0.0f, 0.0f);
+                        _submissionBlock.SetVectorArray(_propertyId, _submissionData);
+                        properties = _submissionBlock;
+                    }
+                    var parameters = new RenderParams(material) { camera = camera, worldBounds = bounds, motionVectorMode = moving || XRayFloraWindBounds.Uses(material, wind) ? MotionVectorGenerationMode.Object : MotionVectorGenerationMode.Camera, layer = gameObject.layer, shadowCastingMode = mode, receiveShadows = true, matProps = properties };
+                    Graphics.RenderMeshInstanced(parameters, batch.Mesh, submesh, matrices, length, start);
+                }
             }
+        }
+
+        public void ResetMotionHistory()
+        {
+            _histories.Clear();
+        }
+
+        private InstanceHistory History(int index, XRayInstanceBatch batch)
+        {
+            while (_histories.Count <= index) _histories.Add(null);
+            InstanceHistory history = _histories[index];
+            if (history == null || !ReferenceEquals(history.Source, batch) || history.Instances.Length != batch.Count)
+            {
+                history = new InstanceHistory(batch);
+                _histories[index] = history;
+            }
+            bool advance = history.Frame != Time.frameCount;
+            history.Moving = false;
+            for (int i = 0; i < batch.Count; i++)
+            {
+                Matrix4x4 current = batch.Matrices[i];
+                Matrix4x4 previous = advance ? history.Instances[i].objectToWorld : history.Instances[i].prevObjectToWorld;
+                history.Instances[i] = new InstanceData(current, previous);
+                history.Moving |= !current.Equals(previous);
+            }
+            history.Frame = Time.frameCount;
+            return history;
+        }
+
+        private struct InstanceData
+        {
+            public readonly Matrix4x4 objectToWorld;
+            public readonly Matrix4x4 prevObjectToWorld;
+
+            public InstanceData(Matrix4x4 current, Matrix4x4 previous)
+            {
+                objectToWorld = current;
+                prevObjectToWorld = previous;
+            }
+        }
+
+        private sealed class InstanceHistory
+        {
+            public InstanceHistory(XRayInstanceBatch source)
+            {
+                Source = source;
+                Instances = new InstanceData[source.Count];
+                for (int i = 0; i < source.Count; i++) Instances[i] = new InstanceData(source.Matrices[i], source.Matrices[i]);
+            }
+
+            public XRayInstanceBatch Source { get; }
+            public InstanceData[] Instances { get; }
+            public int Frame { get; set; } = -1;
+            public bool Moving { get; set; }
         }
 
         private void EnsureProperties()
@@ -292,15 +348,15 @@ namespace XRay.Importer.Levels
             public LodScratch(int capacity)
             {
                 Capacity = capacity;
-                ColorMatrices = new Matrix4x4[capacity];
-                ShadowMatrices = new Matrix4x4[capacity];
+                ColorMatrices = new InstanceData[capacity];
+                ShadowMatrices = new InstanceData[capacity];
                 ColorData = new Vector4[capacity];
                 ShadowData = new Vector4[capacity];
             }
 
             public int Capacity { get; }
-            public Matrix4x4[] ColorMatrices { get; }
-            public Matrix4x4[] ShadowMatrices { get; }
+            public InstanceData[] ColorMatrices { get; }
+            public InstanceData[] ShadowMatrices { get; }
             public Vector4[] ColorData { get; }
             public Vector4[] ShadowData { get; }
             public MaterialPropertyBlock ColorBlock { get; } = new MaterialPropertyBlock();

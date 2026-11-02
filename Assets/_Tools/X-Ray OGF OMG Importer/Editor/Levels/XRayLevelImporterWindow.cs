@@ -166,7 +166,8 @@ namespace XRay.Importer.Editor.Levels
             settings.ImportDetails = EditorGUILayout.Toggle("Import level.details", settings.ImportDetails);
             using (new EditorGUI.DisabledScope(!settings.ImportDetails))
             {
-                settings.DetailDensity = EditorGUILayout.Slider(new GUIContent("Detail Density (r__detail_density)", "Engine console value; smaller is denser. 0.6 is the default."), settings.DetailDensity, 0.04f, 1.0f);
+                settings.RuntimeDetails = EditorGUILayout.Toggle(new GUIContent("Runtime Detail Vegetation", "Preserves source slots and collision for deterministic runtime resampling. Requires a verified source flora profile. Existing saved levels are not migrated."), settings.RuntimeDetails);
+                settings.DetailDensity = EditorGUILayout.Slider(new GUIContent("Detail Density (r__detail_density)", "Engine console value; smaller is denser. Runtime vegetation uses the verified RVM profile."), settings.DetailDensity, 0.04f, 1.0f);
                 settings.DetailHeightScale = EditorGUILayout.Slider(new GUIContent("Detail Height (r__detail_height)"), settings.DetailHeightScale, 0.5f, 2.0f);
                 settings.DetailChunkSize = EditorGUILayout.FloatField("Detail Chunk Size (m)", settings.DetailChunkSize);
             }

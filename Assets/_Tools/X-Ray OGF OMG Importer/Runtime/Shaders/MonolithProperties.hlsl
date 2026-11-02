@@ -197,6 +197,12 @@ float _MonolithLevelHemiMode;
 float _MonolithLevelHemiFlipV;
 float _MonolithLevelAmbientHemi;
 float _MonolithLevelWind;
+float _MonolithGrassSource;
+float _MonolithGrassRuntime;
+float _MonolithGrassAlign;
+float _MonolithGrassHeight;
+float _MonolithGrassHeightPrevious;
+float4 _MonolithWindGrassSetup;
 float _MonolithLevelTerrain;
 float _MonolithTerrainDetailScale;
 float _MonolithTerrainBumpScale;
@@ -384,6 +390,7 @@ float4 MonolithFloraFixesInput()
 #if defined(UNITY_INSTANCING_ENABLED)
 UNITY_INSTANCING_BUFFER_START(MonolithInstance)
 UNITY_DEFINE_INSTANCED_PROP(float4, _MonolithInstanceData)
+UNITY_DEFINE_INSTANCED_PROP(float4, _MonolithInstanceExtra)
 UNITY_INSTANCING_BUFFER_END(MonolithInstance)
 #endif
 float4 MonolithInstanceData()
@@ -392,6 +399,14 @@ float4 MonolithInstanceData()
     return UNITY_ACCESS_INSTANCED_PROP(MonolithInstance, _MonolithInstanceData);
     #else
     return float4(1.0, 0.0, 0.0, 0.0);
+    #endif
+}
+float4 MonolithInstanceExtra()
+{
+    #if defined(UNITY_INSTANCING_ENABLED)
+    return UNITY_ACCESS_INSTANCED_PROP(MonolithInstance, _MonolithInstanceExtra);
+    #else
+    return float4(0.0, 1.0, 0.0, 1.0);
     #endif
 }
 float MonolithBaseHemisphere()

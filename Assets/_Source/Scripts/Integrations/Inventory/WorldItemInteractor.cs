@@ -173,6 +173,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
             Vector3 position = view.position + forward * distance;
             position.y += Mathf.Max(0f, view.forward.y) * _dropDistance;
             worldItem.transform.position = position;
+            Physics.SyncTransforms();
             return worldItem;
         }
 

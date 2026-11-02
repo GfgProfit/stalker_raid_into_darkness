@@ -29,6 +29,7 @@ AttributesMesh ApplyMeshModification(AttributesMesh input, float3 timeParameters
 }
 #elif defined(_MONOLITH_LEVEL_DETAIL)
 #define HAVE_MESH_MODIFICATION
+#include "MonolithFlora.hlsl"
 
 float MonolithDetailCyclic(float x)
 {
@@ -39,6 +40,30 @@ float MonolithDetailCyclic(float x)
 AttributesMesh ApplyMeshModification(AttributesMesh input, float3 timeParameters)
 {
     float4 instance = MonolithInstanceData();
+    if (_MonolithGrassRuntime > 0.5)
+    {
+        bool previous = timeParameters.x == MONOLITH_PREVIOUS_FRAME_TIME;
+        input.positionOS *= previous ? _MonolithGrassHeightPrevious : _MonolithGrassHeight;
+        float3 alignedPosition = TransformObjectToWorld(input.positionOS);
+        float alignedHeight = alignedPosition.y - GetObjectToWorldMatrix()._m13;
+        alignedPosition.xz -= 0.5 * MonolithInstanceExtra().xz * alignedHeight * _MonolithGrassAlign;
+        input.positionOS = TransformWorldToObject(alignedPosition);
+        float sourceSize = previous ? _MonolithGrassHeightPrevious : _MonolithGrassHeight;
+        input.uv1.x = MonolithAnomalyGrassVariation(GetAbsolutePositionWS(alignedPosition), GetObjectToWorldMatrix()._m00 * sourceSize, _MonolithFloraVariation.y);
+        if (_MonolithGrassSource > 0.5 && _MonolithGrassSource < 1.5 && _MonolithLevelWind > 0.5 && instance.z > 0.5 && _MonolithWindActive > 0.5 && _MonolithWindActive < 1.5)
+        {
+            float3 positionAWS = GetAbsolutePositionWS(TransformObjectToWorld(input.positionOS));
+            float baseHeight = GetAbsolutePositionWS(GetObjectToWorldMatrix()._m03_m13_m23).y;
+            MonolithWindSetup setup = MonolithSsfxWindSetup(_MonolithWindParams, _MonolithWindGrassSetup, _MonolithWindTreesSetup);
+            float4 anim = previous ? _MonolithWindAnimPrev : _MonolithWindAnim;
+            float flip = _MonolithWindWavesFlipV > 0.5 ? -1.0 : 1.0;
+            float3 position = float3(positionAWS.x, positionAWS.y, positionAWS.z * flip);
+            float4 flowAnim = float4(anim.x, anim.y * flip, anim.z, anim.w);
+            float3 offset = MonolithSsfxWindGrass(TEXTURE2D_ARGS(_MonolithWindWaves, s_linear_repeat_sampler), position, positionAWS.y - baseHeight, flowAnim, setup);
+            input.positionOS += mul((float3x3)GetWorldToObjectMatrix(), offset);
+        }
+        return input;
+    }
     if (_MonolithLevelWind < 0.5 || instance.z < 0.5)
     {
         return input;
@@ -72,10 +97,12 @@ AttributesMesh ApplyMeshModification(AttributesMesh input, float3 timeParameters
     if (MonolithFloraWindEnabled(_MonolithFloraWind, input.uv3.y))
     {
         bool previous = timeParameters.x == MONOLITH_PREVIOUS_FRAME_TIME;
-        float3 positionAWS = GetAbsolutePositionWS(TransformObjectToWorld(input.positionOS));
-        float baseHeight = GetAbsolutePositionWS(GetObjectToWorldMatrix()._m03_m13_m23).y;
+        float4x4 objectToWorld = previous ? GetPrevObjectToWorldMatrix() : GetObjectToWorldMatrix();
+        float4x4 worldToObject = previous ? GetPrevWorldToObjectMatrix() : GetWorldToObjectMatrix();
+        float3 positionAWS = GetAbsolutePositionWS(mul(objectToWorld, float4(input.positionOS, 1.0)).xyz);
+        float baseHeight = GetAbsolutePositionWS(objectToWorld._m03_m13_m23).y;
         float3 offset = MonolithFloraWindOffset(_MonolithFloraWind, _MonolithFloraWindPart, SHADERPASS == SHADERPASS_SHADOWS, previous, positionAWS, baseHeight, 1.0 - input.uv0.y, input.uv3.x);
-        input.positionOS += mul((float3x3)GetWorldToObjectMatrix(), offset);
+        input.positionOS += mul((float3x3)worldToObject, offset);
     }
     return input;
 }

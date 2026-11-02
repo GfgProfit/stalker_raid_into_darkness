@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Reflection;
 using System.Text;
 using NUnit.Framework;
 using UnityEditor;
@@ -31,11 +32,29 @@ namespace XRay.Importer.Tests
         private const double MOTION_TOLERANCE = 0.01 / SIZE * 0.5;
 
         private readonly List<UnityEngine.Object> _owned = new List<UnityEngine.Object>();
+        private readonly List<Rig> _fixtureRigs = new List<Rig>();
+        private readonly List<List<UnityEngine.Object>> _fixtureObjects = new List<List<UnityEngine.Object>>();
+        private readonly List<Scene> _fixtureScenes = new List<Scene>();
+        private readonly List<Action<ScriptableRenderContext, Camera>> _fixtureSubmissions = new List<Action<ScriptableRenderContext, Camera>>();
         private int _readbacks;
+        private float _captureDeltaTime;
+        private bool _captureTimeOwned;
 
         [TearDown]
         public void TearDown()
         {
+            RestoreCaptureTime();
+            foreach (Action<ScriptableRenderContext, Camera> submission in _fixtureSubmissions) RenderPipelineManager.beginCameraRendering -= submission;
+            _fixtureSubmissions.Clear();
+            foreach (Rig rig in _fixtureRigs) rig.Release();
+            _fixtureRigs.Clear();
+            foreach (List<UnityEngine.Object> objects in _fixtureObjects)
+            {
+                for (int i = objects.Count - 1; i >= 0; i--) if (objects[i] != null) UnityEngine.Object.DestroyImmediate(objects[i]);
+            }
+            _fixtureObjects.Clear();
+            foreach (Scene scene in _fixtureScenes) if (scene.IsValid() && scene.isLoaded && EditorSceneManager.IsPreviewScene(scene)) EditorSceneManager.ClosePreviewScene(scene);
+            _fixtureScenes.Clear();
             for (int i = _owned.Count - 1; i >= 0; i--) UnityEngine.Object.DestroyImmediate(_owned[i]);
             _owned.Clear();
             XRayFloraWindState.Clear();
@@ -389,6 +408,15 @@ namespace XRay.Importer.Tests
                     stored.Sort();
                     int mismatches = 0;
                     bool accepted = expected != XRayFloraSourceProfile.Unknown;
+                    var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(fixture.Root + "/" + fixture.LevelName + "/Prefabs/" + fixture.LevelName + ".prefab");
+                    XRayFloraWindProvider[] providers = prefab.GetComponentsInChildren<XRayFloraWindProvider>(true);
+                    Assert.AreEqual(accepted ? 1 : 0, providers.Length, name);
+                    if (accepted)
+                    {
+                        Assert.AreEqual(trueStalker ? XRayFloraWindProfile.TrueStalkerXRay : XRayFloraWindProfile.AnomalySsfx, providers[0].Profile);
+                        Assert.IsFalse(providers[0].TrueStalkerDiagnosticConstants);
+                        Assert.IsFalse(providers[0].PreviewEnabled);
+                    }
                     for (int v = 0; v < stored.Count; v++) if (accepted ? stored[v] != source[v] : stored[v] != 0.0f) mismatches++;
                     Texture waves = material.GetTexture(XRayFloraWindBindings.WAVES);
                     rows.AppendLine(string.Join(",", name, trueStalker ? "TrueStalker" : "Anomaly", mode, record.Source.FloraWindProfile, record.Source.FloraWindContractHash, mesh.vertexCount, windData, mismatches, Num(material.GetFloat(XRayFloraWindBindings.WIND)), Num(material.GetFloat(XRayFloraWindBindings.PART)), waves != null ? AssetDatabase.GetAssetPath(waves) : string.Empty, material.GetShaderPassEnabled(XRayFloraWindBindings.MOTION_VECTORS_PASS), record.Warnings.FindAll(warning => warning.Contains("wind")).Count));
@@ -459,6 +487,8 @@ namespace XRay.Importer.Tests
             string meshHash = XRayLevelSourceRefresh.HashFile(AssetDatabase.GetAssetPath(selected.Mesh));
             string materialHash = XRayLevelSourceRefresh.HashFile(AssetDatabase.GetAssetPath(selected.Materials[0]));
             Material copy = Own(new Material(selected.Materials[0]));
+            Mesh legacyMesh = Own(UnityEngine.Object.Instantiate(selected.Mesh));
+            legacyMesh.SetUVs(3, new Vector2[legacyMesh.vertexCount]);
             copy.SetFloat(XRayFloraWindBindings.WIND, 1.0f);
             copy.SetTexture(XRayFloraWindBindings.WAVES, Own(Waves(false)));
             string output = Path.Combine(Output(), "SavedEscape");
@@ -472,7 +502,7 @@ namespace XRay.Importer.Tests
                 Matrix4x4 matrix = selected.Matrices[0];
                 rig.Frame(GeometryUtility.CalculateBounds(selected.Mesh.vertices, matrix));
                 XRayFloraWindState.Clear();
-                rig.Show(selected.Mesh, copy, matrix, ShadowCastingMode.On);
+                rig.Show(legacyMesh, copy, matrix, ShadowCastingMode.On);
                 Color[] baseline = rig.Debug(34, Path.Combine(output, "Static"));
                 State(XRayFloraWindProfile.AnomalySsfx, 9).Apply();
                 (int pixels, double error) result = CompareImages(rig.Debug(34, Path.Combine(output, "WindRequested")), baseline, 0.0, "Saved l01_escape mesh without WindFactor");
@@ -488,6 +518,828 @@ namespace XRay.Importer.Tests
             }
             Assert.AreEqual(meshHash, XRayLevelSourceRefresh.HashFile(AssetDatabase.GetAssetPath(selected.Mesh)));
             Assert.AreEqual(materialHash, XRayLevelSourceRefresh.HashFile(AssetDatabase.GetAssetPath(selected.Materials[0])));
+        }
+
+        [UnityTest]
+        [Timeout(600000)]
+        public IEnumerator RealProviderMovesTreeAndInstancedGrassInEditMode()
+        {
+            yield return CaptureProviderVegetation(false);
+        }
+
+        [UnityTest]
+        [Timeout(600000)]
+        public IEnumerator RealProviderMovesTreeAndInstancedGrassInPlayMode()
+        {
+            yield return new EnterPlayMode();
+            yield return CaptureProviderVegetation(true);
+            TearDown();
+            yield return new ExitPlayMode();
+        }
+
+        [UnityTest]
+        [Timeout(600000)]
+        public IEnumerator GameCameraSupportsObjectWindMotionInEditMode()
+        {
+            yield return CaptureProviderVegetation(false, true);
+        }
+
+        [UnityTest]
+        [Timeout(600000)]
+        public IEnumerator NativeSceneViewDisablesObjectMotionDespiteExplicitRequest()
+        {
+            if (Application.isBatchMode) Assert.Ignore("Requires actual Scene View GUI repaint; run separately in the interactive Editor on both APIs.");
+            yield return CaptureProviderVegetation(false, false, true);
+        }
+
+        [UnityTest]
+        [Timeout(600000)]
+        public IEnumerator PausedGameCameraHasNoNativeWindMotion()
+        {
+            yield return CaptureProviderVegetation(false, true, false, true);
+        }
+
+        [UnityTest]
+        [Timeout(900000)]
+        public IEnumerator GrassPerformanceOnGameCamera()
+        {
+            yield return new EnterPlayMode();
+            yield return CaptureProviderVegetation(true, false, false, false, true);
+            TearDown();
+            yield return new ExitPlayMode();
+        }
+
+        [UnityTest]
+        [Timeout(900000)]
+        public IEnumerator GrassPerformanceOnNativeSceneView()
+        {
+            if (Application.isBatchMode) Assert.Ignore("Requires native Scene View GUI rendering; execute separately on both APIs.");
+            yield return CaptureProviderVegetation(false, false, true, false, true);
+        }
+
+        [UnityTest]
+        [Timeout(600000)]
+        public IEnumerator NativeSceneViewsShareOneVegetationPopulation()
+        {
+            if (Application.isBatchMode) Assert.Ignore("Requires two native Scene View windows; execute separately on both APIs.");
+            yield return CaptureProviderVegetation(false, false, true, multipleViews: true);
+        }
+
+        [UnityTest]
+        [Timeout(600000)]
+        public IEnumerator RealSourceTreeInstancingMovesLeavesAndTrunk()
+        {
+            yield return CaptureProviderVegetation(false, true, realTreeInstancing: true);
+        }
+
+        private IEnumerator CaptureProviderVegetation(bool playing, bool gameCamera = false, bool nativeSceneView = false, bool pausedAcceptance = false, bool performance = false, bool multipleViews = false, bool realTreeInstancing = false)
+        {
+            HdrpTestWarmup.Ensure();
+            string output = Path.Combine(Output(), multipleViews ? "MultipleSceneViews" : realTreeInstancing ? "RealTreeInstancing" : performance ? playing ? "PerformanceGameCamera" : "PerformanceSceneView" : pausedAcceptance ? "PausedGameCamera" : playing ? "LivePlayMode" : nativeSceneView ? "NativeSceneView" : gameCamera ? "EditModeGameCamera" : "LiveEditMode");
+            Directory.CreateDirectory(output);
+            var set = AssetDatabase.LoadAssetAtPath<XRayInstanceBatchSet>(ANOMALY_ROOT + "/l01_escape/Meshes/l01_escape_StaticProps.asset");
+            Assert.IsNotNull(set);
+            Scene runtimeScene = SceneManager.GetActiveScene();
+            Scene scene = playing ? SceneManager.CreateScene("DIAGNOSTIC wind GPU fixture") : EditorSceneManager.NewPreviewScene();
+            var temporary = new List<UnityEngine.Object>();
+            var windRoot = new GameObject("DIAGNOSTIC real vegetation wind");
+            SceneManager.MoveGameObjectToScene(windRoot, runtimeScene);
+            temporary.Add(windRoot);
+            bool runInBackground = Application.runInBackground;
+            Application.runInBackground = true;
+            if (playing)
+            {
+                _captureDeltaTime = Time.captureDeltaTime;
+                _captureTimeOwned = true;
+                Time.captureDeltaTime = 1.0f / 30.0f;
+            }
+            File.WriteAllText(Path.Combine(output, "Environment.txt"), "Playing=" + Application.isPlaying + " ObjectPlaying=" + Application.IsPlaying(windRoot) + " Scene=" + windRoot.scene.path + " Paused=" + EditorApplication.isPaused + " Background=" + runInBackground + " API=" + SystemInfo.graphicsDeviceType + " CaptureDeltaTime=" + Num(Time.captureDeltaTime));
+            Rig rig = null;
+            Action<ScriptableRenderContext, Camera> diagnosticSubmission = null;
+            Action<ScriptableRenderContext, Camera> automaticSubmission = null;
+            bool performancePriming = false;
+            var rows = new StringBuilder("Object,Frame,StateTime,FrameCount,ChangedGeometryPixels,MaxCommonPixelWorldPositionDelta,VisibleInstances,DrawCalls\n");
+            var treeMotionRows = new StringBuilder("Object,Frame,MaximumNativeMotion\n");
+            try
+            {
+                XRayFloraWindProvider provider = windRoot.AddComponent<XRayFloraWindProvider>();
+                provider.Profile = XRayFloraWindProfile.AnomalySsfx;
+                provider.PreviewEnabled = false;
+                provider.SetWeather(30.0f, 900.0f, 0.004f);
+                provider.ResetAnimation();
+                rig = CreateRig(scene, temporary, performance, !playing && !gameCamera);
+                foreach (string part in new[] { "opaque", "alpha_clipped", "tree_leaves", "tree_trunk" })
+                {
+                    bool synthetic = part == "opaque" || part == "alpha_clipped";
+                    string sourcePart = part == "opaque" ? "tree_trunk" : synthetic ? "tree_leaves" : part;
+                    XRayInstanceBatch selected = null;
+                    foreach (XRayInstanceBatch batch in set.Batches)
+                    {
+                        if (batch.Mesh == null || batch.Materials.Length == 0 || batch.Materials[0] == null || !batch.Materials[0].name.Contains(sourcePart)) continue;
+                        if (selected == null || batch.Mesh.vertexCount > selected.Mesh.vertexCount) selected = batch;
+                    }
+                    Assert.IsNotNull(selected, part);
+                    Material material = Own(new Material(selected.Materials[0]));
+                    Assert.AreEqual(1.0f, material.GetFloat(XRayFloraWindBindings.WIND));
+                    Matrix4x4 matrix = synthetic ? Matrix4x4.identity : selected.Matrices[0];
+                    Mesh mesh = synthetic ? Own(Grid(true)) : selected.Mesh;
+                    rig.Frame(GeometryUtility.CalculateBounds(mesh.vertices, matrix));
+                    rig.Show(mesh, material, matrix, ShadowCastingMode.On);
+                    GameObject instancedRoot = null;
+                    if (realTreeInstancing)
+                    {
+                        rig.Hide();
+                        material.enableInstancing = true;
+                        instancedRoot = new GameObject("Real source tree instancing acceptance");
+                        temporary.Add(instancedRoot);
+                        SceneManager.MoveGameObjectToScene(instancedRoot, scene);
+                        var batchSet = Own(ScriptableObject.CreateInstance<XRayInstanceBatchSet>());
+                        Vector4 instanceData = selected.Data != null && selected.Data.Length > 0 ? selected.Data[0] : new Vector4(1.0f, 0.0f, 0.0f, 1.0f);
+                        batchSet.Initialize("source tree", 32.0f, new List<XRayInstanceBatch> { new XRayInstanceBatch(part, mesh, new[] { material }, GeometryUtility.CalculateBounds(mesh.vertices, matrix), new[] { matrix }, new[] { instanceData }, true) });
+                        instancedRoot.AddComponent<XRayLevelInstancedRenderer>().BatchSet = batchSet;
+                    }
+                    if (nativeSceneView) yield return rig.NativeFrame(34, null, null);
+                    else rig.Debug(34, null);
+                    material.SetFloat(XRayFloraWindBindings.WIND, 0.0f);
+                    Color[] off = null;
+                    Color[] offNext = null;
+                    if (nativeSceneView) yield return rig.NativeFrame(34, Path.Combine(output, part + "_Off0"), value => off = value);
+                    else off = rig.Debug(34, Path.Combine(output, part + "_Off0"));
+                    provider.Tick(0.1f);
+                    if (nativeSceneView) yield return rig.NativeFrame(34, Path.Combine(output, part + "_Off1"), value => offNext = value);
+                    else offNext = rig.Debug(34, Path.Combine(output, part + "_Off1"));
+                    CollectionAssert.AreEqual(off, offNext, part + ": disabled wind must preserve geometry while animation time advances.");
+                    material.SetFloat(XRayFloraWindBindings.WIND, 1.0f);
+                    Color[] previous = null;
+                    float maximumTreeMotion = 0.0f;
+                    for (int frame = 0; frame < 3; frame++)
+                    {
+                        if (playing) yield return new WaitForSecondsRealtime(0.5f);
+                        else provider.Tick(0.1f);
+                        Color[] pixels = null;
+                        if (nativeSceneView)
+                        {
+                            yield return rig.NativeFrame(34, Path.Combine(output, part + "_" + frame), value => pixels = value);
+                            yield return rig.NativeFrame(0, Path.Combine(output, part + "_" + frame + "_Forward"), null);
+                            yield return rig.NativeFrame(0, Path.Combine(output, part + "_" + frame + "_MotionVectors"), null, true);
+                        }
+                        else
+                        {
+                            pixels = rig.Debug(34, Path.Combine(output, part + "_" + frame));
+                            rig.Debug(0, Path.Combine(output, part + "_" + frame + "_Forward"));
+                            Color[] treeMotion = rig.RawMotion(Path.Combine(output, part + "_" + frame + "_MotionVectors"));
+                            float frameMotion = MaximumMotion(treeMotion);
+                            maximumTreeMotion = Mathf.Max(maximumTreeMotion, frameMotion);
+                            treeMotionRows.AppendLine(string.Join(",", part, frame, Num(frameMotion)));
+                        }
+                        (int changed, float maximum) = GeometryDelta(previous, pixels);
+                        rows.AppendLine(string.Join(",", part, frame, Num((float)provider.State.Time), Time.frameCount, changed, Num(maximum), 1, 1));
+                        if (frame > 0) Assert.Greater(maximum, 0.00001f, part + ": real GPU geometry must move between frames.");
+                        previous = pixels;
+                    }
+                    if (realTreeInstancing) Assert.Greater(maximumTreeMotion, 0.0f, part + ": actual source tree instancing must produce native wind motion across the moving sequence.");
+                    provider.Paused = true;
+                    if (playing) yield return new WaitForSecondsRealtime(0.1f);
+                    else provider.Tick(0.0f);
+                    Color[] paused = null;
+                    if (nativeSceneView) yield return rig.NativeFrame(34, Path.Combine(output, part + "_Paused"), value => paused = value);
+                    else paused = rig.Debug(34, Path.Combine(output, part + "_Paused"));
+                    CollectionAssert.AreEqual(previous, paused, part + ": pause must freeze geometry.");
+                    if (realTreeInstancing) Assert.LessOrEqual(MaximumMotion(rig.RawMotion(Path.Combine(output, part + "_Paused_MotionVectors"))), MOTION_TOLERANCE);
+                    provider.Paused = false;
+                    rig.Hide();
+                    if (instancedRoot != null) UnityEngine.Object.DestroyImmediate(instancedRoot);
+                }
+
+                if (realTreeInstancing) yield break;
+
+                var stored = AssetDatabase.LoadAssetAtPath<XRayDetailDatabase>(ANOMALY_ROOT + "/l01_escape/Details/DetailDatabase.asset");
+                Assert.IsNotNull(stored);
+                Assert.IsTrue(stored.HasRuntimeSource);
+                var database = Own(ScriptableObject.CreateInstance<XRayDetailDatabase>());
+                var models = new List<XRayDetailModelEntry>();
+                foreach (XRayDetailModelEntry model in stored.Models)
+                {
+                    Material material = Own(new Material(model.Material));
+                    material.SetFloat("_MonolithDebug", 34.0f);
+                    models.Add(new XRayDetailModelEntry(model.Shader, model.Texture, model.Mesh, material, model.InverseHeight, model.NoWaving, model.MinScale, model.MaxScale, model.InstanceCount));
+                }
+                database.Initialize(stored.LevelName, stored.ChunkSize, stored.Density, stored.HeightScale, stored.SlotSize, models, new List<XRayDetailChunk>(), stored.Instances, stored.Slots, stored.SwingNormal, stored.SwingFast, stored.InstanceCount, stored.SlotCount);
+                database.SetRuntimeSource(stored.SourceDetails, stored.SourceCollision, stored.Passable, stored.SourceProfile);
+                var root = new GameObject("DIAGNOSTIC instanced grass");
+                temporary.Add(root);
+                root.layer = 31;
+                SceneManager.MoveGameObjectToScene(root, scene);
+                var vegetation = root.AddComponent<XRayDetailVegetation>();
+                vegetation.Database = database;
+                var defaults = XRayGrassDefaults.Load(Resources.Load<TextAsset>("XRayRvmGrassDefaults").text);
+                var settings = new XRayGrassSettings(defaults, null);
+                settings.Set(new XRayGrassValues(performance ? 1.0f : 0.45f, 50, 1.0f, false), false);
+                vegetation.PrepareSource(settings);
+                XRayDetails details = XRayDetails.Read(database.SourceDetails.bytes, "DIAGNOSTIC real source");
+                Vector3 eye = Vector3.zero;
+                bool found = false;
+                for (int z = details.SizeZ / 2; z < details.SizeZ && !found; z += 16)
+                {
+                    for (int x = details.SizeX / 2; x < details.SizeX && !found; x += 16)
+                    {
+                        XRayDetailSlot slot = details.GetSlot(x, z);
+                        if (slot.IsEmpty) continue;
+                        eye = new Vector3((x - details.OffsetX + 0.5f) * 2.0f, slot.YBase + 1.0f, (z - details.OffsetZ + 0.5f) * 2.0f);
+                        vegetation.Population.Stream(eye, 0.1f);
+                        found = vegetation.ResidentInstances > 0;
+                    }
+                }
+                Assert.IsTrue(found);
+                if (performance)
+                {
+                    foreach (XRayDetailCell cell in vegetation.Population.Cells)
+                    {
+                        if (!vegetation.Population.IsCurrent(cell) || cell.Instances.Count == 0) continue;
+                        XRayDetailInstance instance = cell.Instances[0];
+                        eye = new Vector3(instance.X, instance.Y + 1.0f, instance.Z);
+                        break;
+                    }
+                }
+                rig.Frame(new Bounds(eye, Vector3.one * 12.0f));
+                if (performance)
+                {
+                    rig.MoveCameraTo(eye + Vector3.back * 10.0f);
+                    rig.Camera.farClipPlane = 600.0f;
+                }
+                rig.Camera.cameraType = playing || gameCamera ? CameraType.Game : CameraType.SceneView;
+                rig.Camera.cullingMask = 1 << 31;
+                rig.Camera.overrideSceneCullingMask = ulong.MaxValue;
+                vegetation.StreamingCamera = rig.Camera;
+                if ((gameCamera || nativeSceneView || performance) && !multipleViews)
+                {
+                    MethodInfo ensureBuffers = typeof(XRayDetailVegetation).GetMethod("EnsureBuffers", BindingFlags.Instance | BindingFlags.NonPublic);
+                    MethodInfo renderSource = typeof(XRayDetailVegetation).GetMethod("RenderSource", BindingFlags.Instance | BindingFlags.NonPublic);
+                    MethodInfo beginCamera = typeof(XRayDetailVegetation).GetMethod("OnBeginCameraRendering", BindingFlags.Instance | BindingFlags.NonPublic);
+                    automaticSubmission = (Action<ScriptableRenderContext, Camera>)Delegate.CreateDelegate(typeof(Action<ScriptableRenderContext, Camera>), vegetation, beginCamera);
+                    RenderPipelineManager.beginCameraRendering -= automaticSubmission;
+                    diagnosticSubmission = (context, camera) =>
+                    {
+                        if (camera != rig.Camera || vegetation == null || !vegetation.isActiveAndEnabled || performancePriming) return;
+                        if (nativeSceneView || playing)
+                        {
+                            automaticSubmission(context, camera);
+                            return;
+                        }
+                        ensureBuffers.Invoke(vegetation, null);
+                        renderSource.Invoke(vegetation, new object[] { camera });
+                    };
+                    RenderPipelineManager.beginCameraRendering += diagnosticSubmission;
+                    _fixtureSubmissions.Add(diagnosticSubmission);
+                    File.WriteAllText(Path.Combine(output, "Diagnostic_Camera_Isolation.txt"), "This preview fixture dispatches its existing source submission only for its own camera. Other open Scene Views must not recenter the shared population. Game/Edit invokes RenderSource directly to isolate HDRP capability from shipping SceneView-only selection. Native SceneView invokes the original OnBeginCameraRendering unchanged. No shipping selection or renderer code is changed.");
+                }
+                if (nativeSceneView) yield return rig.NativeFrame(-1, null, null);
+                if (performance && nativeSceneView)
+                {
+                    rig.MoveCameraTo(eye + Vector3.back * 10.0f);
+                    yield return rig.NativeFrame(-1, null, null);
+                }
+                for (int i = 0; i < 2000 && (vegetation.Population.NeedsStreaming || vegetation.Population.HasFadingCells); i++) vegetation.Population.Stream(rig.Camera.transform.position, 0.1f);
+                File.WriteAllText(Path.Combine(output, "Population_BeforeCapture.txt"), "Camera=" + rig.Camera.transform.position.ToString("F6") + " Resident=" + vegetation.ResidentInstances + " Cells=" + vegetation.ResidentCells + " Streaming=" + vegetation.Population.NeedsStreaming + " Fading=" + vegetation.Population.HasFadingCells);
+                if (nativeSceneView)
+                {
+                    int covered = 0;
+                    for (int warmup = 0; warmup < 4 && covered == 0; warmup++)
+                    {
+                        Color[] warmPixels = null;
+                        yield return rig.NativeFrame(-1, Path.Combine(output, "GrassWarmup_" + warmup), value => warmPixels = value);
+                        foreach (Color pixel in warmPixels) if (Covered(pixel)) covered++;
+                    }
+                    Assert.Greater(covered, 0, "Settled native Scene View must contain real grass GPU geometry before the motion sequence.");
+                }
+                if (performance)
+                {
+                    yield return CaptureGrassPerformance(rig, vegetation, provider, models, output, nativeSceneView, playing, temporary, automaticSubmission, value => performancePriming = value);
+                    yield break;
+                }
+                if (multipleViews)
+                {
+                    vegetation.StreamingCamera = null;
+                    vegetation.enabled = false;
+                    vegetation.enabled = true;
+                    Assert.IsTrue(vegetation.CanStreamFrom(rig.Camera));
+                    vegetation.PrepareSource(settings);
+                    for (int i = 0; i < 2000 && (vegetation.Population.NeedsStreaming || vegetation.Population.HasFadingCells); i++) vegetation.Population.Stream(rig.Camera.transform.position, 0.1f);
+                    yield return rig.NativeFrame(-1, Path.Combine(output, "Owner_Initial"), null);
+                    XRayDetailPopulation population = vegetation.Population;
+                    object buffers = typeof(XRayDetailVegetation).GetField("_sourceBuffers", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(vegetation);
+                    string signature = PopulationSignature(population);
+                    Rig other = CreateRig(scene, temporary, false, true);
+                    try
+                    {
+                        other.Hide();
+                        other.Frame(new Bounds(rig.Camera.transform.position + new Vector3(1000.0f, 0.0f, 1000.0f), Vector3.one * 12.0f));
+                        Assert.IsFalse(vegetation.CanStreamFrom(other.Camera));
+                        var cameraRows = new StringBuilder("Iteration,OwnerCoveredPixels,OtherCoveredPixels,ResidentCells,ResidentInstances,WindTime\n");
+                        for (int i = 0; i < 5; i++)
+                        {
+                            provider.Tick(0.05f);
+                            double time = provider.State.Time;
+                            Color[] ownerPixels = null;
+                            Color[] otherPixels = null;
+                            yield return rig.NativeFrame(-1, Path.Combine(output, "Owner_" + i), value => ownerPixels = value);
+                            yield return other.NativeFrame(-1, Path.Combine(output, "Other_" + i), value => otherPixels = value);
+                            int ownerCovered = 0;
+                            int otherCovered = 0;
+                            foreach (Color pixel in ownerPixels) if (Covered(pixel)) ownerCovered++;
+                            foreach (Color pixel in otherPixels) if (Covered(pixel)) otherCovered++;
+                            Assert.Greater(ownerCovered, 0);
+                            Assert.AreEqual(0, otherCovered);
+                            Assert.AreSame(population, vegetation.Population);
+                            Assert.AreSame(buffers, typeof(XRayDetailVegetation).GetField("_sourceBuffers", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(vegetation));
+                            Assert.AreEqual(signature, PopulationSignature(population));
+                            Assert.AreEqual(time, provider.State.Time);
+                            cameraRows.AppendLine(string.Join(",", i, ownerCovered, otherCovered, vegetation.ResidentCells, vegetation.ResidentInstances, Num((float)time)));
+                        }
+                        File.WriteAllText(Path.Combine(output, "Multiple_SceneViews.csv"), cameraRows.ToString());
+                    }
+                    finally
+                    {
+                        other.Release();
+                    }
+                    yield break;
+                }
+                Color[] grassPrevious = null;
+                for (int frame = 0; frame < 3; frame++)
+                {
+                    if (playing) yield return new WaitForSecondsRealtime(0.5f);
+                    else provider.Tick(0.1f);
+                    Color[] pixels = null;
+                    if (nativeSceneView) yield return rig.NativeFrame(-1, Path.Combine(output, "InstancedGrass_" + frame), value => pixels = value);
+                    else pixels = rig.Raw(Path.Combine(output, "InstancedGrass_" + frame));
+                    foreach (XRayDetailModelEntry model in models) model.Material.SetFloat("_MonolithDebug", 0.0f);
+                    if (nativeSceneView) yield return rig.NativeFrame(-1, Path.Combine(output, "InstancedGrass_" + frame + "_Forward"), null);
+                    else rig.Raw(Path.Combine(output, "InstancedGrass_" + frame + "_Forward"));
+                    foreach (XRayDetailModelEntry model in models) model.Material.SetFloat("_MonolithDebug", 34.0f);
+                    (int changed, float maximum) = GeometryDelta(grassPrevious, pixels);
+                    rows.AppendLine(string.Join(",", "InstancedGrass", frame, Num((float)provider.State.Time), Time.frameCount, changed, Num(maximum), vegetation.LastVisibleInstances, vegetation.LastDrawCalls));
+                    Assert.Greater(vegetation.LastVisibleInstances, 0);
+                    if (frame > 0) Assert.Greater(maximum, 0.00001f, "Actual detail GPU instancing must deform geometry.");
+                    grassPrevious = pixels;
+                }
+                Color[] grassMotion = null;
+                if (nativeSceneView) yield return rig.NativeFrame(-1, Path.Combine(output, "InstancedGrass_Wind_MotionVectors"), value => grassMotion = value, true);
+                else grassMotion = rig.RawMotion(Path.Combine(output, "InstancedGrass_Wind_MotionVectors"));
+                float maximumMotion = 0.0f;
+                foreach (Color pixel in grassMotion) maximumMotion = Mathf.Max(maximumMotion, Mathf.Max(Mathf.Abs(pixel.r), Mathf.Abs(pixel.g)));
+                if (!playing && !gameCamera)
+                {
+                    string version = UnityEditor.PackageManager.PackageInfo.FindForAssembly(typeof(HDRenderPipeline).Assembly).version;
+                    Assert.IsTrue(version == "17.3.0" || version == "17.6.0", "Review the installed HDRP source and GPU camera contract before accepting a package upgrade.");
+                    Assert.IsFalse(HDCamera.GetOrCreate(rig.Camera).frameSettings.IsEnabled(FrameSettingsField.ObjectMotionVectors), "The reviewed HDRP versions forcibly disable object motion for non-Game cameras.");
+                    Assert.AreEqual(0.0f, maximumMotion, "The reviewed HDRP SceneView geometry animates without native object motion vectors.");
+                }
+                else if (!pausedAcceptance) Assert.Greater(maximumMotion, 0.0f, "Actual instanced grass wind must produce object motion vectors with a static camera.");
+                provider.Paused = true;
+                if (playing) yield return new WaitForSecondsRealtime(0.1f);
+                else provider.Tick(0.0f);
+                Color[] pausedMotion = null;
+                if (nativeSceneView) yield return rig.NativeFrame(-1, Path.Combine(output, "InstancedGrass_Paused_MotionVectors"), value => pausedMotion = value, true);
+                else pausedMotion = rig.RawMotion(Path.Combine(output, "InstancedGrass_Paused_MotionVectors"));
+                float maximumPaused = 0.0f;
+                foreach (Color pixel in pausedMotion) maximumPaused = Mathf.Max(maximumPaused, Mathf.Max(Mathf.Abs(pixel.r), Mathf.Abs(pixel.g)));
+                File.WriteAllText(Path.Combine(output, "Grass_MotionVectors.csv"), "Scenario,MaximumMotion,Tolerance\nWind," + Num(maximumMotion) + ",0\nPaused," + Num(maximumPaused) + "," + Num((float)MOTION_TOLERANCE) + "\n");
+                Assert.LessOrEqual(maximumPaused, MOTION_TOLERANCE, "Paused grass must not generate wind motion vectors.");
+                if (playing)
+                {
+                    yield return null;
+                    rig.RawMotion(Path.Combine(output, "Height_Before"));
+                    settings.Set(new XRayGrassValues(settings.Values.Density, settings.Values.Radius, 2.0f, settings.Values.Shadows), false);
+                    float heightMotion = MaximumMotion(rig.RawMotion(Path.Combine(output, "Height_Changed_MotionVectors")));
+                    Assert.Greater(heightMotion, 0.0f, "A height edit must retain the previous height across repeated renders of the same Game frame.");
+                    yield return null;
+                    float settledHeightMotion = MaximumMotion(rig.RawMotion(Path.Combine(output, "Height_Settled_MotionVectors")));
+                    Assert.LessOrEqual(settledHeightMotion, MOTION_TOLERANCE);
+                    File.WriteAllText(Path.Combine(output, "Height_MotionVectors.csv"), "Scenario,MaximumMotion\nChanged," + Num(heightMotion) + "\nSettled," + Num(settledHeightMotion) + "\n");
+                }
+            }
+            finally
+            {
+                File.WriteAllText(Path.Combine(output, "Wind_Geometry_Frames.csv"), rows.ToString());
+                File.WriteAllText(Path.Combine(output, "Tree_Native_Motion.csv"), treeMotionRows.ToString());
+                if (diagnosticSubmission != null) RenderPipelineManager.beginCameraRendering -= diagnosticSubmission;
+                Application.runInBackground = runInBackground;
+                RestoreCaptureTime();
+                rig?.Release();
+                for (int i = temporary.Count - 1; i >= 0; i--) UnityEngine.Object.DestroyImmediate(temporary[i]);
+                if (Application.isPlaying) SceneManager.UnloadSceneAsync(scene);
+                else EditorSceneManager.ClosePreviewScene(scene);
+                XRayFloraWindState.Clear();
+            }
+        }
+
+        private void RestoreCaptureTime()
+        {
+            if (!_captureTimeOwned) return;
+            Time.captureDeltaTime = _captureDeltaTime;
+            _captureTimeOwned = false;
+        }
+
+        private static (int, float) GeometryDelta(Color[] previous, Color[] current)
+        {
+            int changed = 0;
+            float maximum = 0.0f;
+            if (previous == null) return (0, 0.0f);
+            for (int i = 0; i < current.Length; i++)
+            {
+                if (!Covered(previous[i]) || !Covered(current[i])) continue;
+                float difference = Mathf.Max(Mathf.Abs(current[i].r - previous[i].r), Mathf.Max(Mathf.Abs(current[i].g - previous[i].g), Mathf.Abs(current[i].b - previous[i].b)));
+                if (difference > 0.00001f) changed++;
+                maximum = Mathf.Max(maximum, difference);
+            }
+            return (changed, maximum);
+        }
+
+        private static float MaximumMotion(Color[] pixels)
+        {
+            float result = 0.0f;
+            foreach (Color pixel in pixels) result = Mathf.Max(result, Mathf.Abs(pixel.r), Mathf.Abs(pixel.g));
+            return result;
+        }
+
+        private static string PopulationSignature(XRayDetailPopulation population)
+        {
+            var cells = new List<string>();
+            foreach (XRayDetailCell cell in population.Cells) cells.Add(cell.X + ":" + cell.Z + ":" + cell.Generation + ":" + cell.Instances.Count);
+            cells.Sort(StringComparer.Ordinal);
+            return string.Join("|", cells);
+        }
+
+        private IEnumerator CaptureGrassPerformance(Rig rig, XRayDetailVegetation vegetation, XRayFloraWindProvider wind, List<XRayDetailModelEntry> models, string output, bool nativeSceneView, bool playing, List<UnityEngine.Object> temporary, Action<ScriptableRenderContext, Camera> automaticSubmission, Action<bool> setPriming)
+        {
+            Assert.IsTrue(XRayRvmGrassSource.TryRead(out string json, out string status), status);
+            File.WriteAllText(Path.Combine(output, "Current_RVM_Profile.json"), json);
+            XRayGrassDefaults defaults = XRayGrassDefaults.Load(json);
+            XRayGrassValues baseline = defaults.ForLevel(null);
+            rig.Receiver(true, 31);
+            foreach (Light light in rig.Camera.transform.parent.GetComponentsInChildren<Light>()) light.gameObject.layer = 31;
+            File.WriteAllText(Path.Combine(output, "Performance_Environment.txt"), "API=" + SystemInfo.graphicsDeviceType + "\nGPU=" + SystemInfo.graphicsDeviceName + "\nDeviceVersion=" + SystemInfo.graphicsDeviceVersion + "\nCamera=" + rig.Camera.cameraType + "\nCameraPixelWidth=" + rig.Camera.pixelWidth + "\nCameraPixelHeight=" + rig.Camera.pixelHeight + "\nReadbackSize=" + SIZE + "x" + SIZE + "\nWarmupFrames=30\nMeasuredFramesPerScenario=60\nScope=isolated Editor microbenchmark; measured frames use ordinary rendering without AOV requests; separate AOV snapshots follow each scenario; population is fully settled; Unity draw counter and driver allocation are global, not physical GPU draw or VRAM residency measurements.");
+            if (playing)
+            {
+                Assert.IsNull(XRayGrassSettingsProvider.Active, "The performance fixture must own its runtime settings provider.");
+                var providerRoot = new GameObject("Performance isolated grass settings");
+                temporary.Add(providerRoot);
+                providerRoot.SetActive(false);
+                var provider = providerRoot.AddComponent<XRayGrassSettingsProvider>();
+                provider.Initialize(new XRayGrassSettings(defaults, Path.Combine(output, "RuntimeSettings.json")));
+                providerRoot.SetActive(true);
+            }
+            var controller = vegetation.gameObject.AddComponent<XRayDetailVegetationController>();
+            controller.RefreshFromRvm(json);
+            foreach (XRayDetailModelEntry model in models) model.Material.SetFloat("_MonolithDebug", 0.0f);
+            string[] names = { "ForwardOpaque", "ForwardDepthPrepass", "RenderShadowMaps", "ObjectsMotionVector" };
+            var samplers = new ProfilingSampler[names.Length];
+            Type ids = typeof(HDRenderPipeline).Assembly.GetType("UnityEngine.Rendering.HighDefinition.HDProfileId", true);
+            MethodInfo get = typeof(ProfilingSampler).GetMethod("Get", BindingFlags.Public | BindingFlags.Static).MakeGenericMethod(ids);
+            for (int i = 0; i < names.Length; i++) samplers[i] = (ProfilingSampler)get.Invoke(null, new[] { Enum.Parse(ids, names[i]) });
+            bool wasEnabled = UnityEngine.Profiling.Profiler.enabled;
+            bool binary = UnityEngine.Profiling.Profiler.enableBinaryLog;
+            string log = UnityEngine.Profiling.Profiler.logFile;
+            bool editor = UnityEditorInternal.ProfilerDriver.profileEditor;
+            var csv = new StringBuilder("Scenario,Sample,EditorRenderWallMs,RenderWindowGcBytes,MainThreadNs,FrameGcBytes,UnityDrawCallsCounter,DriverAllocatedBytes,VisibleInstances,ActiveCells,ResidentInstances,DrawSubmissions,StreamingUpdateMs,StreamingPending,GpuFrameMs,ForwardCpuMs,ForwardGpuMs,ForwardGpuSamples,DepthCpuMs,DepthGpuMs,DepthGpuSamples,ShadowCpuMs,ShadowGpuMs,ShadowGpuSamples,MotionCpuMs,MotionGpuMs,MotionGpuSamples\n");
+            using var main = Unity.Profiling.ProfilerRecorder.StartNew(Unity.Profiling.ProfilerCategory.Internal, "Main Thread");
+            using var gc = Unity.Profiling.ProfilerRecorder.StartNew(Unity.Profiling.ProfilerCategory.Memory, "GC Allocated In Frame");
+            using var draws = Unity.Profiling.ProfilerRecorder.StartNew(Unity.Profiling.ProfilerCategory.Render, "Draw Calls Count");
+            var timings = new FrameTiming[1];
+            var warmupRows = new StringBuilder("Scenario,ManualStreamCalls,ManualStreamCpuMs,PopulationWarmupWallMs,ResidentCells,ResidentInstances,StreamingPending,FadingPending\n");
+            try
+            {
+                UnityEditorInternal.ProfilerDriver.profileEditor = true;
+                UnityEngine.Profiling.Profiler.logFile = Path.Combine(output, "VegetationPerformance.raw");
+                UnityEngine.Profiling.Profiler.enableBinaryLog = true;
+                UnityEngine.Profiling.Profiler.enabled = true;
+                foreach (ProfilingSampler sampler in samplers) sampler.enableRecording = true;
+                foreach (string scenario in new[] { "GrassOff", "RvmDefaults", "WindOff", "WindOn", "ShadowsOff", "ShadowsOn", "HeightMinimum", "HeightMaximum", "MinimumPopulation", "MaximumPopulation" })
+                {
+                    rig.SetPerformanceMode(true);
+                    controller.ResetToRvm();
+                    XRayGrassValues values = scenario == "MinimumPopulation" ? new XRayGrassValues(1.0f, 50, baseline.Height, false) : scenario == "MaximumPopulation" ? new XRayGrassValues(0.04f, 250, baseline.Height, false) : new XRayGrassValues(baseline.Density, baseline.Radius, scenario == "HeightMinimum" ? 0.5f : scenario == "HeightMaximum" ? 2.0f : baseline.Height, scenario == "ShadowsOn" || baseline.Shadows && scenario != "ShadowsOff");
+                    controller.SetValues(values);
+                    vegetation.enabled = scenario != "GrassOff";
+                    if (automaticSubmission != null) RenderPipelineManager.beginCameraRendering -= automaticSubmission;
+                    typeof(XRayDetailVegetation).GetField("_wind", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(vegetation, scenario != "WindOff");
+                    File.WriteAllText(Path.Combine(output, scenario + "_Settings.json"), JsonUtility.ToJson(values));
+                    if (vegetation.enabled)
+                    {
+                        setPriming(true);
+                        vegetation.StreamSource(rig.Camera.transform.position);
+                        var warmTimer = System.Diagnostics.Stopwatch.StartNew();
+                        int calls = 0;
+                        double streamCpu = 0.0;
+                        while ((vegetation.Population.NeedsStreaming || vegetation.Population.HasFadingCells) && warmTimer.Elapsed.TotalSeconds < 180.0)
+                        {
+                            vegetation.Population.Stream(rig.Camera.transform.position, 0.1f);
+                            streamCpu += vegetation.Population.LastBuildMilliseconds;
+                            if (++calls % 64 == 0) yield return null;
+                        }
+                        warmTimer.Stop();
+                        warmupRows.AppendLine(string.Join(",", scenario, calls, Num((float)streamCpu), Num((float)warmTimer.Elapsed.TotalMilliseconds), vegetation.ResidentCells, vegetation.ResidentInstances, vegetation.Population.NeedsStreaming, vegetation.Population.HasFadingCells));
+                        File.WriteAllText(Path.Combine(output, "Population_Warmup.csv"), warmupRows.ToString());
+                        Assert.IsFalse(vegetation.Population.NeedsStreaming || vegetation.Population.HasFadingCells, scenario + ": population did not settle within the fixed warmup budget.");
+                        setPriming(false);
+                    }
+                    for (int frame = 0; frame < 90; frame++)
+                    {
+                        File.AppendAllText(Path.Combine(output, "Performance_Stages.csv"), scenario + ",BeforeRender," + frame + "," + DateTime.UtcNow.ToString("O") + "\n");
+                        if (!playing) wind.Tick(1.0f / 30.0f);
+                        long allocated = GC.GetAllocatedBytesForCurrentThread();
+                        var timer = System.Diagnostics.Stopwatch.StartNew();
+                        if (nativeSceneView) yield return rig.PerformanceRepaint();
+                        else rig.Camera.Render();
+                        timer.Stop();
+                        long renderGc = GC.GetAllocatedBytesForCurrentThread() - allocated;
+                        File.AppendAllText(Path.Combine(output, "Performance_Stages.csv"), scenario + ",AfterRender," + frame + "," + DateTime.UtcNow.ToString("O") + "\n");
+                        FrameTimingManager.CaptureFrameTimings();
+                        yield return null;
+                        if (frame < 30) continue;
+                        string gpuFrame = playing && FrameTimingManager.GetLatestTimings(1, timings) > 0 && timings[0].gpuFrameTime > 0.0 ? timings[0].gpuFrameTime.ToString("R", CultureInfo.InvariantCulture) : "NA";
+                        csv.Append(string.Join(",", scenario, frame - 30, Num((float)timer.Elapsed.TotalMilliseconds), renderGc, main.Valid ? main.LastValue.ToString(CultureInfo.InvariantCulture) : "NA", gc.Valid ? gc.LastValue.ToString(CultureInfo.InvariantCulture) : "NA", draws.Valid ? draws.LastValue.ToString(CultureInfo.InvariantCulture) : "NA", UnityEngine.Profiling.Profiler.GetAllocatedMemoryForGraphicsDriver(), vegetation.enabled ? vegetation.LastVisibleInstances : 0, vegetation.ResidentCells, vegetation.ResidentInstances, vegetation.enabled ? vegetation.LastDrawCalls : 0, vegetation.enabled && vegetation.Population != null ? Num((float)vegetation.Population.LastBuildMilliseconds) : "NA", vegetation.Population != null && vegetation.Population.NeedsStreaming, gpuFrame));
+                        foreach (ProfilingSampler sampler in samplers) csv.Append(",").Append(Num(sampler.cpuElapsedTime)).Append(",").Append(playing && sampler.gpuSampleCount > 0 ? Num(sampler.gpuElapsedTime) : "NA").Append(",").Append(playing ? sampler.gpuSampleCount : 0);
+                        csv.AppendLine();
+                        File.WriteAllText(Path.Combine(output, "Performance_Frames.csv"), csv.ToString());
+                    }
+                    File.WriteAllText(Path.Combine(output, "Performance_Frames.csv"), csv.ToString());
+                    rig.SetPerformanceMode(false);
+                    File.AppendAllText(Path.Combine(output, "Performance_Stages.csv"), scenario + ",BeforeAov,0," + DateTime.UtcNow.ToString("O") + "\n");
+                    if (vegetation.enabled) Assert.Greater(vegetation.LastVisibleInstances, 0, scenario);
+                    if (nativeSceneView) yield return rig.NativeFrame(-1, Path.Combine(output, scenario + "_Forward"), null);
+                    else rig.Raw(Path.Combine(output, scenario + "_Forward"));
+                    foreach (XRayDetailModelEntry model in models) model.Material.SetFloat("_MonolithDebug", 34.0f);
+                    if (nativeSceneView) yield return rig.NativeFrame(-1, Path.Combine(output, scenario + "_Geometry"), null);
+                    else rig.Raw(Path.Combine(output, scenario + "_Geometry"));
+                    foreach (XRayDetailModelEntry model in models) model.Material.SetFloat("_MonolithDebug", 0.0f);
+                    if (nativeSceneView) yield return rig.NativeFrame(-1, Path.Combine(output, scenario + "_Motion"), null, true);
+                    else rig.RawMotion(Path.Combine(output, scenario + "_Motion"));
+                    File.WriteAllText(Path.Combine(output, "Performance_Frames.csv"), csv.ToString());
+                    Assert.AreEqual(3, rig.AovHandleCount, "AOV output allocation must remain bounded across all measured frames.");
+                }
+            }
+            finally
+            {
+                rig.SetPerformanceMode(false);
+                setPriming(false);
+                File.WriteAllText(Path.Combine(output, "Performance_Frames.csv"), csv.ToString());
+                foreach (ProfilingSampler sampler in samplers) sampler.enableRecording = false;
+                UnityEngine.Profiling.Profiler.enabled = false;
+                UnityEngine.Profiling.Profiler.enableBinaryLog = binary;
+                UnityEngine.Profiling.Profiler.logFile = log;
+                UnityEditorInternal.ProfilerDriver.profileEditor = editor;
+                UnityEngine.Profiling.Profiler.enabled = wasEnabled;
+            }
+        }
+
+        [UnityTest]
+        [Timeout(600000)]
+        public IEnumerator InstancedTreesUseNativePreviousTransforms()
+        {
+            yield return new EnterPlayMode();
+            HdrpTestWarmup.Ensure();
+            string output = Path.Combine(Output(), "TreeInstanceHistory");
+            Directory.CreateDirectory(output);
+            string original = MonolithFloraReferenceSource.Build(1, File.ReadAllText(MonolithFloraReferenceSource.TEMPLATE), out string manifest);
+            Material reference = Reference(original, output, "InstanceOriginalBranch");
+            File.WriteAllText(Path.Combine(output, "Original_Source_Manifest.txt"), manifest);
+            Scene scene = SceneManager.CreateScene("Tree native history acceptance");
+            var temporary = new List<UnityEngine.Object>();
+            var failures = new List<string>();
+            var rows = new StringBuilder("Scenario,Pixels,MaxError,MaxMotion,VisibleInstances,CurrentMatrix,PreviousMatrix\n");
+            Rig rig = null;
+            try
+            {
+                rig = CreateRig(scene, temporary, false);
+                Mesh mesh = Own(Grid(true));
+                Texture2D waves = Own(Waves(false));
+                Material material = Own(WindMaterial(1.0f, 0.0f, waves, false));
+                material.enableInstancing = true;
+                var root = new GameObject("Tree submission history acceptance");
+                temporary.Add(root);
+                SceneManager.MoveGameObjectToScene(root, scene);
+                var providerRoot = new GameObject("Tree history wind provider");
+                temporary.Add(providerRoot);
+                var provider = providerRoot.AddComponent<XRayFloraWindProvider>();
+                provider.Profile = XRayFloraWindProfile.AnomalySsfx;
+                provider.PreviewEnabled = false;
+                provider.SetWeather(30.0f, 900.0f, 0.004f);
+                provider.ResetAnimation();
+                provider.Paused = true;
+                var set = Own(ScriptableObject.CreateInstance<XRayInstanceBatchSet>());
+                var matrices = new[] { Matrix4x4.identity };
+                set.Initialize("fixture", 32.0f, new List<XRayInstanceBatch> { new XRayInstanceBatch("source tree", mesh, new[] { material }, new Bounds(Vector3.zero, Vector3.one * 20.0f), matrices, new[] { new Vector4(1.0f, 0.0f, 0.0f, 1.0f) }, false) });
+                var renderer = root.AddComponent<XRayLevelInstancedRenderer>();
+                renderer.BatchSet = set;
+                rig.Frame(new Bounds(Vector3.zero, new Vector3(6.0f, 6.0f, 6.0f)));
+                rig.Hide();
+                rig.InstanceFrame(material, Path.Combine(output, "Warmup"));
+                foreach (string scenario in new[] { "FirstFrame", "StaticWind", "MovingInstance", "MovingScaledInstance", "MovingParentWorldSpace", "DisabledWind", "MovingInstanceWindOff", "SubsetReplacement", "CameraMotion", "TeleportReset" })
+                {
+                    Matrix4x4 previousMatrix = matrices[0];
+                    Matrix4x4 previousViewProjection = GL.GetGPUProjectionMatrix(rig.Camera.projectionMatrix, true) * rig.Camera.worldToCameraMatrix;
+                    yield return null;
+                    provider.Paused = false;
+                    if (scenario == "StaticWind") provider.Tick(0.1f);
+                    else provider.Tick(0.0f);
+                    provider.Paused = true;
+                    if (scenario == "MovingInstance" || scenario == "MovingInstanceWindOff") matrices[0] = Matrix4x4.Translate(new Vector3(0.25f, 0.0f, 0.0f)) * matrices[0];
+                    if (scenario == "MovingScaledInstance") matrices[0] = Matrix4x4.TRS(new Vector3(0.1f, 0.1f, 0.0f), Quaternion.Euler(0.0f, 0.0f, 10.0f), new Vector3(1.1f, 0.9f, 1.0f));
+                    if (scenario == "MovingParentWorldSpace") root.transform.position += new Vector3(10.0f, 0.0f, 0.0f);
+                    if (scenario == "DisabledWind") material.SetFloat(XRayFloraWindBindings.WIND, 0.0f);
+                    if (scenario == "SubsetReplacement")
+                    {
+                        renderer.BatchSet = set;
+                        previousMatrix = matrices[0];
+                    }
+                    if (scenario == "CameraMotion") rig.Camera.transform.position += new Vector3(0.21f, -0.13f, 0.0f);
+                    if (scenario == "FirstFrame" || scenario == "TeleportReset")
+                    {
+                        if (scenario == "TeleportReset") matrices[0] = Matrix4x4.Translate(new Vector3(-0.75f, 0.0f, 0.0f));
+                        if (scenario == "FirstFrame")
+                        {
+                            renderer.enabled = false;
+                            renderer.enabled = true;
+                        }
+                        else renderer.ResetMotionHistory();
+                        previousMatrix = matrices[0];
+                        provider.Reinitialize();
+                    }
+                    bool wind = material.GetFloat(XRayFloraWindBindings.WIND) > 0.5f;
+                    Vector3[] current = wind ? Evaluate(reference, mesh.vertices, Uvs(mesh, 0), Uvs(mesh, 3), matrices[0], provider.State, false, waves) : Array.ConvertAll(mesh.vertices, vertex => matrices[0].MultiplyPoint3x4(vertex));
+                    Vector3[] previous = wind ? Evaluate(reference, mesh.vertices, Uvs(mesh, 0), Uvs(mesh, 3), previousMatrix, provider.State, true, waves) : Array.ConvertAll(mesh.vertices, vertex => previousMatrix.MultiplyPoint3x4(vertex));
+                    (Color[] vectors, Color[] uvs) = rig.InstanceFrame(material, Path.Combine(output, scenario));
+                    Matrix4x4 viewProjection = GL.GetGPUProjectionMatrix(rig.Camera.projectionMatrix, true) * rig.Camera.worldToCameraMatrix;
+                    (int pixels, double error, double maximum) = CompareMotion(vectors, uvs, current, previous, viewProjection, previousViewProjection, scenario);
+                    rows.AppendLine(string.Join(",", scenario, pixels, Num((float)error), Num((float)maximum), renderer.LastVisibleInstances, "\"" + matrices[0].ToString("F6").Replace("\n", " ") + "\"", "\"" + previousMatrix.ToString("F6").Replace("\n", " ") + "\""));
+                    if (_motionFailure != null) failures.Add(_motionFailure);
+                    if ((scenario == "StaticWind" || scenario == "MovingInstance" || scenario == "MovingInstanceWindOff" || scenario == "CameraMotion") && maximum <= 0.0) failures.Add(scenario + ": expected nonzero native motion.");
+                    if (scenario == "FirstFrame" || scenario == "TeleportReset")
+                    {
+                        if (maximum > MOTION_TOLERANCE) failures.Add(scenario + ": unexpected motion spike.");
+                    }
+                    rig.InstanceFrame(material, Path.Combine(output, scenario + "_Settled"));
+                }
+                material.SetFloat(XRayFloraWindBindings.WIND, 1.0f);
+                provider.Reinitialize();
+                var lods = Own(ScriptableObject.CreateInstance<XRayLevelLodSet>());
+                var spheres = new[] { new Vector4(10.0f, 0.0f, 0.0f, 0.00001f), new Vector4(0.0f, 0.0f, 0.0f, 100.0f) };
+                lods.Initialize(null, spheres, new[] { 1.0f, 1.0f }, Array.Empty<Vector3>(), Array.Empty<Vector2>(), Array.Empty<float>(), Array.Empty<float>(), Array.Empty<Vector3>(), 1.0f, 64.0f, 48.0f, 3.5f);
+                var subset = new[] { Matrix4x4.Translate(Vector3.right * 10.0f), Matrix4x4.identity };
+                set.Initialize("LOD history", 32.0f, new List<XRayInstanceBatch> { new XRayInstanceBatch("LOD subset", mesh, new[] { material }, new Bounds(Vector3.zero, Vector3.one * 40.0f), subset, new[] { Vector4.one, Vector4.one }, false, new[] { 0, 1 }) }, lods);
+                renderer.BatchSet = set;
+                renderer.LodImpostors = true;
+                rig.InstanceFrame(material, Path.Combine(output, "LodWarmup"));
+                foreach (string scenario in new[] { "LodPartialSubset", "LodFullBatch", "LodPartialReturn" })
+                {
+                    Matrix4x4 previousMatrix = subset[1];
+                    yield return null;
+                    subset[1] = Matrix4x4.Translate(new Vector3(0.15f, 0.0f, 0.0f)) * subset[1];
+                    spheres[0].w = scenario == "LodFullBatch" ? 100.0f : 0.00001f;
+                    Vector3[] current = Evaluate(reference, mesh.vertices, Uvs(mesh, 0), Uvs(mesh, 3), subset[1], provider.State, false, waves);
+                    Vector3[] previous = Evaluate(reference, mesh.vertices, Uvs(mesh, 0), Uvs(mesh, 3), previousMatrix, provider.State, true, waves);
+                    (Color[] vectors, Color[] uvs) = rig.InstanceFrame(material, Path.Combine(output, scenario));
+                    Matrix4x4 viewProjection = GL.GetGPUProjectionMatrix(rig.Camera.projectionMatrix, true) * rig.Camera.worldToCameraMatrix;
+                    (int pixels, double error, double maximum) = CompareMotion(vectors, uvs, current, previous, viewProjection, viewProjection, scenario);
+                    rows.AppendLine(string.Join(",", scenario, pixels, Num((float)error), Num((float)maximum), renderer.LastVisibleInstances, "\"" + subset[1].ToString("F6").Replace("\n", " ") + "\"", "\"" + previousMatrix.ToString("F6").Replace("\n", " ") + "\""));
+                    Assert.AreEqual(scenario == "LodFullBatch" ? 0 : 1, renderer.LastLodDiscardedInstances);
+                    if (_motionFailure != null) failures.Add(_motionFailure);
+                }
+                var boundaryMatrices = new Matrix4x4[512];
+                var boundaryData = new Vector4[512];
+                Bounds boundaryBounds = mesh.bounds;
+                for (int i = 0; i < boundaryMatrices.Length; i++)
+                {
+                    Vector3 offset = new Vector3(i % 32 * 8.0f, i / 32 * 18.0f, 0.0f);
+                    boundaryMatrices[i] = Matrix4x4.Translate(offset);
+                    boundaryData[i] = Vector4.one;
+                    boundaryBounds.Encapsulate(new Bounds(mesh.bounds.center + offset, mesh.bounds.size));
+                }
+                set.Initialize("Native constant buffer boundary", 32.0f, new List<XRayInstanceBatch> { new XRayInstanceBatch("512 source instances", mesh, new[] { material }, boundaryBounds, boundaryMatrices, boundaryData, false) });
+                renderer.BatchSet = set;
+                material.SetFloat(XRayFloraWindBindings.WIND, 0.0f);
+                material.SetFloat("_MonolithDebug", 34.0f);
+                rig.Frame(boundaryBounds);
+                Color[] boundaryPixels = rig.Raw(Path.Combine(output, "ConstantBufferBoundary_Geometry"));
+                var visibleIds = new HashSet<int>();
+                foreach (Color pixel in boundaryPixels)
+                {
+                    if (!Covered(pixel)) continue;
+                    int x = Mathf.RoundToInt((pixel.r - mesh.bounds.center.x) / 8.0f);
+                    int y = Mathf.RoundToInt((pixel.g - mesh.bounds.center.y) / 18.0f);
+                    if (x >= 0 && x < 32 && y >= 0 && y < 16) visibleIds.Add(y * 32 + x);
+                }
+                Assert.AreEqual(512, visibleIds.Count, "GPU geometry must contain every instance across native submission boundaries.");
+                yield return null;
+                float boundaryMotion = MaximumMotion(rig.RawMotion(Path.Combine(output, "ConstantBufferBoundary_Motion")));
+                Assert.LessOrEqual(boundaryMotion, MOTION_TOLERANCE);
+                File.WriteAllText(Path.Combine(output, "ConstantBufferBoundary.csv"), "SourceInstances,GpuVisibleIdentities,MaximumStaticMotion\n512," + visibleIds.Count + "," + Num(boundaryMotion) + "\n");
+                Assert.IsEmpty(failures, string.Join("\n", failures));
+            }
+            finally
+            {
+                File.WriteAllText(Path.Combine(output, "Tree_Instance_Motion.csv"), rows.ToString());
+                File.WriteAllText(Path.Combine(output, "Failures.txt"), string.Join("\n", failures));
+                rig?.Release();
+                for (int i = temporary.Count - 1; i >= 0; i--) UnityEngine.Object.DestroyImmediate(temporary[i]);
+                SceneManager.UnloadSceneAsync(scene);
+            }
+            TearDown();
+            yield return new ExitPlayMode();
+        }
+
+        [UnityTest]
+        [Timeout(600000)]
+        public IEnumerator RealAnomalyLeafAlphaShadowMatchesSourceDeformedMesh()
+        {
+            HdrpTestWarmup.Ensure();
+            string output = Path.Combine(Output(), "RealAlphaShadow");
+            Directory.CreateDirectory(output);
+            var set = AssetDatabase.LoadAssetAtPath<XRayInstanceBatchSet>(ANOMALY_ROOT + "/l01_escape/Meshes/l01_escape_StaticProps.asset");
+            Assert.IsNotNull(set);
+            XRayInstanceBatch selected = null;
+            foreach (XRayInstanceBatch batch in set.Batches)
+            {
+                if (batch.Mesh == null || batch.Materials.Length == 0 || batch.Materials[0] == null || !batch.Materials[0].name.Contains("tree_leaves") || !batch.Materials[0].IsKeywordEnabled("_MONOLITH_LEVEL_FLORA")) continue;
+                if (selected == null || batch.Mesh.vertexCount > selected.Mesh.vertexCount) selected = batch;
+            }
+            Assert.IsNotNull(selected);
+            Material wind = Own(new Material(selected.Materials[0]));
+            Assert.AreEqual(1.0f, wind.GetFloat(XRayFloraWindBindings.WIND));
+            Assert.IsTrue(wind.IsKeywordEnabled("_ALPHATEST_ON"));
+            Texture2D waves = wind.GetTexture(XRayFloraWindBindings.WAVES) as Texture2D;
+            Assert.IsNotNull(waves);
+            Texture2D referenceWaves = wind.GetFloat(XRayFloraWindBindings.WAVES_FLIP) > 0.5f ? Own(UnflippedWaves(waves)) : waves;
+            string source = MonolithFloraReferenceSource.BuildShadow(false, true, File.ReadAllText(MonolithFloraReferenceSource.TEMPLATE), out string manifest);
+            File.WriteAllText(Path.Combine(output, "Original_Source_Manifest.txt"), manifest);
+            Material reference = Reference(source, output, "Real_Alpha_Shadow");
+            Matrix4x4 matrix = selected.Matrices[0];
+            XRayFloraWindState state = State(XRayFloraWindProfile.AnomalySsfx, 941);
+            Vector3[] vertices = Evaluate(reference, selected.Mesh.vertices, Uvs(selected.Mesh, 0), Uvs(selected.Mesh, 3), matrix, state, false, referenceWaves);
+            Mesh bakedMesh = Own(Baked(selected.Mesh, vertices, matrix));
+            Material baked = Own(new Material(wind));
+            baked.SetFloat(XRayFloraWindBindings.WIND, 0.0f);
+            Scene scene = EditorSceneManager.NewPreviewScene();
+            var temporary = new List<UnityEngine.Object>();
+            Rig rig = null;
+            try
+            {
+                rig = CreateRig(scene, temporary);
+                rig.Frame(GeometryUtility.CalculateBounds(vertices, Matrix4x4.identity));
+                state.Apply();
+                rig.Receiver(true);
+                rig.Show(selected.Mesh, wind, matrix, ShadowCastingMode.ShadowsOnly);
+                Color[] actual = rig.Debug(0, Path.Combine(output, "SourceWind_AlphaShadow"));
+                rig.Show(bakedMesh, baked, matrix, ShadowCastingMode.ShadowsOnly);
+                Color[] expected = rig.Debug(0, Path.Combine(output, "OriginalHlslBaked_AlphaShadow"));
+                (int pixels, int differing, double error) parity = CompareShadow(actual, expected);
+                rig.Hide();
+                Color[] unshadowed = rig.Debug(0, Path.Combine(output, "NoCaster"));
+                (int maskPixels, int shadowPixels, double maskError) shadowMask = CompareShadow(actual, unshadowed);
+                File.WriteAllText(Path.Combine(output, "Wind_Alpha_Shadow_Validation.csv"), "Profile,Vertices,AlphaCutoff,ParityPixels,DifferingPixels,MaxError,NonemptyShadowPixels\nAnomalySsfx," + selected.Mesh.vertexCount + "," + Num(wind.GetFloat("_AlphaCutoff")) + "," + parity.pixels + "," + parity.differing + "," + Num((float)parity.error) + "," + shadowMask.shadowPixels + "\n");
+                Assert.Greater(shadowMask.shadowPixels, 10, "The real alpha-clipped leaves must cast a nonempty shadow.");
+                Assert.LessOrEqual(parity.differing, Math.Max(2, parity.pixels / 2000), "Alpha-clipped leaf shadow must match original HLSL-deformed geometry.");
+                yield return null;
+            }
+            finally
+            {
+                rig?.Release();
+                for (int i = temporary.Count - 1; i >= 0; i--) UnityEngine.Object.DestroyImmediate(temporary[i]);
+                EditorSceneManager.ClosePreviewScene(scene);
+                XRayFloraWindState.Clear();
+            }
+        }
+
+
+        private static Texture2D UnflippedWaves(Texture2D source)
+        {
+            RenderTexture target = RenderTexture.GetTemporary(source.width, source.height, 0, RenderTextureFormat.ARGBFloat, RenderTextureReadWrite.Linear);
+            RenderTexture previous = RenderTexture.active;
+            var texture = new Texture2D(source.width, source.height, TextureFormat.RGBAFloat, false, true) { filterMode = source.filterMode, wrapMode = source.wrapMode };
+            try
+            {
+                Graphics.Blit(source, target);
+                RenderTexture.active = target;
+                texture.ReadPixels(new Rect(0, 0, source.width, source.height), 0, 0);
+                texture.Apply();
+                Color[] pixels = texture.GetPixels();
+                var flipped = new Color[pixels.Length];
+                for (int y = 0; y < source.height; y++) Array.Copy(pixels, y * source.width, flipped, (source.height - 1 - y) * source.width, source.width);
+                texture.SetPixels(flipped);
+                texture.Apply();
+                return texture;
+            }
+            catch
+            {
+                UnityEngine.Object.DestroyImmediate(texture);
+                throw;
+            }
+            finally
+            {
+                RenderTexture.active = previous;
+                RenderTexture.ReleaseTemporary(target);
+            }
         }
 
         private IEnumerator CaptureRealSource(string output, XRayInstanceBatch batch, Material stored, bool trueStalker)
@@ -918,12 +1770,16 @@ namespace XRay.Importer.Tests
             return Math.Pow(2.0, Math.Floor(Math.Log(magnitude, 2.0)) - 11.0);
         }
 
-        private static Rig CreateRig(Scene scene, List<UnityEngine.Object> temporary)
+        private Rig CreateRig(Scene scene, List<UnityEngine.Object> temporary, bool shadows = true, bool sceneView = false)
         {
+            if (!_fixtureObjects.Contains(temporary)) _fixtureObjects.Add(temporary);
+            if (!_fixtureScenes.Contains(scene)) _fixtureScenes.Add(scene);
             var root = new GameObject("Wind rig");
             temporary.Add(root);
             SceneManager.MoveGameObjectToScene(root, scene);
-            return new Rig(root, scene, temporary);
+            var rig = new Rig(root, scene, temporary, shadows, sceneView);
+            _fixtureRigs.Add(rig);
+            return rig;
         }
 
         private T Own<T>(T item) where T : UnityEngine.Object
@@ -955,6 +1811,7 @@ namespace XRay.Importer.Tests
 
         private sealed class Rig
         {
+            private readonly WindSceneView _sceneView;
             private readonly Camera _camera;
             private readonly HDAdditionalCameraData _data;
             private readonly GameObject _tree;
@@ -963,23 +1820,49 @@ namespace XRay.Importer.Tests
             private readonly GameObject _receiver;
             private readonly RenderTexture _target;
             private readonly Texture2D _pixels;
-            private readonly List<RTHandle> _aov = new List<RTHandle>();
+            private readonly Dictionary<AOVBuffers, RTHandle> _aov = new Dictionary<AOVBuffers, RTHandle>();
+            private readonly AOVRequestDataCollection _requests;
+            private readonly List<Light> _disabledFixtureLights = new List<Light>();
+            private readonly List<Camera> _disabledFixtureCameras = new List<Camera>();
             private bool _captureAov;
             private RTHandle _depthSource;
             private RTHandle _motionSource;
+            private RTHandle _colorSource;
+            private int _aovVersion;
+            private int _renderVersion;
+            private readonly RenderTexture _initialActive;
+            private bool _released;
 
-            public Rig(GameObject root, Scene scene, List<UnityEngine.Object> temporary)
+            public Camera Camera => _camera;
+            public int AovHandleCount => _aov.Count;
+
+            public Rig(GameObject root, Scene scene, List<UnityEngine.Object> temporary, bool shadows, bool sceneView)
             {
-                _camera = new GameObject("Wind Camera").AddComponent<Camera>();
+                _initialActive = RenderTexture.active;
+                if (sceneView)
+                {
+                    _sceneView = ScriptableObject.CreateInstance<WindSceneView>();
+                    _sceneView.ShowUtility();
+                    _sceneView.Bind(scene);
+                    _camera = _sceneView.camera;
+                }
+                else _camera = new GameObject("Wind Camera").AddComponent<Camera>();
                 _camera.transform.SetParent(root.transform);
                 _camera.scene = scene;
+                if (sceneView)
+                {
+                    _camera.cullingMask = 1 << 31;
+                    _camera.overrideSceneCullingMask = ulong.MaxValue;
+                    root.layer = 31;
+                }
                 _camera.enabled = false;
                 _camera.orthographic = true;
                 _camera.nearClipPlane = 0.1f;
                 _camera.farClipPlane = 200.0f;
                 _camera.allowHDR = true;
                 _camera.useOcclusionCulling = false;
-                _data = _camera.gameObject.AddComponent<HDAdditionalCameraData>();
+                _data = _camera.GetComponent<HDAdditionalCameraData>();
+                if (_data == null) _data = _camera.gameObject.AddComponent<HDAdditionalCameraData>();
                 _data.antialiasing = HDAdditionalCameraData.AntialiasingMode.None;
                 _data.clearColorMode = HDAdditionalCameraData.ClearColorMode.Color;
                 _data.backgroundColorHDR = new Color(BACKGROUND, BACKGROUND, BACKGROUND, 1.0f);
@@ -992,7 +1875,7 @@ namespace XRay.Importer.Tests
                 }
                 foreach (FrameSettingsField field in new[] { FrameSettingsField.MotionVectors, FrameSettingsField.ObjectMotionVectors, FrameSettingsField.ShadowMaps })
                 {
-                    _data.renderingPathCustomFrameSettings.SetEnabled(field, true);
+                    _data.renderingPathCustomFrameSettings.SetEnabled(field, field != FrameSettingsField.ShadowMaps || shadows);
                     _data.renderingPathCustomFrameSettingsOverrideMask.mask[(uint)field] = true;
                 }
                 var profile = ScriptableObject.CreateInstance<VolumeProfile>();
@@ -1008,18 +1891,36 @@ namespace XRay.Importer.Tests
                 volume.sharedProfile = profile;
                 Light sun = new GameObject("Wind Sun").AddComponent<Light>();
                 sun.transform.SetParent(root.transform);
+                if (sceneView) sun.gameObject.layer = 31;
                 sun.type = LightType.Directional;
                 sun.transform.rotation = Quaternion.Euler(35.0f, 15.0f, 0.0f);
-                sun.shadows = LightShadows.Hard;
+                sun.shadows = shadows ? LightShadows.Hard : LightShadows.None;
                 sun.gameObject.AddComponent<HDAdditionalLightData>().SetIntensity(3, LightUnit.Lux);
+                if (shadows)
+                {
+                    foreach (Camera camera in UnityEngine.Object.FindObjectsByType<Camera>(FindObjectsSortMode.None))
+                    {
+                        if (camera == _camera || camera.cameraType != CameraType.Game || !camera.enabled || camera.gameObject.scene.path != string.Empty || camera.name != "Main Camera") continue;
+                        _disabledFixtureCameras.Add(camera);
+                        camera.enabled = false;
+                    }
+                    foreach (Light light in UnityEngine.Object.FindObjectsByType<Light>(FindObjectsSortMode.None))
+                    {
+                        if (light == sun || light.type != LightType.Directional || light.shadows == LightShadows.None || !light.enabled || light.gameObject.scene.path != string.Empty || light.name != "Directional Light") continue;
+                        _disabledFixtureLights.Add(light);
+                        light.enabled = false;
+                    }
+                }
                 _tree = new GameObject("Wind Tree");
                 _tree.transform.SetParent(root.transform);
+                if (sceneView) _tree.layer = 31;
                 _filter = _tree.AddComponent<MeshFilter>();
                 _renderer = _tree.AddComponent<MeshRenderer>();
                 _renderer.motionVectorGenerationMode = MotionVectorGenerationMode.Object;
                 _receiver = GameObject.CreatePrimitive(PrimitiveType.Quad);
                 SceneManager.MoveGameObjectToScene(_receiver, scene);
                 temporary.Add(_receiver);
+                if (sceneView) _receiver.layer = 31;
                 var receiverMaterial = new Material(Shader.Find("HDRP/Lit"));
                 temporary.Add(receiverMaterial);
                 _receiver.GetComponent<MeshRenderer>().sharedMaterial = receiverMaterial;
@@ -1034,23 +1935,46 @@ namespace XRay.Importer.Tests
                 var builder = new AOVRequestBuilder();
                 builder.Add(AOVRequest.NewDefault(), buffer =>
                 {
-                    RTHandle handle = RTHandles.Alloc(SIZE, SIZE, colorFormat: GraphicsFormat.R32G32B32A32_SFloat, name: "Wind AOV " + buffer);
-                    _aov.Add(handle);
+                    if (_aov.TryGetValue(buffer, out RTHandle handle)) return handle;
+                    handle = RTHandles.Alloc(SIZE, SIZE, colorFormat: GraphicsFormat.R32G32B32A32_SFloat, name: "Wind AOV " + buffer);
+                    _aov.Add(buffer, handle);
                     return handle;
-                }, null, new[] { AOVBuffers.DepthStencil, AOVBuffers.MotionVectors }, (command, textures, properties) =>
+                }, null, new[] { AOVBuffers.DepthStencil, AOVBuffers.MotionVectors, AOVBuffers.Color }, (command, textures, properties) =>
                 {
                     if (!_captureAov) return;
                     _depthSource = textures[0];
                     _motionSource = textures[1];
+                    _colorSource = textures[2];
+                    _aovVersion++;
                 });
-                _data.SetAOVRequests(builder.Build());
+                _requests = builder.Build();
+                _data.SetAOVRequests(_requests);
+                RenderPipelineManager.endCameraRendering += OnEndCameraRendering;
+            }
+
+            public void SetPerformanceMode(bool enabled)
+            {
+                if (!_released && _data != null) _data.SetAOVRequests(enabled ? null : _requests);
             }
 
             public void Release()
             {
-                _data.SetAOVRequests(null);
-                foreach (RTHandle handle in _aov) RTHandles.Release(handle);
+                if (_released) return;
+                _released = true;
+                RenderPipelineManager.endCameraRendering -= OnEndCameraRendering;
+                if (_data != null) _data.SetAOVRequests(null);
+                _requests.Dispose();
+                bool ownedActive = RenderTexture.active == _target;
+                foreach (RTHandle handle in _aov.Values) ownedActive |= RenderTexture.active == handle.rt;
+                if (ownedActive) RenderTexture.active = _initialActive;
+                if (_camera != null) _camera.targetTexture = null;
+                foreach (RTHandle handle in _aov.Values) RTHandles.Release(handle);
                 _aov.Clear();
+                if (_sceneView != null) _sceneView.Close();
+                foreach (Light light in _disabledFixtureLights) if (light != null) light.enabled = true;
+                _disabledFixtureLights.Clear();
+                foreach (Camera camera in _disabledFixtureCameras) if (camera != null) camera.enabled = true;
+                _disabledFixtureCameras.Clear();
             }
 
             public float PixelSize => _camera.orthographicSize * 2.0f / SIZE;
@@ -1058,11 +1982,22 @@ namespace XRay.Importer.Tests
             public void Frame(Bounds bounds)
             {
                 _camera.orthographicSize = Mathf.Max(bounds.extents.x, bounds.extents.y) * 1.25f + 0.5f;
+                if (_sceneView != null)
+                {
+                    _sceneView.orthographic = true;
+                    _sceneView.LookAtDirect(bounds.center, Quaternion.identity, _camera.orthographicSize);
+                }
                 _camera.transform.position = bounds.center + Vector3.back * 60.0f;
                 _camera.transform.rotation = Quaternion.identity;
                 _receiver.transform.position = bounds.center + new Vector3(0.0f, 0.0f, Mathf.Max(3.0f, bounds.extents.z + 2.0f));
                 _receiver.transform.rotation = Quaternion.identity;
                 _receiver.transform.localScale = Vector3.one * (Mathf.Max(bounds.size.x, bounds.size.y) * 3.0f + 4.0f);
+            }
+
+            public void MoveCameraTo(Vector3 position)
+            {
+                if (_sceneView != null) _sceneView.LookAtDirect(_sceneView.pivot + position - _camera.transform.position, _sceneView.rotation, _sceneView.size);
+                _camera.transform.position = position;
             }
 
             public void Show(Mesh mesh, Material material, Matrix4x4 matrix, ShadowCastingMode shadows)
@@ -1086,8 +2021,9 @@ namespace XRay.Importer.Tests
                 _tree.SetActive(false);
             }
 
-            public void Receiver(bool visible)
+            public void Receiver(bool visible, int layer = -1)
             {
+                if (layer >= 0) _receiver.layer = layer;
                 _receiver.SetActive(visible);
             }
 
@@ -1100,6 +2036,77 @@ namespace XRay.Importer.Tests
                 _camera.Render();
                 material.SetFloat("_MonolithDebug", previous);
                 return Read(_target, path);
+            }
+
+            public Color[] Raw(string path)
+            {
+                _camera.Render();
+                _camera.Render();
+                Color[] pixels = Read(_target, path);
+                int covered = 0;
+                float minimum = float.MaxValue;
+                float maximum = float.MinValue;
+                foreach (Color pixel in pixels)
+                {
+                    if (Covered(pixel)) covered++;
+                    minimum = Mathf.Min(minimum, pixel.r);
+                    maximum = Mathf.Max(maximum, pixel.r);
+                }
+                File.WriteAllText(path + ".txt", "Covered=" + covered + " RMin=" + minimum + " RMax=" + maximum + " Camera=" + _camera.transform.position + " Type=" + _camera.cameraType + " ActiveWind=" + Shader.GetGlobalFloat(XRayFloraWindState.ACTIVE_PROPERTY) + " Anim=" + Shader.GetGlobalVector(XRayFloraWindState.ANIM_PROPERTY));
+                return pixels;
+            }
+
+            public Color[] RawMotion(string path)
+            {
+                _captureAov = true;
+                _camera.Render();
+                _camera.Render();
+                _captureAov = false;
+                return Read(_motionSource.rt, path);
+            }
+
+            public (Color[], Color[]) InstanceFrame(Material material, string path)
+            {
+                material.SetFloat("_MonolithDebug", 35.0f);
+                _captureAov = true;
+                _camera.Render();
+                _captureAov = false;
+                Color[] uvs = Read(_target, path + "_UV");
+                Color[] vectors = Read(_motionSource.rt, path + "_Motion");
+                material.SetFloat("_MonolithDebug", 0.0f);
+                return (vectors, uvs);
+            }
+
+            public IEnumerator NativeFrame(int debug, string path, Action<Color[]> receive, bool motion = false)
+            {
+                Assert.IsNotNull(_sceneView);
+                Material material = _renderer.sharedMaterial;
+                float previous = material != null ? material.GetFloat("_MonolithDebug") : 0.0f;
+                if (debug >= 0 && material != null) material.SetFloat("_MonolithDebug", debug);
+                int version = _aovVersion;
+                _captureAov = true;
+                _sceneView.Repaint();
+                double limit = EditorApplication.timeSinceStartup + 10.0;
+                while (_aovVersion < version + 2 && EditorApplication.timeSinceStartup < limit)
+                {
+                    _sceneView.Repaint();
+                    yield return null;
+                }
+                _captureAov = false;
+                Assert.GreaterOrEqual(_aovVersion, version + 2, "Actual Scene View GUI repaints must deliver settled AOV callbacks without Camera.Render.");
+                Color[] pixels = Read(motion ? _motionSource.rt : _colorSource.rt, path);
+                if (path != null) Read(_depthSource.rt, path + "_Depth");
+                if (debug >= 0 && material != null) material.SetFloat("_MonolithDebug", previous);
+                receive?.Invoke(pixels);
+            }
+
+            public IEnumerator PerformanceRepaint()
+            {
+                int version = _renderVersion;
+                _sceneView.Repaint();
+                double limit = EditorApplication.timeSinceStartup + 10.0;
+                while (_renderVersion == version && EditorApplication.timeSinceStartup < limit) yield return null;
+                Assert.Greater(_renderVersion, version);
             }
 
             public float[] Depth()
@@ -1132,6 +2139,11 @@ namespace XRay.Importer.Tests
                 return (previousViewProjection, viewProjection, vectors, uvs);
             }
 
+            private void OnEndCameraRendering(ScriptableRenderContext context, Camera camera)
+            {
+                if (camera == _camera) _renderVersion++;
+            }
+
             private Color[] Read(RenderTexture texture, string path)
             {
                 RenderTexture previous = RenderTexture.active;
@@ -1139,8 +2151,37 @@ namespace XRay.Importer.Tests
                 _pixels.ReadPixels(new Rect(0, 0, SIZE, SIZE), 0, 0);
                 _pixels.Apply();
                 RenderTexture.active = previous;
-                if (path != null) File.WriteAllBytes(path + ".exr", _pixels.EncodeToEXR(Texture2D.EXRFlags.OutputAsFloat));
+                if (path != null)
+                {
+                    FrameSettings actual = HDCamera.GetOrCreate(_camera).frameSettings;
+                    XRayFloraWindState wind = XRayFloraWindProvider.Active != null ? XRayFloraWindProvider.Active.State : null;
+                    File.WriteAllText(path + "_State.txt", "API=" + SystemInfo.graphicsDeviceType + " CameraType=" + _camera.cameraType + " Position=" + _camera.transform.position.ToString("F6") + " Rotation=" + _camera.transform.rotation.ToString("F6") + " OrthoSize=" + Num(_camera.orthographicSize) + " Frame=" + Time.frameCount + " EditorTime=" + EditorApplication.timeSinceStartup.ToString("R", CultureInfo.InvariantCulture) + " RequestedObjectMotion=" + _data.renderingPathCustomFrameSettings.IsEnabled(FrameSettingsField.ObjectMotionVectors) + " ActualObjectMotion=" + actual.IsEnabled(FrameSettingsField.ObjectMotionVectors) + " ActualMotion=" + actual.IsEnabled(FrameSettingsField.MotionVectors) + " ActualPostprocess=" + actual.IsEnabled(FrameSettingsField.Postprocess) + " Format=" + texture.graphicsFormat + " WindProfile=" + wind?.Profile + " WindTime=" + wind?.Time + " Current=" + wind?.Anim + " Previous=" + wind?.AnimPrev + " Params=" + wind?.WindParams().ToString("F8") + " ViewMatrix=" + _camera.worldToCameraMatrix.ToString("F6") + " Projection=" + _camera.projectionMatrix.ToString("F6") + " Measurement=GPUReadPixels Float32 EXR");
+                    File.WriteAllBytes(path + ".exr", _pixels.EncodeToEXR(Texture2D.EXRFlags.OutputAsFloat));
+                    var preview = new Texture2D(SIZE, SIZE, TextureFormat.RGBA32, false, true);
+                    try
+                    {
+                        preview.SetPixels(_pixels.GetPixels());
+                        preview.Apply();
+                        File.WriteAllBytes(path + ".png", preview.EncodeToPNG());
+                    }
+                    finally
+                    {
+                        UnityEngine.Object.DestroyImmediate(preview);
+                    }
+                }
                 return _pixels.GetPixels();
+            }
+        }
+
+        private sealed class WindSceneView : SceneView
+        {
+            public void Bind(Scene scene)
+            {
+                customScene = scene;
+                drawGizmos = false;
+                showGrid = false;
+                sceneViewState.fxEnabled = true;
+                sceneViewState.alwaysRefresh = true;
             }
         }
     }

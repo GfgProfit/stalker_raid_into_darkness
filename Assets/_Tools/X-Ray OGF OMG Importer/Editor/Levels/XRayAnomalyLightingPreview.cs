@@ -477,7 +477,7 @@ namespace XRay.Importer.Editor.Levels
             foreach (SceneView view in SceneView.sceneViews)
             {
                 Camera camera = view.camera;
-                views.Add(FormattableString.Invariant($"id={view.GetInstanceID()}; title={view.titleContent.text}; focused={EditorWindow.focusedWindow == view}; lastActive={SceneView.lastActiveSceneView == view}; pivot={view.pivot.ToString("R")}; rotation={view.rotation.eulerAngles.ToString("R")}; cameraPosition={camera.transform.position.ToString("R")}; cameraRotation={camera.transform.eulerAngles.ToString("R")}; fov={camera.fieldOfView}; aspect={camera.aspect}; rect={view.position}"));
+                views.Add(FormattableString.Invariant($"id={view.GetEntityId()}; title={view.titleContent.text}; focused={EditorWindow.focusedWindow == view}; lastActive={SceneView.lastActiveSceneView == view}; pivot={view.pivot.ToString("R")}; rotation={view.rotation.eulerAngles.ToString("R")}; cameraPosition={camera.transform.position.ToString("R")}; cameraRotation={camera.transform.eulerAngles.ToString("R")}; fov={camera.fieldOfView}; aspect={camera.aspect}; rect={view.position}"));
             }
             foreach (Camera camera in Components<Camera>(RequireScene())) views.Add(FormattableString.Invariant($"sceneCamera={camera.name}; main={Camera.main == camera}; enabled={camera.enabled}; position={camera.transform.position.ToString("R")}; rotation={camera.transform.eulerAngles.ToString("R")}"));
             return string.Join("\n", views);

@@ -14,7 +14,7 @@ using UnityEngine.UI;
 
 namespace RaidIntoDarkness.Integrations.Inventory.Tests
 {
-    public sealed class OutdoorsSceneAmmoTests : InputTestFixture
+    public sealed class OutdoorsSceneAmmoTests : OutdoorsSceneInputTestFixture
     {
         private InventoryItemView _hoveredView;
 

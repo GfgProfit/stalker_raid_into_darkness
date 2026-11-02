@@ -14,7 +14,7 @@ using UnityEngine.TestTools;
 
 namespace RaidIntoDarkness.Integrations.Inventory.Tests
 {
-    public sealed class OutdoorsSceneInventoryTests : InputTestFixture
+    public sealed class OutdoorsSceneInventoryTests : OutdoorsSceneInputTestFixture
     {
         private const string SCENE = "OutdoorsScene";
         private const string BACKPACK = "Backpack";
@@ -100,7 +100,8 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
 
                 WorldItem dropped = interactor.Spawn(definition, 1);
                 Assert.That(dropped, Is.Not.Null, section);
-                Physics.SyncTransforms();
+                Rigidbody body = dropped.GetComponent<Rigidbody>();
+                Assert.That(Vector3.Distance(body.position, dropped.transform.position), Is.LessThan(0.0001f), section);
 
                 foreach (Collider collider in dropped.GetComponentsInChildren<Collider>())
                 {
@@ -108,7 +109,6 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
                 }
 
                 Vector3 position = dropped.transform.position;
-                Rigidbody body = dropped.GetComponent<Rigidbody>();
                 yield return new WaitForSeconds(0.2f);
                 Assert.That(Vector3.ProjectOnPlane(dropped.transform.position - position, Vector3.up).magnitude, Is.LessThan(0.1f), section);
                 Assert.That(Vector3.ProjectOnPlane(body.linearVelocity, Vector3.up).magnitude, Is.LessThan(0.5f), section);
@@ -483,15 +483,18 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             Assert.That(sounds[sounds.Count - 1], Is.EqualTo(InventorySound.Drop), "dropping must play inv_drop");
             yield return null;
             WorldItem dropped = null;
+            int droppedMatches = 0;
 
             foreach (WorldItem candidate in Object.FindObjectsByType<WorldItem>(FindObjectsSortMode.None))
             {
-                if (candidate.Definition == hat.Definition)
+                if (ReferenceEquals(candidate.Instance, hat))
                 {
                     dropped = candidate;
+                    droppedMatches++;
                 }
             }
 
+            Assert.That(droppedMatches, Is.EqualTo(1), "the dropped instance must have exactly one world object");
             Assert.That(Object.FindObjectsByType<WorldItem>(FindObjectsSortMode.None).Length, Is.EqualTo(worldBefore + 1));
             WorldItemImpactSound impact = dropped.GetComponent<WorldItemImpactSound>();
             Assert.That(impact, Is.Not.Null, "world item prefab has no impact sound");

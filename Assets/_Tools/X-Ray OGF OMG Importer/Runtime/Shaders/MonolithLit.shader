@@ -73,6 +73,12 @@ Shader "HDRP/MonolithLit"
         [HideInInspector] _MonolithInstanceData("Level Instance Hemisphere Scale Bias", Vector) = (1,0,0,0)
         _MonolithLevelAmbientHemi("Scale HDRP Ambient By Level Hemisphere", Float) = 1
         _MonolithLevelWind("Detail Wind", Float) = 1
+        [HideInInspector] _MonolithGrassSource("Source Detail Vegetation", Float) = 0
+        [HideInInspector] _MonolithGrassRuntime("Runtime Detail Vegetation", Float) = 0
+        [HideInInspector] _MonolithGrassAlign("Source Grass Alignment", Float) = 0
+        [HideInInspector] _MonolithGrassHeight("Runtime Detail Size", Float) = 1
+        [HideInInspector] _MonolithGrassHeightPrevious("Previous Detail Size", Float) = 1
+        [HideInInspector] _MonolithWindGrassSetup("SSFX Grass Wind", Vector) = (0,0,0,0)
         [Toggle(_MONOLITH_LEVEL_TERRAIN)] _MonolithLevelTerrain("X-Ray Terrain 4-Detail Splat", Float) = 0
         _MonolithTerrainMask("Terrain Mask (Linear)", 2D) = "black" {}
         _MonolithTerrainDetailR("Terrain Detail R", 2D) = "grey" {}
@@ -288,6 +294,10 @@ Shader "HDRP/MonolithLit"
         #define _REQUIRE_UV3
         #endif
         #define MONOLITH_PREVIOUS_FRAME_TIME (-1048576.0)
+        #if defined(_MONOLITH_LEVEL_DETAIL)
+        #define ATTRIBUTES_NEED_TEXCOORD1
+        #define VARYINGS_NEED_TEXCOORD1
+        #endif
         #if defined(_MONOLITH_LEVEL) && !defined(_MONOLITH_SKINNED_TBN) && !defined(_MONOLITH_LEVEL_DETAIL)
         #define ATTRIBUTES_NEED_TEXCOORD0
         #define ATTRIBUTES_NEED_TEXCOORD3

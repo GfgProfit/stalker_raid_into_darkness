@@ -140,6 +140,14 @@ namespace XRay.Importer.Tests
             string output = Output();
             if (output == null) return;
             string prefix = Path.Combine(output, "Import" + (++_imports));
+            string savedAssets = prefix + "_Assets";
+            foreach (string asset in Directory.GetFiles(Root, "*", SearchOption.AllDirectories))
+            {
+                if (!(asset.EndsWith(".mat", StringComparison.Ordinal) || asset.EndsWith(".prefab", StringComparison.Ordinal) || asset.EndsWith(".meta", StringComparison.Ordinal) || asset.EndsWith("LevelImportManifest.asset", StringComparison.Ordinal))) continue;
+                string destination = Path.Combine(savedAssets, asset.Substring(Root.Length + 1));
+                Directory.CreateDirectory(Path.GetDirectoryName(destination));
+                File.Copy(asset, destination);
+            }
             File.WriteAllText(prefix + "_Manifest.json", XRayLevelImportJob.LastRecord.ToJson());
             Material material = MonolithTerrainFullImportTests.Material(this);
             File.WriteAllText(prefix + "_Material.json", EditorJsonUtility.ToJson(material, true));

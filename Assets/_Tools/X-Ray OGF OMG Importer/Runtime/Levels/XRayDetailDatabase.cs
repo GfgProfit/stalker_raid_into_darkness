@@ -51,7 +51,6 @@ namespace XRay.Importer.Levels
         [SerializeField] private int _instanceCount;
         [SerializeField] private int _slotStart;
         [SerializeField] private int _slotCount;
-
         public XRayDetailChunk(Bounds bounds, Vector3 positionOrigin, int instanceStart, int instanceCount, int slotStart, int slotCount)
         {
             _bounds = bounds;
@@ -120,6 +119,10 @@ namespace XRay.Importer.Levels
         [SerializeField] private XRayDetailSwing _swingFast;
         [SerializeField] private int _instanceCount;
         [SerializeField] private int _slotCount;
+        [SerializeField] private TextAsset _sourceDetails;
+        [SerializeField] private TextAsset _sourceCollision;
+        [SerializeField] private bool[] _passable;
+        [SerializeField] private int _sourceProfile;
 
         public string LevelName => _levelName;
         public float ChunkSize => _chunkSize;
@@ -134,6 +137,20 @@ namespace XRay.Importer.Levels
         public XRayDetailSwing SwingFast => _swingFast;
         public int InstanceCount => _instanceCount;
         public int SlotCount => _slotCount;
+
+        public TextAsset SourceDetails => _sourceDetails;
+        public TextAsset SourceCollision => _sourceCollision;
+        public bool[] Passable => _passable;
+        public int SourceProfile => _sourceProfile;
+        public bool HasRuntimeSource => _sourceDetails != null && _sourceCollision != null && _sourceProfile > 0;
+
+        public void SetRuntimeSource(TextAsset details, TextAsset collision, bool[] passable, int sourceProfile)
+        {
+            _sourceDetails = details;
+            _sourceCollision = collision;
+            _passable = passable;
+            _sourceProfile = sourceProfile;
+        }
 
         public void Initialize(string levelName, float chunkSize, float density, float heightScale, float slotSize, List<XRayDetailModelEntry> models, List<XRayDetailChunk> chunks, TextAsset instances, TextAsset slots, XRayDetailSwing swingNormal, XRayDetailSwing swingFast, int instanceCount, int slotCount)
         {

@@ -49,12 +49,12 @@ namespace UnityOpenMcpBridge.Tests.Extensions.InputSimulation
         private string Single(string action) => (string)typeof(PointerTools)
             .GetMethod("DoSingle", BindingFlags.NonPublic | BindingFlags.Static)
             .Invoke(null, new object[] { action, PointerEventData.InputButton.Left,
-                (long?)source.GetInstanceID(), null, null, null });
+                (long?)UnityOpenMcpBridge.ObjectRefs.InstanceId.Of(source), null, null, null });
 
         private string Drag(int steps = 2) => (string)typeof(PointerTools)
             .GetMethod("DoDrag", BindingFlags.NonPublic | BindingFlags.Static)
             .Invoke(null, new object[] { PointerEventData.InputButton.Left, steps,
-                (long?)source.GetInstanceID(), null, null, null,
+                (long?)UnityOpenMcpBridge.ObjectRefs.InstanceId.Of(source), null, null, null,
                 "DispatchCanvas/Destination", null, null });
 
         [Test]

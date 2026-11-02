@@ -6,6 +6,7 @@ using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
 using XRay.Importer.Core.Level;
 using XRay.Importer.Levels;
+using XRay.Importer.Sources.Vfs;
 #if XRAY_HDRP
 using UnityEngine.Rendering.HighDefinition;
 #endif
@@ -30,6 +31,8 @@ namespace XRay.Importer.Editor.Levels
         public List<XRayLevelChunkRenderer> Chunks { get; } = new List<XRayLevelChunkRenderer>();
         public XRayInstanceBatchSet Instances { get; set; }
         public XRayDetailDatabase Details { get; set; }
+        public XRaySourcePlan DetailSettingsSource { get; set; }
+        public bool FloraWindAccepted { get; set; }
         public List<XRayLevelCollisionChunk> Collision { get; } = new List<XRayLevelCollisionChunk>();
         public bool ImportLights { get; set; }
         public bool LightShadows { get; set; }
@@ -93,13 +96,31 @@ namespace XRay.Importer.Editor.Levels
             if (content.Details != null)
             {
                 Transform details = Child(root.transform, "DetailVegetation");
-                details.gameObject.AddComponent<XRayDetailVegetation>().Database = content.Details;
+                var vegetation = details.gameObject.AddComponent<XRayDetailVegetation>();
+                vegetation.Database = content.Details;
+                if (content.Details.HasRuntimeSource)
+                {
+                    var controller = details.gameObject.AddComponent<XRayDetailVegetationController>();
+                    controller.Initialize(vegetation);
+                    if (content.Details.SourceProfile == 1)
+                    {
+                        if (content.DetailSettingsSource == null) record.AddLimitation("SOURCE INPUT UNCERTAIN: effective RVM import source is unavailable; frozen grass profile retained.");
+                        else if (XRayRvmGrassSource.TryRead(out string json, out string status, content.DetailSettingsSource)) controller.InitializeRvmSnapshot(json);
+                        else record.AddLimitation(status);
+                    }
+                }
             }
 
             Transform lighting = Child(root.transform, "Lighting");
             CreateLights(lighting, content, record);
             Transform environment = Child(root.transform, "Environment");
             CreateEnvironment(environment, content, record);
+            if (content.FloraWindAccepted && (record.Source.FloraWindProfile == XRayFloraSourceProfile.AnomalySss.ToString() || record.Source.FloraWindProfile == XRayFloraSourceProfile.TrueStalker.ToString()))
+            {
+                var wind = Child(environment, "Source Flora Wind").gameObject.AddComponent<XRayFloraWindProvider>();
+                wind.Profile = record.Source.FloraWindProfile == XRayFloraSourceProfile.AnomalySss.ToString() ? XRayFloraWindProfile.AnomalySsfx : XRayFloraWindProfile.TrueStalkerXRay;
+                wind.ResetAnimation();
+            }
             if (content.Collision.Count > 0)
             {
                 Transform collision = Child(root.transform, "Collision");

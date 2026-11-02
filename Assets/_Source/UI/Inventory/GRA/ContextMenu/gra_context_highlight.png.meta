@@ -1,7 +1,10 @@
 fileFormatVersion: 2
 guid: 9be3c4110168384ffc5ad36dc4925095
 TextureImporter:
-  internalIDToNameTable: []
+  internalIDToNameTable:
+  - first:
+      213: 4228182937425890039
+    second: gra_context_highlight_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -53,7 +56,9 @@ TextureImporter:
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
   alphaIsTransparency: 1
+  spriteTessellationMethod: 0
   spriteTessellationDetail: -1
+  spriteGeometrySubdivision: -1
   textureType: 8
   textureShape: 1
   singleChannelComponent: 0
@@ -95,145 +100,25 @@ TextureImporter:
     forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
-    sprites: []
-    outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: aa91a25ffafa74543982e191a8e66cea
-      internalID: 2020989432
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
+    sprites:
     - serializedVersion: 2
-      name: ui_am_propery_08
+      name: gra_context_highlight_0
       rect:
         serializedVersion: 2
-        x: 154
-        y: 443
-        width: 19
-        height: 19
+        x: 0
+        y: 0
+        width: 60
+        height: 64
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: 2358e4b2c2051bf40a485766b07a9f87
-      internalID: -1399127683
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: ui_am_propery_09
-      rect:
-        serializedVersion: 2
-        x: 154
-        y: 424
-        width: 19
-        height: 19
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 4bf83b1368937c747b51421633934801
-      internalID: 1109638298
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: ui_am_propery_11
-      rect:
-        serializedVersion: 2
-        x: 173
-        y: 481
-        width: 19
-        height: 19
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 3bba55f94e14caa48933ed78ccc0c88e
-      internalID: -1656648241
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: ui_am_prop_wound
-      rect:
-        serializedVersion: 2
-        x: 78
-        y: 500
-        width: 19
-        height: 19
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 757ea5d211349104584979e0bca93e58
-      internalID: 743723136
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: ui_am_prop_explo
-      rect:
-        serializedVersion: 2
-        x: 97
-        y: 500
-        width: 19
-        height: 19
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: efc3f58ce51c7854a83e2b69d173163f
-      internalID: -960436041
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: ui_am_prop_strike
-      rect:
-        serializedVersion: 2
-        x: 116
-        y: 500
-        width: 19
-        height: 19
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 1735096fd1e322b4bacf387225d84a11
-      internalID: 1410035549
+      spriteID: 7fa43aecaf58daa30800000000000000
+      internalID: 4228182937425890039
       vertices: []
       indices: 
       edges: []
@@ -242,8 +127,8 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 57faa8effc76ad07ebe1e7559c65c315
-    internalID: 0
+    spriteID: 2358e4b2c2051bf40a485766b07a9f87
+    internalID: -1399127683
     vertices: []
     indices: 
     edges: []

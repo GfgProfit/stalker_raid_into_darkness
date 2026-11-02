@@ -53,6 +53,7 @@ namespace XRay.Importer.Editor.Levels
         [SerializeField] private float _detailDensity = 0.6f;
         [SerializeField] private float _detailHeightScale = 1.0f;
         [SerializeField] private float _detailChunkSize = 32.0f;
+        [SerializeField] private bool _runtimeDetails;
         [SerializeField] private bool _importCollision = true;
         [SerializeField] private float _collisionChunkSize = 64.0f;
         [SerializeField] private bool _importLights = true;
@@ -88,6 +89,12 @@ namespace XRay.Importer.Editor.Levels
         {
             get => _detailDensity;
             set => _detailDensity = Mathf.Clamp(value, 0.04f, 1.0f);
+        }
+
+        public bool RuntimeDetails
+        {
+            get => _runtimeDetails;
+            set => _runtimeDetails = value;
         }
 
         public float DetailHeightScale

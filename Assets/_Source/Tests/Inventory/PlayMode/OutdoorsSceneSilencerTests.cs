@@ -13,7 +13,7 @@ using UnityEngine.TestTools;
 
 namespace RaidIntoDarkness.Integrations.Inventory.Tests
 {
-    public sealed class OutdoorsSceneSilencerTests : InputTestFixture
+    public sealed class OutdoorsSceneSilencerTests : OutdoorsSceneInputTestFixture
     {
         private Keyboard _keyboard;
         private Mouse _mouse;

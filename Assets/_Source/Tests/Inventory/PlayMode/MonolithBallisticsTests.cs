@@ -136,7 +136,15 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
                 yield return new WaitForEndOfFrame();
                 capture = ScreenCapture.CaptureScreenshotAsTexture();
                 Assert.That(capture.width, Is.GreaterThan(0));
-                System.IO.File.WriteAllBytes(System.IO.Path.GetFullPath("scratchpad/ballistic-tracers.png"), capture.EncodeToPNG());
+                string output = System.Environment.GetEnvironmentVariable("INVENTORY_CAPTURE_DIR");
+                if (string.IsNullOrEmpty(output))
+                {
+                    output = System.IO.Path.Combine(@"E:\Projects\stalker_raid_into_darkness_Archive\BallisticTracerCaptures", System.DateTime.UtcNow.ToString("yyyyMMdd_HHmmss_fff"));
+                }
+
+                Assert.That(System.IO.Path.IsPathRooted(output), Is.True, "an absolute test output directory is required");
+                System.IO.Directory.CreateDirectory(output);
+                System.IO.File.WriteAllBytes(System.IO.Path.Combine(output, "ballistic-tracers.png"), capture.EncodeToPNG());
             }
             finally
             {

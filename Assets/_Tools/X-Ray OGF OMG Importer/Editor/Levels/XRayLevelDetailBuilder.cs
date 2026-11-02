@@ -27,6 +27,8 @@ namespace XRay.Importer.Editor.Levels
         private List<XRayDetailInstance> _instances;
         private XRayDetailPlacement _placement;
         private XRayLevelTextureSet[] _textureSets;
+        private XRayFloraSourceBinding _source;
+        private XRayLevelFloraTextures[] _floraTextures;
 
         public XRayLevelDetailBuilder(string level, XRayDetails details, XRayLevelImportSettings settings, XRayLevelImportRecord record, XRayLevelGamedataInfo info)
         {
@@ -42,7 +44,8 @@ namespace XRay.Importer.Editor.Levels
         public void Place(XRayCollisionModel collision, bool[] passable)
         {
             _placement = new XRayDetailPlacement(_details, collision, passable, new XRayDetailPlacementSettings { Density = _settings.DetailDensity, HeightScale = _settings.DetailHeightScale });
-            _instances = new List<XRayDetailInstance>(1 << 20);
+            _instances = new List<XRayDetailInstance>(_settings.RuntimeDetails ? 0 : 1 << 20);
+            if (_settings.RuntimeDetails) return;
             for (int z = 0; z < _details.SizeZ; z++)
             {
                 for (int x = 0; x < _details.SizeX; x++)
@@ -286,6 +289,21 @@ namespace XRay.Importer.Editor.Levels
 
         public void RequestTextures(XRayLevelTextureLibrary textures)
         {
+            if (_settings.RuntimeDetails)
+            {
+                _source = XRayFloraSourceBinding.Resolve(textures.Resolver);
+                if (!XRayFloraSourceBinding.Accepts(_settings.FloraImportMode, _source.Profile)) throw new InvalidOperationException("Runtime details require a matching verified Source Flora profile.");
+                if (!XRayFloraSourceBinding.AcceptsDetails(textures.Resolver, _source.Profile)) throw new InvalidOperationException("Runtime details are blocked: the effective grass shader contract has changed.");
+                string contract = _source.Profile == XRayFloraSourceProfile.AnomalySss ? XRayFloraSourceBinding.ANOMALY_DETAIL_CONTRACT_HASH : XRayFloraSourceBinding.TRUE_STALKER_DETAIL_CONTRACT_HASH;
+                _record.AddLimitation("Runtime grass shader contract SHA256=" + contract);
+                foreach (string path in _source.Profile == XRayFloraSourceProfile.AnomalySss ? XRayFloraSourceBinding.AnomalyDetailFiles : XRayFloraSourceBinding.TrueStalkerDetailFiles)
+                {
+                    var file = textures.Resolver.ResolveFile(path);
+                    _record.AddDependency(XRayLevelDependencyCategory.VisualObjects, "Runtime grass source", file.DisplayPath, file.Winner.Location, file.VirtualPath, XRayLevelDependencyStatus.Found, "Source grass shader contract", null, "SHA256=" + XRayTerrainSourceBinding.Hash(file));
+                }
+                _floraTextures = new XRayLevelFloraTextures[_details.Models.Count];
+            }
+
             bool tsScript = UsesTrueStalkerDetailScript();
             _textureSets = new XRayLevelTextureSet[_details.Models.Count];
             for (int i = 0; i < _details.Models.Count; i++)
@@ -314,6 +332,13 @@ namespace XRay.Importer.Editor.Levels
                     note = "Standard details\\blend: flat detail shader (deffer_detail_w_flat + deffer_base_aref_flat).";
                 }
 
+                if (_settings.RuntimeDetails && _source.Profile == XRayFloraSourceProfile.AnomalySss)
+                {
+                    string levelBump = "levels\\" + _record.LevelName + "\\" + texture + "_bump";
+                    bump = textures.Exists(levelBump) ? levelBump : null;
+                    note = "Verified Anomaly SSFX details_blend.s: source deffer_grass with per-level bump '" + levelBump + "'.";
+                }
+
                 XRayLevelTextureSet set = textures.Request(texture, false, "Detail object diffuse");
                 if (bump != null)
                 {
@@ -322,6 +347,13 @@ namespace XRay.Importer.Editor.Levels
                 }
 
                 _textureSets[i] = set;
+                if (_settings.RuntimeDetails)
+                {
+                    string correction = _source.Profile == XRayFloraSourceProfile.TrueStalker ? bump + "#" : texture + "_bump#";
+                    if (bump != null && textures.Exists(correction)) set.CorrectionPath = textures.RequestPacked(XRayVirtualPath.TextureToVirtualPath(correction, ".dds"), XRayLevelDependencyCategory.VisualObjects, "Detail bump correction", "Source grass bump#").AssetPath;
+                    _floraTextures[i] = textures.RequestFlora(set, _source);
+                    if (_source.Profile == XRayFloraSourceProfile.AnomalySss) _floraTextures[i].GrassWavesPath = textures.RequestPacked(XRayFloraSourceBinding.ANOMALY_WIND_WAVES, XRayLevelDependencyCategory.VisualObjects, "Grass wind waves", "SSFX source grass deformation").AssetPath;
+                }
                 _record.AddLimitation("Detail shader: " + note);
             }
         }
@@ -329,7 +361,26 @@ namespace XRay.Importer.Editor.Levels
         private Material CreateMaterial(XRayDetailModel model, XRayLevelTextureSet set, XRayLevelMaterialLibrary materials)
         {
             var surface = new XRayLevelSurface { Kind = XRayLevelSurfaceKind.AlphaTest, AlphaCutoff = XRayLevelMaterialLibrary.DETAIL_AREF, DoubleSided = true, CastShadows = false, RuleName = "detail", BlenderClass = "D_STILL", HemiMode = XRayLevelHemiMode.Constant };
-            return materials.Get(new XRayLevelMaterialRequest { ShaderName = model.Shader, Surface = surface, Textures = set, Detail = true });
+            return materials.Get(new XRayLevelMaterialRequest { ShaderName = model.Shader, Surface = surface, Textures = set, Detail = true, RuntimeDetail = _settings.RuntimeDetails, Flora = _floraTextures?[model.Index] });
+        }
+
+        public void BindRuntimeSource(XRayDetailDatabase database, string detailsPath, string collisionPath, bool[] passable)
+        {
+            if (!_settings.RuntimeDetails) return;
+            if (passable == null) throw new InvalidOperationException("Runtime details require source gamemtl.xr passable flags.");
+            string folder = XRayLevelPaths.Details(_level);
+            string detailsAsset = folder + "/DetailSource.bytes";
+            string collisionAsset = folder + "/DetailCollision.bytes";
+            File.WriteAllBytes(detailsAsset, File.ReadAllBytes(detailsPath));
+            File.WriteAllBytes(collisionAsset, File.ReadAllBytes(collisionPath));
+            AssetDatabase.ImportAsset(detailsAsset, ImportAssetOptions.ForceSynchronousImport);
+            AssetDatabase.ImportAsset(collisionAsset, ImportAssetOptions.ForceSynchronousImport);
+            database.SetRuntimeSource(AssetDatabase.LoadAssetAtPath<TextAsset>(detailsAsset), AssetDatabase.LoadAssetAtPath<TextAsset>(collisionAsset), passable, _source.Profile == XRayFloraSourceProfile.AnomalySss ? 1 : 2);
+            EditorUtility.SetDirty(database);
+            AssetDatabase.SaveAssetIfDirty(database);
+            _record.GeneratedAssets.Add(detailsAsset);
+            _record.GeneratedAssets.Add(collisionAsset);
+            _record.AddLimitation("Runtime details retain immutable source level.details and level.cform. Density resamples source slots without reimport; legacy baked DetailInstances are empty. Anomaly placement targets xray-monolith 2026.5.24; TS placement and HDRP cascades remain PARTIAL / SOURCE BLOCKED.");
         }
 
         private bool UsesTrueStalkerDetailScript()

@@ -307,7 +307,7 @@ namespace XRay.Importer.Editor.Levels
                 return string.Empty;
             }
 
-            return AssetDatabase.TryGetGUIDAndLocalFileIdentifier(texture, out string guid, out long _) ? guid : "instance:" + texture.GetInstanceID();
+            return AssetDatabase.TryGetGUIDAndLocalFileIdentifier(texture, out string guid, out long _) ? guid : "instance:" + texture.GetEntityId();
         }
 
         internal static XRayLevelBindingChange Decide(string property, string current, string defaultValue, Dictionary<string, string> previous, string desired)

@@ -193,7 +193,7 @@ namespace XRay.Importer.Tests
                 material.SetFloat("_MonolithDebug", 9.0f);
                 lods = CreateLodSet(material);
                 set = CreateBatchSet(null, null, lods);
-                HashSet<int> baseline = LodMeshIds();
+                HashSet<EntityId> baseline = LodMeshIds();
                 SceneManager.MoveGameObjectToScene(go, rig.Scene);
                 go.layer = LAYER;
                 var renderer = go.AddComponent<XRayLevelInstancedRenderer>();
@@ -284,7 +284,7 @@ namespace XRay.Importer.Tests
                 typeof(XRayLevelMaterialLibrary).GetMethod("ConfigureLod", BindingFlags.NonPublic | BindingFlags.Static).Invoke(null, new object[] { material, albedo, normal });
                 lods = CreateLodSet(material);
                 set = CreateBatchSet(null, null, lods);
-                HashSet<int> baseline = LodMeshIds();
+                HashSet<EntityId> baseline = LodMeshIds();
                 SceneManager.MoveGameObjectToScene(go, rig.Scene);
                 go.layer = LAYER;
                 var renderer = go.AddComponent<XRayLevelInstancedRenderer>();
@@ -321,7 +321,7 @@ namespace XRay.Importer.Tests
                 yield return rig.Render(1);
                 Assert.IsTrue(AssertOwnedMeshes("enabled", renderer, baseline, entries, rig, third).ContainsKey(rig.Camera), "re-enabling the renderer must recreate the camera mesh");
                 Object.DestroyImmediate(go);
-                HashSet<int> remaining = LodMeshIds();
+                HashSet<EntityId> remaining = LodMeshIds();
                 remaining.ExceptWith(baseline);
                 entries.Add($"destroyed,summary,,,,,,0,{remaining.Count},0");
                 Assert.IsEmpty(remaining, "destroying the renderer must release every impostor mesh it created");
@@ -497,12 +497,12 @@ namespace XRay.Importer.Tests
             return Array.FindAll(Resources.FindObjectsOfTypeAll<Mesh>(), mesh => mesh.name == LOD_MESH_NAME);
         }
 
-        private static HashSet<int> LodMeshIds()
+        private static HashSet<EntityId> LodMeshIds()
         {
-            var ids = new HashSet<int>();
+            var ids = new HashSet<EntityId>();
             foreach (Mesh mesh in FindLodMeshes())
             {
-                ids.Add(mesh.GetInstanceID());
+                ids.Add(mesh.GetEntityId());
             }
 
             return ids;
@@ -520,17 +520,17 @@ namespace XRay.Importer.Tests
             return new Dictionary<Camera, Mesh>(meshes);
         }
 
-        private static Dictionary<Camera, Mesh> AssertOwnedMeshes(string stage, XRayLevelInstancedRenderer renderer, HashSet<int> baseline, List<string> rows, params RenderRig[] rigs)
+        private static Dictionary<Camera, Mesh> AssertOwnedMeshes(string stage, XRayLevelInstancedRenderer renderer, HashSet<EntityId> baseline, List<string> rows, params RenderRig[] rigs)
         {
             Dictionary<Camera, Mesh> entries = LodEntries(renderer);
-            var owned = new HashSet<int>();
+            var owned = new HashSet<EntityId>();
             foreach (XRayLevelInstancedRenderer other in Resources.FindObjectsOfTypeAll<XRayLevelInstancedRenderer>())
             {
                 foreach (Mesh mesh in LodEntries(other).Values)
                 {
                     if (mesh != null)
                     {
-                        owned.Add(mesh.GetInstanceID());
+                        owned.Add(mesh.GetEntityId());
                     }
                 }
             }
@@ -541,20 +541,20 @@ namespace XRay.Importer.Tests
                 testCameras.Add(rig.Camera);
             }
 
-            var meshIds = new HashSet<int>();
+            var meshIds = new HashSet<EntityId>();
             foreach (KeyValuePair<Camera, Mesh> entry in entries)
             {
                 bool alive = entry.Key != null;
                 string type = alive ? entry.Key.cameraType.ToString() : "destroyed";
                 string name = alive ? entry.Key.name : "destroyed";
-                rows.Add($"{stage},{entry.Key.GetInstanceID()},{name},{type},{alive},{(alive && entry.Key.isActiveAndEnabled)},{testCameras.Contains(entry.Key)},{(entry.Value != null ? entry.Value.GetInstanceID() : 0)},{entry.Value != null},{renderer.GetInstanceID()}");
-                Assert.IsTrue(alive, $"{stage}: impostor mesh is kept for a destroyed camera {entry.Key.GetInstanceID()}");
+                rows.Add($"{stage},{entry.Key.GetEntityId()},{name},{type},{alive},{(alive && entry.Key.isActiveAndEnabled)},{testCameras.Contains(entry.Key)},{(entry.Value != null ? entry.Value.GetEntityId() : EntityId.None)},{entry.Value != null},{renderer.GetEntityId()}");
+                Assert.IsTrue(alive, $"{stage}: impostor mesh is kept for a destroyed camera {entry.Key.GetEntityId()}");
                 Assert.IsTrue(entry.Key.cameraType != CameraType.Preview && entry.Key.cameraType != CameraType.Reflection, $"{stage}: {type} camera '{name}' must not own impostor meshes");
                 Assert.IsTrue(entry.Value != null, $"{stage}: camera '{name}' references a destroyed impostor mesh");
-                Assert.IsTrue(meshIds.Add(entry.Value.GetInstanceID()), $"{stage}: impostor mesh {entry.Value.GetInstanceID()} is shared by several cameras");
+                Assert.IsTrue(meshIds.Add(entry.Value.GetEntityId()), $"{stage}: impostor mesh {entry.Value.GetEntityId()} is shared by several cameras");
             }
 
-            foreach (int id in LodMeshIds())
+            foreach (EntityId id in LodMeshIds())
             {
                 if (!baseline.Contains(id))
                 {
@@ -562,7 +562,7 @@ namespace XRay.Importer.Tests
                 }
             }
 
-            rows.Add($"{stage},summary,,,,,,{entries.Count},{LodMeshIds().Count - baseline.Count},{renderer.GetInstanceID()}");
+            rows.Add($"{stage},summary,,,,,,{entries.Count},{LodMeshIds().Count - baseline.Count},{renderer.GetEntityId()}");
             return entries;
         }
 

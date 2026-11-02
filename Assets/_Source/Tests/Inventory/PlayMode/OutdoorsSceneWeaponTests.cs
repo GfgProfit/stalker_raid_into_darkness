@@ -16,7 +16,7 @@ using XRay.Importer;
 
 namespace RaidIntoDarkness.Integrations.Inventory.Tests
 {
-    public sealed class OutdoorsSceneWeaponTests : InputTestFixture
+    public sealed class OutdoorsSceneWeaponTests : OutdoorsSceneInputTestFixture
     {
         private const string SCENE = "OutdoorsScene";
         private const string BACKPACK = "Backpack";

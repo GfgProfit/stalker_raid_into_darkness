@@ -3,6 +3,7 @@ using UnityEngine;
 namespace XRay.Importer.Levels
 {
     [ExecuteAlways]
+    [DisallowMultipleComponent]
     public sealed class XRayFloraWindProvider : MonoBehaviour
     {
         [SerializeField] private XRayFloraWindProfile _profile;
@@ -16,6 +17,7 @@ namespace XRay.Importer.Levels
         [SerializeField] private float _treeAmplitude = 0.005f;
         [SerializeField] private Vector3 _treeWaveScale = new Vector3(0.1f, 0.01f, 0.11f);
         [SerializeField] private bool _paused;
+        [SerializeField, InspectorName("DIAGNOSTIC Scene View wind preview")] private bool _previewEnabled;
 
         private readonly XRayFloraWindState _state = new XRayFloraWindState();
         private int _lastFrame = -1;
@@ -25,6 +27,12 @@ namespace XRay.Importer.Levels
         public XRayFloraWindState State => _state;
         public bool InputsComplete => _profile == XRayFloraWindProfile.AnomalySsfx || _profile == XRayFloraWindProfile.TrueStalkerXRay && _trueStalkerDiagnosticConstants;
         public string Diagnostic { get; private set; }
+
+        public bool PreviewEnabled
+        {
+            get => _previewEnabled;
+            set => _previewEnabled = value;
+        }
 
         public XRayFloraWindProfile Profile
         {
@@ -59,7 +67,15 @@ namespace XRay.Importer.Levels
         public void ResetAnimation()
         {
             Configure();
-            _state.Reset(Weather());
+            if (_state.Initialized)
+            {
+                _state.Advance(0.0f, Weather());
+                _state.Reinitialize();
+            }
+            else
+            {
+                _state.Reset(Weather());
+            }
             Publish();
         }
 
@@ -78,7 +94,8 @@ namespace XRay.Importer.Levels
 
         private void OnEnable()
         {
-            Active = this;
+            _lastFrame = -1;
+            if (Active == null) Active = this;
             ResetAnimation();
         }
 
@@ -87,19 +104,26 @@ namespace XRay.Importer.Levels
             if (Active == this)
             {
                 Active = null;
-                XRayFloraWindState.Clear();
+                foreach (XRayFloraWindProvider provider in Resources.FindObjectsOfTypeAll<XRayFloraWindProvider>())
+                {
+                    if (provider == this || !provider.isActiveAndEnabled || !provider.gameObject.scene.IsValid() || Application.isPlaying && !Application.IsPlaying(provider.gameObject)) continue;
+                    Active = provider;
+                    provider.Reinitialize();
+                    break;
+                }
+                if (Active == null) XRayFloraWindState.Clear();
             }
         }
 
         private void Update()
         {
-            if (Time.frameCount == _lastFrame)
+            if (!Application.IsPlaying(gameObject) || Active != this || Time.frameCount == _lastFrame)
             {
                 return;
             }
 
             _lastFrame = Time.frameCount;
-            Tick(Application.isPlaying ? Time.deltaTime : 0.0f);
+            Tick(Time.deltaTime);
         }
 
         private void Configure()

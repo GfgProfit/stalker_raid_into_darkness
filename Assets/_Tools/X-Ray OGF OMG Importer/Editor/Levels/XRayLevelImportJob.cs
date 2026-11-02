@@ -1577,6 +1577,7 @@ namespace XRay.Importer.Editor.Levels
             builder.RequestTextures(_textures);
             _textures.ImportAll();
             XRayDetailDatabase database = builder.Build(_textures, _materials);
+            builder.BindRuntimeSource(database, path, LevelFile("level.cform"), _passable);
             foreach (XRayDetailModelEntry model in database.Models)
             {
                 if (model.Material != null && model.Material.GetTexture("_BaseColorMap") == null)
@@ -1631,6 +1632,8 @@ namespace XRay.Importer.Editor.Levels
             GameObject prefab;
             try
             {
+                _content.FloraWindAccepted = _windAccepted;
+                _content.DetailSettingsSource = _sourcePlan;
                 GameObject root = XRayLevelSceneBuilder.BuildRoot(preview, _content, _record);
                 prefab = PrefabUtility.SaveAsPrefabAsset(root, prefabPath, out bool success);
                 if (!success || prefab == null)

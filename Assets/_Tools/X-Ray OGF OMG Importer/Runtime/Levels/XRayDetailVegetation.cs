@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
+using XRay.Importer.Core.Level;
 
 namespace XRay.Importer.Levels
 {
@@ -16,19 +17,22 @@ namespace XRay.Importer.Levels
         public const int MAX_CACHED_CHUNKS = 512;
 
         private const float TWO_PI = Mathf.PI * 2.0f;
+        private const int MAX_SOURCE_INSTANCES_PER_BATCH = 511;
 
         [SerializeField] private XRayDetailDatabase _database;
-        [SerializeField] private float _drawDistance = ENGINE_FADE_DISTANCE;
+        [SerializeField, HideInInspector] private float _drawDistance = ENGINE_FADE_DISTANCE;
         [SerializeField] private bool _wind = true;
         [SerializeField, Range(0.0f, 1.0f)] private float _windStrength;
-        [SerializeField] private bool _castShadows;
+        [SerializeField, HideInInspector] private bool _castShadows;
         [SerializeField] private bool _debugSlots;
         [SerializeField] private float _debugSlotRadius = 30.0f;
+        [SerializeField] private Camera _streamingCamera;
 
         private readonly Dictionary<int, DecodedChunk> _cache = new Dictionary<int, DecodedChunk>();
         private readonly LinkedList<int> _usage = new LinkedList<int>();
         private readonly Plane[] _planes = new Plane[6];
         private Matrix4x4[][] _matrixBuffers;
+        private SourceInstance[][] _sourceBuffers;
         private Vector4[][] _dataBuffers;
         private int[] _counts;
         private MaterialPropertyBlock _block;
@@ -38,6 +42,15 @@ namespace XRay.Importer.Levels
         private float _timeRot1;
         private float _timeRot2;
         private float _timePos;
+        private XRayGrassSettings _settings;
+        private XRayDetailPopulation _population;
+        private Vector4[][] _extraBuffers;
+        private int _streamFrame = -1;
+        private float _heightPrevious;
+        private float _heightRendered;
+        private double _lastStreamTime;
+        private Camera _sceneStreamingCamera;
+        private int _heightFrame = -1;
 
         public XRayDetailDatabase Database
         {
@@ -46,6 +59,11 @@ namespace XRay.Importer.Levels
             {
                 _database = value;
                 ResetCache();
+                if (_settings != null && _database != null && _database.HasRuntimeSource)
+                {
+                    _settings.SetLevel(_database.LevelName);
+                    ApplySettings();
+                }
             }
         }
 
@@ -62,7 +80,25 @@ namespace XRay.Importer.Levels
         }
 
         public int LastVisibleInstances { get; private set; }
+        public Camera StreamingCamera
+        {
+            get => _streamingCamera;
+            set
+            {
+                _streamingCamera = value;
+                _streamFrame = -1;
+                _sceneStreamingCamera = null;
+            }
+        }
+
         public int LastDrawCalls { get; private set; }
+        public int LastShadowVisibleInstances { get; private set; }
+        public int ResidentCells => _population?.ResidentCells ?? _cache.Count;
+        public int ResidentInstances => _population?.ResidentInstances ?? 0;
+        public XRayDetailPopulation Population => _population;
+        public bool CastShadows => _castShadows;
+        public XRayGrassValues GrassValues => _settings != null ? _settings.Values : default;
+        public bool NeedsEditorUpdate => isActiveAndEnabled && !Application.isPlaying && _database != null && _database.HasRuntimeSource && (_population == null || _population.NeedsStreaming || _population.HasFadingCells);
 
         private void OnEnable()
         {
@@ -72,6 +108,7 @@ namespace XRay.Importer.Levels
             ResetCache();
             RenderPipelineManager.beginContextRendering += OnBeginContextRendering;
             RenderPipelineManager.beginCameraRendering += OnBeginCameraRendering;
+            BindSettings();
         }
 
         private void OnDisable()
@@ -79,6 +116,9 @@ namespace XRay.Importer.Levels
             RenderPipelineManager.beginContextRendering -= OnBeginContextRendering;
             RenderPipelineManager.beginCameraRendering -= OnBeginCameraRendering;
             ResetCache();
+            if (_settings != null) _settings.Changed -= ApplySettings;
+            _settings = null;
+            _block = null;
         }
 
         private void ResetCache()
@@ -87,12 +127,31 @@ namespace XRay.Importer.Levels
             _usage.Clear();
             _instanceBytes = null;
             _matrixBuffers = null;
+            _sourceBuffers = null;
+            _dataBuffers = null;
+            _extraBuffers = null;
+            _counts = null;
+            _population = null;
+            _streamFrame = -1;
+            _lastStreamTime = 0.0;
+            _sceneStreamingCamera = null;
+            _heightFrame = -1;
         }
 
         private void OnBeginContextRendering(ScriptableRenderContext context, List<Camera> cameras)
         {
             if (_database == null)
             {
+                return;
+            }
+
+            if (_database.HasRuntimeSource)
+            {
+                BindSettings();
+                if (!Application.isPlaying || _heightFrame != Time.frameCount) _heightPrevious = _heightRendered;
+                _heightRendered = _settings != null ? _settings.Values.Height : 1.0f;
+                if (_heightPrevious <= 0.0f) _heightPrevious = _heightRendered;
+                _heightFrame = Time.frameCount;
                 return;
             }
 
@@ -126,12 +185,19 @@ namespace XRay.Importer.Levels
 
         private void OnBeginCameraRendering(ScriptableRenderContext context, Camera camera)
         {
-            if (_database == null || _database.Instances == null || camera == null || camera.cameraType == CameraType.Preview || camera.cameraType == CameraType.Reflection)
+            if (_database == null || _database.Instances == null && !_database.HasRuntimeSource || camera == null || camera.cameraType == CameraType.Preview || camera.cameraType == CameraType.Reflection)
             {
                 return;
             }
 
+            if (Application.isPlaying && (!Application.IsPlaying(gameObject) || camera.cameraType == CameraType.SceneView) || _database.HasRuntimeSource && !Application.isPlaying && camera.cameraType != CameraType.SceneView) return;
+
             EnsureBuffers();
+            if (_database.HasRuntimeSource)
+            {
+                RenderSource(camera);
+                return;
+            }
             GeometryUtility.CalculateFrustumPlanes(camera, _planes);
             Vector3 eye = camera.transform.position;
             float fade = Mathf.Max(1.0f, _drawDistance);
@@ -234,12 +300,17 @@ namespace XRay.Importer.Levels
             }
 
             _matrixBuffers = new Matrix4x4[models][];
+            _sourceBuffers = _database.HasRuntimeSource ? new SourceInstance[models][] : null;
             _dataBuffers = new Vector4[models][];
+            _extraBuffers = new Vector4[models][];
             _counts = new int[models];
+            int capacity = _sourceBuffers != null ? MAX_SOURCE_INSTANCES_PER_BATCH : XRayInstanceBatchSet.MAX_INSTANCES_PER_BATCH;
             for (int i = 0; i < models; i++)
             {
-                _matrixBuffers[i] = new Matrix4x4[XRayInstanceBatchSet.MAX_INSTANCES_PER_BATCH];
-                _dataBuffers[i] = new Vector4[XRayInstanceBatchSet.MAX_INSTANCES_PER_BATCH];
+                _extraBuffers[i] = new Vector4[capacity];
+                if (_sourceBuffers == null) _matrixBuffers[i] = new Matrix4x4[XRayInstanceBatchSet.MAX_INSTANCES_PER_BATCH];
+                else _sourceBuffers[i] = new SourceInstance[capacity];
+                _dataBuffers[i] = new Vector4[capacity];
             }
         }
 
@@ -295,6 +366,173 @@ namespace XRay.Importer.Levels
             return decoded;
         }
 
+        private void BindSettings()
+        {
+            if (_database == null || !_database.HasRuntimeSource || _settings != null) return;
+            var controller = GetComponent<XRayDetailVegetationController>();
+            if (controller != null && controller.isActiveAndEnabled)
+            {
+                controller.Initialize(this);
+                if (_settings != null) return;
+            }
+
+            if (Application.IsPlaying(gameObject))
+            {
+                XRayGrassSettingsProvider provider = XRayGrassSettingsProvider.Ensure();
+                if (provider.Settings != null) SetSettings(provider.Settings);
+                return;
+            }
+
+            TextAsset profile = Resources.Load<TextAsset>("XRayRvmGrassDefaults");
+            if (profile != null) SetSettings(new XRayGrassSettings(XRayGrassDefaults.Load(profile.text), null));
+        }
+
+        private void ApplySettings()
+        {
+            if (_settings == null || _database == null) return;
+            _drawDistance = _settings.Values.FadeDistance;
+            _castShadows = _settings.Values.Shadows;
+            _population?.Apply(_settings.Values);
+        }
+
+        public void SetSettings(XRayGrassSettings settings)
+        {
+            if (settings == null) throw new ArgumentNullException(nameof(settings));
+            if (ReferenceEquals(_settings, settings))
+            {
+                ApplySettings();
+                return;
+            }
+
+            if (_settings != null) _settings.Changed -= ApplySettings;
+            _settings = settings ?? throw new ArgumentNullException(nameof(settings));
+            _settings.SetLevel(_database.LevelName);
+            _settings.Changed += ApplySettings;
+            _heightRendered = _settings.Values.Height;
+            _heightPrevious = _heightRendered;
+            ApplySettings();
+        }
+
+        public void PrepareSource(XRayGrassSettings settings)
+        {
+            SetSettings(settings);
+            _population = new XRayDetailPopulation(_database, _settings.Defaults);
+            _population.Apply(_settings.Values);
+        }
+
+        public void StreamSource(Vector3 eye)
+        {
+            if (_settings == null) return;
+            if (_population == null)
+            {
+                _population = new XRayDetailPopulation(_database, _settings.Defaults);
+                _population.Apply(_settings.Values);
+            }
+
+            double now = Time.realtimeSinceStartupAsDouble;
+            float delta = Application.isPlaying ? Time.deltaTime : _lastStreamTime > 0.0 ? Mathf.Clamp((float)(now - _lastStreamTime), 0.0f, 0.1f) : 0.0f;
+            _lastStreamTime = now;
+            _population.Stream(eye, delta);
+        }
+
+        private void RenderSource(Camera camera)
+        {
+            BindSettings();
+            if (_settings == null) return;
+            Vector3 eye = camera.transform.position;
+            if ((!Application.isPlaying || _streamFrame != Time.frameCount) && CanStreamFrom(camera))
+            {
+                StreamSource(eye);
+                _streamFrame = Time.frameCount;
+            }
+
+            if (_population == null) return;
+            GeometryUtility.CalculateFrustumPlanes(camera, _planes);
+            LastVisibleInstances = 0;
+            LastShadowVisibleInstances = 0;
+            LastDrawCalls = 0;
+            for (int pass = 0; pass < (_castShadows && _settings.Defaults.GrassShadows.x > 0.0f ? 2 : 1); pass++)
+            {
+                Array.Clear(_counts, 0, _counts.Length);
+                foreach (XRayDetailCell cell in _population.Cells)
+                {
+                    if (!_population.IsCurrent(cell)) continue;
+                    bool shadow = pass == 1;
+                    float distance = (cell.FadeCenter - eye).sqrMagnitude;
+                    float fade = SourceFade(distance, _drawDistance);
+                    if (shadow)
+                    {
+                        float start = _drawDistance * _drawDistance * _settings.Defaults.GrassShadows.y;
+                        if (distance > start) fade *= Mathf.Max(0.0f, 1.0f - Mathf.Abs(distance - start) * 0.005f);
+                    }
+                    if (fade <= 0.0f || !shadow && !GeometryUtility.TestPlanesAABB(_planes, cell.Bounds)) continue;
+                    foreach (XRayDetailInstance instance in cell.Instances)
+                    {
+                        int model = instance.Model;
+                        int index = _counts[model];
+                        Matrix4x4 matrix = _population.Matrix(instance, instance.Scale * fade);
+                        _sourceBuffers[model][index] = new SourceInstance(matrix, matrix);
+                        _dataBuffers[model][index] = new Vector4(instance.Hemi, _database.Models[model].InverseHeight, _wind ? instance.Wave : 0.0f, instance.Sun);
+                        _extraBuffers[model][index] = new Vector4(instance.NormalX, instance.NormalY, instance.NormalZ, cell.Alpha);
+                        if (shadow) LastShadowVisibleInstances++;
+                        else LastVisibleInstances++;
+                        if (++_counts[model] == MAX_SOURCE_INSTANCES_PER_BATCH) FlushSource(camera, model, shadow);
+                    }
+                }
+
+                for (int model = 0; model < _counts.Length; model++) FlushSource(camera, model, pass == 1);
+            }
+        }
+
+        public static float SourceFade(float distanceSquared, float fadeDistance)
+        {
+            if (fadeDistance <= 1.0f || distanceSquared >= fadeDistance * fadeDistance) return 0.0f;
+            return distanceSquared <= 1.0f ? 1.0f : 1.0f - (distanceSquared - 1.0f) / (fadeDistance * fadeDistance - 1.0f);
+        }
+
+        public bool CanStreamFrom(Camera camera)
+        {
+            if (camera == null) return false;
+            if (!Application.isPlaying)
+            {
+                if (camera.cameraType != CameraType.SceneView) return false;
+                if (_streamingCamera != null && _streamingCamera.cameraType == CameraType.SceneView) return camera == _streamingCamera;
+                if (_sceneStreamingCamera == null) _sceneStreamingCamera = camera;
+                return camera == _sceneStreamingCamera;
+            }
+            if (camera.cameraType != CameraType.Game) return false;
+            Camera owner = _streamingCamera != null ? _streamingCamera : Camera.main;
+            return owner == null || camera == owner;
+        }
+
+        private void FlushSource(Camera camera, int model, bool shadow)
+        {
+            int count = _counts[model];
+            _counts[model] = 0;
+            XRayDetailModelEntry entry = _database.Models[model];
+            if (count == 0 || entry.Mesh == null || entry.Material == null) return;
+            _block.Clear();
+            _block.SetVectorArray(_dataId, _dataBuffers[model]);
+            _block.SetVectorArray("_MonolithInstanceExtra", _extraBuffers[model]);
+            _block.SetFloat("_MonolithGrassRuntime", 1.0f);
+            _block.SetFloat("_MonolithGrassAlign", _database.SourceProfile == 1 && _settings.Defaults.TerrainAlignment ? 1.0f : 0.0f);
+            _block.SetFloat("_MonolithGrassHeight", _settings.Values.Height);
+            _block.SetFloat("_MonolithGrassHeightPrevious", _heightPrevious > 0.0f ? _heightPrevious : _settings.Values.Height);
+            _block.SetVector("_MonolithWindGrassSetup", _settings.Defaults.WindGrass);
+            var parameters = new RenderParams(entry.Material)
+            {
+                camera = camera,
+                worldBounds = new Bounds(camera.transform.position, Vector3.one * ((Mathf.Max(0.0f, _drawDistance) + _population.BoundsPadding) * 2.0f)),
+                layer = gameObject.layer,
+                shadowCastingMode = shadow ? ShadowCastingMode.ShadowsOnly : ShadowCastingMode.Off,
+                motionVectorMode = shadow ? MotionVectorGenerationMode.Camera : MotionVectorGenerationMode.Object,
+                receiveShadows = true,
+                matProps = _block
+            };
+            Graphics.RenderMeshInstanced(parameters, entry.Mesh, 0, _sourceBuffers[model], count);
+            LastDrawCalls++;
+        }
+
         private void OnDrawGizmosSelected()
         {
             if (!_debugSlots || _database == null || _database.Slots == null)
@@ -328,6 +566,19 @@ namespace XRay.Importer.Levels
                         Gizmos.DrawWireCube(center, new Vector3(size, Mathf.Max(0.05f, height), size));
                     }
                 }
+            }
+        }
+
+        [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
+        private readonly struct SourceInstance
+        {
+            public readonly Matrix4x4 objectToWorld;
+            public readonly Matrix4x4 prevObjectToWorld;
+
+            public SourceInstance(Matrix4x4 current, Matrix4x4 previous)
+            {
+                objectToWorld = current;
+                prevObjectToWorld = previous;
             }
         }
 

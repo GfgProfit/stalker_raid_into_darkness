@@ -30,6 +30,7 @@ namespace XRay.Importer.Tests
         private readonly Mo2Fixture _mo2;
         private readonly SourceData _source;
         private readonly bool _ownsHost;
+        private bool _detailsAttached;
 
         public XRayFloraLevelFixture(bool trueStalker)
         {
@@ -80,6 +81,7 @@ namespace XRay.Importer.Tests
             XRaySourceConfiguration configuration = _mo2.CreateConfiguration("FloraAcceptance");
             configuration.IndexScope.Clear();
             configuration.IndexScope.AddRange(new[] { "textures", "textures.ltx", "levels", "shaders", "shaders.xr", "configs" });
+            if (_detailsAttached) configuration.IndexScope.Add("gamemtl.xr");
             return Mo2VirtualFileSystem.Plan(configuration);
         }
 
@@ -155,6 +157,33 @@ namespace XRay.Importer.Tests
         {
             if (_trueStalker) _directory.WriteFile("source/" + file, bytes);
             else _mo2.AddModFile("Flora", file, bytes);
+        }
+
+        public void AttachDetails(XRayEffectiveGamedata source)
+        {
+            _detailsAttached = true;
+            string level = _trueStalker ? "escape" : "l01_escape";
+            byte[] bytes = source.ReadAllBytes("levels/" + level + "/level.details");
+            Write("levels/" + LevelName + "/level.details", bytes);
+            Write("levels/" + LevelName + "/level.cform", source.ReadAllBytes("levels/" + level + "/level.cform"));
+            Write("gamemtl.xr", source.ReadAllBytes("gamemtl.xr"));
+            var resolver = new XRayTextureResolver(source.Index) { LevelFolder = "levels/" + level };
+            foreach (XRayDetailModel model in XRayDetails.Read(bytes, "Real detail fixture").Models)
+            {
+                foreach (string texture in new[] { model.Texture, model.Texture + "_bump", model.Texture + "_bump#", "levels/" + level + "/" + model.Texture + "_bump" })
+                {
+                    XRayResolvedFile file = resolver.ResolveFile(XRayVirtualPath.TextureToVirtualPath(texture, ".dds"));
+                    if (!file.IsResolved) continue;
+                    string target = file.VirtualPath.Replace("levels/" + level + "/", "levels/" + LevelName + "/");
+                    Write(target, file.Winner.ReadAllBytes());
+                }
+            }
+
+            foreach (string file in _trueStalker ? XRayFloraSourceBinding.TrueStalkerDetailFiles : XRayFloraSourceBinding.AnomalyDetailFiles) Write(file, source.ReadAllBytes(file));
+            foreach (string file in new[] { "textures/ts_flora/build_details.dds", "textures/ts_flora/build_details_bump.dds", "textures/ts_flora/build_details_bump#.dds", XRayFloraSourceBinding.ANOMALY_WIND_WAVES })
+            {
+                if (source.Exists(file)) Write(file, source.ReadAllBytes(file));
+            }
         }
 
         private static string Csv(string value)

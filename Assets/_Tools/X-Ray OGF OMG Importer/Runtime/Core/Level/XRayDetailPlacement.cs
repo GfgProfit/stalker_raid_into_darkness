@@ -41,7 +41,7 @@ namespace XRay.Importer.Core.Level
 
     public readonly struct XRayDetailInstance
     {
-        public XRayDetailInstance(int model, float x, float y, float z, float yaw, float scale, float hemi, float sun, int wave)
+        public XRayDetailInstance(int model, float x, float y, float z, float yaw, float scale, float hemi, float sun, int wave, float normalX = 0.0f, float normalY = 1.0f, float normalZ = 0.0f)
         {
             Model = model;
             X = x;
@@ -52,6 +52,9 @@ namespace XRay.Importer.Core.Level
             Hemi = hemi;
             Sun = sun;
             Wave = wave;
+            NormalX = normalX;
+            NormalY = normalY;
+            NormalZ = normalZ;
         }
 
         public int Model { get; }
@@ -63,6 +66,9 @@ namespace XRay.Importer.Core.Level
         public float Hemi { get; }
         public float Sun { get; }
         public int Wave { get; }
+        public float NormalX { get; }
+        public float NormalY { get; }
+        public float NormalZ { get; }
     }
 
     public sealed class XRayDetailPlacementSettings
@@ -70,6 +76,8 @@ namespace XRay.Importer.Core.Level
         public float Density { get; set; } = 0.6f;
         public float HeightScale { get; set; } = 1.0f;
         public bool JitterZBeforeX { get; set; } = true;
+        public bool MonolithRelease { get; set; }
+        public float TerrainSlope { get; set; }
     }
 
     public sealed class XRayDetailPlacementStatistics
@@ -110,7 +118,13 @@ namespace XRay.Importer.Core.Level
         }
 
         public XRayDetailPlacementStatistics Statistics { get; } = new XRayDetailPlacementStatistics();
-        public int DitherSize => (int)Math.Ceiling(XRayDetails.SLOT_SIZE / _settings.Density);
+        public int DitherSize => (int)MathF.Ceiling(XRayDetails.SLOT_SIZE / _settings.Density);
+
+        public static int MonolithSeed(int x, int z)
+        {
+            ulong value = ((ulong)(uint)x << 32) | (uint)z;
+            return unchecked(SEED ^ (int)((9199940308585234877UL * value + 9199940308585234877UL) >> 32));
+        }
 
         public void PlaceSlot(int dbX, int dbZ, List<XRayDetailInstance> output)
         {
@@ -148,7 +162,7 @@ namespace XRay.Importer.Core.Level
             float density = _settings.Density;
             float jitter = density / 1.7f;
             int size = DitherSize;
-            int seed = SEED ^ unchecked(sx * sz);
+            int seed = _settings.MonolithRelease ? MonolithSeed(sx, sz) : SEED ^ unchecked(sx * sz);
             var selection = new XRayRandom(seed);
             var jitterRandom = new XRayRandom(seed);
             var yawRandom = new XRayRandom(seed);
@@ -198,6 +212,9 @@ namespace XRay.Importer.Core.Level
                     float pz = rz + jz;
                     float py = maxY;
                     float y = minY - 5.0f;
+                    float nx = 0.0f;
+                    float ny = 1.0f;
+                    float nz = 0.0f;
                     foreach (int face in _triangles)
                     {
                         if (_passable != null && _collision.Materials[face] < _passable.Length && _passable[_collision.Materials[face]])
@@ -207,12 +224,37 @@ namespace XRay.Importer.Core.Level
 
                         if (_collision.RayDown(face, px, py, pz, out float range) && range >= 0.0f)
                         {
+                            int a = _collision.Triangles[face * 3] * 3;
+                            int b = _collision.Triangles[face * 3 + 1] * 3;
+                            int c = _collision.Triangles[face * 3 + 2] * 3;
+                            float ax = _collision.Vertices[b] - _collision.Vertices[a];
+                            float ay = _collision.Vertices[b + 1] - _collision.Vertices[a + 1];
+                            float az = _collision.Vertices[b + 2] - _collision.Vertices[a + 2];
+                            float bx = _collision.Vertices[c] - _collision.Vertices[a];
+                            float by = _collision.Vertices[c + 1] - _collision.Vertices[a + 1];
+                            float bz = _collision.Vertices[c + 2] - _collision.Vertices[a + 2];
+                            nx = ay * bz - az * by;
+                            ny = az * bx - ax * bz;
+                            nz = ax * by - ay * bx;
+                            float length = (float)Math.Sqrt(nx * nx + ny * ny + nz * nz);
+                            if (length > 0.0f)
+                            {
+                                nx /= length;
+                                ny /= length;
+                                nz /= length;
+                            }
                             float test = py - range;
                             if (test > y)
                             {
                                 y = test;
                             }
                         }
+                    }
+
+                    if (_settings.MonolithRelease && -ny > -(1.0f - scaleRandom.RandF(_settings.TerrainSlope * 0.8f, _settings.TerrainSlope)))
+                    {
+                        Statistics.Rejected++;
+                        continue;
                     }
 
                     if (y < minY || modelId >= _details.Models.Count)
@@ -225,7 +267,7 @@ namespace XRay.Importer.Core.Level
                     float scale = scaleRandom.RandF(model.MinScale * 0.5f, model.MaxScale * 0.9f) * _settings.HeightScale;
                     float yaw = yawRandom.RandF(0.0f, (float)(Math.PI * 2.0));
                     int wave = model.NoWaving ? 0 : waveRandom.RandI(3) == 0 ? 2 : 1;
-                    output.Add(new XRayDetailInstance(modelId, px, y, pz, yaw, scale, hemi, sun, wave));
+                    output.Add(new XRayDetailInstance(modelId, px, y, pz, yaw, scale, hemi, sun, wave, nx, ny, nz));
                     Statistics.Instances++;
                     Statistics.PerModel[modelId]++;
                 }

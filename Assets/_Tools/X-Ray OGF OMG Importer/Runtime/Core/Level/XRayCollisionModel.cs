@@ -30,9 +30,23 @@ namespace XRay.Importer.Core.Level
         public static XRayCollisionModel Read(string path)
         {
             using (var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read, 1 << 16))
+            {
+                return Read(stream, Path.GetFileName(path));
+            }
+        }
+
+        public static XRayCollisionModel Read(byte[] data, string context)
+        {
+            using (var stream = new MemoryStream(data, false))
+            {
+                return Read(stream, context);
+            }
+        }
+
+        private static XRayCollisionModel Read(Stream stream, string context)
+        {
             using (var reader = new BinaryReader(stream))
             {
-                string context = Path.GetFileName(path);
                 if (stream.Length < HEADER_BYTES)
                 {
                     throw new XRayFormatException($"{context}: file is smaller than the CFORM header.");

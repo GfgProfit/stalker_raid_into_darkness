@@ -1,0 +1,36 @@
+{
+  "_provenance": "[{\"path\":\"D:/GRA2.5/Anomaly 1.5.3 up/appdata/user.ltx\",\"sha256\":\"cec1246b55d37ac26d1bb4a1829ea3e567bc161270396e6aa1a8f230f8e6671f\"},{\"path\":\"D:/GRA2.5/MO2/overwrite/gamedata/configs/axr_options.ltx\",\"sha256\":\"0a2cdd1ca4db901c371a7830e7c99ac2a541aaaf46bd1d0a38fd021260410dbc\"},{\"path\":\"D:/GRA2.5/Anomaly 1.5.3 up/fsgame.ltx\",\"sha256\":\"5750e35aac2a9ad43235c792a047e7542ccd03c8d94ee1566398205af7b83eb1\"},{\"path\":\"D:/GRA2.5/MO2/ModOrganizer.ini\",\"sha256\":\"03e032bbbe91f55f2b404356c3b2b56578082476841e8fa777589d935e55a2e0\"},{\"path\":\"D:\\\\GRA2.5\\\\MO2\\\\mods\\\\GRA Bolt\\\\gamedata\\\\scripts\\\\ui_options.script\",\"sha256\":\"f09dbd1da4e1113dce9d012e8206640f29a335b070134d7b789f1ff45eb5766f\"},{\"path\":\"D:\\\\GRA2.5\\\\MO2\\\\mods\\\\[Шейдеры] ScreenSpaceShaders 23.5\\\\gamedata\\\\scripts\\\\ssfx_shadow_cascades.script\",\"sha256\":\"a7dfb925bb2f381e168026d8ca72fd562c0b471c704736c51ecc28a68c8bbe79\"},{\"path\":\"D:\\\\GRA2.5\\\\MO2\\\\mods\\\\[Шейдеры] ScreenSpaceShaders 23.5\\\\gamedata\\\\scripts\\\\ssfx_001_mcm.script\",\"sha256\":\"1cabb8dfcf6c3a0a3130fa672ff403c463df1d1f96e8a680ad55aa5ca7273836\"}]",
+  "_engineRevision": "2026.5.24 / 313a751d4c6e1e40ead2529256b54520a72c0ed9",
+  "_values": {
+    "_density": 0.45,
+    "_radius": 150,
+    "_height": 1,
+    "_shadows": false
+  },
+  "_levels": [],
+  "_terrainSlope": 1,
+  "_terrainAlignment": true,
+  "_windGrass": {
+    "x": 9.7,
+    "y": 1.5,
+    "z": 1.6,
+    "w": 0.5
+  },
+  "_windTrees": {
+    "x": 11.1,
+    "y": 0.17,
+    "z": 0.9,
+    "w": 0.1
+  },
+  "_grassShadows": {
+    "x": 2,
+    "y": 0.35,
+    "z": 30,
+    "w": 0
+  },
+  "_shadowCascades": {
+    "x": 20,
+    "y": 60,
+    "z": 160
+  }
+}

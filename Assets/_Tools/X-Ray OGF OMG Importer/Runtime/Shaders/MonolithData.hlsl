@@ -266,6 +266,15 @@ void GetSurfaceAndBuiltinData(FragInputs input, float3 V, inout PositionInputs p
     if (sourceTerrainActive || trueStalkerTerrain) encodedAlbedo = baseSample.rgb;
     #endif
     encodedAlbedo = saturate(encodedAlbedo * _BaseColor.rgb);
+    #ifdef _MONOLITH_LEVEL_DETAIL
+    float grassSource = _MonolithGrassSource;
+    if (grassSource > 0.5 && grassSource < 1.5)
+    {
+        clip(MonolithInstanceExtra().w - MonolithAnomalyGrassDither(posInput.positionSS));
+        float variation = input.texCoord1.x;
+        encodedAlbedo = MonolithFloraUnorm8(MonolithFloraColorVariation(encodedAlbedo, variation, _MonolithFloraVariation.x));
+    }
+    #endif
     #ifdef _MONOLITH_LEVEL_FLORA
     float floraSource = MonolithFloraSourceMode(_MonolithFloraSource, _MonolithHasBump, _MonolithHasBumpCorrection);
     float floraVariation = 0.0;
@@ -373,6 +382,9 @@ void GetSurfaceAndBuiltinData(FragInputs input, float3 V, inout PositionInputs p
     #ifdef _MONOLITH_LEVEL_FLORA
     gloss = floraSource > 1.5 ? MonolithTrueStalkerFloraGloss(packed) : floraSource > 0.5 ? MonolithAnomalyFloraGloss(_MonolithFloraFixes1, _MonolithFloraWetness, false) : MonolithFloraGloss(packed.r, _MonolithGlossScale);
     #endif
+    #ifdef _MONOLITH_LEVEL_DETAIL
+    if (grassSource > 0.5) gloss = grassSource > 1.5 ? 2.0 / 255.0 : MonolithAnomalyFloraGloss(_MonolithFloraFixes1, _MonolithFloraWetness, true);
+    #endif
     #ifdef MONOLITH_SOURCE_TERRAIN
     if (!trueStalkerTerrain && (_MonolithDebug < 0.5 || _MonolithDiagnosticOptions.x < 0.5))
     #else
@@ -385,6 +397,9 @@ void GetSurfaceAndBuiltinData(FragInputs input, float3 V, inout PositionInputs p
     _MonolithEnvironmentAlbedoGloss = float4(encodedAlbedo, gloss);
     #endif
     float material = MonolithDecodeMaterial(_MonolithMaterialId, _MonolithMaterialWeight);
+    #ifdef _MONOLITH_LEVEL_DETAIL
+    if (grassSource > 0.5) material = MonolithFloraMaterial();
+    #endif
     #ifdef MONOLITH_SOURCE_TERRAIN
     if (sourceTerrain) material = 22.0 / 31.0 * 1.333333333;
     if (trueStalkerTerrain) material = 0.95;
@@ -479,6 +494,9 @@ void GetSurfaceAndBuiltinData(FragInputs input, float3 V, inout PositionInputs p
             detailNormal = posInput.positionWS - GetObjectToWorldMatrix()._m03_m13_m23 + float3(0.0, 0.75, 0.0);
         }
         surfaceData.normalWS = normalize(detailNormal);
+        if (grassSource > 1.5 && _MonolithHasBumpCorrection > 0.5) surfaceData.normalWS = MonolithTrueStalkerFloraNormal(packed, SAMPLE_TEXTURE2D(_MonolithBumpCorrection, sampler_MonolithBump, bumpUv), _MonolithFloraWetness, 0.1);
+        else if (grassSource > 0.5 && grassSource < 1.5) surfaceData.normalWS = MonolithAnomalyGrassNormal(packed, MonolithInstanceExtra().xyz, _MonolithFloraWetness);
+        if (grassSource > 0.5) _MonolithLevelHemiValue = MonolithFloraPackedHemisphere(MonolithFloraGrassHemisphere(_MonolithLevelHemiValue));
         surfaceData.geomNormalWS = normalize(input.tangentToWorld[2]);
         surfaceData.tangentWS = Orthonormalize(input.tangentToWorld[0], surfaceData.normalWS);
     }

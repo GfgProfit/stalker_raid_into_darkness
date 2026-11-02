@@ -14,7 +14,7 @@ namespace XRay.Importer.Editor.Levels
         public const string FLORA_SOURCE = "_MonolithFloraSource";
 
         private static readonly string[] CUTOFFS = { "_AlphaCutoff", "_AlphaCutoffShadow", "_AlphaCutoffPrepass", "_AlphaCutoffPostpass" };
-        private static readonly string[] TEXTURES = { ALBEDO, XRayLevelSourceBindings.CORRECTION };
+        private static readonly string[] TEXTURES = { ALBEDO, XRayLevelSourceBindings.CORRECTION, XRayFloraWindBindings.WAVES };
 
         public static bool Applies(Material material, XRayLevelMaterialRequest request)
         {
@@ -43,6 +43,23 @@ namespace XRay.Importer.Editor.Levels
             {
                 float cutoff = !accepted ? legacyCutoff : trueStalker && request.Textures?.BumpPath != null ? XRayFloraSourceBinding.GRASS_AREF : XRayFloraSourceBinding.AREF;
                 foreach (string property in CUTOFFS) Decide(plan, previous, property, Number(material.GetFloat(property)), Number(legacyCutoff), Number(cutoff), created);
+                if (request.RuntimeDetail)
+                {
+                    string detailLegacyAlbedo = Guid(request.Textures?.AlbedoPath);
+                    string detailAuthoredAlbedo = accepted ? Guid(request.Flora?.AuthoredAlbedoPath) : string.Empty;
+                    XRayLevelBindingChange detailAlbedo = Decide(plan, previous, ALBEDO, XRayLevelSourceBindings.TextureValue(material, ALBEDO), detailLegacyAlbedo, detailAuthoredAlbedo.Length > 0 ? detailAuthoredAlbedo : detailLegacyAlbedo, created);
+                    Texture2D detailTexture = Load(detailAlbedo.Final);
+                    Decide(plan, previous, "_MonolithAlbedoSrgb", Number(material.GetFloat("_MonolithAlbedoSrgb")), Number(material.GetFloat("_MonolithAlbedoSrgb")), Number(detailTexture != null && detailTexture.isDataSRGB ? 1.0f : 0.0f), true);
+                    string detailCorrection = accepted && trueStalker ? Guid(request.Flora?.CorrectionPath) : string.Empty;
+                    Decide(plan, previous, XRayLevelSourceBindings.CORRECTION, XRayLevelSourceBindings.TextureValue(material, XRayLevelSourceBindings.CORRECTION), string.Empty, detailCorrection, created);
+                    Decide(plan, previous, XRayLevelSourceBindings.HAS_CORRECTION, Number(material.GetFloat(XRayLevelSourceBindings.HAS_CORRECTION)), Number(0.0f), Number(detailCorrection.Length > 0 ? 1.0f : 0.0f), created);
+                    Decide(plan, previous, "_MonolithGrassSource", Number(material.GetFloat("_MonolithGrassSource")), Number(0.0f), Number(accepted ? trueStalker ? 2.0f : 1.0f : 0.0f), created);
+                    Decide(plan, previous, "_MonolithGrassRuntime", Number(material.GetFloat("_MonolithGrassRuntime")), Number(0.0f), Number(accepted ? 1.0f : 0.0f), created);
+                    Decide(plan, previous, "_MonolithSourceProfile", Number(material.GetFloat("_MonolithSourceProfile")), Number(0.0f), Number(accepted && !trueStalker ? 1.0f : 0.0f), created);
+                    string grassWaves = Guid(request.Flora?.GrassWavesPath);
+                    Decide(plan, previous, XRayFloraWindBindings.WAVES, XRayLevelSourceBindings.TextureValue(material, XRayFloraWindBindings.WAVES), string.Empty, grassWaves, created);
+                    Decide(plan, previous, XRayFloraWindBindings.WAVES_FLIP, Number(material.GetFloat(XRayFloraWindBindings.WAVES_FLIP)), Number(0.0f), Number(grassWaves.Length > 0 && XRayLevelSourceBindings.PackedFlipV(request.Flora.GrassWavesPath) ? 1.0f : 0.0f), created);
+                }
                 return Finish(plan);
             }
 
@@ -104,6 +121,7 @@ namespace XRay.Importer.Editor.Levels
             }
 
             material.SetOverrideTag(TAG, plan.Tag);
+            if (material.GetFloat("_MonolithGrassRuntime") > 0.5f) material.SetShaderPassEnabled(XRayFloraWindBindings.MOTION_VECTORS_PASS, true);
             material.SetOverrideTag("XRayFloraBinding", XRayFloraSourceBinding.VERSION);
             material.SetOverrideTag("XRayFloraContractSHA256", contractHash ?? string.Empty);
             EditorUtility.SetDirty(material);

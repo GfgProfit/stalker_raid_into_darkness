@@ -21,6 +21,7 @@ namespace XRay.Importer.Editor.Levels
         public string LightmapKey { get; set; }
         public string LightmapLabel { get; set; }
         public bool Detail { get; set; }
+        public bool RuntimeDetail { get; set; }
         public XRayLevelTerrainTextures Terrain { get; set; }
         public XRayLevelFloraTextures Flora { get; set; }
     }
@@ -199,6 +200,7 @@ namespace XRay.Importer.Editor.Levels
                 ConfigureWindBindings(material, request, true);
                 AssetDatabase.CreateAsset(material, path);
                 XRayAssetMarker.Write(path, new XRayAssetMarker(key, MATERIAL_ROLE, surface.RuleName, request.ShaderName, string.Empty));
+                AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceSynchronousImport);
                 Created++;
             }
 

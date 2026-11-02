@@ -372,13 +372,13 @@ namespace Inventory.IconGeneration
         private static List<ItemDefinition> BuildUniqueList(IReadOnlyList<ItemDefinition> definitions)
         {
             var unique = new List<ItemDefinition>();
-            var seen = new HashSet<int>();
+            var seen = new HashSet<EntityId>();
 
             for (int i = 0; i < definitions.Count; i++)
             {
                 ItemDefinition definition = definitions[i];
 
-                if (definition != null && seen.Add(definition.GetInstanceID()))
+                if (definition != null && seen.Add(definition.GetEntityId()))
                 {
                     unique.Add(definition);
                 }

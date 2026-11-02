@@ -10,7 +10,7 @@ using UnityEngine.TestTools;
 
 namespace RaidIntoDarkness.Integrations.Inventory.Tests
 {
-    public sealed class OutdoorsSceneInventoryCaptureTests : InputTestFixture
+    public sealed class OutdoorsSceneInventoryCaptureTests : OutdoorsSceneInputTestFixture
     {
         private const string CAPTURE_VARIABLE = "INVENTORY_CAPTURE_DIR";
         private const int WIDTH = 1920;

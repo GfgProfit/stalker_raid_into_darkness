@@ -33,6 +33,7 @@ namespace XRay.Importer.Editor.Levels
         public XRayDetailDatabase Details { get; set; }
         public XRaySourcePlan DetailSettingsSource { get; set; }
         public bool FloraWindAccepted { get; set; }
+        public XRayWeatherProfile WeatherProfile { get; set; }
         public List<XRayLevelCollisionChunk> Collision { get; } = new List<XRayLevelCollisionChunk>();
         public bool ImportLights { get; set; }
         public bool LightShadows { get; set; }
@@ -121,6 +122,18 @@ namespace XRay.Importer.Editor.Levels
                 wind.Profile = record.Source.FloraWindProfile == XRayFloraSourceProfile.AnomalySss.ToString() ? XRayFloraWindProfile.AnomalySsfx : XRayFloraWindProfile.TrueStalkerXRay;
                 wind.ResetAnimation();
             }
+            if (content.WeatherProfile != null)
+            {
+                if (content.WeatherProfile.Validate(out string diagnostic))
+                {
+                    ConfigureWeather(root, content.WeatherProfile);
+                    record.AddLimitation("RVM weather controls source light/material/wind inputs; neutral HDRP sky and diagnostic lux/exposure remain approximations. Saved user scenes are not migrated.");
+                }
+                else
+                {
+                    record.AddLimitation("Weather profile rejected: " + diagnostic);
+                }
+            }
             if (content.Collision.Count > 0)
             {
                 Transform collision = Child(root.transform, "Collision");
@@ -156,6 +169,64 @@ namespace XRay.Importer.Editor.Levels
 
             info.Initialize(content.LevelName, content.Level.Version, content.SourceFolder, System.DateTime.UtcNow.ToString("u"), content.Bounds, sectorInfos, portals, new List<string>(record.Limitations));
             return root;
+        }
+
+        public static XRayWeatherController ConfigureWeather(GameObject root, XRayWeatherProfile profile)
+        {
+            if (root == null) throw new System.ArgumentNullException(nameof(root));
+            if (profile == null) throw new System.ArgumentNullException(nameof(profile));
+            if (!profile.Validate(out string diagnostic)) throw new System.ArgumentException(diagnostic, nameof(profile));
+            XRayWeatherController[] controllers = root.GetComponentsInChildren<XRayWeatherController>(true);
+            if (controllers.Length > 1) throw new System.InvalidOperationException("The import root contains multiple weather controllers; select one owner before connecting weather.");
+            XRayWeatherController controller = controllers.Length == 1 ? controllers[0] : null;
+            GameObject owner;
+            bool created = controller == null;
+            if (created)
+            {
+                Transform environment = root.transform.Find("Environment");
+                if (environment == null) environment = Child(root.transform, "Environment");
+                owner = new GameObject("Source Weather");
+                owner.SetActive(false);
+                owner.transform.SetParent(environment, false);
+            }
+            else
+            {
+                owner = controller.gameObject;
+            }
+
+            MonolithWeatherInputs weather = root.GetComponentInChildren<MonolithWeatherInputs>(true);
+            if (weather == null) weather = owner.AddComponent<MonolithWeatherInputs>();
+            MonolithSourceLighting lighting = root.GetComponentInChildren<MonolithSourceLighting>(true);
+            if (lighting == null)
+            {
+                lighting = owner.AddComponent<MonolithSourceLighting>();
+                lighting.Mode = MonolithSourceLighting.LightingMode.Bound;
+            }
+            XRayFloraWindProvider wind = root.GetComponentInChildren<XRayFloraWindProvider>(true);
+            if (wind == null) wind = owner.AddComponent<XRayFloraWindProvider>();
+            Light sun = null;
+            foreach (Light light in root.GetComponentsInChildren<Light>(true))
+            {
+                if (light.type != LightType.Directional) continue;
+                sun = light;
+                break;
+            }
+            if (sun == null)
+            {
+                var sunObject = new GameObject("Weather Sun (HDRP diagnostic intensity)");
+                sunObject.transform.SetParent(owner.transform, false);
+                sun = sunObject.AddComponent<Light>();
+                sun.type = LightType.Directional;
+                sun.lightUnit = LightUnit.Lux;
+                sun.intensity = SUN_LUX;
+#if XRAY_HDRP
+                sunObject.AddComponent<HDAdditionalLightData>();
+#endif
+            }
+            if (created) controller = owner.AddComponent<XRayWeatherController>();
+            controller.Configure(profile, weather, lighting, wind, sun);
+            if (created) owner.SetActive(true);
+            return controller;
         }
 
         public static Bounds VisualBounds(XRayLevelVisual visual)

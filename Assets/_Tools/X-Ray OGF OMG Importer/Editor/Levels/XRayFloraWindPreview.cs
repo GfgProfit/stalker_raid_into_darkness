@@ -22,10 +22,10 @@ namespace XRay.Importer.Editor.Levels
         public static bool Advance(double now, bool visible)
         {
             XRayFloraWindProvider provider = XRayFloraWindProvider.Active;
-            bool running = !EditorApplication.isPlayingOrWillChangePlaymode && visible && provider != null && provider.isActiveAndEnabled && provider.PreviewEnabled && !provider.Paused;
+            bool running = !EditorApplication.isPlayingOrWillChangePlaymode && visible && provider != null && provider.isActiveAndEnabled && !provider.WeatherDriven && provider.PreviewEnabled && !provider.Paused;
             if (!running || provider != _provider)
             {
-                if (_provider != null) _provider.Reinitialize();
+                if (_provider != null && !_provider.WeatherDriven) _provider.Reinitialize();
                 _provider = running ? provider : null;
                 _lastTime = now;
                 if (_provider != null) _provider.Tick(0.0f);
@@ -48,7 +48,7 @@ namespace XRay.Importer.Editor.Levels
 
         private static void OnPlayModeChanged(PlayModeStateChange state)
         {
-            if (_provider != null) _provider.Reinitialize();
+            if (_provider != null && !_provider.WeatherDriven) _provider.Reinitialize();
             _provider = null;
             _lastTime = EditorApplication.timeSinceStartup;
         }

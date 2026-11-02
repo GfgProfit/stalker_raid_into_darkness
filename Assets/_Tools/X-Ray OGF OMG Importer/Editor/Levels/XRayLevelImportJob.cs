@@ -402,6 +402,7 @@ namespace XRay.Importer.Editor.Levels
             _content.ImportLights = _request.Settings.ImportLights;
             _content.LightShadows = _request.Settings.StaticLightShadows;
             _content.OpenScene = _request.Settings.OpenSceneAfterImport;
+            _content.WeatherProfile = _request.Settings.WeatherProfile;
         }
 
         private void CopySourceFiles()

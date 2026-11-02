@@ -20,9 +20,46 @@ namespace XRay.Importer
 
         private float _dynamicGloss = 0.71864f;
         private bool _pendingValidation;
+        private UnityEngine.Object _weatherOwner;
+        private Vector3 _weatherSunColor;
+        private Vector4? _weatherLightSetup;
+        private Vector4? _weatherFloraFixes;
 
         public float DynamicGloss => _dynamicGloss;
         public float Wetness => _wetness;
+        public Vector3 SunColor => _weatherOwner != null ? _weatherSunColor : _sunColor;
+        public Vector4 LightSetup => _weatherOwner != null && _weatherLightSetup.HasValue ? _weatherLightSetup.Value : _lightSetup;
+        public Vector4 FloraFixes => _weatherOwner != null && _weatherFloraFixes.HasValue ? _weatherFloraFixes.Value : _floraFixes;
+
+        public bool TrySetWeatherInputs(UnityEngine.Object owner, Vector3 sunColor, Vector4? lightSetup = null, Vector4? floraFixes = null)
+        {
+            if (owner == null || !isActiveAndEnabled || _weatherOwner != null && _weatherOwner != owner) return false;
+            for (int i = 0; i < 3; i++)
+            {
+                Validate(sunColor[i]);
+                if (sunColor[i] < 0.0f) throw new ArgumentOutOfRangeException(nameof(sunColor));
+            }
+            for (int i = 0; i < 4; i++)
+            {
+                if (lightSetup.HasValue) Validate(lightSetup.Value[i]);
+                if (floraFixes.HasValue) Validate(floraFixes.Value[i]);
+            }
+            _weatherOwner = owner;
+            _weatherSunColor = sunColor;
+            _weatherLightSetup = lightSetup;
+            _weatherFloraFixes = floraFixes;
+            Publish();
+            return true;
+        }
+
+        public void ReleaseWeatherInputs(UnityEngine.Object owner)
+        {
+            if (_weatherOwner != owner) return;
+            _weatherOwner = null;
+            _weatherLightSetup = null;
+            _weatherFloraFixes = null;
+            Publish();
+        }
 
         public static float EvaluateGloss(float minimum, float maximum, float autoMaximum, float wetness)
         {
@@ -77,6 +114,7 @@ namespace XRay.Importer
 
         private void OnDisable()
         {
+            _weatherOwner = null;
             if (_owner != this) return;
             Shader.SetGlobalFloat(_activeId, 0.0f);
             _owner = null;
@@ -105,9 +143,9 @@ namespace XRay.Importer
         {
             if (_owner != this || !isActiveAndEnabled) return;
             Shader.SetGlobalVector(_stateId, new Vector4(_dynamicGloss, _wetness, 0.0f, 0.0f));
-            Shader.SetGlobalVector(_sunId, _sunColor);
-            Shader.SetGlobalVector(_lightSetupId, _lightSetup);
-            Shader.SetGlobalVector(_floraId, _floraFixes);
+            Shader.SetGlobalVector(_sunId, SunColor);
+            Shader.SetGlobalVector(_lightSetupId, LightSetup);
+            Shader.SetGlobalVector(_floraId, FloraFixes);
             Shader.SetGlobalFloat(_activeId, 1.0f);
         }
 

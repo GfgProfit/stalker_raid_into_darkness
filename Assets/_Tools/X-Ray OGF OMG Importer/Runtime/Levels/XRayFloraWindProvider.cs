@@ -21,12 +21,43 @@ namespace XRay.Importer.Levels
 
         private readonly XRayFloraWindState _state = new XRayFloraWindState();
         private int _lastFrame = -1;
+        private UnityEngine.Object _weatherOwner;
+        private XRayFloraWindWeather _weatherInputs;
+        private Vector4? _weatherTreesSetup;
 
         public static XRayFloraWindProvider Active { get; private set; }
 
         public XRayFloraWindState State => _state;
-        public bool InputsComplete => _profile == XRayFloraWindProfile.AnomalySsfx || _profile == XRayFloraWindProfile.TrueStalkerXRay && _trueStalkerDiagnosticConstants;
+        public bool InputsComplete => WeatherDriven || _profile == XRayFloraWindProfile.AnomalySsfx || _profile == XRayFloraWindProfile.TrueStalkerXRay && _trueStalkerDiagnosticConstants;
         public string Diagnostic { get; private set; }
+        public bool WeatherDriven => _weatherOwner != null;
+
+        public bool TryAcquireWeather(UnityEngine.Object owner, Vector4? treesSetup)
+        {
+            if (owner == null || !isActiveAndEnabled || Active != null && Active != this || _weatherOwner != null && _weatherOwner != owner) return false;
+            if (Active == null) Active = this;
+            _weatherOwner = owner;
+            _weatherTreesSetup = treesSetup;
+            return true;
+        }
+
+        public void TickWeather(UnityEngine.Object owner, float deltaTime, XRayFloraWindWeather weather, bool resetPrevious)
+        {
+            if (_weatherOwner != owner || !isActiveAndEnabled || Active != this) return;
+            _weatherInputs = weather;
+            Configure();
+            _state.Advance(XRayFloraWindState.EngineDelta(deltaTime, false), weather);
+            if (resetPrevious) _state.Reinitialize();
+            Publish();
+        }
+
+        public void ReleaseWeather(UnityEngine.Object owner)
+        {
+            if (_weatherOwner != owner) return;
+            _weatherOwner = null;
+            _weatherTreesSetup = null;
+            ResetAnimation();
+        }
 
         public bool PreviewEnabled
         {
@@ -87,6 +118,7 @@ namespace XRay.Importer.Levels
 
         public void Tick(float deltaTime)
         {
+            if (WeatherDriven) return;
             Configure();
             _state.Advance(XRayFloraWindState.EngineDelta(deltaTime, _paused), Weather());
             Publish();
@@ -101,6 +133,8 @@ namespace XRay.Importer.Levels
 
         private void OnDisable()
         {
+            _weatherOwner = null;
+            _weatherTreesSetup = null;
             if (Active == this)
             {
                 Active = null;
@@ -117,7 +151,7 @@ namespace XRay.Importer.Levels
 
         private void Update()
         {
-            if (!Application.IsPlaying(gameObject) || Active != this || Time.frameCount == _lastFrame)
+            if (!Application.IsPlaying(gameObject) || Active != this || WeatherDriven || Time.frameCount == _lastFrame)
             {
                 return;
             }
@@ -128,18 +162,25 @@ namespace XRay.Importer.Levels
 
         private void Configure()
         {
-            _state.Profile = InputsComplete ? _profile : XRayFloraWindProfile.Disabled;
-            _state.TreesSetup = _ssfxWindTrees;
+            _state.Profile = WeatherDriven ? XRayFloraWindProfile.AnomalySsfx : InputsComplete ? _profile : XRayFloraWindProfile.Disabled;
+            _state.TreesSetup = WeatherDriven && _weatherTreesSetup.HasValue ? _weatherTreesSetup.Value : _ssfxWindTrees;
             _state.TreeRotationPeriod = Mathf.Max(0.01f, _treeRotationPeriod);
             _state.TreeWaveSpeed = _treeWaveSpeed;
             _state.TreeAmplitude = _treeAmplitude;
             _state.TreeWaveScale = _treeWaveScale;
-            Diagnostic = _profile == XRayFloraWindProfile.TrueStalkerXRay && !_trueStalkerDiagnosticConstants ? "True Stalker tree wind constants (ps_r__Tree_w_rot, ps_r__Tree_w_speed, ps_r__Tree_w_amp, ps_r__Tree_Wave) are not confirmed for xrRender.dll; wind stays disabled until diagnostic constants are explicitly enabled." : null;
+            if (WeatherDriven)
+            {
+                Diagnostic = _weatherTreesSetup.HasValue ? null : "INPUT BLOCKED: source ssfx_wind_trees are unavailable; authored diagnostic tree settings remain active.";
+            }
+            else
+            {
+                Diagnostic = _profile == XRayFloraWindProfile.TrueStalkerXRay && !_trueStalkerDiagnosticConstants ? "True Stalker tree wind constants (ps_r__Tree_w_rot, ps_r__Tree_w_speed, ps_r__Tree_w_amp, ps_r__Tree_Wave) are not confirmed for xrRender.dll; wind stays disabled until diagnostic constants are explicitly enabled." : null;
+            }
         }
 
         private XRayFloraWindWeather Weather()
         {
-            return new XRayFloraWindWeather(_windDirectionDegrees * Mathf.Deg2Rad, _windVelocity, _treeAmplitudeIntensity);
+            return WeatherDriven ? _weatherInputs : new XRayFloraWindWeather(_windDirectionDegrees * Mathf.Deg2Rad, _windVelocity, _treeAmplitudeIntensity);
         }
 
         private void Publish()

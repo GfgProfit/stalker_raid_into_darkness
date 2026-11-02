@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using XRay.Importer.Levels;
 
 namespace XRay.Importer.Editor.Levels
 {
@@ -63,6 +64,7 @@ namespace XRay.Importer.Editor.Levels
         [SerializeField] private XRayTerrainQuality _terrainQuality;
         [SerializeField] private XRayFloraImportMode _floraImportMode;
         [SerializeField] private XRayFloraWindImportMode _floraWindMode;
+        [SerializeField] private XRayWeatherProfile _weatherProfile;
         [SerializeField] private bool _openSceneAfterImport = true;
         [SerializeField] private bool _copySourceFiles = true;
         [SerializeField] private bool _autoImportDroppedLevels = true;
@@ -161,6 +163,12 @@ namespace XRay.Importer.Editor.Levels
         {
             get => _floraWindMode;
             set => _floraWindMode = value;
+        }
+
+        public XRayWeatherProfile WeatherProfile
+        {
+            get => _weatherProfile;
+            set => _weatherProfile = value;
         }
 
         public bool OpenSceneAfterImport

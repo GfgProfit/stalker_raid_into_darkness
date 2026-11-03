@@ -20,6 +20,174 @@ namespace XRay.Importer.Tests
 {
     public sealed class XRayWeatherSceneViewTests
     {
+        private XRayWeatherSceneFixture _skyFixture;
+        private NativeCapture _skyCapture;
+        private AOVRequestDataCollection _skyRequests;
+        private RTHandle _skyRaw;
+        private RTHandle _skyOutput;
+
+        [TearDown]
+        public void RestoreSkyCaptureResources()
+        {
+            if (_skyCapture != null)
+            {
+                _skyCapture.Dispose();
+                _skyCapture = null;
+            }
+            if (_skyFixture != null)
+            {
+                _skyFixture.Dispose();
+                _skyFixture = null;
+            }
+            _skyRequests?.Dispose();
+            _skyRequests = null;
+            if (_skyRaw != null) RTHandles.Release(_skyRaw);
+            if (_skyOutput != null) RTHandles.Release(_skyOutput);
+            _skyRaw = null;
+            _skyOutput = null;
+        }
+
+        [UnityTest]
+        [Timeout(300000)]
+        public IEnumerator SerializedSkyCyclesRenderInGameAndNativeSceneView()
+        {
+            Assert.IsFalse(Application.isBatchMode, "Sky window validation requires a GUI Editor.");
+            string output = Environment.GetEnvironmentVariable("MONOLITH_PHASE07B_OUTPUT");
+            Assert.IsNotEmpty(output);
+            Assert.IsTrue(Path.GetFullPath(output).StartsWith(@"E:\Projects\stalker_raid_into_darkness_Archive\", StringComparison.OrdinalIgnoreCase));
+            Directory.CreateDirectory(output);
+            HdrpTestWarmup.Ensure();
+            const string PROFILE_ROOT = "Assets/_Source/Levels/WeatherProfiles/Phase07B/";
+            XRayWeatherProfile clear = AssetDatabase.LoadAssetAtPath<XRayWeatherProfile>(PROFILE_ROOT + "w_clear1.asset");
+            XRayWeatherProfile rain = AssetDatabase.LoadAssetAtPath<XRayWeatherProfile>(PROFILE_ROOT + "w_rain1.asset");
+            Assert.IsNotNull(clear);
+            Assert.IsNotNull(rain);
+            RTHandle gameRaw = null;
+            RTHandle gameOutput = null;
+            AOVRequestDataCollection requests = null;
+            var rows = new StringBuilder("sample,api,seconds,key0,key1,weights,environment,output_max_delta,output_mean_delta,raw_max_delta,raw_mean_delta\n");
+            try
+            {
+                _skyFixture = new XRayWeatherSceneFixture(clear);
+                _skyCapture = new NativeCapture(_skyFixture, true);
+                var fixture = _skyFixture;
+                var native = _skyCapture;
+                {
+                    fixture.Root.GetComponentInChildren<MeshRenderer>().enabled = false;
+                    fixture.SourceMaterial.SetFloat("_MonolithDebug", 1.0f);
+                    Volume volume = fixture.Root.GetComponent<Volume>();
+                    volume.sharedProfile.TryGet(out Exposure exposure);
+                    exposure.fixedExposure.Override(0.0f);
+                    XRayWeatherSkyRenderer sky = fixture.Root.AddComponent<XRayWeatherSkyRenderer>();
+                    sky.Configure(volume, Shader.Find("XRay/Monolith Weather Sky"));
+                    fixture.Controller.ConfigureSky(sky);
+                    native.ConfigureSkyView();
+                    yield return native.MatchPairedViewport();
+                    Assert.IsTrue(fixture.Controller.BeginPreview(), fixture.Controller.Diagnostic);
+                    fixture.Controller.SetTimeScale(0.0f);
+                    fixture.Controller.SetPaused(true);
+                    Camera game = fixture.Camera;
+                    HDAdditionalCameraData data = game.GetComponent<HDAdditionalCameraData>();
+                    native.Data.CopyTo(data);
+                    data.clearColorMode = HDAdditionalCameraData.ClearColorMode.Sky;
+                    game.allowHDR = true;
+                    _skyRaw = gameRaw = RTHandles.Alloc(640, 640, colorFormat: GraphicsFormat.R32G32B32A32_SFloat, name: "Phase07B Game raw");
+                    _skyOutput = gameOutput = RTHandles.Alloc(640, 640, colorFormat: GraphicsFormat.R32G32B32A32_SFloat, name: "Phase07B Game output");
+                    var request = AOVRequest.NewDefault();
+                    request.SetOverrideRenderFormat(true);
+                    var builder = new AOVRequestBuilder();
+                    int callbacks = 0;
+                    builder.Add(request, buffer => buffer == AOVBuffers.Color ? gameRaw : gameOutput, null, new[] { AOVBuffers.Color, AOVBuffers.Output }, (command, textures, properties) => callbacks++);
+                    _skyRequests = requests = builder.Build();
+                    data.SetAOVRequests(requests);
+                    Color[] first = null;
+                    for (int sample = 0; sample < 15; sample++)
+                    {
+                        string name;
+                        if (sample < 12)
+                        {
+                            XRayWeatherProfile profile = sample < 6 ? clear : rain;
+                            fixture.Controller.SetProfile(profile);
+                            double[] hours = { 0.0, 6.0, 12.0, 18.0, 23.9, 24.1 };
+                            fixture.Controller.Seek(hours[sample % 6] * 3600.0);
+                            name = profile.CycleName + "_" + sample % 6;
+                        }
+                        else
+                        {
+                            if (sample == 12)
+                            {
+                                fixture.Controller.SetProfile(clear);
+                                fixture.Controller.Seek(59400.0);
+                                Assert.IsTrue(fixture.Controller.TransitionTo(rain, 1.0f));
+                            }
+                            else
+                            {
+                                fixture.Controller.SetPaused(false);
+                                fixture.Controller.TickPreview(0.5f);
+                                fixture.Controller.SetPaused(true);
+                            }
+                            name = "Transition_" + (sample - 12);
+                        }
+                        string stem = Path.Combine(output, name);
+                        Color[] scene = null;
+                        yield return native.Frame(stem + "_Scene_Output", colors => scene = colors, 0.0f);
+                        Color[] sceneRaw = ReadPairedFloat(native.ColorTexture, stem + "_Scene_RawLinear");
+                        MatchPairedPose(native.Camera, game);
+                        int before = callbacks;
+                        game.Render();
+                        game.Render();
+                        Assert.Greater(callbacks, before);
+                        Color[] gameColors = ReadPairedFloat(gameOutput.rt, stem + "_Game_Output");
+                        Color[] gameRawColors = ReadPairedFloat(gameRaw.rt, stem + "_Game_RawLinear");
+                        float max = 0.0f;
+                        double mean = 0.0;
+                        float rawMax = 0.0f;
+                        double rawMean = 0.0;
+                        double spread = 0.0;
+                        for (int i = 0; i < gameColors.Length; i++)
+                        {
+                            for (int channel = 0; channel < 3; channel++)
+                            {
+                                Assert.IsFalse(float.IsNaN(gameColors[i][channel]) || float.IsInfinity(gameColors[i][channel]));
+                                float difference = Mathf.Abs(gameColors[i][channel] - scene[i][channel]);
+                                max = Mathf.Max(max, difference);
+                                mean += difference;
+                                float rawDifference = Mathf.Abs(gameRawColors[i][channel] - sceneRaw[i][channel]);
+                                Assert.IsFalse(float.IsNaN(rawDifference) || float.IsInfinity(rawDifference));
+                                rawMax = Mathf.Max(rawMax, rawDifference);
+                                rawMean += rawDifference;
+                                spread += Mathf.Abs(gameColors[i][channel] - gameColors[0][channel]);
+                            }
+                        }
+                        Assert.Greater(spread, 0.01, "The serialized sky must produce visible nonflat pixels.");
+                        if (sample == 0) first = gameColors;
+                        if (sample == 2)
+                        {
+                            double change = 0.0;
+                            for (int i = 0; i < gameColors.Length; i++) change += Mathf.Abs(gameColors[i].r - first[i].r);
+                            Assert.Greater(change, 10.0, "Changing weather time must change sky pixels.");
+                        }
+                        XRayWeatherSnapshot snapshot = fixture.Controller.Snapshot;
+                        if (sample == 13) Assert.AreEqual(4, System.Linq.Enumerable.Count(new[] { 0, 1, 2, 3 }, index => snapshot.SkyResources.Weights[index] > 0.0f));
+                        Assert.IsTrue(fixture.Root.GetComponentInChildren<MonolithWeatherInputs>().EnvironmentActive);
+                        File.WriteAllText(stem + "_Snapshot.json", JsonUtility.ToJson(snapshot, true));
+                        rows.Append(name).Append(',').Append(SystemInfo.graphicsDeviceType).Append(',').Append(Num(snapshot.GameSeconds)).Append(',').Append(snapshot.Key0).Append(',').Append(snapshot.Key1).Append(',').Append('"').Append(snapshot.SkyResources.Weights.ToString("R")).Append("\",").Append(Shader.GetGlobalFloat("_MonolithWeatherEnvironmentActive")).Append(',').Append(Num(max)).Append(',').Append(Num(mean / (gameColors.Length * 3.0))).Append(',').Append(Num(rawMax)).Append(',').Append(Num(rawMean / (gameColors.Length * 3.0))).Append('\n');
+                        if (sample == 2 || sample == 8 || sample >= 12) yield return native.CaptureVisibleWindow(stem + "_Window", scene);
+                    }
+                    data.SetAOVRequests(null);
+                    fixture.Controller.EndPreview();
+                    Assert.IsFalse(sky.HasWeather);
+                    Assert.IsFalse(volume.HasInstantiatedProfile());
+                    Assert.AreEqual(0.0f, Shader.GetGlobalFloat("_MonolithWeatherEnvironmentActive"));
+                }
+            }
+            finally
+            {
+                RestoreSkyCaptureResources();
+                File.WriteAllText(Path.Combine(output, "Sky_Samples.csv"), rows.ToString());
+            }
+        }
+
         [UnityTest]
         [Timeout(600000)]
         public IEnumerator NativeSceneViewShowsImportedWeatherAndWindWithFixedCamera()
@@ -651,6 +819,13 @@ namespace XRay.Importer.Tests
                 Assert.AreEqual(SIZE, _camera.pixelHeight);
             }
 
+            public void ConfigureSkyView()
+            {
+                _view.orthographic = false;
+                _view.LookAtDirect(Vector3.zero, Quaternion.Euler(-15.0f, 0.0f, 0.0f), 10.0f);
+                _data.clearColorMode = HDAdditionalCameraData.ClearColorMode.Sky;
+            }
+
             public IEnumerator CaptureVisibleWindow(string stem, Color[] linearReference)
             {
                 const int COMPARISON_MARGIN = 96;
@@ -721,6 +896,7 @@ namespace XRay.Importer.Tests
                             int index = y * COMPARISON_SIZE + x;
                             Color actual = colors[(viewportY + y + COMPARISON_MARGIN) * width + viewportX + x + COMPARISON_MARGIN];
                             Color reference = linearReference[(y + COMPARISON_MARGIN) * SIZE + x + COMPARISON_MARGIN].gamma;
+                            reference = new Color(Mathf.Clamp01(reference.r), Mathf.Clamp01(reference.g), Mathf.Clamp01(reference.b), 1.0f);
                             capturedRegion[index] = actual;
                             referenceRegion[index] = reference;
                             float red = Mathf.Abs(actual.r - reference.r);
@@ -734,7 +910,7 @@ namespace XRay.Importer.Tests
                     WriteWindowPng(stem + "_Central448_Display.png", capturedRegion, COMPARISON_SIZE, COMPARISON_SIZE);
                     WriteWindowPng(stem + "_AOV_Central448_Display.png", referenceRegion, COMPARISON_SIZE, COMPARISON_SIZE);
                     File.WriteAllText(stem + "_Color_Stage_Comparison.csv", "comparison,max_rgb_delta,mean_abs_rgb_delta\nWindowCentral448_NativeAOVOutputDisplay," + Num(maxDifference) + "," + Num(meanDifference) + "\n");
-                    File.WriteAllText(stem + ".txt", "Capture=UnityEditorInternal.InternalEditorUtility.CaptureEditorWindow of exact task-owned window object backbuffer\nCaptureSucceeded=" + captured + "\nWindowEntityId=" + _view.GetEntityId().ToString() + "\nWindowType=" + _view.GetType().FullName + "\nWindowTitle=" + _view.titleContent.text + "\nHasFocusAtRead=" + _view.hasFocus + "\nExactFocusedWindowAtRead=" + (EditorWindow.focusedWindow == _view) + "\nWindowRect=" + position + "\nPixelsPerPoint=" + scale + "\nReadback=" + width + "x" + height + "\nViewportBoundsInWindow=" + viewportBounds + "\nViewportReadback=" + viewportX + "," + viewportY + "," + SIZE + "," + SIZE + "\nCentralComparison=96,96,448,448 within camera viewport; toolbar, gizmo and bottom overlay excluded\nTargetGraphicsFormat=" + target.graphicsFormat + "\nTargetSRGB=" + target.sRGB + "\nActiveColorSpace=" + QualitySettings.activeColorSpace + "\nAPI=" + SystemInfo.graphicsDeviceType + "\nSRGBWriteBeforeCapture=" + beforeCapture + "\nSRGBWriteAfterCapture=" + afterCapture + "\nSDREncoding=Display-encoded backbuffer RGB transported through a non-sRGB UNorm target then direct RGB24 ReadPixels and PNG\nWindowRGBIsLinearHDR=false\nRawLinearReference=Native_AOV_Output.exr; full Float32 HDRP AOV postprocess destination\nDisplayReference=Color.gamma applied once to the already captured Native AOV Output for comparison\nMaxDisplayRGBDelta=" + Num(maxDifference) + "\nMeanDisplayRGBDelta=" + Num(meanDifference) + "\nMaxDisplayRGBDeltaTolerance=" + Num(2.0f / 255.0f) + "\nManualGamma=false for window image\nIncludesEditorWindowUI=true for full window PNG; false for central display PNGs\nDesktopRectangleReadback=false\nDesktopForegroundClaim=false\n");
+                    File.WriteAllText(stem + ".txt", "Capture=UnityEditorInternal.InternalEditorUtility.CaptureEditorWindow of exact task-owned window object backbuffer\nCaptureSucceeded=" + captured + "\nWindowEntityId=" + _view.GetEntityId().ToString() + "\nWindowType=" + _view.GetType().FullName + "\nWindowTitle=" + _view.titleContent.text + "\nHasFocusAtRead=" + _view.hasFocus + "\nExactFocusedWindowAtRead=" + (EditorWindow.focusedWindow == _view) + "\nWindowRect=" + position + "\nPixelsPerPoint=" + scale + "\nReadback=" + width + "x" + height + "\nViewportBoundsInWindow=" + viewportBounds + "\nViewportReadback=" + viewportX + "," + viewportY + "," + SIZE + "," + SIZE + "\nCentralComparison=96,96,448,448 within camera viewport; toolbar, gizmo and bottom overlay excluded\nTargetGraphicsFormat=" + target.graphicsFormat + "\nTargetSRGB=" + target.sRGB + "\nActiveColorSpace=" + QualitySettings.activeColorSpace + "\nAPI=" + SystemInfo.graphicsDeviceType + "\nSRGBWriteBeforeCapture=" + beforeCapture + "\nSRGBWriteAfterCapture=" + afterCapture + "\nSDREncoding=Display-encoded backbuffer RGB transported through a non-sRGB UNorm target then direct RGB24 ReadPixels and PNG\nWindowRGBIsLinearHDR=false\nRawLinearReference=Native_AOV_Output.exr; full Float32 HDRP AOV postprocess destination\nDisplayReference=Color.gamma applied once to Native AOV Output then clamped to the SDR display range\nMaxDisplayRGBDelta=" + Num(maxDifference) + "\nMeanDisplayRGBDelta=" + Num(meanDifference) + "\nMaxDisplayRGBDeltaTolerance=" + Num(2.0f / 255.0f) + "\nManualGamma=false for window image\nIncludesEditorWindowUI=true for full window PNG; false for central display PNGs\nDesktopRectangleReadback=false\nDesktopForegroundClaim=false\n");
                     Assert.LessOrEqual(maxDifference, 2.0f / 255.0f, "The UI-free owned-window display RGB must match once-sRGB Native AOV Output within two 8-bit quantization steps.");
                 }
                 finally
@@ -766,7 +942,7 @@ namespace XRay.Importer.Tests
                 }
             }
 
-            public IEnumerator Frame(string path, Action<Color[]> receive)
+            public IEnumerator Frame(string path, Action<Color[]> receive, float fixedExposure = XRayWeatherSceneFixture.FIXED_EXPOSURE_EV100)
             {
                 int version = _version;
                 double limit = EditorApplication.timeSinceStartup + 15.0;
@@ -819,12 +995,12 @@ namespace XRay.Importer.Tests
                 bool volumeRegistered = Array.IndexOf(VolumeManager.instance.GetVolumes(_data.volumeLayerMask), _volume) >= 0;
                 bool volumeVisible = UnityEditor.SceneManagement.StageUtility.IsGameObjectRenderedByCamera(_volume.gameObject, _camera);
                 string exposureMetadata = FormattableString.Invariant($"\nActualVolumeExposureMode={exposure.mode.value}\nActualVolumeFixedExposureEV100={exposure.fixedExposure.value:R}\nActualVolumeExposureCompensation={exposure.compensation.value:R}\nSceneViewExposureOverrideActive={sceneOverride}\nSceneViewExposureOverrideEV100={sceneOverrideValue:R}\nConfiguredVolumeLayerMask={_data.volumeLayerMask.value}\nFixtureVolumeRegisteredInMask={volumeRegistered}\nFixtureVolumeVisibleToCamera={volumeVisible}\nActualFrameBloom={actual.IsEnabled(FrameSettingsField.Bloom)}\nActualVolumeBloomIntensity={bloom.intensity.value:R}");
-                File.WriteAllText(path + "_Camera.txt", "API=" + SystemInfo.graphicsDeviceType + "\nCameraType=" + _camera.cameraType + "\nSceneViewDrawMode=" + _view.cameraMode.drawMode + "\nPosition=" + _camera.transform.position.ToString("F8") + "\nRotation=" + _camera.transform.rotation.ToString("F8") + "\nOrthographicSize=" + Num(_camera.orthographicSize) + "\nPixelSize=" + _camera.pixelWidth + "x" + _camera.pixelHeight + "\nAovSize=" + SIZE + "x" + SIZE + "\nConfiguredFixedExposureEV100=" + XRayWeatherSceneFixture.FIXED_EXPOSURE_EV100 + "\nDiagnosticSunLux=" + XRayWeatherSceneFixture.DIAGNOSTIC_SUN_LUX + "\nExposureControl=" + actual.IsEnabled(FrameSettingsField.ExposureControl) + "\nPostprocess=" + actual.IsEnabled(FrameSettingsField.Postprocess) + "\nView=" + _camera.worldToCameraMatrix.ToString("F8") + "\nProjection=" + _camera.projectionMatrix.ToString("F8") + "\nAovCallbacks=" + _version + "\nCapture=Native SceneView GUI repaint and HDRP AOV Output after postprocess" + exposureMetadata);
+                File.WriteAllText(path + "_Camera.txt", "API=" + SystemInfo.graphicsDeviceType + "\nCameraType=" + _camera.cameraType + "\nSceneViewDrawMode=" + _view.cameraMode.drawMode + "\nPosition=" + _camera.transform.position.ToString("F8") + "\nRotation=" + _camera.transform.rotation.ToString("F8") + "\nOrthographicSize=" + Num(_camera.orthographicSize) + "\nPixelSize=" + _camera.pixelWidth + "x" + _camera.pixelHeight + "\nAovSize=" + SIZE + "x" + SIZE + "\nConfiguredFixedExposureEV100=" + fixedExposure + "\nDiagnosticSunLux=" + XRayWeatherSceneFixture.DIAGNOSTIC_SUN_LUX + "\nExposureControl=" + actual.IsEnabled(FrameSettingsField.ExposureControl) + "\nPostprocess=" + actual.IsEnabled(FrameSettingsField.Postprocess) + "\nView=" + _camera.worldToCameraMatrix.ToString("F8") + "\nProjection=" + _camera.projectionMatrix.ToString("F8") + "\nAovCallbacks=" + _version + "\nCapture=Native SceneView GUI repaint and HDRP AOV Output after postprocess" + exposureMetadata);
                 Assert.IsTrue(volumeRegistered && volumeVisible, "The task-owned native fixture Volume must be registered and visible to its Scene View camera.");
                 Assert.AreEqual(_sceneCullingMask, _camera.overrideSceneCullingMask, "Native GUI repaints must preserve the task-owned preview scene culling mask.");
                 Assert.IsFalse(sceneOverride, "A Scene View exposure override would invalidate the shared fixed-volume exposure contract.");
                 Assert.AreEqual(ExposureMode.Fixed, exposure.mode.value);
-                Assert.That(exposure.fixedExposure.value, Is.EqualTo(XRayWeatherSceneFixture.FIXED_EXPOSURE_EV100).Within(0.0001f));
+                Assert.That(exposure.fixedExposure.value, Is.EqualTo(fixedExposure).Within(0.0001f));
                 Assert.That(exposure.compensation.value, Is.EqualTo(0.0f).Within(0.000001f));
                 Assert.IsTrue(actual.IsEnabled(FrameSettingsField.ExposureControl));
                 Assert.IsFalse(actual.IsEnabled(FrameSettingsField.Bloom));

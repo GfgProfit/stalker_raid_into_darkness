@@ -24,6 +24,8 @@ namespace XRay.Importer.Levels
         [SerializeField] private Vector4 _floraFixes;
         [SerializeField] private bool _hasSunLightScale;
         [SerializeField] private Vector3 _sunLightScale = Vector3.one;
+        [SerializeField] private bool _hasEnvironmentScale;
+        [SerializeField] private Vector2 _environmentScale;
         [SerializeField] private float _visibilityScale = 1.0f;
 
         public int SchemaVersion => _schemaVersion;
@@ -41,9 +43,11 @@ namespace XRay.Importer.Levels
         public Vector4 FloraFixes => _floraFixes;
         public bool HasSunLightScale => _hasSunLightScale;
         public Vector3 SunLightScale => _sunLightScale;
+        public bool HasEnvironmentScale => _hasEnvironmentScale;
+        public Vector2 EnvironmentScale => _environmentScale;
         public float VisibilityScale => _visibilityScale;
 
-        public void Initialize(string cycleName, string sourceIdentity, string provenance, XRayWeatherSnapshot[] keyframes, Vector2[] hourlySunPositions, Vector4? ssfxWindTrees = null, Vector4? lightSetup = null, Vector4? floraFixes = null, Vector3? sunLightScale = null, float visibilityScale = 1.0f)
+        public void Initialize(string cycleName, string sourceIdentity, string provenance, XRayWeatherSnapshot[] keyframes, Vector2[] hourlySunPositions, Vector4? ssfxWindTrees = null, Vector4? lightSetup = null, Vector4? floraFixes = null, Vector3? sunLightScale = null, float visibilityScale = 1.0f, Vector2? environmentScale = null)
         {
             _schemaVersion = CURRENT_SCHEMA;
             _sourceTarget = "Rvm";
@@ -60,6 +64,8 @@ namespace XRay.Importer.Levels
             _floraFixes = floraFixes.GetValueOrDefault();
             _hasSunLightScale = sunLightScale.HasValue;
             _sunLightScale = sunLightScale ?? Vector3.one;
+            _hasEnvironmentScale = environmentScale.HasValue;
+            _environmentScale = environmentScale.GetValueOrDefault();
             _visibilityScale = visibilityScale;
             if (!Validate(out string diagnostic)) throw new ArgumentException(diagnostic);
         }
@@ -78,6 +84,7 @@ namespace XRay.Importer.Levels
             else if (_hourlySunPositions == null || _hourlySunPositions.Length != 24) diagnostic = "A weather profile requires 24 hourly sun positions.";
             else if (_hasSsfxWindTrees && !Finite(_ssfxWindTrees) || _hasLightSetup && !Finite(_lightSetup) || _hasFloraFixes && !Finite(_floraFixes)) diagnostic = "Invalid saved weather setup vector.";
             else if (_hasSunLightScale && (!Finite(_sunLightScale.x) || !Finite(_sunLightScale.y) || !Finite(_sunLightScale.z) || _sunLightScale.x < 0.0f || _sunLightScale.y < 0.0f || _sunLightScale.z < 0.0f)) diagnostic = "Invalid source sunlight scale.";
+            else if (_hasEnvironmentScale && (!Finite(_environmentScale.x) || !Finite(_environmentScale.y) || _environmentScale.x < 0.0f || _environmentScale.y < 0.0f)) diagnostic = "Invalid source environment scale.";
             else if (!Finite(_visibilityScale) || _visibilityScale <= 0.0f) diagnostic = "Invalid source visibility scale.";
             if (diagnostic != null) return false;
             for (int i = 0; i < _keyframes.Length; i++)

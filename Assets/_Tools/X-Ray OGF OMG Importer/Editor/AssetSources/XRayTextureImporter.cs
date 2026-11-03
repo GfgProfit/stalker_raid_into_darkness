@@ -288,6 +288,136 @@ namespace XRay.Importer.Editor
             return new XRayTextureAssetResult { AssetPath = assetPath, Status = existing != null ? XRayResourceStatus.Updated : XRayResourceStatus.Imported, Format = header.Description, Note = sampler != null && sampler.Overrides.Count > 0 ? note + " " + sampler.Note : note };
         }
 
+        public XRayTextureAssetResult ImportWeather(XRayResolvedFile file, string folder, bool cubemap)
+        {
+            if (file == null || !file.IsResolved) return new XRayTextureAssetResult { Status = XRayResourceStatus.Missing };
+            byte[] source = file.Winner.ReadAllBytes();
+            DdsHeader header = DdsHeader.Parse(source);
+            GraphicsFormat format = WeatherFormat(header.Format);
+            if (header.IsCubemap != cubemap || header.IsVolume || header.ArraySize != 1 || cubemap && header.Width != header.Height || header.Width > DdsMipChain.MAX_DIMENSION || header.Height > DdsMipChain.MAX_DIMENSION || header.MipCount > DdsMipChain.FullChainLength(header.Width, header.Height) || format == GraphicsFormat.None) return new XRayTextureAssetResult { Status = XRayResourceStatus.Unsupported, Format = header.Description, Note = "Weather textures require a supported 2D texture or a complete square cubemap." };
+            if (cubemap && !header.HasDx10Header && (BitConverter.ToUInt32(source, 112) & 0xFC00) != 0xFC00) return new XRayTextureAssetResult { Status = XRayResourceStatus.Unsupported, Format = header.Description, Note = "Weather cubemap is missing one or more DDS faces." };
+            int faceSize = 0;
+            int width = header.Width;
+            int height = header.Height;
+            for (int mip = 0; mip < header.MipCount; mip++)
+            {
+                faceSize = checked(faceSize + DdsHeader.GetLevelSize(header.Format, width, height));
+                width = Math.Max(1, width >> 1);
+                height = Math.Max(1, height >> 1);
+            }
+            long payloadSize = (long)faceSize * (cubemap ? 6 : 1);
+            long trailingBytes = source.Length - header.DataOffset - payloadSize;
+            if (trailingBytes < 0) return new XRayTextureAssetResult { Status = XRayResourceStatus.Unsupported, Format = header.Description, Note = "Weather DDS payload is shorter than its authored face/mip layout." };
+            string trailingNote = string.Empty;
+            if (trailingBytes > 0)
+            {
+                using (System.Security.Cryptography.SHA256 hash = System.Security.Cryptography.SHA256.Create())
+                {
+                    string tailHash = BitConverter.ToString(hash.ComputeHash(source, (int)(header.DataOffset + payloadSize), (int)trailingBytes)).Replace("-", string.Empty).ToLowerInvariant();
+                    trailingNote = " Header-described payload=" + payloadSize + " bytes; trailing source bytes outside the declared surfaces=" + trailingBytes + "; tailSHA256=" + tailHash + ".";
+                }
+            }
+            List<byte[]> levels = null;
+            if (!cubemap && !DdsMipChain.TryReadFlipped(source, header, out levels, out string reason)) return new XRayTextureAssetResult { Status = XRayResourceStatus.Unsupported, Format = header.Description, Note = reason };
+            var marker = new XRayAssetMarker(file.VirtualPath + "#weather-unorm" + ContentQualifier(source), XRayTextureRole.Packed.ToString(), file.Winner.SourceName, file.Winner.Location, file.Winner.Stamp);
+            string assetPath = XRayAssetNaming.Place(folder, XRayAssetNaming.CreateCandidates(file.Winner.RelativePath, "_weather"), ".asset", marker.Key, XRayAssetMarker.ReadKey, _claimed);
+            Texture existing = AssetDatabase.LoadAssetAtPath<Texture>(assetPath);
+            if (existing != null)
+            {
+                XRayAssetMarker previous = XRayAssetMarker.ReadEffective(assetPath);
+                if (previous != null && previous.Stamp == marker.Stamp && previous.SourcePath == marker.SourcePath || !_options.OverwriteExistingTextures && !_forceUpdate) return new XRayTextureAssetResult { AssetPath = assetPath, Status = XRayResourceStatus.Reused, Format = header.Description, Note = "Preserved the existing weather texture and authored mip chain." + trailingNote };
+            }
+            Texture texture = null;
+            try
+            {
+                if (cubemap)
+                {
+                    var cube = new Cubemap(header.Width, format, TextureCreationFlags.None, header.MipCount);
+                    texture = cube;
+                    int offset = header.DataOffset;
+                    for (int face = 0; face < 6; face++)
+                    {
+                        width = header.Width;
+                        height = header.Height;
+                        for (int mip = 0; mip < header.MipCount; mip++)
+                        {
+                            if (header.Format == DdsFormat.Bgr24)
+                            {
+                                var rgba = new byte[width * height * 4];
+                                for (int pixel = 0; pixel < width * height; pixel++)
+                                {
+                                    rgba[pixel * 4] = source[offset + pixel * 3 + 2];
+                                    rgba[pixel * 4 + 1] = source[offset + pixel * 3 + 1];
+                                    rgba[pixel * 4 + 2] = source[offset + pixel * 3];
+                                    rgba[pixel * 4 + 3] = 255;
+                                }
+                                cube.SetPixelData(rgba, mip, (CubemapFace)face);
+                            }
+                            else cube.SetPixelData(source, mip, (CubemapFace)face, offset);
+                            offset += DdsHeader.GetLevelSize(header.Format, width, height);
+                            width = Math.Max(1, width >> 1);
+                            height = Math.Max(1, height >> 1);
+                        }
+                    }
+                    cube.Apply(false, false);
+                }
+                else
+                {
+                    var image = new Texture2D(header.Width, header.Height, format, header.MipCount, TextureCreationFlags.None);
+                    texture = image;
+                    for (int mip = 0; mip < levels.Count; mip++) image.SetPixelData(levels[mip], mip);
+                    image.Apply(false, false);
+                }
+                texture.name = Path.GetFileNameWithoutExtension(assetPath);
+                texture.filterMode = cubemap ? FilterMode.Bilinear : FilterMode.Trilinear;
+                texture.wrapMode = cubemap ? TextureWrapMode.Clamp : TextureWrapMode.Repeat;
+                texture.anisoLevel = 1;
+                Directory.CreateDirectory(folder);
+                if (existing != null)
+                {
+                    EditorUtility.CopySerialized(texture, existing);
+                    UnityEngine.Object.DestroyImmediate(texture);
+                    texture = existing;
+                    EditorUtility.SetDirty(texture);
+                }
+                else AssetDatabase.CreateAsset(texture, assetPath);
+                var serialized = new SerializedObject(texture);
+                SerializedProperty readable = serialized.FindProperty("m_IsReadable");
+                if (readable != null)
+                {
+                    readable.boolValue = false;
+                    serialized.ApplyModifiedPropertiesWithoutUndo();
+                }
+                AssetDatabase.SaveAssetIfDirty(texture);
+                XRayAssetMarker.Write(assetPath, marker);
+                string note = cubemap ? "UNorm DDS faces and authored mips preserved in native D3D face order." : "UNorm authored DDS mips preserved with the existing block-exact vertical flip.";
+                note += trailingNote;
+                return new XRayTextureAssetResult { AssetPath = assetPath, Status = existing != null ? XRayResourceStatus.Updated : XRayResourceStatus.Imported, Format = header.Description, Note = note };
+            }
+            catch
+            {
+                if (texture != null && !AssetDatabase.Contains(texture)) UnityEngine.Object.DestroyImmediate(texture);
+                throw;
+            }
+        }
+
+        private static GraphicsFormat WeatherFormat(DdsFormat format)
+        {
+            return format switch
+            {
+                DdsFormat.BC1 => GraphicsFormat.RGBA_DXT1_UNorm,
+                DdsFormat.BC2 => GraphicsFormat.RGBA_DXT3_UNorm,
+                DdsFormat.BC3 => GraphicsFormat.RGBA_DXT5_UNorm,
+                DdsFormat.BC7 => GraphicsFormat.RGBA_BC7_UNorm,
+                DdsFormat.Rgba32 => GraphicsFormat.R8G8B8A8_UNorm,
+                DdsFormat.Bgra32 => GraphicsFormat.B8G8R8A8_UNorm,
+                DdsFormat.Bgrx32 => GraphicsFormat.B8G8R8A8_UNorm,
+                DdsFormat.Bgr24 => GraphicsFormat.R8G8B8A8_UNorm,
+                DdsFormat.RgbaHalf => GraphicsFormat.R16G16B16A16_SFloat,
+                _ => GraphicsFormat.None
+            };
+        }
+
         public string FindPacked(XRayResolvedFile file, string folder, out bool upToDate)
         {
             upToDate = false;

@@ -4,6 +4,10 @@
 #ifdef _MONOLITH_ORIGINAL_ENVIRONMENT
 TEXTURECUBE(_MonolithEnv0);
 TEXTURECUBE(_MonolithEnv1);
+TEXTURECUBE(_MonolithWeatherEnvironment0);
+TEXTURECUBE(_MonolithWeatherEnvironment1);
+TEXTURECUBE(_MonolithWeatherEnvironment2);
+TEXTURECUBE(_MonolithWeatherEnvironment3);
 static float4 _MonolithEnvironmentAlbedoGloss;
 
 struct MonolithEnvironmentData
@@ -43,6 +47,15 @@ float3 MonolithEnvironmentDominant(float3 normal, float3 reflection, float rough
     float smoothness = saturate(1.0 - rough);
     float factor = smoothness * (sqrt(smoothness) + rough);
     return lerp(normal, reflection, factor);
+}
+
+float3 MonolithSampleWeatherEnvironment(float3 direction, float mip)
+{
+    float3 value = SAMPLE_TEXTURECUBE_LOD(_MonolithWeatherEnvironment0, s_trilinear_clamp_sampler, direction, mip).rgb * _MonolithWeatherEnvironmentWeights.x;
+    value += SAMPLE_TEXTURECUBE_LOD(_MonolithWeatherEnvironment1, s_trilinear_clamp_sampler, direction, mip).rgb * _MonolithWeatherEnvironmentWeights.y;
+    value += SAMPLE_TEXTURECUBE_LOD(_MonolithWeatherEnvironment2, s_trilinear_clamp_sampler, direction, mip).rgb * _MonolithWeatherEnvironmentWeights.z;
+    value += SAMPLE_TEXTURECUBE_LOD(_MonolithWeatherEnvironment3, s_trilinear_clamp_sampler, direction, mip).rgb * _MonolithWeatherEnvironmentWeights.w;
+    return value;
 }
 
 MonolithEnvironmentData MonolithEvaluateEnvironment(float3 normal, float3 view, float4 albedoGloss)
@@ -93,12 +106,20 @@ MonolithEnvironmentData MonolithEvaluateEnvironment(float3 normal, float3 view, 
     data.cube1Specular = SAMPLE_TEXTURECUBE_LOD(_MonolithEnv1, s_trilinear_clamp_sampler, data.dominant, mip).rgb;
     data.diffuseSample = lerp(data.cube0Diffuse, data.cube1Diffuse, _MonolithEnvColor.w);
     data.specularSample = lerp(data.cube0Specular, data.cube1Specular, _MonolithEnvColor.w);
-    float factor = 1.0 - saturate(dot(_MonolithEnvColor.rgb, 0.15));
+    bool weatherEnvironment = _MonolithSourceProfile > 0.5 && _MonolithWeatherActive > 0.5 && _MonolithWeatherEnvironmentActive > 0.5;
+    float3 environmentColor = weatherEnvironment ? _MonolithWeatherEnvironmentColor.rgb : _MonolithEnvColor.rgb;
+    float3 ambientColor = weatherEnvironment ? _MonolithWeatherAmbient.rgb : _MonolithEnvAmbient.rgb;
+    if (weatherEnvironment)
+    {
+        data.diffuseSample = squared.x * MonolithSampleWeatherEnvironment(dx, 6.0) + squared.y * MonolithSampleWeatherEnvironment(dy, 6.0) + squared.z * MonolithSampleWeatherEnvironment(dz, 6.0);
+        data.specularSample = MonolithSampleWeatherEnvironment(data.dominant, mip);
+    }
+    float factor = 1.0 - saturate(dot(environmentColor, 0.15));
     float baseHemi = MonolithBaseHemisphere();
     float hemi = lerp(baseHemi, baseHemi + _MonolithEnvHudHemi * factor, _MonolithEnvHudMask);
     data.mipViewHemi = float3(mip, dot(normal, view), hemi);
-    data.diffuseIrradiance = pow(max(0.0, data.diffuseSample * _MonolithEnvColor.rgb * hemi + _MonolithEnvAmbient.rgb), 2.2);
-    data.specularIrradiance = pow(max(0.0, data.specularSample * _MonolithEnvColor.rgb * hemi + _MonolithEnvAmbient.rgb), 2.2) * (flora ? 0.25 : 1.0);
+    data.diffuseIrradiance = pow(max(0.0, data.diffuseSample * environmentColor * hemi + ambientColor), 2.2);
+    data.specularIrradiance = pow(max(0.0, data.specularSample * environmentColor * hemi + ambientColor), 2.2) * (flora ? 0.25 : 1.0);
     float nv = max(1e-5, data.mipViewHemi.y);
     data.diffuseBrdf = MonolithEnvBurley(rough, nv);
     data.specularBrdf = MonolithEnvGGX(data.f0, rough, nv);

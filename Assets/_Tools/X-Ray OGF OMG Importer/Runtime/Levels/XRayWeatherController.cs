@@ -21,6 +21,7 @@ namespace XRay.Importer.Levels
         [SerializeField] private MonolithSourceLighting _sourceLighting;
         [SerializeField] private XRayFloraWindProvider _windProvider;
         [SerializeField] private Light _sun;
+        [SerializeField] private XRayWeatherSkyRenderer _skyRenderer;
 
         private XRayWeatherProfile _activeProfile;
         private XRayWeatherProfile _appliedProfile;
@@ -31,6 +32,7 @@ namespace XRay.Importer.Levels
         private MonolithSourceLighting _ownedLighting;
         private XRayFloraWindProvider _ownedWind;
         private Light _ownedSun;
+        private XRayWeatherSkyRenderer _ownedSky;
         private Color _savedSunColor;
         private Quaternion _savedSunRotation;
         private double _gameTimeSeconds;
@@ -46,6 +48,7 @@ namespace XRay.Importer.Levels
         private bool _previewActive;
         private bool _ownsInputs;
         private bool _rebaseWind;
+        private bool _ownsSky;
 
         public static XRayWeatherController Active { get; private set; }
 
@@ -96,7 +99,7 @@ namespace XRay.Importer.Levels
             _appliedInitialTime = _timeOfDayHours;
             _appliedProfile = _profile;
             _settingsApplied = true;
-            if (_ownsInputs && (_ownedWeather != _weatherInputs || _ownedLighting != _sourceLighting || _ownedWind != _windProvider || _ownedSun != _sun)) ReleaseInputs();
+            if (_ownsInputs && (_ownedWeather != _weatherInputs || _ownedLighting != _sourceLighting || _ownedWind != _windProvider || _ownedSun != _sun || _ownedSky != _skyRenderer)) ReleaseInputs();
             if (Application.IsPlaying(gameObject) || _previewActive)
             {
                 if (TryOwnInputs()) EvaluateAndPublish(0.0f, discontinuity);
@@ -107,6 +110,13 @@ namespace XRay.Importer.Levels
         {
             _activeProfile = profile;
             ClearTransition();
+            RefreshDiscontinuity();
+        }
+
+        public void ConfigureSky(XRayWeatherSkyRenderer skyRenderer)
+        {
+            ReleaseInputs();
+            _skyRenderer = skyRenderer;
             RefreshDiscontinuity();
         }
 
@@ -276,11 +286,13 @@ namespace XRay.Importer.Levels
             bool weather = _weatherInputs.TrySetWeatherInputs(this, color, lightSetup, floraFixes);
             bool lighting = _sourceLighting.TrySetWeatherLight(this, _sun, sourceColor, snapshot.SunDirection);
             bool wind = _windProvider.TryAcquireWeather(this, trees);
-            if (!weather || !lighting || !wind)
+            bool sky = ReferenceEquals(_skyRenderer, null) || _skyRenderer != null && _skyRenderer.TrySetWeather(this, snapshot, _windProvider.State.Time);
+            if (!weather || !lighting || !wind || !sky)
             {
                 _weatherInputs.ReleaseWeatherInputs(this);
                 _sourceLighting.ReleaseWeatherLight(this);
                 _windProvider.ReleaseWeather(this);
+                if (_skyRenderer != null) _skyRenderer.ReleaseWeather(this);
                 Diagnostic = "A referenced weather consumer is disabled or already owned by another provider.";
                 return false;
             }
@@ -288,6 +300,8 @@ namespace XRay.Importer.Levels
             _ownedLighting = _sourceLighting;
             _ownedWind = _windProvider;
             _ownedSun = _sun;
+            _ownedSky = _skyRenderer;
+            _ownsSky = _ownedSky != null;
             _savedSunColor = _sun.color;
             _savedSunRotation = _sun.transform.rotation;
             _ownsInputs = true;
@@ -299,6 +313,12 @@ namespace XRay.Importer.Levels
         private void EvaluateAndPublish(float deltaSeconds, bool resetPrevious)
         {
             if (!_ownsInputs || Active != this) return;
+            if (_ownsSky && _ownedSky == null)
+            {
+                Diagnostic = "The owned weather sky renderer was destroyed; authored inputs were restored.";
+                ReleaseInputs();
+                return;
+            }
             string diagnostic = null;
             if (_activeProfile == null || !_activeProfile.TryEvaluate(_gameTimeSeconds, out XRayWeatherSnapshot snapshot, out diagnostic))
             {
@@ -332,6 +352,13 @@ namespace XRay.Importer.Levels
             _ownedSun.color = new Color(sourceColor.x, sourceColor.y, sourceColor.z, 1.0f);
             _ownedSun.transform.rotation = Quaternion.LookRotation(snapshot.SunDirection);
             _ownedWind.TickWeather(this, deltaSeconds, new XRayFloraWindWeather(snapshot.WindDirectionRadians, snapshot.WindVelocity, snapshot.TreeAmplitudeIntensity), resetPrevious || _rebaseWind || deltaSeconds == 0.0f);
+            _ownedWeather.SetWeatherEnvironment(this, snapshot, ActiveProfile.HasEnvironmentScale ? ActiveProfile.EnvironmentScale : (Vector2?)null);
+            if (_ownedSky != null && !_ownedSky.TrySetWeather(this, snapshot, _ownedWind.State.Time))
+            {
+                Diagnostic = _ownedSky.Diagnostic;
+                ReleaseInputs();
+                return;
+            }
             _rebaseWind = false;
             Diagnostic = ActiveProfile.HasSsfxWindTrees ? diagnostic : "INPUT BLOCKED: imported ssfx_wind_trees are unavailable; wind uses the provider's authored diagnostic tree settings.";
             if (!ActiveProfile.HasSunLightScale) Diagnostic = "INPUT BLOCKED: saved source sunlight scale is unavailable; descriptor RGB remains an explicit diagnostic light input.";
@@ -353,10 +380,13 @@ namespace XRay.Importer.Levels
             if (_ownedWeather != null) _ownedWeather.ReleaseWeatherInputs(this);
             if (_ownedLighting != null) _ownedLighting.ReleaseWeatherLight(this);
             if (_ownedWind != null) _ownedWind.ReleaseWeather(this);
+            if (_ownedSky != null) _ownedSky.ReleaseWeather(this);
             _ownedWeather = null;
             _ownedLighting = null;
             _ownedWind = null;
             _ownedSun = null;
+            _ownedSky = null;
+            _ownsSky = false;
             _ownsInputs = false;
             if (Active == this) Active = null;
         }

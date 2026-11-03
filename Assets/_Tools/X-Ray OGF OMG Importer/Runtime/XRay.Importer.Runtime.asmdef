@@ -2,7 +2,9 @@
     "name": "XRay.Importer.Runtime",
     "rootNamespace": "XRay.Importer",
     "references": [
-        "XRay.Importer.Core"
+        "XRay.Importer.Core",
+        "Unity.RenderPipelines.Core.Runtime",
+        "Unity.RenderPipelines.HighDefinition.Runtime"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

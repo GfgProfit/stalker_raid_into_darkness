@@ -25,8 +25,10 @@ namespace XRay.Importer.Editor.Levels
 
         private static readonly Regex INCLUDE = new Regex("^#include\\s+\"([^\"]+)\"", RegexOptions.IgnoreCase);
 
-        public static XRayWeatherProfile ImportCurrent(string cycleName, string assetPath = null)
+        public static XRayWeatherProfile ImportCurrent(string cycleName, string assetPath = null, string resourceFolder = null)
         {
+            if (!string.IsNullOrEmpty(assetPath) && (!assetPath.StartsWith("Assets/", StringComparison.Ordinal) || !assetPath.EndsWith(".asset", StringComparison.OrdinalIgnoreCase))) throw new ArgumentException("Weather assets must use an explicit Assets/.../*.asset destination.", nameof(assetPath));
+            if (!string.IsNullOrEmpty(assetPath) && (File.Exists(assetPath) || AssetDatabase.LoadMainAssetAtPath(assetPath) != null)) throw new IOException("Weather import preserves existing assets; select a new asset path: " + assetPath);
             XRaySourceConfiguration configuration = XRayLevelSourceCache.CreateMo2Configuration();
             configuration.IndexScope.Clear();
             configuration.IndexScope.AddRange(new[] { "configs", "scripts", "textures/sky" });
@@ -45,6 +47,7 @@ namespace XRay.Importer.Editor.Levels
             Vector4? light = null;
             Vector4? flora = null;
             Vector3? sunScale = null;
+            Vector2? environmentScale = null;
             float visibilityScale = 1.0f;
             bool savedSettingsConfirmed = false;
             if (plan.FsGame != null && plan.FsGame.TryGet(XRayFsGame.APP_DATA_ROOT, out XRayFsPath appdata) && !appdata.IsExternal)
@@ -70,6 +73,7 @@ namespace XRay.Importer.Editor.Levels
                             float[] color = Numbers(sunLumscaleColor, 3, 3);
                             sunScale = new Vector3(color[0], color[1], color[2]) * scale;
                         }
+                        if (console.TryGetValue("r2_sun_lumscale_amb", out string ambientScale) && console.TryGetValue("r2_sun_lumscale_hemi", out string hemisphereScale)) environmentScale = new Vector2(Numbers(ambientScale, 1, 1)[0], Numbers(hemisphereScale, 1, 1)[0]);
                         if (VerifiedWriter(source, provenance, "scripts/ssfx_wind.script", WIND_WRITER_HASH)) wind = Reconcile(console, saved, "ssfx_wind_trees", new[] { "ssfx_module/wind/trees_speed_mcm", "ssfx_module/wind/trees_trunk_mcm", "ssfx_module/wind/trees_bend_mcm", "ssfx_module/wind/min_speed_mcm" });
                         if (VerifiedWriter(source, provenance, "scripts/ssfx_wetness.script", LIGHT_WRITER_HASH)) light = Reconcile(console, saved, "ssfx_lightsetup_1", new[] { "ssfx_module/ssfx_wetness/ssfx_gloss/specular_int_mcm", "ssfx_module/ssfx_wetness/ssfx_gloss/specular_color_mcm" });
                         if (VerifiedWriter(source, provenance, "scripts/ssfx_florafixes.script", FLORA_WRITER_HASH)) flora = Reconcile(console, saved, "ssfx_florafixes_2", new[] { "ssfx_module/florafixes/sss_int_mcm", "ssfx_module/florafixes/sss_color_mcm" });
@@ -78,7 +82,8 @@ namespace XRay.Importer.Editor.Levels
             }
             if (!savedSettingsConfirmed) throw new InvalidDataException("INPUT BLOCKED: current weather import requires resolved app_data_root, readable user.ltx and effective axr_options.ltx, and a hash-verified ssfx_001_mcm.script reader.");
             provenance.AppendLine("settings=saved user/MCM agreement with hash-verified writers; not a live-game sample; no Lua execution");
-            XRayWeatherProfile profile = Import(index, cycleName, plan.ProfileName + "|" + plan.ModOrderFingerprint, provenance.ToString(), wind, light, flora, null, sunScale, visibilityScale);
+            XRayWeatherResourceImporter resources = string.IsNullOrEmpty(resourceFolder) ? null : new XRayWeatherResourceImporter(index, resourceFolder);
+            XRayWeatherProfile profile = Import(index, cycleName, plan.ProfileName + "|" + plan.ModOrderFingerprint, provenance.ToString(), wind, light, flora, resources == null ? null : resources.Bind, sunScale, visibilityScale, environmentScale, resources == null ? null : resources.Bind);
             if (string.IsNullOrEmpty(assetPath)) return profile;
             if (!assetPath.StartsWith("Assets/", StringComparison.Ordinal) || !assetPath.EndsWith(".asset", StringComparison.OrdinalIgnoreCase))
             {
@@ -97,7 +102,7 @@ namespace XRay.Importer.Editor.Levels
             return profile;
         }
 
-        public static XRayWeatherProfile Import(XRayAssetIndex index, string cycleName, string sourceIdentity, string sourceProvenance = "", Vector4? ssfxWindTrees = null, Vector4? lightSetup = null, Vector4? floraFixes = null, Func<string, Texture> resourceBinding = null, Vector3? sunLightScale = null, float visibilityScale = 1.0f)
+        public static XRayWeatherProfile Import(XRayAssetIndex index, string cycleName, string sourceIdentity, string sourceProvenance = "", Vector4? ssfxWindTrees = null, Vector4? lightSetup = null, Vector4? floraFixes = null, Func<string, Texture> resourceBinding = null, Vector3? sunLightScale = null, float visibilityScale = 1.0f, Vector2? environmentScale = null, Func<string, Texture> environmentBinding = null)
         {
             if (string.IsNullOrWhiteSpace(cycleName) || Path.GetFileName(cycleName) != cycleName || cycleName.IndexOfAny(new[] { '/', '\\', ':' }) >= 0) throw new ArgumentException("A weather cycle must be an unqualified source filename without extension.", nameof(cycleName));
             string weather = WEATHER_ROOT + cycleName + ".ltx";
@@ -118,10 +123,12 @@ namespace XRay.Importer.Editor.Levels
                 string clouds = Required(descriptors, key, "clouds_texture");
                 TrackResource(source, provenance, sky);
                 TrackResource(source, provenance, clouds);
+                string environment = string.IsNullOrEmpty(sky) ? string.Empty : sky + "#small";
+                if (environmentBinding != null) TrackResource(source, provenance, environment);
                 float[] cloudValues = Numbers(Required(descriptors, key, "clouds_color"), 4, 5);
                 float multiplier = cloudValues.Length == 5 ? cloudValues[4] * 0.5f : 0.0f;
                 var cloudColor = new Color(cloudValues[0] * multiplier, cloudValues[1] * multiplier, cloudValues[2] * multiplier, cloudValues[3]);
-                frames.Add(new XRayWeatherSnapshot(key, seconds, ColorValue(descriptors, key, "sun_color", 3), ColorValue(descriptors, key, "ambient_color", 3), ColorValue(descriptors, key, "hemisphere_color", 4), Number(descriptors, key, "wind_direction") * Mathf.Deg2Rad, Number(descriptors, key, "wind_velocity"), Number(descriptors, key, "tree_amplitude_intensity"), Number(descriptors, key, "rain_density"), ColorValue(descriptors, key, "rain_color", 3), ColorValue(descriptors, key, "fog_color", 3), Number(descriptors, key, "fog_density"), Number(descriptors, key, "fog_distance"), Number(descriptors, key, "far_plane"), ColorValue(descriptors, key, "sky_color", 3), cloudColor, OptionalNumber(descriptors, key, "sky_rotation", 0.0f) * Mathf.Deg2Rad, new XRayWeatherResources(sky, resourceBinding?.Invoke(sky)), new XRayWeatherResources(clouds, resourceBinding?.Invoke(clouds)), Required(descriptors, key, "sun"), Required(descriptors, key, "ambient"), Required(descriptors, key, "thunderbolt_collection"), Number(descriptors, key, "thunderbolt_period"), Number(descriptors, key, "thunderbolt_duration"), Number(descriptors, key, "sun_shafts_intensity"), Number(descriptors, key, "water_intensity")));
+                frames.Add(new XRayWeatherSnapshot(key, seconds, ColorValue(descriptors, key, "sun_color", 3), ColorValue(descriptors, key, "ambient_color", 3), ColorValue(descriptors, key, "hemisphere_color", 4), Number(descriptors, key, "wind_direction") * Mathf.Deg2Rad, Number(descriptors, key, "wind_velocity"), Number(descriptors, key, "tree_amplitude_intensity"), Number(descriptors, key, "rain_density"), ColorValue(descriptors, key, "rain_color", 3), ColorValue(descriptors, key, "fog_color", 3), Number(descriptors, key, "fog_density"), Number(descriptors, key, "fog_distance"), Number(descriptors, key, "far_plane"), ColorValue(descriptors, key, "sky_color", 3), cloudColor, OptionalNumber(descriptors, key, "sky_rotation", 0.0f) * Mathf.Deg2Rad, new XRayWeatherResources(sky, resourceBinding?.Invoke(sky)), new XRayWeatherResources(clouds, resourceBinding?.Invoke(clouds)), Required(descriptors, key, "sun"), Required(descriptors, key, "ambient"), Required(descriptors, key, "thunderbolt_collection"), Number(descriptors, key, "thunderbolt_period"), Number(descriptors, key, "thunderbolt_duration"), Number(descriptors, key, "sun_shafts_intensity"), Number(descriptors, key, "water_intensity"), new XRayWeatherResources(environment, environmentBinding?.Invoke(environment))));
             }
             frames.Sort((a, b) => a.GameSeconds.CompareTo(b.GameSeconds));
             var sun = new Vector2[24];
@@ -134,7 +141,7 @@ namespace XRay.Importer.Editor.Levels
             try
             {
                 profile.name = cycleName;
-                profile.Initialize(cycleName, sourceIdentity, provenance.ToString(), frames.ToArray(), sun, ssfxWindTrees, lightSetup, floraFixes, sunLightScale, visibilityScale);
+                profile.Initialize(cycleName, sourceIdentity, provenance.ToString(), frames.ToArray(), sun, ssfxWindTrees, lightSetup, floraFixes, sunLightScale, visibilityScale, environmentScale);
                 return profile;
             }
             catch

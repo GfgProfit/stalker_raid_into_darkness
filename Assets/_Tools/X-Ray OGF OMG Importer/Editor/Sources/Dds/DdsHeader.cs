@@ -21,7 +21,8 @@ namespace XRay.Importer.Sources.Dds
         Bgra4444,
         Luminance8,
         LuminanceAlpha8,
-        Alpha8
+        Alpha8,
+        RgbaHalf
     }
 
     public sealed class DdsHeader
@@ -135,6 +136,8 @@ namespace XRay.Importer.Sources.Dds
         {
             switch (format)
             {
+                case DdsFormat.RgbaHalf:
+                    return 8;
                 case DdsFormat.Rgba32:
                 case DdsFormat.Bgra32:
                 case DdsFormat.Bgrx32:
@@ -163,6 +166,9 @@ namespace XRay.Importer.Sources.Dds
         {
             switch (FourCC)
             {
+                case "q\0\0\0":
+                    Format = DdsFormat.RgbaHalf;
+                    break;
                 case "DXT1":
                     Format = DdsFormat.BC1;
                     break;

@@ -1,0 +1,12 @@
+#pragma kernel Probe
+
+TextureCube<float4> _Cube;
+SamplerState sampler_point_clamp;
+RWStructuredBuffer<float4> _Result;
+float3 _Direction;
+
+[numthreads(1, 1, 1)]
+void Probe(uint3 id : SV_DispatchThreadID)
+{
+    _Result[0] = _Cube.SampleLevel(sampler_point_clamp, _Direction, 0.0);
+}

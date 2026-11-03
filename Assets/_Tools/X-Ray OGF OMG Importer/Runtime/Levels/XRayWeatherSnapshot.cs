@@ -28,6 +28,7 @@ namespace XRay.Importer.Levels
         [field: SerializeField] public float SkyRotationRadians { get; private set; }
         [field: SerializeField] public XRayWeatherResources SkyResources { get; private set; }
         [field: SerializeField] public XRayWeatherResources CloudsResources { get; private set; }
+        [field: SerializeField] public XRayWeatherResources EnvironmentResources { get; private set; }
         [field: SerializeField] public string SunDefinition { get; private set; }
         [field: SerializeField] public string AmbientDefinition { get; private set; }
         [field: SerializeField] public string ThunderboltCollection { get; private set; }
@@ -36,7 +37,7 @@ namespace XRay.Importer.Levels
         [field: SerializeField] public float SunShaftsIntensity { get; private set; }
         [field: SerializeField] public float WaterIntensity { get; private set; }
 
-        public XRayWeatherSnapshot(string key, double gameSeconds, Color sunColor, Color ambientColor, Color hemisphereColor, float windDirectionRadians, float windVelocity, float treeAmplitudeIntensity, float rainDensity, Color rainColor, Color fogColor, float fogDensity, float fogDistance, float farPlane, Color skyColor, Color cloudsColor, float skyRotationRadians, XRayWeatherResources skyResources, XRayWeatherResources cloudsResources, string sunDefinition = "", string ambientDefinition = "", string thunderboltCollection = "", float thunderboltPeriod = 0.0f, float thunderboltDuration = 0.0f, float sunShaftsIntensity = 0.0f, float waterIntensity = 0.0f)
+        public XRayWeatherSnapshot(string key, double gameSeconds, Color sunColor, Color ambientColor, Color hemisphereColor, float windDirectionRadians, float windVelocity, float treeAmplitudeIntensity, float rainDensity, Color rainColor, Color fogColor, float fogDensity, float fogDistance, float farPlane, Color skyColor, Color cloudsColor, float skyRotationRadians, XRayWeatherResources skyResources, XRayWeatherResources cloudsResources, string sunDefinition = "", string ambientDefinition = "", string thunderboltCollection = "", float thunderboltPeriod = 0.0f, float thunderboltDuration = 0.0f, float sunShaftsIntensity = 0.0f, float waterIntensity = 0.0f, XRayWeatherResources environmentResources = default)
         {
             GameSeconds = gameSeconds;
             Key0 = Key1 = key;
@@ -59,6 +60,7 @@ namespace XRay.Importer.Levels
             SkyRotationRadians = skyRotationRadians;
             SkyResources = skyResources;
             CloudsResources = cloudsResources;
+            EnvironmentResources = environmentResources;
             SunDefinition = sunDefinition;
             AmbientDefinition = ambientDefinition;
             ThunderboltCollection = thunderboltCollection;
@@ -82,6 +84,15 @@ namespace XRay.Importer.Levels
             result.SunDirection = direction;
             result.FarPlane *= visibilityScale;
             result.FogDistance = Mathf.Clamp(result.FogDistance, 1.0f, result.FarPlane - 10.0f);
+            return result;
+        }
+
+        public XRayWeatherSnapshot WithResources(XRayWeatherResources sky, XRayWeatherResources clouds, XRayWeatherResources environment)
+        {
+            var result = this;
+            result.SkyResources = sky;
+            result.CloudsResources = clouds;
+            result.EnvironmentResources = environment;
             return result;
         }
 
@@ -112,6 +123,7 @@ namespace XRay.Importer.Levels
             result.SkyRotationRadians = fi * a.SkyRotationRadians + f * b.SkyRotationRadians;
             result.SkyResources = XRayWeatherResources.Blend(a.SkyResources, b.SkyResources, f);
             result.CloudsResources = XRayWeatherResources.Blend(a.CloudsResources, b.CloudsResources, f);
+            result.EnvironmentResources = XRayWeatherResources.Blend(a.EnvironmentResources, b.EnvironmentResources, f);
             result.ThunderboltPeriod = fi * a.ThunderboltPeriod + f * b.ThunderboltPeriod;
             result.ThunderboltDuration = fi * a.ThunderboltDuration + f * b.ThunderboltDuration;
             result.SunShaftsIntensity = fi * a.SunShaftsIntensity + f * b.SunShaftsIntensity;

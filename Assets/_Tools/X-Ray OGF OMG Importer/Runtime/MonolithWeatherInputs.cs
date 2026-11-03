@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using XRay.Importer.Levels;
 
 namespace XRay.Importer
 {
@@ -11,6 +12,11 @@ namespace XRay.Importer
         private static readonly int _sunId = Shader.PropertyToID("_MonolithWeatherSun");
         private static readonly int _lightSetupId = Shader.PropertyToID("_MonolithWeatherLightSetup");
         private static readonly int _floraId = Shader.PropertyToID("_MonolithWeatherFloraFixes");
+        private static readonly int _environmentActiveId = Shader.PropertyToID("_MonolithWeatherEnvironmentActive");
+        private static readonly int _environmentWeightsId = Shader.PropertyToID("_MonolithWeatherEnvironmentWeights");
+        private static readonly int _environmentColorId = Shader.PropertyToID("_MonolithWeatherEnvironmentColor");
+        private static readonly int _ambientId = Shader.PropertyToID("_MonolithWeatherAmbient");
+        private static readonly int[] _environmentIds = { Shader.PropertyToID("_MonolithWeatherEnvironment0"), Shader.PropertyToID("_MonolithWeatherEnvironment1"), Shader.PropertyToID("_MonolithWeatherEnvironment2"), Shader.PropertyToID("_MonolithWeatherEnvironment3") };
         private static MonolithWeatherInputs _owner;
 
         [SerializeField, Range(0.0f, 1.0f)] private float _wetness;
@@ -24,12 +30,35 @@ namespace XRay.Importer
         private Vector3 _weatherSunColor;
         private Vector4? _weatherLightSetup;
         private Vector4? _weatherFloraFixes;
+        private XRayWeatherResources _weatherEnvironment;
+        private Vector4 _weatherEnvironmentColor;
+        private Vector4 _weatherAmbient;
+        private bool _environmentReady;
 
         public float DynamicGloss => _dynamicGloss;
         public float Wetness => _wetness;
         public Vector3 SunColor => _weatherOwner != null ? _weatherSunColor : _sunColor;
         public Vector4 LightSetup => _weatherOwner != null && _weatherLightSetup.HasValue ? _weatherLightSetup.Value : _lightSetup;
         public Vector4 FloraFixes => _weatherOwner != null && _weatherFloraFixes.HasValue ? _weatherFloraFixes.Value : _floraFixes;
+        public bool EnvironmentActive => _weatherOwner != null && _environmentReady;
+
+        public void SetWeatherEnvironment(UnityEngine.Object owner, XRayWeatherSnapshot snapshot, Vector2? scale)
+        {
+            if (_weatherOwner != owner || owner == null) return;
+            _weatherEnvironment = snapshot.EnvironmentResources;
+            _environmentReady = scale.HasValue && Mathf.Abs(Vector4.Dot(_weatherEnvironment.Weights, Vector4.one) - 1.0f) < 0.0001f;
+            for (int i = 0; i < 4; i++)
+            {
+                if (_weatherEnvironment.Weights[i] > 0.0f && !(_weatherEnvironment.Texture(i) is Cubemap)) _environmentReady = false;
+            }
+            if (_environmentReady)
+            {
+                Vector2 value = scale.Value;
+                _weatherAmbient = new Vector4(Mathf.Max(snapshot.AmbientColor.r * 2.0f, 0.001f) * value.x, Mathf.Max(snapshot.AmbientColor.g * 2.0f, 0.001f) * value.x, Mathf.Max(snapshot.AmbientColor.b * 2.0f, 0.001f) * value.x, 0.0f);
+                _weatherEnvironmentColor = new Vector4((snapshot.HemisphereColor.r * 2.0f + 0.00001f) * 2.0f * value.y, (snapshot.HemisphereColor.g * 2.0f + 0.00001f) * 2.0f * value.y, (snapshot.HemisphereColor.b * 2.0f + 0.00001f) * 2.0f * value.y, 0.0f);
+            }
+            Publish();
+        }
 
         public bool TrySetWeatherInputs(UnityEngine.Object owner, Vector3 sunColor, Vector4? lightSetup = null, Vector4? floraFixes = null)
         {
@@ -44,6 +73,7 @@ namespace XRay.Importer
                 if (lightSetup.HasValue) Validate(lightSetup.Value[i]);
                 if (floraFixes.HasValue) Validate(floraFixes.Value[i]);
             }
+            if (_weatherOwner != owner) _environmentReady = false;
             _weatherOwner = owner;
             _weatherSunColor = sunColor;
             _weatherLightSetup = lightSetup;
@@ -58,6 +88,7 @@ namespace XRay.Importer
             _weatherOwner = null;
             _weatherLightSetup = null;
             _weatherFloraFixes = null;
+            _environmentReady = false;
             Publish();
         }
 
@@ -115,8 +146,10 @@ namespace XRay.Importer
         private void OnDisable()
         {
             _weatherOwner = null;
+            _environmentReady = false;
             if (_owner != this) return;
             Shader.SetGlobalFloat(_activeId, 0.0f);
+            Shader.SetGlobalFloat(_environmentActiveId, 0.0f);
             _owner = null;
         }
 
@@ -146,6 +179,14 @@ namespace XRay.Importer
             Shader.SetGlobalVector(_sunId, SunColor);
             Shader.SetGlobalVector(_lightSetupId, LightSetup);
             Shader.SetGlobalVector(_floraId, FloraFixes);
+            Shader.SetGlobalFloat(_environmentActiveId, EnvironmentActive ? 1.0f : 0.0f);
+            if (EnvironmentActive)
+            {
+                for (int i = 0; i < 4; i++) Shader.SetGlobalTexture(_environmentIds[i], _weatherEnvironment.Texture(i));
+                Shader.SetGlobalVector(_environmentWeightsId, new Vector4(_weatherEnvironment.Weights.x, _weatherEnvironment.Weights.y, _weatherEnvironment.Weights.z, _weatherEnvironment.Weights.w));
+                Shader.SetGlobalVector(_environmentColorId, _weatherEnvironmentColor);
+                Shader.SetGlobalVector(_ambientId, _weatherAmbient);
+            }
             Shader.SetGlobalFloat(_activeId, 1.0f);
         }
 
@@ -154,6 +195,7 @@ namespace XRay.Importer
         {
             _owner = null;
             Shader.SetGlobalFloat(_activeId, 0.0f);
+            Shader.SetGlobalFloat(_environmentActiveId, 0.0f);
         }
     }
 }

@@ -16,6 +16,7 @@ namespace XRay.Importer.Sources.Dds
                 case DdsFormat.Unknown:
                 case DdsFormat.BC6H:
                 case DdsFormat.BC7:
+                case DdsFormat.RgbaHalf:
                     return false;
                 default:
                     return true;

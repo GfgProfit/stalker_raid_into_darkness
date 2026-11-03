@@ -1,5 +1,12 @@
 Shader "XRay/Monolith Weather Sky"
 {
+    Properties
+    {
+        _XRaySkyIntensity("HDRP Sky Intensity", Float) = 1
+        [HDR] _XRayNightAmbient("Night Ambient Linear Radiance", Color) = (0, 0, 0, 0)
+        _XRayNightWeight("Night Ambient Weight", Float) = 0
+    }
+
     HLSLINCLUDE
 
     #pragma vertex Vert
@@ -19,6 +26,9 @@ Shader "XRay/Monolith Weather Sky"
     float4 _XRaySkyWeights;
     float4 _XRaySkyTint;
     float4 _XRaySkyRotation;
+    float _XRaySkyIntensity;
+    float4 _XRayNightAmbient;
+    float _XRayNightWeight;
 
     struct Attributes
     {
@@ -52,7 +62,8 @@ Shader "XRay/Monolith Weather Sky"
         encoded += SAMPLE_TEXTURECUBE(_XRaySky2, sampler_XRaySky0, cubePosition).rgb * _XRaySkyWeights.z;
         encoded += SAMPLE_TEXTURECUBE(_XRaySky3, sampler_XRaySky0, cubePosition).rgb * _XRaySkyWeights.w;
         encoded *= _XRaySkyTint.rgb * 1.70;
-        return float4(pow(max(encoded, 0.0), 2.2), 1.0);
+        float3 radiance = pow(max(encoded, 0.0), 2.2) + _XRayNightAmbient.rgb * _XRayNightWeight;
+        return float4(radiance * _XRaySkyIntensity, 1.0);
     }
 
     float4 FragBaking(Varyings input) : SV_Target

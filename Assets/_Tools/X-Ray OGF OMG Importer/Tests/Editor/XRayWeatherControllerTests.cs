@@ -77,8 +77,10 @@ namespace XRay.Importer.Tests
                 MonolithWeatherInputs weather = root.GetComponent<MonolithWeatherInputs>();
                 Light sun = root.GetComponent<Light>();
                 sun.color = new Color(0.11f, 0.22f, 0.33f);
+                sun.intensity = 17.0f;
                 sun.transform.rotation = Quaternion.Euler(19.0f, 37.0f, 5.0f);
                 Color initialColor = sun.color;
+                float initialIntensity = sun.intensity;
                 Quaternion initialRotation = sun.transform.rotation;
                 weather.SetInputs(0.73f, new Vector3(0.9f, 0.8f, 0.7f), new Vector4(0.2f, 0.4f, 0, 0), new Vector4(1.2f, 1, 0, 0), 0.4f);
                 lighting.SetBindings(new[] { sun }, new[] { new Vector3(0.13f, 0.17f, 0.19f) });
@@ -101,6 +103,7 @@ namespace XRay.Importer.Tests
                 Assert.IsNull(XRayWeatherController.Active);
                 Assert.IsFalse(wind.WeatherDriven);
                 Assert.AreEqual(initialColor, sun.color);
+                Assert.AreEqual(initialIntensity, sun.intensity);
                 Assert.That(Quaternion.Angle(initialRotation, sun.transform.rotation), Is.LessThan(0.0001f));
                 Assert.That(Shader.GetGlobalVector("_MonolithWeatherSun").x, Is.EqualTo(0.9f).Within(TOLERANCE));
                 Assert.That(Shader.GetGlobalVectorArray("_MonolithBoundColor64")[0].x, Is.EqualTo(0.13f).Within(TOLERANCE));
@@ -203,7 +206,7 @@ namespace XRay.Importer.Tests
         [TestCase(MonolithSourceLighting.LightingMode.Native)]
         [TestCase(MonolithSourceLighting.LightingMode.Calibrated)]
         [TestCase(MonolithSourceLighting.LightingMode.Bound)]
-        public void ExistingLightingModesReceiveEncodedColorWithoutIntensityOrScaleChanges(MonolithSourceLighting.LightingMode mode)
+        public void ExistingLightingModesPreserveEncodedBindingsAndLinearSunRadiance(MonolithSourceLighting.LightingMode mode)
         {
             XRayWeatherProfile profile = Profile("lighting_modes", new Color(0.2f, 0.4f, 0.7f), 0.0f, 500.0f, true, new Vector3(2.0f, 1.5f, 0.5f));
             GameObject root = Rig(profile, out XRayWeatherController controller, out XRayFloraWindProvider wind, out MonolithSourceLighting lighting);
@@ -218,11 +221,10 @@ namespace XRay.Importer.Tests
                 lighting.Publish();
                 Assert.AreEqual(mode, lighting.Mode);
                 Assert.AreEqual((float)mode, Shader.GetGlobalFloat("_MonolithSourceLightingMode"));
-                Assert.AreEqual(7.0f, sun.intensity);
+                Assert.That(sun.intensity, Is.EqualTo(7.0f * Mathf.GammaToLinearSpace(0.6f)).Within(TOLERANCE));
                 Assert.AreEqual(3.0f, lighting.BoundRadianceScale);
-                Assert.That(sun.color.r, Is.EqualTo(0.4f).Within(TOLERANCE));
-                Assert.That(sun.color.g, Is.EqualTo(0.6f).Within(TOLERANCE));
-                Assert.That(sun.color.b, Is.EqualTo(0.35f).Within(TOLERANCE));
+                Assert.That(sun.color.maxColorComponent, Is.EqualTo(1.0f).Within(TOLERANCE));
+                AssertSunRadiance(sun, 7.0f, new Vector3(0.4f, 0.6f, 0.35f));
                 Assert.That(Shader.GetGlobalVector("_MonolithWeatherSun").x, Is.EqualTo(0.2f).Within(TOLERANCE));
                 Assert.That(controller.SourceLightColor.x, Is.EqualTo(0.4f).Within(TOLERANCE));
                 Vector4 source = Shader.GetGlobalVectorArray("_MonolithBoundColor64")[0];
@@ -230,11 +232,72 @@ namespace XRay.Importer.Tests
                 Assert.That(source.y, Is.EqualTo(0.6f).Within(TOLERANCE));
                 Assert.That(source.z, Is.EqualTo(0.35f).Within(TOLERANCE));
                 Assert.That(Vector3.Distance(sun.transform.forward, controller.Snapshot.SunDirection), Is.LessThan(TOLERANCE));
+                controller.EndPreview();
+                Assert.AreEqual(7.0f, sun.intensity);
             }
             finally
             {
                 Object.DestroyImmediate(root);
                 Object.DestroyImmediate(profile);
+            }
+        }
+
+        [Test]
+        public void SunIntensityTracksNightDayTransitionsAndRestoresWithoutCompounding()
+        {
+            XRayWeatherProfile cycle = Profile("sun_intensity_cycle", Color.black, 0.0f, 500.0f, secondSun: new Color(0.25f, 0.5f, 1.0f));
+            XRayWeatherProfile night = Profile("sun_intensity_night", Color.black, 0.0f, 500.0f);
+            GameObject root = Rig(cycle, out XRayWeatherController controller, out XRayFloraWindProvider wind, out MonolithSourceLighting lighting);
+            try
+            {
+                Light sun = root.GetComponent<Light>();
+                sun.intensity = 3000.0f;
+                sun.color = new Color(0.8f, 0.6f, 0.4f);
+                Color authoredColor = sun.color;
+                Assert.IsTrue(controller.BeginPreview(), controller.Diagnostic);
+                controller.SetTimeScale(0.0f);
+                controller.Seek(0.0);
+                Assert.AreEqual(0.0f, sun.intensity);
+                Assert.AreEqual(Color.black, sun.color);
+                controller.Seek(43200.0);
+                Assert.That(sun.intensity, Is.EqualTo(3000.0f).Within(0.001f));
+                AssertSunRadiance(sun, 3000.0f, new Vector3(0.25f, 0.5f, 1.0f));
+                controller.Seek(21600.0);
+                float halfIntensity = 3000.0f * Mathf.GammaToLinearSpace(0.5f);
+                Assert.That(sun.intensity, Is.EqualTo(halfIntensity).Within(0.001f));
+                AssertSunRadiance(sun, 3000.0f, new Vector3(0.125f, 0.25f, 0.5f));
+                controller.Seek(43200.0);
+                Assert.That(sun.intensity, Is.EqualTo(3000.0f).Within(0.001f));
+                Assert.IsTrue(controller.TransitionTo(night, 2.0f));
+                controller.TickPreview(1.0f);
+                Assert.That(sun.intensity, Is.EqualTo(halfIntensity).Within(0.001f));
+                AssertSunRadiance(sun, 3000.0f, new Vector3(0.125f, 0.25f, 0.5f));
+                Assert.That(controller.SourceLightColor.x, Is.EqualTo(0.125f).Within(TOLERANCE));
+                Assert.That(Shader.GetGlobalVectorArray("_MonolithBoundColor64")[0].z, Is.EqualTo(0.5f).Within(TOLERANCE));
+                controller.TickPreview(1.0f);
+                Assert.AreEqual(0.0f, sun.intensity);
+                controller.EndPreview();
+                Assert.AreEqual(3000.0f, sun.intensity);
+                Assert.AreEqual(authoredColor, sun.color);
+                Assert.IsTrue(controller.BeginPreview(), controller.Diagnostic);
+                controller.Seek(21600.0);
+                Assert.That(sun.intensity, Is.EqualTo(halfIntensity).Within(0.001f));
+                controller.enabled = false;
+                Assert.AreEqual(3000.0f, sun.intensity);
+                Assert.AreEqual(authoredColor, sun.color);
+                controller.enabled = true;
+                Assert.IsTrue(controller.BeginPreview(), controller.Diagnostic);
+                controller.Seek(21600.0);
+                Assert.That(sun.intensity, Is.EqualTo(halfIntensity).Within(0.001f));
+                controller.EndPreview();
+                Assert.AreEqual(3000.0f, sun.intensity);
+                Assert.AreEqual(authoredColor, sun.color);
+            }
+            finally
+            {
+                Object.DestroyImmediate(root);
+                Object.DestroyImmediate(cycle);
+                Object.DestroyImmediate(night);
             }
         }
 
@@ -354,11 +417,17 @@ namespace XRay.Importer.Tests
             return root;
         }
 
-        private static XRayWeatherProfile Profile(string name, Color sun, float direction, float velocity, bool savedWindSetup = true, Vector3? sunlightScale = null)
+        private static void AssertSunRadiance(Light sun, float authoredIntensity, Vector3 sourceColor)
+        {
+            Color actual = sun.color.linear * sun.intensity;
+            for (int i = 0; i < 3; i++) Assert.That(actual[i], Is.EqualTo(authoredIntensity * Mathf.GammaToLinearSpace(sourceColor[i])).Within(TOLERANCE * Mathf.Max(authoredIntensity, 1.0f)), "Sun linear radiance channel " + i);
+        }
+
+        private static XRayWeatherProfile Profile(string name, Color sun, float direction, float velocity, bool savedWindSetup = true, Vector3? sunlightScale = null, Color? secondSun = null)
         {
             var profile = ScriptableObject.CreateInstance<XRayWeatherProfile>();
             var first = new XRayWeatherSnapshot("00:00:00", 0.0, sun, Color.gray, Color.gray, direction, velocity, 0.01f, 0.8f, Color.white, Color.gray, 0.2f, 300.0f, 400.0f, Color.gray, Color.gray, 0.0f, default, default);
-            var second = new XRayWeatherSnapshot("12:00:00", 43200.0, sun, Color.gray, Color.gray, direction, velocity, 0.01f, 0.8f, Color.white, Color.gray, 0.2f, 300.0f, 400.0f, Color.gray, Color.gray, 0.0f, default, default);
+            var second = new XRayWeatherSnapshot("12:00:00", 43200.0, secondSun ?? sun, Color.gray, Color.gray, direction, velocity, 0.01f, 0.8f, Color.white, Color.gray, 0.2f, 300.0f, 400.0f, Color.gray, Color.gray, 0.0f, default, default);
             var positions = new Vector2[24];
             for (int i = 0; i < positions.Length; i++) positions[i] = new Vector2(0.0f, -45.0f);
             profile.Initialize(name, "controller_regression_fixture", "independent analytic inputs; float tolerance 2e-6 covers trig and scalar float roundoff", new[] { first, second }, positions, savedWindSetup ? new Vector4(11.1f, 0.17f, 0.9f, 0.1f) : (Vector4?)null, null, null, sunlightScale ?? Vector3.one);

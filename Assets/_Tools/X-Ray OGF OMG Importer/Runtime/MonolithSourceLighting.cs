@@ -41,7 +41,7 @@ namespace XRay.Importer
 
         public bool TrySetWeatherLight(UnityEngine.Object owner, Light light, Vector3 sourceColor, Vector3 direction)
         {
-            if (owner == null || light == null || !light.isActiveAndEnabled || light.type != LightType.Directional || !isActiveAndEnabled || _weatherOwner != null && _weatherOwner != owner) return false;
+            if (owner == null || light == null || !light.isActiveAndEnabled || light.type != LightType.Directional || !isActiveAndEnabled || _owner != null && _owner != this || _weatherOwner != null && _weatherOwner != owner) return false;
             for (int i = 0; i < 3; i++)
             {
                 if (float.IsNaN(sourceColor[i]) || float.IsInfinity(sourceColor[i]) || sourceColor[i] < 0.0f || float.IsNaN(direction[i]) || float.IsInfinity(direction[i])) throw new ArgumentOutOfRangeException(nameof(sourceColor));
@@ -57,6 +57,7 @@ namespace XRay.Importer
                 if (candidate != null && candidate.isActiveAndEnabled && (candidate.type == LightType.Directional || candidate.type == LightType.Point || candidate.type == LightType.Spot)) count++;
             }
             if (!bound && count >= MAX_LIGHTS) return false;
+            _owner = this;
             _weatherOwner = owner;
             _weatherLight = light;
             _weatherColor = sourceColor;
@@ -113,14 +114,13 @@ namespace XRay.Importer
 
         private void OnEnable()
         {
+            RenderPipelineManager.beginCameraRendering += OnBeginCameraRendering;
             if (_owner != null && _owner != this)
             {
                 Debug.LogError("Only one MonolithSourceLighting controller can be active.", this);
-                enabled = false;
                 return;
             }
             _owner = this;
-            RenderPipelineManager.beginCameraRendering += OnBeginCameraRendering;
             Publish();
         }
 

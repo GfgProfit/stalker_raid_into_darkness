@@ -71,6 +71,7 @@ namespace XRay.Importer.Editor.Levels
 
         public void Cancel()
         {
+            if (IsDone) return;
             _cancellation.Cancel();
         }
 
@@ -139,6 +140,7 @@ namespace XRay.Importer.Editor.Levels
 
         public void Cancel()
         {
+            if (IsDone) return;
             _cancellation.Cancel();
         }
 

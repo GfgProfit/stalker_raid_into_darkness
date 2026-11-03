@@ -126,8 +126,26 @@ namespace XRay.Importer.Editor.Levels
             {
                 if (content.WeatherProfile.Validate(out string diagnostic))
                 {
-                    ConfigureWeather(root, content.WeatherProfile);
-                    record.AddLimitation("RVM weather controls source light/material/wind inputs; neutral HDRP sky and diagnostic lux/exposure remain approximations. Saved user scenes are not migrated.");
+                    XRayWeatherController controller = ConfigureWeather(root, content.WeatherProfile);
+#if XRAY_HDRP
+                    if (XRayWeatherImporter.HasSerializedResources(content.WeatherProfile))
+                    {
+                        string path = XRayLevelPaths.Scenes(content.LevelName) + "/" + content.LevelName + "_WeatherSky.asset";
+                        if (ConfigureWeatherSky(root, controller, content.WeatherProfile, path))
+                        {
+                            record.GeneratedAssets.Add(path);
+                            record.AddLimitation("RVM weather controls serialized sky/environment resources and source light/material/wind inputs. Authored HDRP exposure and night ambient extension remain Unity presentation settings; original framebuffer parity and precipitation are not implemented.");
+                        }
+                        else
+                        {
+                            record.AddLimitation("Weather sky connection skipped: the authored environment has no active Gradient Sky; its existing sky is preserved while source light/material/wind inputs remain connected.");
+                        }
+                    }
+                    else
+#endif
+                    {
+                        record.AddLimitation("INPUT BLOCKED: the selected weather profile has no complete serialized sky/environment resources; source light/material/wind inputs remain connected and the authored HDRP sky is retained.");
+                    }
                 }
                 else
                 {
@@ -228,6 +246,37 @@ namespace XRay.Importer.Editor.Levels
             if (created) owner.SetActive(true);
             return controller;
         }
+
+#if XRAY_HDRP
+        public static bool ConfigureWeatherSky(GameObject root, XRayWeatherController controller, XRayWeatherProfile profile, string assetPath)
+        {
+            if (root == null || controller == null) throw new System.ArgumentNullException(nameof(root));
+            Volume authoredVolume = null;
+            foreach (Volume candidate in root.GetComponentsInChildren<Volume>(true))
+            {
+                if (!candidate.isGlobal || candidate.sharedProfile == null || !candidate.sharedProfile.TryGet(out GradientSky gradient) || !gradient.active) continue;
+                if (authoredVolume == null || candidate.priority > authoredVolume.priority) authoredVolume = candidate;
+            }
+            if (authoredVolume == null) return false;
+            authoredVolume.sharedProfile.TryGet(out GradientSky authored);
+            Shader shader = Shader.Find("XRay/Monolith Weather Sky");
+            if (shader == null || !shader.isSupported) throw new System.InvalidOperationException("The X-Ray weather sky shader must compile before importing the level environment.");
+            VolumeProfile skyProfile = XRayWeatherSkySetup.GetOrCreateSkyProfile(profile, (float)(controller.GameTimeSeconds / 3600.0), shader, authored, authoredVolume.sharedProfile, assetPath);
+            Transform child = controller.transform.Find("Source Weather Sky");
+            if (child == null) child = Child(controller.transform, "Source Weather Sky");
+            Volume volume = child.GetComponent<Volume>();
+            if (volume == null) volume = child.gameObject.AddComponent<Volume>();
+            child.gameObject.layer = 0;
+            volume.isGlobal = true;
+            volume.priority = authoredVolume.priority + 1.0f;
+            volume.sharedProfile = skyProfile;
+            XRayWeatherSkyRenderer renderer = controller.GetComponent<XRayWeatherSkyRenderer>();
+            if (renderer == null) renderer = controller.gameObject.AddComponent<XRayWeatherSkyRenderer>();
+            renderer.Configure(volume, shader);
+            controller.ConfigureSky(renderer);
+            return true;
+        }
+#endif
 
         public static Bounds VisualBounds(XRayLevelVisual visual)
         {
@@ -364,7 +413,7 @@ namespace XRay.Importer.Editor.Levels
             volume.sharedProfile = profile;
             record.GeneratedAssets.Add(path);
 #endif
-            record.AddLimitation("Environment: neutral test lighting (gradient sky, fixed exposure EV100 9, gradient sky exposure 10.5, 3000 lux sun). True Stalker weather (configs/environment) is not imported and this is not the original game weather.");
+            if (content.WeatherProfile == null || !XRayWeatherImporter.HasSerializedResources(content.WeatherProfile)) record.AddLimitation("Environment: neutral test lighting (gradient sky, fixed exposure EV100 9, gradient sky exposure 10.5, 3000 lux sun). True Stalker weather (configs/environment) is not imported and this is not the original game weather.");
         }
 
         public static void FrameSceneView(Bounds bounds)

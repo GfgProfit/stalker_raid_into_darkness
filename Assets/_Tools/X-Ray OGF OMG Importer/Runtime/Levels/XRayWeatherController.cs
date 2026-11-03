@@ -34,6 +34,7 @@ namespace XRay.Importer.Levels
         private Light _ownedSun;
         private XRayWeatherSkyRenderer _ownedSky;
         private Color _savedSunColor;
+        private float _savedSunIntensity;
         private Quaternion _savedSunRotation;
         private double _gameTimeSeconds;
         private float _simulationTimeScale;
@@ -303,6 +304,7 @@ namespace XRay.Importer.Levels
             _ownedSky = _skyRenderer;
             _ownsSky = _ownedSky != null;
             _savedSunColor = _sun.color;
+            _savedSunIntensity = _sun.intensity;
             _savedSunRotation = _sun.transform.rotation;
             _ownsInputs = true;
             _rebaseWind = true;
@@ -349,7 +351,12 @@ namespace XRay.Importer.Levels
             }
             _snapshot = snapshot;
             SourceLightColor = sourceColor;
-            _ownedSun.color = new Color(sourceColor.x, sourceColor.y, sourceColor.z, 1.0f);
+            Color linearSun = new Color(sourceColor.x, sourceColor.y, sourceColor.z, 1.0f).linear;
+            float intensityScale = linearSun.maxColorComponent;
+            Color sunColor = intensityScale > 0.0f ? (linearSun / intensityScale).gamma : Color.black;
+            sunColor.a = 1.0f;
+            _ownedSun.color = sunColor;
+            _ownedSun.intensity = _savedSunIntensity * intensityScale;
             _ownedSun.transform.rotation = Quaternion.LookRotation(snapshot.SunDirection);
             _ownedWind.TickWeather(this, deltaSeconds, new XRayFloraWindWeather(snapshot.WindDirectionRadians, snapshot.WindVelocity, snapshot.TreeAmplitudeIntensity), resetPrevious || _rebaseWind || deltaSeconds == 0.0f);
             _ownedWeather.SetWeatherEnvironment(this, snapshot, ActiveProfile.HasEnvironmentScale ? ActiveProfile.EnvironmentScale : (Vector2?)null);
@@ -359,6 +366,7 @@ namespace XRay.Importer.Levels
                 ReleaseInputs();
                 return;
             }
+            _ownedWeather.SetWeatherNightAmbient(this, _ownedSky != null ? XRayWeatherSkyPass.GetNightRadiance(_ownedSky.Settings) : Vector3.zero);
             _rebaseWind = false;
             Diagnostic = ActiveProfile.HasSsfxWindTrees ? diagnostic : "INPUT BLOCKED: imported ssfx_wind_trees are unavailable; wind uses the provider's authored diagnostic tree settings.";
             if (!ActiveProfile.HasSunLightScale) Diagnostic = "INPUT BLOCKED: saved source sunlight scale is unavailable; descriptor RGB remains an explicit diagnostic light input.";
@@ -375,6 +383,7 @@ namespace XRay.Importer.Levels
             if (_ownedSun != null)
             {
                 _ownedSun.color = _savedSunColor;
+                _ownedSun.intensity = _savedSunIntensity;
                 _ownedSun.transform.rotation = _savedSunRotation;
             }
             if (_ownedWeather != null) _ownedWeather.ReleaseWeatherInputs(this);

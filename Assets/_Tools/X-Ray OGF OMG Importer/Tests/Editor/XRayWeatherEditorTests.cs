@@ -165,44 +165,59 @@ namespace XRay.Importer.Tests
         [Test]
         public void SavingSceneEndsPreviewAndRestoresAuthoredLightInputs()
         {
+            string hostPath = PrepareSceneSaveHost();
             Scene previous = SceneManager.GetActiveScene();
             Assert.IsTrue(previous.IsValid() && previous.isLoaded && !EditorSceneManager.IsPreviewScene(previous));
             string previousPath = previous.path;
             bool previousDirty = previous.isDirty;
             int previousCount = SceneManager.sceneCount;
             string identity = Guid.NewGuid().ToString("N");
-            Scene scene = EditorSceneManager.NewPreviewScene();
+            Scene scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Additive);
             string path = "Assets/_Tools/X-Ray OGF OMG Importer/Tests/Editor/Fixtures/__WeatherSave_" + identity + ".unity";
             var root = new GameObject("Weather save fixture");
             SceneManager.MoveGameObjectToScene(root, scene);
+            SceneManager.SetActiveScene(previous);
             XRayWeatherProfile profile = Profile();
             try
             {
                 XRayWeatherController controller = XRayLevelSceneBuilder.ConfigureWeather(root, profile);
                 Light sun = root.GetComponentInChildren<Light>();
                 Color color = sun.color;
+                float intensity = sun.intensity;
                 Quaternion rotation = sun.transform.rotation;
                 Assert.IsTrue(XRayWeatherPreview.Start(controller));
                 controller.Seek(3600.0);
-                Assert.AreNotEqual(color, sun.color);
-                Assert.IsTrue(EditorSceneManager.SaveScene(previous, path, true));
+                Assert.That(sun.intensity, Is.LessThan(intensity));
+                Assert.IsTrue(EditorSceneManager.SaveScene(scene, path));
                 Assert.AreEqual(previousPath, previous.path);
                 Assert.AreEqual(previousDirty, previous.isDirty);
-                Assert.AreEqual(previousCount, SceneManager.sceneCount);
+                Assert.AreEqual(previousCount + 1, SceneManager.sceneCount);
                 Assert.AreEqual(previous, SceneManager.GetActiveScene());
                 Assert.IsNull(XRayWeatherPreview.Controller);
                 Assert.IsFalse(controller.PreviewActive);
                 Assert.IsFalse(root.GetComponentInChildren<XRayFloraWindProvider>().WeatherDriven);
                 Assert.AreEqual(color, sun.color);
+                Assert.AreEqual(intensity, sun.intensity);
                 Assert.That(Quaternion.Angle(rotation, sun.transform.rotation), Is.LessThan(0.0001f));
             }
             finally
             {
                 XRayWeatherPreview.Stop();
-                if (scene.IsValid()) EditorSceneManager.ClosePreviewScene(scene);
+                if (scene.IsValid()) EditorSceneManager.CloseScene(scene, true);
                 Object.DestroyImmediate(profile);
                 if (File.Exists(path) || File.Exists(path + ".meta")) Assert.IsTrue(AssetDatabase.DeleteAsset(path));
+                RestoreImportHost(hostPath);
             }
+        }
+
+        private static string PrepareSceneSaveHost()
+        {
+            Scene scene = SceneManager.GetActiveScene();
+            if (!string.IsNullOrEmpty(scene.path)) return null;
+            if (!Application.isBatchMode || !scene.IsValid() || !scene.isLoaded || scene.isDirty || scene.rootCount != 0 || SceneManager.sceneCount != 1) Assert.Ignore("Weather save regression requires a saved host or a clean empty batch host; user scenes were preserved.");
+            string path = "Assets/_Tools/X-Ray OGF OMG Importer/Tests/Editor/Fixtures/__WeatherSaveHost_" + Guid.NewGuid().ToString("N") + ".unity";
+            Assert.IsTrue(EditorSceneManager.SaveScene(scene, path));
+            return path;
         }
 
         private static string PrepareImportHost()

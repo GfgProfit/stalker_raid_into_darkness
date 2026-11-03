@@ -231,6 +231,10 @@ void PostEvaluateBSDF(LightLoopContext lightLoopContext, float3 V, PositionInput
     #ifdef _MONOLITH_ORIGINAL_ENVIRONMENT
     if (originalEnvironment && _MonolithDiagnosticOptions.z < 0.5) lightLoopOutput.diffuseLighting += environmentData.combined;
     #endif
+    if (_MonolithWeatherActive > 0.5 && _MonolithTrueStalkerActive < 0.5 && _MonolithDebug < 0.5 && _MonolithDiagnosticOptions.z < 0.5)
+    {
+        lightLoopOutput.diffuseLighting += bsdfData.diffuseColor * _MonolithWeatherNightAmbient.rgb * bsdfData.ambientOcclusion;
+    }
     if (_MonolithDebug > 0.5 && _MonolithDebug < 19.5)
     {
         lightLoopOutput.diffuseLighting = _MonolithDiagnosticValue * GetInverseCurrentExposureMultiplier();

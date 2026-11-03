@@ -20,6 +20,11 @@ namespace XRay.Importer.Levels
     {
         public const int SKY_ID = 71007;
 
+        [SerializeField] private BoolParameter _useHdrpIntensity = new BoolParameter(false, true);
+        [SerializeField] private ColorParameter _nightAmbient = new ColorParameter(Color.black, true, true, false);
+        [SerializeField] private FloatParameter _nightWeight = new FloatParameter(0.0f, true);
+        [SerializeField] private MinFloatParameter _nightDiffuseMultiplier = new MinFloatParameter(1.0f, 0.0f, true);
+        [SerializeField] private Vector4Parameter _nightTransitionHours = new Vector4Parameter(new Vector4(4.0f, 7.0f, 19.0f, 22.0f), true);
         [SerializeField] private TextureParameter _sky0 = new TextureParameter(null, true);
         [SerializeField] private TextureParameter _sky1 = new TextureParameter(null, true);
         [SerializeField] private TextureParameter _sky2 = new TextureParameter(null, true);
@@ -37,9 +42,44 @@ namespace XRay.Importer.Levels
         public Vector4 SourceTint => _sourceTint.value;
         public float SourceRotation => _sourceRotation.value;
         public Shader Shader => _shader.value;
+        public bool UseHdrpIntensity => _useHdrpIntensity.value;
+        public Color NightAmbient => _nightAmbient.value;
+        public float NightWeight => _nightWeight.value;
+        public float NightDiffuseMultiplier => _nightDiffuseMultiplier.value;
+        public Vector4 NightTransitionHours => _nightTransitionHours.value;
+
+        public void SetHdrpIntensity(bool value)
+        {
+            _useHdrpIntensity.Override(value);
+        }
+
+        public void SetNightAmbient(Color linearRadiance)
+        {
+            _nightAmbient.Override(linearRadiance);
+        }
+
+        public void SetNightDiffuseMultiplier(float value)
+        {
+            _nightDiffuseMultiplier.Override(value);
+        }
+
+        public void SetNightTransitionHours(Vector4 value)
+        {
+            for (int i = 0; i < 4; i++)
+            {
+                if (float.IsNaN(value[i]) || float.IsInfinity(value[i])) throw new ArgumentOutOfRangeException(nameof(value));
+            }
+            if (value.x < 0.0f || value.x >= value.y || value.y > value.z || value.z >= value.w || value.w > 24.0f) throw new ArgumentOutOfRangeException(nameof(value));
+            _nightTransitionHours.Override(value);
+        }
 
         public void SetWeather(XRayWeatherSnapshot snapshot, Shader shader)
         {
+            float hour = (float)(((snapshot.GameSeconds % 86400.0 + 86400.0) % 86400.0) / 3600.0);
+            Vector4 hours = _nightTransitionHours.value;
+            float dawn = Mathf.SmoothStep(0.0f, 1.0f, Mathf.InverseLerp(hours.x, hours.y, hour));
+            float dusk = Mathf.SmoothStep(0.0f, 1.0f, Mathf.InverseLerp(hours.z, hours.w, hour));
+            _nightWeight.Override(1.0f - dawn + dusk);
             _sky0.Override(snapshot.SkyResources.Texture(0));
             _sky1.Override(snapshot.SkyResources.Texture(1));
             _sky2.Override(snapshot.SkyResources.Texture(2));
@@ -61,6 +101,11 @@ namespace XRay.Importer.Levels
             unchecked
             {
                 int hash = base.GetHashCode();
+                hash = hash * 23 + _useHdrpIntensity.GetHashCode();
+                hash = hash * 23 + _nightAmbient.GetHashCode();
+                hash = hash * 23 + _nightWeight.GetHashCode();
+                hash = hash * 23 + _nightDiffuseMultiplier.GetHashCode();
+                hash = hash * 23 + _nightTransitionHours.GetHashCode();
                 hash = hash * 23 + _sky0.GetHashCode();
                 hash = hash * 23 + _sky1.GetHashCode();
                 hash = hash * 23 + _sky2.GetHashCode();

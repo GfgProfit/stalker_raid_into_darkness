@@ -180,7 +180,11 @@ namespace XRay.Importer.Editor.Levels
             settings.TerrainQuality = (XRayTerrainQuality)EditorGUILayout.EnumPopup("Source Terrain Quality", settings.TerrainQuality);
             settings.FloraImportMode = (XRayFloraImportMode)EditorGUILayout.EnumPopup(new GUIContent("Source Flora", "Applies only when the effective flora shader contract matches the selected game; other sources keep legacy flora."), settings.FloraImportMode);
             settings.FloraWindMode = (XRayFloraWindImportMode)EditorGUILayout.EnumPopup(new GUIContent("Source Flora Wind", "Stores tree WindFactor and binds source wind only when the effective wind shader contract matches the selected game; runtime wind also needs an XRayFloraWindProvider."), settings.FloraWindMode);
-            settings.WeatherProfile = (XRay.Importer.Levels.XRayWeatherProfile)EditorGUILayout.ObjectField(new GUIContent("Weather Profile (opt-in)", "Connects an imported RVM weather profile and its light/material/wind consumers to future imports. Existing saved scenes are not migrated."), settings.WeatherProfile, typeof(XRay.Importer.Levels.XRayWeatherProfile), false);
+            settings.WeatherImportMode = (XRayWeatherImportMode)EditorGUILayout.EnumPopup(new GUIContent("Weather", "Automatic prepares verified Anomaly/GRA clear and rain resources once per effective source and connects the sky to new imports. Other games keep their existing environment."), settings.WeatherImportMode);
+            using (new EditorGUI.DisabledScope(settings.WeatherImportMode == XRayWeatherImportMode.Disabled))
+            {
+                settings.WeatherProfile = (XRay.Importer.Levels.XRayWeatherProfile)EditorGUILayout.ObjectField(new GUIContent("Weather Profile Override", "A selected profile takes precedence over automatic weather and is never overwritten. Selected Profile Only requires this field; Disabled preserves it without connecting weather."), settings.WeatherProfile, typeof(XRay.Importer.Levels.XRayWeatherProfile), false);
+            }
             settings.CopySourceFiles = EditorGUILayout.Toggle("Copy level.geom/geomx/cform/details", settings.CopySourceFiles);
             settings.OpenSceneAfterImport = EditorGUILayout.Toggle("Open Scene After Import", settings.OpenSceneAfterImport);
             settings.AutoImportDroppedLevels = EditorGUILayout.Toggle(new GUIContent("Auto Import Dropped 'level'", "Import extensionless 'level' files dropped into the Project window."), settings.AutoImportDroppedLevels);

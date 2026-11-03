@@ -16,6 +16,7 @@ namespace XRay.Importer
         private static readonly int _environmentWeightsId = Shader.PropertyToID("_MonolithWeatherEnvironmentWeights");
         private static readonly int _environmentColorId = Shader.PropertyToID("_MonolithWeatherEnvironmentColor");
         private static readonly int _ambientId = Shader.PropertyToID("_MonolithWeatherAmbient");
+        private static readonly int _nightAmbientId = Shader.PropertyToID("_MonolithWeatherNightAmbient");
         private static readonly int[] _environmentIds = { Shader.PropertyToID("_MonolithWeatherEnvironment0"), Shader.PropertyToID("_MonolithWeatherEnvironment1"), Shader.PropertyToID("_MonolithWeatherEnvironment2"), Shader.PropertyToID("_MonolithWeatherEnvironment3") };
         private static MonolithWeatherInputs _owner;
 
@@ -33,6 +34,7 @@ namespace XRay.Importer
         private XRayWeatherResources _weatherEnvironment;
         private Vector4 _weatherEnvironmentColor;
         private Vector4 _weatherAmbient;
+        private Vector3 _weatherNightAmbient;
         private bool _environmentReady;
 
         public float DynamicGloss => _dynamicGloss;
@@ -41,6 +43,20 @@ namespace XRay.Importer
         public Vector4 LightSetup => _weatherOwner != null && _weatherLightSetup.HasValue ? _weatherLightSetup.Value : _lightSetup;
         public Vector4 FloraFixes => _weatherOwner != null && _weatherFloraFixes.HasValue ? _weatherFloraFixes.Value : _floraFixes;
         public bool EnvironmentActive => _weatherOwner != null && _environmentReady;
+        public Vector3 NightAmbient => _weatherOwner != null ? _weatherNightAmbient : Vector3.zero;
+
+        public bool SetWeatherNightAmbient(UnityEngine.Object owner, Vector3 linearRadiance)
+        {
+            if (owner == null || _weatherOwner != owner || !isActiveAndEnabled) return false;
+            for (int i = 0; i < 3; i++)
+            {
+                Validate(linearRadiance[i]);
+                if (linearRadiance[i] < 0.0f) throw new ArgumentOutOfRangeException(nameof(linearRadiance));
+            }
+            _weatherNightAmbient = linearRadiance;
+            Publish();
+            return true;
+        }
 
         public void SetWeatherEnvironment(UnityEngine.Object owner, XRayWeatherSnapshot snapshot, Vector2? scale)
         {
@@ -62,7 +78,7 @@ namespace XRay.Importer
 
         public bool TrySetWeatherInputs(UnityEngine.Object owner, Vector3 sunColor, Vector4? lightSetup = null, Vector4? floraFixes = null)
         {
-            if (owner == null || !isActiveAndEnabled || _weatherOwner != null && _weatherOwner != owner) return false;
+            if (owner == null || !isActiveAndEnabled || _owner != null && _owner != this || _weatherOwner != null && _weatherOwner != owner) return false;
             for (int i = 0; i < 3; i++)
             {
                 Validate(sunColor[i]);
@@ -73,7 +89,12 @@ namespace XRay.Importer
                 if (lightSetup.HasValue) Validate(lightSetup.Value[i]);
                 if (floraFixes.HasValue) Validate(floraFixes.Value[i]);
             }
-            if (_weatherOwner != owner) _environmentReady = false;
+            if (_weatherOwner != owner)
+            {
+                _environmentReady = false;
+                _weatherNightAmbient = Vector3.zero;
+            }
+            _owner = this;
             _weatherOwner = owner;
             _weatherSunColor = sunColor;
             _weatherLightSetup = lightSetup;
@@ -89,6 +110,7 @@ namespace XRay.Importer
             _weatherLightSetup = null;
             _weatherFloraFixes = null;
             _environmentReady = false;
+            _weatherNightAmbient = Vector3.zero;
             Publish();
         }
 
@@ -132,24 +154,26 @@ namespace XRay.Importer
 
         private void OnEnable()
         {
+            _pendingValidation = false;
+            SetWetness(_wetness);
             if (_owner != null && _owner != this)
             {
                 Debug.LogError("Only one MonolithWeatherInputs provider can be active.", this);
-                enabled = false;
                 return;
             }
             _owner = this;
-            _pendingValidation = false;
-            SetWetness(_wetness);
+            Publish();
         }
 
         private void OnDisable()
         {
             _weatherOwner = null;
             _environmentReady = false;
+            _weatherNightAmbient = Vector3.zero;
             if (_owner != this) return;
             Shader.SetGlobalFloat(_activeId, 0.0f);
             Shader.SetGlobalFloat(_environmentActiveId, 0.0f);
+            Shader.SetGlobalVector(_nightAmbientId, Vector4.zero);
             _owner = null;
         }
 
@@ -179,6 +203,7 @@ namespace XRay.Importer
             Shader.SetGlobalVector(_sunId, SunColor);
             Shader.SetGlobalVector(_lightSetupId, LightSetup);
             Shader.SetGlobalVector(_floraId, FloraFixes);
+            Shader.SetGlobalVector(_nightAmbientId, NightAmbient);
             Shader.SetGlobalFloat(_environmentActiveId, EnvironmentActive ? 1.0f : 0.0f);
             if (EnvironmentActive)
             {
@@ -196,6 +221,7 @@ namespace XRay.Importer
             _owner = null;
             Shader.SetGlobalFloat(_activeId, 0.0f);
             Shader.SetGlobalFloat(_environmentActiveId, 0.0f);
+            Shader.SetGlobalVector(_nightAmbientId, Vector4.zero);
         }
     }
 }

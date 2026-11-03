@@ -13,6 +13,9 @@ namespace XRay.Importer.Levels
         private static readonly int _weightsId = Shader.PropertyToID("_XRaySkyWeights");
         private static readonly int _tintId = Shader.PropertyToID("_XRaySkyTint");
         private static readonly int _rotationId = Shader.PropertyToID("_XRaySkyRotation");
+        private static readonly int _intensityId = Shader.PropertyToID("_XRaySkyIntensity");
+        private static readonly int _nightAmbientId = Shader.PropertyToID("_XRayNightAmbient");
+        private static readonly int _nightWeightId = Shader.PropertyToID("_XRayNightWeight");
         private static readonly int _viewId = Shader.PropertyToID("_PixelCoordToViewDirWS");
 
         private readonly MaterialPropertyBlock _properties = new MaterialPropertyBlock();
@@ -22,6 +25,14 @@ namespace XRay.Importer.Levels
         public XRayWeatherSkyPass()
         {
             SupportDynamicSunLight = false;
+        }
+
+        public static Vector3 GetNightRadiance(XRayWeatherSkySettings settings)
+        {
+            if (settings == null) return Vector3.zero;
+            Color ambient = settings.NightAmbient;
+            float intensity = settings.NightWeight * settings.NightDiffuseMultiplier * (settings.UseHdrpIntensity ? GetSkyIntensity(settings, null) : 1.0f);
+            return new Vector3(ambient.r * intensity, ambient.g * intensity, ambient.b * intensity);
         }
 
         public override void Build()
@@ -57,6 +68,9 @@ namespace XRay.Importer.Levels
             _properties.SetVector(_weightsId, settings.Weights);
             _properties.SetVector(_tintId, settings.SourceTint);
             _properties.SetVector(_rotationId, new Vector4(Mathf.Cos(settings.SourceRotation), Mathf.Sin(settings.SourceRotation), 0.0f, 0.0f));
+            _properties.SetFloat(_intensityId, settings.UseHdrpIntensity ? GetSkyIntensity(settings, builtinParams.debugSettings) : 1.0f);
+            _properties.SetVector(_nightAmbientId, settings.NightAmbient);
+            _properties.SetFloat(_nightWeightId, settings.NightWeight);
             _properties.SetMatrix(_viewId, builtinParams.pixelCoordToViewDirMatrix);
             CoreUtils.DrawFullScreen(builtinParams.commandBuffer, _material, _properties, renderForCubemap ? 0 : 1);
         }

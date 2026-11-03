@@ -77,6 +77,282 @@ namespace XRay.Importer.Tests
             }
         }
 
+        [TestCase(SkyIntensityMode.Exposure, 0.0f, 1.0f)]
+        [TestCase(SkyIntensityMode.Exposure, 10.5f, 7.0f)]
+        [TestCase(SkyIntensityMode.Multiplier, 10.5f, 1.0f)]
+        [TestCase(SkyIntensityMode.Multiplier, 10.5f, 3.25f)]
+        public void SkyPassHonorsHdrpIntensityAfterSourceLinearization(SkyIntensityMode mode, float exposure, float multiplier)
+        {
+            Cubemap[] cubes = Cubes();
+            XRayWeatherSkySettings settings = ScriptableObject.CreateInstance<XRayWeatherSkySettings>();
+            try
+            {
+                settings.SetWeather(FourWay(cubes), SkyShader());
+                settings.SetHdrpIntensity(true);
+                settings.skyIntensityMode.Override(mode);
+                settings.exposure.Override(exposure);
+                settings.multiplier.Override(multiplier);
+                Color source = RenderSky(cubes, settings.Weights, settings.SourceTint, Vector3.up, settings.SourceRotation);
+                Color actual = RenderSky(cubes, settings.Weights, settings.SourceTint, Vector3.up, settings.SourceRotation, settings);
+                float intensity = mode == SkyIntensityMode.Exposure ? ColorUtils.ConvertEV100ToExposure(-exposure) : multiplier;
+                for (int i = 0; i < 3; i++) Assert.That(actual[i], Is.EqualTo(source[i] * intensity).Within(TOLERANCE * Mathf.Max(1.0f, Mathf.Abs(source[i] * intensity))));
+            }
+            finally
+            {
+                Object.DestroyImmediate(settings);
+                Destroy(cubes);
+            }
+        }
+
+        [Test]
+        public void SkyPassPreservesUnitIntensityUntilHdrpIntensityIsExplicitlyEnabled()
+        {
+            Cubemap[] cubes = Cubes();
+            XRayWeatherSkySettings settings = ScriptableObject.CreateInstance<XRayWeatherSkySettings>();
+            try
+            {
+                settings.SetWeather(FourWay(cubes), SkyShader());
+                Assert.IsFalse(settings.UseHdrpIntensity);
+                Color source = RenderSky(cubes, settings.Weights, settings.SourceTint, Vector3.up, settings.SourceRotation);
+                Color initial = RenderSky(cubes, settings.Weights, settings.SourceTint, Vector3.up, settings.SourceRotation, settings);
+                AssertRgb(source, initial, TOLERANCE);
+                settings.exposure.Override(10.5f);
+                settings.multiplier.Override(7.0f);
+                Color authored = RenderSky(cubes, settings.Weights, settings.SourceTint, Vector3.up, settings.SourceRotation, settings);
+                AssertRgb(source, authored, TOLERANCE);
+                int hash = settings.GetHashCode();
+                settings.SetHdrpIntensity(true);
+                Assert.AreNotEqual(hash, settings.GetHashCode());
+                settings.SetHdrpIntensity(false);
+                Assert.AreEqual(hash, settings.GetHashCode());
+            }
+            finally
+            {
+                Object.DestroyImmediate(settings);
+                Destroy(cubes);
+            }
+        }
+
+        [TestCase(0.0f, 1.0f)]
+        [TestCase(4.0f, 1.0f)]
+        [TestCase(5.5f, 0.5f)]
+        [TestCase(7.0f, 0.0f)]
+        [TestCase(12.0f, 0.0f)]
+        [TestCase(19.0f, 0.0f)]
+        [TestCase(20.5f, 0.5f)]
+        [TestCase(22.0f, 1.0f)]
+        [TestCase(24.0f, 1.0f)]
+        public void AuthoredNightAmbientFollowsGameClockAndPrecedesHdrpIntensity(float hour, float expectedWeight)
+        {
+            Cubemap[] cubes = Cubes();
+            XRayWeatherSkySettings settings = ScriptableObject.CreateInstance<XRayWeatherSkySettings>();
+            try
+            {
+                XRayWeatherSnapshot sourceSnapshot = FourWay(cubes);
+                XRayWeatherSnapshot snapshot = Snapshot(sourceSnapshot.SkyResources, sourceSnapshot.EnvironmentResources, Color.white, hour * 3600.0);
+                settings.SetWeather(snapshot, SkyShader());
+                settings.SetHdrpIntensity(true);
+                settings.skyIntensityMode.Override(SkyIntensityMode.Multiplier);
+                settings.multiplier.Override(3.25f);
+                Color ambient = new Color(0.003f, 0.009f, 0.025f);
+                settings.SetNightAmbient(ambient);
+                Assert.That(settings.NightWeight, Is.EqualTo(expectedWeight).Within(TOLERANCE));
+                Color source = RenderSky(cubes, settings.Weights, settings.SourceTint, Vector3.up, settings.SourceRotation);
+                Color actual = RenderSky(cubes, settings.Weights, settings.SourceTint, Vector3.up, settings.SourceRotation, settings);
+                for (int i = 0; i < 3; i++) Assert.That(actual[i], Is.EqualTo((source[i] + ambient[i] * expectedWeight) * 3.25f).Within(TOLERANCE));
+                settings.SetWeather(Snapshot(sourceSnapshot.SkyResources, sourceSnapshot.EnvironmentResources, Color.clear, hour * 3600.0), SkyShader());
+                Assert.That(settings.NightWeight, Is.EqualTo(expectedWeight).Within(TOLERANCE));
+            }
+            finally
+            {
+                Object.DestroyImmediate(settings);
+                Destroy(cubes);
+            }
+        }
+
+        [TestCase(20)]
+        [TestCase(30)]
+        [TestCase(60)]
+        public void NightClockCurveIsContinuousMonotoneAndFrameBoundedAtFastTimeScale(int framesPerSecond)
+        {
+            XRayWeatherSkySettings settings = ScriptableObject.CreateInstance<XRayWeatherSkySettings>();
+            try
+            {
+                double step = 10000.0 / framesPerSecond;
+                float bound = (float)(step * 1.5 / 10800.0) + TOLERANCE;
+                float previous = 1.0f;
+                double previousTime = 0.0;
+                for (double seconds = 0.0; seconds <= 86400.0 + step; seconds += step)
+                {
+                    settings.SetWeather(Snapshot(default, default, Color.white, seconds), null);
+                    float weight = settings.NightWeight;
+                    Assert.IsFalse(float.IsNaN(weight) || float.IsInfinity(weight));
+                    Assert.That(weight, Is.InRange(0.0f, 1.0f));
+                    Assert.That(Mathf.Abs(weight - previous), Is.LessThanOrEqualTo(bound));
+                    if (previousTime >= 14400.0 && seconds <= 25200.0) Assert.That(weight, Is.LessThanOrEqualTo(previous + TOLERANCE));
+                    if (previousTime >= 68400.0 && seconds <= 79200.0) Assert.That(weight, Is.GreaterThanOrEqualTo(previous - TOLERANCE));
+                    previous = weight;
+                    previousTime = seconds;
+                }
+                settings.SetWeather(Snapshot(default, default, Color.white, 86399.999), null);
+                float beforeMidnight = settings.NightWeight;
+                settings.SetWeather(Snapshot(default, default, Color.clear, 86400.001), null);
+                Assert.That(settings.NightWeight, Is.EqualTo(beforeMidnight).Within(TOLERANCE));
+                settings.SetWeather(Snapshot(default, default, Color.white, -0.001), null);
+                Assert.That(settings.NightWeight, Is.EqualTo(beforeMidnight).Within(TOLERANCE));
+            }
+            finally
+            {
+                Object.DestroyImmediate(settings);
+            }
+        }
+
+        [Test]
+        public void NightTransitionConfigurationSurvivesCloningAndControlsTheClockCurve()
+        {
+            XRayWeatherSkySettings settings = ScriptableObject.CreateInstance<XRayWeatherSkySettings>();
+            XRayWeatherSkySettings clone = null;
+            try
+            {
+                Assert.AreEqual(new Vector4(4.0f, 7.0f, 19.0f, 22.0f), settings.NightTransitionHours);
+                settings.SetWeather(Snapshot(default, default, Color.white, 18000.0), null);
+                float original = settings.NightWeight;
+                int hash = settings.GetHashCode();
+                Vector4 hours = new Vector4(2.0f, 8.0f, 18.0f, 23.0f);
+                settings.SetNightTransitionHours(hours);
+                Assert.AreNotEqual(hash, settings.GetHashCode());
+                clone = Object.Instantiate(settings);
+                Assert.AreEqual(hours, clone.NightTransitionHours);
+                clone.SetWeather(Snapshot(default, default, Color.clear, 18000.0), null);
+                Assert.That(clone.NightWeight, Is.EqualTo(0.5f).Within(TOLERANCE));
+                Assert.AreNotEqual(original, clone.NightWeight);
+                Assert.Throws<ArgumentOutOfRangeException>(() => settings.SetNightTransitionHours(new Vector4(8.0f, 2.0f, 18.0f, 23.0f)));
+            }
+            finally
+            {
+                Object.DestroyImmediate(clone);
+                Object.DestroyImmediate(settings);
+            }
+        }
+
+        [TestCase(false, SkyIntensityMode.Exposure, 10.5f, 3.25f)]
+        [TestCase(true, SkyIntensityMode.Exposure, 0.0f, 3.25f)]
+        [TestCase(true, SkyIntensityMode.Exposure, 10.5f, 3.25f)]
+        [TestCase(true, SkyIntensityMode.Multiplier, 10.5f, 3.25f)]
+        public void NightPhysicalRadianceUsesTheCanonicalAuthoredSkyIntensity(bool useHdrpIntensity, SkyIntensityMode mode, float exposure, float multiplier)
+        {
+            XRayWeatherSkySettings settings = ScriptableObject.CreateInstance<XRayWeatherSkySettings>();
+            try
+            {
+                settings.SetWeather(Snapshot(default, default, Color.white, 19800.0), SkyShader());
+                Color ambient = new Color(0.003f, 0.009f, 0.025f);
+                settings.SetNightAmbient(ambient);
+                settings.SetHdrpIntensity(useHdrpIntensity);
+                settings.skyIntensityMode.Override(mode);
+                settings.exposure.Override(exposure);
+                settings.multiplier.Override(multiplier);
+                Vector3 actual = XRayWeatherSkyPass.GetNightRadiance(settings);
+                float intensity = useHdrpIntensity ? settings.GetIntensityFromSettings() : 1.0f;
+                for (int i = 0; i < 3; i++) Assert.That(actual[i], Is.EqualTo(ambient[i] * 0.5f * intensity).Within(TOLERANCE));
+            }
+            finally
+            {
+                Object.DestroyImmediate(settings);
+            }
+        }
+
+        [Test]
+        public void NightPhysicalRadianceIsZeroWithoutAnAuthoredNightColor()
+        {
+            Assert.AreEqual(Vector3.zero, XRayWeatherSkyPass.GetNightRadiance(null));
+            XRayWeatherSkySettings settings = ScriptableObject.CreateInstance<XRayWeatherSkySettings>();
+            try
+            {
+                settings.SetWeather(Snapshot(default, default, Color.clear), SkyShader());
+                settings.SetHdrpIntensity(true);
+                settings.exposure.Override(10.5f);
+                Assert.AreEqual(Vector3.zero, XRayWeatherSkyPass.GetNightRadiance(settings));
+            }
+            finally
+            {
+                Object.DestroyImmediate(settings);
+            }
+        }
+
+        [Test]
+        public void WorldNightMultiplierChangesMaterialRadianceWithoutChangingTheRenderedSky()
+        {
+            Cubemap[] cubes = Cubes();
+            XRayWeatherSkySettings settings = ScriptableObject.CreateInstance<XRayWeatherSkySettings>();
+            try
+            {
+                XRayWeatherSnapshot snapshot = FourWay(cubes);
+                settings.SetWeather(Snapshot(snapshot.SkyResources, snapshot.EnvironmentResources, Color.clear), SkyShader());
+                settings.SetNightAmbient(new Color(0.003f, 0.009f, 0.025f));
+                settings.SetHdrpIntensity(true);
+                settings.skyIntensityMode.Override(SkyIntensityMode.Multiplier);
+                settings.multiplier.Override(3.25f);
+                Assert.AreEqual(1.0f, settings.NightDiffuseMultiplier);
+                Vector3 initialRadiance = XRayWeatherSkyPass.GetNightRadiance(settings);
+                Color initialSky = RenderSky(cubes, settings.Weights, settings.SourceTint, Vector3.up, settings.SourceRotation, settings);
+                int hash = settings.GetHashCode();
+                settings.SetNightDiffuseMultiplier(24.0f);
+                Vector3 scaledRadiance = XRayWeatherSkyPass.GetNightRadiance(settings);
+                Color scaledSky = RenderSky(cubes, settings.Weights, settings.SourceTint, Vector3.up, settings.SourceRotation, settings);
+                Assert.AreNotEqual(hash, settings.GetHashCode());
+                for (int i = 0; i < 3; i++) Assert.That(scaledRadiance[i], Is.EqualTo(initialRadiance[i] * 24.0f).Within(TOLERANCE));
+                AssertRgb(initialSky, scaledSky, TOLERANCE);
+            }
+            finally
+            {
+                Object.DestroyImmediate(settings);
+                Destroy(cubes);
+            }
+        }
+
+        [Test]
+        public void NightAmbientDefaultsPreserveSourceAndAuthoredSettingsSurviveCloning()
+        {
+            Cubemap[] cubes = Cubes();
+            XRayWeatherSkySettings settings = ScriptableObject.CreateInstance<XRayWeatherSkySettings>();
+            XRayWeatherSkySettings clone = null;
+            try
+            {
+                XRayWeatherSnapshot sourceSnapshot = FourWay(cubes);
+                settings.SetWeather(Snapshot(sourceSnapshot.SkyResources, sourceSnapshot.EnvironmentResources, Color.clear), SkyShader());
+                Assert.AreEqual(Color.black, settings.NightAmbient);
+                Assert.AreEqual(1.0f, settings.NightWeight);
+                var serialized = new SerializedObject(settings);
+                Assert.IsFalse(serialized.FindProperty("_nightAmbient.m_OverrideState").boolValue);
+                Color source = RenderSky(cubes, settings.Weights, settings.SourceTint, Vector3.up, settings.SourceRotation);
+                Color actual = RenderSky(cubes, settings.Weights, settings.SourceTint, Vector3.up, settings.SourceRotation, settings);
+                AssertRgb(source, actual, TOLERANCE);
+                int hash = settings.GetHashCode();
+                Color ambient = new Color(0.003f, 0.009f, 0.025f);
+                settings.SetNightAmbient(ambient);
+                Assert.AreNotEqual(hash, settings.GetHashCode());
+                settings.SetHdrpIntensity(true);
+                clone = Object.Instantiate(settings);
+                Assert.AreEqual(ambient, clone.NightAmbient);
+                Assert.AreEqual(1.0f, clone.NightWeight);
+                Assert.IsTrue(clone.UseHdrpIntensity);
+                Color clonedOutput = RenderSky(cubes, clone.Weights, clone.SourceTint, Vector3.up, clone.SourceRotation, clone);
+                float intensity = ColorUtils.ConvertEV100ToExposure(-clone.exposure.value);
+                for (int i = 0; i < 3; i++) Assert.That(clonedOutput[i], Is.EqualTo((source[i] + ambient[i]) * intensity).Within(TOLERANCE));
+                settings.SetHdrpIntensity(false);
+                settings.SetNightAmbient(Color.black);
+                serialized.Update();
+                Assert.IsTrue(serialized.FindProperty("_nightAmbient.m_OverrideState").boolValue);
+                Assert.AreNotEqual(hash, settings.GetHashCode());
+            }
+            finally
+            {
+                Object.DestroyImmediate(clone);
+                Object.DestroyImmediate(settings);
+                Destroy(cubes);
+            }
+        }
+
         [Test]
         public void SkyReleaseAndDisableRestoreAuthoredAndInstantiatedVolumeProfiles()
         {
@@ -299,9 +575,9 @@ namespace XRay.Importer.Tests
             }
         }
 
-        private static XRayWeatherSnapshot Snapshot(XRayWeatherResources sky, XRayWeatherResources environment)
+        private static XRayWeatherSnapshot Snapshot(XRayWeatherResources sky, XRayWeatherResources environment, Color? sunColor = null, double gameSeconds = 0.0)
         {
-            return new XRayWeatherSnapshot("00:00:00", 0.0, Color.white, new Color(0.0001f, 0.02f, 0.04f), new Color(0.2f, 0.4f, 0.6f, 0.89f), 0.0f, 100.0f, 0.01f, 0.0f, Color.white, Color.gray, 0.1f, 300.0f, 400.0f, new Color(0.5f, 0.25f, 0.75f), Color.clear, 0.75f, sky, default, environmentResources: environment);
+            return new XRayWeatherSnapshot("00:00:00", gameSeconds, sunColor ?? Color.white, new Color(0.0001f, 0.02f, 0.04f), new Color(0.2f, 0.4f, 0.6f, 0.89f), 0.0f, 100.0f, 0.01f, 0.0f, Color.white, Color.gray, 0.1f, 300.0f, 400.0f, new Color(0.5f, 0.25f, 0.75f), Color.clear, 0.75f, sky, default, environmentResources: environment);
         }
 
         private static XRayWeatherSnapshot FourWay(Cubemap[] cubes)
@@ -343,11 +619,12 @@ namespace XRay.Importer.Tests
             return shader;
         }
 
-        private static Color RenderSky(Cubemap[] cubes, Vector4 weights, Vector4 tint, Vector3 direction, float rotation)
+        private static Color RenderSky(Cubemap[] cubes, Vector4 weights, Vector4 tint, Vector3 direction, float rotation, XRayWeatherSkySettings settings = null)
         {
             var material = new Material(SkyShader());
             var target = new RenderTexture(4, 4, 0, RenderTextureFormat.ARGBFloat, RenderTextureReadWrite.Linear);
             var readback = new Texture2D(4, 4, TextureFormat.RGBAFloat, false, true);
+            XRayWeatherSkyPass renderer = settings != null ? new XRayWeatherSkyPass() : null;
             RenderTexture previous = RenderTexture.active;
             bool srgb = GL.sRGBWrite;
             try
@@ -365,7 +642,16 @@ namespace XRay.Importer.Tests
                 {
                     commands.SetRenderTarget(target);
                     commands.ClearRenderTarget(false, true, Color.magenta);
-                    commands.DrawProcedural(Matrix4x4.identity, material, 0, MeshTopology.Triangles, 3);
+                    if (renderer == null)
+                    {
+                        commands.DrawProcedural(Matrix4x4.identity, material, 0, MeshTopology.Triangles, 3);
+                    }
+                    else
+                    {
+                        renderer.Build();
+                        var parameters = new BuiltinSkyParameters { commandBuffer = commands, skySettings = settings, pixelCoordToViewDirMatrix = matrix };
+                        renderer.RenderSky(parameters, true, false);
+                    }
                     Graphics.ExecuteCommandBuffer(commands);
                 }
                 RenderTexture.active = target;
@@ -377,6 +663,7 @@ namespace XRay.Importer.Tests
             {
                 RenderTexture.active = previous;
                 GL.sRGBWrite = srgb;
+                if (renderer != null) renderer.Cleanup();
                 target.Release();
                 Object.DestroyImmediate(material);
                 Object.DestroyImmediate(target);

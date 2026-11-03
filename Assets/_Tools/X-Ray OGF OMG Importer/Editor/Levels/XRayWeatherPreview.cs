@@ -96,8 +96,8 @@ namespace XRay.Importer.Editor.Levels
         private static void OnSceneSaving(Scene scene, string path)
         {
             XRayWeatherController active = XRayWeatherController.Active;
-            Stop();
-            if (active != null && active.PreviewActive) active.EndPreview();
+            if (_controller != null && _controller.gameObject.scene == scene) Stop();
+            if (active != null && active.gameObject.scene == scene && active.PreviewActive) active.EndPreview();
         }
 
         private static void Dispose()

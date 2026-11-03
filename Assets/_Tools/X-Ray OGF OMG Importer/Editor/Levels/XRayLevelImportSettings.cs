@@ -45,6 +45,13 @@ namespace XRay.Importer.Editor.Levels
         [InspectorName("LOW")] Low
     }
 
+    public enum XRayWeatherImportMode
+    {
+        [InspectorName("Automatic Verified RVM Weather")] Automatic,
+        [InspectorName("Selected Profile Only")] CustomProfile,
+        [InspectorName("Disabled")] Disabled
+    }
+
     [Serializable]
     public sealed class XRayLevelImportSettings
     {
@@ -64,6 +71,7 @@ namespace XRay.Importer.Editor.Levels
         [SerializeField] private XRayTerrainQuality _terrainQuality;
         [SerializeField] private XRayFloraImportMode _floraImportMode;
         [SerializeField] private XRayFloraWindImportMode _floraWindMode;
+        [SerializeField] private XRayWeatherImportMode _weatherImportMode;
         [SerializeField] private XRayWeatherProfile _weatherProfile;
         [SerializeField] private bool _openSceneAfterImport = true;
         [SerializeField] private bool _copySourceFiles = true;
@@ -163,6 +171,12 @@ namespace XRay.Importer.Editor.Levels
         {
             get => _floraWindMode;
             set => _floraWindMode = value;
+        }
+
+        public XRayWeatherImportMode WeatherImportMode
+        {
+            get => _weatherImportMode;
+            set => _weatherImportMode = value;
         }
 
         public XRayWeatherProfile WeatherProfile

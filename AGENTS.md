@@ -83,7 +83,9 @@ Respond only after the task is completed.
 
 The final response must use Russian unless the user explicitly requests English.
 
-Code, class names, method names, variable names, namespaces, file names, folder names, package names, commit messages, and technical identifiers must remain in English.
+Code, class names, method names, variable names, namespaces, file names, folder names, package names, and technical identifiers must remain in English.
+
+For commit message language and format, follow the `git-commit-ru` skill: Russian text, exactly one Gitmoji, and unchanged English technical identifiers.
 
 ## Final Response Format
 

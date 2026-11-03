@@ -402,7 +402,9 @@ namespace XRay.Importer.Editor.Levels
             _content.ImportLights = _request.Settings.ImportLights;
             _content.LightShadows = _request.Settings.StaticLightShadows;
             _content.OpenScene = _request.Settings.OpenSceneAfterImport;
-            _content.WeatherProfile = _request.Settings.WeatherProfile;
+            bool automaticWeather = XRayWeatherImporter.IsAutomaticEligible(File.Exists(XRayLevelPaths.ScenePath(_entry.Name)), _previous);
+            _record.SetMetric(XRayWeatherImporter.AUTOMATIC_ELIGIBILITY_METRIC, automaticWeather ? 1.0 : 0.0);
+            _content.WeatherProfile = XRayWeatherImporter.ResolveLevelProfile(_request.Settings, _sourcePlan, XRayLevelPaths.Root, _record, automaticWeather);
         }
 
         private void CopySourceFiles()

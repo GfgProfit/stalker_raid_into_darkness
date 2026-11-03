@@ -14,6 +14,7 @@ using UnityEngine.Rendering;
 using UnityEngine.Rendering.HighDefinition;
 using UnityEngine.SceneManagement;
 using XRay.Importer.Editor;
+using XRay.Importer.Editor.Levels;
 using XRay.Importer.Levels;
 
 namespace XRay.Importer.Tests
@@ -118,6 +119,7 @@ namespace XRay.Importer.Tests
             Assert.AreEqual(0.0f, material.GetFloat("_MonolithFloraSource"));
             Assert.AreEqual(0.0f, material.GetFloat("_MonolithFloraWetness"));
             Assert.AreEqual(new Vector4(0.3f, 0.38f, 0.5f, 0.55f), material.GetVector("_MonolithFloraFixes1"));
+            Assert.AreEqual(0.0f, material.GetFloat("_MonolithFloraVariationEnabled"));
             Assert.AreEqual(new Vector4(0.025f, 0.1f, 0.025f, 0.05f), material.GetVector("_MonolithFloraVariation"));
             Texture2D bump = Own(new Texture2D(2, 2, TextureFormat.RGBA32, false, true));
             Texture2D correction = Own(new Texture2D(2, 2, TextureFormat.RGBA32, false, true));
@@ -139,6 +141,95 @@ namespace XRay.Importer.Tests
             Assert.AreEqual(0.0f, material.GetFloat("_MonolithSourceProfile"));
             Assert.IsFalse(MonolithMaterialConfigurator.ConfigureFloraSource(material, 3.0f, correction));
             Assert.AreEqual(0.0f, material.GetFloat("_MonolithFloraSource"));
+        }
+
+        [TestCase(false)]
+        [TestCase(true)]
+        public void FloraColorVariationRequiresExplicitOptInOnGpu(bool detail)
+        {
+            Material defaults = Own(new Material(Shader.Find(MonolithMaterialConfigurator.SHADER_NAME)));
+            Material material = Own(new Material(Shader.Find("Hidden/XRay/MonolithFloraValidation")));
+            Texture2D texture = Own(new Texture2D(2, 2, TextureFormat.RGBAFloat, false, true));
+            var color = new Color(0.24f, 0.37f, 0.12f, 1.0f);
+            texture.SetPixels(new[] { color, color, color, color });
+            texture.Apply();
+            material.SetTexture("_Base", texture);
+            material.SetVector("_Uv", new Vector4(1.0f, 1.0f, 0.0f, 0.0f));
+            Vector4 variation = defaults.GetVector("_MonolithFloraVariation");
+            variation.z = detail ? variation.x : 0.2f;
+            string outputFolder = detail ? "GPU_ColorVariation_Grass" : "GPU_ColorVariation_Trees";
+            foreach (float phase in new[] { 0.0f, 0.27f, 0.61f, 0.98f })
+            {
+                material.SetVector("_Extra", new Vector4(phase, 0.0f, 0.0f, 0.0f));
+                material.SetFloat("_Stage", 22.0f);
+                material.SetFloat("_VariationEnabled", defaults.GetFloat("_MonolithFloraVariationEnabled"));
+                material.SetVector("_Variation", variation);
+                Color[] disabled = Render(material, outputFolder);
+                material.SetVector("_Variation", Vector4.zero);
+                Color[] neutral = Render(material, outputFolder);
+                material.SetVector("_Variation", variation);
+                material.SetFloat("_VariationEnabled", 1.0f);
+                Color[] enabled = Render(material, outputFolder);
+                material.SetFloat("_Stage", 1.0f);
+                Color[] legacy = Render(material, outputFolder);
+                float changed = 0.0f;
+                for (int pixel = 0; pixel < disabled.Length; pixel++)
+                {
+                    for (int channel = 0; channel < 3; channel++)
+                    {
+                        Assert.That(disabled[pixel][channel], Is.EqualTo(neutral[pixel][channel]).Within(0.000001f));
+                        Assert.That(disabled[pixel][channel], Is.EqualTo(color[channel]).Within(0.000001f));
+                        Assert.That(enabled[pixel][channel], Is.EqualTo(legacy[pixel][channel]).Within(0.000001f));
+                        changed = Mathf.Max(changed, Mathf.Abs(enabled[pixel][channel] - disabled[pixel][channel]));
+                    }
+                }
+                Assert.Greater(changed, 0.001f);
+            }
+        }
+
+        [TestCase(false)]
+        [TestCase(true)]
+        public void VerifiedFloraBindingsKeepColorVariationExplicit(bool detail)
+        {
+            Material material = Own(new Material(Shader.Find(MonolithMaterialConfigurator.SHADER_NAME)));
+            Texture2D bump = Own(new Texture2D(2, 2, TextureFormat.RGBA32, false, true));
+            MonolithMaterialConfigurator.Configure(material, null, null, bump, null, true);
+            material.EnableKeyword(detail ? "_MONOLITH_LEVEL_DETAIL" : "_MONOLITH_LEVEL_FLORA");
+            var request = new XRayLevelMaterialRequest { Detail = detail, RuntimeDetail = detail, Surface = new XRayLevelSurface { Flora = !detail, Kind = XRayLevelSurfaceKind.AlphaTest } };
+            XRayLevelBindingPlan plan = XRayFloraMaterialBindings.Plan(material, request, XRayFloraImportMode.EnableVerifiedAnomaly, XRayFloraSourceProfile.AnomalySss, true);
+            XRayFloraMaterialBindings.Apply(material, plan, XRayFloraSourceBinding.ANOMALY_CONTRACT_HASH);
+            Assert.AreEqual(1.0f, material.GetFloat(detail ? "_MonolithGrassSource" : "_MonolithFloraSource"));
+            Assert.AreEqual(0.0f, material.GetFloat("_MonolithFloraVariationEnabled"));
+            material.SetFloat("_MonolithFloraVariationEnabled", 1.0f);
+            plan = XRayFloraMaterialBindings.Plan(material, request, XRayFloraImportMode.EnableVerifiedAnomaly, XRayFloraSourceProfile.AnomalySss, false);
+            XRayFloraMaterialBindings.Apply(material, plan, XRayFloraSourceBinding.ANOMALY_CONTRACT_HASH);
+            Assert.AreEqual(1.0f, material.GetFloat("_MonolithFloraVariationEnabled"));
+        }
+
+        [Test]
+        [Category("ImportedLevelIntegration")]
+        public void SavedAnomalyFloraAndGrassDoNotEnableColorVariation()
+        {
+            int leaves = 0;
+            int grass = 0;
+            var rows = new StringBuilder("Material,Detail,Variation,Enabled\n");
+            foreach (string guid in AssetDatabase.FindAssets("t:Material", new[] { ANOMALY_ROOT + "/Materials" }))
+            {
+                string path = AssetDatabase.GUIDToAssetPath(guid);
+                Material material = AssetDatabase.LoadAssetAtPath<Material>(path);
+                if (material == null || material.shader.name != MonolithMaterialConfigurator.SHADER_NAME) continue;
+                bool detail = material.IsKeywordEnabled("_MONOLITH_LEVEL_DETAIL") && material.GetFloat("_MonolithGrassSource") == 1.0f;
+                bool leaf = material.IsKeywordEnabled("_MONOLITH_LEVEL_FLORA") && material.GetFloat("_MonolithFloraSource") == 1.0f;
+                if (!detail && !leaf) continue;
+                Assert.AreEqual(0.0f, material.GetFloat("_MonolithFloraVariationEnabled"), path);
+                Assert.AreEqual(new Vector4(0.025f, 0.1f, 0.025f, 0.05f), material.GetVector("_MonolithFloraVariation"), path);
+                if (detail) grass++;
+                if (leaf) leaves++;
+                rows.AppendLine(path + "," + detail + ",\"" + material.GetVector("_MonolithFloraVariation") + "\"," + material.GetFloat("_MonolithFloraVariationEnabled"));
+            }
+            Assert.Greater(leaves, 0);
+            Assert.Greater(grass, 0);
+            File.WriteAllText(Path.Combine(Output(), "Flora_Color_Variation.csv"), rows.ToString());
         }
 
         [Test]
@@ -516,7 +607,7 @@ namespace XRay.Importer.Tests
             return texture;
         }
 
-        private Color[] Render(Material material)
+        private Color[] Render(Material material, string outputFolder = "GPU_Numeric")
         {
             RenderTexture previous = RenderTexture.active;
             RenderTexture target = RenderTexture.GetTemporary(SIZE, SIZE, 0, RenderTextureFormat.ARGBFloat, RenderTextureReadWrite.Linear);
@@ -528,7 +619,7 @@ namespace XRay.Importer.Tests
                 readback.ReadPixels(new Rect(0, 0, SIZE, SIZE), 0, 0);
                 readback.Apply();
                 Color[] pixels = readback.GetPixels();
-                string folder = Path.Combine(Output(), "GPU_Numeric");
+                string folder = Path.Combine(Output(), outputFolder);
                 Directory.CreateDirectory(folder);
                 string path = Path.Combine(folder, (_readbacks++).ToString("D5") + "_" + material.shader.name.Substring(material.shader.name.LastIndexOf('/') + 1) + "_S" + material.GetFloat("_Stage") + ".rgba32f");
                 using (var writer = new BinaryWriter(File.Open(path, FileMode.CreateNew)))

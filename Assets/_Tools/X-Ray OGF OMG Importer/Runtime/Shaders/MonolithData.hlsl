@@ -272,7 +272,7 @@ void GetSurfaceAndBuiltinData(FragInputs input, float3 V, inout PositionInputs p
     {
         clip(MonolithInstanceExtra().w - MonolithAnomalyGrassDither(posInput.positionSS));
         float variation = input.texCoord1.x;
-        encodedAlbedo = MonolithFloraUnorm8(MonolithFloraColorVariation(encodedAlbedo, variation, _MonolithFloraVariation.x));
+        encodedAlbedo = MonolithFloraUnorm8(MonolithFloraOptionalColorVariation(encodedAlbedo, variation, _MonolithFloraVariation.x, _MonolithFloraVariationEnabled));
     }
     #endif
     #ifdef _MONOLITH_LEVEL_FLORA
@@ -283,7 +283,7 @@ void GetSurfaceAndBuiltinData(FragInputs input, float3 V, inout PositionInputs p
     {
         float4x4 floraObjectToWorld = GetObjectToWorldMatrix();
         floraVariation = MonolithAnomalyTreeVariation(GetAbsolutePositionWS(floraObjectToWorld._m03_m13_m23), floraObjectToWorld._m00, _MonolithFloraVariation.w);
-        encodedAlbedo = MonolithFloraColorVariation(encodedAlbedo, floraVariation, _MonolithFloraVariation.z);
+        encodedAlbedo = MonolithFloraOptionalColorVariation(encodedAlbedo, floraVariation, _MonolithFloraVariation.z, _MonolithFloraVariationEnabled);
     }
     if (floraSource > 0.5) encodedAlbedo = MonolithFloraUnorm8(encodedAlbedo);
     #endif

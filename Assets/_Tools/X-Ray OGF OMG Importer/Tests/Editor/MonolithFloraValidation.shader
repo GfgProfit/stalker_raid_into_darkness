@@ -31,6 +31,7 @@ Shader "Hidden/XRay/MonolithFloraValidation"
             float4 _Fixes1;
             float4 _Fixes2;
             float4 _Variation;
+            float _VariationEnabled;
             float4 _Extra;
             float4x4 _Xform;
             float4 _Vertex;
@@ -76,6 +77,7 @@ Shader "Hidden/XRay/MonolithFloraValidation"
                 float4 bump = _Bump.Sample(sampler_Base, tc);
                 float4 correction = _BumpX.Sample(sampler_Base, tc);
                 float wetness = _Rain.y;
+                if (_Stage > 21.5) return float4(MonolithFloraOptionalColorVariation(base.rgb, _Extra.x, _Variation.z, _VariationEnabled), base.a);
                 if (_Stage < 0.5) return float4(MonolithAnomalyFloraNormal(bump, wetness), MonolithAnomalyFloraGloss(_Fixes1, wetness, false));
                 if (_Stage < 1.5) return float4(MonolithFloraColorVariation(base.rgb, _Extra.x, _Variation.z), base.a - MONOLITH_FLORA_AREF >= 0.0 ? 1.0 : 0.0);
                 if (_Stage < 2.5) return float4(MonolithFloraMaterial(), MonolithFloraPackedHemisphere(_Position.w), 0.15, _Position.w);

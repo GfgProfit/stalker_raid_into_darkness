@@ -45,6 +45,7 @@ Shader "HDRP/MonolithLit"
         _MonolithWindWavesFlipV("Wind Waves Require V Flip", Float) = 0
         _MonolithFloraWetness("Flora rain_params.y (Explicit Wetness)", Range(0,1)) = 0
         _MonolithFloraFixes1("ssfx_florafixes_1", Vector) = (0.3,0.38,0.5,0.55)
+        [Toggle] _MonolithFloraVariationEnabled("Flora Color Variation (Explicit)", Float) = 0
         _MonolithFloraVariation("ssfx_floravariation", Vector) = (0.025,0.1,0.025,0.05)
         _MonolithSourceDetail("Source Detail (Profile 1): 0 Off 1 USE_TDETAIL 2 USE_TDETAIL_BUMP", Float) = 0
         _MonolithSourceParallax("Source Parallax (Profile 1): 0 Off 1 USE_PARALLAX 2 USE_STEEPPARALLAX", Float) = 0

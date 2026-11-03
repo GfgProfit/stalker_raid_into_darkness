@@ -178,6 +178,7 @@ float _MonolithFloraWindPart;
 float _MonolithWindWavesFlipV;
 float _MonolithFloraWetness;
 float4 _MonolithFloraFixes1;
+float _MonolithFloraVariationEnabled;
 float4 _MonolithFloraVariation;
 float _MonolithSourceDetail;
 float _MonolithSourceParallax;

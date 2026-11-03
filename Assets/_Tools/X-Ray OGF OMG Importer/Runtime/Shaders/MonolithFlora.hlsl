@@ -91,6 +91,11 @@ float3 MonolithFloraColorVariation(float3 color, float variation, float intensit
     return saturate(color + sin(variation * 4.0 + float3(0.0, 0.33, 0.66) * 6.28) * 0.5 * intensity);
 }
 
+float3 MonolithFloraOptionalColorVariation(float3 color, float variation, float intensity, float enabled)
+{
+    return MonolithFloraColorVariation(color, variation, enabled > 0.5 ? intensity : 0.0);
+}
+
 float MonolithFloraTreeHemisphere(float raw, float scale, float bias)
 {
     return clamp(raw * scale + bias, 0.3, 1.0);

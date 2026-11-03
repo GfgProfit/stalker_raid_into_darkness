@@ -238,7 +238,7 @@ namespace XRay.Importer.Tests
                     Color[] gameColorPixels = ReadPairedFloat(gameColor.rt, Path.Combine(output, "Game_AOV_Color"));
                     Color[] gameOutputPixels = ReadPairedFloat(gameOutput.rt, Path.Combine(output, "Game_AOV_Output"));
                     Color[] gameFinal = ReadPairedFloat(gameCamera.targetTexture, Path.Combine(output, "Game_Final_Target"));
-                    yield return native.CaptureVisibleWindow(Path.Combine(output, "Native_Visible_Window"));
+                    yield return native.CaptureVisibleWindow(Path.Combine(output, "Native_Visible_Window"), nativeOutput);
                     WritePairedCameraState(gameCamera, Path.Combine(output, "Game_Matched_State.txt"));
                     WritePairedCameraState(sceneCamera, Path.Combine(output, "Native_Matched_State.txt"));
                     lights.WriteGame(Path.Combine(output, "Game_Final_DiagnosticCameraCull.txt"));
@@ -259,7 +259,7 @@ namespace XRay.Importer.Tests
                     string metrics = "comparison,max_rgb_delta,mean_abs_rgb_delta\n" + PairedDifference("GameAOVColor_NativeAOVColor", gameColorPixels, nativeColor) + PairedDifference("GameAOVOutput_NativeAOVOutput", gameOutputPixels, nativeOutput) + PairedDifference("GameFinalTarget_GameAOVOutput", gameFinal, gameOutputPixels) + PairedDifference("GameFinalWithoutAOV_GameFinalWithAOV", gameWithoutAov, gameFinal) + PairedDifference("GameOriginal_GamePoseOnly", gameOriginal, gamePoseOnly) + PairedDifference("GamePoseOnly_GameAllowHDROnly", gamePoseOnly, gameHdrOnly) + PairedDifference("GamePoseOnly_GameBloomOnly", gamePoseOnly, gameBloomOnly) + PairedDifference("GamePoseOnly_GameVisibilityOnly", gamePoseOnly, gameVisibilityOnly) + PairedDifference("GamePoseOnly_GameMatchedWithoutAOV", gamePoseOnly, gameWithoutAov) + PairedDifference("GameSceneOnlyBaseline_ControlledMaxMaskLeak", gameWithoutAov, gameControlledLeak) + PairedDifference("GameSceneOnlyBaseline_RestoredSceneOnly", gameWithoutAov, gameRestored);
                     File.WriteAllText(Path.Combine(output, "Stage_Comparison.csv"), metrics);
                     File.WriteAllText(Path.Combine(output, "Scene_Isolation_Contract.txt"), "FixtureScene=" + fixture.Scene.path + "#" + fixture.Scene.handle + "\nFixtureSceneMask=" + isolatedSceneMask + "\nControlledLeakChangesOnly=Game.overrideSceneCullingMask to ulong.MaxValue\nBaselineLeakRestoredCameraCullingMask=" + gameCamera.cullingMask + "\nBaselineLeakRestoredVolumeMask=" + gameData.volumeLayerMask.value + "\nCullMetadata=DiagnosticCameraCull via beginCameraRendering before HDRP actual Cull; not a GPU binding list\nHostLightPresenceInLeak=recorded, not required in a clean host\n");
-                    File.WriteAllText(Path.Combine(output, "Contract.txt"), "Profile=w_clear1\nGameSeconds=" + Num(seconds) + "\nFrozenWind=" + wind.ToString("F8") + "\nSourceLight=" + controller.SourceLightColor.ToString("F8") + "\nSunLux=3 (unchanged diagnostic)\nSourceSunlightScale=" + profile.SunLightScale.ToString("F8") + "\nActualGameExposureMode=" + gameExposure.mode.value + "\nActualGameEV100=" + Num(gameExposure.fixedExposure.value) + "\nActualNativeExposureMode=" + nativeExposure.mode.value + "\nActualNativeEV100=" + Num(nativeExposure.fixedExposure.value) + "\nGameAllowHDR=" + gameCamera.allowHDR + "\nNativeAllowHDR=" + sceneCamera.allowHDR + "\nGameVolumeMask=" + gameData.volumeLayerMask.value + "\nNativeVolumeMask=" + native.Data.volumeLayerMask.value + "\nGameTargetFormat=" + gameCamera.targetTexture.graphicsFormat + "\nGameAOVColorFormat=" + gameColor.rt.graphicsFormat + "\nGameAOVOutputFormat=" + gameOutput.rt.graphicsFormat + "\nNativeAOVColorFormat=" + native.ColorTexture.graphicsFormat + "\nNativeAOVOutputFormat=" + native.OutputTexture.graphicsFormat + "\nOverrideInternalAOVRenderFormat=true on both requests\nGameView=" + gameCamera.worldToCameraMatrix.ToString("F8") + "\nNativeView=" + sceneCamera.worldToCameraMatrix.ToString("F8") + "\nGameProjection=" + gameCamera.projectionMatrix.ToString("F8") + "\nNativeProjection=" + sceneCamera.projectionMatrix.ToString("F8") + "\nRawFiles=Float32 EXR\nGammaSDRPNG=componentwise Color.gamma then RGBA32 encoding; values above display white cannot be represented\nSurfaceAboveDisplayWhite is not proof of clipping in raw HDR\nAOVColor=before postprocess\nAOVOutput=postprocess destination before final target blit\nGameFinalTarget=after final target blit\nNativeVisibleWindow=exact task-owned EditorWindow backbuffer via CaptureEditorWindow; direct RGB24 PNG without manual gamma\nPixelParityAssertion=not imposed; measured matched-stage deltas are evidence\n");
+                    File.WriteAllText(Path.Combine(output, "Contract.txt"), "Profile=w_clear1\nGameSeconds=" + Num(seconds) + "\nFrozenWind=" + wind.ToString("F8") + "\nSourceLight=" + controller.SourceLightColor.ToString("F8") + "\nSunLux=3 (unchanged diagnostic)\nSourceSunlightScale=" + profile.SunLightScale.ToString("F8") + "\nActualGameExposureMode=" + gameExposure.mode.value + "\nActualGameEV100=" + Num(gameExposure.fixedExposure.value) + "\nActualNativeExposureMode=" + nativeExposure.mode.value + "\nActualNativeEV100=" + Num(nativeExposure.fixedExposure.value) + "\nGameAllowHDR=" + gameCamera.allowHDR + "\nNativeAllowHDR=" + sceneCamera.allowHDR + "\nGameVolumeMask=" + gameData.volumeLayerMask.value + "\nNativeVolumeMask=" + native.Data.volumeLayerMask.value + "\nGameTargetFormat=" + gameCamera.targetTexture.graphicsFormat + "\nGameAOVColorFormat=" + gameColor.rt.graphicsFormat + "\nGameAOVOutputFormat=" + gameOutput.rt.graphicsFormat + "\nNativeAOVColorFormat=" + native.ColorTexture.graphicsFormat + "\nNativeAOVOutputFormat=" + native.OutputTexture.graphicsFormat + "\nOverrideInternalAOVRenderFormat=true on both requests\nGameView=" + gameCamera.worldToCameraMatrix.ToString("F8") + "\nNativeView=" + sceneCamera.worldToCameraMatrix.ToString("F8") + "\nGameProjection=" + gameCamera.projectionMatrix.ToString("F8") + "\nNativeProjection=" + sceneCamera.projectionMatrix.ToString("F8") + "\nRawCameraFiles=linear Float32 EXR\nCameraGammaSDRPNG=componentwise Color.gamma then RGBA32 encoding; values above display white cannot be represented\nSurfaceAboveDisplayWhite is not proof of clipping in raw HDR\nAOVColor=before postprocess\nAOVOutput=postprocess destination before final target blit\nGameFinalTarget=after final target blit\nNativeVisibleWindow=exact task-owned EditorWindow backbuffer via CaptureEditorWindow into non-sRGB UNorm target; display-encoded direct RGB24 PNG without manual gamma\nNativeWindowReference=raw-linear Native_AOV_Output.exr and once-gamma AOV central448 display PNG\nNativeWindowDisplayAssertion=UI-free central448 RGB max delta within 2/255 of own AOV display reference\nCrossAPIPixelParityAssertion=not imposed; measured matched-stage deltas are evidence\n");
                     Assert.AreEqual(seconds, controller.GameTimeSeconds);
                     Assert.AreEqual(wind, fixture.Wind.State.Anim);
                     Assert.AreEqual(ticks, fixture.Wind.State.Ticks);
@@ -651,14 +651,20 @@ namespace XRay.Importer.Tests
                 Assert.AreEqual(SIZE, _camera.pixelHeight);
             }
 
-            public IEnumerator CaptureVisibleWindow(string stem)
+            public IEnumerator CaptureVisibleWindow(string stem, Color[] linearReference)
             {
+                const int COMPARISON_MARGIN = 96;
+                const int COMPARISON_SIZE = SIZE - COMPARISON_MARGIN * 2;
+
                 EditorWindow previousWindow = EditorWindow.focusedWindow;
                 RenderTexture previousTarget = RenderTexture.active;
+                bool previousSrgbWrite = GL.sRGBWrite;
                 RenderTexture target = null;
                 Texture2D image = null;
                 try
                 {
+                    Assert.IsNotNull(linearReference);
+                    Assert.AreEqual(SIZE * SIZE, linearReference.Length);
                     _view.Focus();
                     _view.Repaint();
                     for (int frame = 0; frame < 3; frame++)
@@ -674,9 +680,27 @@ namespace XRay.Importer.Tests
                     float scale = EditorGUIUtility.pixelsPerPoint;
                     int width = Mathf.RoundToInt(position.width * scale);
                     int height = Mathf.RoundToInt(position.height * scale);
-                    target = new RenderTexture(width, height, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.Default);
+                    var viewportProperty = typeof(SceneView).GetProperty("cameraViewVisualElement", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+                    Assert.IsNotNull(viewportProperty);
+                    var viewportElement = (UnityEngine.UIElements.VisualElement)viewportProperty.GetValue(_view);
+                    Rect viewportBounds = viewportElement.worldBound;
+                    int viewportX = Mathf.RoundToInt(viewportBounds.x * scale);
+                    int viewportY = height - Mathf.RoundToInt(viewportBounds.yMax * scale);
+                    Assert.AreEqual(SIZE, Mathf.RoundToInt(viewportBounds.width * scale));
+                    Assert.AreEqual(SIZE, Mathf.RoundToInt(viewportBounds.height * scale));
+                    Assert.GreaterOrEqual(viewportX, 0);
+                    Assert.GreaterOrEqual(viewportY, 0);
+                    Assert.LessOrEqual(viewportX + SIZE, width);
+                    Assert.LessOrEqual(viewportY + SIZE, height);
+                    target = new RenderTexture(width, height, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.Linear);
                     Assert.IsTrue(target.Create());
-                    Assert.IsTrue(UnityEditorInternal.InternalEditorUtility.CaptureEditorWindow(_view, target), "The exact task-owned Scene View backbuffer must be available; desktop readback is not a fallback.");
+                    Assert.AreEqual(GraphicsFormat.R8G8B8A8_UNorm, target.graphicsFormat);
+                    Assert.IsFalse(target.sRGB);
+                    GL.sRGBWrite = false;
+                    bool beforeCapture = GL.sRGBWrite;
+                    bool captured = UnityEditorInternal.InternalEditorUtility.CaptureEditorWindow(_view, target);
+                    bool afterCapture = GL.sRGBWrite;
+                    Assert.IsTrue(captured, "The exact task-owned Scene View backbuffer must be available; desktop readback is not a fallback.");
                     Assert.IsTrue(_view.hasFocus);
                     Assert.AreSame(_view, EditorWindow.focusedWindow);
                     RenderTexture.active = target;
@@ -686,7 +710,32 @@ namespace XRay.Importer.Tests
                     Color[] colors = image.GetPixels();
                     Assert.AreEqual(width * height, colors.Length);
                     File.WriteAllBytes(stem + ".png", image.EncodeToPNG());
-                    File.WriteAllText(stem + ".txt", "Capture=UnityEditorInternal.InternalEditorUtility.CaptureEditorWindow of exact task-owned window object backbuffer\nWindowEntityId=" + _view.GetEntityId().ToString() + "\nWindowType=" + _view.GetType().FullName + "\nWindowTitle=" + _view.titleContent.text + "\nHasFocusAtRead=" + _view.hasFocus + "\nExactFocusedWindowAtRead=" + (EditorWindow.focusedWindow == _view) + "\nWindowRect=" + position + "\nPixelsPerPoint=" + scale + "\nReadback=" + width + "x" + height + "\nTargetGraphicsFormat=" + target.graphicsFormat + "\nTargetSRGB=" + target.sRGB + "\nActiveColorSpace=" + QualitySettings.activeColorSpace + "\nSDREncoding=CaptureEditorWindow blit into ARGB32 Default target then direct RGB24 ReadPixels and PNG\nManualGamma=false\nIncludesEditorWindowUI=true\nDesktopRectangleReadback=false\nDesktopForegroundClaim=false\n");
+                    var capturedRegion = new Color[COMPARISON_SIZE * COMPARISON_SIZE];
+                    var referenceRegion = new Color[capturedRegion.Length];
+                    float maxDifference = 0.0f;
+                    double sumDifference = 0.0;
+                    for (int y = 0; y < COMPARISON_SIZE; y++)
+                    {
+                        for (int x = 0; x < COMPARISON_SIZE; x++)
+                        {
+                            int index = y * COMPARISON_SIZE + x;
+                            Color actual = colors[(viewportY + y + COMPARISON_MARGIN) * width + viewportX + x + COMPARISON_MARGIN];
+                            Color reference = linearReference[(y + COMPARISON_MARGIN) * SIZE + x + COMPARISON_MARGIN].gamma;
+                            capturedRegion[index] = actual;
+                            referenceRegion[index] = reference;
+                            float red = Mathf.Abs(actual.r - reference.r);
+                            float green = Mathf.Abs(actual.g - reference.g);
+                            float blue = Mathf.Abs(actual.b - reference.b);
+                            maxDifference = Mathf.Max(maxDifference, Mathf.Max(red, Mathf.Max(green, blue)));
+                            sumDifference += red + green + blue;
+                        }
+                    }
+                    double meanDifference = sumDifference / (capturedRegion.Length * 3.0);
+                    WriteWindowPng(stem + "_Central448_Display.png", capturedRegion, COMPARISON_SIZE, COMPARISON_SIZE);
+                    WriteWindowPng(stem + "_AOV_Central448_Display.png", referenceRegion, COMPARISON_SIZE, COMPARISON_SIZE);
+                    File.WriteAllText(stem + "_Color_Stage_Comparison.csv", "comparison,max_rgb_delta,mean_abs_rgb_delta\nWindowCentral448_NativeAOVOutputDisplay," + Num(maxDifference) + "," + Num(meanDifference) + "\n");
+                    File.WriteAllText(stem + ".txt", "Capture=UnityEditorInternal.InternalEditorUtility.CaptureEditorWindow of exact task-owned window object backbuffer\nCaptureSucceeded=" + captured + "\nWindowEntityId=" + _view.GetEntityId().ToString() + "\nWindowType=" + _view.GetType().FullName + "\nWindowTitle=" + _view.titleContent.text + "\nHasFocusAtRead=" + _view.hasFocus + "\nExactFocusedWindowAtRead=" + (EditorWindow.focusedWindow == _view) + "\nWindowRect=" + position + "\nPixelsPerPoint=" + scale + "\nReadback=" + width + "x" + height + "\nViewportBoundsInWindow=" + viewportBounds + "\nViewportReadback=" + viewportX + "," + viewportY + "," + SIZE + "," + SIZE + "\nCentralComparison=96,96,448,448 within camera viewport; toolbar, gizmo and bottom overlay excluded\nTargetGraphicsFormat=" + target.graphicsFormat + "\nTargetSRGB=" + target.sRGB + "\nActiveColorSpace=" + QualitySettings.activeColorSpace + "\nAPI=" + SystemInfo.graphicsDeviceType + "\nSRGBWriteBeforeCapture=" + beforeCapture + "\nSRGBWriteAfterCapture=" + afterCapture + "\nSDREncoding=Display-encoded backbuffer RGB transported through a non-sRGB UNorm target then direct RGB24 ReadPixels and PNG\nWindowRGBIsLinearHDR=false\nRawLinearReference=Native_AOV_Output.exr; full Float32 HDRP AOV postprocess destination\nDisplayReference=Color.gamma applied once to the already captured Native AOV Output for comparison\nMaxDisplayRGBDelta=" + Num(maxDifference) + "\nMeanDisplayRGBDelta=" + Num(meanDifference) + "\nMaxDisplayRGBDeltaTolerance=" + Num(2.0f / 255.0f) + "\nManualGamma=false for window image\nIncludesEditorWindowUI=true for full window PNG; false for central display PNGs\nDesktopRectangleReadback=false\nDesktopForegroundClaim=false\n");
+                    Assert.LessOrEqual(maxDifference, 2.0f / 255.0f, "The UI-free owned-window display RGB must match once-sRGB Native AOV Output within two 8-bit quantization steps.");
                 }
                 finally
                 {
@@ -698,6 +747,22 @@ namespace XRay.Importer.Tests
                         Object.DestroyImmediate(target);
                     }
                     if (previousWindow != null && previousWindow != _view) previousWindow.Focus();
+                    GL.sRGBWrite = previousSrgbWrite;
+                }
+            }
+
+            private static void WriteWindowPng(string path, Color[] colors, int width, int height)
+            {
+                var image = new Texture2D(width, height, TextureFormat.RGBA32, false, true);
+                try
+                {
+                    image.SetPixels(colors);
+                    image.Apply();
+                    File.WriteAllBytes(path, image.EncodeToPNG());
+                }
+                finally
+                {
+                    Object.DestroyImmediate(image);
                 }
             }
 

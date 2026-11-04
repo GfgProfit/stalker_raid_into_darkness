@@ -452,7 +452,8 @@ namespace XRay.Importer.Levels
                 return;
             }
             _ownedWeather.SetWeatherNightAmbient(this, _ownedSky != null ? XRayWeatherSkyPass.GetNightRadiance(_ownedSky.Settings) : Vector3.zero);
-            PublishCelestial(deltaSeconds, resetPrevious && resetCelestial);
+            bool transitionCompletedWithoutGameTime = IsTransitioning && _transitionElapsed >= _transitionDuration && _simulationTimeScale == 0.0f;
+            PublishCelestial(deltaSeconds, resetPrevious && resetCelestial || transitionCompletedWithoutGameTime);
             _rebaseWind = false;
             Diagnostic = ActiveProfile.HasSsfxWindTrees ? diagnostic : "INPUT BLOCKED: imported ssfx_wind_trees are unavailable; wind uses the provider's authored diagnostic tree settings.";
             if (!ActiveProfile.HasSunLightScale) Diagnostic = "INPUT BLOCKED: saved source sunlight scale is unavailable; descriptor RGB remains an explicit diagnostic light input.";

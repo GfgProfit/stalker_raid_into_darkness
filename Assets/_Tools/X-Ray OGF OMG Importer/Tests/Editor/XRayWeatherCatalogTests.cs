@@ -184,6 +184,61 @@ namespace XRay.Importer.Tests
             }
         }
 
+        [TestCase("w_rain1", "w_storm1", "storm_sunrise1", "", false)]
+        [TestCase("w_rain1", "w_storm1", "storm_sunrise1", "", true)]
+        [TestCase("w_clear1", "w_cloudy2_dark", "sunset_sunrise_small", "sunset_sunrise_small_cloud", false)]
+        [TestCase("w_clear1", "w_cloudy2_dark", "sunset_sunrise_small", "sunset_sunrise_small_cloud", true)]
+        public void StationaryClockTransitionCompletesWithTheTargetRendererDefinition(string from, string to, string sourceFlare, string targetFlare, bool singleTick)
+        {
+            const double NOON = 43200.0;
+            const float DURATION = 0.25f;
+            XRayWeatherCatalog catalog = Catalog();
+            XRayWeatherProfile first = Find(catalog, from);
+            XRayWeatherProfile second = Find(catalog, to);
+            var root = new GameObject("Weather flare transition regression");
+            try
+            {
+                XRayWeatherController controller = XRayLevelSceneBuilder.ConfigureWeather(root, first);
+                controller.ConfigureCatalog(catalog);
+                Assert.IsTrue(controller.BeginPreview(NOON, first), controller.Diagnostic);
+                controller.SetCelestialEffectOverrides(true, true);
+                controller.SetPaused(false);
+                controller.SetTimeScale(0.0f);
+                Assert.IsNotNull(controller.Celestial);
+                Assert.AreEqual(sourceFlare, controller.Celestial.FlareDefinition?.Name);
+                Assert.AreEqual(1.0f, controller.Celestial.FlareFade);
+                Assert.IsTrue(controller.TransitionTo(second, DURATION), controller.Diagnostic);
+                float elapsed = singleTick ? 0.0f : DURATION * 0.375f;
+                if (elapsed > 0.0f) controller.TickPreview(elapsed);
+                controller.SetPaused(true);
+                XRayWeatherFlareDefinition beforePause = controller.Celestial.FlareDefinition;
+                float weightBeforePause = controller.Celestial.FlareFade;
+                float progressBeforePause = controller.TransitionProgress;
+                controller.TickPreview(5.0f);
+                Assert.AreEqual(NOON, controller.GameTimeSeconds);
+                Assert.AreEqual(progressBeforePause, controller.TransitionProgress);
+                Assert.AreSame(beforePause, controller.Celestial.FlareDefinition);
+                Assert.AreEqual(weightBeforePause, controller.Celestial.FlareFade);
+                controller.SetPaused(false);
+                if (!singleTick)
+                {
+                    controller.TickPreview(DURATION * 0.25f);
+                    elapsed += DURATION * 0.25f;
+                }
+                controller.TickPreview(DURATION - elapsed);
+                Assert.IsFalse(controller.IsTransitioning);
+                Assert.AreSame(second, controller.ActiveProfile);
+                Assert.AreEqual(targetFlare, controller.Snapshot.SunDefinition);
+                Assert.AreEqual(string.IsNullOrEmpty(targetFlare) ? null : targetFlare, controller.Celestial.FlareDefinition?.Name);
+                Assert.AreEqual(string.IsNullOrEmpty(targetFlare) ? 0.0f : 1.0f, controller.Celestial.FlareFade);
+                Assert.AreEqual(NOON, controller.GameTimeSeconds);
+            }
+            finally
+            {
+                Object.DestroyImmediate(root);
+            }
+        }
+
         private static XRayWeatherCatalog Catalog()
         {
             XRayWeatherCatalog catalog = null;

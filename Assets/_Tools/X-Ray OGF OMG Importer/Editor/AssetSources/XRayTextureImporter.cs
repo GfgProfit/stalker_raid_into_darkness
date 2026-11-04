@@ -288,6 +288,11 @@ namespace XRay.Importer.Editor
             return new XRayTextureAssetResult { AssetPath = assetPath, Status = existing != null ? XRayResourceStatus.Updated : XRayResourceStatus.Imported, Format = header.Description, Note = sampler != null && sampler.Overrides.Count > 0 ? note + " " + sampler.Note : note };
         }
 
+        internal string WeatherKey(string virtualPath, byte[] source)
+        {
+            return virtualPath + "#weather-unorm" + ContentQualifier(source);
+        }
+
         public XRayTextureAssetResult ImportWeather(XRayResolvedFile file, string folder, bool cubemap)
         {
             if (file == null || !file.IsResolved) return new XRayTextureAssetResult { Status = XRayResourceStatus.Missing };
@@ -323,7 +328,7 @@ namespace XRay.Importer.Editor
                 if (!header.IsBlockCompressed) levels = ReadUncompressedWeatherLevels(source, header);
                 else if (!DdsMipChain.TryReadFlipped(source, header, out levels, out string reason)) return new XRayTextureAssetResult { Status = XRayResourceStatus.Unsupported, Format = header.Description, Note = reason };
             }
-            var marker = new XRayAssetMarker(file.VirtualPath + "#weather-unorm" + ContentQualifier(source), XRayTextureRole.Packed.ToString(), file.Winner.SourceName, file.Winner.Location, file.Winner.Stamp);
+            var marker = new XRayAssetMarker(WeatherKey(file.VirtualPath, source), XRayTextureRole.Packed.ToString(), file.Winner.SourceName, file.Winner.Location, file.Winner.Stamp);
             string assetPath = XRayAssetNaming.Place(folder, XRayAssetNaming.CreateCandidates(file.Winner.RelativePath, "_weather"), ".asset", marker.Key, XRayAssetMarker.ReadKey, _claimed);
             Texture existing = AssetDatabase.LoadAssetAtPath<Texture>(assetPath);
             if (existing != null)

@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fbf4346f6d24cef47bd7d899dbd2938f, type: 3}
+  m_Name: OrdinaryWeatherCatalog
+  m_EditorClassIdentifier: XRay.Importer.Runtime::XRay.Importer.Levels.XRayWeatherCatalog
+  _profiles:
+  - {fileID: 11400000, guid: 1969d5810995bf04a9dd1719c8764d90, type: 2}
+  - {fileID: 11400000, guid: 20894904ca2735043bf685e6da89a452, type: 2}
+  - {fileID: 11400000, guid: 1d39756d6ee187247aa130ca5282157b, type: 2}
+  - {fileID: 11400000, guid: 002a65916878519488c3351d59776bfe, type: 2}
+  - {fileID: 11400000, guid: c8c6e0a61e0680d40b0e07d3a1b11f6a, type: 2}
+  - {fileID: 11400000, guid: a9a28605ef672e5499661ad8d3eb26fa, type: 2}
+  - {fileID: 11400000, guid: 3f28d034987918142a1aed4724d73fc7, type: 2}
+  - {fileID: 11400000, guid: 9edb7681ad7e4114abfc7a017bd18c4f, type: 2}
+  - {fileID: 11400000, guid: 11d7ea83403f561498a0a195253539fd, type: 2}
+  - {fileID: 11400000, guid: 213b80bcf33a2644fbe1d681267eb5c4, type: 2}
+  - {fileID: 11400000, guid: c191f4c790cffb44cb8cd686dbe1c982, type: 2}
+  - {fileID: 11400000, guid: c13d8deae4dcaf14480ba3dbac0e4a17, type: 2}
+  - {fileID: 11400000, guid: 8c68ececae598754d87e17f6495eb1c3, type: 2}
+  - {fileID: 11400000, guid: 10d93a2b8a2e39e489ba14cfc907190d, type: 2}
+  - {fileID: 11400000, guid: 7776f42d1b5c8e34bbb52a9ce9d043a9, type: 2}
+  - {fileID: 11400000, guid: 08e71ddbe10e39a4298e2da8f6bbe596, type: 2}
+  - {fileID: 11400000, guid: 2217265a44c9b5c40bee2025b3597f07, type: 2}
+  - {fileID: 11400000, guid: 8b349908c53188542b18e1cace65e5ac, type: 2}
+  - {fileID: 11400000, guid: 2b35187a43b570445b6fe13a85e61b6d, type: 2}
+  - {fileID: 11400000, guid: 1ae2167928184594f9ebe8c22b5c84ee, type: 2}
+  - {fileID: 11400000, guid: db9561540d1efa84ba56a5fed299201a, type: 2}

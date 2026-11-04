@@ -1,0 +1,1652 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3d7f592bb05cd7a4298687c3e33b8d05, type: 3}
+  m_Name: w_partly1
+  m_EditorClassIdentifier: XRay.Importer.Runtime::XRay.Importer.Levels.XRayWeatherProfile
+  _schemaVersion: 1
+  _sourceTarget: Rvm
+  _cycleName: w_partly1
+  _sourceIdentity: "1v2(DX11) (v_12gb) 2.5, \u0412\u0441\u0435 \u0432\u043A\u043B\u044E\u0447\u0435\u043D\u043E (168)|ee2e92fdcede8ad7"
+  _provenance: "schema=1; target=Rvm; public-engine-model=xray-monolith@313a751d; executable equivalence unproven; mode=explicit-cycle\r\nprofile=1v2(DX11) (v_12gb) 2.5, \u0412\u0441\u0435 \u0432\u043A\u043B\u044E\u0447\u0435\u043D\u043E (168); modOrder=ee2e92fdcede8ad7; game=D:\\GRA2.5\\Anomaly 1.5.3 up\r\nD:\\GRA2.5\\MO2\\ModOrganizer.ini|sha256=44e54fd3af0c92b124665066b23d6a3f69a187c8f32dc628f9305511bbf0d6a3\r\nD:\\GRA2.5\\Anomaly 1.5.3 up\\fsgame.ltx|sha256=5750e35aac2a9ad43235c792a047e7542ccd03c8d94ee1566398205af7b83eb1\r\nD:\\GRA2.5\\MO2\\profiles\\1v2(DX11) (v_12gb) 2.5, \u0412\u0441\u0435 \u0432\u043A\u043B\u044E\u0447\u0435\u043D\u043E (168)\\modlist.txt|sha256=56de4669efc1ce1aa41086125081a0ba145d08fcf836b22da51a359470636af5\r\nD:\\GRA2.5\\Anomaly 1.5.3 up\\appdata\\user.ltx|sha256=01232f8af72a4cfa2109d54f925ef739ef615ea7b7a8b1dfc264918a7b8e5282\r\nconfigs/axr_options.ltx|Overwrite|D:\\GRA2.5\\MO2\\overwrite\\gamedata\\configs\\axr_options.ltx|sha256=1c6473a4ab35f901bb4339e0d07ca569f7f679cefab8a54b2583c94e70e6b4ac\r\nscripts/ssfx_001_mcm.script|[\u0428\u0435\u0439\u0434\u0435\u0440\u044B] ScreenSpaceShaders 23.5|D:\\GRA2.5\\MO2\\mods\\[\u0428\u0435\u0439\u0434\u0435\u0440\u044B] ScreenSpaceShaders 23.5\\gamedata\\scripts\\ssfx_001_mcm.script|sha256=1cabb8dfcf6c3a0a3130fa672ff403c463df1d1f96e8a680ad55aa5ca7273836\r\nscripts/level_weathers.script|db/configs/scripts.db0 [Anomaly (game folder)]|D:\\GRA2.5\\Anomaly 1.5.3 up\\db\\configs\\scripts.db0 :: scripts\\level_weathers.script|sha256=860fe1ca0ea658c88882befdba882092ebdb933ffe7fa8f7dddc60f7a771bec5\r\nconfigs/environment/dynamic_weather_graphs.ltx|[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3|D:\\GRA2.5\\MO2\\mods\\[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3\\gamedata\\configs\\environment\\dynamic_weather_graphs.ltx|sha256=f047fcb51c85f9f602df590dfac2aeda2ee65f0d174f23de5c7ff0f48e1836a0\r\nbrightness=slight; verified selected and inherited modifier sections are empty; no color boost\r\nscripts/ssfx_wind.script|[\u0428\u0435\u0439\u0434\u0435\u0440\u044B] ScreenSpaceShaders 23.5|D:\\GRA2.5\\MO2\\mods\\[\u0428\u0435\u0439\u0434\u0435\u0440\u044B] ScreenSpaceShaders 23.5\\gamedata\\scripts\\ssfx_wind.script|sha256=256cb7279f2fb28e7999208ed7e687bd60c9f0b32363015982a7803d36360bad\r\nscripts/ssfx_wetness.script|[\u0428\u0435\u0439\u0434\u0435\u0440\u044B] ScreenSpaceShaders 23.5|D:\\GRA2.5\\MO2\\mods\\[\u0428\u0435\u0439\u0434\u0435\u0440\u044B] ScreenSpaceShaders 23.5\\gamedata\\scripts\\ssfx_wetness.script|sha256=4ec6960c689500e350ae51c436cb575eb6283c4e69827c1cf4064d71cac300ab\r\nscripts/ssfx_florafixes.script|[\u0428\u0435\u0439\u0434\u0435\u0440\u044B] ScreenSpaceShaders 23.5|D:\\GRA2.5\\MO2\\mods\\[\u0428\u0435\u0439\u0434\u0435\u0440\u044B] ScreenSpaceShaders 23.5\\gamedata\\scripts\\ssfx_florafixes.script|sha256=08e723c06f23a6bbb95b39c793cc9cc19b6d818d83c30a5bfe91bcfd1c8013bd\r\nsettings=saved user/MCM agreement with hash-verified writers; not a live-game sample; no Lua execution\r\nconfigs/environment/weathers/w_partly1.ltx|[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3|D:\\GRA2.5\\MO2\\mods\\[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3\\gamedata\\configs\\environment\\weathers\\w_partly1.ltx|sha256=a169d7b6d5ab13731ab581112a271559c522aa4b1774e59521b865a252308a89\r\nconfigs/environment/sun_positions.ltx|[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3|D:\\GRA2.5\\MO2\\mods\\[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3\\gamedata\\configs\\environment\\sun_positions.ltx|sha256=4f8efe69872636b220ed3df7dfc79f2df08c0f946046ae1d8b4e5c4bdf766c21\r\ntextures/sky/swtc_clear_alt/23-00.dds|[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3|D:\\GRA2.5\\MO2\\mods\\[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3\\gamedata\\textures\\sky\\swtc_clear_alt\\23-00.dds|sha256=7ad68537d005530f7112f8791f2aed6ac80465a3caf2bc32734005b9d8807db3\r\ntextures/sky/swtc_clear_alt/23-00#small.dds|[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3|D:\\GRA2.5\\MO2\\mods\\[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3\\gamedata\\textures\\sky\\swtc_clear_alt\\23-00#small.dds|sha256=caac44e48cfc6d80e91a87baaffad83149e241321eaabaf10a59afa22a7c0d4b\r\ntextures/sky/swtc_clear_alt/23-00.dds|[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3|D:\\GRA2.5\\MO2\\mods\\[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3\\gamedata\\textures\\sky\\swtc_clear_alt\\23-00.dds|sha256=7ad68537d005530f7112f8791f2aed6ac80465a3caf2bc32734005b9d8807db3\r\ntextures/sky/swtc_clear_alt/23-00#small.dds|[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3|D:\\GRA2.5\\MO2\\mods\\[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3\\gamedata\\textures\\sky\\swtc_clear_alt\\23-00#small.dds|sha256=caac44e48cfc6d80e91a87baaffad83149e241321eaabaf10a59afa22a7c0d4b\r\ntextures/sky/swtc_clear_alt/23-00.dds|[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3|D:\\GRA2.5\\MO2\\mods\\[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3\\gamedata\\textures\\sky\\swtc_clear_alt\\23-00.dds|sha256=7ad68537d005530f7112f8791f2aed6ac80465a3caf2bc32734005b9d8807db3\r\ntextures/sky/swtc_clear_alt/23-00#small.dds|[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3|D:\\GRA2.5\\MO2\\mods\\[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3\\gamedata\\textures\\sky\\swtc_clear_alt\\23-00#small.dds|sha256=caac44e48cfc6d80e91a87baaffad83149e241321eaabaf10a59afa22a7c0d4b\r\ntextures/sky/swtc_clear_alt/23-00.dds|[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3|D:\\GRA2.5\\MO2\\mods\\[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3\\gamedata\\textures\\sky\\swtc_clear_alt\\23-00.dds|sha256=7ad68537d005530f7112f8791f2aed6ac80465a3caf2bc32734005b9d8807db3\r\ntextures/sky/swtc_clear_alt/23-00#small.dds|[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3|D:\\GRA2.5\\MO2\\mods\\[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3\\gamedata\\textures\\sky\\swtc_clear_alt\\23-00#small.dds|sha256=caac44e48cfc6d80e91a87baaffad83149e241321eaabaf10a59afa22a7c0d4b\r\ntextures/sky/swtc_clear_alt/23-00.dds|[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3|D:\\GRA2.5\\MO2\\mods\\[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3\\gamedata\\textures\\sky\\swtc_clear_alt\\23-00.dds|sha256=7ad68537d005530f7112f8791f2aed6ac80465a3caf2bc32734005b9d8807db3\r\ntextures/sky/swtc_clear_alt/23-00#small.dds|[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3|D:\\GRA2.5\\MO2\\mods\\[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3\\gamedata\\textures\\sky\\swtc_clear_alt\\23-00#small.dds|sha256=caac44e48cfc6d80e91a87baaffad83149e241321eaabaf10a59afa22a7c0d4b\r\ntextures/sky/swtc_clear_alt/23-00.dds|[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3|D:\\GRA2.5\\MO2\\mods\\[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3\\gamedata\\textures\\sky\\swtc_clear_alt\\23-00.dds|sha256=7ad68537d005530f7112f8791f2aed6ac80465a3caf2bc32734005b9d8807db3\r\ntextures/sky/swtc_clear_alt/23-00#small.dds|[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3|D:\\GRA2.5\\MO2\\mods\\[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3\\gamedata\\textures\\sky\\swtc_clear_alt\\23-00#small.dds|sha256=caac44e48cfc6d80e91a87baaffad83149e241321eaabaf10a59afa22a7c0d4b\r\ntextures/sky/swtc_clear_alt/05-00.dds|[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3|D:\\GRA2.5\\MO2\\mods\\[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3\\gamedata\\textures\\sky\\swtc_clear_alt\\05-00.dds|sha256=e8dc0378d6beb23dd2435e60071ec0c640eb726c2af56484c2ce59e13244fb4f\r\ntextures/sky/swtc_clear_alt/05-00#small.dds|[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3|D:\\GRA2.5\\MO2\\mods\\[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3\\gamedata\\textures\\sky\\swtc_clear_alt\\05-00#small.dds|sha256=888dd023b8fda9c04d7ec5c1f0b3653daa8ff74369276db785325e71c607c490\r\ntextures/sky/swtc_clear_alt/05-00.dds|[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3|D:\\GRA2.5\\MO2\\mods\\[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3\\gamedata\\textures\\sky\\swtc_clear_alt\\05-00.dds|sha256=e8dc0378d6beb23dd2435e60071ec0c640eb726c2af56484c2ce59e13244fb4f\r\ntextures/sky/swtc_clear_alt/05-00#small.dds|[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3|D:\\GRA2.5\\MO2\\mods\\[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3\\gamedata\\textures\\sky\\swtc_clear_alt\\05-00#small.dds|sha256=888dd023b8fda9c04d7ec5c1f0b3653daa8ff74369276db785325e71c607c490\r\ntextures/sky/swtc_clear_alt/06-00.dds|[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3|D:\\GRA2.5\\MO2\\mods\\[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3\\gamedata\\textures\\sky\\swtc_clear_alt\\06-00.dds|sha256=34bde151326ae385745aaa26dc3d9d4932572d3cfa23134c635a367286ad1527\r\ntextures/sky/swtc_clear_alt/06-00#small.dds|[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3|D:\\GRA2.5\\MO2\\mods\\[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3\\gamedata\\textures\\sky\\swtc_clear_alt\\06-00#small.dds|sha256=7f681611a2e5b9074f7101d84f955b613f8ba145667634143cf3be39579b3be4\r\ntextures/sky/swtc_clear/swtc_etalon_8dx9.dds|[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3|D:\\GRA2.5\\MO2\\mods\\[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3\\gamedata\\textures\\sky\\swtc_clear\\swtc_etalon_8dx9.dds|sha256=5cbd42e498e8df8e54ccf3f3a3248e79e24c705095235b53e269fc3274922096\r\ntextures/sky/swtc_clear/swtc_etalon_8dx9#small.dds|[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3|D:\\GRA2.5\\MO2\\mods\\[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3\\gamedata\\textures\\sky\\swtc_clear\\swtc_etalon_8dx9#small.dds|sha256=82045b546bec107474c276abf1315af6a2306103cc397add3b15358323bb7c4c\r\ntextures/sky/swtc_clear/16-00_1.dds|[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3|D:\\GRA2.5\\MO2\\mods\\[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3\\gamedata\\textures\\sky\\swtc_clear\\16-00_1.dds|sha256=7fec868b9b9e008eb67d54a99c5bff64689b270616d7eca1a1d65029017952d3\r\ntextures/sky/swtc_clear/16-00_1#small.dds|[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3|D:\\GRA2.5\\MO2\\mods\\[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3\\gamedata\\textures\\sky\\swtc_clear\\16-00_1#small.dds|sha256=e1de04a8ef04e2c063e5e6943885a192254679c02f0bfadd7fbf3b9d17dec40b\r\ntextures/sky/swtc_clear/16-00_1.dds|[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3|D:\\GRA2.5\\MO2\\mods\\[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3\\gamedata\\textures\\sky\\swtc_clear\\16-00_1.dds|sha256=7fec868b9b9e008eb67d54a99c5bff64689b270616d7eca1a1d65029017952d3\r\ntextures/sky/swtc_clear/16-00_1#small.dds|[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3|D:\\GRA2.5\\MO2\\mods\\[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3\\gamedata\\textures\\sky\\swtc_clear\\16-00_1#small.dds|sha256=e1de04a8ef04e2c063e5e6943885a192254679c02f0bfadd7fbf3b9d17dec40b\r\ntextures/sky/swtc_clear/16-00_1.dds|[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3|D:\\GRA2.5\\MO2\\mods\\[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3\\gamedata\\textures\\sky\\swtc_clear\\16-00_1.dds|sha256=7fec868b9b9e008eb67d54a99c5bff64689b270616d7eca1a1d65029017952d3\r\ntextures/sky/swtc_clear/16-00_1#small.dds|[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3|D:\\GRA2.5\\MO2\\mods\\[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3\\gamedata\\textures\\sky\\swtc_clear\\16-00_1#small.dds|sha256=e1de04a8ef04e2c063e5e6943885a192254679c02f0bfadd7fbf3b9d17dec40b\r\ntextures/sky/swtc_clear/16-00_1.dds|[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3|D:\\GRA2.5\\MO2\\mods\\[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3\\gamedata\\textures\\sky\\swtc_clear\\16-00_1.dds|sha256=7fec868b9b9e008eb67d54a99c5bff64689b270616d7eca1a1d65029017952d3\r\ntextures/sky/swtc_clear/16-00_1#small.dds|[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3|D:\\GRA2.5\\MO2\\mods\\[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3\\gamedata\\textures\\sky\\swtc_clear\\16-00_1#small.dds|sha256=e1de04a8ef04e2c063e5e6943885a192254679c02f0bfadd7fbf3b9d17dec40b\r\ntextures/sky/swtc_clear/16-00_1.dds|[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3|D:\\GRA2.5\\MO2\\mods\\[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3\\gamedata\\textures\\sky\\swtc_clear\\16-00_1.dds|sha256=7fec868b9b9e008eb67d54a99c5bff64689b270616d7eca1a1d65029017952d3\r\ntextures/sky/swtc_clear/16-00_1#small.dds|[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3|D:\\GRA2.5\\MO2\\mods\\[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3\\gamedata\\textures\\sky\\swtc_clear\\16-00_1#small.dds|sha256=e1de04a8ef04e2c063e5e6943885a192254679c02f0bfadd7fbf3b9d17dec40b\r\ntextures/sky/swtc_clear_alt/13-00.dds|[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3|D:\\GRA2.5\\MO2\\mods\\[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3\\gamedata\\textures\\sky\\swtc_clear_alt\\13-00.dds|sha256=22bef0cc2aebccfa878f4947de9b676e070c004426c0beeb0dcb1d09b6e9ef9b\r\ntextures/sky/swtc_clear_alt/13-00#small.dds|[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3|D:\\GRA2.5\\MO2\\mods\\[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3\\gamedata\\textures\\sky\\swtc_clear_alt\\13-00#small.dds|sha256=5bcf1a60db7e61e40bcd1bc7e4301b0e6384a7ae7a99b04a55c8c621996e72ce\r\ntextures/sky/swtc_clear_alt/13-00.dds|[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3|D:\\GRA2.5\\MO2\\mods\\[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3\\gamedata\\textures\\sky\\swtc_clear_alt\\13-00.dds|sha256=22bef0cc2aebccfa878f4947de9b676e070c004426c0beeb0dcb1d09b6e9ef9b\r\ntextures/sky/swtc_clear_alt/13-00#small.dds|[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3|D:\\GRA2.5\\MO2\\mods\\[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3\\gamedata\\textures\\sky\\swtc_clear_alt\\13-00#small.dds|sha256=5bcf1a60db7e61e40bcd1bc7e4301b0e6384a7ae7a99b04a55c8c621996e72ce\r\ntextures/sky/new_skytextures/16.dds|[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3|D:\\GRA2.5\\MO2\\mods\\[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3\\gamedata\\textures\\sky\\new_skytextures\\16.dds|sha256=62eeeef5f2ea8d668398d3fe88ea33d7a98d72a6c7a56fb81f8e8b080440d652\r\ntextures/sky/new_skytextures/16#small.dds|[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3|D:\\GRA2.5\\MO2\\mods\\[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3\\gamedata\\textures\\sky\\new_skytextures\\16#small.dds|sha256=723134eb81012622fc8068f9888a04ffab9a041f065580a64224a6b5a19d817c\r\ntextures/sky/new_skytextures/16.dds|[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3|D:\\GRA2.5\\MO2\\mods\\[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3\\gamedata\\textures\\sky\\new_skytextures\\16.dds|sha256=62eeeef5f2ea8d668398d3fe88ea33d7a98d72a6c7a56fb81f8e8b080440d652\r\ntextures/sky/new_skytextures/16#small.dds|[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3|D:\\GRA2.5\\MO2\\mods\\[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3\\gamedata\\textures\\sky\\new_skytextures\\16#small.dds|sha256=723134eb81012622fc8068f9888a04ffab9a041f065580a64224a6b5a19d817c\r\ntextures/sky/af3_a_partly/18-00.dds|[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3|D:\\GRA2.5\\MO2\\mods\\[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3\\gamedata\\textures\\sky\\af3_a_partly\\18-00.dds|sha256=6dd636e35b8fcde38b8b3255b9a785c351dee44e79b9c94848386f600b274832\r\ntextures/sky/af3_a_partly/18-00#small.dds|[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3|D:\\GRA2.5\\MO2\\mods\\[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3\\gamedata\\textures\\sky\\af3_a_partly\\18-00#small.dds|sha256=1dc35b1fe65b2caf8743fa436c5498d31d3d242c4660d8b24c1eaf6c0a035281\r\ntextures/sky/af3_a_partly/18-00.dds|[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3|D:\\GRA2.5\\MO2\\mods\\[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3\\gamedata\\textures\\sky\\af3_a_partly\\18-00.dds|sha256=6dd636e35b8fcde38b8b3255b9a785c351dee44e79b9c94848386f600b274832\r\ntextures/sky/af3_a_partly/18-00#small.dds|[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3|D:\\GRA2.5\\MO2\\mods\\[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3\\gamedata\\textures\\sky\\af3_a_partly\\18-00#small.dds|sha256=1dc35b1fe65b2caf8743fa436c5498d31d3d242c4660d8b24c1eaf6c0a035281\r\ntextures/sky/swtc_clear_alt/20-00_2.dds|[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3|D:\\GRA2.5\\MO2\\mods\\[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3\\gamedata\\textures\\sky\\swtc_clear_alt\\20-00_2.dds|sha256=49dee1af6cc33be01408c1d6669314f9d3f34b584c4d8eacfe501d9e2ddc23c8\r\ntextures/sky/swtc_clear_alt/20-00_2#small.dds|[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3|D:\\GRA2.5\\MO2\\mods\\[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3\\gamedata\\textures\\sky\\swtc_clear_alt\\20-00_2#small.dds|sha256=e7f336c093df957e1ffc07c79c94ed6b7fd20378aebebc6b4f2d120d17b48d0d\r\ntextures/sky/swtc_clear_alt/20-00_2.dds|[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3|D:\\GRA2.5\\MO2\\mods\\[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3\\gamedata\\textures\\sky\\swtc_clear_alt\\20-00_2.dds|sha256=49dee1af6cc33be01408c1d6669314f9d3f34b584c4d8eacfe501d9e2ddc23c8\r\ntextures/sky/swtc_clear_alt/20-00_2#small.dds|[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3|D:\\GRA2.5\\MO2\\mods\\[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3\\gamedata\\textures\\sky\\swtc_clear_alt\\20-00_2#small.dds|sha256=e7f336c093df957e1ffc07c79c94ed6b7fd20378aebebc6b4f2d120d17b48d0d\r\ntextures/sky/swtc_clear_alt/20-00_2.dds|[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3|D:\\GRA2.5\\MO2\\mods\\[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3\\gamedata\\textures\\sky\\swtc_clear_alt\\20-00_2.dds|sha256=49dee1af6cc33be01408c1d6669314f9d3f34b584c4d8eacfe501d9e2ddc23c8\r\ntextures/sky/swtc_clear_alt/20-00_2#small.dds|[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3|D:\\GRA2.5\\MO2\\mods\\[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3\\gamedata\\textures\\sky\\swtc_clear_alt\\20-00_2#small.dds|sha256=e7f336c093df957e1ffc07c79c94ed6b7fd20378aebebc6b4f2d120d17b48d0d\r\ntextures/sky/swtc_clear_alt/20-00_2.dds|[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3|D:\\GRA2.5\\MO2\\mods\\[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3\\gamedata\\textures\\sky\\swtc_clear_alt\\20-00_2.dds|sha256=49dee1af6cc33be01408c1d6669314f9d3f34b584c4d8eacfe501d9e2ddc23c8\r\ntextures/sky/swtc_clear_alt/20-00_2#small.dds|[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3|D:\\GRA2.5\\MO2\\mods\\[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3\\gamedata\\textures\\sky\\swtc_clear_alt\\20-00_2#small.dds|sha256=e7f336c093df957e1ffc07c79c94ed6b7fd20378aebebc6b4f2d120d17b48d0d\r\ntextures/sky/swtc_clear_alt/23-00.dds|[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3|D:\\GRA2.5\\MO2\\mods\\[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3\\gamedata\\textures\\sky\\swtc_clear_alt\\23-00.dds|sha256=7ad68537d005530f7112f8791f2aed6ac80465a3caf2bc32734005b9d8807db3\r\ntextures/sky/swtc_clear_alt/23-00#small.dds|[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3|D:\\GRA2.5\\MO2\\mods\\[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3\\gamedata\\textures\\sky\\swtc_clear_alt\\23-00#small.dds|sha256=caac44e48cfc6d80e91a87baaffad83149e241321eaabaf10a59afa22a7c0d4b\r\ntextures/sky/swtc_clear_alt/23-00.dds|[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3|D:\\GRA2.5\\MO2\\mods\\[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3\\gamedata\\textures\\sky\\swtc_clear_alt\\23-00.dds|sha256=7ad68537d005530f7112f8791f2aed6ac80465a3caf2bc32734005b9d8807db3\r\ntextures/sky/swtc_clear_alt/23-00#small.dds|[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3|D:\\GRA2.5\\MO2\\mods\\[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3\\gamedata\\textures\\sky\\swtc_clear_alt\\23-00#small.dds|sha256=caac44e48cfc6d80e91a87baaffad83149e241321eaabaf10a59afa22a7c0d4b\r\ntextures/sky/swtc_clear_alt/23-00.dds|[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3|D:\\GRA2.5\\MO2\\mods\\[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3\\gamedata\\textures\\sky\\swtc_clear_alt\\23-00.dds|sha256=7ad68537d005530f7112f8791f2aed6ac80465a3caf2bc32734005b9d8807db3\r\ntextures/sky/swtc_clear_alt/23-00#small.dds|[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3|D:\\GRA2.5\\MO2\\mods\\[\u041F\u043E\u0433\u043E\u0434\u0430] Atmospherics 2.68.93_h3\\gamedata\\textures\\sky\\swtc_clear_alt\\23-00#small.dds|sha256=caac44e48cfc6d80e91a87baaffad83149e241321eaabaf10a59afa22a7c0d4b\r\n"
+  _keyframes:
+  - <GameSeconds>k__BackingField: 0
+    <Key0>k__BackingField: 00:00:00
+    <Key1>k__BackingField: 00:00:00
+    <ResourceBlend>k__BackingField: 0
+    <SunColor>k__BackingField: {r: 0.05, g: 0.058, b: 0.065, a: 1}
+    <SunDirection>k__BackingField: {x: 0, y: -1, z: 0}
+    <AmbientColor>k__BackingField: {r: 0.0135, g: 0.014, b: 0.0145, a: 1}
+    <HemisphereColor>k__BackingField: {r: 0.143, g: 0.143, b: 0.095, a: 1}
+    <WindDirectionRadians>k__BackingField: 0.34906584
+    <WindVelocity>k__BackingField: 400
+    <TreeAmplitudeIntensity>k__BackingField: 0.015
+    <RainDensity>k__BackingField: 0
+    <RainColor>k__BackingField: {r: 0.2, g: 0.2, b: 0.215, a: 1}
+    <FogColor>k__BackingField: {r: 0.0061, g: 0.0062, b: 0.00669, a: 1}
+    <FogDensity>k__BackingField: 1
+    <FogDistance>k__BackingField: 500
+    <FarPlane>k__BackingField: 510
+    <SkyColor>k__BackingField: {r: 0.4, g: 0.6, b: 0.54, a: 1}
+    <CloudsColor>k__BackingField: {r: 0, g: 0, b: 0, a: 0}
+    <SkyRotationRadians>k__BackingField: 0
+    <SkyResources>k__BackingField:
+      _name0: sky\swtc_clear_alt\23-00
+      _name1: 
+      _name2: 
+      _name3: 
+      _texture0: {fileID: 8900000, guid: b55ca0a0f4a45ae4d956c10466a213f8, type: 2}
+      _texture1: {fileID: 0}
+      _texture2: {fileID: 0}
+      _texture3: {fileID: 0}
+      _weights: {x: 1, y: 0, z: 0, w: 0}
+    <CloudsResources>k__BackingField:
+      _name0: 
+      _name1: 
+      _name2: 
+      _name3: 
+      _texture0: {fileID: 0}
+      _texture1: {fileID: 0}
+      _texture2: {fileID: 0}
+      _texture3: {fileID: 0}
+      _weights: {x: 0, y: 0, z: 0, w: 0}
+    <EnvironmentResources>k__BackingField:
+      _name0: sky\swtc_clear_alt\23-00#small
+      _name1: 
+      _name2: 
+      _name3: 
+      _texture0: {fileID: 8900000, guid: 8fd8baeb3081608479468c18bf50208e, type: 2}
+      _texture1: {fileID: 0}
+      _texture2: {fileID: 0}
+      _texture3: {fileID: 0}
+      _weights: {x: 1, y: 0, z: 0, w: 0}
+    <SunDefinition>k__BackingField: moon_wan_c
+    <AmbientDefinition>k__BackingField: night
+    <ThunderboltCollection>k__BackingField: 
+    <ThunderboltPeriod>k__BackingField: 0
+    <ThunderboltDuration>k__BackingField: 0
+    <SunShaftsIntensity>k__BackingField: 0.35
+    <WaterIntensity>k__BackingField: 0.1
+  - <GameSeconds>k__BackingField: 60
+    <Key0>k__BackingField: 00:01:00
+    <Key1>k__BackingField: 00:01:00
+    <ResourceBlend>k__BackingField: 0
+    <SunColor>k__BackingField: {r: 0.05, g: 0.058, b: 0.065, a: 1}
+    <SunDirection>k__BackingField: {x: 0, y: -1, z: 0}
+    <AmbientColor>k__BackingField: {r: 0.0135, g: 0.014, b: 0.0145, a: 1}
+    <HemisphereColor>k__BackingField: {r: 0.143, g: 0.143, b: 0.095, a: 1}
+    <WindDirectionRadians>k__BackingField: 0.34906584
+    <WindVelocity>k__BackingField: 400
+    <TreeAmplitudeIntensity>k__BackingField: 0.015
+    <RainDensity>k__BackingField: 0
+    <RainColor>k__BackingField: {r: 0.2, g: 0.2, b: 0.215, a: 1}
+    <FogColor>k__BackingField: {r: 0.0061, g: 0.0062, b: 0.00669, a: 1}
+    <FogDensity>k__BackingField: 1
+    <FogDistance>k__BackingField: 500
+    <FarPlane>k__BackingField: 510
+    <SkyColor>k__BackingField: {r: 0.4, g: 0.6, b: 0.54, a: 1}
+    <CloudsColor>k__BackingField: {r: 0, g: 0, b: 0, a: 0}
+    <SkyRotationRadians>k__BackingField: 0.00017453292
+    <SkyResources>k__BackingField:
+      _name0: sky\swtc_clear_alt\23-00
+      _name1: 
+      _name2: 
+      _name3: 
+      _texture0: {fileID: 8900000, guid: b55ca0a0f4a45ae4d956c10466a213f8, type: 2}
+      _texture1: {fileID: 0}
+      _texture2: {fileID: 0}
+      _texture3: {fileID: 0}
+      _weights: {x: 1, y: 0, z: 0, w: 0}
+    <CloudsResources>k__BackingField:
+      _name0: 
+      _name1: 
+      _name2: 
+      _name3: 
+      _texture0: {fileID: 0}
+      _texture1: {fileID: 0}
+      _texture2: {fileID: 0}
+      _texture3: {fileID: 0}
+      _weights: {x: 0, y: 0, z: 0, w: 0}
+    <EnvironmentResources>k__BackingField:
+      _name0: sky\swtc_clear_alt\23-00#small
+      _name1: 
+      _name2: 
+      _name3: 
+      _texture0: {fileID: 8900000, guid: 8fd8baeb3081608479468c18bf50208e, type: 2}
+      _texture1: {fileID: 0}
+      _texture2: {fileID: 0}
+      _texture3: {fileID: 0}
+      _weights: {x: 1, y: 0, z: 0, w: 0}
+    <SunDefinition>k__BackingField: moon_wan_c
+    <AmbientDefinition>k__BackingField: night
+    <ThunderboltCollection>k__BackingField: 
+    <ThunderboltPeriod>k__BackingField: 0
+    <ThunderboltDuration>k__BackingField: 0
+    <SunShaftsIntensity>k__BackingField: 0.35
+    <WaterIntensity>k__BackingField: 0.1
+  - <GameSeconds>k__BackingField: 3600
+    <Key0>k__BackingField: 01:00:00
+    <Key1>k__BackingField: 01:00:00
+    <ResourceBlend>k__BackingField: 0
+    <SunColor>k__BackingField: {r: 0.05, g: 0.058, b: 0.065, a: 1}
+    <SunDirection>k__BackingField: {x: 0, y: -1, z: 0}
+    <AmbientColor>k__BackingField: {r: 0.0135, g: 0.014, b: 0.0145, a: 1}
+    <HemisphereColor>k__BackingField: {r: 0.143, g: 0.143, b: 0.095, a: 1}
+    <WindDirectionRadians>k__BackingField: 0.34906584
+    <WindVelocity>k__BackingField: 400
+    <TreeAmplitudeIntensity>k__BackingField: 0.015
+    <RainDensity>k__BackingField: 0
+    <RainColor>k__BackingField: {r: 0.2, g: 0.2, b: 0.215, a: 1}
+    <FogColor>k__BackingField: {r: 0.0061, g: 0.0062, b: 0.00669, a: 1}
+    <FogDensity>k__BackingField: 1
+    <FogDistance>k__BackingField: 500
+    <FarPlane>k__BackingField: 510
+    <SkyColor>k__BackingField: {r: 0.4, g: 0.6, b: 0.54, a: 1}
+    <CloudsColor>k__BackingField: {r: 0, g: 0, b: 0, a: 0}
+    <SkyRotationRadians>k__BackingField: 0.0010471975
+    <SkyResources>k__BackingField:
+      _name0: sky\swtc_clear_alt\23-00
+      _name1: 
+      _name2: 
+      _name3: 
+      _texture0: {fileID: 8900000, guid: b55ca0a0f4a45ae4d956c10466a213f8, type: 2}
+      _texture1: {fileID: 0}
+      _texture2: {fileID: 0}
+      _texture3: {fileID: 0}
+      _weights: {x: 1, y: 0, z: 0, w: 0}
+    <CloudsResources>k__BackingField:
+      _name0: 
+      _name1: 
+      _name2: 
+      _name3: 
+      _texture0: {fileID: 0}
+      _texture1: {fileID: 0}
+      _texture2: {fileID: 0}
+      _texture3: {fileID: 0}
+      _weights: {x: 0, y: 0, z: 0, w: 0}
+    <EnvironmentResources>k__BackingField:
+      _name0: sky\swtc_clear_alt\23-00#small
+      _name1: 
+      _name2: 
+      _name3: 
+      _texture0: {fileID: 8900000, guid: 8fd8baeb3081608479468c18bf50208e, type: 2}
+      _texture1: {fileID: 0}
+      _texture2: {fileID: 0}
+      _texture3: {fileID: 0}
+      _weights: {x: 1, y: 0, z: 0, w: 0}
+    <SunDefinition>k__BackingField: moon_wan_c
+    <AmbientDefinition>k__BackingField: night
+    <ThunderboltCollection>k__BackingField: 
+    <ThunderboltPeriod>k__BackingField: 0
+    <ThunderboltDuration>k__BackingField: 0
+    <SunShaftsIntensity>k__BackingField: 0.35
+    <WaterIntensity>k__BackingField: 0.1
+  - <GameSeconds>k__BackingField: 7200
+    <Key0>k__BackingField: 02:00:00
+    <Key1>k__BackingField: 02:00:00
+    <ResourceBlend>k__BackingField: 0
+    <SunColor>k__BackingField: {r: 0.05, g: 0.058, b: 0.065, a: 1}
+    <SunDirection>k__BackingField: {x: 0, y: -1, z: 0}
+    <AmbientColor>k__BackingField: {r: 0.0135, g: 0.014, b: 0.0145, a: 1}
+    <HemisphereColor>k__BackingField: {r: 0.143, g: 0.143, b: 0.095, a: 1}
+    <WindDirectionRadians>k__BackingField: 0.34906584
+    <WindVelocity>k__BackingField: 300
+    <TreeAmplitudeIntensity>k__BackingField: 0.015
+    <RainDensity>k__BackingField: 0
+    <RainColor>k__BackingField: {r: 0.2, g: 0.2, b: 0.215, a: 1}
+    <FogColor>k__BackingField: {r: 0.0061, g: 0.0062, b: 0.00669, a: 1}
+    <FogDensity>k__BackingField: 1
+    <FogDistance>k__BackingField: 500
+    <FarPlane>k__BackingField: 510
+    <SkyColor>k__BackingField: {r: 0.4, g: 0.6, b: 0.54, a: 1}
+    <CloudsColor>k__BackingField: {r: 0, g: 0, b: 0, a: 0}
+    <SkyRotationRadians>k__BackingField: 0.0017453292
+    <SkyResources>k__BackingField:
+      _name0: sky\swtc_clear_alt\23-00
+      _name1: 
+      _name2: 
+      _name3: 
+      _texture0: {fileID: 8900000, guid: b55ca0a0f4a45ae4d956c10466a213f8, type: 2}
+      _texture1: {fileID: 0}
+      _texture2: {fileID: 0}
+      _texture3: {fileID: 0}
+      _weights: {x: 1, y: 0, z: 0, w: 0}
+    <CloudsResources>k__BackingField:
+      _name0: 
+      _name1: 
+      _name2: 
+      _name3: 
+      _texture0: {fileID: 0}
+      _texture1: {fileID: 0}
+      _texture2: {fileID: 0}
+      _texture3: {fileID: 0}
+      _weights: {x: 0, y: 0, z: 0, w: 0}
+    <EnvironmentResources>k__BackingField:
+      _name0: sky\swtc_clear_alt\23-00#small
+      _name1: 
+      _name2: 
+      _name3: 
+      _texture0: {fileID: 8900000, guid: 8fd8baeb3081608479468c18bf50208e, type: 2}
+      _texture1: {fileID: 0}
+      _texture2: {fileID: 0}
+      _texture3: {fileID: 0}
+      _weights: {x: 1, y: 0, z: 0, w: 0}
+    <SunDefinition>k__BackingField: moon_wan_c
+    <AmbientDefinition>k__BackingField: night
+    <ThunderboltCollection>k__BackingField: 
+    <ThunderboltPeriod>k__BackingField: 0
+    <ThunderboltDuration>k__BackingField: 0
+    <SunShaftsIntensity>k__BackingField: 0.35
+    <WaterIntensity>k__BackingField: 0.1
+  - <GameSeconds>k__BackingField: 10800
+    <Key0>k__BackingField: 03:00:00
+    <Key1>k__BackingField: 03:00:00
+    <ResourceBlend>k__BackingField: 0
+    <SunColor>k__BackingField: {r: 0.05, g: 0.058, b: 0.065, a: 1}
+    <SunDirection>k__BackingField: {x: 0, y: -1, z: 0}
+    <AmbientColor>k__BackingField: {r: 0.0135, g: 0.014, b: 0.0145, a: 1}
+    <HemisphereColor>k__BackingField: {r: 0.143, g: 0.143, b: 0.095, a: 1}
+    <WindDirectionRadians>k__BackingField: 0.34906584
+    <WindVelocity>k__BackingField: 500
+    <TreeAmplitudeIntensity>k__BackingField: 0.015
+    <RainDensity>k__BackingField: 0
+    <RainColor>k__BackingField: {r: 0.2, g: 0.2, b: 0.215, a: 1}
+    <FogColor>k__BackingField: {r: 0.0061, g: 0.0062, b: 0.00669, a: 1}
+    <FogDensity>k__BackingField: 1
+    <FogDistance>k__BackingField: 500
+    <FarPlane>k__BackingField: 510
+    <SkyColor>k__BackingField: {r: 0.4, g: 0.6, b: 0.54, a: 1}
+    <CloudsColor>k__BackingField: {r: 0, g: 0, b: 0, a: 0}
+    <SkyRotationRadians>k__BackingField: 0.002443461
+    <SkyResources>k__BackingField:
+      _name0: sky\swtc_clear_alt\23-00
+      _name1: 
+      _name2: 
+      _name3: 
+      _texture0: {fileID: 8900000, guid: b55ca0a0f4a45ae4d956c10466a213f8, type: 2}
+      _texture1: {fileID: 0}
+      _texture2: {fileID: 0}
+      _texture3: {fileID: 0}
+      _weights: {x: 1, y: 0, z: 0, w: 0}
+    <CloudsResources>k__BackingField:
+      _name0: 
+      _name1: 
+      _name2: 
+      _name3: 
+      _texture0: {fileID: 0}
+      _texture1: {fileID: 0}
+      _texture2: {fileID: 0}
+      _texture3: {fileID: 0}
+      _weights: {x: 0, y: 0, z: 0, w: 0}
+    <EnvironmentResources>k__BackingField:
+      _name0: sky\swtc_clear_alt\23-00#small
+      _name1: 
+      _name2: 
+      _name3: 
+      _texture0: {fileID: 8900000, guid: 8fd8baeb3081608479468c18bf50208e, type: 2}
+      _texture1: {fileID: 0}
+      _texture2: {fileID: 0}
+      _texture3: {fileID: 0}
+      _weights: {x: 1, y: 0, z: 0, w: 0}
+    <SunDefinition>k__BackingField: moon_wan_c
+    <AmbientDefinition>k__BackingField: night
+    <ThunderboltCollection>k__BackingField: 
+    <ThunderboltPeriod>k__BackingField: 0
+    <ThunderboltDuration>k__BackingField: 0
+    <SunShaftsIntensity>k__BackingField: 0.35
+    <WaterIntensity>k__BackingField: 0.1
+  - <GameSeconds>k__BackingField: 14400
+    <Key0>k__BackingField: 04:00:00
+    <Key1>k__BackingField: 04:00:00
+    <ResourceBlend>k__BackingField: 0
+    <SunColor>k__BackingField: {r: 0.05, g: 0.058, b: 0.065, a: 1}
+    <SunDirection>k__BackingField: {x: 0, y: -1, z: 0}
+    <AmbientColor>k__BackingField: {r: 0.0135, g: 0.014, b: 0.0145, a: 1}
+    <HemisphereColor>k__BackingField: {r: 0.143, g: 0.143, b: 0.095, a: 1}
+    <WindDirectionRadians>k__BackingField: 0.34906584
+    <WindVelocity>k__BackingField: 500
+    <TreeAmplitudeIntensity>k__BackingField: 0.015
+    <RainDensity>k__BackingField: 0
+    <RainColor>k__BackingField: {r: 0.2, g: 0.2, b: 0.215, a: 1}
+    <FogColor>k__BackingField: {r: 0.0061, g: 0.0062, b: 0.00669, a: 1}
+    <FogDensity>k__BackingField: 1
+    <FogDistance>k__BackingField: 500
+    <FarPlane>k__BackingField: 510
+    <SkyColor>k__BackingField: {r: 0.4, g: 0.6, b: 0.54, a: 1}
+    <CloudsColor>k__BackingField: {r: 0, g: 0, b: 0, a: 0}
+    <SkyRotationRadians>k__BackingField: 0.0033161256
+    <SkyResources>k__BackingField:
+      _name0: sky\swtc_clear_alt\23-00
+      _name1: 
+      _name2: 
+      _name3: 
+      _texture0: {fileID: 8900000, guid: b55ca0a0f4a45ae4d956c10466a213f8, type: 2}
+      _texture1: {fileID: 0}
+      _texture2: {fileID: 0}
+      _texture3: {fileID: 0}
+      _weights: {x: 1, y: 0, z: 0, w: 0}
+    <CloudsResources>k__BackingField:
+      _name0: 
+      _name1: 
+      _name2: 
+      _name3: 
+      _texture0: {fileID: 0}
+      _texture1: {fileID: 0}
+      _texture2: {fileID: 0}
+      _texture3: {fileID: 0}
+      _weights: {x: 0, y: 0, z: 0, w: 0}
+    <EnvironmentResources>k__BackingField:
+      _name0: sky\swtc_clear_alt\23-00#small
+      _name1: 
+      _name2: 
+      _name3: 
+      _texture0: {fileID: 8900000, guid: 8fd8baeb3081608479468c18bf50208e, type: 2}
+      _texture1: {fileID: 0}
+      _texture2: {fileID: 0}
+      _texture3: {fileID: 0}
+      _weights: {x: 1, y: 0, z: 0, w: 0}
+    <SunDefinition>k__BackingField: moon_wan_c
+    <AmbientDefinition>k__BackingField: night
+    <ThunderboltCollection>k__BackingField: 
+    <ThunderboltPeriod>k__BackingField: 0
+    <ThunderboltDuration>k__BackingField: 0
+    <SunShaftsIntensity>k__BackingField: 0.35
+    <WaterIntensity>k__BackingField: 0.1
+  - <GameSeconds>k__BackingField: 16200
+    <Key0>k__BackingField: 04:30:00
+    <Key1>k__BackingField: 04:30:00
+    <ResourceBlend>k__BackingField: 0
+    <SunColor>k__BackingField: {r: 0, g: 0, b: 0, a: 1}
+    <SunDirection>k__BackingField: {x: 0, y: -1, z: 0}
+    <AmbientColor>k__BackingField: {r: 0.0195, g: 0.02, b: 0.0205, a: 1}
+    <HemisphereColor>k__BackingField: {r: 0.065, g: 0.065, b: 0.065, a: 1}
+    <WindDirectionRadians>k__BackingField: 0.34906584
+    <WindVelocity>k__BackingField: 500
+    <TreeAmplitudeIntensity>k__BackingField: 0.015
+    <RainDensity>k__BackingField: 0
+    <RainColor>k__BackingField: {r: 0.68, g: 0.64, b: 0.6, a: 1}
+    <FogColor>k__BackingField: {r: 0.0305, g: 0.0305, b: 0.032, a: 1}
+    <FogDensity>k__BackingField: 1
+    <FogDistance>k__BackingField: 400
+    <FarPlane>k__BackingField: 410
+    <SkyColor>k__BackingField: {r: 0.3, g: 0.32, b: 0.34, a: 1}
+    <CloudsColor>k__BackingField: {r: 0, g: 0, b: 0, a: 0}
+    <SkyRotationRadians>k__BackingField: 0.004363323
+    <SkyResources>k__BackingField:
+      _name0: sky\swtc_clear_alt\05-00
+      _name1: 
+      _name2: 
+      _name3: 
+      _texture0: {fileID: 8900000, guid: 8c5c16878efb4ab41875ffec19a61742, type: 2}
+      _texture1: {fileID: 0}
+      _texture2: {fileID: 0}
+      _texture3: {fileID: 0}
+      _weights: {x: 1, y: 0, z: 0, w: 0}
+    <CloudsResources>k__BackingField:
+      _name0: 
+      _name1: 
+      _name2: 
+      _name3: 
+      _texture0: {fileID: 0}
+      _texture1: {fileID: 0}
+      _texture2: {fileID: 0}
+      _texture3: {fileID: 0}
+      _weights: {x: 0, y: 0, z: 0, w: 0}
+    <EnvironmentResources>k__BackingField:
+      _name0: sky\swtc_clear_alt\05-00#small
+      _name1: 
+      _name2: 
+      _name3: 
+      _texture0: {fileID: 8900000, guid: 07dd75ef9419a8d469e073d41c3fabf1, type: 2}
+      _texture1: {fileID: 0}
+      _texture2: {fileID: 0}
+      _texture3: {fileID: 0}
+      _weights: {x: 1, y: 0, z: 0, w: 0}
+    <SunDefinition>k__BackingField: none
+    <AmbientDefinition>k__BackingField: morning
+    <ThunderboltCollection>k__BackingField: 
+    <ThunderboltPeriod>k__BackingField: 0
+    <ThunderboltDuration>k__BackingField: 0
+    <SunShaftsIntensity>k__BackingField: 0.09
+    <WaterIntensity>k__BackingField: 0.1
+  - <GameSeconds>k__BackingField: 18000
+    <Key0>k__BackingField: 05:00:00
+    <Key1>k__BackingField: 05:00:00
+    <ResourceBlend>k__BackingField: 0
+    <SunColor>k__BackingField: {r: 0, g: 0, b: 0, a: 1}
+    <SunDirection>k__BackingField: {x: 0, y: -1, z: 0}
+    <AmbientColor>k__BackingField: {r: 0.0245, g: 0.0235, b: 0.0235, a: 1}
+    <HemisphereColor>k__BackingField: {r: 0.085, g: 0.085, b: 0.085, a: 1}
+    <WindDirectionRadians>k__BackingField: 0.34906584
+    <WindVelocity>k__BackingField: 300
+    <TreeAmplitudeIntensity>k__BackingField: 0.015
+    <RainDensity>k__BackingField: 0
+    <RainColor>k__BackingField: {r: 0.68, g: 0.64, b: 0.6, a: 1}
+    <FogColor>k__BackingField: {r: 0.04, g: 0.04, b: 0.043, a: 1}
+    <FogDensity>k__BackingField: 1
+    <FogDistance>k__BackingField: 400
+    <FarPlane>k__BackingField: 410
+    <SkyColor>k__BackingField: {r: 0.37, g: 0.37, b: 0.41, a: 1}
+    <CloudsColor>k__BackingField: {r: 0, g: 0, b: 0, a: 0}
+    <SkyRotationRadians>k__BackingField: 0.0045378557
+    <SkyResources>k__BackingField:
+      _name0: sky\swtc_clear_alt\05-00
+      _name1: 
+      _name2: 
+      _name3: 
+      _texture0: {fileID: 8900000, guid: 8c5c16878efb4ab41875ffec19a61742, type: 2}
+      _texture1: {fileID: 0}
+      _texture2: {fileID: 0}
+      _texture3: {fileID: 0}
+      _weights: {x: 1, y: 0, z: 0, w: 0}
+    <CloudsResources>k__BackingField:
+      _name0: 
+      _name1: 
+      _name2: 
+      _name3: 
+      _texture0: {fileID: 0}
+      _texture1: {fileID: 0}
+      _texture2: {fileID: 0}
+      _texture3: {fileID: 0}
+      _weights: {x: 0, y: 0, z: 0, w: 0}
+    <EnvironmentResources>k__BackingField:
+      _name0: sky\swtc_clear_alt\05-00#small
+      _name1: 
+      _name2: 
+      _name3: 
+      _texture0: {fileID: 8900000, guid: 07dd75ef9419a8d469e073d41c3fabf1, type: 2}
+      _texture1: {fileID: 0}
+      _texture2: {fileID: 0}
+      _texture3: {fileID: 0}
+      _weights: {x: 1, y: 0, z: 0, w: 0}
+    <SunDefinition>k__BackingField: none
+    <AmbientDefinition>k__BackingField: morning
+    <ThunderboltCollection>k__BackingField: 
+    <ThunderboltPeriod>k__BackingField: 0
+    <ThunderboltDuration>k__BackingField: 0
+    <SunShaftsIntensity>k__BackingField: 0.09
+    <WaterIntensity>k__BackingField: 0.1
+  - <GameSeconds>k__BackingField: 21600
+    <Key0>k__BackingField: 06:00:00
+    <Key1>k__BackingField: 06:00:00
+    <ResourceBlend>k__BackingField: 0
+    <SunColor>k__BackingField: {r: 0.47, g: 0.38, b: 0.3, a: 1}
+    <SunDirection>k__BackingField: {x: 0, y: -1, z: 0}
+    <AmbientColor>k__BackingField: {r: 0.036, g: 0.03, b: 0.025, a: 1}
+    <HemisphereColor>k__BackingField: {r: 0.21, g: 0.21, b: 0.21, a: 1}
+    <WindDirectionRadians>k__BackingField: 0.34906584
+    <WindVelocity>k__BackingField: 300
+    <TreeAmplitudeIntensity>k__BackingField: 0.015
+    <RainDensity>k__BackingField: 0
+    <RainColor>k__BackingField: {r: 0.44, g: 0.44, b: 0.475, a: 1}
+    <FogColor>k__BackingField: {r: 0.107, g: 0.107, b: 0.119, a: 1}
+    <FogDensity>k__BackingField: 0.99
+    <FogDistance>k__BackingField: 620
+    <FarPlane>k__BackingField: 630
+    <SkyColor>k__BackingField: {r: 0.72, g: 0.72, b: 0.72, a: 1}
+    <CloudsColor>k__BackingField: {r: 0, g: 0, b: 0, a: 0}
+    <SkyRotationRadians>k__BackingField: 0.004886922
+    <SkyResources>k__BackingField:
+      _name0: sky\swtc_clear_alt\06-00
+      _name1: 
+      _name2: 
+      _name3: 
+      _texture0: {fileID: 8900000, guid: eb64d9ab02307374892b3318eb74948c, type: 2}
+      _texture1: {fileID: 0}
+      _texture2: {fileID: 0}
+      _texture3: {fileID: 0}
+      _weights: {x: 1, y: 0, z: 0, w: 0}
+    <CloudsResources>k__BackingField:
+      _name0: 
+      _name1: 
+      _name2: 
+      _name3: 
+      _texture0: {fileID: 0}
+      _texture1: {fileID: 0}
+      _texture2: {fileID: 0}
+      _texture3: {fileID: 0}
+      _weights: {x: 0, y: 0, z: 0, w: 0}
+    <EnvironmentResources>k__BackingField:
+      _name0: sky\swtc_clear_alt\06-00#small
+      _name1: 
+      _name2: 
+      _name3: 
+      _texture0: {fileID: 8900000, guid: d2dac8454f136624fb553362c88d35e9, type: 2}
+      _texture1: {fileID: 0}
+      _texture2: {fileID: 0}
+      _texture3: {fileID: 0}
+      _weights: {x: 1, y: 0, z: 0, w: 0}
+    <SunDefinition>k__BackingField: clear_alt_day1
+    <AmbientDefinition>k__BackingField: morning
+    <ThunderboltCollection>k__BackingField: 
+    <ThunderboltPeriod>k__BackingField: 0
+    <ThunderboltDuration>k__BackingField: 0
+    <SunShaftsIntensity>k__BackingField: 0.08
+    <WaterIntensity>k__BackingField: 0.1
+  - <GameSeconds>k__BackingField: 25200
+    <Key0>k__BackingField: 07:00:00
+    <Key1>k__BackingField: 07:00:00
+    <ResourceBlend>k__BackingField: 0
+    <SunColor>k__BackingField: {r: 0.58, g: 0.49, b: 0.43, a: 1}
+    <SunDirection>k__BackingField: {x: 0, y: -1, z: 0}
+    <AmbientColor>k__BackingField: {r: 0.043, g: 0.039, b: 0.035, a: 1}
+    <HemisphereColor>k__BackingField: {r: 0.26, g: 0.26, b: 0.26, a: 1}
+    <WindDirectionRadians>k__BackingField: 1.2217305
+    <WindVelocity>k__BackingField: 500
+    <TreeAmplitudeIntensity>k__BackingField: 0.015
+    <RainDensity>k__BackingField: 0
+    <RainColor>k__BackingField: {r: 0.68, g: 0.64, b: 0.4, a: 1}
+    <FogColor>k__BackingField: {r: 0.167, g: 0.167, b: 0.179, a: 1}
+    <FogDensity>k__BackingField: 1
+    <FogDistance>k__BackingField: 525
+    <FarPlane>k__BackingField: 535
+    <SkyColor>k__BackingField: {r: 0.91, g: 0.91, b: 0.91, a: 1}
+    <CloudsColor>k__BackingField: {r: 0, g: 0, b: 0, a: 0}
+    <SkyRotationRadians>k__BackingField: 0
+    <SkyResources>k__BackingField:
+      _name0: sky\swtc_clear\swtc_etalon_8dx9
+      _name1: 
+      _name2: 
+      _name3: 
+      _texture0: {fileID: 8900000, guid: 6051ed34053824f41ad9c8d64c4a1969, type: 2}
+      _texture1: {fileID: 0}
+      _texture2: {fileID: 0}
+      _texture3: {fileID: 0}
+      _weights: {x: 1, y: 0, z: 0, w: 0}
+    <CloudsResources>k__BackingField:
+      _name0: 
+      _name1: 
+      _name2: 
+      _name3: 
+      _texture0: {fileID: 0}
+      _texture1: {fileID: 0}
+      _texture2: {fileID: 0}
+      _texture3: {fileID: 0}
+      _weights: {x: 0, y: 0, z: 0, w: 0}
+    <EnvironmentResources>k__BackingField:
+      _name0: sky\swtc_clear\swtc_etalon_8dx9#small
+      _name1: 
+      _name2: 
+      _name3: 
+      _texture0: {fileID: 8900000, guid: 57cd6651ff58524419af09a67fb53ec9, type: 2}
+      _texture1: {fileID: 0}
+      _texture2: {fileID: 0}
+      _texture3: {fileID: 0}
+      _weights: {x: 1, y: 0, z: 0, w: 0}
+    <SunDefinition>k__BackingField: sunset_sunrise_small
+    <AmbientDefinition>k__BackingField: morning
+    <ThunderboltCollection>k__BackingField: 
+    <ThunderboltPeriod>k__BackingField: 0
+    <ThunderboltDuration>k__BackingField: 0
+    <SunShaftsIntensity>k__BackingField: 0.08
+    <WaterIntensity>k__BackingField: 0.1
+  - <GameSeconds>k__BackingField: 28800
+    <Key0>k__BackingField: 08:00:00
+    <Key1>k__BackingField: 08:00:00
+    <ResourceBlend>k__BackingField: 0
+    <SunColor>k__BackingField: {r: 0.525, g: 0.495, b: 0.425, a: 1}
+    <SunDirection>k__BackingField: {x: 0, y: -1, z: 0}
+    <AmbientColor>k__BackingField: {r: 0.043, g: 0.039, b: 0.036, a: 1}
+    <HemisphereColor>k__BackingField: {r: 0.315, g: 0.31, b: 0.3, a: 1}
+    <WindDirectionRadians>k__BackingField: 1.2217305
+    <WindVelocity>k__BackingField: 500
+    <TreeAmplitudeIntensity>k__BackingField: 0.015
+    <RainDensity>k__BackingField: 0
+    <RainColor>k__BackingField: {r: 0.122, g: 0.122, b: 0.122, a: 1}
+    <FogColor>k__BackingField: {r: 0.21, g: 0.21, b: 0.23, a: 1}
+    <FogDensity>k__BackingField: 0.99
+    <FogDistance>k__BackingField: 600
+    <FarPlane>k__BackingField: 610
+    <SkyColor>k__BackingField: {r: 0.85, g: 0.83, b: 0.7, a: 1}
+    <CloudsColor>k__BackingField: {r: 0, g: 0, b: 0, a: 0}
+    <SkyRotationRadians>k__BackingField: 0.007853981
+    <SkyResources>k__BackingField:
+      _name0: sky\swtc_clear\16-00_1
+      _name1: 
+      _name2: 
+      _name3: 
+      _texture0: {fileID: 8900000, guid: 5047f76a9da2f0048ae380ced66688a4, type: 2}
+      _texture1: {fileID: 0}
+      _texture2: {fileID: 0}
+      _texture3: {fileID: 0}
+      _weights: {x: 1, y: 0, z: 0, w: 0}
+    <CloudsResources>k__BackingField:
+      _name0: 
+      _name1: 
+      _name2: 
+      _name3: 
+      _texture0: {fileID: 0}
+      _texture1: {fileID: 0}
+      _texture2: {fileID: 0}
+      _texture3: {fileID: 0}
+      _weights: {x: 0, y: 0, z: 0, w: 0}
+    <EnvironmentResources>k__BackingField:
+      _name0: sky\swtc_clear\16-00_1#small
+      _name1: 
+      _name2: 
+      _name3: 
+      _texture0: {fileID: 8900000, guid: bf5b65c5478ea9a47a339f1c1a2d024f, type: 2}
+      _texture1: {fileID: 0}
+      _texture2: {fileID: 0}
+      _texture3: {fileID: 0}
+      _weights: {x: 1, y: 0, z: 0, w: 0}
+    <SunDefinition>k__BackingField: sunset_sunrise_small
+    <AmbientDefinition>k__BackingField: day
+    <ThunderboltCollection>k__BackingField: 
+    <ThunderboltPeriod>k__BackingField: 0
+    <ThunderboltDuration>k__BackingField: 0
+    <SunShaftsIntensity>k__BackingField: 0.06
+    <WaterIntensity>k__BackingField: 0.1
+  - <GameSeconds>k__BackingField: 32400
+    <Key0>k__BackingField: 09:00:00
+    <Key1>k__BackingField: 09:00:00
+    <ResourceBlend>k__BackingField: 0
+    <SunColor>k__BackingField: {r: 0.475, g: 0.483, b: 0.458, a: 1}
+    <SunDirection>k__BackingField: {x: 0, y: -1, z: 0}
+    <AmbientColor>k__BackingField: {r: 0.044, g: 0.04, b: 0.037, a: 1}
+    <HemisphereColor>k__BackingField: {r: 0.315, g: 0.31, b: 0.3, a: 1}
+    <WindDirectionRadians>k__BackingField: 0.34906584
+    <WindVelocity>k__BackingField: 400
+    <TreeAmplitudeIntensity>k__BackingField: 0.018
+    <RainDensity>k__BackingField: 0
+    <RainColor>k__BackingField: {r: 0.68, g: 0.64, b: 0.6, a: 1}
+    <FogColor>k__BackingField: {r: 0.22, g: 0.22, b: 0.24, a: 1}
+    <FogDensity>k__BackingField: 1
+    <FogDistance>k__BackingField: 647
+    <FarPlane>k__BackingField: 657
+    <SkyColor>k__BackingField: {r: 0.85, g: 0.83, b: 0.7, a: 1}
+    <CloudsColor>k__BackingField: {r: 0, g: 0, b: 0, a: 0}
+    <SkyRotationRadians>k__BackingField: 0.01308997
+    <SkyResources>k__BackingField:
+      _name0: sky\swtc_clear\16-00_1
+      _name1: 
+      _name2: 
+      _name3: 
+      _texture0: {fileID: 8900000, guid: 5047f76a9da2f0048ae380ced66688a4, type: 2}
+      _texture1: {fileID: 0}
+      _texture2: {fileID: 0}
+      _texture3: {fileID: 0}
+      _weights: {x: 1, y: 0, z: 0, w: 0}
+    <CloudsResources>k__BackingField:
+      _name0: 
+      _name1: 
+      _name2: 
+      _name3: 
+      _texture0: {fileID: 0}
+      _texture1: {fileID: 0}
+      _texture2: {fileID: 0}
+      _texture3: {fileID: 0}
+      _weights: {x: 0, y: 0, z: 0, w: 0}
+    <EnvironmentResources>k__BackingField:
+      _name0: sky\swtc_clear\16-00_1#small
+      _name1: 
+      _name2: 
+      _name3: 
+      _texture0: {fileID: 8900000, guid: bf5b65c5478ea9a47a339f1c1a2d024f, type: 2}
+      _texture1: {fileID: 0}
+      _texture2: {fileID: 0}
+      _texture3: {fileID: 0}
+      _weights: {x: 1, y: 0, z: 0, w: 0}
+    <SunDefinition>k__BackingField: sunset_sunrise_small
+    <AmbientDefinition>k__BackingField: day
+    <ThunderboltCollection>k__BackingField: 
+    <ThunderboltPeriod>k__BackingField: 0
+    <ThunderboltDuration>k__BackingField: 0
+    <SunShaftsIntensity>k__BackingField: 0.055
+    <WaterIntensity>k__BackingField: 0.1
+  - <GameSeconds>k__BackingField: 36000
+    <Key0>k__BackingField: 10:00:00
+    <Key1>k__BackingField: 10:00:00
+    <ResourceBlend>k__BackingField: 0
+    <SunColor>k__BackingField: {r: 0.398, g: 0.418, b: 0.423, a: 1}
+    <SunDirection>k__BackingField: {x: 0, y: -1, z: 0}
+    <AmbientColor>k__BackingField: {r: 0.044, g: 0.04, b: 0.037, a: 1}
+    <HemisphereColor>k__BackingField: {r: 0.28, g: 0.3, b: 0.29, a: 1}
+    <WindDirectionRadians>k__BackingField: 0.34906584
+    <WindVelocity>k__BackingField: 300
+    <TreeAmplitudeIntensity>k__BackingField: 0.018
+    <RainDensity>k__BackingField: 0
+    <RainColor>k__BackingField: {r: 0.68, g: 0.64, b: 0.6, a: 1}
+    <FogColor>k__BackingField: {r: 0.18, g: 0.2, b: 0.22, a: 1}
+    <FogDensity>k__BackingField: 1
+    <FogDistance>k__BackingField: 580
+    <FarPlane>k__BackingField: 590
+    <SkyColor>k__BackingField: {r: 0.85, g: 0.83, b: 0.7, a: 1}
+    <CloudsColor>k__BackingField: {r: 0, g: 0, b: 0, a: 0}
+    <SkyRotationRadians>k__BackingField: 0.016580628
+    <SkyResources>k__BackingField:
+      _name0: sky\swtc_clear\16-00_1
+      _name1: 
+      _name2: 
+      _name3: 
+      _texture0: {fileID: 8900000, guid: 5047f76a9da2f0048ae380ced66688a4, type: 2}
+      _texture1: {fileID: 0}
+      _texture2: {fileID: 0}
+      _texture3: {fileID: 0}
+      _weights: {x: 1, y: 0, z: 0, w: 0}
+    <CloudsResources>k__BackingField:
+      _name0: 
+      _name1: 
+      _name2: 
+      _name3: 
+      _texture0: {fileID: 0}
+      _texture1: {fileID: 0}
+      _texture2: {fileID: 0}
+      _texture3: {fileID: 0}
+      _weights: {x: 0, y: 0, z: 0, w: 0}
+    <EnvironmentResources>k__BackingField:
+      _name0: sky\swtc_clear\16-00_1#small
+      _name1: 
+      _name2: 
+      _name3: 
+      _texture0: {fileID: 8900000, guid: bf5b65c5478ea9a47a339f1c1a2d024f, type: 2}
+      _texture1: {fileID: 0}
+      _texture2: {fileID: 0}
+      _texture3: {fileID: 0}
+      _weights: {x: 1, y: 0, z: 0, w: 0}
+    <SunDefinition>k__BackingField: sunset_sunrise_small
+    <AmbientDefinition>k__BackingField: day
+    <ThunderboltCollection>k__BackingField: 
+    <ThunderboltPeriod>k__BackingField: 0
+    <ThunderboltDuration>k__BackingField: 0
+    <SunShaftsIntensity>k__BackingField: 0.055
+    <WaterIntensity>k__BackingField: 0.1
+  - <GameSeconds>k__BackingField: 39600
+    <Key0>k__BackingField: 11:00:00
+    <Key1>k__BackingField: 11:00:00
+    <ResourceBlend>k__BackingField: 0
+    <SunColor>k__BackingField: {r: 0.398, g: 0.418, b: 0.423, a: 1}
+    <SunDirection>k__BackingField: {x: 0, y: -1, z: 0}
+    <AmbientColor>k__BackingField: {r: 0.044, g: 0.04, b: 0.037, a: 1}
+    <HemisphereColor>k__BackingField: {r: 0.28, g: 0.3, b: 0.29, a: 1}
+    <WindDirectionRadians>k__BackingField: 0.34906584
+    <WindVelocity>k__BackingField: 300
+    <TreeAmplitudeIntensity>k__BackingField: 0.018
+    <RainDensity>k__BackingField: 0
+    <RainColor>k__BackingField: {r: 0.68, g: 0.64, b: 0.6, a: 1}
+    <FogColor>k__BackingField: {r: 0.205, g: 0.225, b: 0.235, a: 1}
+    <FogDensity>k__BackingField: 1
+    <FogDistance>k__BackingField: 450
+    <FarPlane>k__BackingField: 460
+    <SkyColor>k__BackingField: {r: 0.85, g: 0.83, b: 0.7, a: 1}
+    <CloudsColor>k__BackingField: {r: 0, g: 0, b: 0, a: 0}
+    <SkyRotationRadians>k__BackingField: 0.02094395
+    <SkyResources>k__BackingField:
+      _name0: sky\swtc_clear\16-00_1
+      _name1: 
+      _name2: 
+      _name3: 
+      _texture0: {fileID: 8900000, guid: 5047f76a9da2f0048ae380ced66688a4, type: 2}
+      _texture1: {fileID: 0}
+      _texture2: {fileID: 0}
+      _texture3: {fileID: 0}
+      _weights: {x: 1, y: 0, z: 0, w: 0}
+    <CloudsResources>k__BackingField:
+      _name0: 
+      _name1: 
+      _name2: 
+      _name3: 
+      _texture0: {fileID: 0}
+      _texture1: {fileID: 0}
+      _texture2: {fileID: 0}
+      _texture3: {fileID: 0}
+      _weights: {x: 0, y: 0, z: 0, w: 0}
+    <EnvironmentResources>k__BackingField:
+      _name0: sky\swtc_clear\16-00_1#small
+      _name1: 
+      _name2: 
+      _name3: 
+      _texture0: {fileID: 8900000, guid: bf5b65c5478ea9a47a339f1c1a2d024f, type: 2}
+      _texture1: {fileID: 0}
+      _texture2: {fileID: 0}
+      _texture3: {fileID: 0}
+      _weights: {x: 1, y: 0, z: 0, w: 0}
+    <SunDefinition>k__BackingField: sunset_sunrise_small
+    <AmbientDefinition>k__BackingField: day
+    <ThunderboltCollection>k__BackingField: 
+    <ThunderboltPeriod>k__BackingField: 0
+    <ThunderboltDuration>k__BackingField: 0
+    <SunShaftsIntensity>k__BackingField: 0.06
+    <WaterIntensity>k__BackingField: 0.1
+  - <GameSeconds>k__BackingField: 43200
+    <Key0>k__BackingField: 12:00:00
+    <Key1>k__BackingField: 12:00:00
+    <ResourceBlend>k__BackingField: 0
+    <SunColor>k__BackingField: {r: 0.373, g: 0.39, b: 0.385, a: 1}
+    <SunDirection>k__BackingField: {x: 0, y: -1, z: 0}
+    <AmbientColor>k__BackingField: {r: 0.044, g: 0.04, b: 0.037, a: 1}
+    <HemisphereColor>k__BackingField: {r: 0.28, g: 0.3, b: 0.29, a: 1}
+    <WindDirectionRadians>k__BackingField: 0.6981317
+    <WindVelocity>k__BackingField: 510
+    <TreeAmplitudeIntensity>k__BackingField: 0.018
+    <RainDensity>k__BackingField: 0
+    <RainColor>k__BackingField: {r: 0.68, g: 0.64, b: 0.6, a: 1}
+    <FogColor>k__BackingField: {r: 0.245, g: 0.285, b: 0.3, a: 1}
+    <FogDensity>k__BackingField: 1
+    <FogDistance>k__BackingField: 450
+    <FarPlane>k__BackingField: 460
+    <SkyColor>k__BackingField: {r: 0.85, g: 0.83, b: 0.7, a: 1}
+    <CloudsColor>k__BackingField: {r: 0, g: 0, b: 0, a: 0}
+    <SkyRotationRadians>k__BackingField: 0.02443461
+    <SkyResources>k__BackingField:
+      _name0: sky\swtc_clear\16-00_1
+      _name1: 
+      _name2: 
+      _name3: 
+      _texture0: {fileID: 8900000, guid: 5047f76a9da2f0048ae380ced66688a4, type: 2}
+      _texture1: {fileID: 0}
+      _texture2: {fileID: 0}
+      _texture3: {fileID: 0}
+      _weights: {x: 1, y: 0, z: 0, w: 0}
+    <CloudsResources>k__BackingField:
+      _name0: 
+      _name1: 
+      _name2: 
+      _name3: 
+      _texture0: {fileID: 0}
+      _texture1: {fileID: 0}
+      _texture2: {fileID: 0}
+      _texture3: {fileID: 0}
+      _weights: {x: 0, y: 0, z: 0, w: 0}
+    <EnvironmentResources>k__BackingField:
+      _name0: sky\swtc_clear\16-00_1#small
+      _name1: 
+      _name2: 
+      _name3: 
+      _texture0: {fileID: 8900000, guid: bf5b65c5478ea9a47a339f1c1a2d024f, type: 2}
+      _texture1: {fileID: 0}
+      _texture2: {fileID: 0}
+      _texture3: {fileID: 0}
+      _weights: {x: 1, y: 0, z: 0, w: 0}
+    <SunDefinition>k__BackingField: sunset_sunrise_small
+    <AmbientDefinition>k__BackingField: day
+    <ThunderboltCollection>k__BackingField: 
+    <ThunderboltPeriod>k__BackingField: 0
+    <ThunderboltDuration>k__BackingField: 0
+    <SunShaftsIntensity>k__BackingField: 0.06
+    <WaterIntensity>k__BackingField: 0.5
+  - <GameSeconds>k__BackingField: 46800
+    <Key0>k__BackingField: 13:00:00
+    <Key1>k__BackingField: 13:00:00
+    <ResourceBlend>k__BackingField: 0
+    <SunColor>k__BackingField: {r: 0.373, g: 0.39, b: 0.385, a: 1}
+    <SunDirection>k__BackingField: {x: 0, y: -1, z: 0}
+    <AmbientColor>k__BackingField: {r: 0.046, g: 0.042, b: 0.039, a: 1}
+    <HemisphereColor>k__BackingField: {r: 0.215, g: 0.235, b: 0.235, a: 1}
+    <WindDirectionRadians>k__BackingField: 0.6981317
+    <WindVelocity>k__BackingField: 510
+    <TreeAmplitudeIntensity>k__BackingField: 0.018
+    <RainDensity>k__BackingField: 0
+    <RainColor>k__BackingField: {r: 0.68, g: 0.64, b: 0.6, a: 1}
+    <FogColor>k__BackingField: {r: 0.155, g: 0.165, b: 0.175, a: 1}
+    <FogDensity>k__BackingField: 1
+    <FogDistance>k__BackingField: 450
+    <FarPlane>k__BackingField: 460
+    <SkyColor>k__BackingField: {r: 0.76, g: 0.68, b: 0.6, a: 1}
+    <CloudsColor>k__BackingField: {r: 0, g: 0, b: 0, a: 0}
+    <SkyRotationRadians>k__BackingField: 0.02617994
+    <SkyResources>k__BackingField:
+      _name0: sky\swtc_clear_alt\13-00
+      _name1: 
+      _name2: 
+      _name3: 
+      _texture0: {fileID: 8900000, guid: afa1a6c9260d85142b432213fa86fc35, type: 2}
+      _texture1: {fileID: 0}
+      _texture2: {fileID: 0}
+      _texture3: {fileID: 0}
+      _weights: {x: 1, y: 0, z: 0, w: 0}
+    <CloudsResources>k__BackingField:
+      _name0: 
+      _name1: 
+      _name2: 
+      _name3: 
+      _texture0: {fileID: 0}
+      _texture1: {fileID: 0}
+      _texture2: {fileID: 0}
+      _texture3: {fileID: 0}
+      _weights: {x: 0, y: 0, z: 0, w: 0}
+    <EnvironmentResources>k__BackingField:
+      _name0: sky\swtc_clear_alt\13-00#small
+      _name1: 
+      _name2: 
+      _name3: 
+      _texture0: {fileID: 8900000, guid: 8bb213d14e6696c44bd6981509f51e59, type: 2}
+      _texture1: {fileID: 0}
+      _texture2: {fileID: 0}
+      _texture3: {fileID: 0}
+      _weights: {x: 1, y: 0, z: 0, w: 0}
+    <SunDefinition>k__BackingField: sunset_sunrise_small
+    <AmbientDefinition>k__BackingField: day
+    <ThunderboltCollection>k__BackingField: 
+    <ThunderboltPeriod>k__BackingField: 0
+    <ThunderboltDuration>k__BackingField: 0
+    <SunShaftsIntensity>k__BackingField: 0.06
+    <WaterIntensity>k__BackingField: 0.5
+  - <GameSeconds>k__BackingField: 50400
+    <Key0>k__BackingField: 14:00:00
+    <Key1>k__BackingField: 14:00:00
+    <ResourceBlend>k__BackingField: 0
+    <SunColor>k__BackingField: {r: 0.367, g: 0.382, b: 0.387, a: 1}
+    <SunDirection>k__BackingField: {x: 0, y: -1, z: 0}
+    <AmbientColor>k__BackingField: {r: 0.046, g: 0.042, b: 0.039, a: 1}
+    <HemisphereColor>k__BackingField: {r: 0.216, g: 0.235, b: 0.235, a: 1}
+    <WindDirectionRadians>k__BackingField: 0.34906584
+    <WindVelocity>k__BackingField: 300
+    <TreeAmplitudeIntensity>k__BackingField: 0.018
+    <RainDensity>k__BackingField: 0
+    <RainColor>k__BackingField: {r: 0.68, g: 0.64, b: 0.6, a: 1}
+    <FogColor>k__BackingField: {r: 0.155, g: 0.165, b: 0.175, a: 1}
+    <FogDensity>k__BackingField: 1
+    <FogDistance>k__BackingField: 450
+    <FarPlane>k__BackingField: 460
+    <SkyColor>k__BackingField: {r: 0.76, g: 0.68, b: 0.6, a: 1}
+    <CloudsColor>k__BackingField: {r: 0, g: 0, b: 0, a: 0}
+    <SkyRotationRadians>k__BackingField: 0.027925268
+    <SkyResources>k__BackingField:
+      _name0: sky\swtc_clear_alt\13-00
+      _name1: 
+      _name2: 
+      _name3: 
+      _texture0: {fileID: 8900000, guid: afa1a6c9260d85142b432213fa86fc35, type: 2}
+      _texture1: {fileID: 0}
+      _texture2: {fileID: 0}
+      _texture3: {fileID: 0}
+      _weights: {x: 1, y: 0, z: 0, w: 0}
+    <CloudsResources>k__BackingField:
+      _name0: 
+      _name1: 
+      _name2: 
+      _name3: 
+      _texture0: {fileID: 0}
+      _texture1: {fileID: 0}
+      _texture2: {fileID: 0}
+      _texture3: {fileID: 0}
+      _weights: {x: 0, y: 0, z: 0, w: 0}
+    <EnvironmentResources>k__BackingField:
+      _name0: sky\swtc_clear_alt\13-00#small
+      _name1: 
+      _name2: 
+      _name3: 
+      _texture0: {fileID: 8900000, guid: 8bb213d14e6696c44bd6981509f51e59, type: 2}
+      _texture1: {fileID: 0}
+      _texture2: {fileID: 0}
+      _texture3: {fileID: 0}
+      _weights: {x: 1, y: 0, z: 0, w: 0}
+    <SunDefinition>k__BackingField: sunset_sunrise_small
+    <AmbientDefinition>k__BackingField: day
+    <ThunderboltCollection>k__BackingField: 
+    <ThunderboltPeriod>k__BackingField: 0
+    <ThunderboltDuration>k__BackingField: 0
+    <SunShaftsIntensity>k__BackingField: 0.06
+    <WaterIntensity>k__BackingField: 0.1
+  - <GameSeconds>k__BackingField: 54000
+    <Key0>k__BackingField: 15:00:00
+    <Key1>k__BackingField: 15:00:00
+    <ResourceBlend>k__BackingField: 0
+    <SunColor>k__BackingField: {r: 0.397, g: 0.408, b: 0.4, a: 1}
+    <SunDirection>k__BackingField: {x: 0, y: -1, z: 0}
+    <AmbientColor>k__BackingField: {r: 0.046, g: 0.042, b: 0.039, a: 1}
+    <HemisphereColor>k__BackingField: {r: 0.295, g: 0.295, b: 0.305, a: 1}
+    <WindDirectionRadians>k__BackingField: 0.34906584
+    <WindVelocity>k__BackingField: 300
+    <TreeAmplitudeIntensity>k__BackingField: 0.018
+    <RainDensity>k__BackingField: 0
+    <RainColor>k__BackingField: {r: 0.68, g: 0.64, b: 0.6, a: 1}
+    <FogColor>k__BackingField: {r: 0.155, g: 0.165, b: 0.17, a: 1}
+    <FogDensity>k__BackingField: 1
+    <FogDistance>k__BackingField: 500
+    <FarPlane>k__BackingField: 510
+    <SkyColor>k__BackingField: {r: 0.85, g: 0.8, b: 0.6, a: 1}
+    <CloudsColor>k__BackingField: {r: 0, g: 0, b: 0, a: 0}
+    <SkyRotationRadians>k__BackingField: 0.04712389
+    <SkyResources>k__BackingField:
+      _name0: sky\new_skytextures\16
+      _name1: 
+      _name2: 
+      _name3: 
+      _texture0: {fileID: 8900000, guid: 9cc72dab8da8a1b4ea932cc1cffd2d30, type: 2}
+      _texture1: {fileID: 0}
+      _texture2: {fileID: 0}
+      _texture3: {fileID: 0}
+      _weights: {x: 1, y: 0, z: 0, w: 0}
+    <CloudsResources>k__BackingField:
+      _name0: 
+      _name1: 
+      _name2: 
+      _name3: 
+      _texture0: {fileID: 0}
+      _texture1: {fileID: 0}
+      _texture2: {fileID: 0}
+      _texture3: {fileID: 0}
+      _weights: {x: 0, y: 0, z: 0, w: 0}
+    <EnvironmentResources>k__BackingField:
+      _name0: sky\new_skytextures\16#small
+      _name1: 
+      _name2: 
+      _name3: 
+      _texture0: {fileID: 8900000, guid: 448adb2dbcc304c40bb2c187fac01107, type: 2}
+      _texture1: {fileID: 0}
+      _texture2: {fileID: 0}
+      _texture3: {fileID: 0}
+      _weights: {x: 1, y: 0, z: 0, w: 0}
+    <SunDefinition>k__BackingField: clear_alt_day1
+    <AmbientDefinition>k__BackingField: day
+    <ThunderboltCollection>k__BackingField: 
+    <ThunderboltPeriod>k__BackingField: 0
+    <ThunderboltDuration>k__BackingField: 0
+    <SunShaftsIntensity>k__BackingField: 0.06
+    <WaterIntensity>k__BackingField: 0.1
+  - <GameSeconds>k__BackingField: 57600
+    <Key0>k__BackingField: 16:00:00
+    <Key1>k__BackingField: 16:00:00
+    <ResourceBlend>k__BackingField: 0
+    <SunColor>k__BackingField: {r: 0.417, g: 0.428, b: 0.42, a: 1}
+    <SunDirection>k__BackingField: {x: 0, y: -1, z: 0}
+    <AmbientColor>k__BackingField: {r: 0.046, g: 0.042, b: 0.039, a: 1}
+    <HemisphereColor>k__BackingField: {r: 0.295, g: 0.295, b: 0.305, a: 1}
+    <WindDirectionRadians>k__BackingField: 0.34906584
+    <WindVelocity>k__BackingField: 300
+    <TreeAmplitudeIntensity>k__BackingField: 0.018
+    <RainDensity>k__BackingField: 0
+    <RainColor>k__BackingField: {r: 0.68, g: 0.64, b: 0.6, a: 1}
+    <FogColor>k__BackingField: {r: 0.155, g: 0.165, b: 0.17, a: 1}
+    <FogDensity>k__BackingField: 1
+    <FogDistance>k__BackingField: 600
+    <FarPlane>k__BackingField: 610
+    <SkyColor>k__BackingField: {r: 0.85, g: 0.8, b: 0.65, a: 1}
+    <CloudsColor>k__BackingField: {r: 0, g: 0, b: 0, a: 0}
+    <SkyRotationRadians>k__BackingField: 0.06632251
+    <SkyResources>k__BackingField:
+      _name0: sky\new_skytextures\16
+      _name1: 
+      _name2: 
+      _name3: 
+      _texture0: {fileID: 8900000, guid: 9cc72dab8da8a1b4ea932cc1cffd2d30, type: 2}
+      _texture1: {fileID: 0}
+      _texture2: {fileID: 0}
+      _texture3: {fileID: 0}
+      _weights: {x: 1, y: 0, z: 0, w: 0}
+    <CloudsResources>k__BackingField:
+      _name0: 
+      _name1: 
+      _name2: 
+      _name3: 
+      _texture0: {fileID: 0}
+      _texture1: {fileID: 0}
+      _texture2: {fileID: 0}
+      _texture3: {fileID: 0}
+      _weights: {x: 0, y: 0, z: 0, w: 0}
+    <EnvironmentResources>k__BackingField:
+      _name0: sky\new_skytextures\16#small
+      _name1: 
+      _name2: 
+      _name3: 
+      _texture0: {fileID: 8900000, guid: 448adb2dbcc304c40bb2c187fac01107, type: 2}
+      _texture1: {fileID: 0}
+      _texture2: {fileID: 0}
+      _texture3: {fileID: 0}
+      _weights: {x: 1, y: 0, z: 0, w: 0}
+    <SunDefinition>k__BackingField: clear_alt_day1
+    <AmbientDefinition>k__BackingField: day
+    <ThunderboltCollection>k__BackingField: 
+    <ThunderboltPeriod>k__BackingField: 0
+    <ThunderboltDuration>k__BackingField: 0
+    <SunShaftsIntensity>k__BackingField: 0.06
+    <WaterIntensity>k__BackingField: 0.1
+  - <GameSeconds>k__BackingField: 61200
+    <Key0>k__BackingField: 17:00:00
+    <Key1>k__BackingField: 17:00:00
+    <ResourceBlend>k__BackingField: 0
+    <SunColor>k__BackingField: {r: 0.44, g: 0.43, b: 0.4, a: 1}
+    <SunDirection>k__BackingField: {x: 0, y: -1, z: 0}
+    <AmbientColor>k__BackingField: {r: 0.042, g: 0.04, b: 0.039, a: 1}
+    <HemisphereColor>k__BackingField: {r: 0.215, g: 0.215, b: 0.215, a: 1}
+    <WindDirectionRadians>k__BackingField: 0.6981317
+    <WindVelocity>k__BackingField: 510
+    <TreeAmplitudeIntensity>k__BackingField: 0.015
+    <RainDensity>k__BackingField: 0
+    <RainColor>k__BackingField: {r: 0.68, g: 0.64, b: 0.6, a: 1}
+    <FogColor>k__BackingField: {r: 0.145, g: 0.14, b: 0.15, a: 1}
+    <FogDensity>k__BackingField: 1
+    <FogDistance>k__BackingField: 650
+    <FarPlane>k__BackingField: 660
+    <SkyColor>k__BackingField: {r: 0.73, g: 0.8, b: 0.8, a: 1}
+    <CloudsColor>k__BackingField: {r: 0, g: 0, b: 0, a: 0}
+    <SkyRotationRadians>k__BackingField: 0.08552113
+    <SkyResources>k__BackingField:
+      _name0: sky\af3_a_partly\18-00
+      _name1: 
+      _name2: 
+      _name3: 
+      _texture0: {fileID: 8900000, guid: fccdb7fad6384b14bbda170a5355c588, type: 2}
+      _texture1: {fileID: 0}
+      _texture2: {fileID: 0}
+      _texture3: {fileID: 0}
+      _weights: {x: 1, y: 0, z: 0, w: 0}
+    <CloudsResources>k__BackingField:
+      _name0: 
+      _name1: 
+      _name2: 
+      _name3: 
+      _texture0: {fileID: 0}
+      _texture1: {fileID: 0}
+      _texture2: {fileID: 0}
+      _texture3: {fileID: 0}
+      _weights: {x: 0, y: 0, z: 0, w: 0}
+    <EnvironmentResources>k__BackingField:
+      _name0: sky\af3_a_partly\18-00#small
+      _name1: 
+      _name2: 
+      _name3: 
+      _texture0: {fileID: 8900000, guid: 456347a318e78874ba7f894db924764c, type: 2}
+      _texture1: {fileID: 0}
+      _texture2: {fileID: 0}
+      _texture3: {fileID: 0}
+      _weights: {x: 1, y: 0, z: 0, w: 0}
+    <SunDefinition>k__BackingField: clear_alt_day1
+    <AmbientDefinition>k__BackingField: day
+    <ThunderboltCollection>k__BackingField: 
+    <ThunderboltPeriod>k__BackingField: 0
+    <ThunderboltDuration>k__BackingField: 0
+    <SunShaftsIntensity>k__BackingField: 0.075
+    <WaterIntensity>k__BackingField: 0.1
+  - <GameSeconds>k__BackingField: 64800
+    <Key0>k__BackingField: 18:00:00
+    <Key1>k__BackingField: 18:00:00
+    <ResourceBlend>k__BackingField: 0
+    <SunColor>k__BackingField: {r: 0.495, g: 0.43, b: 0.34, a: 1}
+    <SunDirection>k__BackingField: {x: 0, y: -1, z: 0}
+    <AmbientColor>k__BackingField: {r: 0.04, g: 0.038, b: 0.039, a: 1}
+    <HemisphereColor>k__BackingField: {r: 0.2, g: 0.195, b: 0.195, a: 1}
+    <WindDirectionRadians>k__BackingField: 0.6981317
+    <WindVelocity>k__BackingField: 510
+    <TreeAmplitudeIntensity>k__BackingField: 0.015
+    <RainDensity>k__BackingField: 0
+    <RainColor>k__BackingField: {r: 0.68, g: 0.64, b: 0.6, a: 1}
+    <FogColor>k__BackingField: {r: 0.115, g: 0.11, b: 0.12, a: 1}
+    <FogDensity>k__BackingField: 1
+    <FogDistance>k__BackingField: 600
+    <FarPlane>k__BackingField: 610
+    <SkyColor>k__BackingField: {r: 0.76, g: 0.83, b: 0.83, a: 1}
+    <CloudsColor>k__BackingField: {r: 0, g: 0, b: 0, a: 0}
+    <SkyRotationRadians>k__BackingField: 0.09773844
+    <SkyResources>k__BackingField:
+      _name0: sky\af3_a_partly\18-00
+      _name1: 
+      _name2: 
+      _name3: 
+      _texture0: {fileID: 8900000, guid: fccdb7fad6384b14bbda170a5355c588, type: 2}
+      _texture1: {fileID: 0}
+      _texture2: {fileID: 0}
+      _texture3: {fileID: 0}
+      _weights: {x: 1, y: 0, z: 0, w: 0}
+    <CloudsResources>k__BackingField:
+      _name0: 
+      _name1: 
+      _name2: 
+      _name3: 
+      _texture0: {fileID: 0}
+      _texture1: {fileID: 0}
+      _texture2: {fileID: 0}
+      _texture3: {fileID: 0}
+      _weights: {x: 0, y: 0, z: 0, w: 0}
+    <EnvironmentResources>k__BackingField:
+      _name0: sky\af3_a_partly\18-00#small
+      _name1: 
+      _name2: 
+      _name3: 
+      _texture0: {fileID: 8900000, guid: 456347a318e78874ba7f894db924764c, type: 2}
+      _texture1: {fileID: 0}
+      _texture2: {fileID: 0}
+      _texture3: {fileID: 0}
+      _weights: {x: 1, y: 0, z: 0, w: 0}
+    <SunDefinition>k__BackingField: sunset_sunrise_small
+    <AmbientDefinition>k__BackingField: day
+    <ThunderboltCollection>k__BackingField: 
+    <ThunderboltPeriod>k__BackingField: 0
+    <ThunderboltDuration>k__BackingField: 0
+    <SunShaftsIntensity>k__BackingField: 0.075
+    <WaterIntensity>k__BackingField: 0.1
+  - <GameSeconds>k__BackingField: 68400
+    <Key0>k__BackingField: 19:00:00
+    <Key1>k__BackingField: 19:00:00
+    <ResourceBlend>k__BackingField: 0
+    <SunColor>k__BackingField: {r: 0.6, g: 0.5, b: 0.41, a: 1}
+    <SunDirection>k__BackingField: {x: 0, y: -1, z: 0}
+    <AmbientColor>k__BackingField: {r: 0.04, g: 0.032, b: 0.032, a: 1}
+    <HemisphereColor>k__BackingField: {r: 0.24, g: 0.24, b: 0.24, a: 1}
+    <WindDirectionRadians>k__BackingField: 0.6981317
+    <WindVelocity>k__BackingField: 400
+    <TreeAmplitudeIntensity>k__BackingField: 0.015
+    <RainDensity>k__BackingField: 0
+    <RainColor>k__BackingField: {r: 0.222, g: 0.222, b: 0.222, a: 1}
+    <FogColor>k__BackingField: {r: 0.105, g: 0.1, b: 0.11, a: 1}
+    <FogDensity>k__BackingField: 0.87
+    <FogDistance>k__BackingField: 560
+    <FarPlane>k__BackingField: 570
+    <SkyColor>k__BackingField: {r: 0.64, g: 0.7, b: 0.9, a: 1}
+    <CloudsColor>k__BackingField: {r: 0, g: 0, b: 0, a: 0}
+    <SkyRotationRadians>k__BackingField: 0.10646508
+    <SkyResources>k__BackingField:
+      _name0: sky\swtc_clear_alt\20-00_2
+      _name1: 
+      _name2: 
+      _name3: 
+      _texture0: {fileID: 8900000, guid: 76d41de30903678478b6acff554fa756, type: 2}
+      _texture1: {fileID: 0}
+      _texture2: {fileID: 0}
+      _texture3: {fileID: 0}
+      _weights: {x: 1, y: 0, z: 0, w: 0}
+    <CloudsResources>k__BackingField:
+      _name0: 
+      _name1: 
+      _name2: 
+      _name3: 
+      _texture0: {fileID: 0}
+      _texture1: {fileID: 0}
+      _texture2: {fileID: 0}
+      _texture3: {fileID: 0}
+      _weights: {x: 0, y: 0, z: 0, w: 0}
+    <EnvironmentResources>k__BackingField:
+      _name0: sky\swtc_clear_alt\20-00_2#small
+      _name1: 
+      _name2: 
+      _name3: 
+      _texture0: {fileID: 8900000, guid: f1dfe42a828162d41afe6a6346e0f01d, type: 2}
+      _texture1: {fileID: 0}
+      _texture2: {fileID: 0}
+      _texture3: {fileID: 0}
+      _weights: {x: 1, y: 0, z: 0, w: 0}
+    <SunDefinition>k__BackingField: sunset_sunrise_small
+    <AmbientDefinition>k__BackingField: evening
+    <ThunderboltCollection>k__BackingField: 
+    <ThunderboltPeriod>k__BackingField: 0
+    <ThunderboltDuration>k__BackingField: 0
+    <SunShaftsIntensity>k__BackingField: 0.075
+    <WaterIntensity>k__BackingField: 0.1
+  - <GameSeconds>k__BackingField: 70200
+    <Key0>k__BackingField: 19:30:00
+    <Key1>k__BackingField: 19:30:00
+    <ResourceBlend>k__BackingField: 0
+    <SunColor>k__BackingField: {r: 0.6, g: 0.5, b: 0.41, a: 1}
+    <SunDirection>k__BackingField: {x: 0, y: -1, z: 0}
+    <AmbientColor>k__BackingField: {r: 0.03, g: 0.0295, b: 0.029, a: 1}
+    <HemisphereColor>k__BackingField: {r: 0.207, g: 0.212, b: 0.224, a: 1}
+    <WindDirectionRadians>k__BackingField: 0.6981317
+    <WindVelocity>k__BackingField: 400
+    <TreeAmplitudeIntensity>k__BackingField: 0.015
+    <RainDensity>k__BackingField: 0
+    <RainColor>k__BackingField: {r: 0.222, g: 0.222, b: 0.222, a: 1}
+    <FogColor>k__BackingField: {r: 0.05, g: 0.0465, b: 0.054, a: 1}
+    <FogDensity>k__BackingField: 0.855
+    <FogDistance>k__BackingField: 590
+    <FarPlane>k__BackingField: 600
+    <SkyColor>k__BackingField: {r: 0.56, g: 0.64, b: 0.81, a: 1}
+    <CloudsColor>k__BackingField: {r: 0, g: 0, b: 0, a: 0}
+    <SkyRotationRadians>k__BackingField: 0.10733775
+    <SkyResources>k__BackingField:
+      _name0: sky\swtc_clear_alt\20-00_2
+      _name1: 
+      _name2: 
+      _name3: 
+      _texture0: {fileID: 8900000, guid: 76d41de30903678478b6acff554fa756, type: 2}
+      _texture1: {fileID: 0}
+      _texture2: {fileID: 0}
+      _texture3: {fileID: 0}
+      _weights: {x: 1, y: 0, z: 0, w: 0}
+    <CloudsResources>k__BackingField:
+      _name0: 
+      _name1: 
+      _name2: 
+      _name3: 
+      _texture0: {fileID: 0}
+      _texture1: {fileID: 0}
+      _texture2: {fileID: 0}
+      _texture3: {fileID: 0}
+      _weights: {x: 0, y: 0, z: 0, w: 0}
+    <EnvironmentResources>k__BackingField:
+      _name0: sky\swtc_clear_alt\20-00_2#small
+      _name1: 
+      _name2: 
+      _name3: 
+      _texture0: {fileID: 8900000, guid: f1dfe42a828162d41afe6a6346e0f01d, type: 2}
+      _texture1: {fileID: 0}
+      _texture2: {fileID: 0}
+      _texture3: {fileID: 0}
+      _weights: {x: 1, y: 0, z: 0, w: 0}
+    <SunDefinition>k__BackingField: sunset_sunrise_small
+    <AmbientDefinition>k__BackingField: evening
+    <ThunderboltCollection>k__BackingField: 
+    <ThunderboltPeriod>k__BackingField: 0
+    <ThunderboltDuration>k__BackingField: 0
+    <SunShaftsIntensity>k__BackingField: 0.04
+    <WaterIntensity>k__BackingField: 0.1
+  - <GameSeconds>k__BackingField: 72000
+    <Key0>k__BackingField: 20:00:00
+    <Key1>k__BackingField: 20:00:00
+    <ResourceBlend>k__BackingField: 0
+    <SunColor>k__BackingField: {r: 0.38, g: 0.36, b: 0.33, a: 1}
+    <SunDirection>k__BackingField: {x: 0, y: -1, z: 0}
+    <AmbientColor>k__BackingField: {r: 0.0195, g: 0.0195, b: 0.02, a: 1}
+    <HemisphereColor>k__BackingField: {r: 0.157, g: 0.152, b: 0.165, a: 1}
+    <WindDirectionRadians>k__BackingField: 0.17453292
+    <WindVelocity>k__BackingField: 400
+    <TreeAmplitudeIntensity>k__BackingField: 0.015
+    <RainDensity>k__BackingField: 0
+    <RainColor>k__BackingField: {r: 0.222, g: 0.222, b: 0.222, a: 1}
+    <FogColor>k__BackingField: {r: 0, g: 0, b: 0, a: 1}
+    <FogDensity>k__BackingField: 1
+    <FogDistance>k__BackingField: 620
+    <FarPlane>k__BackingField: 630
+    <SkyColor>k__BackingField: {r: 0.34, g: 0.38, b: 0.48, a: 1}
+    <CloudsColor>k__BackingField: {r: 0, g: 0, b: 0, a: 0}
+    <SkyRotationRadians>k__BackingField: 0.10821041
+    <SkyResources>k__BackingField:
+      _name0: sky\swtc_clear_alt\20-00_2
+      _name1: 
+      _name2: 
+      _name3: 
+      _texture0: {fileID: 8900000, guid: 76d41de30903678478b6acff554fa756, type: 2}
+      _texture1: {fileID: 0}
+      _texture2: {fileID: 0}
+      _texture3: {fileID: 0}
+      _weights: {x: 1, y: 0, z: 0, w: 0}
+    <CloudsResources>k__BackingField:
+      _name0: 
+      _name1: 
+      _name2: 
+      _name3: 
+      _texture0: {fileID: 0}
+      _texture1: {fileID: 0}
+      _texture2: {fileID: 0}
+      _texture3: {fileID: 0}
+      _weights: {x: 0, y: 0, z: 0, w: 0}
+    <EnvironmentResources>k__BackingField:
+      _name0: sky\swtc_clear_alt\20-00_2#small
+      _name1: 
+      _name2: 
+      _name3: 
+      _texture0: {fileID: 8900000, guid: f1dfe42a828162d41afe6a6346e0f01d, type: 2}
+      _texture1: {fileID: 0}
+      _texture2: {fileID: 0}
+      _texture3: {fileID: 0}
+      _weights: {x: 1, y: 0, z: 0, w: 0}
+    <SunDefinition>k__BackingField: sunset_sunrise_small
+    <AmbientDefinition>k__BackingField: night
+    <ThunderboltCollection>k__BackingField: 
+    <ThunderboltPeriod>k__BackingField: 0
+    <ThunderboltDuration>k__BackingField: 0
+    <SunShaftsIntensity>k__BackingField: 0.05
+    <WaterIntensity>k__BackingField: 0.1
+  - <GameSeconds>k__BackingField: 73800
+    <Key0>k__BackingField: 20:30:00
+    <Key1>k__BackingField: 20:30:00
+    <ResourceBlend>k__BackingField: 0
+    <SunColor>k__BackingField: {r: 0, g: 0, b: 0, a: 1}
+    <SunDirection>k__BackingField: {x: 0, y: -1, z: 0}
+    <AmbientColor>k__BackingField: {r: 0.0155, g: 0.016, b: 0.0165, a: 1}
+    <HemisphereColor>k__BackingField: {r: 0.085, g: 0.085, b: 0.085, a: 1}
+    <WindDirectionRadians>k__BackingField: 0.17453292
+    <WindVelocity>k__BackingField: 400
+    <TreeAmplitudeIntensity>k__BackingField: 0.015
+    <RainDensity>k__BackingField: 0
+    <RainColor>k__BackingField: {r: 0.222, g: 0.222, b: 0.222, a: 1}
+    <FogColor>k__BackingField: {r: 0.01, g: 0.009, b: 0.012, a: 1}
+    <FogDensity>k__BackingField: 1
+    <FogDistance>k__BackingField: 457
+    <FarPlane>k__BackingField: 467
+    <SkyColor>k__BackingField: {r: 0.32, g: 0.32, b: 0.35, a: 1}
+    <CloudsColor>k__BackingField: {r: 0, g: 0, b: 0, a: 0}
+    <SkyRotationRadians>k__BackingField: 0.10908308
+    <SkyResources>k__BackingField:
+      _name0: sky\swtc_clear_alt\20-00_2
+      _name1: 
+      _name2: 
+      _name3: 
+      _texture0: {fileID: 8900000, guid: 76d41de30903678478b6acff554fa756, type: 2}
+      _texture1: {fileID: 0}
+      _texture2: {fileID: 0}
+      _texture3: {fileID: 0}
+      _weights: {x: 1, y: 0, z: 0, w: 0}
+    <CloudsResources>k__BackingField:
+      _name0: 
+      _name1: 
+      _name2: 
+      _name3: 
+      _texture0: {fileID: 0}
+      _texture1: {fileID: 0}
+      _texture2: {fileID: 0}
+      _texture3: {fileID: 0}
+      _weights: {x: 0, y: 0, z: 0, w: 0}
+    <EnvironmentResources>k__BackingField:
+      _name0: sky\swtc_clear_alt\20-00_2#small
+      _name1: 
+      _name2: 
+      _name3: 
+      _texture0: {fileID: 8900000, guid: f1dfe42a828162d41afe6a6346e0f01d, type: 2}
+      _texture1: {fileID: 0}
+      _texture2: {fileID: 0}
+      _texture3: {fileID: 0}
+      _weights: {x: 1, y: 0, z: 0, w: 0}
+    <SunDefinition>k__BackingField: 
+    <AmbientDefinition>k__BackingField: night
+    <ThunderboltCollection>k__BackingField: 
+    <ThunderboltPeriod>k__BackingField: 0
+    <ThunderboltDuration>k__BackingField: 0
+    <SunShaftsIntensity>k__BackingField: 0.1
+    <WaterIntensity>k__BackingField: 0.1
+  - <GameSeconds>k__BackingField: 75600
+    <Key0>k__BackingField: 21:00:00
+    <Key1>k__BackingField: 21:00:00
+    <ResourceBlend>k__BackingField: 0
+    <SunColor>k__BackingField: {r: 0.05, g: 0.058, b: 0.065, a: 1}
+    <SunDirection>k__BackingField: {x: 0, y: -1, z: 0}
+    <AmbientColor>k__BackingField: {r: 0.0135, g: 0.014, b: 0.0145, a: 1}
+    <HemisphereColor>k__BackingField: {r: 0.143, g: 0.143, b: 0.095, a: 1}
+    <WindDirectionRadians>k__BackingField: 0.17453292
+    <WindVelocity>k__BackingField: 400
+    <TreeAmplitudeIntensity>k__BackingField: 0.01
+    <RainDensity>k__BackingField: 0
+    <RainColor>k__BackingField: {r: 0.111, g: 0.111, b: 0.111, a: 1}
+    <FogColor>k__BackingField: {r: 0.0061, g: 0.0062, b: 0.00669, a: 1}
+    <FogDensity>k__BackingField: 1
+    <FogDistance>k__BackingField: 500
+    <FarPlane>k__BackingField: 510
+    <SkyColor>k__BackingField: {r: 0.4, g: 0.6, b: 0.54, a: 1}
+    <CloudsColor>k__BackingField: {r: 0, g: 0, b: 0, a: 0}
+    <SkyRotationRadians>k__BackingField: 0.10995574
+    <SkyResources>k__BackingField:
+      _name0: sky\swtc_clear_alt\23-00
+      _name1: 
+      _name2: 
+      _name3: 
+      _texture0: {fileID: 8900000, guid: b55ca0a0f4a45ae4d956c10466a213f8, type: 2}
+      _texture1: {fileID: 0}
+      _texture2: {fileID: 0}
+      _texture3: {fileID: 0}
+      _weights: {x: 1, y: 0, z: 0, w: 0}
+    <CloudsResources>k__BackingField:
+      _name0: 
+      _name1: 
+      _name2: 
+      _name3: 
+      _texture0: {fileID: 0}
+      _texture1: {fileID: 0}
+      _texture2: {fileID: 0}
+      _texture3: {fileID: 0}
+      _weights: {x: 0, y: 0, z: 0, w: 0}
+    <EnvironmentResources>k__BackingField:
+      _name0: sky\swtc_clear_alt\23-00#small
+      _name1: 
+      _name2: 
+      _name3: 
+      _texture0: {fileID: 8900000, guid: 8fd8baeb3081608479468c18bf50208e, type: 2}
+      _texture1: {fileID: 0}
+      _texture2: {fileID: 0}
+      _texture3: {fileID: 0}
+      _weights: {x: 1, y: 0, z: 0, w: 0}
+    <SunDefinition>k__BackingField: moon_wan_c
+    <AmbientDefinition>k__BackingField: night
+    <ThunderboltCollection>k__BackingField: 
+    <ThunderboltPeriod>k__BackingField: 0
+    <ThunderboltDuration>k__BackingField: 0
+    <SunShaftsIntensity>k__BackingField: 0.35
+    <WaterIntensity>k__BackingField: 0.1
+  - <GameSeconds>k__BackingField: 79200
+    <Key0>k__BackingField: 22:00:00
+    <Key1>k__BackingField: 22:00:00
+    <ResourceBlend>k__BackingField: 0
+    <SunColor>k__BackingField: {r: 0.05, g: 0.058, b: 0.065, a: 1}
+    <SunDirection>k__BackingField: {x: 0, y: -1, z: 0}
+    <AmbientColor>k__BackingField: {r: 0.0135, g: 0.014, b: 0.0145, a: 1}
+    <HemisphereColor>k__BackingField: {r: 0.143, g: 0.143, b: 0.095, a: 1}
+    <WindDirectionRadians>k__BackingField: 0.34906584
+    <WindVelocity>k__BackingField: 300
+    <TreeAmplitudeIntensity>k__BackingField: 0.015
+    <RainDensity>k__BackingField: 0
+    <RainColor>k__BackingField: {r: 0.2, g: 0.2, b: 0.215, a: 1}
+    <FogColor>k__BackingField: {r: 0.0061, g: 0.0062, b: 0.00669, a: 1}
+    <FogDensity>k__BackingField: 1
+    <FogDistance>k__BackingField: 500
+    <FarPlane>k__BackingField: 510
+    <SkyColor>k__BackingField: {r: 0.4, g: 0.6, b: 0.54, a: 1}
+    <CloudsColor>k__BackingField: {r: 0, g: 0, b: 0, a: 0}
+    <SkyRotationRadians>k__BackingField: 0.11170107
+    <SkyResources>k__BackingField:
+      _name0: sky\swtc_clear_alt\23-00
+      _name1: 
+      _name2: 
+      _name3: 
+      _texture0: {fileID: 8900000, guid: b55ca0a0f4a45ae4d956c10466a213f8, type: 2}
+      _texture1: {fileID: 0}
+      _texture2: {fileID: 0}
+      _texture3: {fileID: 0}
+      _weights: {x: 1, y: 0, z: 0, w: 0}
+    <CloudsResources>k__BackingField:
+      _name0: 
+      _name1: 
+      _name2: 
+      _name3: 
+      _texture0: {fileID: 0}
+      _texture1: {fileID: 0}
+      _texture2: {fileID: 0}
+      _texture3: {fileID: 0}
+      _weights: {x: 0, y: 0, z: 0, w: 0}
+    <EnvironmentResources>k__BackingField:
+      _name0: sky\swtc_clear_alt\23-00#small
+      _name1: 
+      _name2: 
+      _name3: 
+      _texture0: {fileID: 8900000, guid: 8fd8baeb3081608479468c18bf50208e, type: 2}
+      _texture1: {fileID: 0}
+      _texture2: {fileID: 0}
+      _texture3: {fileID: 0}
+      _weights: {x: 1, y: 0, z: 0, w: 0}
+    <SunDefinition>k__BackingField: moon_wan_c
+    <AmbientDefinition>k__BackingField: night
+    <ThunderboltCollection>k__BackingField: 
+    <ThunderboltPeriod>k__BackingField: 0
+    <ThunderboltDuration>k__BackingField: 0
+    <SunShaftsIntensity>k__BackingField: 0.35
+    <WaterIntensity>k__BackingField: 0.1
+  - <GameSeconds>k__BackingField: 82800
+    <Key0>k__BackingField: 23:00:00
+    <Key1>k__BackingField: 23:00:00
+    <ResourceBlend>k__BackingField: 0
+    <SunColor>k__BackingField: {r: 0.05, g: 0.058, b: 0.065, a: 1}
+    <SunDirection>k__BackingField: {x: 0, y: -1, z: 0}
+    <AmbientColor>k__BackingField: {r: 0.0135, g: 0.014, b: 0.0145, a: 1}
+    <HemisphereColor>k__BackingField: {r: 0.143, g: 0.143, b: 0.095, a: 1}
+    <WindDirectionRadians>k__BackingField: 0.34906584
+    <WindVelocity>k__BackingField: 300
+    <TreeAmplitudeIntensity>k__BackingField: 0.015
+    <RainDensity>k__BackingField: 0
+    <RainColor>k__BackingField: {r: 0.2, g: 0.2, b: 0.215, a: 1}
+    <FogColor>k__BackingField: {r: 0.0061, g: 0.0062, b: 0.00669, a: 1}
+    <FogDensity>k__BackingField: 1
+    <FogDistance>k__BackingField: 500
+    <FarPlane>k__BackingField: 510
+    <SkyColor>k__BackingField: {r: 0.4, g: 0.6, b: 0.54, a: 1}
+    <CloudsColor>k__BackingField: {r: 0, g: 0, b: 0, a: 0}
+    <SkyRotationRadians>k__BackingField: 0.1134464
+    <SkyResources>k__BackingField:
+      _name0: sky\swtc_clear_alt\23-00
+      _name1: 
+      _name2: 
+      _name3: 
+      _texture0: {fileID: 8900000, guid: b55ca0a0f4a45ae4d956c10466a213f8, type: 2}
+      _texture1: {fileID: 0}
+      _texture2: {fileID: 0}
+      _texture3: {fileID: 0}
+      _weights: {x: 1, y: 0, z: 0, w: 0}
+    <CloudsResources>k__BackingField:
+      _name0: 
+      _name1: 
+      _name2: 
+      _name3: 
+      _texture0: {fileID: 0}
+      _texture1: {fileID: 0}
+      _texture2: {fileID: 0}
+      _texture3: {fileID: 0}
+      _weights: {x: 0, y: 0, z: 0, w: 0}
+    <EnvironmentResources>k__BackingField:
+      _name0: sky\swtc_clear_alt\23-00#small
+      _name1: 
+      _name2: 
+      _name3: 
+      _texture0: {fileID: 8900000, guid: 8fd8baeb3081608479468c18bf50208e, type: 2}
+      _texture1: {fileID: 0}
+      _texture2: {fileID: 0}
+      _texture3: {fileID: 0}
+      _weights: {x: 1, y: 0, z: 0, w: 0}
+    <SunDefinition>k__BackingField: moon_wan_c
+    <AmbientDefinition>k__BackingField: night
+    <ThunderboltCollection>k__BackingField: 
+    <ThunderboltPeriod>k__BackingField: 0
+    <ThunderboltDuration>k__BackingField: 0
+    <SunShaftsIntensity>k__BackingField: 0.35
+    <WaterIntensity>k__BackingField: 0.1
+  _hourlySunPositions:
+  - {x: 14.87, y: -26.543}
+  - {x: 0, y: -28.2}
+  - {x: -14.87, y: -26.543}
+  - {x: -28.3, y: -20.005}
+  - {x: -38.8, y: -9.569}
+  - {x: -44.311, y: 3.033}
+  - {x: 110.3832, y: -1.709}
+  - {x: 99.04011, y: -10.68}
+  - {x: 82.59372, y: -20.16}
+  - {x: 70.3382, y: -29.57}
+  - {x: 61.3612, y: -38.43}
+  - {x: 44.5324, y: -46.04}
+  - {x: 23.9204, y: -51.42}
+  - {x: 0.1585, y: -53.41}
+  - {x: -23.617, y: -51.44}
+  - {x: -44.2558, y: -46.08}
+  - {x: -61.1061, y: -38.47}
+  - {x: -75.0938, y: -29.61}
+  - {x: -87.3502, y: -20.18}
+  - {x: -98.79, y: -10.69}
+  - {x: -110.1213, y: -1.683}
+  - {x: 44.311, y: 3.033}
+  - {x: 38.8, y: -9.569}
+  - {x: 28.301, y: -20.005}
+  _hasSsfxWindTrees: 1
+  _ssfxWindTrees: {x: 11.1, y: 0.17, z: 0.9, w: 0.1}
+  _hasLightSetup: 1
+  _lightSetup: {x: 0.5, y: 1, z: 0, w: 0}
+  _hasFloraFixes: 1
+  _floraFixes: {x: 1.5, y: 1, z: 0, w: 0}
+  _hasSunLightScale: 1
+  _sunLightScale: {x: 2, y: 2, z: 2}
+  _hasEnvironmentScale: 1
+  _environmentScale: {x: 1, y: 1}
+  _visibilityScale: 1.5

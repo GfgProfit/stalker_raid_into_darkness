@@ -42,6 +42,11 @@ namespace XRay.Importer.Tests
             return Queue("Celestial", new Filter { testMode = TestMode.EditMode, assemblyNames = new[] { ASSEMBLY }, groupNames = new[] { @"^XRay\.Importer\.Tests\.XRayWeatherCelestialTests\.", @"^XRay\.Importer\.Tests\.XRayWeatherResourceTests\.FlareBgr24AndBgra32PreserveAuthoredMipsAndAlpha$", @"^XRay\.Importer\.Tests\.XRayWeatherFogMathTests\.", @"^XRay\.Importer\.Tests\.NativeFogRadianceTests\.", @"^XRay\.Importer\.Tests\.WeatherSunRadianceTests\.", @"^XRay\.Importer\.Tests\.XRayWeatherFogIntegrationTests\.", @"^XRay\.Importer\.Tests\.XRayWeatherControllerTests\.", @"^XRay\.Importer\.Tests\.NativeFogPreviewSelectionTests\." } }, archive);
         }
 
+        public static string RunCatalog(string archive)
+        {
+            return Queue("Catalog", new Filter { testMode = TestMode.EditMode, assemblyNames = new[] { ASSEMBLY }, groupNames = new[] { @"^XRay\.Importer\.Tests\.XRayWeatherCatalogTests\." } }, archive);
+        }
+
         public static string Status()
         {
             return _summary == null ? "{\"status\":\"idle\"}" : JsonUtility.ToJson(_summary, true);

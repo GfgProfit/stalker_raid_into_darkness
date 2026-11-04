@@ -129,6 +129,11 @@ namespace XRay.Importer.Levels
             return true;
         }
 
+        internal bool HasSameSourceSettings(XRayWeatherProfile other)
+        {
+            return _hasSsfxWindTrees == other._hasSsfxWindTrees && _ssfxWindTrees.Equals(other._ssfxWindTrees) && _hasLightSetup == other._hasLightSetup && _lightSetup.Equals(other._lightSetup) && _hasFloraFixes == other._hasFloraFixes && _floraFixes.Equals(other._floraFixes) && _hasSunLightScale == other._hasSunLightScale && _sunLightScale.Equals(other._sunLightScale) && _hasEnvironmentScale == other._hasEnvironmentScale && _environmentScale.Equals(other._environmentScale) && _visibilityScale.Equals(other._visibilityScale);
+        }
+
         internal bool HasSameSunPositions(XRayWeatherProfile other)
         {
             if (other == null || _hourlySunPositions == null || other._hourlySunPositions == null || _hourlySunPositions.Length != 24 || other._hourlySunPositions.Length != 24) return false;

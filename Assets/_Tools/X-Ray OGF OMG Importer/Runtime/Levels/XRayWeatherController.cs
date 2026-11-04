@@ -17,6 +17,7 @@ namespace XRay.Importer.Levels
         private static readonly List<XRayWeatherController> _controllers = new List<XRayWeatherController>();
 
         [SerializeField] private XRayWeatherProfile _profile;
+        [SerializeField] private XRayWeatherCatalog _catalog;
         [SerializeField, Range(0.0f, 24.0f)] private float _timeOfDayHours = 12.0f;
         [SerializeField, Min(0.0f)] private float _timeScale = 1.0f;
         [SerializeField] private bool _paused;
@@ -71,6 +72,8 @@ namespace XRay.Importer.Levels
 
         public static XRayWeatherController Active { get; private set; }
 
+        public XRayWeatherProfile AuthoredProfile => _profile;
+        public XRayWeatherCatalog Catalog => _catalog;
         public XRayWeatherProfile ActiveProfile => _transitionTarget != null ? _transitionTarget : _activeProfile;
         public XRayWeatherSnapshot Snapshot => _snapshot;
         public Vector3 SourceLightColor { get; private set; }
@@ -98,6 +101,12 @@ namespace XRay.Importer.Levels
             _sun = sun;
             _settingsApplied = false;
             ApplySettings();
+        }
+
+        public void ConfigureCatalog(XRayWeatherCatalog catalog)
+        {
+            if (catalog != null && !catalog.CanAttachTo(_profile)) throw new ArgumentException("The weather catalog must match the authored profile's source context or contain an identical cycle with the same settings, sun positions and serialized resources.", nameof(catalog));
+            _catalog = catalog;
         }
 
         public void ApplySettings()
@@ -255,11 +264,23 @@ namespace XRay.Importer.Levels
             if (_previewActive && !Application.IsPlaying(gameObject)) TickSimulation(deltaSeconds);
         }
 
+        public bool BeginPreview(double timeSeconds, XRayWeatherProfile profile)
+        {
+            if (double.IsNaN(timeSeconds) || double.IsInfinity(timeSeconds)) throw new ArgumentOutOfRangeException(nameof(timeSeconds));
+            if (profile == null || !profile.Validate(out _) || !BeginPreview()) return false;
+            _gameTimeSeconds = WrapTime(timeSeconds);
+            SetProfile(profile);
+            if (!_ownsInputs) EndPreview();
+            return _previewActive;
+        }
+
         public void EndPreview()
         {
             if (!_previewActive) return;
             _previewActive = false;
             ReleaseInputs();
+            _settingsApplied = false;
+            ApplySettings();
         }
 
         private void OnEnable()

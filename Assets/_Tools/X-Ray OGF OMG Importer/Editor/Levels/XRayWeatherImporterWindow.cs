@@ -22,7 +22,7 @@ namespace XRay.Importer.Editor.Levels
         {
             EditorGUILayout.LabelField("Импорт погодного цикла РВМ", EditorStyles.boldLabel);
             _cycleName = EditorGUILayout.TextField("Исходный цикл", _cycleName);
-            EditorGUILayout.HelpBox("Источник — активный профиль MO2 из действующей конфигурации. Импорт создаёт самостоятельный профиль; renderer неба и текстуры не импортируются.", MessageType.Info);
+            EditorGUILayout.HelpBox("Импорт создаёт профиль с текстурами из активного профиля MO2. Общий каталог доступен через Tools/X-Ray/Weather/Prepare Ordinary Weather Catalog.", MessageType.Info);
             using (new EditorGUI.DisabledScope(string.IsNullOrWhiteSpace(_cycleName)))
             {
                 if (GUILayout.Button("Импортировать в новый Weather Profile")) Import();
@@ -37,7 +37,8 @@ namespace XRay.Importer.Editor.Levels
             if (string.IsNullOrEmpty(path)) return;
             try
             {
-                _imported = XRayWeatherImporter.ImportCurrent(_cycleName, path);
+                string folder = System.IO.Path.GetDirectoryName(path).Replace('\\', '/');
+                _imported = XRayWeatherImporter.ImportCurrent(_cycleName, path, folder + "/Textures");
                 _diagnostic = _imported.CycleName + ": " + _imported.KeyframeCount + " временных ключей. Source identity: " + _imported.SourceIdentity;
                 EditorGUIUtility.PingObject(_imported);
             }

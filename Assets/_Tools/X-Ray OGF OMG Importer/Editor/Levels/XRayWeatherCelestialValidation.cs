@@ -20,9 +20,21 @@ namespace XRay.Importer.Editor.Levels
 
         public static string Prepare(string archive)
         {
+            return Prepare(archive, null);
+        }
+
+        public static string PrepareCatalog(string archive)
+        {
+            XRayWeatherCatalog catalog = XRayWeatherImporter.LoadPreparedCatalog();
+            if (catalog == null) throw new InvalidOperationException("Prepare the saved ordinary weather catalog before building its validation fixture.");
+            return Prepare(archive, catalog);
+        }
+
+        private static string Prepare(string archive, XRayWeatherCatalog catalog)
+        {
             Guard(archive);
             var host = new HostScope();
-            GetProfiles(host.Controller, out XRayWeatherProfile clear, out XRayWeatherProfile rain);
+            GetProfiles(host.Controller, catalog, out XRayWeatherProfile clear, out XRayWeatherProfile rain);
             XRayWeatherCelestialSettings settings = Resources.Load<XRayWeatherCelestialSettings>(XRayWeatherCelestialSettings.RESOURCE_PATH);
             if (settings == null || settings.Shader == null || !settings.Shader.isSupported) throw new InvalidOperationException("Import the current serialized celestial resources and supported shader first.");
             string folder = FIXTURES + "Run_" + DateTime.UtcNow.ToString("yyyyMMdd_HHmmss_fff");
@@ -50,6 +62,7 @@ namespace XRay.Importer.Editor.Levels
                 alpha.SetActive(false);
                 root.transform.Find("Monolith transparent surface").gameObject.SetActive(false);
                 XRayWeatherController controller = XRayLevelSceneBuilder.ConfigureWeather(root, clear);
+                if (catalog != null) controller.ConfigureCatalog(catalog);
                 if (!XRayLevelSceneBuilder.ConfigureWeatherSky(root, controller, clear, folder + "/Sky.asset")) throw new InvalidOperationException("The fixture requires the real weather Sky.");
                 var serialized = new SerializedObject(controller);
                 serialized.FindProperty("_celestialSettings").objectReferenceValue = settings;
@@ -60,6 +73,7 @@ namespace XRay.Importer.Editor.Levels
                 SceneManager.MoveGameObjectToScene(probeObject, fixture);
                 var probe = probeObject.AddComponent<XRayWeatherCelestialValidationProbe>();
                 probe.Configure(camera, controller, clear, rain, opaque, alpha, XRayWeatherFogValidation.SourceHash());
+                probe.RequireCatalog(catalog != null);
                 probe.ConfigureEnvironment(serialized.FindProperty("_sun").objectReferenceValue as Light);
                 if (!EditorSceneManager.SaveScene(fixture, path)) throw new IOException("Cannot save the dedicated celestial fixture.");
                 File.WriteAllText(Path.Combine(archive, "Fixture_" + Path.GetFileName(folder) + ".txt"), path);
@@ -152,12 +166,25 @@ namespace XRay.Importer.Editor.Levels
             if (!scenePath.StartsWith(FIXTURES, StringComparison.Ordinal) || !File.Exists(scenePath)) throw new InvalidOperationException("Select the saved celestial fixture.");
         }
 
-        private static void GetProfiles(XRayWeatherController controller, out XRayWeatherProfile clear, out XRayWeatherProfile rain)
+        private static void GetProfiles(XRayWeatherController controller, XRayWeatherCatalog catalog, out XRayWeatherProfile clear, out XRayWeatherProfile rain)
         {
-            var profile = new SerializedObject(controller).FindProperty("_profile").objectReferenceValue as XRayWeatherProfile;
-            string folder = Path.GetDirectoryName(AssetDatabase.GetAssetPath(profile))?.Replace('\\', '/');
-            clear = AssetDatabase.LoadAssetAtPath<XRayWeatherProfile>(folder + "/w_clear1.asset");
-            rain = AssetDatabase.LoadAssetAtPath<XRayWeatherProfile>(folder + "/w_rain1.asset");
+            if (catalog != null)
+            {
+                clear = null;
+                rain = null;
+                foreach (XRayWeatherProfile candidate in catalog.Profiles)
+                {
+                    if (candidate.CycleName == "w_clear1") clear = candidate;
+                    if (candidate.CycleName == "w_rain1") rain = candidate;
+                }
+            }
+            else
+            {
+                var profile = new SerializedObject(controller).FindProperty("_profile").objectReferenceValue as XRayWeatherProfile;
+                string folder = Path.GetDirectoryName(AssetDatabase.GetAssetPath(profile))?.Replace('\\', '/');
+                clear = AssetDatabase.LoadAssetAtPath<XRayWeatherProfile>(folder + "/w_clear1.asset");
+                rain = AssetDatabase.LoadAssetAtPath<XRayWeatherProfile>(folder + "/w_rain1.asset");
+            }
             if (clear == null || rain == null || clear.SourceIdentity != rain.SourceIdentity || !XRayWeatherImporter.HasSerializedResources(clear) || !XRayWeatherImporter.HasSerializedResources(rain)) throw new InvalidOperationException("Current military clear/rain profiles and serialized resources are required.");
         }
 

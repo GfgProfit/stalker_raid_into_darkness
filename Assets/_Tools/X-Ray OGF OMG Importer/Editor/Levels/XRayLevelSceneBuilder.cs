@@ -34,6 +34,7 @@ namespace XRay.Importer.Editor.Levels
         public XRaySourcePlan DetailSettingsSource { get; set; }
         public bool FloraWindAccepted { get; set; }
         public XRayWeatherProfile WeatherProfile { get; set; }
+        public XRayWeatherCatalog WeatherCatalog { get; set; }
         public List<XRayLevelCollisionChunk> Collision { get; } = new List<XRayLevelCollisionChunk>();
         public bool ImportLights { get; set; }
         public bool LightShadows { get; set; }
@@ -127,6 +128,7 @@ namespace XRay.Importer.Editor.Levels
                 if (content.WeatherProfile.Validate(out string diagnostic))
                 {
                     XRayWeatherController controller = ConfigureWeather(root, content.WeatherProfile);
+                    controller.ConfigureCatalog(content.WeatherCatalog);
 #if XRAY_HDRP
                     if (XRayWeatherImporter.HasSerializedResources(content.WeatherProfile))
                     {

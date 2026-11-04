@@ -15,8 +15,9 @@ namespace XRay.Importer.Editor.Levels
         private readonly XRayTextureImporter _importer;
         private readonly string _folder;
         private readonly Dictionary<string, Texture> _textures = new Dictionary<string, Texture>(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<string, string> _reusable = new Dictionary<string, string>(StringComparer.Ordinal);
 
-        public XRayWeatherResourceImporter(XRayAssetIndex index, string folder)
+        public XRayWeatherResourceImporter(XRayAssetIndex index, string folder, string reuseRoot = null)
         {
             if (index == null) throw new ArgumentNullException(nameof(index));
             string normalized = (folder ?? string.Empty).Replace('\\', '/').TrimEnd('/');
@@ -25,6 +26,17 @@ namespace XRay.Importer.Editor.Levels
             _folder = normalized;
             _resolver = new XRayTextureResolver(index);
             _importer = new XRayTextureImporter(new XRayImportOptions(), false, new HashSet<string>()) { ContentKeys = true };
+            if (!string.IsNullOrEmpty(reuseRoot) && Directory.Exists(reuseRoot))
+            {
+                var paths = new List<string>(Directory.EnumerateFiles(reuseRoot, "*_weather*.asset", SearchOption.AllDirectories));
+                paths.Sort(StringComparer.Ordinal);
+                foreach (string candidate in paths)
+                {
+                    string path = candidate.Replace('\\', '/');
+                    string key = XRayAssetMarker.ReadKey(path);
+                    if (!string.IsNullOrEmpty(key) && key.Contains("#weather-unorm@")) _reusable.TryAdd(key, path);
+                }
+            }
         }
 
         public Texture Bind(string name)
@@ -34,11 +46,21 @@ namespace XRay.Importer.Editor.Levels
             if (_textures.TryGetValue(virtualPath, out Texture cached)) return cached;
             XRayResolvedFile file = _resolver.ResolveFile(virtualPath);
             if (!file.IsResolved) throw new InvalidDataException("INPUT BLOCKED: missing effective weather resource " + virtualPath);
-            DdsHeader header = DdsHeader.Parse(file.Winner.ReadAllBytes());
+            byte[] bytes = file.Winner.ReadAllBytes();
+            DdsHeader header = DdsHeader.Parse(bytes);
+            if (_reusable.TryGetValue(_importer.WeatherKey(virtualPath, bytes), out string existingPath))
+            {
+                Texture existing = AssetDatabase.LoadAssetAtPath<Texture>(existingPath);
+                if (existing != null && existing.width == header.Width && existing.height == header.Height && existing.mipmapCount == header.MipCount && (existing is Cubemap) == header.IsCubemap)
+                {
+                    _textures.Add(virtualPath, existing);
+                    return existing;
+                }
+            }
             PrepareFolder();
             XRayTextureAssetResult result = _importer.ImportWeather(file, _folder, header.IsCubemap);
             Texture texture = string.IsNullOrEmpty(result.AssetPath) ? null : AssetDatabase.LoadAssetAtPath<Texture>(result.AssetPath);
-            if (texture == null) throw new InvalidDataException("INPUT BLOCKED: cannot import effective weather resource " + virtualPath + ": " + result.Note);
+            if (texture == null) throw new InvalidDataException("INPUT BLOCKED: cannot import effective weather resource " + virtualPath + " from " + file.Winner.Location + ": " + result.Note);
             _textures.Add(virtualPath, texture);
             return texture;
         }

@@ -30,6 +30,7 @@ namespace XRay.Importer.Levels
         [SerializeField] private Light _sun;
         [SerializeField] private string _sourceHash;
         [SerializeField] private int _cameraMask;
+        [SerializeField] private bool _catalogExpected;
 
         private string _output;
         private bool _stagePassed;
@@ -50,6 +51,11 @@ namespace XRay.Importer.Levels
         public void ConfigureEnvironment(Light sun)
         {
             _sun = sun;
+        }
+
+        public void RequireCatalog(bool expected)
+        {
+            _catalogExpected = expected;
         }
 
         public string RunEditorCases(string evidenceDir)
@@ -80,6 +86,7 @@ namespace XRay.Importer.Levels
                 _instance.Configure(_camera, _controller, _clear, _rain, _opaque, _alpha, _sourceHash);
                 _instance.ConfigureEnvironment(_sun);
                 _instance._cameraMask = _cameraMask;
+                _instance._catalogExpected = _catalogExpected;
                 Destroy(gameObject);
                 return;
             }
@@ -127,6 +134,7 @@ namespace XRay.Importer.Levels
                 record.runtimeFallback = fog.Volume.gameObject.hideFlags == HideFlags.HideAndDontSave;
                 Require(record.runtimeFallback == fallback && (_cameraMask & (1 << fog.Volume.gameObject.layer)) != 0, "The native Fog consumer uses the original camera layer and expected serialized/fallback binding.");
                 Require(_camera.GetComponent<HDAdditionalCameraData>().volumeLayerMask.value == _cameraMask, "The fixture's original Volume Mask is unchanged.");
+                if (_catalogExpected) RunCatalogStage(directory, fog);
                 string resultPath = RunCases(_camera, _controller, _clear, _rain, _opaque, _alpha, Path.Combine(directory, "Cases"), _sun);
                 ResultRecord cases = JsonUtility.FromJson<ResultRecord>(File.ReadAllText(resultPath));
                 record.captureWritten = cases.captureWritten;
@@ -151,6 +159,117 @@ namespace XRay.Importer.Levels
             record.passed = record.captureWritten && record.assertionsPassed && record.restorationPassed && record.released && record.reacquired && string.IsNullOrEmpty(record.error);
             Write(directory, "Result", record);
             _stagePassed = record.passed;
+        }
+
+        private void RunCatalogStage(string directory, XRayWeatherFogRenderer fog)
+        {
+            XRayWeatherCatalog catalog = _controller.Catalog;
+            Require(catalog != null && catalog.Profiles.Count == 21, "The Player must serialize all 21 ordinary profiles.");
+            Require(fog.Volume.profile.TryGet(out Fog fogSettings), "The Player's weather Fog settings are active.");
+            XRayWeatherProfile original = _controller.ActiveProfile;
+            double time = _controller.GameTimeSeconds;
+            bool paused = _controller.Paused;
+            float scale = _controller.TimeScale;
+            bool? shafts = _controller.SunShaftsOverride;
+            bool? flare = _controller.LensFlareOverride;
+            var profiles = new List<string>();
+            var transitions = new List<string>();
+            int keys = 0;
+            int zeroSun = 0;
+            try
+            {
+                _controller.SetPaused(true);
+                _controller.SetCelestialEffectOverrides(true, true);
+                foreach (XRayWeatherProfile profile in catalog.Profiles)
+                {
+                    Require(catalog.Contains(profile) && catalog.IsCompatible(profile) && !profiles.Contains(profile.CycleName), "The Player catalog contains an incompatible or repeated profile.");
+                    profiles.Add(profile.CycleName);
+                    _controller.SetProfile(profile);
+                    Require(_controller.ActiveProfile == profile && XRayWeatherController.Active == _controller, "The Player could not select " + profile.CycleName + ". " + _controller.Diagnostic);
+                    for (int i = 0; i < profile.KeyframeCount; i++)
+                    {
+                        XRayWeatherSnapshot key = profile.GetKeyframe(i);
+                        _controller.Seek(key.GameSeconds);
+                        XRayWeatherSnapshot snapshot = _controller.Snapshot;
+                        string label = profile.CycleName + "/" + key.Key0;
+                        Require(snapshot.GameSeconds == key.GameSeconds && snapshot.SunColor == key.SunColor && snapshot.FogDensity == key.FogDensity && snapshot.RainDensity == key.RainDensity, "The Player changed the serialized key " + label);
+                        Require(snapshot.SkyResources.Texture(0) is Cubemap && snapshot.EnvironmentResources.Texture(0) is Cubemap && fog.HasWeather, "The Player is missing serialized Sky/Environment/Fog at " + label);
+                        XRayWeatherFlareDefinition flareDefinition = _controller.Celestial.FlareDefinition;
+                        string definitionName = string.IsNullOrEmpty(snapshot.SunDefinition) ? null : snapshot.SunDefinition;
+                        Require(flareDefinition?.Name == definitionName, "The Player could not apply the flare definition at " + label);
+                        if (definitionName == "none") Require(flareDefinition.Source.Texture == null && flareDefinition.Gradient.Texture != null && flareDefinition.Elements.Count > 0, "The none definition must retain the source gradient and flare elements at " + label);
+                        keys++;
+                        if (key.SunColor.maxColorComponent != 0.0f) continue;
+                        Require(_sun.intensity == 0.0f && fogSettings.enableVolumetricFog.value, "The native Fog or exact zero Lux was lost at " + label);
+                        _controller.SetCelestialEffectOverrides(false, true);
+                        Require(!fogSettings.enableVolumetricFog.value && _sun.intensity == 0.0f, "Disabling shafts must restore analytic Fog and preserve zero Lux at " + label);
+                        _controller.SetCelestialEffectOverrides(true, true);
+                        CheckCatalogSunBoundary(key.GameSeconds - 1.0, fogSettings, label);
+                        CheckCatalogSunBoundary(key.GameSeconds + 1.0, fogSettings, label);
+                        zeroSun++;
+                    }
+                    _controller.Seek(-1.0);
+                    XRayWeatherSnapshot beforeMidnight = _controller.Snapshot;
+                    _controller.Seek(86399.0);
+                    Require(beforeMidnight.GameSeconds == _controller.GameTimeSeconds && beforeMidnight.SunColor == _controller.Snapshot.SunColor, "The Player could not wrap time for " + profile.CycleName);
+                }
+                _controller.SetPaused(false);
+                foreach (string[] pair in new[] { new[] { "w_clear1", "w_cloudy1" }, new[] { "w_clear1", "w_foggy1" }, new[] { "w_partly1", "w_rain1" }, new[] { "w_rain1", "w_storm1" } })
+                {
+                    RunCatalogTransition(catalog, pair[0], pair[1]);
+                    transitions.Add(pair[0] + " -> " + pair[1]);
+                }
+                Require(zeroSun > 0, "The catalog must contain a checked zero-Sun key.");
+                Write(directory, "Catalog", new CatalogRecord { profiles = profiles.ToArray(), keys = keys, zeroSun = zeroSun, transitions = transitions.ToArray() });
+            }
+            finally
+            {
+                _controller.SetProfile(original);
+                _controller.Seek(time);
+                _controller.SetTimeScale(scale);
+                _controller.SetPaused(paused);
+                _controller.SetCelestialEffectOverrides(shafts, flare);
+            }
+        }
+
+        private void CheckCatalogSunBoundary(double time, Fog fog, string label)
+        {
+            _controller.Seek(time);
+            bool sourcePositive = _controller.Snapshot.SunColor.maxColorComponent > 0.0f;
+            Require(fog.enableVolumetricFog.value && (_sun.intensity > 0.0f) == sourcePositive, "The Player changed Fog mode or Sun intensity beside " + label);
+        }
+
+        private void RunCatalogTransition(XRayWeatherCatalog catalog, string from, string to)
+        {
+            XRayWeatherProfile first = FindCatalogProfile(catalog, from);
+            XRayWeatherProfile second = FindCatalogProfile(catalog, to);
+            _controller.SetProfile(first);
+            _controller.Seek(86398.0);
+            _controller.SetTimeScale(4.0f);
+            Require(_controller.TransitionTo(second, 4.0f), "The Player could not transition from " + from + " to " + to + ". " + _controller.Diagnostic);
+            Require(!_controller.TransitionTo(first, 1.0f), "The Player accepted overlapping weather transitions.");
+            _controller.TickSimulation(1.0f);
+            Require(_controller.GameTimeSeconds == 2.0 && _controller.TransitionProgress == 0.25f, "The Player transition did not cross midnight with a single game clock.");
+            _controller.SetPaused(true);
+            _controller.TickSimulation(2.0f);
+            Require(_controller.GameTimeSeconds == 2.0 && _controller.TransitionProgress == 0.25f, "Pause did not freeze the Player transition.");
+            _controller.Seek(43200.0);
+            _controller.SetPaused(false);
+            _controller.SetTimeScale(0.0f);
+            _controller.TickSimulation(1.0f);
+            Require(_controller.GameTimeSeconds == 43200.0 && _controller.TransitionProgress == 0.5f, "Zero TimeScale stopped the Player transition or advanced its game clock.");
+            Require(second.TryEvaluate(43200.0, out XRayWeatherSnapshot target, out _) && _controller.Snapshot.SunDefinition == target.SunDefinition, "The Player did not switch the flare definition at the transition midpoint.");
+            _controller.TickSimulation(2.0f);
+            Require(!_controller.IsTransitioning && _controller.ActiveProfile == second && _controller.TransitionTo(first, 0.0f) && _controller.ActiveProfile == first, "The Player did not complete the timed and immediate transitions.");
+        }
+
+        private static XRayWeatherProfile FindCatalogProfile(XRayWeatherCatalog catalog, string cycle)
+        {
+            foreach (XRayWeatherProfile profile in catalog.Profiles)
+            {
+                if (profile.CycleName == cycle) return profile;
+            }
+            throw new InvalidOperationException("The Player catalog is missing " + cycle);
         }
 
         public static string RunCases(Camera camera, XRayWeatherController controller, XRayWeatherProfile clear, XRayWeatherProfile rain, GameObject opaque, GameObject alpha, string evidenceDir, Light sun = null)
@@ -815,6 +934,15 @@ namespace XRay.Importer.Levels
             public bool released;
             public bool reacquired;
             public string error;
+        }
+
+        [Serializable]
+        private sealed class CatalogRecord
+        {
+            public string[] profiles;
+            public int keys;
+            public int zeroSun;
+            public string[] transitions;
         }
 
         [Serializable]

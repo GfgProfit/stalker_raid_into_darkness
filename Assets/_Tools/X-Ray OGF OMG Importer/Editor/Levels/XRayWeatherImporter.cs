@@ -26,22 +26,46 @@ namespace XRay.Importer.Editor.Levels
         private const string MCM_READER_HASH = "1cabb8dfcf6c3a0a3130fa672ff403c463df1d1f96e8a680ad55aa5ca7273836";
         private const string WEATHER_WRITER_HASH = "860fe1ca0ea658c88882befdba882092ebdb933ffe7fa8f7dddc60f7a771bec5";
 
+        private static readonly string[] ORDINARY_CYCLES =
+        {
+            "w_clear1", "w_clear2", "w_clear3",
+            "w_partly1", "w_partly2", "w_partly3",
+            "w_cloudy1", "w_cloudy2", "w_cloudy2_dark", "w_cloudy3_dark",
+            "w_foggy1", "w_foggy2", "w_foggy3",
+            "w_cloudy3", "w_rain1", "w_rain2", "w_rain3", "w_rain4",
+            "w_storm1", "w_storm2", "w_storm3"
+        };
         private static readonly Regex INCLUDE = new Regex("^#include\\s+\"([^\"]+)\"", RegexOptions.IgnoreCase);
+
+        private static IEnumerator<XRayWeatherCatalog> _preparation;
 
         public static XRayWeatherProfile ImportCurrent(string cycleName, string assetPath = null, string resourceFolder = null)
         {
             if (!string.IsNullOrEmpty(assetPath) && (!assetPath.StartsWith("Assets/", StringComparison.Ordinal) || !assetPath.EndsWith(".asset", StringComparison.OrdinalIgnoreCase))) throw new ArgumentException("Weather assets must use an explicit Assets/.../*.asset destination.", nameof(assetPath));
             if (!string.IsNullOrEmpty(assetPath) && (File.Exists(assetPath) || AssetDatabase.LoadMainAssetAtPath(assetPath) != null)) throw new IOException("Weather import preserves existing assets; select a new asset path: " + assetPath);
+            return ImportSource(CreateCurrentPlan(), cycleName, assetPath, resourceFolder);
+        }
+
+        private static XRaySourcePlan CreateCurrentPlan()
+        {
             XRaySourceConfiguration configuration = XRayLevelSourceCache.CreateMo2Configuration();
             configuration.IndexScope.Clear();
             configuration.IndexScope.AddRange(new[] { "configs", "scripts", "textures/sky" });
-            return ImportSource(Mo2VirtualFileSystem.Plan(configuration), cycleName, assetPath, resourceFolder);
+            return Mo2VirtualFileSystem.Plan(configuration);
         }
 
         public static XRayWeatherProfile ImportSource(XRaySourcePlan plan, string cycleName, string assetPath = null, string resourceFolder = null)
         {
             if (!string.IsNullOrEmpty(assetPath) && (!assetPath.StartsWith("Assets/", StringComparison.Ordinal) || !assetPath.EndsWith(".asset", StringComparison.OrdinalIgnoreCase))) throw new ArgumentException("Weather assets must use an explicit Assets/.../*.asset destination.", nameof(assetPath));
             if (!string.IsNullOrEmpty(assetPath) && (File.Exists(assetPath) || AssetDatabase.LoadMainAssetAtPath(assetPath) != null)) throw new IOException("Weather import preserves existing assets; select a new asset path: " + assetPath);
+            Func<string, XRayWeatherProfile> import = OpenSource(plan, resourceFolder, out _);
+            XRayWeatherProfile profile = import(cycleName);
+            if (!string.IsNullOrEmpty(assetPath)) SaveProfile(profile, assetPath);
+            return profile;
+        }
+
+        private static Func<string, XRayWeatherProfile> OpenSource(XRaySourcePlan plan, string resourceFolder, out string commonProvenance, string reuseRoot = null)
+        {
             if (plan == null) throw new ArgumentNullException(nameof(plan));
             if (!plan.IsValid || plan.MissingModFolders.Count != 0) throw new InvalidDataException("Cannot resolve current weather source: " + string.Join("; ", plan.Errors));
             XRayAssetIndex index = XRayAssetIndex.Build(plan);
@@ -92,28 +116,142 @@ namespace XRay.Importer.Editor.Levels
             }
             if (!savedSettingsConfirmed) throw new InvalidDataException("INPUT BLOCKED: current weather import requires resolved app_data_root, readable user.ltx and effective axr_options.ltx, and a hash-verified ssfx_001_mcm.script reader.");
             provenance.AppendLine("settings=saved user/MCM agreement with hash-verified writers; not a live-game sample; no Lua execution");
-            XRayWeatherResourceImporter resources = string.IsNullOrEmpty(resourceFolder) ? null : new XRayWeatherResourceImporter(index, resourceFolder);
-            XRayWeatherProfile profile = Import(index, cycleName, plan.ProfileName + "|" + plan.ModOrderFingerprint, provenance.ToString(), wind, light, flora, resources == null ? null : resources.Bind, sunScale, visibilityScale, environmentScale, resources == null ? null : resources.Bind);
-            if (string.IsNullOrEmpty(assetPath)) return profile;
-            if (!assetPath.StartsWith("Assets/", StringComparison.Ordinal) || !assetPath.EndsWith(".asset", StringComparison.OrdinalIgnoreCase))
-            {
-                UnityEngine.Object.DestroyImmediate(profile);
-                throw new ArgumentException("Weather assets must use an explicit Assets/.../*.asset destination.", nameof(assetPath));
-            }
-            if (File.Exists(assetPath) || AssetDatabase.LoadMainAssetAtPath(assetPath) != null)
-            {
-                UnityEngine.Object.DestroyImmediate(profile);
-                throw new IOException("Weather import preserves existing assets; select a new asset path: " + assetPath);
-            }
+            commonProvenance = provenance.ToString();
+            string importProvenance = commonProvenance;
+            XRayWeatherResourceImporter resources = string.IsNullOrEmpty(resourceFolder) ? null : new XRayWeatherResourceImporter(index, resourceFolder, reuseRoot);
+            return cycle => Import(index, cycle, plan.ProfileName + "|" + plan.ModOrderFingerprint, importProvenance, wind, light, flora, resources == null ? null : resources.Bind, sunScale, visibilityScale, environmentScale, resources == null ? null : resources.Bind);
+        }
+
+        private static void SaveProfile(XRayWeatherProfile profile, string assetPath)
+        {
             Directory.CreateDirectory(Path.GetDirectoryName(assetPath));
-            AssetDatabase.Refresh();
+            if (!AssetDatabase.IsValidFolder(Path.GetDirectoryName(assetPath).Replace('\\', '/'))) AssetDatabase.Refresh();
             AssetDatabase.CreateAsset(profile, assetPath);
             AssetDatabase.SaveAssetIfDirty(profile);
-            return profile;
+        }
+
+        [MenuItem("Tools/X-Ray/Weather/Prepare Ordinary Weather Catalog")]
+        public static void PrepareOrdinaryCatalog()
+        {
+            if (EditorApplication.isPlayingOrWillChangePlaymode || _preparation != null) throw new InvalidOperationException("Prepare the weather catalog once, outside Play Mode.");
+            XRaySourcePlan plan = CreateCurrentPlan();
+            _preparation = ResolveCatalog(plan, CurrentAssetRoot(plan), true).GetEnumerator();
+            EditorApplication.update += AdvancePreparation;
+        }
+
+        private static void AdvancePreparation()
+        {
+            try
+            {
+                if (!EditorApplication.isPlayingOrWillChangePlaymode && _preparation.MoveNext())
+                {
+                    XRayWeatherCatalog catalog = _preparation.Current;
+                    if (catalog == null) return;
+                    Debug.Log("[X-Ray Weather] Prepared " + catalog.Profiles.Count + " cycles at " + AssetDatabase.GetAssetPath(catalog));
+                }
+            }
+            catch (Exception exception)
+            {
+                Debug.LogException(exception);
+            }
+            _preparation.Dispose();
+            _preparation = null;
+            EditorApplication.update -= AdvancePreparation;
+        }
+
+        public static XRayWeatherCatalog LoadPreparedCatalog()
+        {
+            XRaySourcePlan plan = CreateCurrentPlan();
+            return LoadCatalog(plan, CurrentAssetRoot(plan));
+        }
+
+        private static XRayWeatherCatalog LoadCatalog(XRaySourcePlan plan, string assetRoot)
+        {
+            foreach (XRayWeatherCatalog catalog in ResolveCatalog(plan, assetRoot, false)) return catalog;
+            return null;
+        }
+
+        private static string CurrentAssetRoot(XRaySourcePlan plan)
+        {
+            if (!plan.IsValid || plan.Installation == null) throw new InvalidDataException("Cannot resolve current weather source: " + string.Join("; ", plan.Errors));
+            return XRayLevelPaths.SpaceRoot(XRayLevelSourceCache.CreateProfileId(plan.Installation.InstanceFolder, plan.ProfileName));
+        }
+
+        private static string WeatherFolder(XRaySourcePlan plan, string assetRoot)
+        {
+            string settingsHash = "missing";
+            if (plan.FsGame != null && plan.FsGame.TryGet(XRayFsGame.APP_DATA_ROOT, out XRayFsPath appdata) && !appdata.IsExternal)
+            {
+                string user = Path.GetFullPath(Path.Combine(plan.GameFolder, appdata.RelativePath, "user.ltx"));
+                if (File.Exists(user)) settingsHash = XRayLevelGamedata.ComputeHash(user).Substring(0, 8);
+            }
+            return assetRoot + "/WeatherProfiles/" + plan.Fingerprint.Substring(0, 12) + "_" + settingsHash;
+        }
+
+        private static IEnumerable<XRayWeatherCatalog> ResolveCatalog(XRaySourcePlan plan, string assetRoot, bool prepare)
+        {
+            string folder = WeatherFolder(plan, assetRoot);
+            string catalogPath = folder + "/OrdinaryWeatherCatalog.asset";
+            XRayWeatherCatalog catalog = AssetDatabase.LoadAssetAtPath<XRayWeatherCatalog>(catalogPath);
+            if (!prepare && catalog == null && !File.Exists(catalogPath)) yield break;
+            if (catalog == null && File.Exists(catalogPath)) throw new InvalidDataException("Weather catalog destination is occupied: " + catalogPath);
+            Func<string, XRayWeatherProfile> import = OpenSource(plan, prepare ? folder + "/Textures" : null, out string provenance, assetRoot + "/WeatherProfiles");
+            var profiles = new XRayWeatherProfile[ORDINARY_CYCLES.Length];
+            for (int i = 0; i < profiles.Length; i++)
+            {
+                string cycle = ORDINARY_CYCLES[i];
+                string path = folder + "/" + cycle + ".asset";
+                XRayWeatherProfile profile = AssetDatabase.LoadAssetAtPath<XRayWeatherProfile>(path);
+                if (profile == null && (!prepare || File.Exists(path))) throw new InvalidDataException("Missing or incompatible cached weather profile: " + path);
+                if (profile != null && (profile.CycleName != cycle || profile.SourceIdentity != plan.ProfileName + "|" + plan.ModOrderFingerprint || !profile.Provenance.StartsWith(provenance, StringComparison.Ordinal) || !HasSerializedResources(profile))) throw new InvalidDataException("Preserve or replace the incompatible cached weather profile explicitly: " + path);
+                if (prepare)
+                {
+                    XRayWeatherProfile imported = import(cycle);
+                    if (!HasSerializedResources(imported))
+                    {
+                        UnityEngine.Object.DestroyImmediate(imported);
+                        throw new InvalidDataException("The cycle has incomplete sky or environment resources: " + cycle);
+                    }
+                    if (profile == null)
+                    {
+                        SaveProfile(imported, path);
+                        profile = imported;
+                    }
+                    else
+                    {
+                        bool compatible = EditorJsonUtility.ToJson(profile) == EditorJsonUtility.ToJson(imported);
+                        UnityEngine.Object.DestroyImmediate(imported);
+                        if (!compatible) throw new InvalidDataException("Preserve or replace the incompatible cached weather profile explicitly: " + path);
+                    }
+                }
+                profiles[i] = profile;
+                if (prepare) yield return null;
+            }
+            if (catalog != null)
+            {
+                if (catalog.Profiles.Count != profiles.Length) throw new InvalidDataException("Preserve or replace the incompatible cached weather catalog explicitly: " + catalogPath);
+                for (int i = 0; i < profiles.Length; i++)
+                {
+                    if (catalog.Profiles[i] != profiles[i] || !catalog.IsCompatible(profiles[i])) throw new InvalidDataException("Preserve or replace the incompatible cached weather catalog explicitly: " + catalogPath);
+                }
+                yield return catalog;
+                yield break;
+            }
+            catalog = ScriptableObject.CreateInstance<XRayWeatherCatalog>();
+            catalog.Initialize(profiles);
+            AssetDatabase.CreateAsset(catalog, catalogPath);
+            AssetDatabase.SaveAssetIfDirty(catalog);
+            yield return catalog;
         }
 
         public static XRayWeatherProfile ResolveLevelProfile(XRayLevelImportSettings settings, XRaySourcePlan sourcePlan, string assetRoot, XRayLevelImportRecord record, bool allowAutomatic = true)
         {
+            return ResolveLevelProfile(settings, sourcePlan, assetRoot, record, out _, allowAutomatic);
+        }
+
+        public static XRayWeatherProfile ResolveLevelProfile(XRayLevelImportSettings settings, XRaySourcePlan sourcePlan, string assetRoot, XRayLevelImportRecord record, out XRayWeatherCatalog catalog, bool allowAutomatic = true)
+        {
+            catalog = null;
             if (settings.WeatherImportMode == XRayWeatherImportMode.Disabled) return null;
             if (settings.WeatherProfile != null) return settings.WeatherProfile;
             if (settings.WeatherImportMode == XRayWeatherImportMode.CustomProfile) return null;
@@ -144,18 +282,20 @@ namespace XRay.Importer.Editor.Levels
                 configuration.IndexScope.AddRange(new[] { "configs", "scripts", "textures/sky" });
                 XRaySourcePlan plan = Mo2VirtualFileSystem.Plan(configuration);
                 if (!plan.IsValid || plan.ProfileName != sourcePlan.ProfileName || plan.ModOrderFingerprint != sourcePlan.ModOrderFingerprint) throw new InvalidDataException("The automatic weather source must match the level's effective MO2 profile.");
-                string settingsHash = "missing";
-                if (plan.FsGame != null && plan.FsGame.TryGet(XRayFsGame.APP_DATA_ROOT, out XRayFsPath appdata) && !appdata.IsExternal)
+                catalog = LoadCatalog(plan, assetRoot);
+                if (catalog == null)
                 {
-                    string user = Path.GetFullPath(Path.Combine(plan.GameFolder, appdata.RelativePath, "user.ltx"));
-                    if (File.Exists(user)) settingsHash = XRayLevelGamedata.ComputeHash(user).Substring(0, 8);
+                    string folder = WeatherFolder(plan, assetRoot);
+                    XRayWeatherProfile clear = CachedCycle(plan, "w_clear1", folder);
+                    XRayWeatherProfile rain = CachedCycle(plan, "w_rain1", folder);
+                    record?.GeneratedAssets.Add(AssetDatabase.GetAssetPath(clear));
+                    record?.GeneratedAssets.Add(AssetDatabase.GetAssetPath(rain));
+                    record?.AddLimitation("Prepare Ordinary Weather Catalog before importing to attach the complete weather selection.");
+                    return clear;
                 }
-                string folder = assetRoot + "/WeatherProfiles/" + plan.Fingerprint.Substring(0, 12) + "_" + settingsHash;
-                XRayWeatherProfile clear = CachedCycle(plan, "w_clear1", folder);
-                CachedCycle(plan, "w_rain1", folder);
-                record?.GeneratedAssets.Add(AssetDatabase.GetAssetPath(clear));
-                record?.GeneratedAssets.Add(folder + "/w_rain1.asset");
-                return clear;
+                record?.GeneratedAssets.Add(AssetDatabase.GetAssetPath(catalog));
+                foreach (XRayWeatherProfile profile in catalog.Profiles) record?.GeneratedAssets.Add(AssetDatabase.GetAssetPath(profile));
+                return catalog.Profiles[0];
             }
             catch (Exception exception)
             {

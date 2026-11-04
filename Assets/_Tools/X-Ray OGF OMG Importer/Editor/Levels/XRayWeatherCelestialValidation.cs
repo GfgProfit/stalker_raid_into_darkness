@@ -30,7 +30,14 @@ namespace XRay.Importer.Editor.Levels
             return Prepare(archive, catalog);
         }
 
-        private static string Prepare(string archive, XRayWeatherCatalog catalog)
+        public static string PrepareFx(string archive)
+        {
+            XRayWeatherFxCatalog catalog = XRayWeatherImporter.LoadPreparedFxCatalog();
+            if (catalog == null) throw new InvalidOperationException("Prepare the saved Weather FX catalog before building its validation fixture.");
+            return Prepare(archive, catalog.OrdinaryCatalog, catalog);
+        }
+
+        private static string Prepare(string archive, XRayWeatherCatalog catalog, XRayWeatherFxCatalog fxCatalog = null)
         {
             Guard(archive);
             var host = new HostScope();
@@ -63,6 +70,7 @@ namespace XRay.Importer.Editor.Levels
                 root.transform.Find("Monolith transparent surface").gameObject.SetActive(false);
                 XRayWeatherController controller = XRayLevelSceneBuilder.ConfigureWeather(root, clear);
                 if (catalog != null) controller.ConfigureCatalog(catalog);
+                if (fxCatalog != null) controller.ConfigureFxCatalog(fxCatalog);
                 if (!XRayLevelSceneBuilder.ConfigureWeatherSky(root, controller, clear, folder + "/Sky.asset")) throw new InvalidOperationException("The fixture requires the real weather Sky.");
                 var serialized = new SerializedObject(controller);
                 serialized.FindProperty("_celestialSettings").objectReferenceValue = settings;
@@ -74,6 +82,7 @@ namespace XRay.Importer.Editor.Levels
                 var probe = probeObject.AddComponent<XRayWeatherCelestialValidationProbe>();
                 probe.Configure(camera, controller, clear, rain, opaque, alpha, XRayWeatherFogValidation.SourceHash());
                 probe.RequireCatalog(catalog != null);
+                probe.RequireFx(fxCatalog != null);
                 probe.ConfigureEnvironment(serialized.FindProperty("_sun").objectReferenceValue as Light);
                 if (!EditorSceneManager.SaveScene(fixture, path)) throw new IOException("Cannot save the dedicated celestial fixture.");
                 File.WriteAllText(Path.Combine(archive, "Fixture_" + Path.GetFileName(folder) + ".txt"), path);

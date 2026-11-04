@@ -31,6 +31,7 @@ namespace XRay.Importer.Levels
         [SerializeField] private string _sourceHash;
         [SerializeField] private int _cameraMask;
         [SerializeField] private bool _catalogExpected;
+        [SerializeField] private bool _fxExpected;
 
         private string _output;
         private bool _stagePassed;
@@ -56,6 +57,11 @@ namespace XRay.Importer.Levels
         public void RequireCatalog(bool expected)
         {
             _catalogExpected = expected;
+        }
+
+        public void RequireFx(bool expected)
+        {
+            _fxExpected = expected;
         }
 
         public string RunEditorCases(string evidenceDir)
@@ -87,6 +93,7 @@ namespace XRay.Importer.Levels
                 _instance.ConfigureEnvironment(_sun);
                 _instance._cameraMask = _cameraMask;
                 _instance._catalogExpected = _catalogExpected;
+                _instance._fxExpected = _fxExpected;
                 Destroy(gameObject);
                 return;
             }
@@ -135,6 +142,11 @@ namespace XRay.Importer.Levels
                 Require(record.runtimeFallback == fallback && (_cameraMask & (1 << fog.Volume.gameObject.layer)) != 0, "The native Fog consumer uses the original camera layer and expected serialized/fallback binding.");
                 Require(_camera.GetComponent<HDAdditionalCameraData>().volumeLayerMask.value == _cameraMask, "The fixture's original Volume Mask is unchanged.");
                 if (_catalogExpected) RunCatalogStage(directory, fog);
+                if (_fxExpected)
+                {
+                    RunAdaptationStage(directory);
+                    RunFxStage(directory, fog);
+                }
                 string resultPath = RunCases(_camera, _controller, _clear, _rain, _opaque, _alpha, Path.Combine(directory, "Cases"), _sun);
                 ResultRecord cases = JsonUtility.FromJson<ResultRecord>(File.ReadAllText(resultPath));
                 record.captureWritten = cases.captureWritten;
@@ -159,6 +171,158 @@ namespace XRay.Importer.Levels
             record.passed = record.captureWritten && record.assertionsPassed && record.restorationPassed && record.released && record.reacquired && string.IsNullOrEmpty(record.error);
             Write(directory, "Result", record);
             _stagePassed = record.passed;
+        }
+
+        private void RunAdaptationStage(string directory)
+        {
+            var context = new CaptureContext(_camera, _controller, Path.Combine(directory, "Adaptation"), new List<FrameRecord>(), _sun);
+            var original = new SavedState(context, _opaque, _alpha);
+            float? intensity = _controller.LensFlareIntensityOverride;
+            bool? adaptation = _controller.FlareAdaptationOverride;
+            float? expressive = _controller.ExpressiveFlareIntensityOverride;
+            var samples = new List<PlayerFlareSample>();
+            PrepareOutput(context.Output);
+            try
+            {
+                _controller.SetPaused(true);
+                _controller.SetFlareAppearanceOverrides(1.0f, true, 1.0f);
+                _controller.SetCelestialEffectOverrides(true, true);
+                foreach (XRayWeatherProfile profile in _controller.Catalog.Profiles)
+                {
+                    _controller.SetProfile(profile);
+                    foreach (double time in new[] { 0.0, 43200.0 })
+                    {
+                        _controller.Seek(time);
+                        XRayWeatherCelestialRenderer renderer = _controller.Celestial;
+                        float visibility = XRayWeatherFlareVisibility.AtTime(XRayWeatherFlareVisibility.Resolve(profile, _controller.Snapshot), time);
+                        Require(Mathf.Abs(renderer.WeatherVisibility - visibility) < TOLERANCE && renderer.SourceBrightness == _sun.intensity, "The Player changed flare weather visibility or source Lux for " + profile.CycleName);
+                        samples.Add(new PlayerFlareSample { profile = profile.CycleName, time = time, brightness = renderer.SourceBrightness, visibility = renderer.WeatherVisibility, intensity = renderer.EffectiveIntensity });
+                    }
+                }
+                double clear = MeasureFlare(_clear, 43200.0, "Clear");
+                double dense = MeasureFlare(FindCatalogProfile(_controller.Catalog, "w_cloudy2_dark"), 43200.0, "Dense");
+                double moon = MeasureFlare(_clear, 0.0, "Moon");
+                Require(clear > VISIBLE_DELTA && moon > VISIBLE_DELTA && dense < TOLERANCE, "The Player must show real clear solar/lunar contribution and suppress dense daylight flare.");
+                Write(context.Output, "Result", new PlayerFlareAdaptationRecord { samples = samples.ToArray(), clearPixelDelta = clear, densePixelDelta = dense, clearMoonPixelDelta = moon });
+            }
+            finally
+            {
+                original.Restore(context);
+                _controller.SetFlareAppearanceOverrides(intensity, adaptation, expressive);
+            }
+
+            double MeasureFlare(XRayWeatherProfile profile, double time, string label)
+            {
+                _controller.SetProfile(profile);
+                _controller.Seek(time);
+                _camera.transform.rotation = Quaternion.LookRotation(-_controller.Snapshot.SunDirection);
+                Color[] off = Capture(context, label + "_Off", true, false);
+                Color[] on = Capture(context, label + "_On", true, true);
+                for (int i = 0; i < off.Length; i++) Require(Mathf.Abs(off[i].a - on[i].a) < TOLERANCE, "The Player flare changed frame alpha in " + label);
+                return Difference(off, on);
+            }
+        }
+
+        private void RunFxStage(string directory, XRayWeatherFogRenderer fog)
+        {
+            XRayWeatherFxCatalog catalog = _controller.FxCatalog;
+            Require(catalog != null && catalog.Effects.Count == 7, "The Player must serialize all seven Weather FX profiles.");
+            Require(fog.Volume.profile.TryGet(out Fog fogSettings), "The Player's weather Fog settings are active during FX.");
+            XRayWeatherProfile ordinary = _controller.ActiveProfile;
+            double time = _controller.GameTimeSeconds;
+            bool paused = _controller.Paused;
+            float scale = _controller.TimeScale;
+            bool? shafts = _controller.SunShaftsOverride;
+            bool? flare = _controller.LensFlareOverride;
+            var names = new List<string>();
+            int keys = 0;
+            bool zero = false;
+            try
+            {
+                _controller.SetPaused(false);
+                _controller.SetTimeScale(2.0f);
+                _controller.SetCelestialEffectOverrides(true, true);
+                foreach (XRayWeatherFxProfile effect in catalog.Effects)
+                {
+                    names.Add(effect.EffectName);
+                    _controller.Seek(86399.0);
+                    Require(_controller.StartFx(effect) && _controller.FxPhase == XRayWeatherFxPhase.Entry, "The Player cannot start " + effect.EffectName + ". " + _controller.Diagnostic);
+                    _controller.TickSimulation(1.0f);
+                    Require(_controller.FxTimeSeconds == 2.0 && _controller.GameTimeSeconds == 1.0, "The Player did not use one wrapped clock while entering " + effect.EffectName);
+                    double entry = _controller.FxEntrySeconds;
+                    double end = entry + effect.AuthoredDurationSeconds;
+                    double duration = _controller.FxDurationSeconds;
+                    Require(entry == 10.0 && duration == end + entry, "The Player computed unexpected entry and return times for " + effect.EffectName);
+                    for (int i = 1; i < effect.KeyframeCount; i++)
+                    {
+                        XRayWeatherSnapshot key = effect.GetKeyframe(i);
+                        _controller.SeekFx(entry + key.GameSeconds);
+                        XRayWeatherSnapshot snapshot = _controller.Snapshot;
+                        Require(_controller.ActiveFx == effect && snapshot.SunDefinition == key.SunDefinition && Vector4.Distance(snapshot.SunColor, key.SunColor) < TOLERANCE && snapshot.SkyResources.Texture(0) is Cubemap && snapshot.EnvironmentResources.Texture(0) is Cubemap && fog.HasWeather, "The Player changed the FX frame " + effect.EffectName + "/" + key.Key0);
+                        XRayWeatherFlareDefinition definition = _controller.Celestial.FlareDefinition;
+                        Require(definition?.Name == (string.IsNullOrEmpty(key.SunDefinition) ? null : key.SunDefinition), "The Player retained the wrong flare at " + effect.EffectName + "/" + key.Key0);
+                        if (key.SunDefinition == "none") Require(definition.Source.Texture == null && definition.Gradient.Texture != null && definition.Elements.Count > 0, "The Player lost the source named none flare data.");
+                        keys++;
+                        if (effect.EffectName == "fx_super_blowout_night" && key.GameSeconds == 432.0)
+                        {
+                            Require(_sun.intensity == 0.0f && _controller.SourceLightColor == Vector3.zero && _controller.Celestial.EffectiveIntensity == 0.0f && fogSettings.enableVolumetricFog.value, "The source zero must suppress flare and light while preserving native Fog.");
+                            _controller.SetCelestialEffectOverrides(false, true);
+                            Require(!fogSettings.enableVolumetricFog.value && _sun.intensity == 0.0f, "Explicit shafts-off must restore analytic Fog at the FX zero key.");
+                            _controller.SetCelestialEffectOverrides(true, true);
+                            zero = true;
+                        }
+                    }
+                    _controller.SeekFx(end + entry * 0.5);
+                    Require(_controller.FxPhase == XRayWeatherFxPhase.Return, "The Player skipped the return phase of " + effect.EffectName);
+                    _controller.SetPaused(true);
+                    double returnClock = _controller.GameTimeSeconds;
+                    _controller.TickSimulation(5.0f);
+                    Require(_controller.GameTimeSeconds == returnClock && _controller.FxTimeSeconds == end + entry * 0.5, "The Player did not freeze FX and world clock on Pause.");
+                    _controller.SetPaused(false);
+                    _controller.TickSimulation(2.5f);
+                    Require(_controller.ActiveFx == null && _controller.FxPhase == XRayWeatherFxPhase.None && _controller.ActiveProfile == ordinary, "The Player did not return to its ordinary profile after " + effect.EffectName);
+                    Require(ordinary.TryEvaluate(_controller.GameTimeSeconds, out XRayWeatherSnapshot expected, out _) && expected.SunDefinition == _controller.Snapshot.SunDefinition && expected.SunColor == _controller.Snapshot.SunColor, "The Player did not sample current ordinary weather on return.");
+                    Require(_controller.Celestial.FlareDefinition?.Name == (string.IsNullOrEmpty(expected.SunDefinition) ? null : expected.SunDefinition), "The Player retained a stale FX flare on return.");
+                }
+                Require(zero && keys == 105, "The Player must cover all authored playable FX keys and the exact source zero.");
+                Write(directory, "WeatherFx", new PlayerFxRecord { effects = names.ToArray(), playableKeys = keys, exactZero = zero });
+            }
+            finally
+            {
+                if (_controller.ActiveFx != null) _controller.StopFx();
+                _controller.SetProfile(ordinary);
+                _controller.Seek(time);
+                _controller.SetTimeScale(scale);
+                _controller.SetPaused(paused);
+                _controller.SetCelestialEffectOverrides(shafts, flare);
+            }
+        }
+
+        [Serializable]
+        private sealed class PlayerFlareSample
+        {
+            public string profile;
+            public double time;
+            public float brightness;
+            public float visibility;
+            public float intensity;
+        }
+
+        [Serializable]
+        private sealed class PlayerFlareAdaptationRecord
+        {
+            public PlayerFlareSample[] samples;
+            public double clearPixelDelta;
+            public double densePixelDelta;
+            public double clearMoonPixelDelta;
+        }
+
+        [Serializable]
+        private sealed class PlayerFxRecord
+        {
+            public string[] effects;
+            public int playableKeys;
+            public bool exactZero;
         }
 
         private void RunCatalogStage(string directory, XRayWeatherFogRenderer fog)

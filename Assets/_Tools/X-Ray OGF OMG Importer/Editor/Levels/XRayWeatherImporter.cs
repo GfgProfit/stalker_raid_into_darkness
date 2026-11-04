@@ -14,7 +14,7 @@ using XRay.Importer.Sources.Vfs;
 
 namespace XRay.Importer.Editor.Levels
 {
-    public static class XRayWeatherImporter
+    public static partial class XRayWeatherImporter
     {
         public const string AUTOMATIC_ELIGIBILITY_METRIC = "AutomaticWeatherEligible";
 
@@ -37,7 +37,7 @@ namespace XRay.Importer.Editor.Levels
         };
         private static readonly Regex INCLUDE = new Regex("^#include\\s+\"([^\"]+)\"", RegexOptions.IgnoreCase);
 
-        private static IEnumerator<XRayWeatherCatalog> _preparation;
+        private static IEnumerator<UnityEngine.Object> _preparation;
 
         public static XRayWeatherProfile ImportCurrent(string cycleName, string assetPath = null, string resourceFolder = null)
         {
@@ -122,7 +122,7 @@ namespace XRay.Importer.Editor.Levels
             return cycle => Import(index, cycle, plan.ProfileName + "|" + plan.ModOrderFingerprint, importProvenance, wind, light, flora, resources == null ? null : resources.Bind, sunScale, visibilityScale, environmentScale, resources == null ? null : resources.Bind);
         }
 
-        private static void SaveProfile(XRayWeatherProfile profile, string assetPath)
+        private static void SaveProfile(ScriptableObject profile, string assetPath)
         {
             Directory.CreateDirectory(Path.GetDirectoryName(assetPath));
             if (!AssetDatabase.IsValidFolder(Path.GetDirectoryName(assetPath).Replace('\\', '/'))) AssetDatabase.Refresh();
@@ -145,9 +145,10 @@ namespace XRay.Importer.Editor.Levels
             {
                 if (!EditorApplication.isPlayingOrWillChangePlaymode && _preparation.MoveNext())
                 {
-                    XRayWeatherCatalog catalog = _preparation.Current;
+                    UnityEngine.Object catalog = _preparation.Current;
                     if (catalog == null) return;
-                    Debug.Log("[X-Ray Weather] Prepared " + catalog.Profiles.Count + " cycles at " + AssetDatabase.GetAssetPath(catalog));
+                    string count = catalog is XRayWeatherCatalog ordinary ? ordinary.Profiles.Count + " cycles" : ((XRayWeatherFxCatalog)catalog).Effects.Count + " effects";
+                    Debug.Log("[X-Ray Weather] Prepared " + count + " at " + AssetDatabase.GetAssetPath(catalog));
                 }
             }
             catch (Exception exception)
@@ -314,13 +315,18 @@ namespace XRay.Importer.Editor.Levels
             if (profile == null || !profile.Validate(out string diagnostic)) return false;
             for (int frame = 0; frame < profile.KeyframeCount; frame++)
             {
-                XRayWeatherSnapshot snapshot = profile.GetKeyframe(frame);
-                if (Mathf.Abs(Vector4.Dot(snapshot.SkyResources.Weights, Vector4.one) - 1.0f) > 0.0001f || Mathf.Abs(Vector4.Dot(snapshot.EnvironmentResources.Weights, Vector4.one) - 1.0f) > 0.0001f) return false;
-                for (int resource = 0; resource < 4; resource++)
-                {
-                    if (snapshot.SkyResources.Weights[resource] > 0.0f && !(snapshot.SkyResources.Texture(resource) is Cubemap)) return false;
-                    if (snapshot.EnvironmentResources.Weights[resource] > 0.0f && !(snapshot.EnvironmentResources.Texture(resource) is Cubemap)) return false;
-                }
+                if (!HasSerializedSkyResources(profile.GetKeyframe(frame))) return false;
+            }
+            return true;
+        }
+
+        private static bool HasSerializedSkyResources(XRayWeatherSnapshot snapshot)
+        {
+            if (Mathf.Abs(Vector4.Dot(snapshot.SkyResources.Weights, Vector4.one) - 1.0f) > 0.0001f || Mathf.Abs(Vector4.Dot(snapshot.EnvironmentResources.Weights, Vector4.one) - 1.0f) > 0.0001f) return false;
+            for (int resource = 0; resource < 4; resource++)
+            {
+                if (snapshot.SkyResources.Weights[resource] > 0.0f && !(snapshot.SkyResources.Texture(resource) is Cubemap)) return false;
+                if (snapshot.EnvironmentResources.Weights[resource] > 0.0f && !(snapshot.EnvironmentResources.Texture(resource) is Cubemap)) return false;
             }
             return true;
         }
@@ -347,6 +353,30 @@ namespace XRay.Importer.Editor.Levels
             XRayLtxDatabase positions = XRayLtxDatabase.LoadFile(index, SUN_POSITIONS);
             ValidateDatabase(descriptors);
             ValidateDatabase(positions);
+            XRayWeatherSnapshot[] frames = ReadFrames(source, descriptors, weather, provenance, resourceBinding, environmentBinding);
+            var sun = new Vector2[24];
+            for (int hour = 0; hour < sun.Length; hour++)
+            {
+                string key = hour.ToString("00", CultureInfo.InvariantCulture) + ":00:00";
+                sun[hour] = new Vector2(Number(positions, key, "sun_altitude"), Number(positions, key, "sun_longitude"));
+            }
+            var profile = ScriptableObject.CreateInstance<XRayWeatherProfile>();
+            try
+            {
+                profile.name = cycleName;
+                profile.Initialize(cycleName, sourceIdentity, provenance.ToString(), frames, sun, ssfxWindTrees, lightSetup, floraFixes, sunLightScale, visibilityScale, environmentScale);
+                return profile;
+            }
+            catch
+            {
+                UnityEngine.Object.DestroyImmediate(profile);
+                throw;
+            }
+        }
+
+        private static XRayWeatherSnapshot[] ReadFrames(XRayEffectiveGamedata source, XRayLtxDatabase descriptors, string weather, StringBuilder provenance, Func<string, Texture> resourceBinding, Func<string, Texture> environmentBinding)
+        {
+            bool isFx = weather.StartsWith(WEATHER_FX_ROOT, StringComparison.Ordinal);
             var frames = new List<XRayWeatherSnapshot>();
             foreach (string key in descriptors.Sections.Keys)
             {
@@ -360,27 +390,24 @@ namespace XRay.Importer.Editor.Levels
                 float[] cloudValues = Numbers(Required(descriptors, key, "clouds_color"), 4, 5);
                 float multiplier = cloudValues.Length == 5 ? cloudValues[4] * 0.5f : 0.0f;
                 var cloudColor = new Color(cloudValues[0] * multiplier, cloudValues[1] * multiplier, cloudValues[2] * multiplier, cloudValues[3]);
-                frames.Add(new XRayWeatherSnapshot(key, seconds, ColorValue(descriptors, key, "sun_color", 3), ColorValue(descriptors, key, "ambient_color", 3), ColorValue(descriptors, key, "hemisphere_color", 4), Number(descriptors, key, "wind_direction") * Mathf.Deg2Rad, Number(descriptors, key, "wind_velocity"), Number(descriptors, key, "tree_amplitude_intensity"), Number(descriptors, key, "rain_density"), ColorValue(descriptors, key, "rain_color", 3), ColorValue(descriptors, key, "fog_color", 3), Number(descriptors, key, "fog_density"), Number(descriptors, key, "fog_distance"), Number(descriptors, key, "far_plane"), ColorValue(descriptors, key, "sky_color", 3), cloudColor, OptionalNumber(descriptors, key, "sky_rotation", 0.0f) * Mathf.Deg2Rad, new XRayWeatherResources(sky, resourceBinding?.Invoke(sky)), new XRayWeatherResources(clouds, resourceBinding?.Invoke(clouds)), Required(descriptors, key, "sun"), Required(descriptors, key, "ambient"), Required(descriptors, key, "thunderbolt_collection"), Number(descriptors, key, "thunderbolt_period"), Number(descriptors, key, "thunderbolt_duration"), Number(descriptors, key, "sun_shafts_intensity"), Number(descriptors, key, "water_intensity"), new XRayWeatherResources(environment, environmentBinding?.Invoke(environment))));
+                Color sunColor = ReadSunColor(descriptors, key, weather, provenance);
+                float rainDensity = Number(descriptors, key, "rain_density");
+                float effectiveRainDensity = isFx ? Mathf.Clamp01(rainDensity) : rainDensity;
+                if (rainDensity != effectiveRainDensity) provenance.AppendLine("monolith-rain-density-clamp=" + weather + "/" + key + "; source=" + rainDensity.ToString(CultureInfo.InvariantCulture) + "; effective=" + effectiveRainDensity.ToString(CultureInfo.InvariantCulture));
+                frames.Add(new XRayWeatherSnapshot(key, seconds, sunColor, ColorValue(descriptors, key, "ambient_color", 3), ColorValue(descriptors, key, "hemisphere_color", 4), Number(descriptors, key, "wind_direction") * Mathf.Deg2Rad, Number(descriptors, key, "wind_velocity"), Number(descriptors, key, "tree_amplitude_intensity"), effectiveRainDensity, ColorValue(descriptors, key, "rain_color", 3), ColorValue(descriptors, key, "fog_color", 3), Number(descriptors, key, "fog_density"), Number(descriptors, key, "fog_distance"), Number(descriptors, key, "far_plane"), ColorValue(descriptors, key, "sky_color", 3), cloudColor, OptionalNumber(descriptors, key, "sky_rotation", 0.0f) * Mathf.Deg2Rad, new XRayWeatherResources(sky, resourceBinding?.Invoke(sky)), new XRayWeatherResources(clouds, resourceBinding?.Invoke(clouds)), Required(descriptors, key, "sun"), Required(descriptors, key, "ambient"), Required(descriptors, key, "thunderbolt_collection"), Number(descriptors, key, "thunderbolt_period"), Number(descriptors, key, "thunderbolt_duration"), Number(descriptors, key, "sun_shafts_intensity"), Number(descriptors, key, "water_intensity"), new XRayWeatherResources(environment, environmentBinding?.Invoke(environment))));
             }
             frames.Sort((a, b) => a.GameSeconds.CompareTo(b.GameSeconds));
-            var sun = new Vector2[24];
-            for (int hour = 0; hour < sun.Length; hour++)
+            return frames.ToArray();
+        }
+
+        private static Color ReadSunColor(XRayLtxDatabase descriptors, string key, string weather, StringBuilder provenance)
+        {
+            if (weather == WEATHER_FX_ROOT + "fx_super_blowout_night.ltx" && key == "00:07:12" && Required(descriptors, key, "sun_color") == "w, 0, 0")
             {
-                string key = hour.ToString("00", CultureInfo.InvariantCulture) + ":00:00";
-                sun[hour] = new Vector2(Number(positions, key, "sun_altitude"), Number(positions, key, "sun_longitude"));
+                provenance.AppendLine("monolith-zero-vector-scanf=" + weather + "/" + key + "; source=w, 0, 0; effective=0, 0, 0");
+                return Color.black;
             }
-            var profile = ScriptableObject.CreateInstance<XRayWeatherProfile>();
-            try
-            {
-                profile.name = cycleName;
-                profile.Initialize(cycleName, sourceIdentity, provenance.ToString(), frames.ToArray(), sun, ssfxWindTrees, lightSetup, floraFixes, sunLightScale, visibilityScale, environmentScale);
-                return profile;
-            }
-            catch
-            {
-                UnityEngine.Object.DestroyImmediate(profile);
-                throw;
-            }
+            return ColorValue(descriptors, key, "sun_color", 3);
         }
 
         private static void ValidateInput(XRayEffectiveGamedata source, string path, HashSet<string> loaded, HashSet<string> stack, StringBuilder provenance)

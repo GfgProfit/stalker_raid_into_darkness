@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bfc2834eed44dd549bc9d5a42a5fa603, type: 3}
+  m_Name: WeatherFxCatalog
+  m_EditorClassIdentifier: XRay.Importer.Runtime::XRay.Importer.Levels.XRayWeatherFxCatalog
+  _ordinaryCatalog: {fileID: 11400000, guid: 6c171b1981ba5d74c85b8b85c7b558e7, type: 2}
+  _effects:
+  - {fileID: 11400000, guid: e6172696a9f2c084e85a9cbf9ee28e3f, type: 2}
+  - {fileID: 11400000, guid: d5ed4a01d8738eb4e8e29607fd489569, type: 2}
+  - {fileID: 11400000, guid: fc870dafe7aa03f4da79903f2afa05a0, type: 2}
+  - {fileID: 11400000, guid: e95825caac93ee84e834d13eb51e2c66, type: 2}
+  - {fileID: 11400000, guid: 16e7a902d88affe4a95d8400a537041e, type: 2}
+  - {fileID: 11400000, guid: 177e0186a5f13e842a6cf4fe95de9edd, type: 2}
+  - {fileID: 11400000, guid: 5646a495e4610d04b97257c3c93132ff, type: 2}

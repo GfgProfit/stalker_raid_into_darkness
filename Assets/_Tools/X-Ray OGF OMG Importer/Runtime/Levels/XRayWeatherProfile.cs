@@ -90,7 +90,7 @@ namespace XRay.Importer.Levels
             for (int i = 0; i < _keyframes.Length; i++)
             {
                 XRayWeatherSnapshot frame = _keyframes[i];
-                if (double.IsNaN(frame.GameSeconds) || double.IsInfinity(frame.GameSeconds) || frame.GameSeconds < 0.0 || frame.GameSeconds >= DAY_SECONDS || i > 0 && frame.GameSeconds <= _keyframes[i - 1].GameSeconds || !Finite(frame.WindDirectionRadians) || !Finite(frame.WindVelocity) || frame.WindVelocity < 0.0f || !Finite(frame.TreeAmplitudeIntensity) || frame.TreeAmplitudeIntensity < 0.0f || !Finite(frame.RainDensity) || frame.RainDensity < 0.0f || frame.RainDensity > 1.0f || !Finite(frame.FogDensity) || !Finite(frame.FogDistance) || !Finite(frame.FarPlane) || frame.FarPlane <= 11.0f || !Finite(frame.FarPlane * _visibilityScale) || frame.FarPlane * _visibilityScale <= 11.0f || !Finite(frame.SkyRotationRadians) || !Finite(frame.SunColor) || !Finite(frame.AmbientColor) || !Finite(frame.HemisphereColor) || !Finite(frame.RainColor) || !Finite(frame.FogColor) || !Finite(frame.SkyColor) || !Finite(frame.CloudsColor) || !Finite(frame.ThunderboltPeriod) || !Finite(frame.ThunderboltDuration) || !Finite(frame.SunShaftsIntensity) || !Finite(frame.WaterIntensity))
+                if (!IsValidDescriptor(frame, _visibilityScale) || i > 0 && frame.GameSeconds <= _keyframes[i - 1].GameSeconds)
                 {
                     diagnostic = "Invalid or unsorted weather descriptor at index " + i + ".";
                     return false;
@@ -117,16 +117,26 @@ namespace XRay.Importer.Levels
                 return false;
             }
             double seconds = NormalizeTime(gameSeconds);
+            GetBracketingKeyframes(seconds, out XRayWeatherSnapshot first, out XRayWeatherSnapshot second, out float weight);
+            snapshot = XRayWeatherSnapshot.Blend(first, second, weight).WithSampling(seconds, SunDirection(seconds), _visibilityScale);
+            return true;
+        }
+
+        internal void GetBracketingKeyframes(double seconds, out XRayWeatherSnapshot first, out XRayWeatherSnapshot second, out float weight)
+        {
             int next = 0;
             while (next < _keyframes.Length && _keyframes[next].GameSeconds < seconds) next++;
             if (next == _keyframes.Length) next = 0;
             int previous = next == 0 ? _keyframes.Length - 1 : next - 1;
-            XRayWeatherSnapshot a = _keyframes[previous];
-            XRayWeatherSnapshot b = _keyframes[next];
-            double length = TimeDiff(a.GameSeconds, b.GameSeconds);
-            float weight = length <= 0.00001 ? 0.0f : Mathf.Clamp01((float)(TimeDiff(a.GameSeconds, seconds) / length));
-            snapshot = XRayWeatherSnapshot.Blend(a, b, weight).WithSampling(seconds, SunDirection(seconds), _visibilityScale);
-            return true;
+            first = _keyframes[previous];
+            second = _keyframes[next];
+            double length = TimeDiff(first.GameSeconds, second.GameSeconds);
+            weight = length <= 0.00001 ? 0.0f : Mathf.Clamp01((float)(TimeDiff(first.GameSeconds, seconds) / length));
+        }
+
+        internal static bool IsValidDescriptor(XRayWeatherSnapshot frame, float visibilityScale)
+        {
+            return !(double.IsNaN(frame.GameSeconds) || double.IsInfinity(frame.GameSeconds) || frame.GameSeconds < 0.0 || frame.GameSeconds >= DAY_SECONDS || !Finite(frame.WindDirectionRadians) || !Finite(frame.WindVelocity) || frame.WindVelocity < 0.0f || !Finite(frame.TreeAmplitudeIntensity) || frame.TreeAmplitudeIntensity < 0.0f || !Finite(frame.RainDensity) || frame.RainDensity < 0.0f || frame.RainDensity > 1.0f || !Finite(frame.FogDensity) || !Finite(frame.FogDistance) || !Finite(frame.FarPlane) || frame.FarPlane <= 11.0f || !Finite(frame.FarPlane * visibilityScale) || frame.FarPlane * visibilityScale <= 11.0f || !Finite(frame.SkyRotationRadians) || !Finite(frame.SunColor) || !Finite(frame.AmbientColor) || !Finite(frame.HemisphereColor) || !Finite(frame.RainColor) || !Finite(frame.FogColor) || !Finite(frame.SkyColor) || !Finite(frame.CloudsColor) || !Finite(frame.ThunderboltPeriod) || !Finite(frame.ThunderboltDuration) || !Finite(frame.SunShaftsIntensity) || !Finite(frame.WaterIntensity));
         }
 
         internal bool HasSameSourceSettings(XRayWeatherProfile other)

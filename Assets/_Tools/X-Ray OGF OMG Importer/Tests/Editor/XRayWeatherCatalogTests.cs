@@ -295,12 +295,12 @@ namespace XRay.Importer.Tests
             }
         }
 
-        private static void CheckFrame(XRayLtxDatabase data, string key, XRayWeatherSnapshot frame, Dictionary<string, string> guids)
+        internal static void CheckFrame(XRayLtxDatabase data, string key, XRayWeatherSnapshot frame, Dictionary<string, string> guids, Color? sourceSun = null)
         {
             Assert.AreEqual(key, frame.Key0);
             Assert.AreEqual(key, frame.Key1);
             Assert.AreEqual(TimeSpan.ParseExact(key, "hh\\:mm\\:ss", CultureInfo.InvariantCulture).TotalSeconds, frame.GameSeconds);
-            Assert.AreEqual(ReadColor(data, key, "sun_color"), frame.SunColor);
+            Assert.AreEqual(sourceSun ?? ReadColor(data, key, "sun_color"), frame.SunColor);
             Assert.AreEqual(ReadColor(data, key, "ambient_color"), frame.AmbientColor);
             Assert.AreEqual(ReadColor(data, key, "hemisphere_color"), frame.HemisphereColor);
             Assert.AreEqual(ReadColor(data, key, "rain_color"), frame.RainColor);
@@ -313,7 +313,7 @@ namespace XRay.Importer.Tests
             Assert.That(frame.SkyRotationRadians, Is.EqualTo(ReadNumber(data, key, "sky_rotation", "0") * Mathf.Deg2Rad).Within(TOLERANCE));
             Assert.AreEqual(ReadNumber(data, key, "wind_velocity"), frame.WindVelocity);
             Assert.AreEqual(ReadNumber(data, key, "tree_amplitude_intensity"), frame.TreeAmplitudeIntensity);
-            Assert.AreEqual(ReadNumber(data, key, "rain_density"), frame.RainDensity);
+            Assert.AreEqual(Mathf.Clamp01(ReadNumber(data, key, "rain_density")), frame.RainDensity);
             Assert.AreEqual(ReadNumber(data, key, "fog_density"), frame.FogDensity);
             Assert.AreEqual(ReadNumber(data, key, "fog_distance"), frame.FogDistance);
             Assert.AreEqual(ReadNumber(data, key, "far_plane"), frame.FarPlane);

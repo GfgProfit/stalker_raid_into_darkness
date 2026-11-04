@@ -9,10 +9,14 @@ namespace XRay.Importer.Editor.Levels
     public sealed class XRayWeatherControllerEditor : UnityEditor.Editor
     {
         private XRayWeatherProfile _selectedProfile;
+        private XRayWeatherFxProfile _selectedFx;
+        private XRayWeatherFxCatalog _pickerFxCatalog;
         private string _catalogDiagnostic;
         private string _transitionDiagnostic;
         private string _geometryDiagnostic;
+        private string _fxDiagnostic;
         private float _transitionDuration = 10.0f;
+        private float _fxStartSeconds;
 
         public override bool RequiresConstantRepaint()
         {
@@ -26,11 +30,11 @@ namespace XRay.Importer.Editor.Levels
             bool playing = Application.IsPlaying(controller.gameObject);
             serializedObject.Update();
             EditorGUI.BeginChangeCheck();
-            using (new EditorGUI.DisabledScope(playing || controller.Catalog != null))
+            using (new EditorGUI.DisabledScope(playing || controller.Catalog != null || controller.FxCatalog != null || controller.ActiveFx != null))
             {
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("_profile"), new GUIContent("Стартовый профиль сцены"));
             }
-            DrawPropertiesExcluding(serializedObject, "m_Script", "_profile", "_catalog", "_lensFlareEnabled", "_lensFlareIntensity", "_adaptLensFlareToWeather", "_expressiveDaylight", "_expressiveFlareIntensity", "_flareProfileOverrides");
+            DrawPropertiesExcluding(serializedObject, "m_Script", "_profile", "_catalog", "_fxCatalog", "_lensFlareEnabled", "_lensFlareIntensity", "_adaptLensFlareToWeather", "_expressiveDaylight", "_expressiveFlareIntensity", "_flareProfileOverrides");
             DrawFlareSettings();
             if (EditorGUI.EndChangeCheck())
             {
@@ -45,7 +49,7 @@ namespace XRay.Importer.Editor.Levels
             DrawProfilePicker(controller.Catalog, preferredProfile);
             if (!playing && controller.Catalog != null)
             {
-                using (new EditorGUI.DisabledScope(_selectedProfile == null || _selectedProfile == controller.AuthoredProfile))
+                using (new EditorGUI.DisabledScope(_selectedProfile == null || _selectedProfile == controller.AuthoredProfile || controller.ActiveFx != null))
                 {
                     if (GUILayout.Button("Назначить стартовым профилем сцены"))
                     {
@@ -68,11 +72,13 @@ namespace XRay.Importer.Editor.Levels
                 {
                     _transitionDiagnostic = null;
                     _geometryDiagnostic = null;
+                    _fxDiagnostic = null;
                     if (XRayWeatherPreview.Start(controller) && _selectedProfile != null && _selectedProfile != controller.ActiveProfile) controller.SetProfile(_selectedProfile);
                     SceneView.RepaintAll();
                 }
             }
             if (playing || controller.PreviewActive) DrawSimulation(controller);
+            DrawFxControls(controller, playing);
         }
 
         private void DrawFlareSettings()
@@ -117,7 +123,7 @@ namespace XRay.Importer.Editor.Levels
 
         private void DrawCatalog(XRayWeatherController controller, bool playing)
         {
-            using (new EditorGUI.DisabledScope(playing))
+            using (new EditorGUI.DisabledScope(playing || controller.ActiveFx != null))
             {
                 var catalog = (XRayWeatherCatalog)EditorGUILayout.ObjectField("Каталог погоды", controller.Catalog, typeof(XRayWeatherCatalog), false);
                 if (catalog != controller.Catalog) AssignCatalog(controller, catalog);
@@ -194,13 +200,16 @@ namespace XRay.Importer.Editor.Levels
             using (new EditorGUILayout.HorizontalScope())
             {
                 if (GUILayout.Button(controller.Paused ? "Продолжить" : "Пауза")) controller.SetPaused(!controller.Paused);
-                if (GUILayout.Button("Сбросить симуляцию"))
+                using (new EditorGUI.DisabledScope(controller.ActiveFx != null))
                 {
-                    controller.ResetSimulation();
-                    _transitionDiagnostic = null;
+                    if (GUILayout.Button("Сбросить симуляцию"))
+                    {
+                        controller.ResetSimulation();
+                        _transitionDiagnostic = null;
+                    }
                 }
             }
-            using (new EditorGUI.DisabledScope(_selectedProfile == null))
+            using (new EditorGUI.DisabledScope(_selectedProfile == null || controller.ActiveFx != null))
             {
                 if (GUILayout.Button(controller.IsTransitioning ? "Прервать переход и применить цикл" : "Применить цикл сразу"))
                 {
@@ -211,7 +220,7 @@ namespace XRay.Importer.Editor.Levels
                 }
             }
             _transitionDuration = EditorGUILayout.DelayedFloatField("Длительность перехода (с)", _transitionDuration);
-            using (new EditorGUI.DisabledScope(_selectedProfile == null || controller.IsTransitioning || !IsNonNegativeFinite(_transitionDuration)))
+            using (new EditorGUI.DisabledScope(_selectedProfile == null || controller.IsTransitioning || controller.ActiveFx != null || !IsNonNegativeFinite(_transitionDuration)))
             {
                 if (GUILayout.Button("Начать переход")) _transitionDiagnostic = controller.TransitionTo(_selectedProfile, _transitionDuration) ? null : controller.Diagnostic;
             }
@@ -220,6 +229,103 @@ namespace XRay.Importer.Editor.Levels
                 EditorGUI.ProgressBar(EditorGUILayout.GetControlRect(), controller.TransitionProgress, controller.Paused ? "Переход на паузе" : "Переход выполняется");
             }
             if (!string.IsNullOrEmpty(_transitionDiagnostic)) EditorGUILayout.HelpBox(_transitionDiagnostic, MessageType.Warning);
+        }
+
+        private void DrawFxControls(XRayWeatherController controller, bool playing)
+        {
+            EditorGUILayout.Space();
+            EditorGUILayout.LabelField("Погодные эффекты", EditorStyles.boldLabel);
+            using (new EditorGUI.DisabledScope(playing || controller.ActiveFx != null))
+            {
+                var catalog = (XRayWeatherFxCatalog)EditorGUILayout.ObjectField("Каталог FX", controller.FxCatalog, typeof(XRayWeatherFxCatalog), false);
+                if (catalog != controller.FxCatalog) AssignFxCatalog(controller, catalog);
+                if (controller.FxCatalog == null && GUILayout.Button("Подключить подготовленный каталог FX"))
+                {
+                    try
+                    {
+                        catalog = XRayWeatherImporter.LoadPreparedFxCatalog();
+                        if (catalog != null) AssignFxCatalog(controller, catalog);
+                        else _fxDiagnostic = "Подготовленный каталог FX отсутствует.";
+                    }
+                    catch (Exception exception)
+                    {
+                        _fxDiagnostic = exception.Message;
+                    }
+                }
+            }
+            if (controller.FxCatalog != null)
+            {
+                DrawFxPicker(controller.FxCatalog, controller.ActiveFx);
+                _fxStartSeconds = EditorGUILayout.DelayedFloatField("Позиция запуска (игровые с)", _fxStartSeconds);
+                bool simulating = playing || controller.PreviewActive;
+                if (!simulating) EditorGUILayout.HelpBox("Запустите предпросмотр погоды, чтобы применить FX.", MessageType.Info);
+                if (controller.IsTransitioning) EditorGUILayout.HelpBox("При запуске FX обычный переход завершится на целевом цикле.", MessageType.Info);
+                using (new EditorGUI.DisabledScope(!simulating || _selectedFx == null || !IsNonNegativeFinite(_fxStartSeconds)))
+                {
+                    if (GUILayout.Button("Запустить FX"))
+                    {
+                        _fxDiagnostic = controller.StartFx(_selectedFx, _fxStartSeconds) ? null : controller.Diagnostic;
+                        EditorApplication.QueuePlayerLoopUpdate();
+                        SceneView.RepaintAll();
+                    }
+                }
+            }
+            if (controller.ActiveFx != null)
+            {
+                EditorGUILayout.LabelField("Активный FX", controller.ActiveFx.EffectName);
+                EditorGUILayout.LabelField("Фаза FX", controller.Paused ? controller.FxPhase + " (пауза)" : controller.FxPhase.ToString());
+                EditorGUILayout.LabelField("Время FX, игровые с", FormattableString.Invariant($"{controller.FxTimeSeconds:0.##} / {controller.FxDurationSeconds:0.##}"));
+                EditorGUI.BeginChangeCheck();
+                float seconds = EditorGUILayout.Slider("Позиция FX (игровые с)", (float)controller.FxTimeSeconds, 0.0f, (float)controller.FxDurationSeconds);
+                if (EditorGUI.EndChangeCheck())
+                {
+                    _fxDiagnostic = controller.SeekFx(Math.Min(seconds, controller.FxDurationSeconds)) ? null : controller.Diagnostic;
+                    EditorApplication.QueuePlayerLoopUpdate();
+                    SceneView.RepaintAll();
+                }
+                if (GUILayout.Button("Остановить и вернуть погоду"))
+                {
+                    _fxDiagnostic = controller.StopFx() ? null : controller.Diagnostic;
+                    EditorApplication.QueuePlayerLoopUpdate();
+                    SceneView.RepaintAll();
+                }
+            }
+            if (!string.IsNullOrEmpty(_fxDiagnostic)) EditorGUILayout.HelpBox(_fxDiagnostic, MessageType.Warning);
+        }
+
+        private void AssignFxCatalog(XRayWeatherController controller, XRayWeatherFxCatalog catalog)
+        {
+            if (catalog != null && !catalog.CanAttachTo(controller.AuthoredProfile))
+            {
+                _fxDiagnostic = "Каталог FX несовместим со стартовым профилем сцены.";
+                return;
+            }
+            _fxDiagnostic = null;
+            serializedObject.FindProperty("_fxCatalog").objectReferenceValue = catalog;
+            serializedObject.ApplyModifiedProperties();
+        }
+
+        private void DrawFxPicker(XRayWeatherFxCatalog catalog, XRayWeatherFxProfile active)
+        {
+            if (_pickerFxCatalog != catalog)
+            {
+                _pickerFxCatalog = catalog;
+                _selectedFx = active;
+            }
+            Rect button = EditorGUI.PrefixLabel(EditorGUILayout.GetControlRect(), new GUIContent("Выбранный FX"));
+            if (!EditorGUI.DropdownButton(button, new GUIContent(_selectedFx != null ? _selectedFx.EffectName : "Выбрать"), FocusType.Keyboard)) return;
+            var menu = new GenericMenu();
+            foreach (XRayWeatherFxProfile effect in catalog.Effects)
+            {
+                if (effect == null) continue;
+                menu.AddItem(new GUIContent(effect.EffectName), _selectedFx == effect, () =>
+                {
+                    _selectedFx = effect;
+                    _fxDiagnostic = null;
+                    Repaint();
+                });
+            }
+            menu.DropDown(button);
         }
 
         private static bool IsNonNegativeFinite(float value)

@@ -13,11 +13,14 @@ namespace XRay.Importer.Levels
         private const double DAY_SECONDS = 86400.0;
         private const float SHAFTS_DAY_GAIN = 26.0f;
         private const float SHAFTS_NIGHT_GAIN = 64.0f;
+        private const double FX_BLEND_REAL_SECONDS = 5.0;
+        private const float FX_FLARE_TRANSMISSION = 0.35f;
 
         private static readonly List<XRayWeatherController> _controllers = new List<XRayWeatherController>();
 
         [SerializeField] private XRayWeatherProfile _profile;
         [SerializeField] private XRayWeatherCatalog _catalog;
+        [SerializeField] private XRayWeatherFxCatalog _fxCatalog;
         [SerializeField, Range(0.0f, 24.0f)] private float _timeOfDayHours = 12.0f;
         [SerializeField, Min(0.0f)] private float _timeScale = 1.0f;
         [SerializeField] private bool _paused;
@@ -40,6 +43,7 @@ namespace XRay.Importer.Levels
         private XRayWeatherProfile _appliedProfile;
         private XRayWeatherProfile _transitionFrom;
         private XRayWeatherProfile _transitionTarget;
+        private XRayWeatherFxPlayback _fxPlayback;
         private XRayWeatherSnapshot _snapshot;
         private Vector2 _flareVisibility = Vector2.one;
         private MonolithWeatherInputs _ownedWeather;
@@ -79,6 +83,12 @@ namespace XRay.Importer.Levels
 
         public XRayWeatherProfile AuthoredProfile => _profile;
         public XRayWeatherCatalog Catalog => _catalog;
+        public XRayWeatherFxCatalog FxCatalog => _fxCatalog;
+        public XRayWeatherFxProfile ActiveFx => _fxPlayback?.Effect;
+        public double FxTimeSeconds => _fxPlayback?.ElapsedSeconds ?? 0.0;
+        public double FxDurationSeconds => _fxPlayback?.DurationSeconds ?? 0.0;
+        public double FxEntrySeconds => _fxPlayback?.EntrySeconds ?? 0.0;
+        public XRayWeatherFxPhase FxPhase => _fxPlayback?.Phase ?? XRayWeatherFxPhase.None;
         public XRayWeatherProfile ActiveProfile => _transitionTarget != null ? _transitionTarget : _activeProfile;
         public XRayWeatherSnapshot Snapshot => _snapshot;
         public Vector3 SourceLightColor { get; private set; }
@@ -117,6 +127,13 @@ namespace XRay.Importer.Levels
             _catalog = catalog;
         }
 
+        public void ConfigureFxCatalog(XRayWeatherFxCatalog catalog)
+        {
+            if (_fxPlayback != null && _fxCatalog != catalog) throw new InvalidOperationException("Stop the weather effect before replacing its catalog.");
+            if (catalog != null && !catalog.CanAttachTo(_profile)) throw new ArgumentException("The weather effect catalog must match the authored ordinary weather source.", nameof(catalog));
+            _fxCatalog = catalog;
+        }
+
         public void ApplySettings()
         {
             _settingsDirty = false;
@@ -129,6 +146,7 @@ namespace XRay.Importer.Levels
             }
             _settingsValid = true;
             bool discontinuity = !_settingsApplied || _appliedInitialTime != _timeOfDayHours || _appliedProfile != _profile;
+            if (discontinuity) _fxPlayback = null;
             if (!_settingsApplied || _appliedInitialTime != _timeOfDayHours) _gameTimeSeconds = WrapTime(_timeOfDayHours * 3600.0);
             if (!_settingsApplied || _appliedProfile != _profile)
             {
@@ -153,6 +171,11 @@ namespace XRay.Importer.Levels
 
         public void SetProfile(XRayWeatherProfile profile)
         {
+            if (_fxPlayback != null)
+            {
+                Diagnostic = "Stop the weather effect before selecting another ordinary cycle.";
+                return;
+            }
             _activeProfile = profile;
             ClearTransition();
             RefreshDiscontinuity();
@@ -176,6 +199,7 @@ namespace XRay.Importer.Levels
         {
             if (double.IsNaN(gameSeconds) || double.IsInfinity(gameSeconds)) throw new ArgumentOutOfRangeException(nameof(gameSeconds));
             _gameTimeSeconds = WrapTime(gameSeconds);
+            if (_fxPlayback != null) _fxPlayback.Rebase(_gameTimeSeconds - _fxPlayback.ElapsedSeconds);
             RefreshDiscontinuity();
         }
 
@@ -213,6 +237,11 @@ namespace XRay.Importer.Levels
         public bool TransitionTo(XRayWeatherProfile profile, float durationRealSeconds)
         {
             if (!IsFinite(durationRealSeconds) || durationRealSeconds < 0.0f) throw new ArgumentOutOfRangeException(nameof(durationRealSeconds));
+            if (_fxPlayback != null)
+            {
+                Diagnostic = "Stop the weather effect before starting an ordinary transition.";
+                return false;
+            }
             if (IsTransitioning)
             {
                 Diagnostic = "Finish the current weather transition before starting another resource blend.";
@@ -242,6 +271,68 @@ namespace XRay.Importer.Levels
             return true;
         }
 
+        public bool StartFx(XRayWeatherFxProfile effect, double elapsedSeconds = 0.0)
+        {
+            return StartFxAt(effect, elapsedSeconds, false);
+        }
+
+        public bool StartFxFromRemaining(XRayWeatherFxProfile effect, double remainingSeconds)
+        {
+            return StartFxAt(effect, remainingSeconds, true);
+        }
+
+        private bool StartFxAt(XRayWeatherFxProfile effect, double seconds, bool remaining)
+        {
+            if (!_ownsInputs || Active != this || _fxCatalog == null || !_fxCatalog.Contains(effect) || !_fxCatalog.CanAttachTo(ActiveProfile) || !effect.Validate(out _))
+            {
+                Diagnostic = "Weather effects require active weather ownership and a compatible prepared catalog.";
+                return false;
+            }
+            if (_fxPlayback != null && (_fxPlayback.Effect.Kind != XRayWeatherFxKind.Blowout || effect.Kind != XRayWeatherFxKind.SuperBlowout))
+            {
+                Diagnostic = "Only a super blowout can interrupt an active ordinary blowout.";
+                return false;
+            }
+            double entrySeconds = FX_BLEND_REAL_SECONDS * (_simulationTimeScale > 0.0f ? _simulationTimeScale : 1.0f);
+            double duration = 2.0 * entrySeconds + effect.AuthoredDurationSeconds;
+            double elapsed = remaining ? duration - seconds : seconds;
+            if (!double.IsFinite(elapsed) || elapsed < 0.0 || elapsed >= duration || duration >= DAY_SECONDS)
+            {
+                Diagnostic = "Weather effect start must be inside a finite sequence shorter than one game day.";
+                return false;
+            }
+            if (IsTransitioning)
+            {
+                _activeProfile = _transitionTarget;
+                ClearTransition();
+            }
+            _fxPlayback = new XRayWeatherFxPlayback(effect, _activeProfile, entrySeconds, _gameTimeSeconds, elapsed);
+            RefreshDiscontinuity();
+            return ActiveFx == effect;
+        }
+
+        public bool SeekFx(double elapsedSeconds)
+        {
+            if (_fxPlayback == null || !double.IsFinite(elapsedSeconds) || elapsedSeconds < 0.0 || elapsedSeconds > _fxPlayback.DurationSeconds)
+            {
+                Diagnostic = "Seek must be inside an active weather effect.";
+                return false;
+            }
+            _gameTimeSeconds = WrapTime(_gameTimeSeconds + elapsedSeconds - _fxPlayback.ElapsedSeconds);
+            _fxPlayback.ElapsedSeconds = elapsedSeconds;
+            if (elapsedSeconds == _fxPlayback.DurationSeconds) _fxPlayback = null;
+            RefreshDiscontinuity();
+            return true;
+        }
+
+        public bool StopFx()
+        {
+            if (_fxPlayback == null) return false;
+            _fxPlayback = null;
+            RefreshDiscontinuity();
+            return true;
+        }
+
         public void ResetSimulation()
         {
             _settingsApplied = false;
@@ -257,9 +348,17 @@ namespace XRay.Importer.Levels
             if (!_settingsValid) return;
             if (!TryOwnInputs()) return;
             float elapsed = _simulationPaused ? 0.0f : deltaSeconds;
-            _gameTimeSeconds = WrapTime(_gameTimeSeconds + elapsed * _simulationTimeScale);
+            double gameDelta = elapsed * _simulationTimeScale;
+            _gameTimeSeconds = WrapTime(_gameTimeSeconds + gameDelta);
             if (IsTransitioning) _transitionElapsed = Mathf.Min(_transitionDuration, _transitionElapsed + elapsed);
-            EvaluateAndPublish(elapsed, false);
+            bool effectCompleted = false;
+            if (_fxPlayback != null)
+            {
+                _fxPlayback.ElapsedSeconds += gameDelta;
+                effectCompleted = _fxPlayback.ElapsedSeconds >= _fxPlayback.DurationSeconds;
+                if (effectCompleted) _fxPlayback = null;
+            }
+            EvaluateAndPublish(elapsed, effectCompleted);
             if (IsTransitioning && _transitionElapsed >= _transitionDuration)
             {
                 _activeProfile = _transitionTarget;
@@ -426,7 +525,16 @@ namespace XRay.Importer.Levels
                 return;
             }
             Vector2 flareVisibility = ResolveFlareVisibility(_activeProfile, snapshot);
-            if (IsTransitioning)
+            bool effectFlareHandover = false;
+            if (_fxPlayback != null)
+            {
+                snapshot = _fxPlayback.Evaluate(_gameTimeSeconds, out float effectWeight);
+                Vector2 effectVisibility = Vector2.one * (FX_FLARE_TRANSMISSION * XRayWeatherFlareVisibility.FogTransmission(snapshot));
+                flareVisibility = Vector2.Lerp(flareVisibility, effectVisibility, effectWeight);
+                effectFlareHandover = effectWeight >= 1.0f && !_fxPlayback.AuthoredFlarePublished;
+                _fxPlayback.AuthoredFlarePublished = effectWeight >= 1.0f;
+            }
+            else if (IsTransitioning)
             {
                 if (!_transitionFrom.TryEvaluate(_gameTimeSeconds, out XRayWeatherSnapshot from, out string fromDiagnostic) || !_transitionTarget.TryEvaluate(_gameTimeSeconds, out XRayWeatherSnapshot target, out string targetDiagnostic))
                 {
@@ -474,7 +582,7 @@ namespace XRay.Importer.Levels
             }
             _ownedWeather.SetWeatherNightAmbient(this, _ownedSky != null ? XRayWeatherSkyPass.GetNightRadiance(_ownedSky.Settings) : Vector3.zero);
             bool transitionCompletedWithoutGameTime = IsTransitioning && _transitionElapsed >= _transitionDuration && _simulationTimeScale == 0.0f;
-            PublishCelestial(deltaSeconds, resetPrevious && resetCelestial || transitionCompletedWithoutGameTime);
+            PublishCelestial(deltaSeconds, resetPrevious && resetCelestial || transitionCompletedWithoutGameTime || effectFlareHandover);
             _rebaseWind = false;
             Diagnostic = ActiveProfile.HasSsfxWindTrees ? diagnostic : "INPUT BLOCKED: imported ssfx_wind_trees are unavailable; wind uses the provider's authored diagnostic tree settings.";
             if (!ActiveProfile.HasSunLightScale) Diagnostic = "INPUT BLOCKED: saved source sunlight scale is unavailable; descriptor RGB remains an explicit diagnostic light input.";
@@ -553,6 +661,7 @@ namespace XRay.Importer.Levels
 
         private void ReleaseInputs()
         {
+            _fxPlayback = null;
             if (_ownedSun != null)
             {
                 _ownedSun.color = _savedSunColor;

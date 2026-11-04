@@ -52,6 +52,11 @@ namespace XRay.Importer.Tests
             return Queue("FlareAdaptation", new Filter { testMode = TestMode.EditMode, assemblyNames = new[] { ASSEMBLY }, groupNames = new[] { @"^XRay\.Importer\.Tests\.XRayWeatherFlareAdaptationTests\." } }, archive);
         }
 
+        public static string RunFx(string archive)
+        {
+            return Queue("Fx", new Filter { testMode = TestMode.EditMode, assemblyNames = new[] { ASSEMBLY }, groupNames = new[] { @"^XRay\.Importer\.Tests\.XRayWeatherFxTests\." } }, archive);
+        }
+
         public static string Status()
         {
             return _summary == null ? "{\"status\":\"idle\"}" : JsonUtility.ToJson(_summary, true);

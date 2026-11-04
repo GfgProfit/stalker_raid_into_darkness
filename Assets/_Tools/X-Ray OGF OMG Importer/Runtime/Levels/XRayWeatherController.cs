@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering.HighDefinition;
 
 namespace XRay.Importer.Levels
 {
@@ -10,6 +11,8 @@ namespace XRay.Importer.Levels
     public sealed class XRayWeatherController : MonoBehaviour
     {
         private const double DAY_SECONDS = 86400.0;
+        private const float SHAFTS_DAY_GAIN = 26.0f;
+        private const float SHAFTS_NIGHT_GAIN = 64.0f;
 
         private static readonly List<XRayWeatherController> _controllers = new List<XRayWeatherController>();
 
@@ -22,6 +25,11 @@ namespace XRay.Importer.Levels
         [SerializeField] private XRayFloraWindProvider _windProvider;
         [SerializeField] private Light _sun;
         [SerializeField] private XRayWeatherSkyRenderer _skyRenderer;
+        [SerializeField] private XRayWeatherFogRenderer _fogRenderer;
+        [SerializeField] private XRayWeatherCelestialSettings _celestialSettings;
+        [SerializeField] private bool _sunShaftsEnabled = true;
+        [SerializeField] private bool _lensFlareEnabled = true;
+        [SerializeField] private bool _expressiveDaylight = true;
 
         private XRayWeatherProfile _activeProfile;
         private XRayWeatherProfile _appliedProfile;
@@ -32,10 +40,16 @@ namespace XRay.Importer.Levels
         private MonolithSourceLighting _ownedLighting;
         private XRayFloraWindProvider _ownedWind;
         private Light _ownedSun;
+        private HDAdditionalLightData _ownedSunData;
         private XRayWeatherSkyRenderer _ownedSky;
+        private XRayWeatherFogRenderer _ownedFog;
+        private XRayWeatherCelestialSettings _appliedCelestialSettings;
+        private XRayWeatherCelestialRenderer _celestial;
         private Color _savedSunColor;
         private float _savedSunIntensity;
         private Quaternion _savedSunRotation;
+        private float _savedVolumetricDimmer;
+        private float _savedVolumetricShadowDimmer;
         private double _gameTimeSeconds;
         private float _simulationTimeScale;
         private float _appliedInitialTime;
@@ -50,6 +64,10 @@ namespace XRay.Importer.Levels
         private bool _ownsInputs;
         private bool _rebaseWind;
         private bool _ownsSky;
+        private bool _ownsFog;
+        private bool _ownsShaftsLight;
+        private bool _savedAffectsVolumetric;
+        private bool _celestialResolved;
 
         public static XRayWeatherController Active { get; private set; }
 
@@ -63,6 +81,12 @@ namespace XRay.Importer.Levels
         public bool PreviewActive => _previewActive;
         public bool IsTransitioning => _transitionTarget != null;
         public float TransitionProgress => IsTransitioning ? Mathf.Clamp01(_transitionElapsed / _transitionDuration) : 1.0f;
+        public XRayWeatherCelestialRenderer Celestial => _celestial;
+        public bool? SunShaftsOverride { get; private set; }
+        public bool? LensFlareOverride { get; private set; }
+        public bool SunShaftsEnabled => SunShaftsOverride ?? _sunShaftsEnabled;
+        public bool LensFlareEnabled => LensFlareOverride ?? _lensFlareEnabled;
+        public bool ExpressiveDaylight => _expressiveDaylight;
 
         public void Configure(XRayWeatherProfile profile, MonolithWeatherInputs weatherInputs, MonolithSourceLighting sourceLighting, XRayFloraWindProvider windProvider, Light sun)
         {
@@ -100,7 +124,10 @@ namespace XRay.Importer.Levels
             _appliedInitialTime = _timeOfDayHours;
             _appliedProfile = _profile;
             _settingsApplied = true;
-            if (_ownsInputs && (_ownedWeather != _weatherInputs || _ownedLighting != _sourceLighting || _ownedWind != _windProvider || _ownedSun != _sun || _ownedSky != _skyRenderer)) ReleaseInputs();
+            if (_appliedCelestialSettings != _celestialSettings) ReleaseCelestial();
+            _appliedCelestialSettings = _celestialSettings;
+            if (_celestial == null) _celestialResolved = false;
+            if (_ownsInputs && (_ownedWeather != _weatherInputs || _ownedLighting != _sourceLighting || _ownedWind != _windProvider || _ownedSun != _sun || _ownedSky != _skyRenderer || _ownedFog != _fogRenderer)) ReleaseInputs();
             if (Application.IsPlaying(gameObject) || _previewActive)
             {
                 if (TryOwnInputs()) EvaluateAndPublish(0.0f, discontinuity);
@@ -118,6 +145,13 @@ namespace XRay.Importer.Levels
         {
             ReleaseInputs();
             _skyRenderer = skyRenderer;
+            RefreshDiscontinuity();
+        }
+
+        public void ConfigureFog(XRayWeatherFogRenderer fogRenderer)
+        {
+            ReleaseInputs();
+            _fogRenderer = fogRenderer;
             RefreshDiscontinuity();
         }
 
@@ -139,6 +173,14 @@ namespace XRay.Importer.Levels
         {
             if (!IsFinite(timeScale) || timeScale < 0.0f) throw new ArgumentOutOfRangeException(nameof(timeScale));
             _simulationTimeScale = timeScale;
+        }
+
+        public void SetCelestialEffectOverrides(bool? shafts, bool? flare)
+        {
+            bool previousFlare = LensFlareEnabled;
+            SunShaftsOverride = shafts;
+            LensFlareOverride = flare;
+            if (_ownsInputs && Active == this) PublishCelestial(0.0f, previousFlare != LensFlareEnabled);
         }
 
         public bool TransitionTo(XRayWeatherProfile profile, float durationRealSeconds)
@@ -169,7 +211,7 @@ namespace XRay.Importer.Levels
             _transitionTarget = profile;
             _transitionDuration = durationRealSeconds;
             _transitionElapsed = 0.0f;
-            RefreshDiscontinuity();
+            RefreshDiscontinuity(false);
             return true;
         }
 
@@ -222,6 +264,11 @@ namespace XRay.Importer.Levels
 
         private void OnEnable()
         {
+            if (Application.IsPlaying(gameObject) && _fogRenderer == null)
+            {
+                _fogRenderer = GetComponent<XRayWeatherFogRenderer>();
+                if (_fogRenderer == null) _fogRenderer = gameObject.AddComponent<XRayWeatherFogRenderer>();
+            }
             if (!_controllers.Contains(this)) _controllers.Add(this);
             _lastFrame = -1;
             _settingsApplied = false;
@@ -288,12 +335,14 @@ namespace XRay.Importer.Levels
             bool lighting = _sourceLighting.TrySetWeatherLight(this, _sun, sourceColor, snapshot.SunDirection);
             bool wind = _windProvider.TryAcquireWeather(this, trees);
             bool sky = ReferenceEquals(_skyRenderer, null) || _skyRenderer != null && _skyRenderer.TrySetWeather(this, snapshot, _windProvider.State.Time);
-            if (!weather || !lighting || !wind || !sky)
+            bool fog = ReferenceEquals(_fogRenderer, null) || _fogRenderer != null && _fogRenderer.TrySetWeather(this, snapshot);
+            if (!weather || !lighting || !wind || !sky || !fog)
             {
                 _weatherInputs.ReleaseWeatherInputs(this);
                 _sourceLighting.ReleaseWeatherLight(this);
                 _windProvider.ReleaseWeather(this);
                 if (_skyRenderer != null) _skyRenderer.ReleaseWeather(this);
+                if (_fogRenderer != null) _fogRenderer.ReleaseWeather(this);
                 Diagnostic = "A referenced weather consumer is disabled or already owned by another provider.";
                 return false;
             }
@@ -301,8 +350,11 @@ namespace XRay.Importer.Levels
             _ownedLighting = _sourceLighting;
             _ownedWind = _windProvider;
             _ownedSun = _sun;
+            _ownedSunData = _sun.GetComponent<HDAdditionalLightData>();
             _ownedSky = _skyRenderer;
             _ownsSky = _ownedSky != null;
+            _ownedFog = _fogRenderer;
+            _ownsFog = _ownedFog != null;
             _savedSunColor = _sun.color;
             _savedSunIntensity = _sun.intensity;
             _savedSunRotation = _sun.transform.rotation;
@@ -312,12 +364,18 @@ namespace XRay.Importer.Levels
             return true;
         }
 
-        private void EvaluateAndPublish(float deltaSeconds, bool resetPrevious)
+        private void EvaluateAndPublish(float deltaSeconds, bool resetPrevious, bool resetCelestial = true)
         {
             if (!_ownsInputs || Active != this) return;
             if (_ownsSky && _ownedSky == null)
             {
                 Diagnostic = "The owned weather sky renderer was destroyed; authored inputs were restored.";
+                ReleaseInputs();
+                return;
+            }
+            if (_ownsFog && _ownedFog == null)
+            {
+                Diagnostic = "The owned weather fog renderer was destroyed; authored inputs were restored.";
                 ReleaseInputs();
                 return;
             }
@@ -366,16 +424,78 @@ namespace XRay.Importer.Levels
                 ReleaseInputs();
                 return;
             }
+            if (_ownedFog != null && !_ownedFog.TrySetWeather(this, snapshot))
+            {
+                Diagnostic = _ownedFog.Diagnostic;
+                ReleaseInputs();
+                return;
+            }
             _ownedWeather.SetWeatherNightAmbient(this, _ownedSky != null ? XRayWeatherSkyPass.GetNightRadiance(_ownedSky.Settings) : Vector3.zero);
+            PublishCelestial(deltaSeconds, resetPrevious && resetCelestial);
             _rebaseWind = false;
             Diagnostic = ActiveProfile.HasSsfxWindTrees ? diagnostic : "INPUT BLOCKED: imported ssfx_wind_trees are unavailable; wind uses the provider's authored diagnostic tree settings.";
             if (!ActiveProfile.HasSunLightScale) Diagnostic = "INPUT BLOCKED: saved source sunlight scale is unavailable; descriptor RGB remains an explicit diagnostic light input.";
         }
 
-        private void RefreshDiscontinuity()
+        private void PublishCelestial(float deltaSeconds, bool snap)
+        {
+            if (!_celestialResolved)
+            {
+                _celestialResolved = true;
+                XRayWeatherCelestialSettings settings = _celestialSettings != null ? _celestialSettings : Resources.Load<XRayWeatherCelestialSettings>(XRayWeatherCelestialSettings.RESOURCE_PATH);
+                if (settings != null && settings.Shader != null && settings.Shader.isSupported) _celestial = new XRayWeatherCelestialRenderer(gameObject, settings);
+                snap = true;
+            }
+            if (_celestial != null) _celestial.Publish(_snapshot, SunShaftsEnabled, LensFlareEnabled, deltaSeconds * _simulationTimeScale, snap || _simulationPaused, _expressiveDaylight);
+            PublishNativeShafts();
+        }
+
+        private void PublishNativeShafts()
+        {
+            bool mediumActive = _ownedFog != null && _ownedFog.HasWeather && _ownedSun != null && _ownedSunData != null && _celestial != null && _celestial.ShaftsIntensity > 0.001f;
+            bool lightActive = mediumActive && _ownedSun.intensity > 0.0f;
+            float daylight = lightActive ? Mathf.InverseLerp(64.0f, 800.0f, _ownedSun.intensity) : 0.0f;
+            if (_ownedFog != null) _ownedFog.SetNativeShafts(this, mediumActive, daylight);
+            if (!lightActive)
+            {
+                RestoreShaftsLight();
+                return;
+            }
+            if (!_ownsShaftsLight)
+            {
+                _savedAffectsVolumetric = _ownedSunData.affectsVolumetric;
+                if (!_savedAffectsVolumetric) _ownedSunData.affectsVolumetric = true;
+                _savedVolumetricDimmer = _ownedSunData.volumetricDimmer;
+                _savedVolumetricShadowDimmer = _ownedSunData.volumetricShadowDimmer;
+                _ownsShaftsLight = true;
+            }
+            float gain = Mathf.Lerp(SHAFTS_NIGHT_GAIN, SHAFTS_DAY_GAIN, daylight);
+            _ownedSunData.volumetricDimmer = _celestial.ShaftsIntensity * gain;
+            _ownedSunData.volumetricShadowDimmer = 1.0f;
+        }
+
+        private void RestoreShaftsLight()
+        {
+            if (_ownsShaftsLight && _ownedSunData != null)
+            {
+                _ownedSunData.volumetricDimmer = _savedVolumetricDimmer;
+                _ownedSunData.volumetricShadowDimmer = _savedVolumetricShadowDimmer;
+                if (_ownedSunData.affectsVolumetric != _savedAffectsVolumetric) _ownedSunData.affectsVolumetric = _savedAffectsVolumetric;
+            }
+            _ownsShaftsLight = false;
+        }
+
+        private void ReleaseCelestial()
+        {
+            if (_celestial != null) _celestial.Release();
+            _celestial = null;
+            _celestialResolved = false;
+        }
+
+        private void RefreshDiscontinuity(bool resetCelestial = true)
         {
             if (!Application.IsPlaying(gameObject) && !_previewActive) return;
-            if (TryOwnInputs()) EvaluateAndPublish(0.0f, true);
+            if (TryOwnInputs()) EvaluateAndPublish(0.0f, true, resetCelestial);
         }
 
         private void ReleaseInputs()
@@ -390,12 +510,20 @@ namespace XRay.Importer.Levels
             if (_ownedLighting != null) _ownedLighting.ReleaseWeatherLight(this);
             if (_ownedWind != null) _ownedWind.ReleaseWeather(this);
             if (_ownedSky != null) _ownedSky.ReleaseWeather(this);
+            if (_ownedFog != null) _ownedFog.ReleaseWeather(this);
+            RestoreShaftsLight();
+            ReleaseCelestial();
+            SunShaftsOverride = null;
+            LensFlareOverride = null;
             _ownedWeather = null;
             _ownedLighting = null;
             _ownedWind = null;
             _ownedSun = null;
+            _ownedSunData = null;
             _ownedSky = null;
             _ownsSky = false;
+            _ownedFog = null;
+            _ownsFog = false;
             _ownsInputs = false;
             if (Active == this) Active = null;
         }

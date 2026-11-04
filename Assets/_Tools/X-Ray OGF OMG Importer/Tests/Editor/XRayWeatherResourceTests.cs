@@ -71,6 +71,39 @@ namespace XRay.Importer.Tests
         }
 
         [Test]
+        public void FlareBgr24AndBgra32PreserveAuthoredMipsAndAlpha()
+        {
+            foreach (DdsFormat format in new[] { DdsFormat.Bgr24, DdsFormat.Bgra32 })
+            {
+                byte[] source = Cube(format);
+                byte[] payload = format == DdsFormat.Bgr24 ? new byte[] { 10, 20, 30, 50, 60, 70, 90, 100, 110, 130, 140, 150, 170, 180, 190 } : new byte[] { 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200 };
+                Array.Resize(ref source, DdsHeader.HEADER_SIZE + payload.Length);
+                Write(source, 12, 2);
+                Write(source, 16, 2);
+                Write(source, 28, 2);
+                Write(source, 112, 0);
+                Buffer.BlockCopy(payload, 0, source, DdsHeader.HEADER_SIZE, payload.Length);
+                using (var fixture = new Fixture(source))
+                {
+                    var importer = new XRayTextureImporter(new XRayImportOptions(), false, new HashSet<string>());
+                    XRayTextureAssetResult result = importer.ImportWeather(fixture.File, fixture.AssetsFolder, false);
+                    Assert.AreEqual(XRayResourceStatus.Imported, result.Status, result.Note);
+                    Texture2D texture = AssetDatabase.LoadAssetAtPath<Texture2D>(result.AssetPath);
+                    Assert.IsNotNull(texture);
+                    Assert.AreEqual(2, texture.mipmapCount);
+                    Assert.IsFalse(GraphicsFormatUtility.IsSRGBFormat(texture.graphicsFormat));
+                    var serialized = new SerializedObject(texture);
+                    serialized.FindProperty("m_IsReadable").boolValue = true;
+                    serialized.ApplyModifiedPropertiesWithoutUndo();
+                    byte[] expectedTop = format == DdsFormat.Bgr24 ? new byte[] { 110, 100, 90, 255, 150, 140, 130, 255, 30, 20, 10, 255, 70, 60, 50, 255 } : new byte[] { 90, 100, 110, 120, 130, 140, 150, 160, 10, 20, 30, 40, 50, 60, 70, 80 };
+                    byte[] expectedMip = format == DdsFormat.Bgr24 ? new byte[] { 190, 180, 170, 255 } : new byte[] { 170, 180, 190, 200 };
+                    CollectionAssert.AreEqual(expectedTop, texture.GetPixelData<byte>(0).ToArray(), format.ToString());
+                    CollectionAssert.AreEqual(expectedMip, texture.GetPixelData<byte>(1).ToArray(), format.ToString());
+                }
+            }
+        }
+
+        [Test]
         public void HalfFloatMetadataPreservesEightBytePixelsWithoutLegacyDecoding()
         {
             DdsHeader header = DdsHeader.Parse(Cube(DdsFormat.RgbaHalf));

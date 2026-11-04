@@ -318,7 +318,11 @@ namespace XRay.Importer.Editor
                 }
             }
             List<byte[]> levels = null;
-            if (!cubemap && !DdsMipChain.TryReadFlipped(source, header, out levels, out string reason)) return new XRayTextureAssetResult { Status = XRayResourceStatus.Unsupported, Format = header.Description, Note = reason };
+            if (!cubemap)
+            {
+                if (!header.IsBlockCompressed) levels = ReadUncompressedWeatherLevels(source, header);
+                else if (!DdsMipChain.TryReadFlipped(source, header, out levels, out string reason)) return new XRayTextureAssetResult { Status = XRayResourceStatus.Unsupported, Format = header.Description, Note = reason };
+            }
             var marker = new XRayAssetMarker(file.VirtualPath + "#weather-unorm" + ContentQualifier(source), XRayTextureRole.Packed.ToString(), file.Winner.SourceName, file.Winner.Location, file.Winner.Stamp);
             string assetPath = XRayAssetNaming.Place(folder, XRayAssetNaming.CreateCandidates(file.Winner.RelativePath, "_weather"), ".asset", marker.Key, XRayAssetMarker.ReadKey, _claimed);
             Texture existing = AssetDatabase.LoadAssetAtPath<Texture>(assetPath);
@@ -390,7 +394,7 @@ namespace XRay.Importer.Editor
                 }
                 AssetDatabase.SaveAssetIfDirty(texture);
                 XRayAssetMarker.Write(assetPath, marker);
-                string note = cubemap ? "UNorm DDS faces and authored mips preserved in native D3D face order." : "UNorm authored DDS mips preserved with the existing block-exact vertical flip.";
+                string note = cubemap ? "UNorm DDS faces and authored mips preserved in native D3D face order." : "UNorm authored DDS mips preserved with a vertical flip.";
                 note += trailingNote;
                 return new XRayTextureAssetResult { AssetPath = assetPath, Status = existing != null ? XRayResourceStatus.Updated : XRayResourceStatus.Imported, Format = header.Description, Note = note };
             }
@@ -399,6 +403,47 @@ namespace XRay.Importer.Editor
                 if (texture != null && !AssetDatabase.Contains(texture)) UnityEngine.Object.DestroyImmediate(texture);
                 throw;
             }
+        }
+
+        private static List<byte[]> ReadUncompressedWeatherLevels(byte[] source, DdsHeader header)
+        {
+            var levels = new List<byte[]>(header.MipCount);
+            int offset = header.DataOffset;
+            int width = header.Width;
+            int height = header.Height;
+            int sourcePixelSize = DdsHeader.GetBytesPerPixel(header.Format);
+            int targetPixelSize = header.Format == DdsFormat.Bgr24 ? 4 : sourcePixelSize;
+            for (int mip = 0; mip < header.MipCount; mip++)
+            {
+                int sourcePitch = width * sourcePixelSize;
+                int targetPitch = width * targetPixelSize;
+                var level = new byte[targetPitch * height];
+                for (int row = 0; row < height; row++)
+                {
+                    int from = offset + row * sourcePitch;
+                    int to = (height - row - 1) * targetPitch;
+                    if (header.Format == DdsFormat.Bgr24)
+                    {
+                        for (int pixel = 0; pixel < width; pixel++, from += 3, to += 4)
+                        {
+                            level[to] = source[from + 2];
+                            level[to + 1] = source[from + 1];
+                            level[to + 2] = source[from];
+                            level[to + 3] = 255;
+                        }
+                    }
+                    else
+                    {
+                        Buffer.BlockCopy(source, from, level, to, targetPitch);
+                        if (header.Format == DdsFormat.Bgrx32) for (int pixel = to + 3; pixel < to + targetPitch; pixel += 4) level[pixel] = 255;
+                    }
+                }
+                levels.Add(level);
+                offset += sourcePitch * height;
+                width = Math.Max(1, width >> 1);
+                height = Math.Max(1, height >> 1);
+            }
+            return levels;
         }
 
         private static GraphicsFormat WeatherFormat(DdsFormat format)

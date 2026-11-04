@@ -218,6 +218,7 @@ namespace XRay.Importer.Editor.Levels
             if (lighting == null)
             {
                 lighting = owner.AddComponent<MonolithSourceLighting>();
+                lighting.BoundRadianceScale = MonolithSourceLighting.DEFAULT_WEATHER_RADIANCE_SCALE;
                 lighting.Mode = MonolithSourceLighting.LightingMode.Bound;
             }
             XRayFloraWindProvider wind = root.GetComponentInChildren<XRayFloraWindProvider>(true);
@@ -243,11 +244,19 @@ namespace XRay.Importer.Editor.Levels
             }
             if (created) controller = owner.AddComponent<XRayWeatherController>();
             controller.Configure(profile, weather, lighting, wind, sun);
+#if XRAY_HDRP
+            ConfigureWeatherFog(controller);
+#endif
             if (created) owner.SetActive(true);
             return controller;
         }
 
 #if XRAY_HDRP
+        public static XRayWeatherFogRenderer ConfigureWeatherFog(XRayWeatherController controller)
+        {
+            return XRayWeatherFogSetup.ConfigureController(controller);
+        }
+
         public static bool ConfigureWeatherSky(GameObject root, XRayWeatherController controller, XRayWeatherProfile profile, string assetPath)
         {
             if (root == null || controller == null) throw new System.ArgumentNullException(nameof(root));
@@ -264,9 +273,9 @@ namespace XRay.Importer.Editor.Levels
             VolumeProfile skyProfile = XRayWeatherSkySetup.GetOrCreateSkyProfile(profile, (float)(controller.GameTimeSeconds / 3600.0), shader, authored, authoredVolume.sharedProfile, assetPath);
             Transform child = controller.transform.Find("Source Weather Sky");
             if (child == null) child = Child(controller.transform, "Source Weather Sky");
+            child.gameObject.layer = XRayWeatherFogRenderer.GetVolumeLayer(controller.gameObject);
             Volume volume = child.GetComponent<Volume>();
             if (volume == null) volume = child.gameObject.AddComponent<Volume>();
-            child.gameObject.layer = 0;
             volume.isGlobal = true;
             volume.priority = authoredVolume.priority + 1.0f;
             volume.sharedProfile = skyProfile;

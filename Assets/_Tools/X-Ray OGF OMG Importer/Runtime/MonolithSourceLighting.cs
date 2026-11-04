@@ -7,6 +7,8 @@ namespace XRay.Importer
     [ExecuteAlways]
     public sealed class MonolithSourceLighting : MonoBehaviour
     {
+        public const float DEFAULT_WEATHER_RADIANCE_SCALE = 512.0f;
+
         public enum LightingMode
         {
             Native,
@@ -38,6 +40,8 @@ namespace XRay.Importer
         private Light _weatherLight;
         private Vector3 _weatherColor;
         private Vector3 _weatherDirection;
+
+        public float EffectiveBoundRadianceScale => _mode == LightingMode.Bound && _weatherOwner != null && _boundRadianceScale == 1.0f && (_lights == null || _lights.Length == 0) && (_sourceColors == null || _sourceColors.Length == 0) ? DEFAULT_WEATHER_RADIANCE_SCALE : _boundRadianceScale;
 
         public bool TrySetWeatherLight(UnityEngine.Object owner, Light light, Vector3 sourceColor, Vector3 direction)
         {
@@ -132,6 +136,7 @@ namespace XRay.Importer
             if (_owner != this) return;
             Shader.SetGlobalFloat(_modeId, 0.0f);
             Shader.SetGlobalInt(_countId, 0);
+            Shader.SetGlobalFloat(_radianceScaleId, _boundRadianceScale);
             _owner = null;
         }
 
@@ -181,7 +186,7 @@ namespace XRay.Importer
             Shader.SetGlobalVectorArray(_directionId, _directions);
             Shader.SetGlobalVectorArray(_colorId, _colors);
             Shader.SetGlobalVector(_calibrationId, new Vector4(Mathf.Max(0.0f, _calibration.x), Mathf.Max(0.0f, _calibration.y), 0.0f, 0.0f));
-            Shader.SetGlobalFloat(_radianceScaleId, _boundRadianceScale);
+            Shader.SetGlobalFloat(_radianceScaleId, EffectiveBoundRadianceScale);
             Shader.SetGlobalInt(_countId, count);
             Shader.SetGlobalFloat(_modeId, (float)_mode);
         }

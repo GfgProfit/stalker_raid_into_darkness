@@ -91,11 +91,6 @@ namespace XRay.Importer.Editor.Levels
             }
         }
 
-        private void OnDisable()
-        {
-            if (target != null && XRayWeatherPreview.Controller == target) XRayWeatherPreview.Stop();
-        }
-
         private static XRayWeatherProfile QuickProfile(XRayWeatherProfile source, string cycle)
         {
             if (source == null) return null;

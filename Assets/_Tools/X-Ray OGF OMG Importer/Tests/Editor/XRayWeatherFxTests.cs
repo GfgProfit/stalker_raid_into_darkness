@@ -21,6 +21,8 @@ namespace XRay.Importer.Tests
         private const double NOON = 43200.0;
         private const float TOLERANCE = 0.0001f;
 
+        private static readonly int _fxLightingId = Shader.PropertyToID("_MonolithWeatherFxAmbient");
+
         [Test]
         public void SavedEffectFramesAndResourcesMatchEffectiveSource()
         {
@@ -109,6 +111,7 @@ namespace XRay.Importer.Tests
                 Assert.AreEqual(XRayWeatherFxPhase.Entry, controller.FxPhase);
                 Assert.AreEqual(10.0, controller.FxEntrySeconds);
                 Assert.AreEqual(lastOffset + 20.0, controller.FxDurationSeconds);
+                Assert.AreEqual(Vector4.zero, Shader.GetGlobalVector(_fxLightingId));
                 Assert.IsTrue(ordinary.TryEvaluate(MIDNIGHT - 1.0, out XRayWeatherSnapshot start, out string diagnostic), diagnostic);
                 Assert.That(Vector4.Distance(start.SunColor, controller.Snapshot.SunColor), Is.LessThan(TOLERANCE));
                 controller.TickPreview(1.0f);
@@ -120,6 +123,12 @@ namespace XRay.Importer.Tests
                     XRayWeatherSnapshot key = effect.GetKeyframe(i);
                     controller.SeekFx(entry + key.GameSeconds);
                     Assert.AreSame(effect, controller.ActiveFx);
+                    Vector4 fxLighting = Shader.GetGlobalVector(_fxLightingId);
+                    Assert.AreEqual(1.0f, fxLighting.x, key.Key0);
+                    Assert.Greater(fxLighting.y, 0.0f, key.Key0);
+                    if (key.SkyColor.maxColorComponent == 0.0f || key.SunColor.maxColorComponent > 0.0f) Assert.AreEqual(0.0f, fxLighting.z, key.Key0);
+                    Assert.That(Vector4.Distance(key.AmbientColor, controller.Snapshot.AmbientColor), Is.LessThan(TOLERANCE), key.Key0);
+                    Assert.That(Vector4.Distance(key.HemisphereColor, controller.Snapshot.HemisphereColor), Is.LessThan(TOLERANCE), key.Key0);
                     Assert.AreEqual(key.SunDefinition, controller.Snapshot.SunDefinition, key.Key0);
                     Assert.AreEqual(string.IsNullOrEmpty(key.SunDefinition) ? null : key.SunDefinition, controller.Celestial.FlareDefinition?.Name, key.Key0);
                     Assert.That(Vector4.Distance(key.SunColor, controller.Snapshot.SunColor), Is.LessThan(TOLERANCE), key.Key0);
@@ -132,9 +141,11 @@ namespace XRay.Importer.Tests
                 Assert.AreEqual(XRayWeatherFxPhase.Effect, controller.FxPhase);
                 controller.SeekFx(entry + lastOffset + 5.0);
                 Assert.AreEqual(XRayWeatherFxPhase.Return, controller.FxPhase);
+                Assert.That(Shader.GetGlobalVector(_fxLightingId).x, Is.EqualTo(0.5f).Within(TOLERANCE));
                 controller.TickPreview(2.5f);
                 Assert.IsNull(controller.ActiveFx);
                 Assert.AreEqual(XRayWeatherFxPhase.None, controller.FxPhase);
+                Assert.AreEqual(Vector4.zero, Shader.GetGlobalVector(_fxLightingId));
                 Assert.AreSame(ordinary, controller.ActiveProfile);
                 CheckOrdinarySample(controller, ordinary);
             }
@@ -260,6 +271,79 @@ namespace XRay.Importer.Tests
                 controller.SeekFx(elapsed + 1.0);
                 Assert.AreEqual(0.0f, sun.intensity);
                 Assert.IsTrue(fog.enableVolumetricFog.value);
+            }
+            finally
+            {
+                Object.DestroyImmediate(root);
+            }
+        }
+
+        [Test]
+        public void FxLightingOverridePreservesSourceAndReleasesPublishedState()
+        {
+            XRayWeatherFxCatalog catalog = Catalog();
+            XRayWeatherFxProfile effect = FindEffect(catalog, "fx_psi_storm_day");
+            XRayWeatherProfile ordinary = FindOrdinary(catalog, "w_clear1");
+            var root = new GameObject("Weather FX lighting regression");
+            try
+            {
+                XRayWeatherController controller = Begin(root, catalog, ordinary, NOON);
+                Light sun = root.GetComponentInChildren<Light>();
+                MonolithWeatherInputs weather = root.GetComponentInChildren<MonolithWeatherInputs>();
+                Assert.IsTrue(weather.EnvironmentActive);
+                float ordinaryLux = sun.intensity;
+                Vector4 ordinaryAmbient = Shader.GetGlobalVector("_MonolithWeatherAmbient");
+                Vector4 ordinaryHemisphere = Shader.GetGlobalVector("_MonolithWeatherEnvironmentColor");
+                Vector4 ordinaryEnvironmentWeights = Shader.GetGlobalVector("_MonolithWeatherEnvironmentWeights");
+                Assert.AreEqual(Vector4.zero, Shader.GetGlobalVector(_fxLightingId));
+                Assert.IsTrue(controller.StartFx(effect), controller.Diagnostic);
+                double entry = controller.FxEntrySeconds;
+                controller.SeekFx(entry + 120.0);
+                Assert.That(Shader.GetGlobalVector(_fxLightingId).x, Is.EqualTo(0.5f).Within(TOLERANCE));
+                controller.SeekFx(entry + 480.0);
+                XRayWeatherSnapshot source = controller.Snapshot;
+                Vector4 before = Shader.GetGlobalVector(_fxLightingId);
+                double world = controller.GameTimeSeconds;
+                double elapsed = controller.FxTimeSeconds;
+                Assert.AreEqual(1.0f, before.x);
+                Assert.Greater(before.y, 0.0f);
+                Assert.Greater(before.z, 0.0f);
+                Assert.AreEqual(0.0f, sun.intensity);
+                Assert.AreEqual(Vector3.zero, controller.SourceLightColor);
+                Assert.AreEqual(0.0f, controller.Celestial.EffectiveIntensity);
+
+                controller.SetFxLightingAdaptationOverride(0.0f);
+                Assert.AreEqual(0.0f, controller.FxLightingAdaptationOverride);
+                Vector4 disabled = Shader.GetGlobalVector(_fxLightingId);
+                Assert.AreEqual(before.x, disabled.x);
+                Assert.AreEqual(before.y, disabled.y);
+                Assert.AreEqual(0.0f, disabled.z);
+                Assert.IsTrue(weather.EnvironmentActive);
+                Assert.AreEqual(source.AmbientColor, controller.Snapshot.AmbientColor);
+                Assert.AreEqual(source.HemisphereColor, controller.Snapshot.HemisphereColor);
+                Assert.AreEqual(source.SkyColor, controller.Snapshot.SkyColor);
+                Assert.AreEqual(world, controller.GameTimeSeconds);
+                Assert.AreEqual(elapsed, controller.FxTimeSeconds);
+                Assert.AreEqual(0.0f, sun.intensity);
+                Assert.AreEqual(0.0f, controller.Celestial.EffectiveIntensity);
+                controller.SetFxLightingAdaptationOverride(null);
+                Assert.AreEqual(before, Shader.GetGlobalVector(_fxLightingId));
+
+                controller.StopFx();
+                Assert.AreEqual(Vector4.zero, Shader.GetGlobalVector(_fxLightingId));
+                controller.Seek(NOON);
+                CheckOrdinarySample(controller, ordinary);
+                Assert.AreEqual(ordinaryLux, sun.intensity);
+                Assert.AreEqual(ordinaryAmbient, Shader.GetGlobalVector("_MonolithWeatherAmbient"));
+                Assert.AreEqual(ordinaryHemisphere, Shader.GetGlobalVector("_MonolithWeatherEnvironmentColor"));
+                Assert.AreEqual(ordinaryEnvironmentWeights, Shader.GetGlobalVector("_MonolithWeatherEnvironmentWeights"));
+
+                Assert.IsTrue(controller.StartFx(effect), controller.Diagnostic);
+                controller.SeekFx(controller.FxEntrySeconds + 480.0);
+                Assert.AreEqual(before, Shader.GetGlobalVector(_fxLightingId));
+                controller.EndPreview();
+                Assert.AreEqual(Vector4.zero, Shader.GetGlobalVector(_fxLightingId));
+                Assert.IsFalse(weather.EnvironmentActive);
             }
             finally
             {

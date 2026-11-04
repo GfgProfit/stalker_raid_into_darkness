@@ -32,6 +32,7 @@ namespace XRay.Importer.Levels
         [SerializeField] private int _cameraMask;
         [SerializeField] private bool _catalogExpected;
         [SerializeField] private bool _fxExpected;
+        [SerializeField] private Material _fxLightingSurface;
 
         private string _output;
         private bool _stagePassed;
@@ -64,6 +65,11 @@ namespace XRay.Importer.Levels
             _fxExpected = expected;
         }
 
+        public void ConfigureFxLightingSurface(Material material)
+        {
+            _fxLightingSurface = material;
+        }
+
         public string RunEditorCases(string evidenceDir)
         {
             bool started = !_controller.PreviewActive;
@@ -94,6 +100,7 @@ namespace XRay.Importer.Levels
                 _instance._cameraMask = _cameraMask;
                 _instance._catalogExpected = _catalogExpected;
                 _instance._fxExpected = _fxExpected;
+                _instance._fxLightingSurface = _fxLightingSurface;
                 Destroy(gameObject);
                 return;
             }
@@ -146,6 +153,7 @@ namespace XRay.Importer.Levels
                 {
                     RunAdaptationStage(directory);
                     RunFxStage(directory, fog);
+                    if (_fxLightingSurface != null) RunFxLightingPixelStage(directory);
                 }
                 string resultPath = RunCases(_camera, _controller, _clear, _rain, _opaque, _alpha, Path.Combine(directory, "Cases"), _sun);
                 ResultRecord cases = JsonUtility.FromJson<ResultRecord>(File.ReadAllText(resultPath));
@@ -171,6 +179,113 @@ namespace XRay.Importer.Levels
             record.passed = record.captureWritten && record.assertionsPassed && record.restorationPassed && record.released && record.reacquired && string.IsNullOrEmpty(record.error);
             Write(directory, "Result", record);
             _stagePassed = record.passed;
+        }
+
+        private void RunFxLightingPixelStage(string directory)
+        {
+            const int PIXEL_WIDTH = 256;
+            const int PIXEL_HEIGHT = 144;
+            const float MILITARY_SKY_EXPOSURE = 10.5f;
+            var context = new CaptureContext(_camera, _controller, Path.Combine(directory, "FxLightingPixels"), new List<FrameRecord>(), _sun);
+            PrepareOutput(context.Output);
+            var original = new SavedState(context, _opaque, _alpha);
+            float? overrideBefore = _controller.FxLightingAdaptationOverride;
+            XRayWeatherSkySettings sky = _controller.GetComponent<XRayWeatherSkyRenderer>().Settings;
+            bool useHdrpIntensity = sky.UseHdrpIntensity;
+            SkyIntensityMode skyIntensityMode = sky.skyIntensityMode.value;
+            float skyExposure = sky.exposure.value;
+            var surface = _opaque.GetComponent<Renderer>();
+            Material previous = surface.sharedMaterial;
+            var exposureObject = new GameObject("FX Lighting Validation Exposure");
+            var profile = ScriptableObject.CreateInstance<VolumeProfile>();
+            try
+            {
+                exposureObject.layer = _opaque.layer;
+                SceneManager.MoveGameObjectToScene(exposureObject, _camera.gameObject.scene);
+                var volume = exposureObject.AddComponent<Volume>();
+                volume.isGlobal = true;
+                volume.priority = 10001.0f;
+                var exposure = profile.Add<Exposure>(true);
+                exposure.mode.Override(ExposureMode.Fixed);
+                exposure.fixedExposure.Override(9.0f);
+                profile.Add<Tonemapping>(true).mode.Override(TonemappingMode.ACES);
+                profile.Add<Bloom>(true).intensity.Override(0.0f);
+                volume.sharedProfile = profile;
+                sky.SetHdrpIntensity(true);
+                sky.skyIntensityMode.value = SkyIntensityMode.Exposure;
+                sky.exposure.value = MILITARY_SKY_EXPOSURE;
+
+                XRayWeatherFxProfile effect = _controller.FxCatalog.FindVariant(XRayWeatherFxKind.PsiStorm, 43200.0);
+                Require(effect != null, "The source psi storm is available for the pixel fixture.");
+                _controller.SetProfile(_clear);
+                _controller.SetPaused(true);
+                _controller.SetTimeScale(10.0f);
+                _controller.Seek(43200.0);
+                _controller.SetCelestialEffectOverrides(false, false);
+                _controller.SetFxLightingAdaptationOverride(0.0f);
+                Require(_controller.StartFx(effect) && _controller.SeekFx(_controller.FxEntrySeconds + 480.0), "The pixel fixture reaches the zero-direct psi storm key.");
+                Require(_sun.intensity == 0.0f && _controller.Snapshot.SunColor.maxColorComponent == 0.0f, "The pixel fixture uses the true zero direct source.");
+                float radianceScale = Shader.GetGlobalVector("_MonolithWeatherFxAmbient").y;
+                Require(Mathf.Abs(radianceScale - sky.GetIntensityFromSettings()) < TOLERANCE && radianceScale > 1.0f, "The pixel fixture uses the military Sky radiance at fixed camera exposure.");
+
+                var cameraData = _camera.GetComponent<HDAdditionalCameraData>();
+                cameraData.renderingPathCustomFrameSettings.SetEnabled(FrameSettingsField.LitShaderMode, false);
+                cameraData.renderingPathCustomFrameSettingsOverrideMask.mask[(uint)FrameSettingsField.LitShaderMode] = true;
+                _camera.transform.rotation = Quaternion.identity;
+                surface.sharedMaterial = _fxLightingSurface;
+                _opaque.transform.SetPositionAndRotation(_camera.transform.position + new Vector3(0.0f, -2.25f, 12.0f), Quaternion.identity);
+                _opaque.transform.localScale = new Vector3(10.0f, 6.0f, 1.0f);
+                _opaque.SetActive(true);
+                _alpha.SetActive(false);
+                Color[] before = CaptureFrame(context, "Unadapted", PIXEL_WIDTH, PIXEL_HEIGHT, 8);
+                _controller.SetFxLightingAdaptationOverride(null);
+                Color[] after = CaptureFrame(context, "Adapted", PIXEL_WIDTH, PIXEL_HEIGHT, 8);
+                double geometryBefore = MeanLuminance(before, 96, 30, 160, 63);
+                double geometryAfter = MeanLuminance(after, 96, 30, 160, 63);
+                double skyDifference = Math.Abs(MeanLuminance(after, 8, 112, 100, 136) - MeanLuminance(before, 8, 112, 100, 136));
+                bool passed = geometryAfter > geometryBefore + VISIBLE_DELTA && skyDifference < Math.Max(TOLERANCE, (geometryAfter - geometryBefore) * 0.25) && _sun.intensity == 0.0f;
+                Write(context.Output, "Result", new FxLightingPixelRecord { passed = passed, geometryMeanBefore = geometryBefore, geometryMeanAfter = geometryAfter, skyMeanDifference = skyDifference, sunLux = _sun.intensity, radianceScale = radianceScale, gain = _controller.FxLightingAdaptationGain });
+                Require(passed, "The Player adaptation brightens the terrain surface with 0 lux and without raising the sky.");
+            }
+            finally
+            {
+                sky.SetHdrpIntensity(useHdrpIntensity);
+                sky.skyIntensityMode.value = skyIntensityMode;
+                sky.exposure.value = skyExposure;
+                if (_controller.ActiveFx != null) _controller.StopFx();
+                _controller.SetFxLightingAdaptationOverride(overrideBefore);
+                surface.sharedMaterial = previous;
+                exposureObject.SetActive(false);
+                Destroy(exposureObject);
+                Destroy(profile);
+                original.Restore(context);
+            }
+
+            double MeanLuminance(Color[] pixels, int minX, int minY, int maxX, int maxY)
+            {
+                double total = 0.0;
+                for (int y = minY; y < maxY; y++)
+                {
+                    for (int x = minX; x < maxX; x++)
+                    {
+                        Color pixel = pixels[y * PIXEL_WIDTH + x];
+                        total += pixel.r * 0.2126 + pixel.g * 0.7152 + pixel.b * 0.0722;
+                    }
+                }
+                return total / ((maxX - minX) * (maxY - minY));
+            }
+        }
+
+        [Serializable]
+        private sealed class FxLightingPixelRecord
+        {
+            public bool passed;
+            public double geometryMeanBefore;
+            public double geometryMeanAfter;
+            public double skyMeanDifference;
+            public float sunLux;
+            public float radianceScale;
+            public float gain;
         }
 
         private void RunAdaptationStage(string directory)
@@ -234,9 +349,19 @@ namespace XRay.Importer.Levels
             float scale = _controller.TimeScale;
             bool? shafts = _controller.SunShaftsOverride;
             bool? flare = _controller.LensFlareOverride;
+            XRayWeatherSkyRenderer sky = _controller.GetComponent<XRayWeatherSkyRenderer>();
+            Require(sky != null && sky.HasWeather && sky.Settings != null, "The Player requires an active weather Sky for the FX radiance conversion.");
+            float expectedRadianceScale = sky.Settings.UseHdrpIntensity ? sky.Settings.GetIntensityFromSettings() : 1.0f;
+            float? adaptation = _controller.FxLightingAdaptationOverride;
+            int fxLightingId = Shader.PropertyToID("_MonolithWeatherFxAmbient");
+            int weatherActiveId = Shader.PropertyToID("_MonolithWeatherEnvironmentActive");
             var names = new List<string>();
+            var samples = new List<PlayerFxLightingSample>();
             int keys = 0;
+            int zeroDirectKeys = 0;
+            int artKeys = 0;
             bool zero = false;
+            bool zeroSky = false;
             try
             {
                 _controller.SetPaused(false);
@@ -247,6 +372,7 @@ namespace XRay.Importer.Levels
                     names.Add(effect.EffectName);
                     _controller.Seek(86399.0);
                     Require(_controller.StartFx(effect) && _controller.FxPhase == XRayWeatherFxPhase.Entry, "The Player cannot start " + effect.EffectName + ". " + _controller.Diagnostic);
+                    Require(Shader.GetGlobalVector(fxLightingId) == Vector4.zero, "FX indirect lighting must be absent during the ordinary entry blend.");
                     _controller.TickSimulation(1.0f);
                     Require(_controller.FxTimeSeconds == 2.0 && _controller.GameTimeSeconds == 1.0, "The Player did not use one wrapped clock while entering " + effect.EffectName);
                     double entry = _controller.FxEntrySeconds;
@@ -262,10 +388,31 @@ namespace XRay.Importer.Levels
                         XRayWeatherFlareDefinition definition = _controller.Celestial.FlareDefinition;
                         Require(definition?.Name == (string.IsNullOrEmpty(key.SunDefinition) ? null : key.SunDefinition), "The Player retained the wrong flare at " + effect.EffectName + "/" + key.Key0);
                         if (key.SunDefinition == "none") Require(definition.Source.Texture == null && definition.Gradient.Texture != null && definition.Elements.Count > 0, "The Player lost the source named none flare data.");
+                        Vector4 fxLighting = Shader.GetGlobalVector(fxLightingId);
+                        bool blackSky = key.SkyColor.maxColorComponent == 0.0f;
+                        Require(Shader.GetGlobalFloat(weatherActiveId) == 1.0f && fxLighting.x == 1.0f && fxLighting.y > 0.0f && Mathf.Abs(fxLighting.y - expectedRadianceScale) < TOLERANCE, "The Player did not publish source FX lighting in the current HDRP Sky units for " + effect.EffectName + "/" + key.Key0);
+                        Require(float.IsFinite(fxLighting.z) && fxLighting.z >= 0.0f && (!blackSky || fxLighting.z == 0.0f), "The Player applied artistic FX gain to a source blackout.");
+                        Require(Vector4.Distance(snapshot.AmbientColor, key.AmbientColor) < TOLERANCE && Vector4.Distance(snapshot.HemisphereColor, key.HemisphereColor) < TOLERANCE && Vector4.Distance(snapshot.SkyColor, key.SkyColor) < TOLERANCE, "The Player changed the authored FX lighting for " + effect.EffectName + "/" + key.Key0);
+                        if (key.SunColor.maxColorComponent == 0.0f)
+                        {
+                            Require(_sun.intensity == 0.0f && _controller.Celestial.EffectiveIntensity == 0.0f, "FX indirect lighting changed the zero direct source or flare for " + effect.EffectName + "/" + key.Key0);
+                            zeroDirectKeys++;
+                        }
+                        else
+                        {
+                            Require(_sun.intensity > 0.0f && fxLighting.z == 0.0f, "The Player changed an authored direct flash or added artistic fill during it for " + effect.EffectName + "/" + key.Key0);
+                        }
+                        if (blackSky) zeroSky = true;
+                        if (fxLighting.z > 0.0f) artKeys++;
+                        samples.Add(new PlayerFxLightingSample { effect = effect.EffectName, key = key.Key0, input = fxLighting, sourceSun = snapshot.SunColor, sourceAmbient = snapshot.AmbientColor, sourceHemisphere = snapshot.HemisphereColor, sourceSky = snapshot.SkyColor, sunLux = _sun.intensity });
                         keys++;
                         if (effect.EffectName == "fx_super_blowout_night" && key.GameSeconds == 432.0)
                         {
                             Require(_sun.intensity == 0.0f && _controller.SourceLightColor == Vector3.zero && _controller.Celestial.EffectiveIntensity == 0.0f && fogSettings.enableVolumetricFog.value, "The source zero must suppress flare and light while preserving native Fog.");
+                            _controller.SetFxLightingAdaptationOverride(0.0f);
+                            Vector4 sourceOnly = Shader.GetGlobalVector(fxLightingId);
+                            Require(sourceOnly.x == fxLighting.x && sourceOnly.y == fxLighting.y && sourceOnly.z == 0.0f && _sun.intensity == 0.0f, "Disabling FX art adaptation must preserve source lighting and zero direct Lux.");
+                            _controller.SetFxLightingAdaptationOverride(adaptation);
                             _controller.SetCelestialEffectOverrides(false, true);
                             Require(!fogSettings.enableVolumetricFog.value && _sun.intensity == 0.0f, "Explicit shafts-off must restore analytic Fog at the FX zero key.");
                             _controller.SetCelestialEffectOverrides(true, true);
@@ -274,6 +421,7 @@ namespace XRay.Importer.Levels
                     }
                     _controller.SeekFx(end + entry * 0.5);
                     Require(_controller.FxPhase == XRayWeatherFxPhase.Return, "The Player skipped the return phase of " + effect.EffectName);
+                    Require(Mathf.Abs(Shader.GetGlobalVector(fxLightingId).x - 0.5f) < TOLERANCE, "The Player did not fade FX indirect lighting during return.");
                     _controller.SetPaused(true);
                     double returnClock = _controller.GameTimeSeconds;
                     _controller.TickSimulation(5.0f);
@@ -281,11 +429,16 @@ namespace XRay.Importer.Levels
                     _controller.SetPaused(false);
                     _controller.TickSimulation(2.5f);
                     Require(_controller.ActiveFx == null && _controller.FxPhase == XRayWeatherFxPhase.None && _controller.ActiveProfile == ordinary, "The Player did not return to its ordinary profile after " + effect.EffectName);
+                    Require(Shader.GetGlobalVector(fxLightingId) == Vector4.zero, "The Player retained FX lighting after the ordinary weather return.");
                     Require(ordinary.TryEvaluate(_controller.GameTimeSeconds, out XRayWeatherSnapshot expected, out _) && expected.SunDefinition == _controller.Snapshot.SunDefinition && expected.SunColor == _controller.Snapshot.SunColor, "The Player did not sample current ordinary weather on return.");
                     Require(_controller.Celestial.FlareDefinition?.Name == (string.IsNullOrEmpty(expected.SunDefinition) ? null : expected.SunDefinition), "The Player retained a stale FX flare on return.");
                 }
-                Require(zero && keys == 105, "The Player must cover all authored playable FX keys and the exact source zero.");
-                Write(directory, "WeatherFx", new PlayerFxRecord { effects = names.ToArray(), playableKeys = keys, exactZero = zero });
+                XRayWeatherFxProfile cancelled = catalog.Effects[0];
+                Require(_controller.StartFx(cancelled, 10.0 + cancelled.GetKeyframe(1).GameSeconds) && Shader.GetGlobalVector(fxLightingId).x == 1.0f, "The Player cannot reach an authored FX state before cancellation.");
+                _controller.StopFx();
+                Require(_controller.ActiveFx == null && Shader.GetGlobalVector(fxLightingId) == Vector4.zero, "The Player retained FX lighting after cancellation.");
+                Require(zero && zeroSky && keys == 105 && zeroDirectKeys == 99 && artKeys > 0, "The Player must cover all authored playable FX keys, source blackouts and direct flashes.");
+                Write(directory, "WeatherFx", new PlayerFxRecord { effects = names.ToArray(), playableKeys = keys, exactZero = zero, zeroDirectKeys = zeroDirectKeys, artKeys = artKeys, radianceScale = expectedRadianceScale, lighting = samples.ToArray() });
             }
             finally
             {
@@ -295,6 +448,7 @@ namespace XRay.Importer.Levels
                 _controller.SetTimeScale(scale);
                 _controller.SetPaused(paused);
                 _controller.SetCelestialEffectOverrides(shafts, flare);
+                _controller.SetFxLightingAdaptationOverride(adaptation);
             }
         }
 
@@ -323,6 +477,23 @@ namespace XRay.Importer.Levels
             public string[] effects;
             public int playableKeys;
             public bool exactZero;
+            public int zeroDirectKeys;
+            public int artKeys;
+            public float radianceScale;
+            public PlayerFxLightingSample[] lighting;
+        }
+
+        [Serializable]
+        private sealed class PlayerFxLightingSample
+        {
+            public string effect;
+            public string key;
+            public Vector4 input;
+            public Color sourceSun;
+            public Color sourceAmbient;
+            public Color sourceHemisphere;
+            public Color sourceSky;
+            public float sunLux;
         }
 
         private void RunCatalogStage(string directory, XRayWeatherFogRenderer fog)

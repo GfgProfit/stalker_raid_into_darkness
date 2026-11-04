@@ -15,6 +15,12 @@ namespace XRay.Importer.Levels
         private const float SHAFTS_NIGHT_GAIN = 64.0f;
         private const double FX_BLEND_REAL_SECONDS = 5.0;
         private const float FX_FLARE_TRANSMISSION = 0.35f;
+        private const float MAX_FX_LIGHTING_ADAPTATION = 4.0f;
+        private const float FX_DARK_SURFACE_GAIN = 128.0f;
+        private const float FX_PSI_NIGHT_GAIN = 64.0f;
+        private const float FX_DAY_ART_RADIANCE_LIMIT = 0.30f;
+        private const float FX_NIGHT_ART_RADIANCE_LIMIT = 0.16f;
+        private const float FX_DIRECT_LIGHT_ART_CUTOFF = 0.15f;
 
         private static readonly List<XRayWeatherController> _controllers = new List<XRayWeatherController>();
 
@@ -38,6 +44,7 @@ namespace XRay.Importer.Levels
         [SerializeField] private bool _adaptLensFlareToWeather = true;
         [SerializeField, Min(0.0f)] private float _expressiveFlareIntensity = 1.0f;
         [SerializeField] private XRayWeatherFlareProfileOverride[] _flareProfileOverrides = Array.Empty<XRayWeatherFlareProfileOverride>();
+        [SerializeField, Range(0.0f, MAX_FX_LIGHTING_ADAPTATION)] private float _fxLightingAdaptation = 1.0f;
 
         private XRayWeatherProfile _activeProfile;
         private XRayWeatherProfile _appliedProfile;
@@ -105,6 +112,8 @@ namespace XRay.Importer.Levels
         public float? LensFlareIntensityOverride { get; private set; }
         public bool? FlareAdaptationOverride { get; private set; }
         public float? ExpressiveFlareIntensityOverride { get; private set; }
+        public float? FxLightingAdaptationOverride { get; private set; }
+        public float FxLightingAdaptationGain => FxLightingAdaptationOverride ?? (IsFinite(_fxLightingAdaptation) ? Mathf.Clamp(_fxLightingAdaptation, 0.0f, MAX_FX_LIGHTING_ADAPTATION) : 1.0f);
         public bool SunShaftsEnabled => SunShaftsOverride ?? _sunShaftsEnabled;
         public bool LensFlareEnabled => LensFlareOverride ?? _lensFlareEnabled;
         public bool ExpressiveDaylight => _expressiveDaylight;
@@ -232,6 +241,17 @@ namespace XRay.Importer.Levels
             FlareAdaptationOverride = adaptation;
             ExpressiveFlareIntensityOverride = expressiveIntensity;
             if (_ownsInputs && Active == this) PublishCelestial(0.0f, false);
+        }
+
+        public void SetFxLightingAdaptationOverride(float? gain)
+        {
+            if (gain.HasValue && (!IsFinite(gain.Value) || gain.Value < 0.0f || gain.Value > MAX_FX_LIGHTING_ADAPTATION)) throw new ArgumentOutOfRangeException(nameof(gain));
+            FxLightingAdaptationOverride = gain;
+            if (_ownsInputs && Active == this && _ownedWeather != null && _fxPlayback != null)
+            {
+                _fxPlayback.Evaluate(_gameTimeSeconds, out float effectWeight);
+                PublishEnvironment(_snapshot, effectWeight);
+            }
         }
 
         public bool TransitionTo(XRayWeatherProfile profile, float durationRealSeconds)
@@ -526,9 +546,10 @@ namespace XRay.Importer.Levels
             }
             Vector2 flareVisibility = ResolveFlareVisibility(_activeProfile, snapshot);
             bool effectFlareHandover = false;
+            float effectWeight = 0.0f;
             if (_fxPlayback != null)
             {
-                snapshot = _fxPlayback.Evaluate(_gameTimeSeconds, out float effectWeight);
+                snapshot = _fxPlayback.Evaluate(_gameTimeSeconds, out effectWeight);
                 Vector2 effectVisibility = Vector2.one * (FX_FLARE_TRANSMISSION * XRayWeatherFlareVisibility.FogTransmission(snapshot));
                 flareVisibility = Vector2.Lerp(flareVisibility, effectVisibility, effectWeight);
                 effectFlareHandover = effectWeight >= 1.0f && !_fxPlayback.AuthoredFlarePublished;
@@ -567,7 +588,6 @@ namespace XRay.Importer.Levels
             _ownedSun.intensity = _savedSunIntensity * intensityScale;
             _ownedSun.transform.rotation = Quaternion.LookRotation(snapshot.SunDirection);
             _ownedWind.TickWeather(this, deltaSeconds, new XRayFloraWindWeather(snapshot.WindDirectionRadians, snapshot.WindVelocity, snapshot.TreeAmplitudeIntensity), resetPrevious || _rebaseWind || deltaSeconds == 0.0f);
-            _ownedWeather.SetWeatherEnvironment(this, snapshot, ActiveProfile.HasEnvironmentScale ? ActiveProfile.EnvironmentScale : (Vector2?)null);
             if (_ownedSky != null && !_ownedSky.TrySetWeather(this, snapshot, _ownedWind.State.Time))
             {
                 Diagnostic = _ownedSky.Diagnostic;
@@ -580,12 +600,30 @@ namespace XRay.Importer.Levels
                 ReleaseInputs();
                 return;
             }
+            PublishEnvironment(snapshot, effectWeight);
             _ownedWeather.SetWeatherNightAmbient(this, _ownedSky != null ? XRayWeatherSkyPass.GetNightRadiance(_ownedSky.Settings) : Vector3.zero);
             bool transitionCompletedWithoutGameTime = IsTransitioning && _transitionElapsed >= _transitionDuration && _simulationTimeScale == 0.0f;
             PublishCelestial(deltaSeconds, resetPrevious && resetCelestial || transitionCompletedWithoutGameTime || effectFlareHandover);
             _rebaseWind = false;
             Diagnostic = ActiveProfile.HasSsfxWindTrees ? diagnostic : "INPUT BLOCKED: imported ssfx_wind_trees are unavailable; wind uses the provider's authored diagnostic tree settings.";
             if (!ActiveProfile.HasSunLightScale) Diagnostic = "INPUT BLOCKED: saved source sunlight scale is unavailable; descriptor RGB remains an explicit diagnostic light input.";
+        }
+
+        private void PublishEnvironment(XRayWeatherSnapshot snapshot, float effectWeight)
+        {
+            Vector2? scale = ActiveProfile.HasEnvironmentScale ? ActiveProfile.EnvironmentScale : (Vector2?)null;
+            Vector4 fxLighting = Vector4.zero;
+            if (effectWeight > 0.0f)
+            {
+                float radianceScale = _ownedSky != null ? XRayWeatherSkyPass.GetEnvironmentRadianceScale(_ownedSky.Settings) : 1.0f;
+                XRayWeatherFxProfile effect = _fxPlayback.Effect;
+                bool night = effect.EffectName.EndsWith("_night", StringComparison.Ordinal);
+                float calibratedGain = night && effect.Kind == XRayWeatherFxKind.PsiStorm ? FX_PSI_NIGHT_GAIN : FX_DARK_SURFACE_GAIN;
+                float directWeight = Mathf.SmoothStep(0.0f, 1.0f, snapshot.SunColor.maxColorComponent / FX_DIRECT_LIGHT_ART_CUTOFF);
+                float gain = FxLightingAdaptationGain * calibratedGain * Mathf.Clamp01(snapshot.SkyColor.maxColorComponent) * (1.0f - directWeight);
+                fxLighting = new Vector4(effectWeight, radianceScale, gain, night ? FX_NIGHT_ART_RADIANCE_LIMIT : FX_DAY_ART_RADIANCE_LIMIT);
+            }
+            _ownedWeather.SetWeatherEnvironment(this, snapshot, scale, fxLighting);
         }
 
         private void PublishCelestial(float deltaSeconds, bool snap)

@@ -17,6 +17,7 @@ namespace XRay.Importer
         private static readonly int _environmentColorId = Shader.PropertyToID("_MonolithWeatherEnvironmentColor");
         private static readonly int _ambientId = Shader.PropertyToID("_MonolithWeatherAmbient");
         private static readonly int _nightAmbientId = Shader.PropertyToID("_MonolithWeatherNightAmbient");
+        private static readonly int _fxAmbientId = Shader.PropertyToID("_MonolithWeatherFxAmbient");
         private static readonly int[] _environmentIds = { Shader.PropertyToID("_MonolithWeatherEnvironment0"), Shader.PropertyToID("_MonolithWeatherEnvironment1"), Shader.PropertyToID("_MonolithWeatherEnvironment2"), Shader.PropertyToID("_MonolithWeatherEnvironment3") };
         private static MonolithWeatherInputs _owner;
 
@@ -35,6 +36,7 @@ namespace XRay.Importer
         private Vector4 _weatherEnvironmentColor;
         private Vector4 _weatherAmbient;
         private Vector3 _weatherNightAmbient;
+        private Vector4 _weatherFxAmbient;
         private bool _environmentReady;
 
         public float DynamicGloss => _dynamicGloss;
@@ -58,7 +60,7 @@ namespace XRay.Importer
             return true;
         }
 
-        public void SetWeatherEnvironment(UnityEngine.Object owner, XRayWeatherSnapshot snapshot, Vector2? scale)
+        public void SetWeatherEnvironment(UnityEngine.Object owner, XRayWeatherSnapshot snapshot, Vector2? scale, Vector4 fxLighting = default)
         {
             if (_weatherOwner != owner || owner == null) return;
             _weatherEnvironment = snapshot.EnvironmentResources;
@@ -67,6 +69,7 @@ namespace XRay.Importer
             {
                 if (_weatherEnvironment.Weights[i] > 0.0f && !(_weatherEnvironment.Texture(i) is Cubemap)) _environmentReady = false;
             }
+            _weatherFxAmbient = _environmentReady ? fxLighting : Vector4.zero;
             if (_environmentReady)
             {
                 Vector2 value = scale.Value;
@@ -93,6 +96,7 @@ namespace XRay.Importer
             {
                 _environmentReady = false;
                 _weatherNightAmbient = Vector3.zero;
+                _weatherFxAmbient = Vector4.zero;
             }
             _owner = this;
             _weatherOwner = owner;
@@ -111,6 +115,7 @@ namespace XRay.Importer
             _weatherFloraFixes = null;
             _environmentReady = false;
             _weatherNightAmbient = Vector3.zero;
+            _weatherFxAmbient = Vector4.zero;
             Publish();
         }
 
@@ -170,10 +175,12 @@ namespace XRay.Importer
             _weatherOwner = null;
             _environmentReady = false;
             _weatherNightAmbient = Vector3.zero;
+            _weatherFxAmbient = Vector4.zero;
             if (_owner != this) return;
             Shader.SetGlobalFloat(_activeId, 0.0f);
             Shader.SetGlobalFloat(_environmentActiveId, 0.0f);
             Shader.SetGlobalVector(_nightAmbientId, Vector4.zero);
+            Shader.SetGlobalVector(_fxAmbientId, Vector4.zero);
             _owner = null;
         }
 
@@ -204,10 +211,12 @@ namespace XRay.Importer
             Shader.SetGlobalVector(_lightSetupId, LightSetup);
             Shader.SetGlobalVector(_floraId, FloraFixes);
             Shader.SetGlobalVector(_nightAmbientId, NightAmbient);
+            Shader.SetGlobalVector(_fxAmbientId, _weatherFxAmbient);
             Shader.SetGlobalFloat(_environmentActiveId, EnvironmentActive ? 1.0f : 0.0f);
             if (EnvironmentActive)
             {
-                for (int i = 0; i < 4; i++) Shader.SetGlobalTexture(_environmentIds[i], _weatherEnvironment.Texture(i));
+                Texture fallback = _weatherFxAmbient.x > 0.0f ? _weatherEnvironment.Texture(0) : null;
+                for (int i = 0; i < 4; i++) Shader.SetGlobalTexture(_environmentIds[i], _weatherEnvironment.Texture(i) ?? fallback);
                 Shader.SetGlobalVector(_environmentWeightsId, new Vector4(_weatherEnvironment.Weights.x, _weatherEnvironment.Weights.y, _weatherEnvironment.Weights.z, _weatherEnvironment.Weights.w));
                 Shader.SetGlobalVector(_environmentColorId, _weatherEnvironmentColor);
                 Shader.SetGlobalVector(_ambientId, _weatherAmbient);
@@ -222,6 +231,7 @@ namespace XRay.Importer
             Shader.SetGlobalFloat(_activeId, 0.0f);
             Shader.SetGlobalFloat(_environmentActiveId, 0.0f);
             Shader.SetGlobalVector(_nightAmbientId, Vector4.zero);
+            Shader.SetGlobalVector(_fxAmbientId, Vector4.zero);
         }
     }
 }

@@ -83,6 +83,13 @@ namespace XRay.Importer.Editor.Levels
                 probe.Configure(camera, controller, clear, rain, opaque, alpha, XRayWeatherFogValidation.SourceHash());
                 probe.RequireCatalog(catalog != null);
                 probe.RequireFx(fxCatalog != null);
+                if (fxCatalog != null)
+                {
+                    const string FX_SURFACE = "Assets/_Source/Levels/Anomaly/1v2_DX11_v_12gb_2.5_168_662acc8d/Materials/levels/l07_military/terrain/l07_military_terrain_terrain_military_1_terrain.mat";
+                    Material surface = AssetDatabase.LoadAssetAtPath<Material>(FX_SURFACE);
+                    if (surface == null || surface.shader == null || !surface.shader.isSupported) throw new InvalidOperationException("The FX lighting pixel fixture requires the serialized military terrain material.");
+                    probe.ConfigureFxLightingSurface(surface);
+                }
                 probe.ConfigureEnvironment(serialized.FindProperty("_sun").objectReferenceValue as Light);
                 if (!EditorSceneManager.SaveScene(fixture, path)) throw new IOException("Cannot save the dedicated celestial fixture.");
                 File.WriteAllText(Path.Combine(archive, "Fixture_" + Path.GetFileName(folder) + ".txt"), path);

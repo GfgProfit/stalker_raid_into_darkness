@@ -34,8 +34,9 @@ namespace XRay.Importer.Editor.Levels
             {
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("_profile"), new GUIContent("Стартовый профиль сцены"));
             }
-            DrawPropertiesExcluding(serializedObject, "m_Script", "_profile", "_catalog", "_fxCatalog", "_lensFlareEnabled", "_lensFlareIntensity", "_adaptLensFlareToWeather", "_expressiveDaylight", "_expressiveFlareIntensity", "_flareProfileOverrides");
+            DrawPropertiesExcluding(serializedObject, "m_Script", "_profile", "_catalog", "_fxCatalog", "_lensFlareEnabled", "_lensFlareIntensity", "_adaptLensFlareToWeather", "_expressiveDaylight", "_expressiveFlareIntensity", "_flareProfileOverrides", "_fxLightingAdaptation");
             DrawFlareSettings();
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("_fxLightingAdaptation"), new GUIContent("Адаптация освещения WeatherFX"));
             if (EditorGUI.EndChangeCheck())
             {
                 serializedObject.ApplyModifiedProperties();
@@ -272,6 +273,8 @@ namespace XRay.Importer.Editor.Levels
             }
             if (controller.ActiveFx != null)
             {
+                bool sourceLightingOnly = controller.FxLightingAdaptationOverride == 0.0f;
+                if (EditorGUILayout.Toggle("Только исходное освещение FX", sourceLightingOnly) != sourceLightingOnly) controller.SetFxLightingAdaptationOverride(sourceLightingOnly ? (float?)null : 0.0f);
                 EditorGUILayout.LabelField("Активный FX", controller.ActiveFx.EffectName);
                 EditorGUILayout.LabelField("Фаза FX", controller.Paused ? controller.FxPhase + " (пауза)" : controller.FxPhase.ToString());
                 EditorGUILayout.LabelField("Время FX, игровые с", FormattableString.Invariant($"{controller.FxTimeSeconds:0.##} / {controller.FxDurationSeconds:0.##}"));

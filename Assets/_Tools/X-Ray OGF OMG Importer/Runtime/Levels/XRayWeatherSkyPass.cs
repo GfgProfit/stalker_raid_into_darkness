@@ -31,8 +31,13 @@ namespace XRay.Importer.Levels
         {
             if (settings == null) return Vector3.zero;
             Color ambient = settings.NightAmbient;
-            float intensity = settings.NightWeight * settings.NightDiffuseMultiplier * (settings.UseHdrpIntensity ? GetSkyIntensity(settings, null) : 1.0f);
+            float intensity = settings.NightWeight * settings.NightDiffuseMultiplier * GetEnvironmentRadianceScale(settings);
             return new Vector3(ambient.r * intensity, ambient.g * intensity, ambient.b * intensity);
+        }
+
+        internal static float GetEnvironmentRadianceScale(XRayWeatherSkySettings settings)
+        {
+            return settings != null && settings.UseHdrpIntensity ? GetSkyIntensity(settings, null) : 1.0f;
         }
 
         public override void Build()

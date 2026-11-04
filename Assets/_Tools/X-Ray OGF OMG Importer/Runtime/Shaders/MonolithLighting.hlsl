@@ -191,6 +191,35 @@ DirectLighting EvaluateBSDF_Punctual(LightLoopContext lightLoopContext, float3 V
     return lighting;
 }
 
+#if defined(_MONOLITH_ORIGINAL_ENVIRONMENT) || defined(_MONOLITH_LEVEL) || defined(_MONOLITH_LEVEL_DETAIL) || defined(_MONOLITH_LEVEL_LOD)
+#ifndef _MONOLITH_ORIGINAL_ENVIRONMENT
+TEXTURECUBE(_MonolithWeatherEnvironment0);
+TEXTURECUBE(_MonolithWeatherEnvironment1);
+TEXTURECUBE(_MonolithWeatherEnvironment2);
+TEXTURECUBE(_MonolithWeatherEnvironment3);
+#endif
+
+float3 MonolithWeatherFxIrradiance(float3 normal)
+{
+    float3 magnitude = abs(normal);
+    float3 direction = normal / max(1e-5, max(magnitude.x, max(magnitude.y, magnitude.z)));
+    direction.y = direction.y * 2.0 - 1.0;
+    float3 cube = 0.0;
+    [branch] if (_MonolithWeatherEnvironmentWeights.x > 0.0) cube += SAMPLE_TEXTURECUBE_LOD(_MonolithWeatherEnvironment0, s_trilinear_clamp_sampler, direction, 6.0).rgb * _MonolithWeatherEnvironmentWeights.x;
+    [branch] if (_MonolithWeatherEnvironmentWeights.y > 0.0) cube += SAMPLE_TEXTURECUBE_LOD(_MonolithWeatherEnvironment1, s_trilinear_clamp_sampler, direction, 6.0).rgb * _MonolithWeatherEnvironmentWeights.y;
+    [branch] if (_MonolithWeatherEnvironmentWeights.z > 0.0) cube += SAMPLE_TEXTURECUBE_LOD(_MonolithWeatherEnvironment2, s_trilinear_clamp_sampler, direction, 6.0).rgb * _MonolithWeatherEnvironmentWeights.z;
+    [branch] if (_MonolithWeatherEnvironmentWeights.w > 0.0) cube += SAMPLE_TEXTURECUBE_LOD(_MonolithWeatherEnvironment3, s_trilinear_clamp_sampler, direction, 6.0).rgb * _MonolithWeatherEnvironmentWeights.w;
+    return pow(max(0.0, cube * _MonolithWeatherEnvironmentColor.rgb * MonolithBaseHemisphere() + _MonolithWeatherAmbient.rgb), 2.2);
+}
+
+float3 MonolithWeatherFxAdaptation(float3 irradiance)
+{
+    float peak = max(irradiance.r, max(irradiance.g, irradiance.b));
+    float gain = min(_MonolithWeatherFxAmbient.z / (1.0 + peak / 0.025), _MonolithWeatherFxAmbient.w / max(peak, 1e-5));
+    return irradiance * gain;
+}
+#endif
+
 void PostEvaluateBSDF(LightLoopContext lightLoopContext, float3 V, PositionInputs posInput, PreLightData preLightData, BSDFData bsdfData, BuiltinData builtinData, AggregateLighting lighting, out LightLoopOutput lightLoopOutput)
 {
     #ifdef _MONOLITH_ORIGINAL_ENVIRONMENT
@@ -230,6 +259,21 @@ void PostEvaluateBSDF(LightLoopContext lightLoopContext, float3 V, PositionInput
     MonolithLegacyPostEvaluateBSDF(lightLoopContext, V, posInput, preLightData, bsdfData, builtinData, lighting, lightLoopOutput);
     #ifdef _MONOLITH_ORIGINAL_ENVIRONMENT
     if (originalEnvironment && _MonolithDiagnosticOptions.z < 0.5) lightLoopOutput.diffuseLighting += environmentData.combined;
+    #endif
+    #if defined(_MONOLITH_ORIGINAL_ENVIRONMENT) || defined(_MONOLITH_LEVEL) || defined(_MONOLITH_LEVEL_DETAIL) || defined(_MONOLITH_LEVEL_LOD)
+    [branch] if (_MonolithWeatherFxAmbient.x > 0.0 && _MonolithWeatherActive > 0.5 && _MonolithWeatherEnvironmentActive > 0.5 && _MonolithTrueStalkerActive < 0.5 && _MonolithDebug < 0.5 && _MonolithDiagnosticOptions.z < 0.5)
+    {
+        #ifdef _MONOLITH_ORIGINAL_ENVIRONMENT
+        bool alreadyUsesWeatherEnvironment = originalEnvironment && _MonolithSourceProfile > 0.5;
+        float3 irradiance = alreadyUsesWeatherEnvironment ? environmentData.diffuseIrradiance : MonolithWeatherFxIrradiance(normalize(bsdfData.normalWS));
+        float3 diffuse = alreadyUsesWeatherEnvironment ? 0.0 : irradiance;
+        #else
+        float3 irradiance = MonolithWeatherFxIrradiance(normalize(bsdfData.normalWS));
+        float3 diffuse = irradiance;
+        #endif
+        diffuse += MonolithWeatherFxAdaptation(irradiance);
+        lightLoopOutput.diffuseLighting += bsdfData.diffuseColor * diffuse * bsdfData.ambientOcclusion * (_MonolithWeatherFxAmbient.x * _MonolithWeatherFxAmbient.y);
+    }
     #endif
     if (_MonolithWeatherActive > 0.5 && _MonolithTrueStalkerActive < 0.5 && _MonolithDebug < 0.5 && _MonolithDiagnosticOptions.z < 0.5)
     {

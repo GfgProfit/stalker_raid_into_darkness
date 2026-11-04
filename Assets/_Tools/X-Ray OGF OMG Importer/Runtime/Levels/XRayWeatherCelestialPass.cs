@@ -21,6 +21,7 @@ namespace XRay.Importer.Levels
         private const int BLUR_PASS = 1;
         private const int SHAFTS_PASS = 2;
         private const int SPRITE_PASS = 3;
+        private const int GEOMETRY_PASS = 4;
         private const int DISK_MODE = 0;
         private const int GHOST_MODE = 1;
         private const int GRADIENT_MODE = 2;
@@ -40,6 +41,7 @@ namespace XRay.Importer.Levels
         private static readonly int _spriteRectId = Shader.PropertyToID("_XRayCelestialSpriteRect");
         private static readonly int _spriteModeId = Shader.PropertyToID("_XRayCelestialSpriteMode");
         private static readonly int _spriteFadeId = Shader.PropertyToID("_XRayCelestialSpriteFade");
+        private static readonly int _spriteContributionId = Shader.PropertyToID("_XRayCelestialSpriteContribution");
 
         [SerializeField] private Shader _shader;
 
@@ -50,17 +52,27 @@ namespace XRay.Importer.Levels
         private bool _flareEnabled;
         private bool _expressiveDaylight;
         private XRayWeatherFlareDefinition _definition;
+        private XRayWeatherFlareDefinition _expressiveDefinition;
         private float _flareFade;
+        private float _flareIntensity;
+        private float _untintedBrightness;
+        private float _expressiveIntensity;
         private Material _material;
         private RTHandle _maskA;
         private RTHandle _maskB;
         private RTHandle _sceneColor;
+        private RTHandle _geometrySample;
+        private bool _geometryRequested;
+        private bool _geometryPending;
+        private int _geometryGeneration;
 
         public Camera LastCamera { get; private set; }
         public Vector2 LastSourceUv { get; private set; }
         public int RenderCount { get; private set; }
         public bool LastShaftsDrawn { get; private set; }
         public int LastFlareDraws { get; private set; }
+        public float? GeometryVisibility { get; private set; }
+        public string GeometryCamera { get; private set; }
 
         public void Configure(Shader shader)
         {
@@ -75,7 +87,7 @@ namespace XRay.Importer.Levels
             targetDepthBuffer = TargetBuffer.None;
         }
 
-        public void SetFrame(GameObject owner, Vector3 directionToSource, float shaftsIntensity, bool flareEnabled, Color encodedSourceColor, XRayWeatherFlareDefinition definition, float flareFade = 1.0f, bool expressiveDaylight = false)
+        public void SetFrame(GameObject owner, Vector3 directionToSource, float shaftsIntensity, bool flareEnabled, Color encodedSourceColor, XRayWeatherFlareDefinition definition, float flareFade = 1.0f, bool expressiveDaylight = false, float flareIntensity = 1.0f, float untintedBrightness = 1.0f, float expressiveIntensity = 1.0f, XRayWeatherFlareDefinition expressiveDefinition = null)
         {
             _sceneOwner = owner;
             _direction = Finite(directionToSource) ? directionToSource.normalized : Vector3.zero;
@@ -84,8 +96,19 @@ namespace XRay.Importer.Levels
             _flareEnabled = flareEnabled;
             _expressiveDaylight = expressiveDaylight;
             _definition = definition;
+            _expressiveDefinition = expressiveDefinition;
             _flareFade = Mathf.Clamp01(Nonnegative(flareFade));
-            enabled = owner != null && _direction != Vector3.zero && (_sourceColor.r > 0.0f || _sourceColor.g > 0.0f || _sourceColor.b > 0.0f) && (_shaftsIntensity > MIN_SHAFTS_INTENSITY || _flareEnabled && _definition != null && _flareFade > 0.0f);
+            _flareIntensity = Nonnegative(flareIntensity);
+            _untintedBrightness = Mathf.Clamp01(Nonnegative(untintedBrightness));
+            _expressiveIntensity = Nonnegative(expressiveIntensity);
+            enabled = owner != null && _direction != Vector3.zero && _sourceColor.maxColorComponent > 0.0f && (_shaftsIntensity > MIN_SHAFTS_INTENSITY || _flareEnabled && _definition != null && _flareFade > 0.0f && _flareIntensity > 0.0f);
+        }
+
+        public bool RequestGeometrySample()
+        {
+            if (!enabled || !SystemInfo.supportsAsyncGPUReadback || _geometryRequested || _geometryPending) return false;
+            _geometryRequested = true;
+            return true;
         }
 
         public void ClearFrame()
@@ -98,11 +121,14 @@ namespace XRay.Importer.Levels
             _flareEnabled = false;
             _expressiveDaylight = false;
             _definition = null;
+            _expressiveDefinition = null;
             _flareFade = 0.0f;
+            _flareIntensity = 0.0f;
             LastCamera = null;
             LastSourceUv = default;
             LastShaftsDrawn = false;
             LastFlareDraws = 0;
+            ClearGeometrySample();
         }
 
         protected override void Execute(CustomPassContext context)
@@ -121,7 +147,7 @@ namespace XRay.Importer.Levels
             float x = Mathf.Max(0.0f, Mathf.Max(-sourceUv.x, sourceUv.x - 1.0f));
             float y = Mathf.Max(0.0f, Mathf.Max(-sourceUv.y, sourceUv.y - 1.0f)) * aspect;
             bool shafts = _shaftsIntensity > MIN_SHAFTS_INTENSITY && x * x + y * y < 1.0f;
-            bool flare = _flareEnabled && _definition != null && _flareFade > 0.0f;
+            bool flare = _flareEnabled && _definition != null && _flareFade > 0.0f && _flareIntensity > 0.0f;
             if (!shafts && !flare) return;
             if (_material == null) _material = CoreUtils.CreateEngineMaterial(_shader);
             MaterialPropertyBlock properties = context.propertyBlock;
@@ -129,12 +155,22 @@ namespace XRay.Importer.Levels
             properties.SetVector(_sourceId, new Vector4(sourceUv.x, sourceUv.y, forward, aspect));
             properties.SetVector(_viewportId, new Vector4(viewport.x, viewport.y, 1.0f / viewport.x, 1.0f / viewport.y));
             properties.SetVector(_occlusionId, occlusion);
+            if (_geometryRequested) CaptureGeometry(context, camera);
             if (flare) DrawSprite(context, _definition.Source, DISK_MODE, sourceUv, radiusScale);
             if (shafts) DrawShafts(context);
             if (!flare) return;
-            bool expressiveFlare = _expressiveDaylight && _definition.Source.Texture != null && !string.IsNullOrEmpty(_definition.Name) && !_definition.Name.StartsWith("moon", StringComparison.OrdinalIgnoreCase);
-            if (expressiveFlare) DrawOptics(context, sourceUv);
-            for (int index = 0; index < _definition.Elements.Count; index++) DrawSprite(context, _definition.Elements[index], GHOST_MODE, sourceUv, radiusScale, expressiveFlare);
+            float expressive = _expressiveDaylight && _definition.Source.Texture != null && !string.IsNullOrEmpty(_definition.Name) && !_definition.Name.StartsWith("moon", StringComparison.OrdinalIgnoreCase) ? _expressiveIntensity : 0.0f;
+            float regular = 1.0f - Mathf.Clamp01(expressive);
+            if (expressive > 0.0f)
+            {
+                DrawOptics(context, sourceUv, expressive);
+                XRayWeatherFlareDefinition styled = _expressiveDefinition ?? _definition;
+                for (int index = 0; index < styled.Elements.Count; index++) DrawSprite(context, styled.Elements[index], GHOST_MODE, sourceUv, radiusScale, true, expressive);
+            }
+            if (regular > 0.0f)
+            {
+                for (int index = 0; index < _definition.Elements.Count; index++) DrawSprite(context, _definition.Elements[index], GHOST_MODE, sourceUv, radiusScale, false, regular);
+            }
             DrawSprite(context, _definition.Gradient, GRADIENT_MODE, sourceUv, radiusScale);
         }
 
@@ -144,10 +180,42 @@ namespace XRay.Importer.Levels
             _maskA?.Release();
             _maskB?.Release();
             _sceneColor?.Release();
+            _geometrySample?.Release();
             _material = null;
             _maskA = null;
             _maskB = null;
             _sceneColor = null;
+            _geometrySample = null;
+            ClearGeometrySample();
+        }
+
+        private void CaptureGeometry(CustomPassContext context, Camera camera)
+        {
+            _geometryRequested = false;
+            _geometryPending = true;
+            if (_geometrySample == null) _geometrySample = RTHandles.Alloc(1, 1, colorFormat: GraphicsFormat.R32_SFloat, name: "X-Ray Flare Geometry Sample");
+            int generation = _geometryGeneration;
+            string cameraName = camera.name;
+            CoreUtils.SetRenderTarget(context.cmd, _geometrySample);
+            CoreUtils.DrawFullScreen(context.cmd, _material, context.propertyBlock, GEOMETRY_PASS);
+            context.cmd.RequestAsyncReadback(_geometrySample.rt, request =>
+            {
+                if (generation != _geometryGeneration) return;
+                _geometryPending = false;
+                if (request.hasError) return;
+                GeometryVisibility = request.GetData<float>()[0];
+                GeometryCamera = cameraName;
+            });
+            CoreUtils.SetRenderTarget(context.cmd, context.cameraColorBuffer);
+        }
+
+        private void ClearGeometrySample()
+        {
+            _geometryGeneration++;
+            _geometryRequested = false;
+            _geometryPending = false;
+            GeometryVisibility = null;
+            GeometryCamera = null;
         }
 
         private bool CanRender(Camera camera)
@@ -226,7 +294,7 @@ namespace XRay.Importer.Levels
             CoreUtils.DrawFullScreen(context.cmd, _material, context.propertyBlock, BLUR_PASS);
         }
 
-        private void DrawOptics(CustomPassContext context, Vector2 sourceUv)
+        private void DrawOptics(CustomPassContext context, Vector2 sourceUv, float layerIntensity)
         {
             float outside = Mathf.Max(Mathf.Abs(sourceUv.x - 0.5f), Mathf.Abs(sourceUv.y - 0.5f)) - 0.5f;
             float fade = _flareFade * (1.0f - Mathf.Clamp01(outside * OPTICAL_EDGE_TAPER));
@@ -236,14 +304,17 @@ namespace XRay.Importer.Levels
             properties.SetInt(_spriteModeId, OPTICAL_MODE);
             properties.SetVector(_colorId, _sourceColor);
             properties.SetVector(_spriteFadeId, new Vector4(fade, 1.0f, 0.0f, 0.0f));
+            properties.SetFloat(_spriteContributionId, _flareIntensity * layerIntensity);
             context.cmd.DrawProcedural(Matrix4x4.identity, _material, SPRITE_PASS, MeshTopology.Triangles, 6, 1, properties);
             LastFlareDraws++;
         }
 
-        private void DrawSprite(CustomPassContext context, XRayWeatherFlareElement element, int mode, Vector2 sourceUv, Vector2 radiusScale, bool expressiveGhost = false)
+        private void DrawSprite(CustomPassContext context, XRayWeatherFlareElement element, int mode, Vector2 sourceUv, Vector2 radiusScale, bool expressiveGhost = false, float layerIntensity = 1.0f)
         {
             if (element.Texture == null || !(element.Radius > 0.0f) || !float.IsFinite(element.Radius)) return;
             float opacity = mode == DISK_MODE ? 1.0f : Mathf.Clamp01(Nonnegative(element.Opacity));
+            float contribution = _flareIntensity * layerIntensity * (element.IgnoreColor ? _untintedBrightness : 1.0f);
+            if (!(contribution > 0.0f)) return;
             if (!(opacity > 0.0f) || mode == GHOST_MODE && !float.IsFinite(element.Position)) return;
             Vector2 center = mode == GHOST_MODE ? Vector2.LerpUnclamped(Vector2.one * 0.5f, sourceUv, element.Position) : sourceUv;
             Vector2 halfSize = radiusScale * element.Radius;
@@ -256,6 +327,7 @@ namespace XRay.Importer.Levels
             properties.SetInt(_spriteModeId, mode);
             properties.SetVector(_colorId, element.IgnoreColor ? Color.white : _sourceColor);
             properties.SetVector(_spriteFadeId, new Vector4(_flareFade, opacity, expressiveGhost ? 1.0f : 0.0f, 0.0f));
+            properties.SetFloat(_spriteContributionId, contribution);
             context.cmd.DrawProcedural(Matrix4x4.identity, _material, SPRITE_PASS, MeshTopology.Triangles, 6, 1, properties);
             LastFlareDraws++;
         }

@@ -11,6 +11,7 @@ namespace XRay.Importer.Editor.Levels
         private XRayWeatherProfile _selectedProfile;
         private string _catalogDiagnostic;
         private string _transitionDiagnostic;
+        private string _geometryDiagnostic;
         private float _transitionDuration = 10.0f;
 
         public override bool RequiresConstantRepaint()
@@ -29,13 +30,15 @@ namespace XRay.Importer.Editor.Levels
             {
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("_profile"), new GUIContent("Стартовый профиль сцены"));
             }
-            DrawPropertiesExcluding(serializedObject, "m_Script", "_profile", "_catalog");
+            DrawPropertiesExcluding(serializedObject, "m_Script", "_profile", "_catalog", "_lensFlareEnabled", "_lensFlareIntensity", "_adaptLensFlareToWeather", "_expressiveDaylight", "_expressiveFlareIntensity", "_flareProfileOverrides");
+            DrawFlareSettings();
             if (EditorGUI.EndChangeCheck())
             {
                 serializedObject.ApplyModifiedProperties();
                 controller.ApplySettings();
             }
 
+            DrawFlareDiagnostics(controller);
             DrawCatalog(controller, playing);
             EditorGUILayout.Space();
             XRayWeatherProfile preferredProfile = playing || controller.PreviewActive ? controller.ActiveProfile : controller.AuthoredProfile;
@@ -64,11 +67,52 @@ namespace XRay.Importer.Editor.Levels
                 else if (GUILayout.Button("Предпросмотр погоды в Scene View"))
                 {
                     _transitionDiagnostic = null;
+                    _geometryDiagnostic = null;
                     if (XRayWeatherPreview.Start(controller) && _selectedProfile != null && _selectedProfile != controller.ActiveProfile) controller.SetProfile(_selectedProfile);
                     SceneView.RepaintAll();
                 }
             }
             if (playing || controller.PreviewActive) DrawSimulation(controller);
+        }
+
+        private void DrawFlareSettings()
+        {
+            EditorGUILayout.Space();
+            EditorGUILayout.LabelField("Lens flare", EditorStyles.boldLabel);
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("_lensFlareEnabled"), new GUIContent("Включён"));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("_lensFlareIntensity"), new GUIContent("Общая сила flare"));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("_adaptLensFlareToWeather"), new GUIContent("Адаптация к погоде"));
+            SerializedProperty expressive = serializedObject.FindProperty("_expressiveDaylight");
+            EditorGUILayout.PropertyField(expressive, new GUIContent("Expressive Daylight"));
+            using (new EditorGUI.DisabledScope(!expressive.boolValue))
+            {
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("_expressiveFlareIntensity"), new GUIContent("Сила дополнительных бликов"));
+            }
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("_flareProfileOverrides"), new GUIContent("Исключения по профилям", "Дневная и лунная видимость прямого источника в выбранном цикле. 0 гасит оптические блики, 1 пропускает полностью."), true);
+        }
+
+        private void DrawFlareDiagnostics(XRayWeatherController controller)
+        {
+            XRayWeatherCelestialRenderer celestial = controller.Celestial;
+            if (celestial == null) return;
+            string requested = controller.Snapshot.SunDefinition;
+            EditorGUILayout.LabelField("Определение из погоды", string.IsNullOrEmpty(requested) ? "Пустое" : requested);
+            EditorGUILayout.LabelField("Определение renderer", celestial.FlareDefinition?.Name ?? "—");
+            EditorGUILayout.LabelField("Яркость источника, лк", celestial.SourceBrightness.ToString("0.###"));
+            EditorGUILayout.LabelField("Погодная видимость", celestial.WeatherVisibility.ToString("0.###"));
+            EditorGUILayout.LabelField("Сила IgnoreColor", celestial.UntintedBrightness.ToString("0.###"));
+            EditorGUILayout.LabelField("Временное затухание", celestial.FlareFade.ToString("0.###"));
+            EditorGUILayout.LabelField("Коэффициент RGB до depth и fade", celestial.EffectiveIntensity.ToString("0.###"));
+            float? visibility = celestial.GeometryVisibility;
+            string camera = string.IsNullOrEmpty(celestial.GeometryCamera) ? "" : " · " + celestial.GeometryCamera;
+            EditorGUILayout.LabelField(new GUIContent("Геометрия оптики", "Пять выборок HDRP depth вокруг источника. Для диска применяется попиксельный depth."), new GUIContent(visibility.HasValue ? visibility.Value.ToString("P0") + camera : "Нет замера"));
+            if (GUILayout.Button("Измерить геометрическую видимость"))
+            {
+                _geometryDiagnostic = celestial.RequestGeometrySample() ? null : "Замер depth сейчас недоступен.";
+                EditorApplication.QueuePlayerLoopUpdate();
+                SceneView.RepaintAll();
+            }
+            if (!string.IsNullOrEmpty(_geometryDiagnostic)) EditorGUILayout.HelpBox(_geometryDiagnostic, MessageType.Info);
         }
 
         private void DrawCatalog(XRayWeatherController controller, bool playing)

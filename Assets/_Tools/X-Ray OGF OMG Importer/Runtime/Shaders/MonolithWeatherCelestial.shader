@@ -23,6 +23,7 @@ Shader "XRay/Monolith Weather Celestial"
     float4 _XRayCelestialSpriteFade;
     float _XRayCelestialBlurSize;
     float _XRayCelestialGain;
+    float _XRayCelestialSpriteContribution;
     int _XRayCelestialSpriteMode;
 
     static const int SHAFTS_SAMPLES = 9;
@@ -142,6 +143,12 @@ Shader "XRay/Monolith Weather Celestial"
         return visibility * 0.2;
     }
 
+    float FragGeometryVisibility(Varyings input) : SV_Target
+    {
+        UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
+        return FlareVisibility();
+    }
+
     SpriteVaryings VertSprite(Attributes input)
     {
         SpriteVaryings output;
@@ -197,12 +204,12 @@ Shader "XRay/Monolith Weather Celestial"
             float streak = exp2(-abs(offset.y) * 155.0 - abs(offset.x) * 2.4) * saturate(1.0 - abs(local.x));
             float halo = exp2(-radius * 20.0) * saturate(1.0 - radius);
             float3 color = saturate(input.color.rgb) * float3(1.0, 0.82, 0.58);
-            return float4(color * (0.85 * rays + 0.36 * streak + 0.20 * halo), 0.0);
+            return float4(color * (0.85 * rays + 0.36 * streak + 0.20 * halo) * _XRayCelestialSpriteContribution, 0.0);
         }
         if (_XRayCelestialSpriteMode == 0) clip(Sky(input.positionCS.xy * _XRayCelestialViewport.zw) - 0.5);
         float4 sprite = SAMPLE_TEXTURE2D(_XRayCelestialSprite, s_linear_clamp_sampler, input.uv) * input.color;
-        if (_XRayCelestialSpriteMode == 1 && _XRayCelestialSpriteFade.z > 0.5) return float4(min(saturate(sprite.rgb * sprite.a) * 1.5, 0.28), 0.0);
-        return float4(pow(saturate(sprite.rgb * sprite.a), 2.2), 0.0);
+        if (_XRayCelestialSpriteMode == 1 && _XRayCelestialSpriteFade.z > 0.5) return float4(min(saturate(sprite.rgb * sprite.a) * 1.5, 0.28) * _XRayCelestialSpriteContribution, 0.0);
+        return float4(pow(saturate(sprite.rgb * sprite.a), 2.2) * _XRayCelestialSpriteContribution, 0.0);
     }
 
     ENDHLSL
@@ -254,6 +261,16 @@ Shader "XRay/Monolith Weather Celestial"
             HLSLPROGRAM
             #pragma vertex VertSprite
             #pragma fragment FragSprite
+            ENDHLSL
+        }
+
+        Pass
+        {
+            Name "Flare Geometry Visibility"
+
+            HLSLPROGRAM
+            #pragma vertex VertScreen
+            #pragma fragment FragGeometryVisibility
             ENDHLSL
         }
     }

@@ -24,6 +24,12 @@ namespace XRay.Importer.Levels
         public float ShaftsIntensity { get; private set; }
         public XRayWeatherFlareDefinition FlareDefinition => _fade.Definition;
         public float FlareFade => _fade.Weight;
+        public float SourceBrightness { get; private set; }
+        public float WeatherVisibility { get; private set; }
+        public float UntintedBrightness { get; private set; }
+        public float EffectiveIntensity { get; private set; }
+        public float? GeometryVisibility => _pass?.GeometryVisibility;
+        public string GeometryCamera => _pass?.GeometryCamera;
 
         public XRayWeatherCelestialRenderer(GameObject owner, XRayWeatherCelestialSettings settings)
         {
@@ -39,7 +45,7 @@ namespace XRay.Importer.Levels
             _daylightGhosts = ghosts.ToArray();
         }
 
-        public void Publish(XRayWeatherSnapshot snapshot, bool shafts, bool flare, float gameDelta, bool snap, bool expressiveDaylight = false)
+        public void Publish(XRayWeatherSnapshot snapshot, bool shafts, bool flare, float gameDelta, bool snap, bool expressiveDaylight = false, float sourceLux = -1.0f, Vector2 visibility = default, float flareIntensity = 1.0f, bool adaptFlare = false, float expressiveIntensity = 1.0f)
         {
             ShaftsIntensity = shafts ? ResolveShaftsIntensity(snapshot.SunShaftsIntensity, _settings.ShaftsMin, _settings.ShaftsValue) : 0.0f;
             if (!string.Equals(_targetName, snapshot.SunDefinition, StringComparison.Ordinal))
@@ -48,16 +54,26 @@ namespace XRay.Importer.Levels
                 _targetDefinition = _settings.FindDefinition(_targetName);
             }
             _fade.Step(flare ? _targetDefinition : null, gameDelta, snap || !flare);
-            bool visible = snapshot.SunColor.r > 0.0f || snapshot.SunColor.g > 0.0f || snapshot.SunColor.b > 0.0f;
-            if (!visible || _fade.Definition == null)
+            bool moon = IsMoon(_fade.Definition);
+            SourceBrightness = float.IsFinite(sourceLux) ? Mathf.Max(0.0f, sourceLux) : 0.0f;
+            WeatherVisibility = adaptFlare ? XRayWeatherFlareVisibility.AtTime(visibility, snapshot.GameSeconds) : 1.0f;
+            UntintedBrightness = adaptFlare ? XRayWeatherFlareVisibility.UntintedBrightness(SourceBrightness, moon) : 1.0f;
+            bool visible = (sourceLux < 0.0f || SourceBrightness > 0.0f) && snapshot.SunColor.maxColorComponent > 0.0f;
+            EffectiveIntensity = visible && flare && _fade.Definition != null && _fade.Weight > 0.0f && float.IsFinite(flareIntensity) ? Mathf.Max(0.0f, flareIntensity) * WeatherVisibility : 0.0f;
+            if (!(EffectiveIntensity > 0.0f))
             {
                 if (_pass != null) _pass.ClearFrame();
                 return;
             }
             if (_volume == null) CreateVolume();
-            bool expressive = expressiveDaylight && HasDaylightSource(_targetDefinition);
-            XRayWeatherFlareDefinition definition = expressive ? StyleDefinition(_fade.Definition) : _fade.Definition;
-            _pass.SetFrame(_owner, -snapshot.SunDirection, 0.0f, flare, snapshot.SunColor, definition, _fade.Weight, expressive);
+            bool expressive = expressiveDaylight && HasDaylightSource(_fade.Definition);
+            XRayWeatherFlareDefinition styled = expressive ? StyleDefinition(_fade.Definition) : null;
+            _pass.SetFrame(_owner, -snapshot.SunDirection, 0.0f, flare, snapshot.SunColor, _fade.Definition, _fade.Weight, expressive, EffectiveIntensity, UntintedBrightness, expressiveIntensity, styled);
+        }
+
+        public bool RequestGeometrySample()
+        {
+            return _pass != null && _pass.RequestGeometrySample();
         }
 
         private XRayWeatherFlareDefinition StyleDefinition(XRayWeatherFlareDefinition definition)
@@ -71,7 +87,13 @@ namespace XRay.Importer.Levels
 
         private static bool HasDaylightSource(XRayWeatherFlareDefinition definition)
         {
-            return definition != null && definition.Source.Texture != null && !definition.Name.StartsWith("moon", StringComparison.OrdinalIgnoreCase);
+            return definition != null && definition.Source.Texture != null && !IsMoon(definition);
+        }
+
+        private static bool IsMoon(XRayWeatherFlareDefinition definition)
+        {
+            string name = definition?.Name;
+            return !string.IsNullOrEmpty(name) && (name.StartsWith("moon", StringComparison.OrdinalIgnoreCase) || name.StartsWith("flares_moon", StringComparison.OrdinalIgnoreCase));
         }
 
         public void Release()
@@ -86,6 +108,10 @@ namespace XRay.Importer.Levels
             _volume = null;
             _fade = default;
             ShaftsIntensity = 0.0f;
+            SourceBrightness = 0.0f;
+            WeatherVisibility = 0.0f;
+            UntintedBrightness = 0.0f;
+            EffectiveIntensity = 0.0f;
         }
 
         public static float ResolveShaftsIntensity(float raw, float minimum, float value)

@@ -31,12 +31,17 @@ namespace XRay.Importer.Levels
         [SerializeField] private bool _sunShaftsEnabled = true;
         [SerializeField] private bool _lensFlareEnabled = true;
         [SerializeField] private bool _expressiveDaylight = true;
+        [SerializeField, Min(0.0f)] private float _lensFlareIntensity = 1.0f;
+        [SerializeField] private bool _adaptLensFlareToWeather = true;
+        [SerializeField, Min(0.0f)] private float _expressiveFlareIntensity = 1.0f;
+        [SerializeField] private XRayWeatherFlareProfileOverride[] _flareProfileOverrides = Array.Empty<XRayWeatherFlareProfileOverride>();
 
         private XRayWeatherProfile _activeProfile;
         private XRayWeatherProfile _appliedProfile;
         private XRayWeatherProfile _transitionFrom;
         private XRayWeatherProfile _transitionTarget;
         private XRayWeatherSnapshot _snapshot;
+        private Vector2 _flareVisibility = Vector2.one;
         private MonolithWeatherInputs _ownedWeather;
         private MonolithSourceLighting _ownedLighting;
         private XRayFloraWindProvider _ownedWind;
@@ -87,6 +92,9 @@ namespace XRay.Importer.Levels
         public XRayWeatherCelestialRenderer Celestial => _celestial;
         public bool? SunShaftsOverride { get; private set; }
         public bool? LensFlareOverride { get; private set; }
+        public float? LensFlareIntensityOverride { get; private set; }
+        public bool? FlareAdaptationOverride { get; private set; }
+        public float? ExpressiveFlareIntensityOverride { get; private set; }
         public bool SunShaftsEnabled => SunShaftsOverride ?? _sunShaftsEnabled;
         public bool LensFlareEnabled => LensFlareOverride ?? _lensFlareEnabled;
         public bool ExpressiveDaylight => _expressiveDaylight;
@@ -190,6 +198,16 @@ namespace XRay.Importer.Levels
             SunShaftsOverride = shafts;
             LensFlareOverride = flare;
             if (_ownsInputs && Active == this) PublishCelestial(0.0f, previousFlare != LensFlareEnabled);
+        }
+
+        public void SetFlareAppearanceOverrides(float? intensity, bool? adaptation, float? expressiveIntensity)
+        {
+            if (intensity.HasValue && (!IsFinite(intensity.Value) || intensity.Value < 0.0f)) throw new ArgumentOutOfRangeException(nameof(intensity));
+            if (expressiveIntensity.HasValue && (!IsFinite(expressiveIntensity.Value) || expressiveIntensity.Value < 0.0f)) throw new ArgumentOutOfRangeException(nameof(expressiveIntensity));
+            LensFlareIntensityOverride = intensity;
+            FlareAdaptationOverride = adaptation;
+            ExpressiveFlareIntensityOverride = expressiveIntensity;
+            if (_ownsInputs && Active == this) PublishCelestial(0.0f, false);
         }
 
         public bool TransitionTo(XRayWeatherProfile profile, float durationRealSeconds)
@@ -407,6 +425,7 @@ namespace XRay.Importer.Levels
                 ReleaseInputs();
                 return;
             }
+            Vector2 flareVisibility = ResolveFlareVisibility(_activeProfile, snapshot);
             if (IsTransitioning)
             {
                 if (!_transitionFrom.TryEvaluate(_gameTimeSeconds, out XRayWeatherSnapshot from, out string fromDiagnostic) || !_transitionTarget.TryEvaluate(_gameTimeSeconds, out XRayWeatherSnapshot target, out string targetDiagnostic))
@@ -416,6 +435,7 @@ namespace XRay.Importer.Levels
                     return;
                 }
                 snapshot = XRayWeatherSnapshot.Blend(from, target, TransitionProgress);
+                flareVisibility = Vector2.Lerp(flareVisibility, ResolveFlareVisibility(_transitionTarget, target), TransitionProgress);
             }
             Vector3 color = new Vector3(snapshot.SunColor.r, snapshot.SunColor.g, snapshot.SunColor.b);
             Vector3 sourceColor = ActiveProfile.HasSunLightScale ? Vector3.Scale(color, ActiveProfile.SunLightScale) : color;
@@ -429,6 +449,7 @@ namespace XRay.Importer.Levels
                 return;
             }
             _snapshot = snapshot;
+            _flareVisibility = flareVisibility;
             SourceLightColor = sourceColor;
             Color linearSun = new Color(sourceColor.x, sourceColor.y, sourceColor.z, 1.0f).linear;
             float intensityScale = linearSun.maxColorComponent;
@@ -468,8 +489,18 @@ namespace XRay.Importer.Levels
                 if (settings != null && settings.Shader != null && settings.Shader.isSupported) _celestial = new XRayWeatherCelestialRenderer(gameObject, settings);
                 snap = true;
             }
-            if (_celestial != null) _celestial.Publish(_snapshot, SunShaftsEnabled, LensFlareEnabled, deltaSeconds * _simulationTimeScale, snap || _simulationPaused, _expressiveDaylight);
+            float sourceLux = _ownedSun != null ? _ownedSun.intensity : 0.0f;
+            if (_celestial != null) _celestial.Publish(_snapshot, SunShaftsEnabled, LensFlareEnabled, deltaSeconds * _simulationTimeScale, snap || _simulationPaused, _expressiveDaylight, sourceLux, _flareVisibility, LensFlareIntensityOverride ?? _lensFlareIntensity, FlareAdaptationOverride ?? _adaptLensFlareToWeather, ExpressiveFlareIntensityOverride ?? _expressiveFlareIntensity);
             PublishNativeShafts();
+        }
+
+        private Vector2 ResolveFlareVisibility(XRayWeatherProfile profile, XRayWeatherSnapshot snapshot)
+        {
+            foreach (XRayWeatherFlareProfileOverride settings in _flareProfileOverrides)
+            {
+                if (settings.Profile == profile) return XRayWeatherFlareVisibility.Resolve(profile, snapshot, settings.Visibility);
+            }
+            return XRayWeatherFlareVisibility.Resolve(profile, snapshot);
         }
 
         private void PublishNativeShafts()
@@ -537,6 +568,9 @@ namespace XRay.Importer.Levels
             ReleaseCelestial();
             SunShaftsOverride = null;
             LensFlareOverride = null;
+            LensFlareIntensityOverride = null;
+            FlareAdaptationOverride = null;
+            ExpressiveFlareIntensityOverride = null;
             _ownedWeather = null;
             _ownedLighting = null;
             _ownedWind = null;

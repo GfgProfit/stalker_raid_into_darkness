@@ -24,7 +24,7 @@ namespace XRay.Importer.Tests
 
         private static readonly Dictionary<bool, SourceData> SOURCES = new Dictionary<bool, SourceData>();
 
-        private readonly TestDirectory _directory = new TestDirectory();
+        private readonly TestDirectory _directory;
         private readonly bool _createdParent;
         private readonly bool _trueStalker;
         private readonly Mo2Fixture _mo2;
@@ -32,8 +32,9 @@ namespace XRay.Importer.Tests
         private readonly bool _ownsHost;
         private bool _detailsAttached;
 
-        public XRayFloraLevelFixture(bool trueStalker)
+        public XRayFloraLevelFixture(bool trueStalker, string sourceRoot = null)
         {
+            _directory = new TestDirectory(sourceRoot);
             _trueStalker = trueStalker;
             Root = PARENT + "/" + Guid.NewGuid().ToString("N").Substring(0, 8);
             Assert.IsFalse(Directory.Exists(Root) || File.Exists(Root + ".meta"));

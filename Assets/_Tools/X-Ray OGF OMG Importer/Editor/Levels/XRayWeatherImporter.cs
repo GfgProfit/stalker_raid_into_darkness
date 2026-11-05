@@ -252,57 +252,49 @@ namespace XRay.Importer.Editor.Levels
 
         public static XRayWeatherProfile ResolveLevelProfile(XRayLevelImportSettings settings, XRaySourcePlan sourcePlan, string assetRoot, XRayLevelImportRecord record, out XRayWeatherCatalog catalog, bool allowAutomatic = true)
         {
-            catalog = null;
+            XRayWeatherProfile profile = ResolveLevelProfile(settings, record, out bool inheritWeather, allowAutomatic);
+            catalog = inheritWeather ? GameConfig.Load().OrdinaryWeatherCatalog : null;
+            return profile;
+        }
+
+        public static XRayWeatherProfile ResolveLevelProfile(XRayLevelImportSettings settings, XRayLevelImportRecord record, out bool inheritWeather, bool allowAutomatic = true)
+        {
+            inheritWeather = false;
             if (settings.WeatherImportMode == XRayWeatherImportMode.Disabled) return null;
             if (settings.WeatherProfile != null) return settings.WeatherProfile;
-            if (settings.WeatherImportMode == XRayWeatherImportMode.CustomProfile) return null;
+            if (settings.WeatherImportMode == XRayWeatherImportMode.CustomProfile)
+            {
+                record?.AddLimitation("Select an explicit profile for Custom Profile weather import.");
+                return null;
+            }
             if (!allowAutomatic)
             {
-                record?.AddLimitation("Automatic weather preserves saved scenes imported before weather automation; select an explicit weather profile to connect their generated environment.");
+                record?.AddLimitation("Automatic weather preserves saved scenes imported before weather automation. Use Connect Active Scene Game Weather to add missing links.");
                 return null;
             }
-            if (sourcePlan?.Installation == null || sourcePlan.Installation.GameName == null || sourcePlan.Installation.GameName.IndexOf("Anomaly", StringComparison.OrdinalIgnoreCase) < 0) return null;
-            try
+            GameConfig config = RequirePreparedGameConfig();
+            inheritWeather = true;
+            record?.AddDependency(XRayLevelDependencyCategory.Lighting, "GameConfig", config.name, null, null, XRayLevelDependencyStatus.Reused, "Shared runtime weather configuration", AssetDatabase.GetAssetPath(config));
+            record?.AddDependency(XRayLevelDependencyCategory.Lighting, "Ordinary Weather Catalog", config.OrdinaryWeatherCatalog.name, null, null, XRayLevelDependencyStatus.Reused, "Global ordinary weather cycles", AssetDatabase.GetAssetPath(config.OrdinaryWeatherCatalog));
+            record?.AddDependency(XRayLevelDependencyCategory.Lighting, "Weather FX Catalog", config.WeatherFxCatalog.name, null, null, XRayLevelDependencyStatus.Reused, "Global authored weather effects", AssetDatabase.GetAssetPath(config.WeatherFxCatalog));
+            return config.DefaultWeather;
+        }
+
+        internal static GameConfig RequirePreparedGameConfig()
+        {
+            GameConfig config = GameConfig.Load();
+            if (config == null) throw new InvalidDataException("The canonical Resources GameConfig.asset is required. Restore the Production configuration asset before importing a level.");
+            if (!config.TryValidate(out string diagnostic)) throw new InvalidDataException("GameConfig is invalid: " + diagnostic + " Use the existing Tools/X-Ray/Weather catalog preparation commands to restore missing assets, then assign them in GameConfig.");
+            if (config.CelestialSettings.Shader == null) throw new InvalidDataException("GameConfig celestial settings require the imported celestial shader. Use Tools/X-Ray/Levels/Import Celestial Weather Resources.");
+            foreach (XRayWeatherProfile profile in config.OrdinaryWeatherCatalog.Profiles)
             {
-                XRaySourceConfiguration source = sourcePlan.Configuration;
-                var configuration = new XRaySourceConfiguration
-                {
-                    Mode = XRaySourceMode.Mo2Effective,
-                    Mo2Folder = source.Mo2Folder,
-                    Mo2Instance = source.Mo2Instance,
-                    Mo2Profile = sourcePlan.ProfileName,
-                    ModsFolder = source.ModsFolder,
-                    ProfilesFolder = source.ProfilesFolder,
-                    OverwriteFolder = source.OverwriteFolder,
-                    GameFolder = sourcePlan.GameFolder,
-                    LocalAppDataFolder = source.LocalAppDataFolder,
-                    IncludeGameGamedata = source.IncludeGameGamedata,
-                    TreatModRootAsGamedata = source.TreatModRootAsGamedata
-                };
-                configuration.IndexScope.Clear();
-                configuration.IndexScope.AddRange(new[] { "configs", "scripts", "textures/sky" });
-                XRaySourcePlan plan = Mo2VirtualFileSystem.Plan(configuration);
-                if (!plan.IsValid || plan.ProfileName != sourcePlan.ProfileName || plan.ModOrderFingerprint != sourcePlan.ModOrderFingerprint) throw new InvalidDataException("The automatic weather source must match the level's effective MO2 profile.");
-                catalog = LoadCatalog(plan, assetRoot);
-                if (catalog == null)
-                {
-                    string folder = WeatherFolder(plan, assetRoot);
-                    XRayWeatherProfile clear = CachedCycle(plan, "w_clear1", folder);
-                    XRayWeatherProfile rain = CachedCycle(plan, "w_rain1", folder);
-                    record?.GeneratedAssets.Add(AssetDatabase.GetAssetPath(clear));
-                    record?.GeneratedAssets.Add(AssetDatabase.GetAssetPath(rain));
-                    record?.AddLimitation("Prepare Ordinary Weather Catalog before importing to attach the complete weather selection.");
-                    return clear;
-                }
-                record?.GeneratedAssets.Add(AssetDatabase.GetAssetPath(catalog));
-                foreach (XRayWeatherProfile profile in catalog.Profiles) record?.GeneratedAssets.Add(AssetDatabase.GetAssetPath(profile));
-                return catalog.Profiles[0];
+                if (!HasSerializedResources(profile)) throw new InvalidDataException("GameConfig ordinary weather requires complete serialized sky and environment resources. Restore the prepared Ordinary Weather Catalog.");
             }
-            catch (Exception exception)
+            foreach (XRayWeatherFxProfile effect in config.WeatherFxCatalog.Effects)
             {
-                record?.AddLimitation("INPUT BLOCKED: automatic verified RVM weather could not be connected; existing environment retained. " + exception.Message);
-                return null;
+                if (effect == null || !HasSerializedFxResources(effect, config.CelestialSettings)) throw new InvalidDataException("GameConfig WeatherFX requires complete serialized sky, environment and celestial resources. Restore the prepared Weather FX Catalog.");
             }
+            return config;
         }
 
         public static bool IsAutomaticEligible(bool sceneExists, XRayLevelImportRecord previous)
@@ -329,15 +321,6 @@ namespace XRay.Importer.Editor.Levels
                 if (snapshot.EnvironmentResources.Weights[resource] > 0.0f && !(snapshot.EnvironmentResources.Texture(resource) is Cubemap)) return false;
             }
             return true;
-        }
-
-        private static XRayWeatherProfile CachedCycle(XRaySourcePlan plan, string cycle, string folder)
-        {
-            string path = folder + "/" + cycle + ".asset";
-            XRayWeatherProfile profile = AssetDatabase.LoadAssetAtPath<XRayWeatherProfile>(path);
-            if (profile == null && !File.Exists(path)) profile = ImportSource(plan, cycle, path, folder + "/Textures");
-            if (profile == null || profile.CycleName != cycle || profile.SourceIdentity != plan.ProfileName + "|" + plan.ModOrderFingerprint || !HasSerializedResources(profile)) throw new InvalidDataException("Preserve or replace the incompatible cached weather profile explicitly: " + path);
-            return profile;
         }
 
         public static XRayWeatherProfile Import(XRayAssetIndex index, string cycleName, string sourceIdentity, string sourceProvenance = "", Vector4? ssfxWindTrees = null, Vector4? lightSetup = null, Vector4? floraFixes = null, Func<string, Texture> resourceBinding = null, Vector3? sunLightScale = null, float visibilityScale = 1.0f, Vector2? environmentScale = null, Func<string, Texture> environmentBinding = null)

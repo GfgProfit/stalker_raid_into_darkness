@@ -489,7 +489,7 @@ namespace XRay.Importer.Tests
             }
         }
 
-        private static bool IsRunnerBootstrap(Scene host)
+        internal static bool IsRunnerBootstrap(Scene host)
         {
             if (!host.IsValid() || !host.isLoaded || host.isDirty || !string.IsNullOrEmpty(host.path) || EditorApplication.isPlayingOrWillChangePlaymode) return false;
             Type holderType = typeof(UnityEditor.TestTools.TestRunner.Api.TestRunnerApi).Assembly.GetType("UnityEditor.TestTools.TestRunner.TestRun.TestJobDataHolder");

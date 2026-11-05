@@ -6,9 +6,9 @@ namespace XRay.Importer.Tests
 {
     public sealed class TestDirectory : IDisposable
     {
-        public TestDirectory()
+        public TestDirectory(string parent = null)
         {
-            Root = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "XRayImporterTests", Guid.NewGuid().ToString("N"));
+            Root = System.IO.Path.Combine(parent ?? System.IO.Path.Combine(System.IO.Path.GetTempPath(), "XRayImporterTests"), Guid.NewGuid().ToString("N"));
             Directory.CreateDirectory(Root);
         }
 

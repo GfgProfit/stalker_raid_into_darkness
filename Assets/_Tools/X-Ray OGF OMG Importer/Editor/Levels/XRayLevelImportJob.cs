@@ -390,6 +390,10 @@ namespace XRay.Importer.Editor.Levels
             _record.ImportedUtc = DateTime.UtcNow.ToString("u");
             _record.Settings = JsonUtility.ToJson(_request.Settings);
             _record.Warnings.AddRange(_info.Warnings);
+            bool automaticWeather = XRayWeatherImporter.IsAutomaticEligible(File.Exists(XRayLevelPaths.ScenePath(_entry.Name)), _previous);
+            _record.SetMetric(XRayWeatherImporter.AUTOMATIC_ELIGIBILITY_METRIC, automaticWeather ? 1.0 : 0.0);
+            _content.WeatherProfile = XRayWeatherImporter.ResolveLevelProfile(_request.Settings, _record, out bool inheritWeather, automaticWeather);
+            _content.InheritWeather = inheritWeather;
             XRayLevelPaths.EnsureFolder(XRayLevelPaths.Textures);
             XRayLevelPaths.EnsureFolder(XRayLevelPaths.Materials);
             XRayLevelPaths.EnsureFolder(XRayLevelPaths.Meshes(_entry.Name));
@@ -402,10 +406,6 @@ namespace XRay.Importer.Editor.Levels
             _content.ImportLights = _request.Settings.ImportLights;
             _content.LightShadows = _request.Settings.StaticLightShadows;
             _content.OpenScene = _request.Settings.OpenSceneAfterImport;
-            bool automaticWeather = XRayWeatherImporter.IsAutomaticEligible(File.Exists(XRayLevelPaths.ScenePath(_entry.Name)), _previous);
-            _record.SetMetric(XRayWeatherImporter.AUTOMATIC_ELIGIBILITY_METRIC, automaticWeather ? 1.0 : 0.0);
-            _content.WeatherProfile = XRayWeatherImporter.ResolveLevelProfile(_request.Settings, _sourcePlan, XRayLevelPaths.Root, _record, out XRayWeatherCatalog catalog, automaticWeather);
-            _content.WeatherCatalog = catalog;
         }
 
         private void CopySourceFiles()
@@ -1666,7 +1666,8 @@ namespace XRay.Importer.Editor.Levels
                 camera.farClipPlane = 3000.0f;
                 cameraObject.tag = "MainCamera";
 #if XRAY_HDRP
-                cameraObject.AddComponent<UnityEngine.Rendering.HighDefinition.HDAdditionalCameraData>();
+                var cameraData = cameraObject.AddComponent<UnityEngine.Rendering.HighDefinition.HDAdditionalCameraData>();
+                cameraData.volumeLayerMask = 1 << instance.layer;
 #endif
                 Bounds bounds = _content.Bounds;
                 cameraObject.transform.position = bounds.center + new Vector3(0.0f, bounds.extents.y + 20.0f, -bounds.extents.z * 0.5f);

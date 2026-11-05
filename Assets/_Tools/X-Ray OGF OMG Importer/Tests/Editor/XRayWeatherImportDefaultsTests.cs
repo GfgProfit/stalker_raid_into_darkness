@@ -19,26 +19,29 @@ namespace XRay.Importer.Tests
             Assert.AreEqual(XRayWeatherImportMode.Automatic, settings.WeatherImportMode);
             settings.WeatherImportMode = XRayWeatherImportMode.Disabled;
             Assert.AreEqual(XRayWeatherImportMode.Disabled, settings.Clone().WeatherImportMode);
-            Assert.IsNull(XRayWeatherImporter.ResolveLevelProfile(settings, null, "Assets/UnusedWeatherImportFixture", new XRayLevelImportRecord()));
+            Assert.IsNull(XRayWeatherImporter.ResolveLevelProfile(settings, new XRayLevelImportRecord(), out bool inherited));
+            Assert.IsFalse(inherited);
         }
 
         [Test]
-        public void ExplicitProfilesAndSourceGuardsPreventUnexpectedAutomaticImports()
+        public void ExplicitProfilesAndLegacyGuardsPreserveImportChoices()
         {
             XRayWeatherProfile selected = ScriptableObject.CreateInstance<XRayWeatherProfile>();
             try
             {
                 var settings = new XRayLevelImportSettings { WeatherProfile = selected };
-                Assert.AreSame(selected, XRayWeatherImporter.ResolveLevelProfile(settings, null, "Assets/UnusedWeatherImportFixture", null, false));
+                Assert.AreSame(selected, XRayWeatherImporter.ResolveLevelProfile(settings, null, out _, false));
                 settings.WeatherImportMode = XRayWeatherImportMode.CustomProfile;
-                Assert.AreSame(selected, XRayWeatherImporter.ResolveLevelProfile(settings, null, "Assets/UnusedWeatherImportFixture", null));
+                Assert.AreSame(selected, XRayWeatherImporter.ResolveLevelProfile(settings, null, out _));
                 settings.WeatherImportMode = XRayWeatherImportMode.Disabled;
-                Assert.IsNull(XRayWeatherImporter.ResolveLevelProfile(settings, null, "Assets/UnusedWeatherImportFixture", null));
+                Assert.IsNull(XRayWeatherImporter.ResolveLevelProfile(settings, null, out _));
                 settings.WeatherImportMode = XRayWeatherImportMode.Automatic;
                 settings.WeatherProfile = null;
                 var record = new XRayLevelImportRecord();
-                Assert.IsNull(XRayWeatherImporter.ResolveLevelProfile(settings, null, "Assets/UnusedWeatherImportFixture", record));
-                Assert.IsNull(XRayWeatherImporter.ResolveLevelProfile(settings, null, "Assets/UnusedWeatherImportFixture", record, false));
+                Assert.AreSame(GameConfig.Load().DefaultWeather, XRayWeatherImporter.ResolveLevelProfile(settings, record, out bool inherited));
+                Assert.IsTrue(inherited);
+                Assert.IsNull(XRayWeatherImporter.ResolveLevelProfile(settings, record, out inherited, false));
+                Assert.IsFalse(inherited);
                 Assert.AreEqual(0, record.GeneratedAssets.Count);
                 Assert.IsTrue(record.Limitations.Exists(value => value.Contains("saved scenes")));
             }

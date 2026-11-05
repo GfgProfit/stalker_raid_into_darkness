@@ -30,13 +30,26 @@ namespace XRay.Importer.Editor.Levels
             bool playing = Application.IsPlaying(controller.gameObject);
             serializedObject.Update();
             EditorGUI.BeginChangeCheck();
-            using (new EditorGUI.DisabledScope(playing || controller.Catalog != null || controller.FxCatalog != null || controller.ActiveFx != null))
+            var flags = serializedObject.FindProperty("_levelOverrides");
+            using (new EditorGUI.DisabledScope(true))
             {
-                EditorGUILayout.PropertyField(serializedObject.FindProperty("_profile"), new GUIContent("Стартовый профиль сцены"));
+                EditorGUILayout.ObjectField("GameConfig", controller.Configuration, typeof(GameConfig), false);
             }
-            DrawPropertiesExcluding(serializedObject, "m_Script", "_profile", "_catalog", "_fxCatalog", "_lensFlareEnabled", "_lensFlareIntensity", "_adaptLensFlareToWeather", "_expressiveDaylight", "_expressiveFlareIntensity", "_flareProfileOverrides", "_fxLightingAdaptation");
-            DrawFlareSettings();
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("_fxLightingAdaptation"), new GUIContent("Адаптация освещения WeatherFX"));
+            using (new EditorGUI.DisabledScope(playing || controller.ActiveFx != null))
+            {
+                EditorGUILayout.PropertyField(flags, new GUIContent("Переопределения локации"));
+                DrawOverride(flags, XRayWeatherLevelOverrides.TimeOfDay, "_timeOfDayHours", "Стартовое время", controller.ConfiguredTimeOfDay.ToString("0.###"));
+                DrawOverride(flags, XRayWeatherLevelOverrides.TimeScale, "_timeScale", "Масштаб времени", controller.ConfiguredTimeScale.ToString("0.###"));
+                DrawOverride(flags, XRayWeatherLevelOverrides.WeatherProfile, "_profile", "Стартовый профиль", controller.AuthoredProfile != null ? controller.AuthoredProfile.CycleName : "—");
+                DrawOverride(flags, XRayWeatherLevelOverrides.Fog, "_fogEnabled", "Weather Fog", EnabledText(controller.FogEnabled), controller.FogOverride.HasValue);
+                DrawOverride(flags, XRayWeatherLevelOverrides.SunShafts, "_sunShaftsEnabled", "Sun Shafts", EnabledText(controller.SunShaftsEnabled), controller.SunShaftsOverride.HasValue);
+                DrawOverride(flags, XRayWeatherLevelOverrides.CelestialSettings, "_celestialSettings", "Профиль Celestial", controller.Configuration != null && controller.Configuration.CelestialSettings != null ? controller.Configuration.CelestialSettings.name : "—");
+                DrawFlareSettings(controller, flags);
+                DrawOverride(flags, XRayWeatherLevelOverrides.FxLightingAdaptation, "_fxLightingAdaptation", "Адаптация освещения WeatherFX", controller.FxLightingAdaptationGain.ToString("0.###"), controller.FxLightingAdaptationOverride.HasValue);
+            }
+            DrawPropertiesExcluding(serializedObject, "m_Script", "_levelOverrides", "_timeOfDayHours", "_timeScale", "_profile", "_catalog", "_fxCatalog", "_fogEnabled", "_sunShaftsEnabled", "_celestialSettings", "_lensFlareEnabled", "_lensFlareIntensity", "_adaptLensFlareToWeather", "_expressiveDaylight", "_expressiveFlareIntensity", "_flareProfileOverrides", "_fxLightingAdaptation");
+            string timeSource = controller.TimeScaleOverride.HasValue ? "Runtime" : (controller.LevelOverrides & XRayWeatherLevelOverrides.TimeScale) != 0 ? "Level" : "Global";
+            EditorGUILayout.LabelField("Эффективный масштаб времени", $"{controller.TimeScale:0.###} ({timeSource})");
             if (EditorGUI.EndChangeCheck())
             {
                 serializedObject.ApplyModifiedProperties();
@@ -50,11 +63,13 @@ namespace XRay.Importer.Editor.Levels
             DrawProfilePicker(controller.Catalog, preferredProfile);
             if (!playing && controller.Catalog != null)
             {
-                using (new EditorGUI.DisabledScope(_selectedProfile == null || _selectedProfile == controller.AuthoredProfile || controller.ActiveFx != null))
+                bool hasProfileOverride = (controller.LevelOverrides & XRayWeatherLevelOverrides.WeatherProfile) != 0;
+                using (new EditorGUI.DisabledScope(_selectedProfile == null || hasProfileOverride && _selectedProfile == controller.AuthoredProfile || controller.ActiveFx != null))
                 {
                     if (GUILayout.Button("Назначить стартовым профилем сцены"))
                     {
                         serializedObject.FindProperty("_profile").objectReferenceValue = _selectedProfile;
+                        flags.intValue |= (int)XRayWeatherLevelOverrides.WeatherProfile;
                         serializedObject.ApplyModifiedProperties();
                         controller.ApplySettings();
                     }
@@ -82,20 +97,33 @@ namespace XRay.Importer.Editor.Levels
             DrawFxControls(controller, playing);
         }
 
-        private void DrawFlareSettings()
+        private void DrawFlareSettings(XRayWeatherController controller, SerializedProperty flags)
         {
             EditorGUILayout.Space();
             EditorGUILayout.LabelField("Lens flare", EditorStyles.boldLabel);
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("_lensFlareEnabled"), new GUIContent("Включён"));
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("_lensFlareIntensity"), new GUIContent("Общая сила flare"));
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("_adaptLensFlareToWeather"), new GUIContent("Адаптация к погоде"));
-            SerializedProperty expressive = serializedObject.FindProperty("_expressiveDaylight");
-            EditorGUILayout.PropertyField(expressive, new GUIContent("Expressive Daylight"));
-            using (new EditorGUI.DisabledScope(!expressive.boolValue))
-            {
-                EditorGUILayout.PropertyField(serializedObject.FindProperty("_expressiveFlareIntensity"), new GUIContent("Сила дополнительных бликов"));
-            }
+            DrawOverride(flags, XRayWeatherLevelOverrides.LensFlare, "_lensFlareEnabled", "Включён", EnabledText(controller.LensFlareEnabled), controller.LensFlareOverride.HasValue);
+            DrawOverride(flags, XRayWeatherLevelOverrides.LensFlareIntensity, "_lensFlareIntensity", "Общая сила flare", controller.LensFlareIntensity.ToString("0.###"), controller.LensFlareIntensityOverride.HasValue);
+            DrawOverride(flags, XRayWeatherLevelOverrides.FlareAdaptation, "_adaptLensFlareToWeather", "Адаптация к погоде", EnabledText(controller.AdaptLensFlareToWeather), controller.FlareAdaptationOverride.HasValue);
+            DrawOverride(flags, XRayWeatherLevelOverrides.ExpressiveDaylight, "_expressiveDaylight", "Expressive Daylight", EnabledText(controller.ExpressiveDaylight));
+            DrawOverride(flags, XRayWeatherLevelOverrides.ExpressiveFlareIntensity, "_expressiveFlareIntensity", "Сила дополнительных бликов", controller.ExpressiveFlareIntensity.ToString("0.###"), controller.ExpressiveFlareIntensityOverride.HasValue);
             EditorGUILayout.PropertyField(serializedObject.FindProperty("_flareProfileOverrides"), new GUIContent("Исключения по профилям", "Дневная и лунная видимость прямого источника в выбранном цикле. 0 гасит оптические блики, 1 пропускает полностью."), true);
+        }
+
+        private void DrawOverride(SerializedProperty flags, XRayWeatherLevelOverrides flag, string property, string label, string effective, bool runtime = false)
+        {
+            if ((flags.intValue & (int)flag) != 0)
+            {
+                EditorGUILayout.PropertyField(serializedObject.FindProperty(property), new GUIContent(label));
+            }
+            else
+            {
+                EditorGUILayout.LabelField(label, effective + (runtime ? " (Runtime)" : " (Global)"));
+            }
+        }
+
+        private static string EnabledText(bool enabled)
+        {
+            return enabled ? "Вкл" : "Выкл";
         }
 
         private void DrawFlareDiagnostics(XRayWeatherController controller)
@@ -124,11 +152,12 @@ namespace XRay.Importer.Editor.Levels
 
         private void DrawCatalog(XRayWeatherController controller, bool playing)
         {
-            using (new EditorGUI.DisabledScope(playing || controller.ActiveFx != null))
+            bool local = (controller.LevelOverrides & XRayWeatherLevelOverrides.WeatherCatalog) != 0;
+            using (new EditorGUI.DisabledScope(!local || playing || controller.ActiveFx != null))
             {
-                var catalog = (XRayWeatherCatalog)EditorGUILayout.ObjectField("Каталог погоды", controller.Catalog, typeof(XRayWeatherCatalog), false);
+                var catalog = (XRayWeatherCatalog)EditorGUILayout.ObjectField(local ? "Каталог погоды (Level)" : "Каталог погоды (Global)", controller.Catalog, typeof(XRayWeatherCatalog), false);
                 if (catalog != controller.Catalog) AssignCatalog(controller, catalog);
-                if (controller.Catalog == null && GUILayout.Button("Подключить подготовленный каталог"))
+                if (local && controller.Catalog == null && GUILayout.Button("Подключить подготовленный каталог"))
                 {
                     try
                     {
@@ -156,6 +185,7 @@ namespace XRay.Importer.Editor.Levels
             _transitionDiagnostic = null;
             serializedObject.FindProperty("_catalog").objectReferenceValue = catalog;
             serializedObject.ApplyModifiedProperties();
+            controller.ApplySettings();
         }
 
         private void DrawProfilePicker(XRayWeatherCatalog catalog, XRayWeatherProfile preferredProfile)
@@ -198,6 +228,7 @@ namespace XRay.Importer.Editor.Levels
             }
             float scale = EditorGUILayout.DelayedFloatField("Масштаб игрового времени", controller.TimeScale);
             if (scale != controller.TimeScale && IsNonNegativeFinite(scale)) controller.SetTimeScale(scale);
+            if (controller.TimeScaleOverride.HasValue && GUILayout.Button("Сбросить переопределение времени сессии")) controller.ClearTimeScaleOverride();
             using (new EditorGUILayout.HorizontalScope())
             {
                 if (GUILayout.Button(controller.Paused ? "Продолжить" : "Пауза")) controller.SetPaused(!controller.Paused);
@@ -236,11 +267,12 @@ namespace XRay.Importer.Editor.Levels
         {
             EditorGUILayout.Space();
             EditorGUILayout.LabelField("Погодные эффекты", EditorStyles.boldLabel);
-            using (new EditorGUI.DisabledScope(playing || controller.ActiveFx != null))
+            bool local = (controller.LevelOverrides & XRayWeatherLevelOverrides.WeatherFxCatalog) != 0;
+            using (new EditorGUI.DisabledScope(!local || playing || controller.ActiveFx != null))
             {
-                var catalog = (XRayWeatherFxCatalog)EditorGUILayout.ObjectField("Каталог FX", controller.FxCatalog, typeof(XRayWeatherFxCatalog), false);
+                var catalog = (XRayWeatherFxCatalog)EditorGUILayout.ObjectField(local ? "Каталог FX (Level)" : "Каталог FX (Global)", controller.FxCatalog, typeof(XRayWeatherFxCatalog), false);
                 if (catalog != controller.FxCatalog) AssignFxCatalog(controller, catalog);
-                if (controller.FxCatalog == null && GUILayout.Button("Подключить подготовленный каталог FX"))
+                if (local && controller.FxCatalog == null && GUILayout.Button("Подключить подготовленный каталог FX"))
                 {
                     try
                     {
@@ -306,6 +338,7 @@ namespace XRay.Importer.Editor.Levels
             _fxDiagnostic = null;
             serializedObject.FindProperty("_fxCatalog").objectReferenceValue = catalog;
             serializedObject.ApplyModifiedProperties();
+            controller.ApplySettings();
         }
 
         private void DrawFxPicker(XRayWeatherFxCatalog catalog, XRayWeatherFxProfile active)

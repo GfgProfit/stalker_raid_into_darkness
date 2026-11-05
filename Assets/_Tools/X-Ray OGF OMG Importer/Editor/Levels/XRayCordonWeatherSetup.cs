@@ -56,7 +56,7 @@ namespace XRay.Importer.Editor.Levels
             }
             XRayWeatherPreview.Stop();
             if (controller.PreviewActive) controller.EndPreview();
-            VolumeProfile profile = SkyProfile(resourceProfile, initialTime, shader, authoredSky, authoredVolume.sharedProfile);
+            VolumeProfile profile = SkyProfile(resourceProfile, controller.ConfiguredTimeOfDay, shader, authoredSky, authoredVolume.sharedProfile);
             Undo.IncrementCurrentGroup();
             int group = Undo.GetCurrentGroup();
             Undo.SetCurrentGroupName("Connect Cordon Weather");
@@ -91,6 +91,7 @@ namespace XRay.Importer.Editor.Levels
             Undo.RecordObject(controller, "Connect Cordon Resource Weather Profile");
             serialized.Update();
             serialized.FindProperty("_profile").objectReferenceValue = resourceProfile;
+            serialized.FindProperty("_levelOverrides").intValue |= (int)XRayWeatherLevelOverrides.WeatherProfile;
             serialized.ApplyModifiedProperties();
             controller.ApplySettings();
             controller.ConfigureSky(renderer);
@@ -122,7 +123,7 @@ namespace XRay.Importer.Editor.Levels
                 activeWind++;
             }
             if (activeWind != 1) throw new InvalidDataException("The authored controller wind provider must remain enabled.");
-            XRayWeatherProfile profile = controller.FindProperty("_profile").objectReferenceValue as XRayWeatherProfile;
+            XRayWeatherProfile profile = controllers[0].AuthoredProfile;
             if (profile == null || AssetDatabase.GetAssetPath(profile) != AssetDatabase.GetAssetPath(ResourceProfile(profile))) throw new InvalidDataException("The Cordon controller must reference its same-cycle resource-ready profile.");
             var renderer = new SerializedObject(renderers[0]);
             var volume = renderer.FindProperty("_volume").objectReferenceValue as Volume;

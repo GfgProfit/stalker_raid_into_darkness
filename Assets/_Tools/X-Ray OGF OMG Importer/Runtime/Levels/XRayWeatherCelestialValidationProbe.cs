@@ -35,6 +35,8 @@ namespace XRay.Importer.Levels
         [SerializeField] private Material _fxLightingSurface;
 
         private string _output;
+        private string _configurationState;
+        private GameConfig _sharedConfiguration;
         private bool _stagePassed;
         private readonly List<string> _runtimeErrors = new List<string>();
 
@@ -144,6 +146,22 @@ namespace XRay.Importer.Levels
             XRayWeatherFogRenderer fog = _controller.GetComponent<XRayWeatherFogRenderer>();
             try
             {
+                GameConfig configuration = GameConfig.Load();
+                Require(configuration != null && configuration.TryValidate(out _), "The Player requires a valid canonical Resources/GameConfig.asset.");
+                if (_sharedConfiguration == null)
+                {
+                    _sharedConfiguration = configuration;
+                    _configurationState = ConfigurationJson(configuration);
+                }
+                record.sharedConfiguration = configuration == _sharedConfiguration && _controller.Configuration == configuration;
+                record.inheritedTimeScale = _controller.TimeScale;
+                record.configurationInherited = (_controller.LevelOverrides & XRayWeatherLevelOverrides.TimeScale) == 0 && !_controller.TimeScaleOverride.HasValue && record.inheritedTimeScale == configuration.DefaultTimeScale;
+                record.sharedCatalogs = _controller.Catalog == configuration.OrdinaryWeatherCatalog && _controller.FxCatalog == configuration.WeatherFxCatalog;
+                record.ordinaryCycles = _controller.Catalog == null ? 0 : _controller.Catalog.Profiles.Count;
+                record.weatherFxEffects = _controller.FxCatalog == null ? 0 : _controller.FxCatalog.Effects.Count;
+                record.sharedGraphics = _controller.FogEnabled == configuration.FogEnabled && _controller.SunShaftsEnabled == configuration.SunShaftsEnabled && _controller.LensFlareEnabled == configuration.LensFlareEnabled && _controller.FxLightingAdaptationGain == configuration.FxLightingAdaptation;
+                Require(record.sharedConfiguration && record.configurationInherited, "The Player must retain one canonical configuration and inherit the configured default TimeScale after initialization and reload.");
+                Require(record.sharedCatalogs && record.ordinaryCycles == 21 && record.weatherFxEffects == 7 && record.sharedGraphics, "The Player must resolve the shared catalogs and supported graphics defaults.");
                 Require(setupValid && fog != null && fog.HasWeather && fog.Volume != null, "The current scene owns its native Fog consumer.");
                 record.runtimeFallback = fog.Volume.gameObject.hideFlags == HideFlags.HideAndDontSave;
                 Require(record.runtimeFallback == fallback && (_cameraMask & (1 << fog.Volume.gameObject.layer)) != 0, "The native Fog consumer uses the original camera layer and expected serialized/fallback binding.");
@@ -161,6 +179,8 @@ namespace XRay.Importer.Levels
                 record.assertionsPassed = cases.assertionsPassed;
                 record.restorationPassed = cases.restorationPassed;
                 record.error = cases.error;
+                record.configurationReadOnly = _configurationState == ConfigurationJson(configuration);
+                Require(record.configurationReadOnly, "Runtime weather and FX must preserve all shared configuration assets.");
             }
             catch (Exception exception)
             {
@@ -176,7 +196,8 @@ namespace XRay.Importer.Levels
             _controller.enabled = true;
             yield return null;
             record.reacquired = XRayWeatherController.Active == _controller && _controller.Celestial != null && _controller.Celestial != celestial && fog != null && fog.HasWeather && (boundFog == null || fog.Volume == boundFog);
-            record.passed = record.captureWritten && record.assertionsPassed && record.restorationPassed && record.released && record.reacquired && string.IsNullOrEmpty(record.error);
+            record.configurationReadOnly &= _sharedConfiguration != null && _configurationState == ConfigurationJson(_sharedConfiguration);
+            record.passed = record.captureWritten && record.assertionsPassed && record.restorationPassed && record.released && record.reacquired && record.sharedConfiguration && record.configurationInherited && record.sharedCatalogs && record.sharedGraphics && record.configurationReadOnly && string.IsNullOrEmpty(record.error);
             Write(directory, "Result", record);
             _stagePassed = record.passed;
         }
@@ -1047,6 +1068,21 @@ namespace XRay.Importer.Levels
             return result.ToString();
         }
 
+        private static string ConfigurationJson(GameConfig configuration)
+        {
+            var result = new System.Text.StringBuilder(JsonUtility.ToJson(configuration));
+            result.Append(JsonUtility.ToJson(configuration.CelestialSettings));
+            result.Append(JsonUtility.ToJson(configuration.OrdinaryWeatherCatalog));
+            result.Append(JsonUtility.ToJson(configuration.WeatherFxCatalog));
+            foreach (XRayWeatherProfile profile in configuration.OrdinaryWeatherCatalog.Profiles) result.Append(JsonUtility.ToJson(profile));
+            foreach (XRayWeatherFxProfile effect in configuration.WeatherFxCatalog.Effects)
+            {
+                result.Append(JsonUtility.ToJson(effect));
+                result.Append(JsonUtility.ToJson(effect.SourceProfile));
+            }
+            return result.ToString();
+        }
+
         private void ObserveLog(string text, string trace, LogType type)
         {
             if (type == LogType.Error || type == LogType.Exception || type == LogType.Assert) _runtimeErrors.Add(text + "\n" + trace);
@@ -1268,6 +1304,14 @@ namespace XRay.Importer.Levels
             public bool restorationPassed;
             public bool released;
             public bool reacquired;
+            public bool sharedConfiguration;
+            public bool configurationInherited;
+            public float inheritedTimeScale;
+            public bool sharedCatalogs;
+            public int ordinaryCycles;
+            public int weatherFxEffects;
+            public bool sharedGraphics;
+            public bool configurationReadOnly;
             public string error;
         }
 

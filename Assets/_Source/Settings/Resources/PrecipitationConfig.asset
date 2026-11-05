@@ -1,0 +1,52 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fd38845ad1ea94446b5a5eb3c55cb3f0, type: 3}
+  m_Name: PrecipitationConfig
+  m_EditorClassIdentifier: XRay.Importer.Runtime::XRay.Importer.Levels.PrecipitationConfig
+  _enabled: 1
+  _intensityMultiplier: 1
+  _quality: 2
+  _maxDrops: 2500
+  _drawRadius: 15
+  _dropLength: 2
+  _dropHalfWidth: 0.1
+  _dropSpeed: 0.6
+  _windResponse: 1
+  _rainOpacity: 0.65
+  _splashesEnabled: 1
+  _maxSplashes: 1000
+  _splashSize: 0.2
+  _maxCameraViews: 4
+  _geometryRefreshSeconds: 2
+  _rainShader: {fileID: 4800000, guid: b0741d6fd11e4ef5989a178d22ef58cd, type: 3}
+  _heightShader: {fileID: 4800000, guid: 28d927253175ff54a9dcc83db439b7dd, type: 3}
+  _rainCompute: {fileID: 7200000, guid: 5c4e82daa3644758afbd6a67c8a1ce6e, type: 3}
+  _rainTexture: {fileID: 2800000, guid: 2a45e28c72a29214cabf472623428649, type: 2}
+  _splashTexture: {fileID: 2800000, guid: d1ca5b54a5c074c4698e0cdef5bd1f60, type: 2}
+  _wetnessEnabled: 0
+  _wettingRate: 0.0156
+  _dryingRate: 0.0072
+  _maxWetness: 1
+  _wetnessStrength: 1
+  _puddlesEnabled: 0
+  _puddleFormationRate: 0.0039
+  _puddleDryingRate: 0.0018
+  _maxPuddles: 1
+  _puddleWetnessThreshold: 0.65
+  _puddleStrength: 1
+  _rippleStrength: 0.025
+  _puddleMaskScale: 1.1
+  _shelterTolerance: 0.15
+  _wetnessCompute: {fileID: 0}
+  _puddleNoise: {fileID: 0}
+  _rippleNormal: {fileID: 0}
+  _puddleMasks: []

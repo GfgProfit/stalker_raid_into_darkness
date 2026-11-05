@@ -158,7 +158,10 @@ namespace XRay.Importer.Editor.Levels
         {
             Guard(archive);
             if (!Path.GetFullPath(snapshotPath).StartsWith(Path.GetFullPath(archive).TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase)) throw new InvalidOperationException("Use a snapshot from this validation directory.");
-            HostRecord before = JsonUtility.FromJson<HostRecord>(File.ReadAllText(snapshotPath));
+            string json = File.ReadAllText(snapshotPath);
+            HostRecord before = JsonUtility.FromJson<HostRecord>(json);
+            if (json.IndexOf("\"precipitationOverride\"", StringComparison.Ordinal) < 0) before.precipitationOverride = -1;
+            if (json.IndexOf("\"rainVisualOverride\"", StringComparison.Ordinal) < 0) before.rainVisualOverride = -1;
             RequireSameAuthored(before, ReadHost());
             Resume(Find<XRayWeatherController>(SceneManager.GetActiveScene()), before);
             return WriteHost(archive, "HostRestored", before);
@@ -250,14 +253,14 @@ namespace XRay.Importer.Editor.Levels
             Scene scene = SceneManager.GetActiveScene();
             XRayWeatherController controller = Find<XRayWeatherController>(scene);
             Behaviour[] providers = Providers(controller);
-            return new HostRecord { scene = scene.path, dirty = scene.isDirty, roots = scene.rootCount, authored = Array.ConvertAll(providers, Authored), enabled = Array.ConvertAll(providers, value => value.enabled), preview = controller.PreviewActive, manager = XRayWeatherPreview.Controller == controller, profile = AssetDatabase.GetAssetPath(controller.ActiveProfile), seconds = controller.GameTimeSeconds, paused = controller.Paused, timeScale = controller.TimeScale, hasTimeScaleOverride = controller.TimeScaleOverride.HasValue, shaftsOverride = Encode(controller.SunShaftsOverride), flareOverride = Encode(controller.LensFlareOverride), selection = Array.ConvertAll(Selection.objects, value => GlobalObjectId.GetGlobalObjectIdSlow(value).ToString()) };
+            return new HostRecord { scene = scene.path, dirty = scene.isDirty, roots = scene.rootCount, authored = Array.ConvertAll(providers, Authored), enabled = Array.ConvertAll(providers, value => value.enabled), preview = controller.PreviewActive, manager = XRayWeatherPreview.Controller == controller, profile = AssetDatabase.GetAssetPath(controller.ActiveProfile), seconds = controller.GameTimeSeconds, paused = controller.Paused, timeScale = controller.TimeScale, hasTimeScaleOverride = controller.TimeScaleOverride.HasValue, shaftsOverride = Encode(controller.SunShaftsOverride), flareOverride = Encode(controller.LensFlareOverride), precipitationOverride = Encode(controller.PrecipitationOverride), rainVisualOverride = Encode(controller.RainVisualOverride), selection = Array.ConvertAll(Selection.objects, value => GlobalObjectId.GetGlobalObjectIdSlow(value).ToString()) };
         }
 
         private static string WriteHost(string output, string label, HostRecord before)
         {
             HostRecord after = ReadHost();
             RequireSameAuthored(before, after);
-            if (before.preview != after.preview || before.manager != after.manager || before.profile != after.profile || Math.Abs(before.seconds - after.seconds) > 0.000001 || before.paused != after.paused || before.timeScale != after.timeScale || before.hasTimeScaleOverride != after.hasTimeScaleOverride || before.shaftsOverride != after.shaftsOverride || before.flareOverride != after.flareOverride) throw new InvalidOperationException("Military runtime preview state changed during validation.");
+            if (before.preview != after.preview || before.manager != after.manager || before.profile != after.profile || Math.Abs(before.seconds - after.seconds) > 0.000001 || before.paused != after.paused || before.timeScale != after.timeScale || before.hasTimeScaleOverride != after.hasTimeScaleOverride || before.shaftsOverride != after.shaftsOverride || before.flareOverride != after.flareOverride || before.precipitationOverride != after.precipitationOverride || before.rainVisualOverride != after.rainVisualOverride) throw new InvalidOperationException("Military runtime preview state changed during validation.");
             string path = Path.Combine(output, label + "_" + DateTime.UtcNow.ToString("yyyyMMdd_HHmmss_fff") + ".json");
             File.WriteAllText(path, JsonUtility.ToJson(after, true));
             return path;
@@ -281,6 +284,8 @@ namespace XRay.Importer.Editor.Levels
             if (state.hasTimeScaleOverride) controller.SetTimeScale(state.timeScale);
             else controller.ClearTimeScaleOverride();
             controller.SetCelestialEffectOverrides(Decode(state.shaftsOverride), Decode(state.flareOverride));
+            controller.SetPrecipitationOverride(Decode(state.precipitationOverride));
+            controller.SetRainVisualOverride(Decode(state.rainVisualOverride));
             var selected = new List<Object>();
             foreach (string text in state.selection)
             {
@@ -301,7 +306,7 @@ namespace XRay.Importer.Editor.Levels
             return value < 0 ? (bool?)null : value != 0;
         }
 
-        private sealed class HostScope
+        internal sealed class HostScope
         {
             private readonly Scene _scene;
             private readonly Behaviour[] _providers;
@@ -315,7 +320,7 @@ namespace XRay.Importer.Editor.Levels
             {
                 _scene = SceneManager.GetActiveScene();
                 Controller = Find<XRayWeatherController>(_scene);
-                if (Controller.IsTransitioning || XRayWeatherController.Active != null && XRayWeatherController.Active != Controller) throw new InvalidOperationException("Preserve the current weather transition or foreign owner before validation.");
+                if (Controller.IsTransitioning || Controller.ActiveFx != null || XRayWeatherController.Active != null && XRayWeatherController.Active != Controller) throw new InvalidOperationException("Preserve the current weather transition, active WeatherFX or foreign owner before validation.");
                 _providers = Providers(Controller);
                 Before = ReadHost();
             }
@@ -329,6 +334,14 @@ namespace XRay.Importer.Editor.Levels
                 if (XRayWeatherController.Active != null) throw new InvalidOperationException("Military weather did not release ownership.");
             }
 
+            public void BeginHostPreview()
+            {
+                _isolated = true;
+                if (XRayWeatherPreview.Controller == Controller) XRayWeatherPreview.Stop();
+                Controller.EndPreview();
+                if (!Controller.BeginPreview()) throw new InvalidOperationException(Controller.Diagnostic);
+            }
+
             public void Restore()
             {
                 if (!_isolated) return;
@@ -340,7 +353,7 @@ namespace XRay.Importer.Editor.Levels
         }
 
         [Serializable]
-        private sealed class HostRecord
+        internal sealed class HostRecord
         {
             public string scene;
             public bool dirty;
@@ -356,6 +369,8 @@ namespace XRay.Importer.Editor.Levels
             public bool hasTimeScaleOverride;
             public int shaftsOverride;
             public int flareOverride;
+            public int precipitationOverride = -1;
+            public int rainVisualOverride = -1;
             public string[] selection;
         }
     }

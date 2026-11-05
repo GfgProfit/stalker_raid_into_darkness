@@ -19,6 +19,7 @@ namespace XRay.Importer.Levels
         FlareAdaptation = 1 << 10,
         ExpressiveFlareIntensity = 1 << 11,
         FxLightingAdaptation = 1 << 12,
-        CelestialSettings = 1 << 13
+        CelestialSettings = 1 << 13,
+        Precipitation = 1 << 14
     }
 }

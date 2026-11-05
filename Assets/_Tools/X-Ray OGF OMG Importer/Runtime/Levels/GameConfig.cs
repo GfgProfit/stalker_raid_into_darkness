@@ -14,6 +14,7 @@ namespace XRay.Importer.Levels
         [SerializeField] private XRayWeatherCatalog _ordinaryWeatherCatalog;
         [SerializeField] private XRayWeatherFxCatalog _weatherFxCatalog;
         [SerializeField] private XRayWeatherCelestialSettings _celestialSettings;
+        [SerializeField] private PrecipitationConfig _precipitation;
         [SerializeField] private bool _fogEnabled = true;
         [SerializeField] private bool _sunShaftsEnabled = true;
         [SerializeField] private bool _lensFlareEnabled = true;
@@ -29,6 +30,7 @@ namespace XRay.Importer.Levels
         public XRayWeatherCatalog OrdinaryWeatherCatalog => _ordinaryWeatherCatalog;
         public XRayWeatherFxCatalog WeatherFxCatalog => _weatherFxCatalog;
         public XRayWeatherCelestialSettings CelestialSettings => _celestialSettings;
+        public PrecipitationConfig Precipitation => _precipitation;
         public bool FogEnabled => _fogEnabled;
         public bool SunShaftsEnabled => _sunShaftsEnabled;
         public bool LensFlareEnabled => _lensFlareEnabled;
@@ -55,6 +57,7 @@ namespace XRay.Importer.Levels
             else if (_weatherFxCatalog == null || _weatherFxCatalog.Effects == null || _weatherFxCatalog.Effects.Count == 0) diagnostic = "GameConfig requires a WeatherFX catalog with effects.";
             else if (_weatherFxCatalog.OrdinaryCatalog != _ordinaryWeatherCatalog) diagnostic = "GameConfig WeatherFX and ordinary weather catalogs must reference the same ordinary catalog.";
             else if (_celestialSettings == null || _celestialSettings.Shader == null) diagnostic = "GameConfig requires celestial settings with a shader.";
+            else if (_precipitation != null && !_precipitation.TryValidate(out string precipitationDiagnostic)) diagnostic = precipitationDiagnostic;
             else if (!float.IsFinite(_lensFlareIntensity) || _lensFlareIntensity < 0.0f) diagnostic = "GameConfig LensFlareIntensity must be finite and non-negative.";
             else if (!float.IsFinite(_expressiveFlareIntensity) || _expressiveFlareIntensity < 0.0f) diagnostic = "GameConfig ExpressiveFlareIntensity must be finite and non-negative.";
             else if (!float.IsFinite(_fxLightingAdaptation) || _fxLightingAdaptation < 0.0f || _fxLightingAdaptation > MAX_FX_LIGHTING_ADAPTATION) diagnostic = "GameConfig FxLightingAdaptation must be within its supported range.";

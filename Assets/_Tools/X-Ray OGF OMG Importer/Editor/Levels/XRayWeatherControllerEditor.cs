@@ -44,10 +44,11 @@ namespace XRay.Importer.Editor.Levels
                 DrawOverride(flags, XRayWeatherLevelOverrides.Fog, "_fogEnabled", "Weather Fog", EnabledText(controller.FogEnabled), controller.FogOverride.HasValue);
                 DrawOverride(flags, XRayWeatherLevelOverrides.SunShafts, "_sunShaftsEnabled", "Sun Shafts", EnabledText(controller.SunShaftsEnabled), controller.SunShaftsOverride.HasValue);
                 DrawOverride(flags, XRayWeatherLevelOverrides.CelestialSettings, "_celestialSettings", "Профиль Celestial", controller.Configuration != null && controller.Configuration.CelestialSettings != null ? controller.Configuration.CelestialSettings.name : "—");
+                DrawOverride(flags, XRayWeatherLevelOverrides.Precipitation, "_precipitationConfig", "Осадки", controller.EffectivePrecipitationConfig != null ? controller.EffectivePrecipitationConfig.name : "—");
                 DrawFlareSettings(controller, flags);
                 DrawOverride(flags, XRayWeatherLevelOverrides.FxLightingAdaptation, "_fxLightingAdaptation", "Адаптация освещения WeatherFX", controller.FxLightingAdaptationGain.ToString("0.###"), controller.FxLightingAdaptationOverride.HasValue);
             }
-            DrawPropertiesExcluding(serializedObject, "m_Script", "_levelOverrides", "_timeOfDayHours", "_timeScale", "_profile", "_catalog", "_fxCatalog", "_fogEnabled", "_sunShaftsEnabled", "_celestialSettings", "_lensFlareEnabled", "_lensFlareIntensity", "_adaptLensFlareToWeather", "_expressiveDaylight", "_expressiveFlareIntensity", "_flareProfileOverrides", "_fxLightingAdaptation");
+            DrawPropertiesExcluding(serializedObject, "m_Script", "_levelOverrides", "_timeOfDayHours", "_timeScale", "_profile", "_catalog", "_fxCatalog", "_fogEnabled", "_sunShaftsEnabled", "_celestialSettings", "_precipitationConfig", "_lensFlareEnabled", "_lensFlareIntensity", "_adaptLensFlareToWeather", "_expressiveDaylight", "_expressiveFlareIntensity", "_flareProfileOverrides", "_fxLightingAdaptation");
             string timeSource = controller.TimeScaleOverride.HasValue ? "Runtime" : (controller.LevelOverrides & XRayWeatherLevelOverrides.TimeScale) != 0 ? "Level" : "Global";
             EditorGUILayout.LabelField("Эффективный масштаб времени", $"{controller.TimeScale:0.###} ({timeSource})");
             if (EditorGUI.EndChangeCheck())
@@ -95,6 +96,33 @@ namespace XRay.Importer.Editor.Levels
             }
             if (playing || controller.PreviewActive) DrawSimulation(controller);
             DrawFxControls(controller, playing);
+            DrawPrecipitation(controller);
+        }
+
+        private static void DrawPrecipitation(XRayWeatherController controller)
+        {
+            EditorGUILayout.Space();
+            EditorGUILayout.LabelField("Осадки", EditorStyles.boldLabel);
+            using (new EditorGUI.DisabledScope(true))
+            {
+                EditorGUILayout.ObjectField("Эффективная конфигурация", controller.EffectivePrecipitationConfig, typeof(PrecipitationConfig), false);
+            }
+            XRayPrecipitationSystem precipitation = controller.Precipitation;
+            if (precipitation != null)
+            {
+                EditorGUILayout.LabelField("Интенсивность", precipitation.RainDensity.ToString("0.###"));
+                EditorGUILayout.LabelField("Физическое время", precipitation.RealTime.ToString("0.###"));
+                EditorGUILayout.LabelField("Память атласа и капель", (precipitation.EstimatedBytes / (1024.0 * 1024.0)).ToString("0.##") + " MiB");
+                if (!string.IsNullOrEmpty(precipitation.Diagnostic)) EditorGUILayout.HelpBox(precipitation.Diagnostic, MessageType.Warning);
+            }
+            if (controller.PreviewActive || Application.IsPlaying(controller.gameObject))
+            {
+                bool visible = controller.RainVisualOverride ?? true;
+                bool selected = EditorGUILayout.Toggle("Показывать дождь в сессии", visible);
+                if (selected != visible) controller.SetRainVisualOverride(selected);
+            }
+            if (controller.RainVisualOverride.HasValue && GUILayout.Button("Наследовать видимость дождя")) controller.SetRainVisualOverride(null);
+            if (controller.PrecipitationOverride.HasValue && GUILayout.Button("Наследовать систему осадков")) controller.SetPrecipitationOverride(null);
         }
 
         private void DrawFlareSettings(XRayWeatherController controller, SerializedProperty flags)

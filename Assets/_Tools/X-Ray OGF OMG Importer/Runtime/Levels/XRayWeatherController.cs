@@ -37,6 +37,7 @@ namespace XRay.Importer.Levels
         [SerializeField] private XRayWeatherSkyRenderer _skyRenderer;
         [SerializeField] private XRayWeatherFogRenderer _fogRenderer;
         [SerializeField] private XRayWeatherCelestialSettings _celestialSettings;
+        [SerializeField] private PrecipitationConfig _precipitationConfig;
         [SerializeField] private bool _fogEnabled = true;
         [SerializeField] private bool _sunShaftsEnabled = true;
         [SerializeField] private bool _lensFlareEnabled = true;
@@ -68,6 +69,7 @@ namespace XRay.Importer.Levels
         private XRayWeatherFogRenderer _ownedFog;
         private XRayWeatherCelestialSettings _appliedCelestialSettings;
         private XRayWeatherCelestialRenderer _celestial;
+        private XRayPrecipitationSystem _precipitation;
         private Color _savedSunColor;
         private float _savedSunIntensity;
         private Quaternion _savedSunRotation;
@@ -120,6 +122,11 @@ namespace XRay.Importer.Levels
         public bool IsTransitioning => _transitionTarget != null;
         public float TransitionProgress => IsTransitioning ? Mathf.Clamp01(_transitionElapsed / _transitionDuration) : 1.0f;
         public XRayWeatherCelestialRenderer Celestial => _celestial;
+        public XRayPrecipitationSystem Precipitation => _precipitation;
+        public PrecipitationConfig EffectivePrecipitationConfig => Inherits(XRayWeatherLevelOverrides.Precipitation) ? _configuration.Precipitation : _precipitationConfig;
+        public bool? PrecipitationOverride { get; private set; }
+        public bool? RainVisualOverride { get; private set; }
+        public bool PrecipitationEnabled => PrecipitationOverride ?? (EffectivePrecipitationConfig != null && EffectivePrecipitationConfig.Enabled);
         public bool? FogOverride { get; private set; }
         public bool? SunShaftsOverride { get; private set; }
         public bool? LensFlareOverride { get; private set; }
@@ -303,6 +310,18 @@ namespace XRay.Importer.Levels
             if (FogOverride == enabled) return;
             FogOverride = enabled;
             if (_ownsInputs && Active == this) EvaluateAndPublish(0.0f, false);
+        }
+
+        public void SetPrecipitationOverride(bool? enabled)
+        {
+            PrecipitationOverride = enabled;
+            RefreshDiscontinuity(false);
+        }
+
+        public void SetRainVisualOverride(bool? enabled)
+        {
+            RainVisualOverride = enabled;
+            RefreshDiscontinuity(false);
         }
 
         public void SetCelestialEffectOverrides(bool? shafts, bool? flare)
@@ -538,6 +557,12 @@ namespace XRay.Importer.Levels
             _settingsDirty = true;
         }
 
+        private void OnDestroy()
+        {
+            if (_precipitation != null) _precipitation.Dispose();
+            _precipitation = null;
+        }
+
         private void Update()
         {
             if (!Application.IsPlaying(gameObject) || Time.frameCount == _lastFrame) return;
@@ -685,6 +710,9 @@ namespace XRay.Importer.Levels
             }
             if (_ownedFog != null && !FogEnabled && _ownedFog.HasWeather) _ownedFog.ReleaseWeather(this);
             PublishEnvironment(snapshot, effectWeight);
+            if (_precipitation == null) _precipitation = new XRayPrecipitationSystem(gameObject);
+            float precipitationRadiance = _ownedSky != null ? XRayWeatherSkyPass.GetEnvironmentRadianceScale(_ownedSky.Settings) : 1.0f;
+            _precipitation.Publish(EffectivePrecipitationConfig, snapshot, _simulationPaused ? 0.0f : deltaSeconds, precipitationRadiance, PrecipitationEnabled, RainVisualOverride ?? true);
             _ownedWeather.SetWeatherNightAmbient(this, _ownedSky != null ? XRayWeatherSkyPass.GetNightRadiance(_ownedSky.Settings) : Vector3.zero);
             bool transitionCompletedWithoutGameTime = IsTransitioning && _transitionElapsed >= _transitionDuration && _simulationTimeScale == 0.0f;
             PublishCelestial(deltaSeconds, resetPrevious && resetCelestial || transitionCompletedWithoutGameTime || effectFlareHandover);
@@ -783,6 +811,7 @@ namespace XRay.Importer.Levels
 
         private void ReleaseInputs()
         {
+            if (_precipitation != null) _precipitation.Suspend();
             _fxPlayback = null;
             if (_ownedSun != null)
             {
@@ -797,6 +826,8 @@ namespace XRay.Importer.Levels
             if (_ownedFog != null) _ownedFog.ReleaseWeather(this);
             RestoreShaftsLight();
             ReleaseCelestial();
+            PrecipitationOverride = null;
+            RainVisualOverride = null;
             FogOverride = null;
             SunShaftsOverride = null;
             LensFlareOverride = null;

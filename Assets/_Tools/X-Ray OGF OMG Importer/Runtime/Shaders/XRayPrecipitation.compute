@@ -1,0 +1,160 @@
+#pragma kernel InitializeDrops
+#pragma kernel SimulateDrops
+
+struct RainDrop
+{
+    float3 position;
+    float age;
+    float3 velocity;
+    uint seed;
+    float3 splashPosition;
+    float splashAge;
+    float lifetime;
+    float size;
+    float2 reserved;
+};
+
+RWStructuredBuffer<RainDrop> _XRayRainDrops;
+Texture2D<float2> _XRayRainHeights;
+int _XRayRainDropCount;
+int _XRayRainActiveCount;
+int _XRayRainSplashBudget;
+float _XRayRainDelta;
+float4 _XRayRainSource;
+float4 _XRayRainForward;
+float4 _XRayRainMotion;
+float4 _XRayRainWorldMapping;
+
+static const float SOURCE_HEIGHT = 20.0;
+static const float SOURCE_FORWARD = 5.0;
+static const float TRAJECTORY_LENGTH = 30.0;
+static const float SPLASH_LIFETIME = 0.3;
+static const float DROP_ANGLE = 0.2617993877991494;
+static const float PI = 3.1415926535897932;
+
+uint NextRandom(inout uint seed)
+{
+    seed = seed * 1664525u + 1013904223u;
+    return seed;
+}
+
+float RandomUnit(inout uint seed)
+{
+    return float(NextRandom(seed) >> 8) * (1.0 / 16777216.0);
+}
+
+bool ReadHeight(float2 position, out float height)
+{
+    float2 uv = (position - _XRayRainWorldMapping.xy) * _XRayRainWorldMapping.zw;
+    height = 0.0;
+    if (any(uv < 0.0) || any(uv >= 1.0)) return false;
+    uint width;
+    uint length;
+    _XRayRainHeights.GetDimensions(width, length);
+    int2 pixel = min(int2(uv * float2(width, length)), int2(width, length) - 1);
+    float2 range = _XRayRainHeights.Load(int3(pixel, 0));
+    height = range.x;
+    return range.x >= range.y;
+}
+
+void Spawn(inout RainDrop drop, bool randomPhase)
+{
+    float3 direction = _XRayRainMotion.xyz;
+    direction /= max(length(direction), 0.0001);
+    float2 upwind = -direction.xz * SOURCE_HEIGHT / max(-direction.y, 0.05);
+    float coneAngle = lerp(-DROP_ANGLE, DROP_ANGLE, RandomUnit(drop.seed)) * (1.5 - saturate(_XRayRainForward.w));
+    float z = cos(RandomUnit(drop.seed) * PI);
+    float azimuth = RandomUnit(drop.seed) * (2.0 * PI);
+    float radial = sqrt(max(0.0, 1.0 - z * z));
+    float3 sphere = float3(radial * cos(azimuth), radial * sin(azimuth), z);
+    direction = normalize(direction + sphere * (RandomUnit(drop.seed) * tan(coneAngle)));
+    float speed = lerp(40.0, 80.0, RandomUnit(drop.seed)) * max(_XRayRainMotion.w, 0.0);
+    float2 offset = (float2(RandomUnit(drop.seed), RandomUnit(drop.seed)) - 0.5) * _XRayRainSource.w;
+    float2 forward = _XRayRainForward.xz;
+    drop.position = _XRayRainSource.xyz + float3(offset.x + forward.x * SOURCE_FORWARD + upwind.x, SOURCE_HEIGHT, offset.y + forward.y * SOURCE_FORWARD + upwind.y);
+    drop.velocity = direction * speed;
+    drop.age = 0.0;
+    drop.lifetime = TRAJECTORY_LENGTH / max(speed, 0.01);
+    drop.size = 1.0;
+    drop.reserved = 0.0;
+    float height;
+    bool hasHeight = ReadHeight(drop.position.xz, height);
+    if (hasHeight && drop.position.y <= height)
+    {
+        drop.size = 0.0;
+        return;
+    }
+    if (randomPhase)
+    {
+        float phaseLimit = drop.lifetime;
+        if (hasHeight && drop.velocity.y < -0.0001) phaseLimit = min(phaseLimit, max(0.0, (drop.position.y - height - 0.01) / -drop.velocity.y));
+        float phase = RandomUnit(drop.seed) * phaseLimit;
+        float3 initialPosition = drop.position;
+        drop.position += drop.velocity * phase;
+        drop.age = phase;
+        if (ReadHeight(drop.position.xz, height) && drop.position.y <= height)
+        {
+            drop.position = initialPosition;
+            drop.age = 0.0;
+        }
+    }
+}
+
+[numthreads(64, 1, 1)]
+void InitializeDrops(uint3 id : SV_DispatchThreadID)
+{
+    if (id.x >= (uint)_XRayRainDropCount) return;
+    RainDrop drop = (RainDrop)0;
+    drop.seed = (id.x + 1u) * 747796405u + 2891336453u;
+    drop.splashAge = SPLASH_LIFETIME;
+    Spawn(drop, true);
+    if (id.x >= (uint)_XRayRainActiveCount) drop.size = 0.0;
+    _XRayRainDrops[id.x] = drop;
+}
+
+[numthreads(64, 1, 1)]
+void SimulateDrops(uint3 id : SV_DispatchThreadID)
+{
+    if (id.x >= (uint)_XRayRainDropCount) return;
+    RainDrop drop = _XRayRainDrops[id.x];
+    float delta = max(_XRayRainDelta, 0.0);
+    if (delta <= 0.0) return;
+    drop.splashAge = min(drop.splashAge + delta, SPLASH_LIFETIME);
+    if (id.x >= (uint)_XRayRainActiveCount)
+    {
+        drop.size = 0.0;
+        drop.age = 0.0;
+        _XRayRainDrops[id.x] = drop;
+        return;
+    }
+    float2 cameraOffset = drop.position.xz - _XRayRainSource.xz;
+    float upwindMargin = SOURCE_HEIGHT * length(_XRayRainMotion.xz) / max(-_XRayRainMotion.y, 0.05);
+    float farRadius = max(_XRayRainSource.w * 3.0 + upwindMargin + SOURCE_FORWARD, 1.0);
+    if (drop.size <= 0.0 || dot(cameraOffset, cameraOffset) > farRadius * farRadius)
+    {
+        Spawn(drop, true);
+        _XRayRainDrops[id.x] = drop;
+        return;
+    }
+    float3 previousPosition = drop.position;
+    drop.position += drop.velocity * delta;
+    drop.age += delta;
+    float height;
+    bool hit = ReadHeight(drop.position.xz, height) && drop.position.y <= height;
+    if (hit)
+    {
+        if (previousPosition.y >= height && id.x < (uint)max(_XRayRainSplashBudget, 0) && RandomUnit(drop.seed) < 0.5)
+        {
+            float weight = saturate((previousPosition.y - height) / max(previousPosition.y - drop.position.y, 0.0001));
+            drop.splashPosition = lerp(previousPosition, drop.position, weight);
+            drop.splashPosition.y = height + 0.015;
+            drop.splashAge = 0.0;
+        }
+        Spawn(drop, false);
+    }
+    else if (drop.age >= drop.lifetime)
+    {
+        Spawn(drop, false);
+    }
+    _XRayRainDrops[id.x] = drop;
+}

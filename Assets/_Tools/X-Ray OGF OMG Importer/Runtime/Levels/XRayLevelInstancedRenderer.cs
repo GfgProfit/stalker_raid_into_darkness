@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -43,6 +44,7 @@ namespace XRay.Importer.Levels
             set => _lodImpostors = value;
         }
 
+        public Func<Material, Material> MaterialResolver { get; set; }
         public int LastVisibleBatches { get; private set; }
         public int LastVisibleInstances { get; private set; }
         public int LastShadowOnlyBatches { get; private set; }
@@ -246,7 +248,8 @@ namespace XRay.Importer.Levels
             int submeshes = Mathf.Min(batch.Mesh.subMeshCount, batch.Materials.Length);
             for (int submesh = 0; submesh < submeshes; submesh++)
             {
-                Material material = batch.Materials[submesh];
+                Material source = batch.Materials[submesh];
+                Material material = source != null && MaterialResolver != null ? MaterialResolver(source) : source;
                 if (material == null)
                 {
                     continue;

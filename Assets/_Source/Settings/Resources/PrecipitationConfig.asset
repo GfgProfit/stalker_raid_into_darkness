@@ -32,12 +32,12 @@ MonoBehaviour:
   _rainCompute: {fileID: 7200000, guid: 5c4e82daa3644758afbd6a67c8a1ce6e, type: 3}
   _rainTexture: {fileID: 2800000, guid: 2a45e28c72a29214cabf472623428649, type: 2}
   _splashTexture: {fileID: 2800000, guid: d1ca5b54a5c074c4698e0cdef5bd1f60, type: 2}
-  _wetnessEnabled: 0
+  _wetnessEnabled: 1
   _wettingRate: 0.0156
   _dryingRate: 0.0072
   _maxWetness: 1
   _wetnessStrength: 1
-  _puddlesEnabled: 0
+  _puddlesEnabled: 1
   _puddleFormationRate: 0.0039
   _puddleDryingRate: 0.0018
   _maxPuddles: 1
@@ -46,7 +46,80 @@ MonoBehaviour:
   _rippleStrength: 0.025
   _puddleMaskScale: 1.1
   _shelterTolerance: 0.15
-  _wetnessCompute: {fileID: 0}
+  _wetnessCompute: {fileID: 7200000, guid: 3f90ce6d3ba67dc47898f08a4043f0f2, type: 3}
   _puddleNoise: {fileID: 0}
   _rippleNormal: {fileID: 0}
-  _puddleMasks: []
+  _puddleMasks:
+  - _baseTextureName: terrain_agroprom
+    _mask: {fileID: 0}
+    _slice: 2
+  - _baseTextureName: terrain_darkcape
+    _mask: {fileID: 0}
+    _slice: 3
+  - _baseTextureName: terrain_darkvalley
+    _mask: {fileID: 0}
+    _slice: 4
+  - _baseTextureName: terrain_frodo_gen
+    _mask: {fileID: 0}
+    _slice: 5
+  - _baseTextureName: terrain_garbage_new
+    _mask: {fileID: 0}
+    _slice: 6
+  - _baseTextureName: terrain_jupiter
+    _mask: {fileID: 0}
+    _slice: 7
+  - _baseTextureName: terrain_limansk
+    _mask: {fileID: 0}
+    _slice: 8
+  - _baseTextureName: terrain_marsh
+    _mask: {fileID: 0}
+    _slice: 9
+  - _baseTextureName: terrain_military_1
+    _mask: {fileID: 0}
+    _slice: 10
+  - _baseTextureName: terrain_pripyat
+    _mask: {fileID: 0}
+    _slice: 11
+  - _baseTextureName: terrain_red_forest
+    _mask: {fileID: 0}
+    _slice: 12
+  - _baseTextureName: terrain_yantar
+    _mask: {fileID: 0}
+    _slice: 13
+  - _baseTextureName: terrain_zaton
+    _mask: {fileID: 0}
+    _slice: 14
+  _wetSurfaceTextures: {fileID: 18700000, guid: 2eb58abbf7991cb4289e6b94d7cb6ced, type: 2}
+  _surfaceResponses:
+  - _surface: 0
+    _albedoMultiplier: 0.8
+    _glossScale: 0.75
+    _puddleSupport: 0.35
+  - _surface: 1
+    _albedoMultiplier: 0.65
+    _glossScale: 1
+    _puddleSupport: 1
+  - _surface: 2
+    _albedoMultiplier: 0.75
+    _glossScale: 0.85
+    _puddleSupport: 0.65
+  - _surface: 3
+    _albedoMultiplier: 0.82
+    _glossScale: 0.75
+    _puddleSupport: 0.45
+  - _surface: 4
+    _albedoMultiplier: 0.6
+    _glossScale: 0.6
+    _puddleSupport: 0.8
+  - _surface: 5
+    _albedoMultiplier: 0.95
+    _glossScale: 1
+    _puddleSupport: 0.7
+  - _surface: 6
+    _albedoMultiplier: 0.72
+    _glossScale: 0.65
+    _puddleSupport: 0.1
+  - _surface: 7
+    _albedoMultiplier: 0.9
+    _glossScale: 0.3
+    _puddleSupport: 0

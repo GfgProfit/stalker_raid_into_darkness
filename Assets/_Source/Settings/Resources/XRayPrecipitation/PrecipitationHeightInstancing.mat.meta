@@ -1,0 +1,8 @@
+fileFormatVersion: 2
+guid: 78a02d4357bbe50468b1e05491180edd
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: xray-asset:{"_key":"precipitation/height-instancing-material-v1","_role":"PrecipitationHeightInstancingMaterial","_source":"GameConfig.Precipitation.HeightShader","_sourcePath":"Assets/_Tools/X-Ray OGF OMG Importer/Runtime/Shaders/MonolithPrecipitationHeight.shader","_stamp":"28d927253175ff54a9dcc83db439b7dd"}
+  assetBundleName: 
+  assetBundleVariant: 

@@ -368,6 +368,9 @@ float _TessellationShapeFactor;
 float _TessellationBackFaceCullEpsilon;
 #endif
 UNITY_TEXTURE_STREAMING_DEBUG_VARS;
+float4 _MonolithWetResponse;
+float _MonolithPuddleMaskSlice;
+float _MonolithPuddleMaskFlipV;
 CBUFFER_END
 
 bool MonolithTrueStalkerTerrainEnabled()

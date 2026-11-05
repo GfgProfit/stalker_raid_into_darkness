@@ -44,6 +44,11 @@ Shader "HDRP/MonolithLit"
         [NoScaleOffset] _MonolithWindWaves("SSFX s_waves (fx wind_wave, Linear)", 2D) = "grey" {}
         _MonolithWindWavesFlipV("Wind Waves Require V Flip", Float) = 0
         _MonolithFloraWetness("Flora rain_params.y (Explicit Wetness)", Range(0,1)) = 0
+        _MonolithWetResponse("Precipitation Response (Darkening, Gloss, Puddles, Enabled)", Vector) = (0.8,0.75,0.35,0)
+        _MonolithPuddleMask("Original Terrain Puddle Mask", 2D) = "white" {}
+        [HideInInspector] _MonolithHasPuddleMask("Original Puddle Mask Bound", Float) = 0
+        [HideInInspector] _MonolithPuddleMaskSlice("Original Puddle Mask Slice", Float) = -1
+        [HideInInspector] _MonolithPuddleMaskFlipV("Original Puddle Mask Flip V", Float) = 0
         _MonolithFloraFixes1("ssfx_florafixes_1", Vector) = (0.3,0.38,0.5,0.55)
         [Toggle] _MonolithFloraVariationEnabled("Flora Color Variation (Explicit)", Float) = 0
         _MonolithFloraVariation("ssfx_floravariation", Vector) = (0.025,0.1,0.025,0.05)
@@ -288,6 +293,8 @@ Shader "HDRP/MonolithLit"
         #pragma shader_feature_local _MONOLITH_LEVEL_LOD
         #pragma shader_feature_local_fragment _MONOLITH_LEVEL_FLORA
         #pragma shader_feature_local_fragment _MONOLITH_LEVEL_TERRAIN
+        #pragma multi_compile_local_fragment _ _MONOLITH_PRECIPITATION
+        #pragma multi_compile_local_fragment _ _MONOLITH_WET_ANOMALY_TERRAIN
         #ifdef _MONOLITH_ORIGINAL_TBN
         #define _REQUIRE_UV3
         #endif
@@ -364,8 +371,20 @@ Shader "HDRP/MonolithLit"
     #include "Packages/com.unity.render-pipelines.high-definition/Runtime/RenderPipeline/ShaderPass/FragInputs.hlsl"
     #include "Packages/com.unity.render-pipelines.high-definition/Runtime/RenderPipeline/ShaderPass/ShaderPass.cs.hlsl"
     #include "MonolithProperties.hlsl"
+    #if defined(_MONOLITH_PRECIPITATION) && defined(_MONOLITH_WET_ANOMALY_TERRAIN) && defined(_MONOLITH_LEVEL_TERRAIN)
+    #define _MonolithSourceProfile 1.0
+    #define _MonolithSourceTerrain 1.0
+    #define _MonolithTerrainSource 1.0
+    #define _MonolithHasTerrainSourceColor 1.0
+    #define _MonolithTrueStalkerSourceTerrain 0.0
+    #define _MonolithTrueStalkerHasLookup 0.0
+    #define MonolithTrueStalkerTerrainEnabled() false
+    #endif
     #include "MonolithLightInputs.hlsl"
     #include "MonolithMaterial.hlsl"
+    #ifdef _MONOLITH_PRECIPITATION
+    #include "MonolithWetness.hlsl"
+    #endif
     #include "MonolithFlora.hlsl"
     #include "MonolithTrueStalkerTerrain.hlsl"
     #include "MonolithSourceTexture.hlsl"

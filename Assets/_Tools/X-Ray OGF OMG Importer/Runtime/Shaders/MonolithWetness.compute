@@ -1,0 +1,81 @@
+#pragma kernel UpdateWetness
+#pragma kernel ResampleWetness
+#pragma kernel ClearWetness
+
+struct WetCell
+{
+    float4 moisture;
+    float2 heights;
+};
+
+StructuredBuffer<WetCell> _Previous;
+RWStructuredBuffer<WetCell> _Result;
+Texture2D<float2> _Height;
+int2 _Size;
+int2 _PreviousSize;
+float4 _PreviousMapping;
+float4 _Mapping;
+float4 _WetRates;
+float4 _PuddleRates;
+float4 _Uniform;
+float _Delta;
+float _ShelterTolerance;
+int _PreserveHeights;
+
+WetCell PreviousCell(uint2 pixel)
+{
+    float2 uv = (float2(pixel) + 0.5) / float2(_Size);
+    float2 world = _Mapping.xy + uv / _Mapping.zw;
+    float2 previousUv = (world - _PreviousMapping.xy) * _PreviousMapping.zw;
+    WetCell cell;
+    cell.moisture = 0.0;
+    cell.heights = float2(0.0, 1.0);
+    if (all(previousUv >= 0.0) && all(previousUv < 1.0))
+    {
+        int2 previousPixel = clamp(int2(previousUv * _PreviousSize), 0, _PreviousSize - 1);
+        cell = _Previous[previousPixel.y * _PreviousSize.x + previousPixel.x];
+    }
+    return cell;
+}
+
+float2 Accumulate(float2 state, float rain)
+{
+    state.x = clamp(state.x + (rain > 0.0 ? rain * _WetRates.x : -_WetRates.y) * _Delta, 0.0, _WetRates.z);
+    float target = rain > 0.0 ? saturate((state.x - _PuddleRates.w) / max(0.001, _WetRates.z - _PuddleRates.w)) * _PuddleRates.z : 0.0;
+    state.y = clamp(state.y + clamp(target - state.y, -_PuddleRates.y * _Delta, rain * _PuddleRates.x * _Delta), 0.0, _PuddleRates.z);
+    return state;
+}
+
+[numthreads(8, 8, 1)]
+void UpdateWetness(uint3 id : SV_DispatchThreadID)
+{
+    if (any(id.xy >= (uint2)_Size)) return;
+    WetCell cell = PreviousCell(id.xy);
+    cell.heights = _Height.Load(int3(id.xy, 0));
+    if (cell.heights.x < cell.heights.y) cell.moisture = 0.0;
+    else
+    {
+        float lowerRain = cell.heights.x - cell.heights.y <= _ShelterTolerance ? _WetRates.w : 0.0;
+        cell.moisture.xy = Accumulate(cell.moisture.xy, lowerRain);
+        cell.moisture.zw = Accumulate(cell.moisture.zw, _WetRates.w);
+    }
+    _Result[id.y * _Size.x + id.x] = cell;
+}
+
+[numthreads(8, 8, 1)]
+void ResampleWetness(uint3 id : SV_DispatchThreadID)
+{
+    if (any(id.xy >= (uint2)_Size)) return;
+    _Result[id.y * _Size.x + id.x] = PreviousCell(id.xy);
+}
+
+[numthreads(8, 8, 1)]
+void ClearWetness(uint3 id : SV_DispatchThreadID)
+{
+    if (any(id.xy >= (uint2)_Size)) return;
+    uint index = id.y * _Size.x + id.x;
+    WetCell cell;
+    cell.moisture = _Uniform;
+    cell.heights = _PreserveHeights != 0 ? _Result[index].heights : float2(0.0, 1.0);
+    _Result[index] = cell;
+}

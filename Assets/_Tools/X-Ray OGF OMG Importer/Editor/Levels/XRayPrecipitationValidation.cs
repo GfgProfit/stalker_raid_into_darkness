@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Reflection;
 using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -20,6 +21,8 @@ namespace XRay.Importer.Editor.Levels
         private const string ARCHIVE = @"E:\Projects\stalker_raid_into_darkness_Archive\";
 
         private static string _queuedOutput;
+        private static bool _wetSmoke;
+        private static bool _coldWetSmoke;
 
         public static string BeginMilitary(string archive)
         {
@@ -28,8 +31,30 @@ namespace XRay.Importer.Editor.Levels
             string output = NewOutput(archive, "MilitaryRain");
             File.WriteAllText(Path.Combine(output, "Status.txt"), "queued");
             _queuedOutput = output;
+            _wetSmoke = false;
+            _coldWetSmoke = false;
             EditorApplication.update += RunQueuedMilitary;
             return output;
+        }
+
+        public static string BeginWetSmoke(string archive)
+        {
+            Guard(archive);
+            if (!string.IsNullOrEmpty(_queuedOutput)) throw new InvalidOperationException("A precipitation capture is already queued.");
+            string output = NewOutput(archive, "WetZeroSmoke");
+            File.WriteAllText(Path.Combine(output, "Status.txt"), "queued");
+            _queuedOutput = output;
+            _wetSmoke = true;
+            _coldWetSmoke = false;
+            EditorApplication.update += RunQueuedMilitary;
+            return output;
+        }
+
+        public static string BeginColdWetSmoke(string archive)
+        {
+            string path = BeginWetSmoke(archive);
+            _coldWetSmoke = true;
+            return path;
         }
 
         private static void RunQueuedMilitary()
@@ -39,13 +64,146 @@ namespace XRay.Importer.Editor.Levels
             _queuedOutput = null;
             try
             {
-                RunMilitary(output);
+                if (_wetSmoke) RunWetSmoke(output, _coldWetSmoke);
+                else RunMilitary(output);
             }
             catch (Exception exception)
             {
                 File.WriteAllText(Path.Combine(output, "QueueFailure.txt"), exception.ToString());
                 File.WriteAllText(Path.Combine(output, "Status.txt"), "failed");
             }
+        }
+
+        private static void RunWetSmoke(string output, bool ownedOverride)
+        {
+            var host = new XRayWeatherCelestialValidation.HostScope();
+            string before = XRayWeatherCelestialValidation.InspectHost();
+            File.WriteAllText(Path.Combine(output, "HostBefore.json"), before);
+            GameObject temporary = null;
+            var result = new WetSmokeRecord();
+            XRayWeatherController controller = host.Controller;
+            FieldInfo configField = typeof(XRayWeatherController).GetField("_precipitationConfig", BindingFlags.Instance | BindingFlags.NonPublic);
+            FieldInfo flagsField = typeof(XRayWeatherController).GetField("_levelOverrides", BindingFlags.Instance | BindingFlags.NonPublic);
+            object originalConfig = configField.GetValue(controller);
+            object originalFlags = flagsField.GetValue(controller);
+            PrecipitationConfig ownedConfig = null;
+            StackTraceLogType originalError = Application.GetStackTraceLogType(LogType.Error);
+            StackTraceLogType originalWarning = Application.GetStackTraceLogType(LogType.Warning);
+            StackTraceLogType originalException = Application.GetStackTraceLogType(LogType.Exception);
+            string logPath = Path.GetFullPath(Path.Combine(Application.dataPath, "../Logs/Editor.log"));
+            long logStart = new FileInfo(logPath).Length;
+            result.nativeBefore = NativeErrors(logPath);
+            result.originalErrorStack = originalError.ToString();
+            result.originalWarningStack = originalWarning.ToString();
+            result.originalExceptionStack = originalException.ToString();
+            try
+            {
+                Application.SetStackTraceLogType(LogType.Error, StackTraceLogType.Full);
+                Application.SetStackTraceLogType(LogType.Warning, StackTraceLogType.Full);
+                Application.SetStackTraceLogType(LogType.Exception, StackTraceLogType.Full);
+                host.BeginHostPreview();
+                controller.SetPaused(true);
+                controller.SetTimeScale(0.0f);
+                controller.SetProfile(GameConfig.Load().DefaultWeather);
+                controller.Seek(43200.0);
+                controller.SetRainVisualOverride(false);
+                if (ownedOverride)
+                {
+                    ownedConfig = Object.Instantiate(controller.EffectivePrecipitationConfig);
+                    JsonUtility.FromJsonOverwrite("{\"_wetnessEnabled\":true,\"_puddlesEnabled\":true}", ownedConfig);
+                    configField.SetValue(controller, ownedConfig);
+                    flagsField.SetValue(controller, (XRayWeatherLevelOverrides)originalFlags | XRayWeatherLevelOverrides.Precipitation);
+                    controller.ApplySettings();
+                }
+                XRayPrecipitationSystem system = controller.Precipitation;
+                if (system.Wetness == null || system.WetMaterials == null) throw new InvalidOperationException("Prepare the active shared wetness resources first.");
+                system.Wetness.SetUniformState(0.0f, 0.0f);
+                system.Wetness.Publish(controller.EffectivePrecipitationConfig, system.RealTime, system.RainDensity);
+                Scene scene = SceneManager.GetActiveScene();
+                Camera authored = Find<Camera>(scene);
+                temporary = new GameObject("Phase08 Wet Zero Evidence Camera");
+                temporary.hideFlags = HideFlags.HideAndDontSave;
+                SceneManager.MoveGameObjectToScene(temporary, scene);
+                Camera camera = temporary.AddComponent<Camera>();
+                camera.CopyFrom(authored);
+                camera.transform.SetPositionAndRotation(authored.transform.position, authored.transform.rotation);
+                authored.GetComponent<HDAdditionalCameraData>().CopyTo(camera.GetComponent<HDAdditionalCameraData>() ?? temporary.AddComponent<HDAdditionalCameraData>());
+                PrepareCamera(camera);
+                camera.scene = scene;
+                camera.enabled = false;
+                system.WetMaterials.Dispose();
+                result.originalGlobals = ReadHighGlobals();
+                Color[] baseline = XRayWeatherFogValidationProbe.Capture(camera, Path.Combine(output, "OriginalMaterials"), 1280, 720, 4);
+                Color[] repeat = XRayWeatherFogValidationProbe.Capture(camera, Path.Combine(output, "OriginalMaterialsRepeat"), 1280, 720, 2);
+                system.WetMaterials.Bind(scene, controller.EffectivePrecipitationConfig);
+                result.clones = system.WetMaterials.CloneCount;
+                result.bindings = system.WetMaterials.BindingCount;
+                result.wetGlobals = ReadHighGlobals();
+                Color[] zero = XRayWeatherFogValidationProbe.Capture(camera, Path.Combine(output, "WetKeywordOnStateZero"), 1280, 720, 4);
+                XRayPrecipitationValidationProbe.Difference(baseline, repeat, out result.noise, out result.noiseChangedPixels, out result.noiseMaximum);
+                XRayPrecipitationValidationProbe.Difference(repeat, zero, out result.zeroDifference, out result.zeroChangedPixels, out result.zeroMaximum);
+                foreach (Color pixel in zero) if (pixel.r > 0.02f && pixel.b > 0.02f && pixel.g < Mathf.Min(pixel.r, pixel.b) * 0.4f && Mathf.Abs(pixel.r - pixel.b) < Mathf.Max(pixel.r, pixel.b) * 0.25f) result.magentaPixels++;
+                result.passed = result.clones > 0 && result.bindings > 0 && result.magentaPixels == 0 && result.zeroDifference <= Math.Max(result.noise * 4.0, 0.00005);
+            }
+            catch (Exception exception)
+            {
+                result.error = exception.ToString();
+            }
+            finally
+            {
+                if (temporary != null) Object.DestroyImmediate(temporary);
+                if (ownedConfig != null)
+                {
+                    configField.SetValue(controller, originalConfig);
+                    flagsField.SetValue(controller, originalFlags);
+                    controller.ApplySettings();
+                }
+                host.Restore();
+                if (ownedOverride) XRayPrecipitationEditorLifecycle.Release(controller);
+                if (ownedConfig != null) Object.DestroyImmediate(ownedConfig);
+                Application.SetStackTraceLogType(LogType.Error, originalError);
+                Application.SetStackTraceLogType(LogType.Warning, originalWarning);
+                Application.SetStackTraceLogType(LogType.Exception, originalException);
+                string after = XRayWeatherCelestialValidation.InspectHost();
+                File.WriteAllText(Path.Combine(output, "HostAfter.json"), after);
+                result.hostRestored = before == after;
+                result.nativeAfter = NativeErrors(logPath);
+                result.passed &= result.hostRestored && result.nativeAfter == result.nativeBefore;
+                using (var stream = new FileStream(logPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete))
+                {
+                    stream.Seek(Math.Min(logStart, stream.Length), SeekOrigin.Begin);
+                    using (var reader = new StreamReader(stream))
+                    {
+                        string logs = Regex.Replace(reader.ReadToEnd(), "(?im)^.*(?:\\btoken\\b|authToken|accessToken|refreshToken|authorization|password|credential|\\bBearer\\b).*$", "[REDACTED TOKEN-BEARING LOG LINE]");
+                        File.WriteAllText(Path.Combine(output, "RenderLogDeltaRedacted.log"), logs);
+                    }
+                }
+                File.WriteAllText(Path.Combine(output, "Result.json"), JsonUtility.ToJson(result, true));
+                File.WriteAllText(Path.Combine(output, "Status.txt"), "completed");
+            }
+        }
+
+        private static int NativeErrors(string path)
+        {
+            int count = 0;
+            using (var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete))
+            using (var reader = new StreamReader(stream))
+            {
+                string line;
+                while ((line = reader.ReadLine()) != null) if (line.Contains("DX12: Texture index out of range")) count++;
+            }
+            return count;
+        }
+
+        private static TextureRecord[] ReadHighGlobals()
+        {
+            var result = new List<TextureRecord>();
+            foreach (string name in new[] { "_MonolithWeatherEnvironment0", "_MonolithWeatherEnvironment1", "_MonolithWeatherEnvironment2", "_MonolithWeatherEnvironment3", "_DBufferTexture0", "_DBufferTexture1", "_DBufferTexture2", "_MonolithWetSurfaceTextures", "_LtcData", "_PreIntegratedFGD_GGXDisneyDiffuse" })
+            {
+                Texture texture = Shader.GetGlobalTexture(name);
+                result.Add(new TextureRecord { property = name, nonNull = texture != null, name = texture != null ? texture.name : null, type = texture != null ? texture.GetType().FullName : null, dimension = texture != null ? texture.dimension.ToString() : null, asset = texture != null ? AssetDatabase.GetAssetPath(texture) : null });
+            }
+            return result.ToArray();
         }
 
         public static string InspectResources(string archive)
@@ -320,6 +478,41 @@ namespace XRay.Importer.Editor.Levels
             public bool renderPassed;
             public bool hostRestored;
             public string error;
+        }
+
+        [Serializable]
+        private sealed class WetSmokeRecord
+        {
+            public bool passed;
+            public bool hostRestored;
+            public int clones;
+            public int bindings;
+            public double noise;
+            public int noiseChangedPixels;
+            public float noiseMaximum;
+            public double zeroDifference;
+            public int zeroChangedPixels;
+            public float zeroMaximum;
+            public int magentaPixels;
+            public int nativeBefore;
+            public int nativeAfter;
+            public string originalErrorStack;
+            public string originalWarningStack;
+            public string originalExceptionStack;
+            public TextureRecord[] originalGlobals;
+            public TextureRecord[] wetGlobals;
+            public string error;
+        }
+
+        [Serializable]
+        private sealed class TextureRecord
+        {
+            public string property;
+            public bool nonNull;
+            public string name;
+            public string type;
+            public string dimension;
+            public string asset;
         }
     }
 }

@@ -15,8 +15,10 @@ namespace XRay.Importer.Levels
 
         private readonly List<GameObject> _roots = new List<GameObject>();
         private readonly List<MeshRenderer> _renderers = new List<MeshRenderer>();
+        private readonly List<XRayLevelInstancedRenderer> _instancedRenderers = new List<XRayLevelInstancedRenderer>();
         private readonly List<Material> _materials = new List<Material>();
         private readonly List<Draw> _draws = new List<Draw>();
+        private readonly List<InstancedDraw> _instancedDraws = new List<InstancedDraw>();
         private readonly Scene _scene;
 
         private Material _material;
@@ -29,8 +31,10 @@ namespace XRay.Importer.Levels
         public Vector4 WorldMapping { get; private set; }
         public Bounds Bounds { get; private set; }
         public int CaptureCount { get; private set; }
-        public int GeometryCount => _draws.Count;
-        public long EstimatedBytes => _heights != null ? (long)_heights.width * _heights.height * 16L : 0L;
+        public int GeometryCount => _draws.Count + _instancedDraws.Count;
+        public int InstancedGeometryCount => _instancedDraws.Count;
+        public int InstancedInstanceCount { get; private set; }
+        public long EstimatedBytes => (_heights != null ? (long)_heights.width * _heights.height * 16L : 0L) + (long)InstancedInstanceCount * 64L;
 
         public XRayPrecipitationGeometry(Scene scene)
         {
@@ -47,19 +51,7 @@ namespace XRay.Importer.Levels
             _roots.Clear();
             _scene.GetRootGameObjects(_roots);
             int signature = CaptureGeometrySignature();
-            bool changed = force || resized || signature != _geometrySignature;
-            if (!changed)
-            {
-                foreach (Draw draw in _draws)
-                {
-                    if (draw.Renderer == null || !draw.Renderer.enabled || !draw.Renderer.gameObject.activeInHierarchy || draw.Matrix != draw.Renderer.localToWorldMatrix)
-                    {
-                        changed = true;
-                        break;
-                    }
-                }
-            }
-            if (!changed) return;
+            if (!force && !resized && signature == _geometrySignature) return;
             _geometrySignature = signature;
             Rebuild(config);
         }
@@ -71,31 +63,79 @@ namespace XRay.Importer.Levels
             _heights = null;
             _material = null;
             _draws.Clear();
+            _instancedDraws.Clear();
             _renderers.Clear();
+            _instancedRenderers.Clear();
             _roots.Clear();
+            InstancedInstanceCount = 0;
         }
 
         private int CaptureGeometrySignature()
         {
             int signature = 17;
-            foreach (GameObject root in _roots)
+            unchecked
             {
-                _renderers.Clear();
-                root.GetComponentsInChildren(false, _renderers);
-                foreach (MeshRenderer renderer in _renderers)
+                foreach (GameObject root in _roots)
                 {
-                    if (renderer == null || !renderer.enabled || !renderer.gameObject.activeInHierarchy || !renderer.TryGetComponent(out MeshFilter filter) || filter.sharedMesh == null) continue;
-                    unchecked
+                    if (!root.activeInHierarchy) continue;
+                    _renderers.Clear();
+                    root.GetComponentsInChildren(false, _renderers);
+                    foreach (MeshRenderer renderer in _renderers)
                     {
+                        if (renderer == null || !renderer.enabled || !renderer.gameObject.activeInHierarchy || !renderer.TryGetComponent(out MeshFilter filter) || filter.sharedMesh == null) continue;
                         signature = signature * 31 + renderer.GetEntityId().GetHashCode();
                         signature = signature * 31 + filter.sharedMesh.GetEntityId().GetHashCode();
+                        signature = signature * 31 + renderer.localToWorldMatrix.GetHashCode();
                         _materials.Clear();
                         renderer.GetSharedMaterials(_materials);
-                        foreach (Material material in _materials) signature = signature * 31 + (material != null ? material.GetEntityId().GetHashCode() : 0);
+                        foreach (Material material in _materials) signature = MaterialSignature(signature, material);
+                    }
+                    _instancedRenderers.Clear();
+                    root.GetComponentsInChildren(false, _instancedRenderers);
+                    foreach (XRayLevelInstancedRenderer renderer in _instancedRenderers)
+                    {
+                        if (renderer == null || !renderer.isActiveAndEnabled || renderer.BatchSet == null) continue;
+                        signature = signature * 31 + renderer.GetEntityId().GetHashCode();
+                        signature = signature * 31 + renderer.BatchSet.GetEntityId().GetHashCode();
+                        signature = signature * 31 + renderer.transform.localToWorldMatrix.GetHashCode();
+                        foreach (XRayInstanceBatch batch in renderer.BatchSet.Batches)
+                        {
+                            if (batch == null || batch.Mesh == null || batch.Count == 0 || batch.Materials == null) continue;
+                            signature = signature * 31 + batch.Mesh.GetEntityId().GetHashCode();
+                            signature = signature * 31 + batch.Bounds.GetHashCode();
+                            signature = signature * 31 + batch.Count;
+                            foreach (Material material in batch.Materials) signature = MaterialSignature(signature, ResolveMaterial(renderer, material));
+                            foreach (Matrix4x4 matrix in batch.Matrices) signature = signature * 31 + matrix.GetHashCode();
+                        }
                     }
                 }
             }
             return signature;
+        }
+
+        private static int MaterialSignature(int signature, Material material)
+        {
+            unchecked
+            {
+                signature = signature * 31 + (material != null ? material.GetEntityId().GetHashCode() : 0);
+                if (material == null) return signature;
+                Texture texture = material.HasProperty("_BaseColorMap") ? material.GetTexture("_BaseColorMap") : material.mainTexture;
+                signature = signature * 31 + (texture != null ? texture.GetEntityId().GetHashCode() : 0);
+                signature = signature * 31 + material.renderQueue;
+                signature = signature * 31 + (material.HasProperty("_AlphaCutoff") ? material.GetFloat("_AlphaCutoff").GetHashCode() : 0);
+                signature = signature * 31 + (material.IsKeywordEnabled("_ALPHATEST_ON") ? 1 : 0);
+                if (material.HasProperty("_BaseColorMap"))
+                {
+                    signature = signature * 31 + material.GetTextureScale("_BaseColorMap").GetHashCode();
+                    signature = signature * 31 + material.GetTextureOffset("_BaseColorMap").GetHashCode();
+                }
+                return signature;
+            }
+        }
+
+        private static Material ResolveMaterial(XRayLevelInstancedRenderer renderer, Material material)
+        {
+            return material != null && renderer.MaterialResolver != null ? renderer.MaterialResolver(material) : material;
         }
 
         private void Rebuild(PrecipitationConfig config)
@@ -105,6 +145,7 @@ namespace XRay.Importer.Levels
             {
                 if (_material != null) CoreUtils.Destroy(_material);
                 _material = CoreUtils.CreateEngineMaterial(config.HeightShader);
+                _material.enableInstancing = true;
                 _shader = config.HeightShader;
             }
             if (_heights == null || _heights.width != config.AtlasResolution)
@@ -118,10 +159,13 @@ namespace XRay.Importer.Levels
                 if (!_heights.Create()) throw new InvalidOperationException("Could not allocate the precipitation height atlas.");
             }
             _draws.Clear();
+            _instancedDraws.Clear();
+            InstancedInstanceCount = 0;
             bool hasBounds = false;
             Bounds bounds = default;
             foreach (GameObject root in _roots)
             {
+                if (!root.activeInHierarchy) continue;
                 _renderers.Clear();
                 root.GetComponentsInChildren(false, _renderers);
                 foreach (MeshRenderer renderer in _renderers)
@@ -132,21 +176,32 @@ namespace XRay.Importer.Levels
                     Mesh mesh = filter.sharedMesh;
                     for (int submesh = 0; submesh < Mathf.Min(mesh.subMeshCount, _materials.Count); submesh++)
                     {
-                        Material source = _materials[submesh];
-                        if (source == null || source.renderQueue >= (int)RenderQueue.Transparent || source.shader == null || source.shader.name.IndexOf("Sky", StringComparison.OrdinalIgnoreCase) >= 0) continue;
-                        if (source.HasProperty("_SurfaceType") && source.GetFloat("_SurfaceType") > 0.5f) continue;
-                        var properties = new MaterialPropertyBlock();
-                        Texture texture = source.HasProperty("_BaseColorMap") ? source.GetTexture("_BaseColorMap") : source.mainTexture;
-                        properties.SetTexture(_textureId, texture != null ? texture : Texture2D.whiteTexture);
-                        Vector2 scale = source.HasProperty("_BaseColorMap") ? source.GetTextureScale("_BaseColorMap") : Vector2.one;
-                        Vector2 offset = source.HasProperty("_BaseColorMap") ? source.GetTextureOffset("_BaseColorMap") : Vector2.zero;
-                        properties.SetVector(_textureTransformId, new Vector4(scale.x, scale.y, offset.x, offset.y));
-                        bool clipped = source.IsKeywordEnabled("_ALPHATEST_ON") || source.HasProperty("_AlphaCutoffEnable") && source.GetFloat("_AlphaCutoffEnable") > 0.5f;
-                        properties.SetFloat(_cutoffId, clipped && source.HasProperty("_AlphaCutoff") ? source.GetFloat("_AlphaCutoff") : -1.0f);
-                        _draws.Add(new Draw(renderer, mesh, renderer.localToWorldMatrix, submesh, properties));
-                        if (hasBounds) bounds.Encapsulate(renderer.bounds);
-                        else bounds = renderer.bounds;
-                        hasBounds = true;
+                        if (!TryCreateProperties(_materials[submesh], out MaterialPropertyBlock properties)) continue;
+                        _draws.Add(new Draw(mesh, renderer.localToWorldMatrix, submesh, properties));
+                        Encapsulate(ref bounds, ref hasBounds, renderer.bounds);
+                    }
+                }
+                _instancedRenderers.Clear();
+                root.GetComponentsInChildren(false, _instancedRenderers);
+                foreach (XRayLevelInstancedRenderer renderer in _instancedRenderers)
+                {
+                    if (renderer == null || !renderer.isActiveAndEnabled || renderer.BatchSet == null) continue;
+                    foreach (XRayInstanceBatch batch in renderer.BatchSet.Batches)
+                    {
+                        if (batch == null || batch.Mesh == null || batch.Count == 0 || batch.Materials == null) continue;
+                        for (int submesh = 0; submesh < Mathf.Min(batch.Mesh.subMeshCount, batch.Materials.Length); submesh++)
+                        {
+                            if (!TryCreateProperties(ResolveMaterial(renderer, batch.Materials[submesh]), out MaterialPropertyBlock properties)) continue;
+                            for (int start = 0; start < batch.Count; start += XRayInstanceBatchSet.MAX_INSTANCES_PER_BATCH)
+                            {
+                                int count = Mathf.Min(XRayInstanceBatchSet.MAX_INSTANCES_PER_BATCH, batch.Count - start);
+                                var matrices = new Matrix4x4[count];
+                                Array.Copy(batch.Matrices, start, matrices, 0, count);
+                                _instancedDraws.Add(new InstancedDraw(batch.Mesh, submesh, properties, matrices));
+                                InstancedInstanceCount += count;
+                            }
+                            Encapsulate(ref bounds, ref hasBounds, batch.Bounds);
+                        }
                     }
                 }
             }
@@ -160,8 +215,11 @@ namespace XRay.Importer.Levels
             {
                 commands.SetRenderTarget(_heights);
                 commands.ClearRenderTarget(false, true, new Color(bounds.min.y - 1.0f, bounds.max.y + 1.0f, 0.0f, 0.0f));
-                foreach (Draw draw in _draws) commands.DrawMesh(draw.Mesh, draw.Matrix, _material, draw.Submesh, 0, draw.Properties);
-                foreach (Draw draw in _draws) commands.DrawMesh(draw.Mesh, draw.Matrix, _material, draw.Submesh, 1, draw.Properties);
+                for (int pass = 0; pass < 2; pass++)
+                {
+                    foreach (Draw draw in _draws) commands.DrawMesh(draw.Mesh, draw.Matrix, _material, draw.Submesh, pass, draw.Properties);
+                    foreach (InstancedDraw draw in _instancedDraws) commands.DrawMeshInstanced(draw.Mesh, draw.Submesh, _material, pass, draw.Matrices, draw.Matrices.Length, draw.Properties);
+                }
                 Graphics.ExecuteCommandBuffer(commands);
                 CaptureCount++;
             }
@@ -171,21 +229,58 @@ namespace XRay.Importer.Levels
             }
         }
 
+        private static bool TryCreateProperties(Material source, out MaterialPropertyBlock properties)
+        {
+            properties = null;
+            if (source == null || source.renderQueue >= (int)RenderQueue.Transparent || source.shader == null || source.shader.name.IndexOf("Sky", StringComparison.OrdinalIgnoreCase) >= 0) return false;
+            if (source.HasProperty("_SurfaceType") && source.GetFloat("_SurfaceType") > 0.5f) return false;
+            properties = new MaterialPropertyBlock();
+            Texture texture = source.HasProperty("_BaseColorMap") ? source.GetTexture("_BaseColorMap") : source.mainTexture;
+            properties.SetTexture(_textureId, texture != null ? texture : Texture2D.whiteTexture);
+            Vector2 scale = source.HasProperty("_BaseColorMap") ? source.GetTextureScale("_BaseColorMap") : Vector2.one;
+            Vector2 offset = source.HasProperty("_BaseColorMap") ? source.GetTextureOffset("_BaseColorMap") : Vector2.zero;
+            properties.SetVector(_textureTransformId, new Vector4(scale.x, scale.y, offset.x, offset.y));
+            bool clipped = source.IsKeywordEnabled("_ALPHATEST_ON") || source.HasProperty("_AlphaCutoffEnable") && source.GetFloat("_AlphaCutoffEnable") > 0.5f;
+            properties.SetFloat(_cutoffId, clipped && source.HasProperty("_AlphaCutoff") ? source.GetFloat("_AlphaCutoff") : -1.0f);
+            return true;
+        }
+
+        private static void Encapsulate(ref Bounds bounds, ref bool hasBounds, Bounds addition)
+        {
+            if (hasBounds) bounds.Encapsulate(addition);
+            else bounds = addition;
+            hasBounds = true;
+        }
+
         private sealed class Draw
         {
-            public MeshRenderer Renderer { get; }
             public Mesh Mesh { get; }
             public Matrix4x4 Matrix { get; }
             public int Submesh { get; }
             public MaterialPropertyBlock Properties { get; }
 
-            public Draw(MeshRenderer renderer, Mesh mesh, Matrix4x4 matrix, int submesh, MaterialPropertyBlock properties)
+            public Draw(Mesh mesh, Matrix4x4 matrix, int submesh, MaterialPropertyBlock properties)
             {
-                Renderer = renderer;
                 Mesh = mesh;
                 Matrix = matrix;
                 Submesh = submesh;
                 Properties = properties;
+            }
+        }
+
+        private sealed class InstancedDraw
+        {
+            public Mesh Mesh { get; }
+            public int Submesh { get; }
+            public MaterialPropertyBlock Properties { get; }
+            public Matrix4x4[] Matrices { get; }
+
+            public InstancedDraw(Mesh mesh, int submesh, MaterialPropertyBlock properties, Matrix4x4[] matrices)
+            {
+                Mesh = mesh;
+                Submesh = submesh;
+                Properties = properties;
+                Matrices = matrices;
             }
         }
     }

@@ -1,0 +1,8 @@
+fileFormatVersion: 2
+guid: 2eb58abbf7991cb4289e6b94d7cb6ced
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 18700000
+  userData: xray-asset:{"_key":"precipitation/wet-surface-textures-v1","_role":"PrecipitationSourceTextureArray","_source":"MO2 effective precipitation resources","_sourcePath":"fx/puddles_perlin|fx/water_normal|terrain/terrain_agroprom_puddles_mask|terrain/terrain_darkcape_puddles_mask|terrain/terrain_darkvalley_puddles_mask|terrain/terrain_frodo_gen_puddles_mask|terrain/terrain_garbage_new_puddles_mask|terrain/terrain_jupiter_puddles_mask|terrain/terrain_limansk_puddles_mask|terrain/terrain_marsh_puddles_mask|terrain/terrain_military_1_puddles_mask|terrain/terrain_pripyat_puddles_mask|terrain/terrain_red_forest_puddles_mask|terrain/terrain_yantar_puddles_mask|terrain/terrain_zaton_puddles_mask","_stamp":"3e6322334fad7fea441485fe476dad0b732183277f091916b76bfa90639f3f98"}
+  assetBundleName: 
+  assetBundleVariant: 

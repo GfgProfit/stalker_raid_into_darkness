@@ -91,6 +91,7 @@ namespace XRay.Importer.Levels
             }
         }
 
+        public Func<Material, Material> MaterialResolver { get; set; }
         public int LastDrawCalls { get; private set; }
         public int LastShadowVisibleInstances { get; private set; }
         public int ResidentCells => _population?.ResidentCells ?? _cache.Count;
@@ -276,9 +277,11 @@ namespace XRay.Importer.Levels
                 return 0;
             }
 
+            Material material = MaterialResolver != null ? MaterialResolver(entry.Material) : entry.Material;
+            if (material == null) return 0;
             _block.Clear();
             _block.SetVectorArray(_dataId, _dataBuffers[model]);
-            var parameters = new RenderParams(entry.Material)
+            var parameters = new RenderParams(material)
             {
                 camera = camera,
                 worldBounds = new Bounds(camera.transform.position, Vector3.one * (_drawDistance * 2.0f + 10.0f)),
@@ -511,6 +514,8 @@ namespace XRay.Importer.Levels
             _counts[model] = 0;
             XRayDetailModelEntry entry = _database.Models[model];
             if (count == 0 || entry.Mesh == null || entry.Material == null) return;
+            Material material = MaterialResolver != null ? MaterialResolver(entry.Material) : entry.Material;
+            if (material == null) return;
             _block.Clear();
             _block.SetVectorArray(_dataId, _dataBuffers[model]);
             _block.SetVectorArray("_MonolithInstanceExtra", _extraBuffers[model]);
@@ -519,7 +524,7 @@ namespace XRay.Importer.Levels
             _block.SetFloat("_MonolithGrassHeight", _settings.Values.Height);
             _block.SetFloat("_MonolithGrassHeightPrevious", _heightPrevious > 0.0f ? _heightPrevious : _settings.Values.Height);
             _block.SetVector("_MonolithWindGrassSetup", _settings.Defaults.WindGrass);
-            var parameters = new RenderParams(entry.Material)
+            var parameters = new RenderParams(material)
             {
                 camera = camera,
                 worldBounds = new Bounds(camera.transform.position, Vector3.one * ((Mathf.Max(0.0f, _drawDistance) + _population.BoundsPadding) * 2.0f)),

@@ -160,7 +160,7 @@ namespace XRay.Importer.Levels
             properties.SetVector("_XRayRainCamera", new Vector4(center.x, center.y, center.z, 0.0f));
             properties.SetVector("_XRayRainShape", new Vector4(_settings.DropLength, _settings.DropHalfWidth, _settings.SplashSize, _settings.RainOpacity));
             properties.SetVector("_XRayRainAppearance", new Vector4(_density, _realTime, _settings.DrawRadius, _settings.SplashesEnabled ? 1.0f : 0.0f));
-            properties.SetColor("_XRayRainColor", _radiance);
+            properties.SetVector("_XRayRainColor", new Vector4(_radiance.r, _radiance.g, _radiance.b, _radiance.a));
             if (LastDropCount > 0) context.cmd.DrawProcedural(Matrix4x4.identity, _material, 0, MeshTopology.Triangles, 6, LastDropCount, properties);
             int splashes = Mathf.Min(view.Capacity, _settings.MaxSplashes);
             if (_settings.SplashesEnabled && splashes > 0) context.cmd.DrawProcedural(Matrix4x4.identity, _material, 1, MeshTopology.Triangles, 6, splashes, properties);

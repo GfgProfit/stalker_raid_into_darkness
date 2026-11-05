@@ -13,6 +13,7 @@ Shader "Hidden/XRay/Precipitation Height"
     {
         float4 positionOS : POSITION;
         float2 uv : TEXCOORD0;
+        UNITY_VERTEX_INPUT_INSTANCE_ID
     };
 
     struct Varyings
@@ -24,6 +25,7 @@ Shader "Hidden/XRay/Precipitation Height"
 
     Varyings Vert(Attributes input)
     {
+        UNITY_SETUP_INSTANCE_ID(input);
         Varyings output;
         float3 position = mul(unity_ObjectToWorld, input.positionOS).xyz;
         float2 uv = (position.xz - _XRayRainWorldMapping.xy) * _XRayRainWorldMapping.zw;
@@ -52,6 +54,7 @@ Shader "Hidden/XRay/Precipitation Height"
             Blend One One
             BlendOp Max
             HLSLPROGRAM
+            #pragma multi_compile_instancing
             #pragma vertex Vert
             #pragma fragment Frag
             ENDHLSL
@@ -62,6 +65,7 @@ Shader "Hidden/XRay/Precipitation Height"
             Blend One One
             BlendOp Min
             HLSLPROGRAM
+            #pragma multi_compile_instancing
             #pragma vertex Vert
             #pragma fragment Frag
             ENDHLSL

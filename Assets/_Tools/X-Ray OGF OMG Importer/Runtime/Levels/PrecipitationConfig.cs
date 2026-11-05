@@ -15,9 +15,11 @@ namespace XRay.Importer.Levels
     {
         [SerializeField] private string _baseTextureName;
         [SerializeField] private Texture2D _mask;
+        [SerializeField, HideInInspector] private int _slice = -1;
 
         public string BaseTextureName => _baseTextureName;
         public Texture2D Mask => _mask;
+        public int Slice => _slice;
     }
 
     public sealed class PrecipitationConfig : ScriptableObject
@@ -65,6 +67,8 @@ namespace XRay.Importer.Levels
         [SerializeField] private Texture2D _puddleNoise;
         [SerializeField] private Texture2D _rippleNormal;
         [SerializeField] private XRayPuddleMaskBinding[] _puddleMasks = Array.Empty<XRayPuddleMaskBinding>();
+        [SerializeField] private Texture2DArray _wetSurfaceTextures;
+        [SerializeField] private XRayWetSurfaceResponse[] _surfaceResponses = XRayWetSurfaceResponse.CreateDefaults();
 
         public bool Enabled => _enabled;
         public float IntensityMultiplier => _intensityMultiplier;
@@ -103,18 +107,28 @@ namespace XRay.Importer.Levels
         public ComputeShader WetnessCompute => _wetnessCompute;
         public Texture2D PuddleNoise => _puddleNoise;
         public Texture2D RippleNormal => _rippleNormal;
+        public Texture2DArray WetSurfaceTextures => _wetSurfaceTextures;
         public int AtlasResolution => 256 << (int)_quality;
         public int DropBudget => Mathf.Max(1, _maxDrops >> (2 - (int)_quality));
         public int Revision { get; private set; }
 
         public Texture2D FindPuddleMask(string baseTextureName)
         {
-            if (string.IsNullOrEmpty(baseTextureName)) return null;
-            foreach (XRayPuddleMaskBinding binding in _puddleMasks)
+            return FindMaskBinding(baseTextureName)?.Mask;
+        }
+
+        public int FindPuddleMaskSlice(string baseTextureName)
+        {
+            return FindMaskBinding(baseTextureName)?.Slice ?? -1;
+        }
+
+        public XRayWetSurfaceResponse GetWetResponse(XRayWetSurfaceType surface)
+        {
+            foreach (XRayWetSurfaceResponse response in _surfaceResponses)
             {
-                if (binding != null && !string.IsNullOrEmpty(binding.BaseTextureName) && baseTextureName.IndexOf(binding.BaseTextureName, StringComparison.OrdinalIgnoreCase) >= 0) return binding.Mask;
+                if (response != null && response.Surface == surface) return response;
             }
-            return null;
+            throw new ArgumentOutOfRangeException(nameof(surface), "A configured wet surface response is required.");
         }
 
         public bool TryValidate(out string diagnostic, bool requireResources = false)
@@ -127,7 +141,42 @@ namespace XRay.Importer.Levels
             else if (!FiniteNonnegative(_wettingRate) || !FiniteNonnegative(_dryingRate) || !FiniteNonnegative(_wetnessStrength) || !FiniteNonnegative(_puddleFormationRate) || !FiniteNonnegative(_puddleDryingRate) || !FiniteNonnegative(_puddleStrength) || !FiniteNonnegative(_rippleStrength) || !Positive(_puddleMaskScale)) diagnostic = "Wetness and puddle rates must be finite and nonnegative.";
             else if (!Unit(_maxWetness) || !Unit(_maxPuddles) || !Unit(_puddleWetnessThreshold)) diagnostic = "Wetness and puddle limits must be between zero and one.";
             else if ((_wetnessEnabled || _puddlesEnabled) && _wetnessCompute == null) diagnostic = "Wetness and puddles require the prepared wetness compute shader.";
+            else if ((_wetnessEnabled || _puddlesEnabled) && (_wetSurfaceTextures == null || _wetSurfaceTextures.depth < 2)) diagnostic = "Wetness and puddles require prepared shared texture array slices.";
+            if (diagnostic != null) return false;
+            int responseMask = 0;
+            if (_surfaceResponses != null)
+            {
+                foreach (XRayWetSurfaceResponse response in _surfaceResponses)
+                {
+                    if (response == null || !response.IsValid || (responseMask & (1 << (int)response.Surface)) != 0)
+                    {
+                        diagnostic = "Wet surface responses must be valid and unique for each surface type.";
+                        return false;
+                    }
+                    responseMask |= 1 << (int)response.Surface;
+                }
+            }
+            if (responseMask != (1 << (int)XRayWetSurfaceType.Excluded) - 1) diagnostic = "Configure one wetness response for every supported surface type.";
+            if (_puddleMasks != null)
+            {
+                foreach (XRayPuddleMaskBinding binding in _puddleMasks)
+                {
+                    if (binding == null || string.IsNullOrWhiteSpace(binding.BaseTextureName) || binding.Slice < -1 || binding.Slice == 0 || binding.Slice == 1 || binding.Slice >= 2 && (_wetSurfaceTextures == null || binding.Slice >= _wetSurfaceTextures.depth)) diagnostic = "Puddle mask source bindings require valid names and prepared texture array slices.";
+                }
+            }
             return diagnostic == null;
+        }
+
+        private XRayPuddleMaskBinding FindMaskBinding(string baseTextureName)
+        {
+            if (string.IsNullOrEmpty(baseTextureName) || _puddleMasks == null) return null;
+            XRayPuddleMaskBinding match = null;
+            foreach (XRayPuddleMaskBinding binding in _puddleMasks)
+            {
+                if (binding == null || string.IsNullOrEmpty(binding.BaseTextureName) || baseTextureName.IndexOf(binding.BaseTextureName, StringComparison.OrdinalIgnoreCase) < 0) continue;
+                if (match == null || binding.BaseTextureName.Length > match.BaseTextureName.Length) match = binding;
+            }
+            return match;
         }
 
         private void OnValidate()

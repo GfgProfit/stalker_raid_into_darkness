@@ -1,4 +1,5 @@
 using System;
+using Unity.Profiling;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.HighDefinition;
@@ -8,12 +9,18 @@ namespace XRay.Importer.Levels
 {
     public sealed class XRayPrecipitationSystem : IDisposable
     {
+        private static readonly ProfilerMarker _wetnessTickMarker = new ProfilerMarker("XRay.Precipitation.WetnessTick");
+
         private readonly GameObject _owner;
 
         private PrecipitationConfig _settings;
         private CustomPassVolume _volume;
         private XRayPrecipitationPass _pass;
+        private XRayWetnessField _wetness;
+        private XRayWetMaterialBindings _wetMaterials;
         private int _revision = -1;
+        private int _materialGeometryCapture = -1;
+        private float _materialRefreshElapsed;
 
         public bool Enabled { get; private set; }
         public float RainDensity { get; private set; }
@@ -21,7 +28,9 @@ namespace XRay.Importer.Levels
         public string Diagnostic { get; private set; }
         public XRayPrecipitationGeometry Geometry { get; }
         public XRayPrecipitationPass Pass => _pass;
-        public long EstimatedBytes => Geometry.EstimatedBytes + (_pass != null ? _pass.EstimatedBytes : 0L);
+        public XRayWetnessField Wetness => _wetness;
+        public XRayWetMaterialBindings WetMaterials => _wetMaterials;
+        public long EstimatedBytes => Geometry.EstimatedBytes + (_pass != null ? _pass.EstimatedBytes : 0L) + (_wetness != null ? _wetness.EstimatedBytes : 0L) + (_wetMaterials != null ? _wetMaterials.EstimatedBytes : 0L);
 
         public XRayPrecipitationSystem(GameObject owner)
         {
@@ -64,6 +73,7 @@ namespace XRay.Importer.Levels
             RainDensity = Mathf.Clamp01(weather.RainDensity * config.IntensityMultiplier);
             RealTime += realDelta;
             Geometry.Refresh(config, realDelta, changed);
+            PublishWetness(config, realDelta, changed);
             EnsurePass();
             float noise = Mathf.PerlinNoise(RealTime * 0.3f, 0.5f) * 2.0f - 1.0f;
             Vector3 direction = XRayPrecipitationMath.FallDirection(weather.WindDirectionRadians, weather.WindVelocity, noise, config.WindResponse);
@@ -84,6 +94,10 @@ namespace XRay.Importer.Levels
         {
             Enabled = false;
             RainDensity = 0.0f;
+            if (_wetness != null) _wetness.Unpublish();
+            if (_wetMaterials != null) _wetMaterials.Dispose();
+            _wetMaterials = null;
+            _materialGeometryCapture = -1;
             if (_pass != null) _pass.Release();
             if (_volume != null) _volume.enabled = false;
         }
@@ -94,7 +108,36 @@ namespace XRay.Importer.Levels
             if (_volume != null) CoreUtils.Destroy(_volume.gameObject);
             _volume = null;
             _pass = null;
+            if (_wetness != null) _wetness.Dispose();
+            _wetness = null;
             Geometry.Dispose();
+        }
+
+        private void PublishWetness(PrecipitationConfig config, float realDelta, bool changed)
+        {
+            if (!config.WetnessEnabled && !config.PuddlesEnabled)
+            {
+                if (_wetness != null) _wetness.Unpublish();
+                if (_wetMaterials != null) _wetMaterials.Dispose();
+                _wetMaterials = null;
+                _materialGeometryCapture = -1;
+                return;
+            }
+            if (_wetness == null) _wetness = new XRayWetnessField(_owner);
+            using (_wetnessTickMarker.Auto())
+            {
+                _wetness.Tick(config, Geometry.Heights, Geometry.WorldMapping, RainDensity, realDelta);
+            }
+            _materialRefreshElapsed += realDelta;
+            if (_wetMaterials == null || changed || _materialGeometryCapture != Geometry.CaptureCount || _materialRefreshElapsed >= config.GeometryRefreshSeconds)
+            {
+                if (_wetMaterials == null) _wetMaterials = new XRayWetMaterialBindings();
+                _wetMaterials.Bind(_owner.scene, config);
+                if (changed) _wetMaterials.Refresh(config);
+                _materialGeometryCapture = Geometry.CaptureCount;
+                _materialRefreshElapsed = 0.0f;
+            }
+            _wetness.Publish(config, RealTime, RainDensity);
         }
 
         private void EnsurePass()

@@ -15,7 +15,6 @@ namespace XRay.Importer.Levels
         private const float SHAFTS_NIGHT_GAIN = 64.0f;
         private const double FX_BLEND_REAL_SECONDS = 5.0;
         private const float FX_FLARE_TRANSMISSION = 0.35f;
-        private const float MAX_FX_LIGHTING_ADAPTATION = 4.0f;
         private const float FX_DARK_SURFACE_GAIN = 128.0f;
         private const float FX_PSI_NIGHT_GAIN = 64.0f;
         private const float FX_DAY_ART_RADIANCE_LIMIT = 0.30f;
@@ -24,6 +23,7 @@ namespace XRay.Importer.Levels
 
         private static readonly List<XRayWeatherController> _controllers = new List<XRayWeatherController>();
 
+        [SerializeField] private XRayWeatherLevelOverrides _levelOverrides;
         [SerializeField] private XRayWeatherProfile _profile;
         [SerializeField] private XRayWeatherCatalog _catalog;
         [SerializeField] private XRayWeatherFxCatalog _fxCatalog;
@@ -37,6 +37,7 @@ namespace XRay.Importer.Levels
         [SerializeField] private XRayWeatherSkyRenderer _skyRenderer;
         [SerializeField] private XRayWeatherFogRenderer _fogRenderer;
         [SerializeField] private XRayWeatherCelestialSettings _celestialSettings;
+        [SerializeField] private bool _fogEnabled = true;
         [SerializeField] private bool _sunShaftsEnabled = true;
         [SerializeField] private bool _lensFlareEnabled = true;
         [SerializeField] private bool _expressiveDaylight = true;
@@ -44,8 +45,13 @@ namespace XRay.Importer.Levels
         [SerializeField] private bool _adaptLensFlareToWeather = true;
         [SerializeField, Min(0.0f)] private float _expressiveFlareIntensity = 1.0f;
         [SerializeField] private XRayWeatherFlareProfileOverride[] _flareProfileOverrides = Array.Empty<XRayWeatherFlareProfileOverride>();
-        [SerializeField, Range(0.0f, MAX_FX_LIGHTING_ADAPTATION)] private float _fxLightingAdaptation = 1.0f;
+        [SerializeField, Range(0.0f, GameConfig.MAX_FX_LIGHTING_ADAPTATION)] private float _fxLightingAdaptation = 1.0f;
 
+        private GameConfig _configuration;
+        private int _configurationRevision;
+        private string _configurationDiagnostic;
+        private XRayWeatherCatalog _effectiveCatalog;
+        private XRayWeatherFxCatalog _effectiveFxCatalog;
         private XRayWeatherProfile _activeProfile;
         private XRayWeatherProfile _appliedProfile;
         private XRayWeatherProfile _transitionFrom;
@@ -69,11 +75,13 @@ namespace XRay.Importer.Levels
         private float _savedVolumetricShadowDimmer;
         private double _gameTimeSeconds;
         private float _simulationTimeScale;
-        private float _appliedInitialTime;
+        private float? _timeScaleOverride;
         private float _transitionDuration;
         private float _transitionElapsed;
         private int _lastFrame = -1;
         private bool _simulationPaused;
+        private bool _appliedPaused;
+        private bool _sessionWeatherSelected;
         private bool _settingsApplied;
         private bool _settingsValid;
         private bool _settingsDirty;
@@ -88,9 +96,11 @@ namespace XRay.Importer.Levels
 
         public static XRayWeatherController Active { get; private set; }
 
-        public XRayWeatherProfile AuthoredProfile => _profile;
-        public XRayWeatherCatalog Catalog => _catalog;
-        public XRayWeatherFxCatalog FxCatalog => _fxCatalog;
+        public GameConfig Configuration => _configuration;
+        public XRayWeatherLevelOverrides LevelOverrides => _levelOverrides;
+        public XRayWeatherProfile AuthoredProfile => Inherits(XRayWeatherLevelOverrides.WeatherProfile) ? _configuration.DefaultWeather : _profile;
+        public XRayWeatherCatalog Catalog => _effectiveCatalog;
+        public XRayWeatherFxCatalog FxCatalog => _effectiveFxCatalog;
         public XRayWeatherFxProfile ActiveFx => _fxPlayback?.Effect;
         public double FxTimeSeconds => _fxPlayback?.ElapsedSeconds ?? 0.0;
         public double FxDurationSeconds => _fxPlayback?.DurationSeconds ?? 0.0;
@@ -103,25 +113,35 @@ namespace XRay.Importer.Levels
         public double GameTimeSeconds => _gameTimeSeconds;
         public bool Paused => _simulationPaused;
         public float TimeScale => _simulationTimeScale;
+        public float? TimeScaleOverride => _timeScaleOverride;
+        public float ConfiguredTimeScale => Inherits(XRayWeatherLevelOverrides.TimeScale) ? _configuration.DefaultTimeScale : _timeScale;
+        public float ConfiguredTimeOfDay => Inherits(XRayWeatherLevelOverrides.TimeOfDay) ? _configuration.DefaultTimeOfDay : _timeOfDayHours;
         public bool PreviewActive => _previewActive;
         public bool IsTransitioning => _transitionTarget != null;
         public float TransitionProgress => IsTransitioning ? Mathf.Clamp01(_transitionElapsed / _transitionDuration) : 1.0f;
         public XRayWeatherCelestialRenderer Celestial => _celestial;
+        public bool? FogOverride { get; private set; }
         public bool? SunShaftsOverride { get; private set; }
         public bool? LensFlareOverride { get; private set; }
         public float? LensFlareIntensityOverride { get; private set; }
         public bool? FlareAdaptationOverride { get; private set; }
         public float? ExpressiveFlareIntensityOverride { get; private set; }
         public float? FxLightingAdaptationOverride { get; private set; }
-        public float FxLightingAdaptationGain => FxLightingAdaptationOverride ?? (IsFinite(_fxLightingAdaptation) ? Mathf.Clamp(_fxLightingAdaptation, 0.0f, MAX_FX_LIGHTING_ADAPTATION) : 1.0f);
-        public bool SunShaftsEnabled => SunShaftsOverride ?? _sunShaftsEnabled;
-        public bool LensFlareEnabled => LensFlareOverride ?? _lensFlareEnabled;
-        public bool ExpressiveDaylight => _expressiveDaylight;
+        public float FxLightingAdaptationGain => FxLightingAdaptationOverride ?? (Inherits(XRayWeatherLevelOverrides.FxLightingAdaptation) ? _configuration.FxLightingAdaptation : IsFinite(_fxLightingAdaptation) ? Mathf.Clamp(_fxLightingAdaptation, 0.0f, GameConfig.MAX_FX_LIGHTING_ADAPTATION) : 1.0f);
+        public bool FogEnabled => FogOverride ?? (Inherits(XRayWeatherLevelOverrides.Fog) ? _configuration.FogEnabled : _fogEnabled);
+        public bool SunShaftsEnabled => SunShaftsOverride ?? (Inherits(XRayWeatherLevelOverrides.SunShafts) ? _configuration.SunShaftsEnabled : _sunShaftsEnabled);
+        public bool LensFlareEnabled => LensFlareOverride ?? (Inherits(XRayWeatherLevelOverrides.LensFlare) ? _configuration.LensFlareEnabled : _lensFlareEnabled);
+        public bool ExpressiveDaylight => Inherits(XRayWeatherLevelOverrides.ExpressiveDaylight) ? _configuration.ExpressiveDaylight : _expressiveDaylight;
+        public float LensFlareIntensity => LensFlareIntensityOverride ?? (Inherits(XRayWeatherLevelOverrides.LensFlareIntensity) ? _configuration.LensFlareIntensity : _lensFlareIntensity);
+        public bool AdaptLensFlareToWeather => FlareAdaptationOverride ?? (Inherits(XRayWeatherLevelOverrides.FlareAdaptation) ? _configuration.AdaptLensFlareToWeather : _adaptLensFlareToWeather);
+        public float ExpressiveFlareIntensity => ExpressiveFlareIntensityOverride ?? (Inherits(XRayWeatherLevelOverrides.ExpressiveFlareIntensity) ? _configuration.ExpressiveFlareIntensity : _expressiveFlareIntensity);
 
-        public void Configure(XRayWeatherProfile profile, MonolithWeatherInputs weatherInputs, MonolithSourceLighting sourceLighting, XRayFloraWindProvider windProvider, Light sun)
+        public void Configure(XRayWeatherProfile profile, MonolithWeatherInputs weatherInputs, MonolithSourceLighting sourceLighting, XRayFloraWindProvider windProvider, Light sun, bool overrideInitialWeather = true)
         {
             ReleaseInputs();
             _profile = profile;
+            if (overrideInitialWeather) _levelOverrides |= XRayWeatherLevelOverrides.WeatherProfile;
+            else _levelOverrides &= ~XRayWeatherLevelOverrides.WeatherProfile;
             _weatherInputs = weatherInputs;
             _sourceLighting = sourceLighting;
             _windProvider = windProvider;
@@ -132,21 +152,47 @@ namespace XRay.Importer.Levels
 
         public void ConfigureCatalog(XRayWeatherCatalog catalog)
         {
-            if (catalog != null && !catalog.CanAttachTo(_profile)) throw new ArgumentException("The weather catalog must match the authored profile's source context or contain an identical cycle with the same settings, sun positions and serialized resources.", nameof(catalog));
+            if (catalog != null && !catalog.CanAttachTo(AuthoredProfile)) throw new ArgumentException("The weather catalog must match the initial profile's source context or contain an identical cycle with the same settings, sun positions and serialized resources.", nameof(catalog));
             _catalog = catalog;
+            _levelOverrides |= XRayWeatherLevelOverrides.WeatherCatalog;
+            _effectiveCatalog = catalog;
         }
 
         public void ConfigureFxCatalog(XRayWeatherFxCatalog catalog)
         {
-            if (_fxPlayback != null && _fxCatalog != catalog) throw new InvalidOperationException("Stop the weather effect before replacing its catalog.");
-            if (catalog != null && !catalog.CanAttachTo(_profile)) throw new ArgumentException("The weather effect catalog must match the authored ordinary weather source.", nameof(catalog));
+            if (_fxPlayback != null && _effectiveFxCatalog != catalog) throw new InvalidOperationException("Stop the weather effect before replacing its catalog.");
+            if (catalog != null && !catalog.CanAttachTo(AuthoredProfile)) throw new ArgumentException("The weather effect catalog must match the initial ordinary weather source.", nameof(catalog));
             _fxCatalog = catalog;
+            _levelOverrides |= XRayWeatherLevelOverrides.WeatherFxCatalog;
+            _effectiveFxCatalog = catalog;
         }
 
         public void ApplySettings()
         {
+            ApplyConfiguration(GameConfig.Load());
+        }
+
+        private void ApplyConfiguration(GameConfig configuration)
+        {
             _settingsDirty = false;
-            if (!IsFinite(_timeOfDayHours) || !IsFinite(_timeScale) || _timeScale < 0.0f)
+            _configuration = configuration;
+            _configurationRevision = configuration != null ? configuration.Revision : 0;
+            string diagnostic = "Missing GameConfig. Include the canonical Resources/GameConfig.asset in the project.";
+            if (configuration == null || !configuration.TryValidate(out diagnostic))
+            {
+                _settingsValid = false;
+                _effectiveCatalog = null;
+                _effectiveFxCatalog = null;
+                Diagnostic = diagnostic;
+                if (_configurationDiagnostic != diagnostic) Debug.LogError(diagnostic, this);
+                _configurationDiagnostic = diagnostic;
+                ReleaseInputs();
+                return;
+            }
+            _configurationDiagnostic = null;
+            float timeOfDay = ConfiguredTimeOfDay;
+            float timeScale = ConfiguredTimeScale;
+            if (!IsFinite(timeOfDay) || !IsFinite(timeScale) || timeScale < 0.0f)
             {
                 _settingsValid = false;
                 Diagnostic = "Weather time and scale must be finite; scale must be nonnegative.";
@@ -154,28 +200,47 @@ namespace XRay.Importer.Levels
                 return;
             }
             _settingsValid = true;
-            bool discontinuity = !_settingsApplied || _appliedInitialTime != _timeOfDayHours || _appliedProfile != _profile;
-            if (discontinuity) _fxPlayback = null;
-            if (!_settingsApplied || _appliedInitialTime != _timeOfDayHours) _gameTimeSeconds = WrapTime(_timeOfDayHours * 3600.0);
-            if (!_settingsApplied || _appliedProfile != _profile)
+            XRayWeatherProfile profile = AuthoredProfile;
+            bool matchesGlobalCatalog = Inherits(XRayWeatherLevelOverrides.WeatherProfile) || configuration.OrdinaryWeatherCatalog.CanAttachTo(profile);
+            _effectiveCatalog = Inherits(XRayWeatherLevelOverrides.WeatherCatalog) ? (matchesGlobalCatalog ? configuration.OrdinaryWeatherCatalog : null) : _catalog;
+            _effectiveFxCatalog = Inherits(XRayWeatherLevelOverrides.WeatherFxCatalog) ? (matchesGlobalCatalog ? configuration.WeatherFxCatalog : null) : _fxCatalog;
+            bool discontinuity = !_settingsApplied;
+            if (!_settingsApplied)
             {
-                _activeProfile = _profile;
-                ClearTransition();
+                _gameTimeSeconds = WrapTime(timeOfDay * 3600.0);
+                _timeScaleOverride = null;
+                _sessionWeatherSelected = false;
+                _fxPlayback = null;
             }
-            discontinuity |= _simulationPaused != _paused;
-            _simulationPaused = _paused;
-            _simulationTimeScale = _timeScale;
-            _appliedInitialTime = _timeOfDayHours;
-            _appliedProfile = _profile;
+            if (!_settingsApplied || _appliedProfile != profile && !_sessionWeatherSelected && _fxPlayback == null && !IsTransitioning)
+            {
+                _activeProfile = profile;
+                ClearTransition();
+                discontinuity = true;
+            }
+            if (!_settingsApplied || _appliedPaused != _paused)
+            {
+                discontinuity |= _simulationPaused != _paused;
+                _simulationPaused = _paused;
+            }
+            _simulationTimeScale = _timeScaleOverride ?? timeScale;
+            _appliedPaused = _paused;
+            _appliedProfile = profile;
             _settingsApplied = true;
-            if (_appliedCelestialSettings != _celestialSettings) ReleaseCelestial();
-            _appliedCelestialSettings = _celestialSettings;
+            XRayWeatherCelestialSettings celestialSettings = Inherits(XRayWeatherLevelOverrides.CelestialSettings) ? configuration.CelestialSettings : _celestialSettings;
+            if (_appliedCelestialSettings != celestialSettings) ReleaseCelestial();
+            _appliedCelestialSettings = celestialSettings;
             if (_celestial == null) _celestialResolved = false;
             if (_ownsInputs && (_ownedWeather != _weatherInputs || _ownedLighting != _sourceLighting || _ownedWind != _windProvider || _ownedSun != _sun || _ownedSky != _skyRenderer || _ownedFog != _fogRenderer)) ReleaseInputs();
             if (Application.IsPlaying(gameObject) || _previewActive)
             {
                 if (TryOwnInputs()) EvaluateAndPublish(0.0f, discontinuity);
             }
+        }
+
+        private bool Inherits(XRayWeatherLevelOverrides setting)
+        {
+            return _configuration != null && (_levelOverrides & setting) == 0;
         }
 
         public void SetProfile(XRayWeatherProfile profile)
@@ -186,6 +251,7 @@ namespace XRay.Importer.Levels
                 return;
             }
             _activeProfile = profile;
+            _sessionWeatherSelected = true;
             ClearTransition();
             RefreshDiscontinuity();
         }
@@ -222,7 +288,21 @@ namespace XRay.Importer.Levels
         public void SetTimeScale(float timeScale)
         {
             if (!IsFinite(timeScale) || timeScale < 0.0f) throw new ArgumentOutOfRangeException(nameof(timeScale));
+            _timeScaleOverride = timeScale;
             _simulationTimeScale = timeScale;
+        }
+
+        public void ClearTimeScaleOverride()
+        {
+            _timeScaleOverride = null;
+            _simulationTimeScale = ConfiguredTimeScale;
+        }
+
+        public void SetFogOverride(bool? enabled)
+        {
+            if (FogOverride == enabled) return;
+            FogOverride = enabled;
+            if (_ownsInputs && Active == this) EvaluateAndPublish(0.0f, false);
         }
 
         public void SetCelestialEffectOverrides(bool? shafts, bool? flare)
@@ -245,7 +325,7 @@ namespace XRay.Importer.Levels
 
         public void SetFxLightingAdaptationOverride(float? gain)
         {
-            if (gain.HasValue && (!IsFinite(gain.Value) || gain.Value < 0.0f || gain.Value > MAX_FX_LIGHTING_ADAPTATION)) throw new ArgumentOutOfRangeException(nameof(gain));
+            if (gain.HasValue && (!IsFinite(gain.Value) || gain.Value < 0.0f || gain.Value > GameConfig.MAX_FX_LIGHTING_ADAPTATION)) throw new ArgumentOutOfRangeException(nameof(gain));
             FxLightingAdaptationOverride = gain;
             if (_ownsInputs && Active == this && _ownedWeather != null && _fxPlayback != null)
             {
@@ -287,6 +367,7 @@ namespace XRay.Importer.Levels
             _transitionTarget = profile;
             _transitionDuration = durationRealSeconds;
             _transitionElapsed = 0.0f;
+            _sessionWeatherSelected = true;
             RefreshDiscontinuity(false);
             return true;
         }
@@ -303,7 +384,7 @@ namespace XRay.Importer.Levels
 
         private bool StartFxAt(XRayWeatherFxProfile effect, double seconds, bool remaining)
         {
-            if (!_ownsInputs || Active != this || _fxCatalog == null || !_fxCatalog.Contains(effect) || !_fxCatalog.CanAttachTo(ActiveProfile) || !effect.Validate(out _))
+            if (!_ownsInputs || Active != this || _effectiveFxCatalog == null || !_effectiveFxCatalog.Contains(effect) || !_effectiveFxCatalog.CanAttachTo(ActiveProfile) || !effect.Validate(out _))
             {
                 Diagnostic = "Weather effects require active weather ownership and a compatible prepared catalog.";
                 return false;
@@ -365,6 +446,7 @@ namespace XRay.Importer.Levels
             if (!IsFinite(deltaSeconds) || deltaSeconds < 0.0f) throw new ArgumentOutOfRangeException(nameof(deltaSeconds));
             if (!isActiveAndEnabled || !Application.IsPlaying(gameObject) && !_previewActive) return;
             if (_settingsDirty) ApplySettings();
+            else if (_configuration != null && _configurationRevision != _configuration.Revision) ApplyConfiguration(_configuration);
             if (!_settingsValid) return;
             if (!TryOwnInputs()) return;
             float elapsed = _simulationPaused ? 0.0f : deltaSeconds;
@@ -465,6 +547,7 @@ namespace XRay.Importer.Levels
 
         private bool TryOwnInputs()
         {
+            if (!_settingsValid) return false;
             if (Active != null && Active != this)
             {
                 Diagnostic = "Another weather controller owns the global weather inputs.";
@@ -493,7 +576,7 @@ namespace XRay.Importer.Levels
             bool lighting = _sourceLighting.TrySetWeatherLight(this, _sun, sourceColor, snapshot.SunDirection);
             bool wind = _windProvider.TryAcquireWeather(this, trees);
             bool sky = ReferenceEquals(_skyRenderer, null) || _skyRenderer != null && _skyRenderer.TrySetWeather(this, snapshot, _windProvider.State.Time);
-            bool fog = ReferenceEquals(_fogRenderer, null) || _fogRenderer != null && _fogRenderer.TrySetWeather(this, snapshot);
+            bool fog = !FogEnabled || ReferenceEquals(_fogRenderer, null) || _fogRenderer != null && _fogRenderer.TrySetWeather(this, snapshot);
             if (!weather || !lighting || !wind || !sky || !fog)
             {
                 _weatherInputs.ReleaseWeatherInputs(this);
@@ -594,12 +677,13 @@ namespace XRay.Importer.Levels
                 ReleaseInputs();
                 return;
             }
-            if (_ownedFog != null && !_ownedFog.TrySetWeather(this, snapshot))
+            if (_ownedFog != null && FogEnabled && !_ownedFog.TrySetWeather(this, snapshot))
             {
                 Diagnostic = _ownedFog.Diagnostic;
                 ReleaseInputs();
                 return;
             }
+            if (_ownedFog != null && !FogEnabled && _ownedFog.HasWeather) _ownedFog.ReleaseWeather(this);
             PublishEnvironment(snapshot, effectWeight);
             _ownedWeather.SetWeatherNightAmbient(this, _ownedSky != null ? XRayWeatherSkyPass.GetNightRadiance(_ownedSky.Settings) : Vector3.zero);
             bool transitionCompletedWithoutGameTime = IsTransitioning && _transitionElapsed >= _transitionDuration && _simulationTimeScale == 0.0f;
@@ -631,12 +715,12 @@ namespace XRay.Importer.Levels
             if (!_celestialResolved)
             {
                 _celestialResolved = true;
-                XRayWeatherCelestialSettings settings = _celestialSettings != null ? _celestialSettings : Resources.Load<XRayWeatherCelestialSettings>(XRayWeatherCelestialSettings.RESOURCE_PATH);
+                XRayWeatherCelestialSettings settings = _appliedCelestialSettings;
                 if (settings != null && settings.Shader != null && settings.Shader.isSupported) _celestial = new XRayWeatherCelestialRenderer(gameObject, settings);
                 snap = true;
             }
             float sourceLux = _ownedSun != null ? _ownedSun.intensity : 0.0f;
-            if (_celestial != null) _celestial.Publish(_snapshot, SunShaftsEnabled, LensFlareEnabled, deltaSeconds * _simulationTimeScale, snap || _simulationPaused, _expressiveDaylight, sourceLux, _flareVisibility, LensFlareIntensityOverride ?? _lensFlareIntensity, FlareAdaptationOverride ?? _adaptLensFlareToWeather, ExpressiveFlareIntensityOverride ?? _expressiveFlareIntensity);
+            if (_celestial != null) _celestial.Publish(_snapshot, SunShaftsEnabled, LensFlareEnabled, deltaSeconds * _simulationTimeScale, snap || _simulationPaused, ExpressiveDaylight, sourceLux, _flareVisibility, LensFlareIntensity, AdaptLensFlareToWeather, ExpressiveFlareIntensity);
             PublishNativeShafts();
         }
 
@@ -713,6 +797,7 @@ namespace XRay.Importer.Levels
             if (_ownedFog != null) _ownedFog.ReleaseWeather(this);
             RestoreShaftsLight();
             ReleaseCelestial();
+            FogOverride = null;
             SunShaftsOverride = null;
             LensFlareOverride = null;
             LensFlareIntensityOverride = null;

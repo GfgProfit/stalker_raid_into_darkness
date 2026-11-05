@@ -518,6 +518,45 @@ Avoid:
 - Runtime code depending directly on editor-only APIs
 - Large architectural rewrites for small bug fixes
 
+## Global Game Configuration Policy
+
+Use exactly one root `GameConfig` ScriptableObject as the authoritative entry point for shared runtime game configuration. Treat `GameConfig` and the configuration assets it references as read-only at runtime.
+
+### Configuration Ownership
+
+- **Global game configuration.** Store game-wide defaults, shared rules, and behavior intended to be consistent across locations or systems in `GameConfig` or a domain configuration it references.
+- **Subsystem configuration.** Keep subsystem-specific settings with their owning subsystem. Use a dedicated ScriptableObject for complex settings where appropriate and make it reachable through the established configuration entry point.
+- **Location-specific configuration.** Use explicit location overrides for values that genuinely depend on a particular level.
+- **Runtime state.** Keep the current time, active weather, running effects, player state, timers, and other mutable simulation data in runtime state owned by the relevant system.
+- **Save data.** Store player progress and persisted runtime state in the save system.
+- **Editor and importer settings.** Keep source paths, import options, diagnostic flags, and Editor-only preferences in separate settings owned by the relevant tools.
+
+### Required Decision Process
+
+When developing new mechanics, the agent must independently decide which parameters belong in global configuration and which should stay local or with another owner.
+
+1. Inspect existing configuration assets and nearby code before adding or changing a configurable value.
+2. Classify the value using the ownership rules above and reuse an existing field that represents the same setting.
+3. Put new shared settings in `GameConfig` or the appropriate referenced domain configuration. Keep a single source for each global value and let scene components and prefabs inherit it by default.
+4. Keep source-derived constants, mathematical formulas, imported data, and internal implementation details with their owning systems unless a game-design requirement makes them configurable.
+5. Preserve GUIDs, ScriptableObject references, intentional user-authored overrides, and existing runtime behavior.
+
+### Configuration Resolution
+
+Document and apply the following order from lowest to highest priority.
+
+Global defaults → explicitly enabled location overrides → runtime/session overrides → restored save state where applicable.
+
+Require explicit opt-in for location overrides. A legacy serialized value alone does not enable an override. Apply restored saves only to the applicable runtime state and keep all overrides separate from the shared configuration assets.
+
+Use the existing DI container and reference patterns. Group complex settings by domain and keep access through explicit dependencies.
+
+### Scope and Validation
+
+Limit classification and migration to the task scope. For a dedicated configuration architecture task, perform a targeted project-wide audit and produce a list of migration candidates before applying changes.
+
+For changes to runtime configuration resolution or integration, follow the Project Directories and Testing Policy. Verify shared configuration references, default inheritance, override precedence, scene reload, Play Mode, Player builds, and compatibility with existing scenes. Verify that changing a global value reaches all consumers that inherit it without reimporting locations.
+
 ## MonoBehaviour Rules
 
 Keep MonoBehaviours small and focused.

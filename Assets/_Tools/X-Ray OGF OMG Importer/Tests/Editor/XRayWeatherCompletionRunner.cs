@@ -57,6 +57,11 @@ namespace XRay.Importer.Tests
             return Queue("Fx", new Filter { testMode = TestMode.EditMode, assemblyNames = new[] { ASSEMBLY }, groupNames = new[] { @"^XRay\.Importer\.Tests\.XRayWeatherFxTests\." } }, archive);
         }
 
+        public static string RunGameConfig(string archive)
+        {
+            return Queue("GameConfig", new Filter { testMode = TestMode.EditMode, assemblyNames = new[] { ASSEMBLY }, groupNames = new[] { @"^XRay\.Importer\.Tests\.GameConfigTests\.", @"^XRay\.Importer\.Tests\.XRayWeatherEditorTests\.PreviewClockRebasesAndRestoresWithoutSerializingTicks$" } }, archive);
+        }
+
         public static string Status()
         {
             return _summary == null ? "{\"status\":\"idle\"}" : JsonUtility.ToJson(_summary, true);

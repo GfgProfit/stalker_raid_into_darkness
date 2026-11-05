@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 18f0ae4bbd6d44e6afdc8cd69cb2fbfa, type: 3}
+  m_Name: GameConfig
+  m_EditorClassIdentifier: XRay.Importer.Runtime::XRay.Importer.Levels.GameConfig
+  _defaultTimeScale: 7
+  _defaultTimeOfDay: 12
+  _defaultWeather: {fileID: 11400000, guid: 1969d5810995bf04a9dd1719c8764d90, type: 2}
+  _ordinaryWeatherCatalog: {fileID: 11400000, guid: 6c171b1981ba5d74c85b8b85c7b558e7, type: 2}
+  _weatherFxCatalog: {fileID: 11400000, guid: e41ce4b841757b64b9bedc08e3f0c593, type: 2}
+  _celestialSettings: {fileID: 11400000, guid: daf0ba08ecb8f9e4cbfd2ef8f9a13bfd, type: 2}
+  _fogEnabled: 1
+  _sunShaftsEnabled: 1
+  _lensFlareEnabled: 1
+  _expressiveDaylight: 1
+  _lensFlareIntensity: 1
+  _adaptLensFlareToWeather: 1
+  _expressiveFlareIntensity: 1
+  _fxLightingAdaptation: 1

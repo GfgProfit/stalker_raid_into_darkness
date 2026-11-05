@@ -78,6 +78,7 @@ namespace XRay.Importer.Tests
                 XRayWeatherController controller = XRayLevelSceneBuilder.ConfigureWeather(root, profile);
                 var serialized = new SerializedObject(controller);
                 serialized.FindProperty("_timeScale").floatValue = 60.0f;
+                serialized.FindProperty("_levelOverrides").intValue |= (int)XRayWeatherLevelOverrides.TimeScale;
                 serialized.ApplyModifiedPropertiesWithoutUndo();
                 controller.ApplySettings();
                 XRayFloraWindProvider wind = root.GetComponentInChildren<XRayFloraWindProvider>();

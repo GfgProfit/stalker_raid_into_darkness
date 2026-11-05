@@ -250,14 +250,14 @@ namespace XRay.Importer.Editor.Levels
             Scene scene = SceneManager.GetActiveScene();
             XRayWeatherController controller = Find<XRayWeatherController>(scene);
             Behaviour[] providers = Providers(controller);
-            return new HostRecord { scene = scene.path, dirty = scene.isDirty, roots = scene.rootCount, authored = Array.ConvertAll(providers, Authored), enabled = Array.ConvertAll(providers, value => value.enabled), preview = controller.PreviewActive, manager = XRayWeatherPreview.Controller == controller, profile = AssetDatabase.GetAssetPath(controller.ActiveProfile), seconds = controller.GameTimeSeconds, paused = controller.Paused, timeScale = controller.TimeScale, shaftsOverride = Encode(controller.SunShaftsOverride), flareOverride = Encode(controller.LensFlareOverride), selection = Array.ConvertAll(Selection.objects, value => GlobalObjectId.GetGlobalObjectIdSlow(value).ToString()) };
+            return new HostRecord { scene = scene.path, dirty = scene.isDirty, roots = scene.rootCount, authored = Array.ConvertAll(providers, Authored), enabled = Array.ConvertAll(providers, value => value.enabled), preview = controller.PreviewActive, manager = XRayWeatherPreview.Controller == controller, profile = AssetDatabase.GetAssetPath(controller.ActiveProfile), seconds = controller.GameTimeSeconds, paused = controller.Paused, timeScale = controller.TimeScale, hasTimeScaleOverride = controller.TimeScaleOverride.HasValue, shaftsOverride = Encode(controller.SunShaftsOverride), flareOverride = Encode(controller.LensFlareOverride), selection = Array.ConvertAll(Selection.objects, value => GlobalObjectId.GetGlobalObjectIdSlow(value).ToString()) };
         }
 
         private static string WriteHost(string output, string label, HostRecord before)
         {
             HostRecord after = ReadHost();
             RequireSameAuthored(before, after);
-            if (before.preview != after.preview || before.manager != after.manager || before.profile != after.profile || Math.Abs(before.seconds - after.seconds) > 0.000001 || before.paused != after.paused || before.timeScale != after.timeScale || before.shaftsOverride != after.shaftsOverride || before.flareOverride != after.flareOverride) throw new InvalidOperationException("Military runtime preview state changed during validation.");
+            if (before.preview != after.preview || before.manager != after.manager || before.profile != after.profile || Math.Abs(before.seconds - after.seconds) > 0.000001 || before.paused != after.paused || before.timeScale != after.timeScale || before.hasTimeScaleOverride != after.hasTimeScaleOverride || before.shaftsOverride != after.shaftsOverride || before.flareOverride != after.flareOverride) throw new InvalidOperationException("Military runtime preview state changed during validation.");
             string path = Path.Combine(output, label + "_" + DateTime.UtcNow.ToString("yyyyMMdd_HHmmss_fff") + ".json");
             File.WriteAllText(path, JsonUtility.ToJson(after, true));
             return path;
@@ -278,7 +278,8 @@ namespace XRay.Importer.Editor.Levels
             controller.SetProfile(profile);
             controller.Seek(state.seconds);
             controller.SetPaused(state.paused);
-            controller.SetTimeScale(state.timeScale);
+            if (state.hasTimeScaleOverride) controller.SetTimeScale(state.timeScale);
+            else controller.ClearTimeScaleOverride();
             controller.SetCelestialEffectOverrides(Decode(state.shaftsOverride), Decode(state.flareOverride));
             var selected = new List<Object>();
             foreach (string text in state.selection)
@@ -352,6 +353,7 @@ namespace XRay.Importer.Editor.Levels
             public double seconds;
             public bool paused;
             public float timeScale;
+            public bool hasTimeScaleOverride;
             public int shaftsOverride;
             public int flareOverride;
             public string[] selection;

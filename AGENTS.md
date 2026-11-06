@@ -50,10 +50,10 @@ FORBIDDEN:
 
 REQUIRED:
 - Reply only once after the task is fully completed
-- Keep the final response concise and technical
+- Provide a substantive, self-contained technical final response with detail proportional to the task
 - Use Russian in user-facing responses unless the user explicitly requests another language
 - Preserve existing code style
-- Minimize token usage
+- Minimize unnecessary context and tool output without reducing the completeness of the final response
 - Implement the smallest safe change that solves the task
 
 ## Misc
@@ -97,7 +97,19 @@ The final response must contain only these sections:
 4. Risks or limitations
 5. Manual Unity steps, if any
 
-Keep the final response concise and technical.
+Write a detailed final report that lets the user understand the result without reading progress messages, opening reports, or inspecting the diff first. Keep the short summary brief and develop the relevant details in the other sections.
+
+For nontrivial implementation, debugging, audit, or visual tasks, normally aim for 300–600 words. Use more detail when the scope or findings require it. Small targeted edits may use a shorter response, provided it explains the actual changes and verification. Treat these lengths as guidance; avoid filler, repetition, and unrelated explanations.
+
+Content of the required sections:
+
+1. **Short summary:** describe the problem addressed, the resulting behavior, and whether the requested work is complete. Distinguish completed implementation from unresolved validation or missing prerequisites.
+2. **Changed files:** identify the relevant files or related groups with absolute links and explain their purpose. State which Unity project was modified. Include commit information only when a commit was actually created.
+3. **Important implementation details:** explain the established cause, the chosen solution, why it fits the task, and any material behavior or integration changes. Describe the checks performed, their scope, results, and what was not checked. Include absolute paths to reports and generated artifacts where applicable. Links, commit hashes, and test counts supplement this explanation rather than replace it.
+4. **Risks or limitations:** describe remaining issues, unverified behavior, compatibility constraints, skipped checks, and their practical impact. Separate confirmed results from assumptions. If no material risks remain, say so without inventing warnings.
+5. **Manual Unity steps, if any:** give concrete actions and expected results when user intervention is required. State explicitly when no manual steps are needed.
+
+For documentation-only tasks, explain the changed rules or wording and the consistency checks performed; Unity tests are not required.
 
 If validation was not run because it is forbidden or unsafe, say so in `Risks or limitations` and list manual checks in `Manual Unity steps`.
 
@@ -108,7 +120,7 @@ Project skills:
 
 Apply compatible principles from both skills to all user-facing responses by default:
 - Put the result or next concrete action first, within the required final response format.
-- Keep responses concise, easy to scan, and specific. Number multi-step instructions only when useful.
+- Keep responses specific, structured, and easy to scan. Give the final response enough detail to understand the result, decisions, verification, and remaining work. Number multi-step instructions only when useful.
 - Use natural, direct Russian without generic AI phrasing, filler, hype, empty praise, or redundant conclusions.
 - Preserve meaning, technical accuracy, project terminology, identifiers, and existing code style.
 - Do not add extra final response sections or override any project hard constraints.
@@ -273,7 +285,7 @@ Avoid:
 - Explaining unrelated architecture
 - Listing unrelated findings
 
-Use the smallest useful amount of information to complete the task correctly.
+Use task-relevant information without repetition, while preserving complete explanations and verification results in the final response.
 
 ## C# Code Style
 
@@ -793,7 +805,7 @@ Before completing the task, verify:
 - R3 subscriptions have valid lifetimes if R3 was used
 - UniTask cancellation is propagated if UniTask was used
 - Editor/runtime separation is preserved
-- Final response is concise and uses the required format
+- Final response is substantive, self-contained, sufficiently detailed, and uses the required format
 
 If any item fails, revise the implementation before responding.
 

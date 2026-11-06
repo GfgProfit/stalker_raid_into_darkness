@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
@@ -28,7 +29,12 @@ namespace XRay.Importer.Editor.Levels
         private const double MIN_PLAY_SECONDS = 5.0;
         private const double POST_EXIT_SECONDS = 5.0;
         private const double WATCHDOG_SECONDS = 150.0;
+        private const double NATIVE_CAPTURE_SECONDS = 90.0;
         private const float NIGHT_EXPOSURE = 9.0f;
+        private const float DAY_ART_CLOCK = 8.0f;
+
+        private static readonly FieldInfo _nightClonesField = typeof(XRayWetMaterialBindings).GetField("_clones", BindingFlags.Instance | BindingFlags.NonPublic);
+        private static readonly Dictionary<Material, float> _nightDebugValues = new Dictionary<Material, float>();
 
         private static State _state;
         private static XRayWeatherController _controller;
@@ -41,6 +47,9 @@ namespace XRay.Importer.Editor.Levels
         private static Camera _nightCamera;
         private static RenderTexture _nightTarget;
         private static RenderTexture _nightSavedTarget;
+        private static Vector3 _nightSavedPosition;
+        private static Quaternion _nightSavedRotation;
+        private static float _nightSavedFieldOfView;
         private static GameObject _nightVolume;
         private static VolumeProfile _nightExposure;
         private static AsyncGPUReadbackRequest _nightReadback;
@@ -48,6 +57,13 @@ namespace XRay.Importer.Editor.Levels
         private static EditorWindow _nightGameView;
         private static bool _nightSavedRunInBackground;
         private static bool _nightOwnsBackground;
+        private static bool _nightOwnsCamera;
+        private static bool _nightOwnsArtProfile;
+        private static XRayPuddleArtProfile? _nightSavedArtProfile;
+        private static bool _nightOwnsPlanarWeight;
+        private static float _nightSavedPlanarWeight;
+        private static bool _nightOwnsDayPause;
+        private static bool _nightSavedPaused;
 
         static XRayPrecipitationNaturalPlayGuard()
         {
@@ -109,19 +125,31 @@ namespace XRay.Importer.Editor.Levels
 
         public static string BeginNightPuddles(string archiveFolder, string expectedScenePath, string posesPath)
         {
+            return BeginPuddles(archiveFolder, expectedScenePath, posesPath, false);
+        }
+
+        public static string BeginDayPuddles(string archiveFolder, string expectedScenePath, string posesPath)
+        {
+            return BeginPuddles(archiveFolder, expectedScenePath, posesPath, true);
+        }
+
+        private static string BeginPuddles(string archiveFolder, string expectedScenePath, string posesPath, bool dayCapture)
+        {
             Require(Path.GetFullPath(posesPath).StartsWith(ARCHIVE, StringComparison.OrdinalIgnoreCase) && File.Exists(posesPath), "Use the audited Military pose manifest from Archive.");
             string posesJson = File.ReadAllText(posesPath);
             NightPoses poses = JsonUtility.FromJson<NightPoses>(posesJson);
             NightPose puddles = null;
             if (poses?.poses != null) foreach (NightPose pose in poses.poses) if (pose.name == "Puddles") puddles = pose;
             Require(puddles != null, "The audited manifest must contain the real Puddles pose.");
+            Require(!dayCapture || (int)puddles.artProfile >= 0 && (int)puddles.artProfile <= 2, "Day capture art profile must be AtmosphericZone0, SubtleRealistic1 or HeavyRain2.");
+            Require(!dayCapture || !puddles.overridePlanarWeight || float.IsFinite(puddles.planarWeight) && puddles.planarWeight >= 0.0f && puddles.planarWeight <= 1.0f, "The explicit native planar capture weight must lie between zero and one.");
             bool hasGameCamera = false;
             foreach (Camera camera in Object.FindObjectsByType<Camera>(FindObjectsInactive.Exclude, FindObjectsSortMode.None)) hasGameCamera |= camera.isActiveAndEnabled && camera.cameraType == CameraType.Game && camera.gameObject.scene.path == expectedScenePath;
-            Require(hasGameCamera, "The night water guard requires an enabled native Game camera in the loaded Military scene.");
-            return BeginInternal(archiveFolder, expectedScenePath, true, puddles, posesJson);
+            Require(hasGameCamera, "The water guard requires an enabled native Game camera in the loaded Military scene.");
+            return BeginInternal(archiveFolder, expectedScenePath, true, puddles, posesJson, dayCapture, posesPath);
         }
 
-        private static string BeginInternal(string archiveFolder, string expectedScenePath, bool uniformWetState, NightPose nightPose, string posesJson)
+        private static string BeginInternal(string archiveFolder, string expectedScenePath, bool uniformWetState, NightPose nightPose, string posesJson, bool dayCapture = false, string posesPath = null)
         {
             Require(Path.GetFullPath(Path.Combine(Application.dataPath, "..")).Equals(PROJECT, StringComparison.OrdinalIgnoreCase), "The active project must be Production.");
             Require(!EditorApplication.isPlayingOrWillChangePlaymode && !EditorApplication.isCompiling && !EditorApplication.isUpdating, "The clean Editor must be idle outside Play Mode.");
@@ -144,7 +172,11 @@ namespace XRay.Importer.Editor.Levels
             Directory.CreateDirectory(output);
             _state = new State { phase = "WaitingForPlay", output = output, scene = expectedScenePath, startedUtc = DateTime.UtcNow.ToString("O"), deadlineUtc = DateTime.UtcNow.AddSeconds(WATCHDOG_SECONDS).ToString("O"), uniformRequested = uniformWetState, scenes = Scenes(), selection = SelectionIds(), bindingsBefore = Bindings(expectedScenePath), resourcesBefore = ResourcesCount(), logPath = Application.consoleLogPath, graphicsApi = SystemInfo.graphicsDeviceType.ToString(), project = PROJECT };
             _state.nightPose = nightPose;
-            if (nightPose != null) File.WriteAllText(Path.Combine(output, "NightInputPoses.json"), posesJson);
+            _state.dayCapture = dayCapture;
+            _state.capturePoseSourcePath = posesPath != null ? Path.GetFullPath(posesPath) : null;
+            _state.capturePoseSourceSha256 = posesPath != null ? Hash(File.ReadAllBytes(posesPath)) : null;
+            _state.captureDebugWetness = dayCapture && nightPose != null && nightPose.debugWetness;
+            if (nightPose != null) File.WriteAllText(Path.Combine(output, dayCapture ? "DayInputPoses.json" : "NightInputPoses.json"), posesJson);
             _state.files = ProtectedFiles(expectedScenePath);
             _state.logOffset = File.Exists(_state.logPath) ? new FileInfo(_state.logPath).Length : 0;
             foreach (Camera camera in Object.FindObjectsByType<Camera>(FindObjectsInactive.Exclude, FindObjectsSortMode.None))
@@ -260,14 +292,16 @@ namespace XRay.Importer.Editor.Levels
                 ready &= _state.nightCaptured;
             }
             if (ready) RequestExit();
-            if (elapsed > 30.0) Fail("The natural camera/resource requirements were not met within 30 seconds.");
+            if (!_state.nightConfigured && elapsed > 30.0) Fail("The natural camera/resource requirements were not met within 30 seconds.");
+            if (_state.nightConfigured && (DateTime.UtcNow - DateTime.Parse(_state.captureConfiguredUtc).ToUniversalTime()).TotalSeconds > NATIVE_CAPTURE_SECONDS) Fail("The configured native partial/full water capture did not complete within its bounded shader-warmup and rendering budget.");
         }
 
         private static void ConfigureNight()
         {
             XRayWeatherProfile profile = null;
-            foreach (XRayWeatherProfile candidate in _controller.Catalog.Profiles) if (candidate != null && candidate.CycleName == "w_storm2") profile = candidate;
-            Require(profile != null, "The inherited real weather catalog must contain w_storm2.");
+            string cycle = _state.dayCapture ? "w_clear1" : "w_storm2";
+            foreach (XRayWeatherProfile candidate in _controller.Catalog.Profiles) if (candidate != null && candidate.CycleName == cycle) profile = candidate;
+            Require(profile != null, "The inherited real weather catalog must contain " + cycle + ".");
             foreach (Camera camera in Object.FindObjectsByType<Camera>(FindObjectsInactive.Exclude, FindObjectsSortMode.None))
             {
                 if (!camera.isActiveAndEnabled || camera.cameraType != CameraType.Game || camera.gameObject.scene.path != _state.scene) continue;
@@ -275,6 +309,18 @@ namespace XRay.Importer.Editor.Levels
                 break;
             }
             Require(_nightCamera != null, "Keep the native Military Game camera enabled during the night guard.");
+            _nightSavedPosition = _nightCamera.transform.position;
+            _nightSavedRotation = _nightCamera.transform.rotation;
+            _nightSavedFieldOfView = _nightCamera.fieldOfView;
+            _nightSavedTarget = _nightCamera.targetTexture;
+            _nightOwnsCamera = true;
+            _state.captureSourceCameraPosition = _nightSavedPosition;
+            _state.captureSourceCameraRotation = _nightSavedRotation;
+            _state.captureSourceCameraFieldOfView = _nightSavedFieldOfView;
+            _state.captureSourceCameraScene = _nightCamera.gameObject.scene.path;
+            _state.captureSourceCameraPath = _nightCamera.name;
+            for (Transform parent = _nightCamera.transform.parent; parent != null; parent = parent.parent) _state.captureSourceCameraPath = parent.name + "/" + _state.captureSourceCameraPath;
+            if (_state.dayCapture && _state.nightPose.useFieldGroundHeight) ResolveDayLowPose();
             foreach (EditorWindow window in Resources.FindObjectsOfTypeAll<EditorWindow>()) if (window.GetType().FullName == "UnityEditor.GameView") _nightGameView = window;
             Require(_nightGameView != null, "Keep an existing Game view open for the native night capture.");
             _nightGameView.Focus();
@@ -282,10 +328,9 @@ namespace XRay.Importer.Editor.Levels
             _nightOwnsBackground = true;
             Application.runInBackground = true;
             _nightCamera.transform.SetPositionAndRotation(_state.nightPose.position, _state.nightPose.rotation);
-            _nightCamera.fieldOfView = 60.0f;
-            _nightSavedTarget = _nightCamera.targetTexture;
+            _nightCamera.fieldOfView = _state.dayCapture && _state.nightPose.fov >= 10.0f && _state.nightPose.fov <= 150.0f ? _state.nightPose.fov : 60.0f;
             _nightTarget = new RenderTexture(1920, 1080, 0, RenderTextureFormat.ARGBFloat, RenderTextureReadWrite.Linear);
-            _nightTarget.name = "XRayNightWaterNativeCapture";
+            _nightTarget.name = _state.dayCapture ? "XRayDayWaterNativeCapture" : "XRayNightWaterNativeCapture";
             _nightTarget.hideFlags = HideFlags.HideAndDontSave;
             Require(_nightTarget.Create(), "Create the bounded native night framebuffer.");
             _nightCamera.targetTexture = _nightTarget;
@@ -295,7 +340,13 @@ namespace XRay.Importer.Editor.Levels
             exposure.mode.Override(ExposureMode.Fixed);
             exposure.fixedExposure.Override(NIGHT_EXPOSURE);
             exposure.compensation.Override(0.0f);
-            _nightVolume = new GameObject("Owned night water exposure");
+            if (_state.dayCapture)
+            {
+                ScreenSpaceReflection reflections = _nightExposure.Add<ScreenSpaceReflection>(true);
+                reflections.enabled.Override(false);
+                reflections.enabledTransparent.Override(false);
+            }
+            _nightVolume = new GameObject(_state.dayCapture ? "Owned day water exposure" : "Owned night water exposure");
             _nightVolume.hideFlags = HideFlags.HideAndDontSave;
             _nightVolume.transform.SetParent(_controller.transform, false);
             _nightVolume.layer = XRayWeatherFogRenderer.GetVolumeLayer(_controller.gameObject);
@@ -304,22 +355,65 @@ namespace XRay.Importer.Editor.Levels
             volume.priority = 100000.0f;
             volume.sharedProfile = _nightExposure;
             _controller.StopFx();
+            if (_state.dayCapture)
+            {
+                _nightSavedPaused = _controller.Paused;
+                _nightOwnsDayPause = true;
+            }
             _controller.SetPaused(true);
             _controller.SetTimeScale(0.0f);
             _controller.SetProfile(profile);
-            _controller.Seek(60.0);
+            _controller.Seek(_state.dayCapture ? 43230.0 : 60.0);
             _controller.SetRainVisualOverride(false);
-            _controller.SetPaused(false);
+            _controller.SetPaused(_state.dayCapture);
             XRayPrecipitationSystem system = _controller.Precipitation;
+            if (_state.dayCapture)
+            {
+                _nightSavedArtProfile = system.ArtProfileOverride;
+                _nightOwnsArtProfile = true;
+                system.ArtProfileOverride = _state.nightPose.artProfile;
+                _state.captureArtProfile = _state.nightPose.artProfile.ToString();
+                _state.captureArtClock = DAY_ART_CLOCK;
+            }
             system.Wetness.SetUniformState(1.0f, 0.8f);
+            if (_state.dayCapture) system.Wetness.Publish(_controller.EffectivePrecipitationConfig, DAY_ART_CLOCK, system.RainDensity, system.ArtProfileOverride, _controller.Snapshot.WindVelocity);
             Require(system.Reflections != null && system.Reflections.Probe != null, "The inherited night configuration must own a native reflection probe.");
+            if (_state.dayCapture)
+            {
+                _nightSavedPlanarWeight = system.Reflections.PlanarWeight;
+                _nightOwnsPlanarWeight = true;
+                float planarWeight = _state.nightPose.overridePlanarWeight ? _state.nightPose.planarWeight : 1.0f;
+                system.Reflections.PlanarWeight = planarWeight;
+                _state.capturePlanarRequestedWeight = planarWeight;
+            }
             system.Reflections.Dispose();
             system.Reflections.Tick(_controller.EffectivePrecipitationConfig, 0.0f);
             _state.maximumReflectionRequests = 0;
             _state.maximumReflectionUpdates = 0;
             _state.nightPuddleState = 0.8f;
             _state.nightConfigured = true;
+            _state.captureConfiguredUtc = DateTime.UtcNow.ToString("O");
+            _state.captureBudgetSeconds = NATIVE_CAPTURE_SECONDS;
             Save();
+        }
+
+        private static void ResolveDayLowPose()
+        {
+            XRayPrecipitationSystem system = _controller.Precipitation;
+            Vector4 mapping = system.Geometry.WorldMapping;
+            Vector3 position = _state.nightPose.position;
+            int column = Mathf.FloorToInt((position.x - mapping.x) * mapping.z * system.Wetness.Width);
+            int row = Mathf.FloorToInt((position.z - mapping.y) * mapping.w * system.Wetness.Height);
+            bool readable = system.Wetness.TryReadCell(column, row, out XRayWetnessCell cell);
+            Require(float.IsFinite(_state.nightPose.groundReferenceY) && readable && float.IsFinite(cell.Heights.x) && float.IsFinite(cell.Heights.y) && cell.Heights.x >= cell.Heights.y, "The candidate low camera requires a valid existing native height field cell at its actual XZ position.");
+            float ground = Mathf.Abs(cell.Heights.x - _state.nightPose.groundReferenceY) < Mathf.Abs(cell.Heights.y - _state.nightPose.groundReferenceY) ? cell.Heights.x : cell.Heights.y;
+            _state.captureGroundHeights = cell.Heights;
+            _state.captureGroundColumn = column;
+            _state.captureGroundRow = row;
+            _state.captureGroundSelectedY = ground;
+            _state.captureLowPoseScope = "Candidate low view at native field height+0.45m. Height cell is measured; visibility, clipping and surface contact still require visual review.";
+            position.y = ground + 0.45f;
+            _state.nightPose.position = position;
         }
 
         private static void CompleteNightCapture()
@@ -343,7 +437,7 @@ namespace XRay.Importer.Editor.Levels
             Require(nonBlack > 1000 && sum / pixels.Length > 0.000001 && maximum - minimum > 0.00001f, "The actual night water framebuffer must be nonblack with a measurable luminance range.");
             var exr = new Texture2D(_nightTarget.width, _nightTarget.height, TextureFormat.RGBAFloat, false, true);
             var png = new Texture2D(_nightTarget.width, _nightTarget.height, TextureFormat.RGBA32, false, false);
-            string label = _state.nightPartialCaptured ? "NightPuddlesFull" : "NightPuddlesPartial";
+            string label = (_state.captureDebugWetness ? "DayWetnessDebug" : _state.dayCapture ? "DayPuddles" : "NightPuddles") + (_state.nightPartialCaptured ? "Full" : "Partial");
             try
             {
                 exr.SetPixels(pixels);
@@ -389,7 +483,45 @@ namespace XRay.Importer.Editor.Levels
 
         private static void ReleaseNightCapture()
         {
-            if (_nightCamera != null) _nightCamera.targetTexture = _nightSavedTarget;
+            if (_nightCamera != null && _nightOwnsCamera)
+            {
+                _nightCamera.transform.SetPositionAndRotation(_nightSavedPosition, _nightSavedRotation);
+                _nightCamera.fieldOfView = _nightSavedFieldOfView;
+                _nightCamera.targetTexture = _nightSavedTarget;
+                if (_state != null)
+                {
+                    _state.captureCameraRestored = _nightCamera.transform.position == _nightSavedPosition && _nightCamera.transform.rotation == _nightSavedRotation && _nightCamera.fieldOfView == _nightSavedFieldOfView && _nightCamera.targetTexture == _nightSavedTarget;
+                    if (!_state.captureCameraRestored) Fail("The owned native capture camera transform, field of view or target was not restored.");
+                }
+            }
+            _nightOwnsCamera = false;
+            bool debugRestored = true;
+            foreach (KeyValuePair<Material, float> entry in _nightDebugValues)
+            {
+                if (entry.Key == null) continue;
+                entry.Key.SetFloat("_MonolithDebug", entry.Value);
+                debugRestored &= entry.Key.GetFloat("_MonolithDebug") == entry.Value;
+            }
+            _nightDebugValues.Clear();
+            if (_state != null) _state.captureDebugRestored = debugRestored;
+            if (_nightOwnsArtProfile && _controller != null && _controller.Precipitation != null)
+            {
+                _controller.Precipitation.ArtProfileOverride = _nightSavedArtProfile;
+                if (_state != null) _state.captureArtProfileRestored = _controller.Precipitation.ArtProfileOverride == _nightSavedArtProfile;
+            }
+            _nightOwnsArtProfile = false;
+            if (_nightOwnsPlanarWeight && _controller != null && _controller.Precipitation != null && _controller.Precipitation.Reflections != null)
+            {
+                _controller.Precipitation.Reflections.PlanarWeight = _nightSavedPlanarWeight;
+                if (_state != null) _state.capturePlanarWeightRestored = _controller.Precipitation.Reflections.PlanarWeight == _nightSavedPlanarWeight;
+            }
+            _nightOwnsPlanarWeight = false;
+            if (_nightOwnsDayPause && _controller != null)
+            {
+                _controller.SetPaused(_nightSavedPaused);
+                if (_state != null) _state.captureDayPauseRestored = _controller.Paused == _nightSavedPaused;
+            }
+            _nightOwnsDayPause = false;
             if (_nightTarget != null) CoreUtils.Destroy(_nightTarget);
             if (_nightVolume != null) CoreUtils.Destroy(_nightVolume);
             if (_nightExposure != null)
@@ -436,6 +568,7 @@ namespace XRay.Importer.Editor.Levels
             _state.phase = "Exiting";
             Save();
             ReleaseNightCapture();
+            Save();
             EditorApplication.ExitPlaymode();
         }
 
@@ -472,13 +605,30 @@ namespace XRay.Importer.Editor.Levels
             {
                 camera.transform.SetPositionAndRotation(_state.nightPose.position, _state.nightPose.rotation);
                 XRayPrecipitationSystem system = _controller.Precipitation;
+                if (_state.captureDebugWetness) ApplyDayWetnessDebug(system.WetMaterials);
                 system.Wetness.SetUniformState(1.0f, _state.nightPuddleState);
-                system.Wetness.Publish(_controller.EffectivePrecipitationConfig, system.RealTime, system.RainDensity);
+                if (_state.dayCapture) system.Wetness.Publish(_controller.EffectivePrecipitationConfig, DAY_ART_CLOCK, system.RainDensity, system.ArtProfileOverride, _controller.Snapshot.WindVelocity);
+                else system.Wetness.Publish(_controller.EffectivePrecipitationConfig, system.RealTime, system.RainDensity);
             }
             catch (Exception exception)
             {
                 Fail(exception.ToString());
             }
+        }
+
+        private static void ApplyDayWetnessDebug(XRayWetMaterialBindings bindings)
+        {
+            Require(bindings != null && _nightClonesField != null, "Wetness debug requires the existing runtime-owned material clone dictionary.");
+            var clones = _nightClonesField.GetValue(bindings) as Dictionary<Material, Material>;
+            Require(clones != null, "The inspected runtime clone dictionary schema must match.");
+            foreach (Material material in clones.Values)
+            {
+                if (material == null || !material.HasProperty("_MonolithDebug")) continue;
+                Require(!EditorUtility.IsPersistent(material) && (material.hideFlags & HideFlags.HideAndDontSave) == HideFlags.HideAndDontSave, "Wetness diagnostic may change only transient owned material clones.");
+                if (!_nightDebugValues.ContainsKey(material)) _nightDebugValues.Add(material, material.GetFloat("_MonolithDebug"));
+                material.SetFloat("_MonolithDebug", 89.0f);
+            }
+            _state.captureDebugCloneCount = _nightDebugValues.Count;
         }
 
         private static void CameraRendered(ScriptableRenderContext context, Camera camera)
@@ -492,7 +642,8 @@ namespace XRay.Importer.Editor.Levels
                 try
                 {
                     XRayPrecipitationSystem system = _controller.Precipitation;
-                    Require(_controller.ActiveProfile.CycleName == "w_storm2" && Math.Abs(_controller.GameTimeSeconds - 60.0) < 0.001 && _controller.TimeScale == 0.0f && !_controller.Paused, "Render the actual selected night snapshot with a frozen weather clock and live physical simulation.");
+                    Require(_controller.ActiveProfile.CycleName == (_state.dayCapture ? "w_clear1" : "w_storm2") && Math.Abs(_controller.GameTimeSeconds - (_state.dayCapture ? 43230.0 : 60.0)) < 0.001 && _controller.TimeScale == 0.0f && _controller.Paused == _state.dayCapture, "Render the selected authored snapshot; Day freezes source wind and physical time while Night retains live physical simulation.");
+                    Require(!_state.dayCapture || _controller.SourceLightColor.sqrMagnitude > 0.000001f, "The authored clear daytime snapshot must retain nonzero direct sunlight.");
                     Require(_controller.EffectivePrecipitationConfig.WetnessEnabled && _controller.EffectivePrecipitationConfig.PuddlesEnabled && system.Reflections.Probe.realtimeTexture.updateCount > 0, "Night water and a fresh native cubemap capture must remain enabled.");
                     _state.nightSnapshot = _controller.Snapshot;
                     _state.nightProfile = _controller.ActiveProfile.CycleName;
@@ -501,11 +652,38 @@ namespace XRay.Importer.Editor.Levels
                     _state.nightProbePosition = system.Reflections.Probe.transform.position;
                     _state.nightCameraPosition = camera.transform.position;
                     _state.nightCameraRotation = camera.transform.rotation;
+                    _state.captureFieldOfView = camera.fieldOfView;
+                    _state.capturePuddleShape = Shader.GetGlobalVector("_MonolithPuddleShape");
+                    _state.capturePuddleOptics = Shader.GetGlobalVector("_MonolithPuddleOptics");
+                    _state.capturePuddleRipple = Shader.GetGlobalVector("_MonolithPuddleRipple");
+                    _state.captureSimulationPaused = _controller.Paused;
+                    _state.capturePrecipitationRealTime = system.RealTime;
+                    _state.capturePlanarConfigured = _controller.EffectivePrecipitationConfig.PlanarReflectionsEnabled;
+                    _state.capturePlanarGroundHeights = system.Reflections.PlanarGroundHeights;
+                    _state.capturePlanarGroundHeight = system.Reflections.PlanarGroundHeight;
+                    _state.capturePlanarGroundValid = system.Reflections.PlanarGroundValid;
+                    PlanarReflectionProbe planar = system.Reflections.PlanarProbe;
+                    if (planar != null)
+                    {
+                        _state.capturePlanarAvailable = true;
+                        _state.capturePlanarPosition = planar.transform.position;
+                        _state.capturePlanarInfluenceBox = planar.influenceVolume.boxSize;
+                        _state.capturePlanarActualWeight = planar.weight;
+                        if (planar.realtimeTexture != null)
+                        {
+                            _state.capturePlanarTextureUpdates = planar.realtimeTexture.updateCount;
+                            _state.capturePlanarTextureWidth = planar.realtimeTexture.width;
+                            _state.capturePlanarTextureHeight = planar.realtimeTexture.height;
+                        }
+                    }
                     _state.nightWidth = _nightTarget.width;
                     _state.nightHeight = _nightTarget.height;
                     Exposure actualExposure = HDCamera.GetOrCreate(camera).volumeStack.GetComponent<Exposure>();
                     Require(actualExposure != null && actualExposure.mode.value == ExposureMode.Fixed && Mathf.Abs(actualExposure.fixedExposure.value - NIGHT_EXPOSURE) < 0.001f, "The actual native night camera must use the controlled reference exposure.");
                     _state.nightFixedExposure = actualExposure.fixedExposure.value;
+                    ScreenSpaceReflection actualReflections = HDCamera.GetOrCreate(camera).volumeStack.GetComponent<ScreenSpaceReflection>();
+                    _state.captureSsrEnabled = actualReflections != null && actualReflections.enabled.value;
+                    Require(!_state.dayCapture || !_state.captureSsrEnabled, "The native Day reflection comparison requires SSR disabled in the applied camera volume stack.");
                     _nightReadback = AsyncGPUReadback.Request(_nightTarget, 0, TextureFormat.RGBAFloat);
                     _nightReadbackPending = true;
                 }
@@ -563,6 +741,10 @@ namespace XRay.Importer.Editor.Levels
                 Require(_state.resourcesObserved && _state.maximumClones > 0 && (_state.originalGameCameras > 0 ? _state.gameFrames : _state.sceneViewFrames) >= REQUIRED_FRAMES, "Required natural rendering/resource evidence is incomplete.");
                 Require(!_state.naturalNonCameraReflectionsEnabled || _state.maximumReflectionRequests > 0 && _state.maximumReflectionUpdates > 0, "The inherited native wet reflection probe never completed a cubemap capture.");
                 Require(_state.nightPose == null || _state.nightCaptured && _state.nightPartialCaptured && _state.nightProbeUpdates > 0 && _state.nightWetGlobals.x > 0.0f && _state.nightWetGlobals.y > 0.0f && File.Exists(_state.nightScreenshot) && File.Exists(_state.nightPartialScreenshot), "The actual night wetness, partial/full puddles and completed probe screenshot evidence is incomplete.");
+                Require(_state.nightPose == null || _state.captureCameraRestored, "The capture must restore the existing native camera before leaving Play Mode.");
+                Require(!_state.dayCapture || _state.captureArtProfileRestored, "Restore the inherited art profile after the owned daytime capture.");
+                Require(!_state.captureDebugWetness || _state.captureDebugRestored, "Restore all surviving runtime clone diagnostic values.");
+                Require(!_state.dayCapture || _state.capturePlanarWeightRestored && _state.captureDayPauseRestored, "Restore the original planar capture weight and simulation pause state.");
             }
             catch (Exception exception)
             {
@@ -765,6 +947,49 @@ namespace XRay.Importer.Editor.Levels
             public bool naturalNonCameraReflectionsEnabled;
             public float naturalInitialRainDensity;
             public string naturalConfigPath;
+            public bool dayCapture;
+            public string captureConfiguredUtc;
+            public double captureBudgetSeconds;
+            public float captureFieldOfView;
+            public bool captureSsrEnabled;
+            public string capturePoseSourcePath;
+            public string capturePoseSourceSha256;
+            public string captureSourceCameraScene;
+            public string captureSourceCameraPath;
+            public Vector3 captureSourceCameraPosition;
+            public Quaternion captureSourceCameraRotation;
+            public float captureSourceCameraFieldOfView;
+            public bool captureCameraRestored;
+            public string captureArtProfile;
+            public float captureArtClock;
+            public Vector4 capturePuddleShape;
+            public Vector4 capturePuddleOptics;
+            public Vector4 capturePuddleRipple;
+            public bool captureArtProfileRestored;
+            public Vector2 captureGroundHeights;
+            public int captureGroundColumn;
+            public int captureGroundRow;
+            public float captureGroundSelectedY;
+            public string captureLowPoseScope;
+            public bool captureDebugWetness;
+            public int captureDebugCloneCount;
+            public bool captureDebugRestored;
+            public bool capturePlanarConfigured;
+            public bool capturePlanarAvailable;
+            public Vector2 capturePlanarGroundHeights;
+            public float capturePlanarGroundHeight;
+            public bool capturePlanarGroundValid;
+            public Vector3 capturePlanarPosition;
+            public Vector3 capturePlanarInfluenceBox;
+            public float capturePlanarActualWeight;
+            public uint capturePlanarTextureUpdates;
+            public int capturePlanarTextureWidth;
+            public int capturePlanarTextureHeight;
+            public float capturePlanarRequestedWeight;
+            public bool capturePlanarWeightRestored;
+            public bool captureSimulationPaused;
+            public float capturePrecipitationRealTime;
+            public bool captureDayPauseRestored;
             public NightPose nightPose;
             public bool nightConfigured;
             public bool nightCaptureRequested;
@@ -798,6 +1023,13 @@ namespace XRay.Importer.Editor.Levels
             public string name;
             public Vector3 position;
             public Quaternion rotation;
+            public float fov;
+            public XRayPuddleArtProfile artProfile;
+            public bool useFieldGroundHeight;
+            public float groundReferenceY;
+            public bool debugWetness;
+            public float planarWeight = 1.0f;
+            public bool overridePlanarWeight;
         }
 
         [Serializable]

@@ -25,7 +25,8 @@ PreLightData GetPreLightData(float3 V, PositionInputs posInput, inout BSDFData b
         data.specularFGD *= MonolithSourceAmbientSpecularScale(_MonolithSourceRawMaterial);
     }
     #ifdef MONOLITH_WETNESS_INCLUDED
-    data.specularFGD = lerp(data.specularFGD, MonolithEnvGGX(bsdfData.fresnel0, bsdfData.perceptualRoughness, nv), _MonolithPrecipitationSurface.y);
+    float wetBsdf = MonolithWetBsdfWeight(_MonolithPrecipitationSurface);
+    data.specularFGD = lerp(data.specularFGD, MonolithEnvGGX(bsdfData.fresnel0, bsdfData.perceptualRoughness, nv), wetBsdf);
     #endif
     return data;
 }
@@ -74,11 +75,12 @@ CBSDF MonolithEvaluateBSDF(float3 V, float3 L, PreLightData preLightData, BSDFDa
 {
     CBSDF data = MonolithDryEvaluateBSDF(V, L, preLightData, bsdfData);
     #ifdef MONOLITH_WETNESS_INCLUDED
-    if (_MonolithPrecipitationSurface.y > 0.0)
+    float wetBsdf = MonolithWetBsdfWeight(_MonolithPrecipitationSurface);
+    if (wetBsdf > 0.0)
     {
         CBSDF water = EvaluateBSDF(V, L, preLightData, bsdfData);
-        data.diffR = lerp(data.diffR, water.diffR, _MonolithPrecipitationSurface.y);
-        data.specR = lerp(data.specR, water.specR, _MonolithPrecipitationSurface.y);
+        data.diffR = lerp(data.diffR, water.diffR, wetBsdf);
+        data.specR = lerp(data.specR, water.specR, wetBsdf);
     }
     #endif
     return data;
@@ -145,6 +147,9 @@ DirectLighting EvaluateBSDF_Directional(LightLoopContext lightLoopContext, float
         if (_MonolithDebug > 62.5 && _MonolithDebug < 63.5) _MonolithDiagnosticValue = shadow;
         float3 cookie = 1.0;
         if (lightData.cookieMode != COOKIEMODE_NONE) cookie = EvaluateCookie_Directional(lightLoopContext, lightData, posInput.positionWS - lightData.positionRWS);
+        #ifdef MONOLITH_WETNESS_INCLUDED
+        if (_MonolithPrecipitationSurface.x > 0.0 || _MonolithPrecipitationSurface.y > 0.0) ClampRoughness(preLightData, bsdfData, lightData.minRoughness);
+        #endif
         return MonolithBoundLighting(V, -lightData.forward, preLightData, bsdfData, sourceColor, cookie, shadow, 1.0, lightData.diffuseDimmer, lightData.specularDimmer);
     }
     if (_MonolithSourceProfile > 0.5 && _MonolithSourceLightingMode > 0.5 && _MonolithSourceLightingMode < 1.5)
@@ -192,6 +197,9 @@ DirectLighting EvaluateBSDF_Punctual(LightLoopContext lightLoopContext, float3 V
         float4 cookie = 1.0;
         if (lightData.cookieMode != COOKIEMODE_NONE) cookie = EvaluateCookie_Punctual(lightLoopContext, lightData, delta);
         if (lightData.lightType == GPULIGHTTYPE_SPOT) cookie.rgb *= AngleAttenuation(dot(-L, lightData.forward), lightData.angleScale, lightData.angleOffset);
+        #ifdef MONOLITH_WETNESS_INCLUDED
+        if (_MonolithPrecipitationSurface.x > 0.0 || _MonolithPrecipitationSurface.y > 0.0) ClampRoughness(preLightData, bsdfData, lightData.minRoughness);
+        #endif
         DirectLighting lighting = MonolithBoundLighting(V, L, preLightData, bsdfData, sourceColor, cookie.rgb * cookie.a, shadow, attenuation, lightData.diffuseDimmer, lightData.specularDimmer);
         _MonolithSourceLocalLight = 0.0;
         return lighting;
@@ -249,7 +257,7 @@ void PostEvaluateBSDF(LightLoopContext lightLoopContext, float3 V, PositionInput
         builtinData.bakeDiffuseLighting = 0.0;
         builtinData.backBakeDiffuseLighting = 0.0;
         #ifdef MONOLITH_WETNESS_INCLUDED
-        float wetReflection = saturate(_MonolithPrecipitationSurface.x * 0.18 + _MonolithPrecipitationSurface.y);
+        float wetReflection = MonolithWetBsdfWeight(_MonolithPrecipitationSurface);
         lighting.indirect.specularReflected *= wetReflection * _MonolithWetReflectionIntensity;
         environmentData.total = environmentData.diffuse + environmentData.specular * (1.0 - wetReflection);
         environmentData.combined = _MonolithEnvCombineClamp > 0.5 ? saturate(environmentData.total) : environmentData.total;
@@ -275,7 +283,7 @@ void PostEvaluateBSDF(LightLoopContext lightLoopContext, float3 V, PositionInput
     if (!originalEnvironment)
     #endif
     {
-        lighting.indirect.specularReflected *= lerp(1.0, _MonolithWetReflectionIntensity, saturate(_MonolithPrecipitationSurface.x * 0.18 + _MonolithPrecipitationSurface.y));
+        lighting.indirect.specularReflected *= lerp(1.0, _MonolithWetReflectionIntensity, MonolithWetBsdfWeight(_MonolithPrecipitationSurface));
     }
     #endif
     if (_MonolithDiagnosticOptions.z > 0.5)
@@ -347,6 +355,9 @@ void PostEvaluateBSDF(LightLoopContext lightLoopContext, float3 V, PositionInput
         if (_MonolithDebug > 68.5 && _MonolithDebug < 69.5) diagnostic = _MonolithDiagnosticValue;
         if (_MonolithDebug > 69.5 && _MonolithDebug < 87.5) diagnostic = _MonolithDiagnosticValue;
         if (_MonolithDebug > 87.5 && _MonolithDebug < 88.5) diagnostic = bsdfData.diffuseColor * lighting.direct.diffuse;
+        #ifdef MONOLITH_WETNESS_INCLUDED
+        if (_MonolithDebug > 88.5 && _MonolithDebug < 89.5) diagnostic = float3(_MonolithPrecipitationSurface, saturate(_MonolithPrecipitationDepth / max(0.0001, MonolithResolvedPuddleShape().x)));
+        #endif
         lightLoopOutput.diffuseLighting = diagnostic * GetInverseCurrentExposureMultiplier();
         lightLoopOutput.specularLighting = 0.0;
     }

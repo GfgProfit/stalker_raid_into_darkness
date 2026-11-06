@@ -28,6 +28,14 @@ namespace XRay.Importer.Levels
         private static readonly int _settingsId = Shader.PropertyToID("_MonolithWetnessSettings");
         private static readonly int _puddleId = Shader.PropertyToID("_MonolithPuddleSettings");
         private static readonly int _reflectionId = Shader.PropertyToID("_MonolithWetReflectionIntensity");
+        private static readonly int _shapeId = Shader.PropertyToID("_MonolithPuddleShape");
+        private static readonly int _opticsId = Shader.PropertyToID("_MonolithPuddleOptics");
+        private static readonly int _rippleId = Shader.PropertyToID("_MonolithPuddleRipple");
+        private static readonly int _soilId = Shader.PropertyToID("_MonolithWetSoilResponse");
+        private static readonly int _asphaltId = Shader.PropertyToID("_MonolithWetAsphaltResponse");
+        private static readonly int _concreteId = Shader.PropertyToID("_MonolithWetConcreteResponse");
+        private static readonly int _stoneId = Shader.PropertyToID("_MonolithWetStoneResponse");
+        private static readonly int _rainTimeId = Shader.PropertyToID("_MonolithPuddleRainTime");
 
         private readonly int _ownerToken;
         private readonly int[] _size = new int[2];
@@ -44,8 +52,18 @@ namespace XRay.Importer.Levels
         private Vector4 _savedCell;
         private Vector4 _savedSettings;
         private Vector4 _savedPuddle;
+        private Vector4 _savedShape;
+        private Vector4 _savedOptics;
+        private Vector4 _savedRipple;
+        private Vector4 _savedSoil;
+        private Vector4 _savedAsphalt;
+        private Vector4 _savedConcrete;
+        private Vector4 _savedStone;
         private float _savedActive;
         private float _savedReflection;
+        private float _rippleRainEnvelope;
+        private float _savedRainTime;
+        private float _lastRainTime;
         private int _savedOwner;
         private int _updateKernel;
         private int _resampleKernel;
@@ -53,9 +71,11 @@ namespace XRay.Importer.Levels
         private bool _published;
 
         public GraphicsBuffer Buffer => _current;
+        public Vector4 WorldMapping => _mapping;
         public int Width => _size[0];
         public int Height => _size[1];
         public long EstimatedBytes => _current != null ? (long)_current.count * CELL_STRIDE * 2 : 0;
+        public float RippleRainEnvelope => _rippleRainEnvelope;
 
         public XRayWetnessField(GameObject owner)
         {
@@ -71,6 +91,7 @@ namespace XRay.Importer.Levels
             if (!float.IsFinite(rainDensity)) throw new ArgumentOutOfRangeException(nameof(rainDensity));
             if (!float.IsFinite(worldMapping.x) || !float.IsFinite(worldMapping.y) || !float.IsFinite(worldMapping.z) || !float.IsFinite(worldMapping.w) || worldMapping.z <= 0.0f || worldMapping.w <= 0.0f) throw new ArgumentOutOfRangeException(nameof(worldMapping));
             EnsureResources(config.WetnessCompute, heightTexture.width, heightTexture.height, worldMapping);
+            _rippleRainEnvelope = Mathf.Max(Mathf.Clamp01(rainDensity), _rippleRainEnvelope * Mathf.Exp(-realDelta / config.RippleDecaySeconds));
             _compute.SetBuffer(_updateKernel, "_Previous", _current);
             _compute.SetBuffer(_updateKernel, "_Result", _next);
             _compute.SetTexture(_updateKernel, "_Height", heightTexture);
@@ -89,7 +110,7 @@ namespace XRay.Importer.Levels
             _mapping = worldMapping;
         }
 
-        public void Publish(PrecipitationConfig config, float realTime, float rainDensity)
+        public void Publish(PrecipitationConfig config, float realTime, float rainDensity, XRayPuddleArtProfile? artProfile = null, float windVelocity = 0.0f)
         {
             if (config == null || _current == null) return;
             if (config.WetSurfaceTextures == null) throw new InvalidOperationException("PrecipitationConfig requires prepared wet surface texture slices.");
@@ -104,6 +125,14 @@ namespace XRay.Importer.Levels
                 _savedSettings = Shader.GetGlobalVector(_settingsId);
                 _savedPuddle = Shader.GetGlobalVector(_puddleId);
                 _savedReflection = Shader.GetGlobalFloat(_reflectionId);
+                _savedShape = Shader.GetGlobalVector(_shapeId);
+                _savedOptics = Shader.GetGlobalVector(_opticsId);
+                _savedRipple = Shader.GetGlobalVector(_rippleId);
+                _savedSoil = Shader.GetGlobalVector(_soilId);
+                _savedAsphalt = Shader.GetGlobalVector(_asphaltId);
+                _savedConcrete = Shader.GetGlobalVector(_concreteId);
+                _savedStone = Shader.GetGlobalVector(_stoneId);
+                _savedRainTime = Shader.GetGlobalFloat(_rainTimeId);
                 _published = true;
             }
             else if (Shader.GetGlobalInteger(_ownerId) != _ownerToken) throw new InvalidOperationException("The precipitation wetness field no longer owns its shader bindings.");
@@ -114,6 +143,16 @@ namespace XRay.Importer.Levels
             Shader.SetGlobalVector(_settingsId, new Vector4(config.WetnessEnabled ? config.WetnessStrength : 0.0f, config.PuddlesEnabled ? config.PuddleStrength : 0.0f, config.ShelterTolerance, Mathf.Clamp01(rainDensity)));
             Shader.SetGlobalVector(_puddleId, new Vector4(config.RippleStrength, config.PuddleMaskScale, realTime, config.WetSurfaceTextures.depth));
             Shader.SetGlobalFloat(_reflectionId, config.ReflectionIntensity);
+            XRayPuddleArtProfile profile = artProfile ?? config.ArtProfile;
+            Shader.SetGlobalVector(_shapeId, config.GetPuddleShape(profile));
+            Shader.SetGlobalVector(_opticsId, config.GetPuddleOptics(profile));
+            Shader.SetGlobalVector(_rippleId, new Vector4(_rippleRainEnvelope, Mathf.Clamp01(rainDensity), Mathf.Clamp01(windVelocity / 20.0f) * config.WindRippleStrength, config.GetPuddleCoverage(profile)));
+            Shader.SetGlobalVector(_soilId, config.GetWetResponse(XRayWetSurfaceType.Soil).Response);
+            Shader.SetGlobalVector(_asphaltId, config.GetWetResponse(XRayWetSurfaceType.Asphalt).Response);
+            Shader.SetGlobalVector(_concreteId, config.GetWetResponse(XRayWetSurfaceType.Concrete).Response);
+            Shader.SetGlobalVector(_stoneId, config.GetWetResponse(XRayWetSurfaceType.Stone).Response);
+            if (rainDensity > 0.0f) _lastRainTime = realTime;
+            Shader.SetGlobalFloat(_rainTimeId, _lastRainTime);
             Shader.SetGlobalInteger(_ownerId, _ownerToken);
             Shader.SetGlobalFloat(_activeId, config.WetnessEnabled || config.PuddlesEnabled ? 1.0f : 0.0f);
         }
@@ -131,6 +170,14 @@ namespace XRay.Importer.Levels
                 Shader.SetGlobalVector(_settingsId, _savedSettings);
                 Shader.SetGlobalVector(_puddleId, _savedPuddle);
                 Shader.SetGlobalFloat(_reflectionId, _savedReflection);
+                Shader.SetGlobalVector(_shapeId, _savedShape);
+                Shader.SetGlobalVector(_opticsId, _savedOptics);
+                Shader.SetGlobalVector(_rippleId, _savedRipple);
+                Shader.SetGlobalVector(_soilId, _savedSoil);
+                Shader.SetGlobalVector(_asphaltId, _savedAsphalt);
+                Shader.SetGlobalVector(_concreteId, _savedConcrete);
+                Shader.SetGlobalVector(_stoneId, _savedStone);
+                Shader.SetGlobalFloat(_rainTimeId, _savedRainTime);
                 Shader.SetGlobalInteger(_ownerId, _savedOwner);
             }
             _published = false;
@@ -164,6 +211,8 @@ namespace XRay.Importer.Levels
             _next = null;
             _compute = null;
             _sourceCompute = null;
+            _rippleRainEnvelope = 0.0f;
+            _lastRainTime = 0.0f;
             _size[0] = 0;
             _size[1] = 0;
         }

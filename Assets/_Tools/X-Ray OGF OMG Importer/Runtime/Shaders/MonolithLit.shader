@@ -45,6 +45,10 @@ Shader "HDRP/MonolithLit"
         _MonolithWindWavesFlipV("Wind Waves Require V Flip", Float) = 0
         _MonolithFloraWetness("Flora rain_params.y (Explicit Wetness)", Range(0,1)) = 0
         _MonolithWetResponse("Precipitation Response (Darkening, Gloss, Puddles, Enabled)", Vector) = (0.8,0.75,0.35,0)
+        _MonolithWetTerrainResponseR("Precipitation Terrain R Response", Vector) = (0,0,0,0)
+        _MonolithWetTerrainResponseG("Precipitation Terrain G Response", Vector) = (0,0,0,0)
+        _MonolithWetTerrainResponseB("Precipitation Terrain B Response", Vector) = (0,0,0,0)
+        _MonolithWetTerrainResponseA("Precipitation Terrain A Response", Vector) = (0,0,0,0)
         _MonolithPuddleMask("Original Terrain Puddle Mask", 2D) = "white" {}
         [HideInInspector] _MonolithHasPuddleMask("Original Puddle Mask Bound", Float) = 0
         [HideInInspector] _MonolithPuddleMaskSlice("Original Puddle Mask Slice", Float) = -1

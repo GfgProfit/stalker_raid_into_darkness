@@ -1,5 +1,7 @@
 #pragma kernel SampleMoisture
 #pragma kernel SampleSurface
+#pragma kernel SampleGroundPlane
+#pragma kernel SampleFilmEnergy
 #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Common.hlsl"
 
 SAMPLER(s_linear_repeat_sampler);
@@ -35,6 +37,21 @@ void SampleSurface(uint3 id : SV_DispatchThreadID)
     float2 moisture = MonolithWetSurface(worldPosition, geometricNormal, worldPosition.xz, _Positions[id.x].w, _Moisture[id.x].xy, false, albedo, gloss);
     float3 surfaceNormal = MonolithWetNormal(worldPosition, geometricNormal, normalize(float3(0.12, 0.985, 0.08)), moisture);
     _Results[id.x] = float4(moisture, gloss, 1.0);
-    _Albedo[id.x] = float4(albedo, 1.0);
+    _Albedo[id.x] = float4(albedo, _MonolithPrecipitationDepth);
     _SurfaceNormals[id.x] = float4(surfaceNormal, 1.0);
+}
+
+[numthreads(64, 1, 1)]
+void SampleGroundPlane(uint3 id : SV_DispatchThreadID)
+{
+    if (id.x >= _SampleCount) return;
+    _Results[id.x] = float4(MonolithWetGroundPlane(_Positions[id.x].xyz), 0.0, 0.0, 1.0);
+}
+
+[numthreads(64, 1, 1)]
+void SampleFilmEnergy(uint3 id : SV_DispatchThreadID)
+{
+    if (id.x >= _SampleCount) return;
+    float2 surface = _Moisture[id.x].xy;
+    _Results[id.x] = float4(MonolithWetSpecular(float3(0.5, 0.2, 0.1), surface), MonolithWetBsdfWeight(surface));
 }

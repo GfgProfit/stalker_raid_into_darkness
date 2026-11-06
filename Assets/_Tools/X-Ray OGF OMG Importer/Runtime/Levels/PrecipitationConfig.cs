@@ -10,6 +10,13 @@ namespace XRay.Importer.Levels
         High
     }
 
+    public enum XRayPuddleArtProfile
+    {
+        AtmosphericZone,
+        SubtleRealistic,
+        HeavyRain
+    }
+
     [Serializable]
     public sealed class XRayPuddleMaskBinding
     {
@@ -62,10 +69,23 @@ namespace XRay.Importer.Levels
         [SerializeField, Min(0.0f)] private float _rippleStrength = 0.025f;
         [SerializeField, Min(0.01f)] private float _puddleMaskScale = 1.1f;
         [SerializeField, Min(0.01f)] private float _shelterTolerance = 0.15f;
+        [Header("Художественная модель луж")]
+        [SerializeField] private XRayPuddleArtProfile _artProfile = XRayPuddleArtProfile.AtmosphericZone;
+        [SerializeField, Min(0.001f)] private float _puddleDepth = 0.055f;
+        [SerializeField, Min(0.0001f)] private float _puddleEdgeWidth = 0.004f;
+        [SerializeField, Range(1.0f, 4.0f)] private float _puddleBasinRadius = 2.0f;
+        [SerializeField, Min(0.001f)] private float _puddleMicroRelief = 0.085f;
+        [SerializeField, Min(0.0f)] private float _waterAbsorption = 5.0f;
+        [SerializeField, Range(0.02f, 1.0f)] private float _wetRoughnessFloor = 0.32f;
+        [SerializeField, Range(0.02f, 1.0f)] private float _waterRoughness = 0.12f;
+        [SerializeField, Min(0.0f)] private float _windRippleStrength = 0.12f;
+        [SerializeField, Min(0.01f)] private float _rippleDecaySeconds = 1.2f;
         [Header("Отражения мокрых поверхностей")]
         [SerializeField] private bool _nonCameraReflectionsEnabled = true;
         [SerializeField, Min(0.0f)] private float _reflectionIntensity = 1.0f;
         [SerializeField, Min(5.0f)] private float _reflectionRefreshSeconds = 5.0f;
+        [SerializeField] private bool _planarReflectionsEnabled = true;
+        [SerializeField] private int _planarReflectionResolution = 256;
         [Header("Ресурсы поверхностей")]
         [SerializeField] private ComputeShader _wetnessCompute;
         [SerializeField] private Texture2D _puddleNoise;
@@ -108,9 +128,14 @@ namespace XRay.Importer.Levels
         public float RippleStrength => _rippleStrength;
         public float PuddleMaskScale => _puddleMaskScale;
         public float ShelterTolerance => _shelterTolerance;
+        public XRayPuddleArtProfile ArtProfile => _artProfile;
+        public float WindRippleStrength => _windRippleStrength;
+        public float RippleDecaySeconds => _rippleDecaySeconds;
         public bool NonCameraReflectionsEnabled => _nonCameraReflectionsEnabled;
         public float ReflectionIntensity => _reflectionIntensity;
         public float ReflectionRefreshSeconds => _reflectionRefreshSeconds;
+        public bool PlanarReflectionsEnabled => _planarReflectionsEnabled;
+        public int PlanarReflectionResolution => _planarReflectionResolution;
         public ComputeShader WetnessCompute => _wetnessCompute;
         public Texture2D PuddleNoise => _puddleNoise;
         public Texture2D RippleNormal => _rippleNormal;
@@ -118,6 +143,25 @@ namespace XRay.Importer.Levels
         public int AtlasResolution => 256 << (int)_quality;
         public int DropBudget => Mathf.Max(1, _maxDrops >> (2 - (int)_quality));
         public int Revision { get; private set; }
+
+        public Vector4 GetPuddleShape(XRayPuddleArtProfile profile)
+        {
+            float depthScale = profile == XRayPuddleArtProfile.SubtleRealistic ? 0.035f / 0.055f : profile == XRayPuddleArtProfile.HeavyRain ? 0.075f / 0.055f : 1.0f;
+            return new Vector4(_puddleDepth * depthScale, _puddleEdgeWidth, _puddleBasinRadius, _puddleMicroRelief);
+        }
+
+        public Vector4 GetPuddleOptics(XRayPuddleArtProfile profile)
+        {
+            float wetScale = profile == XRayPuddleArtProfile.SubtleRealistic ? 0.38f / 0.32f : profile == XRayPuddleArtProfile.HeavyRain ? 0.28f / 0.32f : 1.0f;
+            float waterScale = profile == XRayPuddleArtProfile.SubtleRealistic ? 1.25f : profile == XRayPuddleArtProfile.HeavyRain ? 0.10f / 0.12f : 1.0f;
+            float rippleScale = profile == XRayPuddleArtProfile.SubtleRealistic ? 0.55f : profile == XRayPuddleArtProfile.HeavyRain ? 1.35f : 1.0f;
+            return new Vector4(_waterAbsorption, Mathf.Clamp(_wetRoughnessFloor * wetScale, 0.02f, 1.0f), Mathf.Clamp(_waterRoughness * waterScale, 0.02f, 1.0f), rippleScale);
+        }
+
+        public float GetPuddleCoverage(XRayPuddleArtProfile profile)
+        {
+            return profile == XRayPuddleArtProfile.SubtleRealistic ? 0.75f : profile == XRayPuddleArtProfile.HeavyRain ? 1.25f : 1.0f;
+        }
 
         public Texture2D FindPuddleMask(string baseTextureName)
         {
@@ -147,7 +191,10 @@ namespace XRay.Importer.Levels
             else if ((_enabled || requireResources) && (_rainShader == null || _heightShader == null || _rainCompute == null || _rainTexture == null || _splashTexture == null)) diagnostic = "Precipitation requires prepared rain, splash, height and compute shader resources.";
             else if (!FiniteNonnegative(_wettingRate) || !FiniteNonnegative(_dryingRate) || !FiniteNonnegative(_wetnessStrength) || !FiniteNonnegative(_puddleFormationRate) || !FiniteNonnegative(_puddleDryingRate) || !FiniteNonnegative(_puddleStrength) || !FiniteNonnegative(_rippleStrength) || !Positive(_puddleMaskScale)) diagnostic = "Wetness and puddle rates must be finite and nonnegative.";
             else if (!Unit(_maxWetness) || !Unit(_maxPuddles) || !Unit(_puddleWetnessThreshold)) diagnostic = "Wetness and puddle limits must be between zero and one.";
+            else if ((int)_artProfile < 0 || (int)_artProfile > 2 || !Positive(_puddleDepth) || !Positive(_puddleEdgeWidth) || !float.IsFinite(_puddleBasinRadius) || _puddleBasinRadius < 1.0f || _puddleBasinRadius > 4.0f || !Positive(_puddleMicroRelief)) diagnostic = "Puddle art profile, depth, edge width, basin radius and micro relief must be valid.";
+            else if (!FiniteNonnegative(_waterAbsorption) || !Unit(_wetRoughnessFloor) || _wetRoughnessFloor < 0.02f || !Unit(_waterRoughness) || _waterRoughness < 0.02f || !FiniteNonnegative(_windRippleStrength) || !Positive(_rippleDecaySeconds)) diagnostic = "Puddle absorption, roughness and ripple settings must be finite and within their supported ranges.";
             else if (!FiniteNonnegative(_reflectionIntensity) || !float.IsFinite(_reflectionRefreshSeconds) || _reflectionRefreshSeconds < 5.0f) diagnostic = "Wet surface reflection intensity must be finite and nonnegative, with at least five seconds between captures.";
+            else if (_planarReflectionResolution != 128 && _planarReflectionResolution != 256 && _planarReflectionResolution != 512) diagnostic = "Planar reflection resolution must be 128, 256 or 512 pixels.";
             else if ((_wetnessEnabled || _puddlesEnabled) && _wetnessCompute == null) diagnostic = "Wetness and puddles require the prepared wetness compute shader.";
             else if ((_wetnessEnabled || _puddlesEnabled) && (_wetSurfaceTextures == null || _wetSurfaceTextures.depth < 2)) diagnostic = "Wetness and puddles require prepared shared texture array slices.";
             if (diagnostic != null) return false;

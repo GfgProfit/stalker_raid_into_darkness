@@ -369,6 +369,10 @@ float _TessellationBackFaceCullEpsilon;
 #endif
 UNITY_TEXTURE_STREAMING_DEBUG_VARS;
 float4 _MonolithWetResponse;
+float4 _MonolithWetTerrainResponseR;
+float4 _MonolithWetTerrainResponseG;
+float4 _MonolithWetTerrainResponseB;
+float4 _MonolithWetTerrainResponseA;
 float _MonolithPuddleMaskSlice;
 float _MonolithPuddleMaskFlipV;
 CBUFFER_END

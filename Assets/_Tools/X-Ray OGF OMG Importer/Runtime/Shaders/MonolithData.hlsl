@@ -342,6 +342,20 @@ void GetSurfaceAndBuiltinData(FragInputs input, float3 V, inout PositionInputs p
     }
     #endif
     #ifdef MONOLITH_WETNESS_INCLUDED
+    _MonolithPrecipitationResponse = _MonolithWetResponse;
+    _MonolithPrecipitationDepth = 0.0;
+    #ifdef MONOLITH_SOURCE_TERRAIN
+    if (sourceTerrain)
+    {
+        float2 precipitationMaskUv = MonolithSourceTextureUv(MonolithSourceXRayUv(uv), _MonolithTerrainMaskFlipV);
+        float4 precipitationWeights = MonolithTerrainWeights(SAMPLE_TEXTURE2D(_MonolithTerrainMask, sampler_MonolithTerrainBumpR, precipitationMaskUv));
+        float4 precipitationR = _MonolithWetTerrainResponseR.w > 0.0 ? _MonolithWetTerrainResponseR : _MonolithWetResponse;
+        float4 precipitationG = _MonolithWetTerrainResponseG.w > 0.0 ? _MonolithWetTerrainResponseG : _MonolithWetResponse;
+        float4 precipitationB = _MonolithWetTerrainResponseB.w > 0.0 ? _MonolithWetTerrainResponseB : _MonolithWetResponse;
+        float4 precipitationA = _MonolithWetTerrainResponseA.w > 0.0 ? _MonolithWetTerrainResponseA : _MonolithWetResponse;
+        if (dot(precipitationWeights, 1.0) > 0.0) _MonolithPrecipitationResponse = precipitationR * precipitationWeights.r + precipitationG * precipitationWeights.g + precipitationB * precipitationWeights.b + precipitationA * precipitationWeights.a;
+    }
+    #endif
     float3 precipitationPosition = GetAbsolutePositionWS(posInput.positionWS);
     float3 precipitationNormal = SafeNormalize(input.tangentToWorld[2]);
     #ifdef MONOLITH_SOURCE_TERRAIN
@@ -412,12 +426,12 @@ void GetSurfaceAndBuiltinData(FragInputs input, float3 V, inout PositionInputs p
         if (_MonolithWetnessSettings.y > 0.0 && precipitationMoisture.y > 0.0)
         {
     #ifdef _MONOLITH_LEVEL_TERRAIN
-            precipitationHeight = MonolithWetNoise(precipitationPosition.xz) * 0.5;
+            precipitationHeight = 0.5;
     #ifdef MONOLITH_SOURCE_TERRAIN
             if (sourceTerrain) precipitationHeight = terrainHeight;
     #endif
     #else
-            precipitationHeight = _MonolithHasBumpCorrection > 0.5 ? SAMPLE_TEXTURE2D(_MonolithBumpCorrection, sampler_MonolithBump, bumpUv).r : MonolithWetNoise(precipitationPosition.xz) * 0.5;
+            precipitationHeight = _MonolithHasBumpCorrection > 0.5 ? SAMPLE_TEXTURE2D(_MonolithBumpCorrection, sampler_MonolithBump, bumpUv).r : 0.5;
     #endif
         }
         bool precipitationFlora = false;
@@ -570,10 +584,21 @@ void GetSurfaceAndBuiltinData(FragInputs input, float3 V, inout PositionInputs p
     {
         surfaceData.normalWS = MonolithWetNormal(precipitationPosition, surfaceData.geomNormalWS, surfaceData.normalWS, precipitationSurface);
         surfaceData.tangentWS = Orthonormalize(surfaceData.tangentWS, surfaceData.normalWS);
-        surfaceData.specularColor = lerp(surfaceData.specularColor, 0.0204, precipitationSurface.y);
-        surfaceData.perceptualSmoothness = lerp(surfaceData.perceptualSmoothness, 0.965 - saturate(_MonolithWetnessSettings.w) * 0.04, precipitationSurface.y);
-        surfaceData.coatMask = max(surfaceData.coatMask, precipitationSurface.x * 0.15 * (1.0 - precipitationSurface.y));
-        surfaceData.materialFeatures |= MATERIALFEATUREFLAGS_LIT_CLEAR_COAT;
+        float4 precipitationOptics = MonolithResolvedPuddleOptics();
+        float4 precipitationResponse = MonolithResolvedWetResponse();
+        float wetFilm = saturate(precipitationSurface.x * precipitationResponse.y);
+        float dryRoughness = 1.0 - surfaceData.perceptualSmoothness;
+        float filmRoughness = max(precipitationOptics.y, dryRoughness * 0.72);
+        float waterRoughness = precipitationOptics.z + saturate(_MonolithPuddleRipple.x) * 0.045;
+        float precipitationRoughness = lerp(lerp(dryRoughness, filmRoughness, wetFilm), waterRoughness, precipitationSurface.y);
+        #if defined(SHADER_STAGE_FRAGMENT)
+        float3 normalDx = ddx(surfaceData.normalWS);
+        float3 normalDy = ddy(surfaceData.normalWS);
+        float precipitationVariance = min(0.035, dot(normalDx, normalDx) + dot(normalDy, normalDy));
+        precipitationRoughness = sqrt(saturate(precipitationRoughness * precipitationRoughness + precipitationVariance));
+        #endif
+        surfaceData.specularColor = MonolithWetSpecular(surfaceData.specularColor, precipitationSurface);
+        surfaceData.perceptualSmoothness = 1.0 - precipitationRoughness;
     }
     _MonolithPrecipitationSurface = precipitationSurface;
     #endif

@@ -355,6 +355,129 @@ namespace XRay.Importer.Tests
             }
         }
 
+        [Test]
+        public void ArtProfilesChangeOpticsWithoutMutatingSharedConfigurationOrAccumulatedWater()
+        {
+            PrecipitationConfig configuration = Configuration();
+            Texture2D heights = Heights(2, 2, Color.clear);
+            var field = new XRayWetnessField(_owner);
+            int shapeId = Shader.PropertyToID("_MonolithPuddleShape");
+            int opticsId = Shader.PropertyToID("_MonolithPuddleOptics");
+            int rippleId = Shader.PropertyToID("_MonolithPuddleRipple");
+            int soilId = Shader.PropertyToID("_MonolithWetSoilResponse");
+            Vector4 savedShape = Shader.GetGlobalVector(shapeId);
+            Vector4 savedOptics = Shader.GetGlobalVector(opticsId);
+            Vector4 savedRipple = Shader.GetGlobalVector(rippleId);
+            Vector4 savedSoil = Shader.GetGlobalVector(soilId);
+            string before = JsonUtility.ToJson(configuration);
+            Assert.AreEqual(0, Shader.GetGlobalInteger("_MonolithWetnessOwner"));
+            try
+            {
+                field.Tick(configuration, heights, new Vector4(0.0f, 0.0f, 0.5f, 0.5f), 1.0f, 0.0f);
+                field.SetUniformState(0.85f, 0.65f);
+                Color accumulated = Read(field, 0, 0);
+                field.Publish(configuration, 10.0f, 0.5f, XRayPuddleArtProfile.SubtleRealistic, 5.0f);
+                float subtleDepth = Shader.GetGlobalVector(shapeId).x;
+                float subtleRipple = Shader.GetGlobalVector(opticsId).w;
+                field.Publish(configuration, 10.0f, 0.5f, XRayPuddleArtProfile.HeavyRain, 5.0f);
+                Assert.Greater(Shader.GetGlobalVector(shapeId).x, subtleDepth);
+                Assert.Greater(Shader.GetGlobalVector(opticsId).w, subtleRipple);
+                Assert.AreEqual(configuration.GetWetResponse(XRayWetSurfaceType.Soil).Response, Shader.GetGlobalVector(soilId));
+                Assert.AreEqual(accumulated, Read(field, 0, 0));
+                Assert.AreEqual(before, JsonUtility.ToJson(configuration));
+                field.Unpublish();
+                Assert.AreEqual(savedShape, Shader.GetGlobalVector(shapeId));
+                Assert.AreEqual(savedOptics, Shader.GetGlobalVector(opticsId));
+                Assert.AreEqual(savedRipple, Shader.GetGlobalVector(rippleId));
+                Assert.AreEqual(savedSoil, Shader.GetGlobalVector(soilId));
+            }
+            finally
+            {
+                field.Dispose();
+                Object.DestroyImmediate(heights);
+                Object.DestroyImmediate(configuration);
+            }
+        }
+
+        [Test]
+        public void RainRippleEnvelopeDecaysBeforeTheAccumulatedPuddleDries()
+        {
+            PrecipitationConfig configuration = Configuration();
+            Texture2D heights = Heights(2, 2, Color.clear);
+            var field = new XRayWetnessField(_owner);
+            try
+            {
+                var mapping = new Vector4(0.0f, 0.0f, 0.5f, 0.5f);
+                field.Tick(configuration, heights, mapping, 1.0f, 0.0f);
+                field.SetUniformState(1.0f, 0.8f);
+                Assert.AreEqual(1.0f, field.RippleRainEnvelope);
+                field.Tick(configuration, heights, mapping, 0.0f, configuration.RippleDecaySeconds);
+                Assert.That(field.RippleRainEnvelope, Is.EqualTo(Mathf.Exp(-1.0f)).Within(TOLERANCE));
+                field.Tick(configuration, heights, mapping, 0.0f, configuration.RippleDecaySeconds * 5.0f);
+                Assert.Less(field.RippleRainEnvelope, 0.003f);
+                Assert.Greater(Read(field, 0, 0).g, 0.75f);
+                field.Tick(configuration, heights, mapping, 0.4f, 0.0f);
+                Assert.That(field.RippleRainEnvelope, Is.EqualTo(0.4f).Within(TOLERANCE));
+            }
+            finally
+            {
+                field.Dispose();
+                Object.DestroyImmediate(heights);
+                Object.DestroyImmediate(configuration);
+            }
+        }
+
+        [Test]
+        public void TerrainSplatChannelsInheritTheirMaterialDomainAndPreserveAuthoredOverrides()
+        {
+            PrecipitationConfig configuration = Configuration();
+            var source = new Material(Shader.Find("HDRP/MonolithLit")) { name = "mixed terrain" };
+            var asphalt = new Texture2D(2, 2) { name = "detail_asphalt" };
+            var concrete = new Texture2D(2, 2) { name = "detail_concrete" };
+            var soil = new Texture2D(2, 2) { name = "detail_earth" };
+            var stone = new Texture2D(2, 2) { name = "detail_rock" };
+            var bindings = new XRayWetMaterialBindings();
+            try
+            {
+                source.EnableKeyword("_MONOLITH_LEVEL_TERRAIN");
+                source.SetFloat("_MonolithSourceProfile", 1.0f);
+                source.SetFloat("_MonolithSourceTerrain", 1.0f);
+                source.SetFloat("_MonolithTerrainSource", 1.0f);
+                source.SetFloat("_MonolithHasTerrainSourceColor", 1.0f);
+                source.SetTexture("_MonolithTerrainDetailR", soil);
+                source.SetTexture("_MonolithTerrainSourceColorR", asphalt);
+                source.SetTexture("_MonolithTerrainSourceColorG", concrete);
+                source.SetTexture("_MonolithTerrainSourceColorB", soil);
+                source.SetTexture("_MonolithTerrainSourceColorA", stone);
+                GameObject ground = GameObject.CreatePrimitive(PrimitiveType.Quad);
+                SceneManager.MoveGameObjectToScene(ground, _scene);
+                MeshRenderer renderer = ground.GetComponent<MeshRenderer>();
+                renderer.sharedMaterial = source;
+                bindings.Bind(_scene, configuration);
+                Material clone = renderer.sharedMaterial;
+                Assert.AreNotSame(source, clone);
+                Assert.AreEqual(configuration.GetWetResponse(XRayWetSurfaceType.Asphalt).Response, clone.GetVector("_MonolithWetTerrainResponseR"));
+                Assert.AreEqual(configuration.GetWetResponse(XRayWetSurfaceType.Concrete).Response, clone.GetVector("_MonolithWetTerrainResponseG"));
+                Assert.AreEqual(configuration.GetWetResponse(XRayWetSurfaceType.Soil).Response, clone.GetVector("_MonolithWetTerrainResponseB"));
+                Assert.AreEqual(configuration.GetWetResponse(XRayWetSurfaceType.Stone).Response, clone.GetVector("_MonolithWetTerrainResponseA"));
+                var authored = new Vector4(0.9f, 0.2f, 0.1f, 1.0f);
+                source.SetVector("_MonolithWetTerrainResponseR", authored);
+                bindings.Refresh(configuration);
+                Assert.AreEqual(authored, clone.GetVector("_MonolithWetTerrainResponseR"));
+                Assert.AreEqual(Vector4.zero, source.GetVector("_MonolithWetTerrainResponseG"));
+            }
+            finally
+            {
+                bindings.Dispose();
+                Object.DestroyImmediate(source);
+                Object.DestroyImmediate(asphalt);
+                Object.DestroyImmediate(concrete);
+                Object.DestroyImmediate(soil);
+                Object.DestroyImmediate(stone);
+                Object.DestroyImmediate(configuration);
+            }
+        }
+
         private static PrecipitationConfig Configuration()
         {
             PrecipitationConfig source = GameConfig.Load().Precipitation;

@@ -20,6 +20,7 @@ namespace XRay.Importer.Levels
 
         private static readonly string[] SCENARIO_NAMES = { "baseline", "moderate_rain", "strong_rain", "rain_wetness", "rain_puddles", "full" };
         private static readonly string[] EXTENDED_SCENARIO_NAMES = { "baseline", "wetness_only", "puddles_only", "wetness_puddles", "moderate_rain", "strong_rain", "rain_wetness", "rain_puddles", "full", "full_reflection_refresh", "full_no_reflections" };
+        private static readonly string[] ART_SCENARIO_NAMES = { "baseline", "wetness_only", "puddles_only", "wetness_puddles", "moderate_rain", "strong_rain", "rain_wetness", "rain_puddles", "full", "full_reflection_refresh", "full_no_reflections", "puddles_no_ripples", "puddles_ripples" };
 
         public sealed class Scenario
         {
@@ -97,6 +98,16 @@ namespace XRay.Importer.Levels
                         result.estimatedSystemBytesScope = "Constant snapshot after warmup repeated in each CSV row. A second endpoint is read after native samples. Estimates include owned resource budgets and runtime clone allocations, not measured VRAM. Both expensive queries are outside timed samples. One unmeasured native yield isolates the first query from frame timing samples.";
                         yield return null;
                         result.rainDensityAfterWarmup = controller.Precipitation != null ? controller.Precipitation.RainDensity : 0.0f;
+                        result.cameraPosition = camera.transform.position;
+                        result.cameraRotation = camera.transform.rotation;
+                        result.cameraFieldOfView = camera.fieldOfView;
+                        result.precipitationRealTime = controller.Precipitation != null ? controller.Precipitation.RealTime : 0.0f;
+                        result.rippleStrength = config != null ? config.RippleStrength : 0.0f;
+                        result.wetnessEnabled = config != null && config.WetnessEnabled;
+                        result.puddlesEnabled = config != null && config.PuddlesEnabled;
+                        result.nonCameraReflectionsEnabled = config != null && config.NonCameraReflectionsEnabled;
+                        result.puddleSettings = Shader.GetGlobalVector("_MonolithPuddleSettings");
+                        result.puddleRipple = Shader.GetGlobalVector("_MonolithPuddleRipple");
                         result.reflectionCaptureRequestsBeforeSamples = controller.Precipitation?.Reflections?.CaptureRequests ?? 0;
                         result.precipitationEnabledAfterWarmup = controller.Precipitation != null && controller.Precipitation.Enabled;
                         result.rainVisualVisible = controller.RainVisualOverride ?? true;
@@ -186,8 +197,8 @@ namespace XRay.Importer.Levels
             if (string.IsNullOrWhiteSpace(settings.ArchiveFolder) || !Path.GetFullPath(settings.ArchiveFolder).StartsWith(ARCHIVE + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase)) throw new ArgumentException("Performance reports require a task subdirectory under the project Archive.");
             if (string.IsNullOrWhiteSpace(settings.SourceRevision) || string.IsNullOrWhiteSpace(settings.SourceManifestSha256)) throw new ArgumentException("Supply the tested source revision and source manifest SHA256.");
             if (settings.WarmupFrames < 8 || settings.SampleFrames < 1 || settings.CameraRenderWallSamples < 0) throw new ArgumentOutOfRangeException(nameof(settings));
-            if (scenarios == null || scenarios.Length != SCENARIO_NAMES.Length && scenarios.Length != EXTENDED_SCENARIO_NAMES.Length) throw new ArgumentException("Provide the six base or eleven extended precipitation scenarios, with an explicit reason for unavailable scenarios.", nameof(scenarios));
-            string[] expected = scenarios.Length == SCENARIO_NAMES.Length ? SCENARIO_NAMES : EXTENDED_SCENARIO_NAMES;
+            if (scenarios == null || scenarios.Length != SCENARIO_NAMES.Length && scenarios.Length != EXTENDED_SCENARIO_NAMES.Length && scenarios.Length != ART_SCENARIO_NAMES.Length) throw new ArgumentException("Provide the six base, eleven extended or thirteen art precipitation scenarios, with an explicit reason for unavailable scenarios.", nameof(scenarios));
+            string[] expected = scenarios.Length == SCENARIO_NAMES.Length ? SCENARIO_NAMES : scenarios.Length == EXTENDED_SCENARIO_NAMES.Length ? EXTENDED_SCENARIO_NAMES : ART_SCENARIO_NAMES;
             for (int i = 0; i < scenarios.Length; i++)
             {
                 if (scenarios[i] == null || scenarios[i].Name != expected[i] || scenarios[i].SampleFrames < 0 || string.IsNullOrEmpty(scenarios[i].UnavailableReason) && scenarios[i].Setup == null) throw new ArgumentException("Unexpected precipitation scenario at index " + i + ". Expected " + expected[i], nameof(scenarios));
@@ -344,6 +355,16 @@ namespace XRay.Importer.Levels
             public int reflectionCaptureRequestsBeforeSamples;
             public int reflectionCaptureRequestsAfterSamples;
             public float rainDensityAfterWarmup;
+            public Vector3 cameraPosition;
+            public Quaternion cameraRotation;
+            public float cameraFieldOfView;
+            public float precipitationRealTime;
+            public float rippleStrength;
+            public bool wetnessEnabled;
+            public bool puddlesEnabled;
+            public bool nonCameraReflectionsEnabled;
+            public Vector4 puddleSettings;
+            public Vector4 puddleRipple;
             public bool precipitationEnabledAfterWarmup;
             public bool rainVisualVisible;
             public int cameraViewsAfterWarmup;

@@ -32,6 +32,7 @@ namespace XRay.Importer.Levels
         public XRayWetnessField Wetness => _wetness;
         public XRayWetMaterialBindings WetMaterials => _wetMaterials;
         public XRayWetnessReflection Reflections => _reflections;
+        public XRayPuddleArtProfile? ArtProfileOverride { get; set; }
         public long EstimatedBytes => Geometry.EstimatedBytes + (_pass != null ? _pass.EstimatedBytes : 0L) + (_wetness != null ? _wetness.EstimatedBytes : 0L) + (_wetMaterials != null ? _wetMaterials.EstimatedBytes : 0L) + (_reflections != null ? _reflections.EstimatedBytes : 0L);
 
         public XRayPrecipitationSystem(GameObject owner)
@@ -75,7 +76,7 @@ namespace XRay.Importer.Levels
             RainDensity = Mathf.Clamp01(weather.RainDensity * config.IntensityMultiplier);
             RealTime += realDelta;
             Geometry.Refresh(config, realDelta, changed);
-            PublishWetness(config, realDelta, changed);
+            PublishWetness(config, realDelta, changed, weather.WindVelocity);
             EnsurePass();
             float noise = Mathf.PerlinNoise(RealTime * 0.3f, 0.5f) * 2.0f - 1.0f;
             Vector3 direction = XRayPrecipitationMath.FallDirection(weather.WindDirectionRadians, weather.WindVelocity, noise, config.WindResponse);
@@ -117,7 +118,7 @@ namespace XRay.Importer.Levels
             Geometry.Dispose();
         }
 
-        private void PublishWetness(PrecipitationConfig config, float realDelta, bool changed)
+        private void PublishWetness(PrecipitationConfig config, float realDelta, bool changed, float windVelocity)
         {
             if (!config.WetnessEnabled && !config.PuddlesEnabled)
             {
@@ -143,9 +144,9 @@ namespace XRay.Importer.Levels
                 _materialGeometryCapture = Geometry.CaptureCount;
                 _materialRefreshElapsed = 0.0f;
             }
-            _wetness.Publish(config, RealTime, RainDensity);
+            _wetness.Publish(config, RealTime, RainDensity, ArtProfileOverride, windVelocity);
             if (_reflections == null) _reflections = new XRayWetnessReflection(_owner);
-            _reflections.Tick(config, realDelta);
+            _reflections.Tick(config, realDelta, _wetness);
         }
 
         private void EnsurePass()

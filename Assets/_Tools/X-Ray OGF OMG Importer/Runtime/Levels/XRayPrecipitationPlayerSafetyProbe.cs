@@ -28,6 +28,7 @@ namespace XRay.Importer.Levels
         private readonly List<string> _errors = new List<string>();
         private readonly object _logLock = new object();
         private readonly List<PrecipitationConfig> _ownedConfigs = new List<PrecipitationConfig>();
+        private readonly List<RenderTexture> _trackedReflectionTextures = new List<RenderTexture>(20);
 
         private string _output;
         private string _serializedSourceTag;
@@ -128,19 +129,24 @@ namespace XRay.Importer.Levels
             yield return SceneManager.LoadSceneAsync(scene, LoadSceneMode.Single);
             yield return Frames(8);
             Breadcrumb("SceneReloadAfter");
-            bool oldReleased = _releasedSystem != null && _releasedSystem.EstimatedBytes == 0;
+            int trackedBeforeReload = _trackedReflectionTextures.Count;
+            int releasedAfterReload = ReleasedReflectionTextureCount(_trackedReflectionTextures);
+            bool oldReleased = _releasedSystem != null && _releasedSystem.EstimatedBytes == 0 && trackedBeforeReload > 0 && releasedAfterReload == trackedBeforeReload;
             yield return RunStage("Reload");
             yield return Frames(6);
             bool passed = initial && _stagePassed && oldReleased && ErrorCount() == 0;
             bool fullRequested = Array.IndexOf(Environment.GetCommandLineArgs(), "-precipitationFull") >= 0;
             if (passed && fullRequested) yield return RunGuardedFull();
             passed &= !fullRequested || _fullPassed;
+            bool artRequested = Array.IndexOf(Environment.GetCommandLineArgs(), "-precipitationArt") >= 0;
+            if (initial && _stagePassed && oldReleased && ErrorCount() == 0 && artRequested) yield return RunGuardedArt();
+            passed &= !artRequested || _artPassed;
             if (_camera != null) _camera.targetTexture = null;
             yield return Frames(6);
             if (_capture != null) Destroy(_capture);
             yield return Frames(4);
             passed &= ErrorCount() == 0;
-            Write(_output, "Result", new ResultRecord { passed = passed, initial = initial, reload = _stagePassed, oldSceneResourcesReleased = oldReleased, passedScope = fullRequested ? "FULL_PRECIPITATION_VISUAL_AND_LIFECYCLE" : "NATIVE_SAFETY_AND_LIFECYCLE_ONLY", fullRequested = fullRequested, fullPassed = _fullPassed, errors = ErrorSnapshot() });
+            Write(_output, "Result", new ResultRecord { passed = passed, initial = initial, reload = _stagePassed, oldSceneResourcesReleased = oldReleased, trackedBeforeReload = trackedBeforeReload, releasedAfterReload = releasedAfterReload, reflectionTexturesTracked = _trackedReflectionTextures.Count, reflectionTexturesReleased = ReleasedReflectionTextureCount(_trackedReflectionTextures), passedScope = artRequested ? "ART_CAPTURE_ASSERTIONS_AND_NATIVE_SAFETY" : fullRequested ? "FULL_PRECIPITATION_VISUAL_AND_LIFECYCLE" : "NATIVE_SAFETY_AND_LIFECYCLE_ONLY", fullRequested = fullRequested, fullPassed = _fullPassed, artRequested = artRequested, artCaptureAssertionsPassed = _artPassed, errors = ErrorSnapshot() });
             Application.logMessageReceivedThreaded -= ObserveLog;
             RenderPipelineManager.endCameraRendering -= ObserveCamera;
             Application.Quit(passed ? 0 : 1);
@@ -152,6 +158,7 @@ namespace XRay.Importer.Levels
             string output = Path.Combine(_output, name);
             Directory.CreateDirectory(output);
             var result = new StageRecord();
+            var reflectionTextures = new List<RenderTexture>(10);
             bool hasBindings = false;
             Exception failure = null;
             try
@@ -201,6 +208,8 @@ namespace XRay.Importer.Levels
                     {
                         Breadcrumb(name + ":WetFeaturesBefore");
                         SetFeatures(true, true);
+                        JsonUtility.FromJsonOverwrite("{\"_nonCameraReflectionsEnabled\":false}", _ownedConfigs[_ownedConfigs.Count - 1]);
+                        _controller.ApplySettings();
                         Breadcrumb(name + ":WetFeaturesAfter");
                         Require(_controller.Precipitation.Wetness != null, "The owned active configuration creates a real wetness field.");
                         Require(_controller.Precipitation.Geometry.GeometryCount > 0, "Real active scene geometry must be captured before wet rendering is validated.");
@@ -219,13 +228,26 @@ namespace XRay.Importer.Levels
                     if (failure == null)
                     {
                         XRayPrecipitationValidationProbe.Difference(repeat, _lastPixels, out result.wetZeroDifference, out result.wetZeroPixels, out result.wetZeroMaximum);
-                        result.zeroPassed = result.wetZeroDifference <= Math.Max(result.noise * 4.0, 0.00005);
+                        result.zeroReflectionsHeldOff = !_controller.EffectivePrecipitationConfig.NonCameraReflectionsEnabled && (_controller.Precipitation.Reflections == null || _controller.Precipitation.Reflections.ProbeCount == 0 && _controller.Precipitation.Reflections.PlanarProbe == null);
+                        result.zeroPassed = result.zeroReflectionsHeldOff && result.wetZeroDifference <= Math.Max(result.noise * 4.0, 0.00005);
                         result.materialClones = _controller.Precipitation.WetMaterials.CloneCount;
                         result.rendererBindings = _controller.Precipitation.WetMaterials.BindingCount;
                         result.estimatedBytes = _controller.Precipitation.EstimatedBytes;
                         result.instancedInstanceCount = _controller.Precipitation.Geometry.InstancedInstanceCount;
                         result.geometryEstimatedBytes = _controller.Precipitation.Geometry.EstimatedBytes;
                         result.environment = EnvironmentNames();
+                        JsonUtility.FromJsonOverwrite("{\"_nonCameraReflectionsEnabled\":true}", _ownedConfigs[_ownedConfigs.Count - 1]);
+                        _controller.ApplySettings();
+                    }
+                }
+                if (failure == null)
+                {
+                    yield return Frames(60);
+                    yield return Capture(output, "WetZeroReflectionsOn");
+                    failure = _captureFailure;
+                    if (failure == null)
+                    {
+                        XRayPrecipitationValidationProbe.Difference(repeat, _lastPixels, out result.wetZeroReflectionsDifference, out result.wetZeroReflectionsPixels, out result.wetZeroReflectionsMaximum);
                         if (!_fatalNative) _controller.Precipitation.Wetness.SetUniformState(1.0f, 0.0f);
                     }
                 }
@@ -248,8 +270,21 @@ namespace XRay.Importer.Levels
                     yield return Capture(output, "PuddleOne");
                     failure = _captureFailure;
                     if (failure == null) XRayPrecipitationValidationProbe.Difference(wet, _lastPixels, out result.puddleDifference, out result.puddlePixels, out result.puddleMaximum);
+                    if (failure == null)
+                    {
+                        result.planarReleaseEvidenceRequired = _controller.EffectivePrecipitationConfig.PlanarReflectionsEnabled && _controller.EffectivePrecipitationConfig.NonCameraReflectionsEnabled;
+                        for (int frame = 0; frame < 180 && !_fatalNative; frame++)
+                        {
+                            TrackOwnedReflectionTextures(_controller.Precipitation.Reflections, reflectionTextures, result);
+                            if (result.cubeColorTexturesTracked > 0 && (!result.planarReleaseEvidenceRequired || result.planarColorTexturesTracked > 0)) break;
+                            yield return null;
+                        }
+                        if (result.cubeColorTexturesTracked == 0 || result.planarReleaseEvidenceRequired && result.planarColorTexturesTracked == 0) failure = new InvalidOperationException("PuddleOne must allocate actual owned cubemap and enabled planar color textures before native lifetime acceptance.");
+                    }
                 }
                 yield return Frames(120);
+                TrackOwnedReflectionTextures(_controller.Precipitation.Reflections, reflectionTextures, result);
+                _trackedReflectionTextures.AddRange(reflectionTextures);
             }
             if (_fatalNative) yield break;
             try
@@ -290,6 +325,11 @@ namespace XRay.Importer.Levels
             Breadcrumb(name + ":ControllerDisableBefore");
             if (_controller != null) _controller.enabled = false;
             yield return Frames(6);
+            for (int frame = 0; frame < 30 && ReleasedReflectionTextureCount(reflectionTextures) < reflectionTextures.Count; frame++) yield return null;
+            result.reflectionTexturesTracked = reflectionTextures.Count;
+            result.reflectionTexturesReleased = ReleasedReflectionTextureCount(reflectionTextures);
+            result.reflectionTexturesReleasedAfterDisable = result.reflectionTexturesTracked > 0 && result.reflectionTexturesReleased == result.reflectionTexturesTracked && !result.reflectionSnapshotOverflow;
+            if (!result.reflectionTexturesReleasedAfterDisable && string.IsNullOrEmpty(result.error)) result.error = "Actual PuddleOne reflection RenderTexture references were absent, exceeded the bounded snapshot, or remained allocated after owner disable.";
             result.disabled = _releasedSystem != null && !_releasedSystem.Enabled && (_releasedSystem.Pass == null || _releasedSystem.Pass.ViewCount == 0);
             Breadcrumb(name + ":ControllerDisableAfter");
             if (_controller != null)
@@ -300,12 +340,47 @@ namespace XRay.Importer.Levels
             yield return Frames(6);
             result.reenabled = _controller != null && _controller.Precipitation != null && _controller.Precipitation.Enabled;
             result.nativeErrors = ErrorCount();
-            result.passed &= result.disabled && result.reenabled && result.nativeErrors == 0;
+            result.passed &= result.disabled && result.reenabled && result.reflectionTexturesReleasedAfterDisable && result.nativeErrors == 0;
             result.visibleWetObserved = result.wetOneDifference > Math.Max(result.noise * 4.0, 0.00001);
             result.visiblePuddlesObserved = result.puddleDifference > Math.Max(result.noise * 4.0, 0.00001);
             result.passedScope = "NATIVE_SAFETY_AND_LIFECYCLE_ONLY";
             _stagePassed = result.passed;
             Write(output, "Stage", result);
+        }
+
+        private static void TrackOwnedReflectionTextures(XRayWetnessReflection reflections, List<RenderTexture> textures, StageRecord record)
+        {
+            if (reflections == null) return;
+            for (int index = 0; index < reflections.ProbeCount; index++)
+            {
+                HDAdditionalReflectionData probe = reflections.GetProbe(index);
+                if (probe == null) continue;
+                if (TrackReflectionTexture(textures, probe.realtimeTexture, record)) record.cubeColorTexturesTracked++;
+                if (TrackReflectionTexture(textures, probe.realtimeDepthTexture, record)) record.cubeDepthTexturesTracked++;
+            }
+            PlanarReflectionProbe planar = reflections.PlanarProbe;
+            if (planar == null) return;
+            if (TrackReflectionTexture(textures, planar.realtimeTexture, record)) record.planarColorTexturesTracked++;
+            if (TrackReflectionTexture(textures, planar.realtimeDepthTexture, record)) record.planarDepthTexturesTracked++;
+        }
+
+        private static bool TrackReflectionTexture(List<RenderTexture> textures, RenderTexture texture, StageRecord record)
+        {
+            if (texture == null || !texture.IsCreated() || textures.Contains(texture)) return false;
+            if (textures.Count >= 10)
+            {
+                record.reflectionSnapshotOverflow = true;
+                return false;
+            }
+            textures.Add(texture);
+            return true;
+        }
+
+        private static int ReleasedReflectionTextureCount(List<RenderTexture> textures)
+        {
+            int released = 0;
+            foreach (RenderTexture texture in textures) if (texture == null || !texture.IsCreated()) released++;
+            return released;
         }
 
         private void SetFeatures(bool wetness, bool puddles)
@@ -570,15 +645,28 @@ namespace XRay.Importer.Levels
             public bool visibleWetObserved;
             public bool visiblePuddlesObserved;
             public bool zeroPassed;
+            public bool zeroReflectionsHeldOff;
             public bool configurationReadOnly;
             public bool disabled;
             public bool reenabled;
+            public bool planarReleaseEvidenceRequired;
+            public bool reflectionTexturesReleasedAfterDisable;
+            public bool reflectionSnapshotOverflow;
+            public int reflectionTexturesTracked;
+            public int reflectionTexturesReleased;
+            public int cubeColorTexturesTracked;
+            public int cubeDepthTexturesTracked;
+            public int planarColorTexturesTracked;
+            public int planarDepthTexturesTracked;
             public double noise;
             public int noisePixels;
             public float noiseMaximum;
             public double wetZeroDifference;
             public int wetZeroPixels;
             public float wetZeroMaximum;
+            public double wetZeroReflectionsDifference;
+            public int wetZeroReflectionsPixels;
+            public float wetZeroReflectionsMaximum;
             public double wetOneDifference;
             public int wetOnePixels;
             public float wetOneMaximum;
@@ -605,8 +693,14 @@ namespace XRay.Importer.Levels
             public bool initial;
             public bool reload;
             public bool oldSceneResourcesReleased;
+            public int trackedBeforeReload;
+            public int releasedAfterReload;
+            public int reflectionTexturesTracked;
+            public int reflectionTexturesReleased;
             public bool fullRequested;
             public bool fullPassed;
+            public bool artRequested;
+            public bool artCaptureAssertionsPassed;
             public string[] errors;
         }
     }

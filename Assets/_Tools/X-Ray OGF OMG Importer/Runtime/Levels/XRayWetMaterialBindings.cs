@@ -240,7 +240,14 @@ namespace XRay.Importer.Levels
             if (inherited == null) throw new InvalidOperationException("PrecipitationConfig requires the complete wet surface response table.");
             clone.SetVector(RESPONSE, response.w > 0.0f ? response : inherited.Response);
             clone.EnableKeyword(KEYWORD);
-            if (HasAnomalyTerrainSource(source)) clone.EnableKeyword(SOURCE_TERRAIN_KEYWORD);
+            if (HasAnomalyTerrainSource(source))
+            {
+                clone.EnableKeyword(SOURCE_TERRAIN_KEYWORD);
+                ConfigureTerrainResponse(source, clone, config, "R", response);
+                ConfigureTerrainResponse(source, clone, config, "G", response);
+                ConfigureTerrainResponse(source, clone, config, "B", response);
+                ConfigureTerrainResponse(source, clone, config, "A", response);
+            }
             else clone.DisableKeyword(SOURCE_TERRAIN_KEYWORD);
             float slice = source.GetFloat(PUDDLE_SLICE);
             if (float.IsFinite(slice) && slice >= 2.0f)
@@ -252,6 +259,24 @@ namespace XRay.Importer.Levels
             Texture texture = BaseTexture(source);
             clone.SetFloat(PUDDLE_SLICE, texture != null ? config.FindPuddleMaskSlice(texture.name) : -1.0f);
             clone.SetFloat("_MonolithPuddleMaskFlipV", 0.0f);
+        }
+
+        private static void ConfigureTerrainResponse(Material source, Material clone, PrecipitationConfig config, string channel, Vector4 uniformResponse)
+        {
+            string property = "_MonolithWetTerrainResponse" + channel;
+            Vector4 response = source.GetVector(property);
+            if (response.w <= 0.0f)
+            {
+                Texture texture = source.GetTexture("_MonolithTerrainSourceColor" + channel);
+                if (texture == null) texture = source.GetTexture("_MonolithTerrainDetail" + channel);
+                string name = texture != null ? texture.name.ToLowerInvariant() : string.Empty;
+                XRayWetSurfaceType surface = XRayWetSurfaceType.Soil;
+                if (Contains(name, "asphalt", "asfalt", "road", "dorog")) surface = XRayWetSurfaceType.Asphalt;
+                else if (Contains(name, "concrete", "beton", "brick", "cement")) surface = XRayWetSurfaceType.Concrete;
+                else if (Contains(name, "stone", "rock", "granit", "kamen")) surface = XRayWetSurfaceType.Stone;
+                response = uniformResponse.w > 0.0f ? uniformResponse : config.GetWetResponse(surface).Response;
+            }
+            clone.SetVector(property, response);
         }
 
         private static bool HasAnomalyTerrainSource(Material material)

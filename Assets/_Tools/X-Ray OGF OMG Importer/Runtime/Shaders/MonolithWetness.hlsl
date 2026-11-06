@@ -14,8 +14,78 @@ float4 _MonolithWetnessMapping;
 float4 _MonolithWetnessCellSize;
 float4 _MonolithWetnessSettings;
 float4 _MonolithPuddleSettings;
+float4 _MonolithPuddleShape;
+float4 _MonolithPuddleOptics;
+float4 _MonolithPuddleRipple;
+float _MonolithPuddleRainTime;
 float _MonolithWetReflectionIntensity;
 static float2 _MonolithPrecipitationSurface;
+static float4 _MonolithPrecipitationResponse;
+static float _MonolithPrecipitationDepth;
+
+float4 MonolithResolvedWetResponse()
+{
+    return _MonolithPrecipitationResponse.w > 0.0 ? _MonolithPrecipitationResponse : _MonolithWetResponse;
+}
+
+float MonolithWetBsdfWeight(float2 surface)
+{
+    float film = surface.x * saturate(MonolithResolvedWetResponse().y);
+    return max(surface.y, smoothstep(0.0, 0.35, film));
+}
+
+float3 MonolithWetSpecular(float3 drySpecular, float2 surface)
+{
+    return lerp(lerp(drySpecular, 0.04, MonolithWetBsdfWeight(surface)), 0.0204, surface.y);
+}
+
+float4 MonolithResolvedPuddleShape()
+{
+    return _MonolithPuddleShape.x > 0.0 ? _MonolithPuddleShape : float4(0.055, 0.004, 2.0, 0.085);
+}
+
+float4 MonolithResolvedPuddleOptics()
+{
+    return _MonolithPuddleOptics.z > 0.0 ? _MonolithPuddleOptics : float4(5.0, 0.32, 0.12, 1.0);
+}
+
+float MonolithWetTextureLod(float2 uv)
+{
+    #if defined(SHADER_STAGE_FRAGMENT)
+    uint width;
+    uint height;
+    uint slices;
+    _MonolithWetSurfaceTextures.GetDimensions(width, height, slices);
+    float2 footprint = max(abs(ddx(uv)), abs(ddy(uv))) * float2(width, height);
+    return max(0.0, log2(max(1.0, max(footprint.x, footprint.y))));
+    #else
+    return 0.0;
+    #endif
+}
+
+float MonolithWetGroundHeight(int2 pixel, float referenceHeight, uint2 size)
+{
+    pixel = clamp(pixel, 0, (int2)size - 1);
+    float2 heights = _MonolithWetnessCells[pixel.y * size.x + pixel.x].heights;
+    if (heights.x < heights.y) return referenceHeight;
+    float height = abs(heights.x - referenceHeight) < abs(heights.y - referenceHeight) ? heights.x : heights.y;
+    float continuity = 1.0 - smoothstep(0.25, 0.5, abs(height - referenceHeight));
+    return lerp(referenceHeight, height, continuity);
+}
+
+float MonolithWetGroundPlane(float3 worldPosition)
+{
+    if (_MonolithPuddleShape.x <= 0.0 || any(_MonolithWetnessCellSize.xy <= 0.0)) return worldPosition.y;
+    uint2 size = (uint2)_MonolithWetnessCellSize.zw;
+    if (any(size < 1)) return worldPosition.y;
+    int radius = max(1, (int)round(_MonolithPuddleShape.z));
+    float2 coordinate = ((worldPosition.xz - _MonolithWetnessMapping.xy) / _MonolithWetnessCellSize.xy - 0.5) / radius;
+    int2 pixel = (int2)floor(coordinate) * radius;
+    float2 blend = frac(coordinate);
+    float lower = lerp(MonolithWetGroundHeight(pixel, worldPosition.y, size), MonolithWetGroundHeight(pixel + int2(radius, 0), worldPosition.y, size), blend.x);
+    float upper = lerp(MonolithWetGroundHeight(pixel + int2(0, radius), worldPosition.y, size), MonolithWetGroundHeight(pixel + int2(radius, radius), worldPosition.y, size), blend.x);
+    return lerp(lower, upper, blend.y);
+}
 
 float2 MonolithCellMoisture(int2 pixel, float3 worldPosition, float3 geometricNormal, uint2 size)
 {
@@ -48,42 +118,48 @@ float2 MonolithSurfaceMoisture(float3 worldPosition, float3 geometricNormal)
 float MonolithWetNoise(float2 worldPosition)
 {
     float2 uv = worldPosition * _MonolithPuddleSettings.y;
-    float broad = SAMPLE_TEXTURE2D_ARRAY_LOD(_MonolithWetSurfaceTextures, s_linear_repeat_sampler, uv * 0.09, 0.0, 0.0).r;
-    float medium = SAMPLE_TEXTURE2D_ARRAY_LOD(_MonolithWetSurfaceTextures, s_linear_repeat_sampler, float2(uv.x + uv.y, uv.y - uv.x) * 0.21 + 0.37, 0.0, 0.0).r;
-    float fine = SAMPLE_TEXTURE2D_ARRAY_LOD(_MonolithWetSurfaceTextures, s_linear_repeat_sampler, uv * 0.83 - 0.19, 0.0, 0.0).r;
+    float broad = SAMPLE_TEXTURE2D_ARRAY_LOD(_MonolithWetSurfaceTextures, s_linear_repeat_sampler, uv * 0.09, 0.0, MonolithWetTextureLod(uv * 0.09)).r;
+    float medium = SAMPLE_TEXTURE2D_ARRAY_LOD(_MonolithWetSurfaceTextures, s_linear_repeat_sampler, float2(uv.x + uv.y, uv.y - uv.x) * 0.21 + 0.37, 0.0, MonolithWetTextureLod(uv * 0.21)).r;
+    float fine = SAMPLE_TEXTURE2D_ARRAY_LOD(_MonolithWetSurfaceTextures, s_linear_repeat_sampler, uv * 0.83 - 0.19, 0.0, MonolithWetTextureLod(uv * 0.83)).r;
     return broad * 0.55 + medium * 0.3 + fine * 0.15;
 }
 
 float2 MonolithWetSurface(float3 worldPosition, float3 geometricNormal, float2 uv, float microHeight, float2 moisture, bool flora, inout float3 encodedAlbedo, inout float gloss)
 {
-    if (_MonolithWetnessActive < 0.5 || _MonolithWetResponse.w < 0.5 || all(moisture <= 0.0)) return 0.0;
+    float4 response = MonolithResolvedWetResponse();
+    _MonolithPrecipitationDepth = 0.0;
+    if (_MonolithWetnessActive < 0.5 || response.w < 0.5 || all(moisture <= 0.0)) return 0.0;
+    float4 shape = MonolithResolvedPuddleShape();
+    float4 optics = MonolithResolvedPuddleOptics();
     float noise = MonolithWetNoise(worldPosition.xz);
     float wetness = saturate(moisture.x * _MonolithWetnessSettings.x * lerp(0.8, 1.2, noise));
     float puddles = 0.0;
     if (!flora && moisture.y > 0.0 && _MonolithWetnessSettings.y > 0.0)
     {
-        float reservoir = noise;
+        float reservoir = saturate(microHeight);
+        float sourceSupport = 1.0;
         if (_MonolithPuddleMaskSlice >= 2.0 && _MonolithPuddleMaskSlice < _MonolithPuddleSettings.w)
         {
             float2 sourceUv = float2(uv.x, 1.0 - uv.y);
             sourceUv.y = _MonolithPuddleMaskFlipV > 0.5 ? 1.0 - sourceUv.y : sourceUv.y;
-            float sourceHeight = SAMPLE_TEXTURE2D_ARRAY_LOD(_MonolithWetSurfaceTextures, s_linear_repeat_sampler, sourceUv, _MonolithPuddleMaskSlice, 0.0).r;
-            reservoir = lerp(noise, sourceHeight, 0.55);
+            float sourceHeight = SAMPLE_TEXTURE2D_ARRAY_LOD(_MonolithWetSurfaceTextures, s_linear_repeat_sampler, sourceUv, _MonolithPuddleMaskSlice, MonolithWetTextureLod(sourceUv)).r;
+            sourceSupport = 1.0 - saturate(sourceHeight);
         }
-        reservoir = reservoir * 0.65 + saturate(microHeight) * 0.35;
-        float slope = smoothstep(0.94, 0.995, geometricNormal.y);
-        float waterLevel = saturate(moisture.y * _MonolithWetResponse.z * _MonolithWetnessSettings.y) * 0.6 - 0.1;
-        puddles = smoothstep(reservoir - 0.035, reservoir + 0.035, waterLevel) * slope;
+        float slope = smoothstep(0.97, 0.998, geometricNormal.y);
+        float coverageScale = _MonolithPuddleRipple.w > 0.0 ? _MonolithPuddleRipple.w : 1.0;
+        float fill = saturate(moisture.y * response.z * _MonolithWetnessSettings.y * coverageScale);
+        float macroDepth = clamp(MonolithWetGroundPlane(worldPosition) - worldPosition.y, -shape.x, shape.x);
+        float waterLevel = fill * shape.x;
+        float depth = min(shape.x, waterLevel + macroDepth * fill - reservoir * shape.w - (noise - 0.5) * shape.y);
+        puddles = smoothstep(0.0, shape.y, depth) * slope * saturate(fill * 16.0) * sourceSupport;
+        _MonolithPrecipitationDepth = max(0.0, depth) * slope * sourceSupport;
+        float dampRim = smoothstep(-shape.y * 4.0, shape.y, depth) * fill * slope * sourceSupport;
+        wetness = max(wetness, dampRim);
     }
     if (wetness <= 0.0 && puddles <= 0.0) return 0.0;
-    encodedAlbedo *= lerp(1.0, _MonolithWetResponse.x, wetness);
-    if (!flora)
-    {
-        float wetGloss = (0.15 + saturate(_MonolithWetnessSettings.w) * 0.05) * saturate(wetness * 2.0);
-        gloss = saturate(gloss + wetGloss * saturate(geometricNormal.y * 1.5) * _MonolithWetResponse.y);
-    }
-    encodedAlbedo *= lerp(1.0, float3(0.92, 0.95, 0.97), puddles * saturate(moisture.y));
-    gloss = lerp(gloss, 0.94, puddles);
+    encodedAlbedo *= lerp(1.0, response.x, wetness);
+    float3 absorption = exp(-_MonolithPrecipitationDepth * optics.x * float3(0.8, 1.1, 1.6));
+    encodedAlbedo *= lerp(1.0, pow(absorption, 1.0 / 2.2), puddles);
     return float2(wetness, puddles);
 }
 
@@ -97,15 +173,22 @@ float3 MonolithWetNormal(float3 worldPosition, float3 geometricNormal, float3 no
     if (wetness.x <= 0.0 && wetness.y <= 0.0) return normal;
     float3 film = normalize(lerp(normal, geometricNormal, wetness.x * 0.2));
     if (wetness.y <= 0.0) return film;
-    float rain = saturate(_MonolithWetnessSettings.w * 1.5);
+    float4 optics = MonolithResolvedPuddleOptics();
+    float rain = _MonolithPuddleShape.x > 0.0 ? saturate(_MonolithPuddleRipple.x) : saturate(_MonolithWetnessSettings.w);
     float animation = _MonolithPuddleSettings.z * (0.01 + rain * 0.008);
     float2 waveUv = worldPosition.xz * (0.25 * _MonolithPuddleSettings.y);
-    float3 first = SAMPLE_TEXTURE2D_ARRAY_LOD(_MonolithWetSurfaceTextures, s_linear_repeat_sampler, waveUv + float2(0.0, animation), 1.0, 0.0).xyz;
-    float3 second = SAMPLE_TEXTURE2D_ARRAY_LOD(_MonolithWetSurfaceTextures, s_linear_repeat_sampler, waveUv - float2(0.33, animation), 1.0, 0.0).xyz;
+    float waveLod = MonolithWetTextureLod(waveUv);
+    float3 first = SAMPLE_TEXTURE2D_ARRAY_LOD(_MonolithWetSurfaceTextures, s_linear_repeat_sampler, waveUv + float2(0.0, animation), 1.0, waveLod).xyz;
+    float3 second = SAMPLE_TEXTURE2D_ARRAY_LOD(_MonolithWetSurfaceTextures, s_linear_repeat_sampler, waveUv - float2(0.33, animation), 1.0, waveLod).xyz;
     float2 wave = (first.xy + second.xy - 1.0) * 0.5;
     float2 coordinate = worldPosition.xz * 1.8;
     float2 cell = floor(coordinate);
     float2 ripple = 0.0;
+    float ringAntialias = 1.0;
+    #if defined(SHADER_STAGE_FRAGMENT)
+    float footprint = max(length(ddx(coordinate)), length(ddy(coordinate)));
+    ringAntialias = 1.0 - smoothstep(0.035, 0.12, footprint);
+    #endif
     for (int y = -1; y <= 1; y++)
     {
         for (int x = -1; x <= 1; x++)
@@ -115,12 +198,18 @@ float3 MonolithWetNormal(float3 worldPosition, float3 geometricNormal, float3 no
             float2 center = neighbor + float2(phase, MonolithRippleHash(neighbor.yx + 29.0)) * 0.6 + 0.2;
             float2 delta = coordinate - center;
             float radius = length(delta);
-            float age = frac(_MonolithPuddleSettings.z * 0.85 + phase);
+            float birthTime = _MonolithPuddleShape.x > 0.0 ? min(_MonolithPuddleSettings.z, _MonolithPuddleRainTime) : _MonolithPuddleSettings.z;
+            float birthCycle = floor(birthTime * 0.85 + phase);
+            float age = _MonolithPuddleSettings.z * 0.85 + phase - birthCycle;
+            if (age >= 1.0) continue;
+            float eventSeed = MonolithRippleHash(neighbor + birthCycle * 17.0);
+            float occurrence = 1.0 - smoothstep(rain * 0.85, rain * 0.85 + 0.1, eventSeed);
             float ring = sin((radius - age * 0.8) * 40.0) * saturate(1.0 - abs(radius - age * 0.8) * 12.0) * Sq(1.0 - age) * smoothstep(0.0, 0.12, age) * saturate(1.0 - radius);
-            ripple += delta / max(radius, 0.001) * ring;
+            ripple += delta / max(radius, 0.001) * ring * occurrence;
         }
     }
-    float2 perturbation = (wave * (0.12 + rain * 0.35) + ripple * rain) * _MonolithPuddleSettings.x;
+    float wind = max(0.02, _MonolithPuddleRipple.z);
+    float2 perturbation = (wave * (wind + rain * 0.16) + ripple * rain * ringAntialias) * _MonolithPuddleSettings.x * optics.w;
     float3 waterNormal = normalize(float3(perturbation.x, 1.0, perturbation.y));
     return normalize(lerp(film, waterNormal, saturate(wetness.y * wetness.y * 1.8)));
 }

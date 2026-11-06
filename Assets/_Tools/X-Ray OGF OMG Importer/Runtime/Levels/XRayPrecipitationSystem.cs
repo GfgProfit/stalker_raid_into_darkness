@@ -18,6 +18,7 @@ namespace XRay.Importer.Levels
         private XRayPrecipitationPass _pass;
         private XRayWetnessField _wetness;
         private XRayWetMaterialBindings _wetMaterials;
+        private XRayWetnessReflection _reflections;
         private int _revision = -1;
         private int _materialGeometryCapture = -1;
         private float _materialRefreshElapsed;
@@ -30,7 +31,8 @@ namespace XRay.Importer.Levels
         public XRayPrecipitationPass Pass => _pass;
         public XRayWetnessField Wetness => _wetness;
         public XRayWetMaterialBindings WetMaterials => _wetMaterials;
-        public long EstimatedBytes => Geometry.EstimatedBytes + (_pass != null ? _pass.EstimatedBytes : 0L) + (_wetness != null ? _wetness.EstimatedBytes : 0L) + (_wetMaterials != null ? _wetMaterials.EstimatedBytes : 0L);
+        public XRayWetnessReflection Reflections => _reflections;
+        public long EstimatedBytes => Geometry.EstimatedBytes + (_pass != null ? _pass.EstimatedBytes : 0L) + (_wetness != null ? _wetness.EstimatedBytes : 0L) + (_wetMaterials != null ? _wetMaterials.EstimatedBytes : 0L) + (_reflections != null ? _reflections.EstimatedBytes : 0L);
 
         public XRayPrecipitationSystem(GameObject owner)
         {
@@ -97,6 +99,8 @@ namespace XRay.Importer.Levels
             if (_wetness != null) _wetness.Unpublish();
             if (_wetMaterials != null) _wetMaterials.Dispose();
             _wetMaterials = null;
+            if (_reflections != null) _reflections.Dispose();
+            _reflections = null;
             _materialGeometryCapture = -1;
             if (_pass != null) _pass.Release();
             if (_volume != null) _volume.enabled = false;
@@ -120,6 +124,8 @@ namespace XRay.Importer.Levels
                 if (_wetness != null) _wetness.Unpublish();
                 if (_wetMaterials != null) _wetMaterials.Dispose();
                 _wetMaterials = null;
+                if (_reflections != null) _reflections.Dispose();
+                _reflections = null;
                 _materialGeometryCapture = -1;
                 return;
             }
@@ -138,6 +144,8 @@ namespace XRay.Importer.Levels
                 _materialRefreshElapsed = 0.0f;
             }
             _wetness.Publish(config, RealTime, RainDensity);
+            if (_reflections == null) _reflections = new XRayWetnessReflection(_owner);
+            _reflections.Tick(config, realDelta);
         }
 
         private void EnsurePass()

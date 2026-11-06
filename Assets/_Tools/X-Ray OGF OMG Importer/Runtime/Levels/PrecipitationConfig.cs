@@ -62,6 +62,10 @@ namespace XRay.Importer.Levels
         [SerializeField, Min(0.0f)] private float _rippleStrength = 0.025f;
         [SerializeField, Min(0.01f)] private float _puddleMaskScale = 1.1f;
         [SerializeField, Min(0.01f)] private float _shelterTolerance = 0.15f;
+        [Header("Отражения мокрых поверхностей")]
+        [SerializeField] private bool _nonCameraReflectionsEnabled = true;
+        [SerializeField, Min(0.0f)] private float _reflectionIntensity = 1.0f;
+        [SerializeField, Min(5.0f)] private float _reflectionRefreshSeconds = 5.0f;
         [Header("Ресурсы поверхностей")]
         [SerializeField] private ComputeShader _wetnessCompute;
         [SerializeField] private Texture2D _puddleNoise;
@@ -104,6 +108,9 @@ namespace XRay.Importer.Levels
         public float RippleStrength => _rippleStrength;
         public float PuddleMaskScale => _puddleMaskScale;
         public float ShelterTolerance => _shelterTolerance;
+        public bool NonCameraReflectionsEnabled => _nonCameraReflectionsEnabled;
+        public float ReflectionIntensity => _reflectionIntensity;
+        public float ReflectionRefreshSeconds => _reflectionRefreshSeconds;
         public ComputeShader WetnessCompute => _wetnessCompute;
         public Texture2D PuddleNoise => _puddleNoise;
         public Texture2D RippleNormal => _rippleNormal;
@@ -140,6 +147,7 @@ namespace XRay.Importer.Levels
             else if ((_enabled || requireResources) && (_rainShader == null || _heightShader == null || _rainCompute == null || _rainTexture == null || _splashTexture == null)) diagnostic = "Precipitation requires prepared rain, splash, height and compute shader resources.";
             else if (!FiniteNonnegative(_wettingRate) || !FiniteNonnegative(_dryingRate) || !FiniteNonnegative(_wetnessStrength) || !FiniteNonnegative(_puddleFormationRate) || !FiniteNonnegative(_puddleDryingRate) || !FiniteNonnegative(_puddleStrength) || !FiniteNonnegative(_rippleStrength) || !Positive(_puddleMaskScale)) diagnostic = "Wetness and puddle rates must be finite and nonnegative.";
             else if (!Unit(_maxWetness) || !Unit(_maxPuddles) || !Unit(_puddleWetnessThreshold)) diagnostic = "Wetness and puddle limits must be between zero and one.";
+            else if (!FiniteNonnegative(_reflectionIntensity) || !float.IsFinite(_reflectionRefreshSeconds) || _reflectionRefreshSeconds < 5.0f) diagnostic = "Wet surface reflection intensity must be finite and nonnegative, with at least five seconds between captures.";
             else if ((_wetnessEnabled || _puddlesEnabled) && _wetnessCompute == null) diagnostic = "Wetness and puddles require the prepared wetness compute shader.";
             else if ((_wetnessEnabled || _puddlesEnabled) && (_wetSurfaceTextures == null || _wetSurfaceTextures.depth < 2)) diagnostic = "Wetness and puddles require prepared shared texture array slices.";
             if (diagnostic != null) return false;

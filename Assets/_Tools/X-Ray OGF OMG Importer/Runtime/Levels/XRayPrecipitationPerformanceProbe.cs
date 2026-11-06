@@ -19,6 +19,7 @@ namespace XRay.Importer.Levels
         private const string WETNESS_TICK_MARKER = "XRay.Precipitation.WetnessTick";
 
         private static readonly string[] SCENARIO_NAMES = { "baseline", "moderate_rain", "strong_rain", "rain_wetness", "rain_puddles", "full" };
+        private static readonly string[] EXTENDED_SCENARIO_NAMES = { "baseline", "wetness_only", "puddles_only", "wetness_puddles", "moderate_rain", "strong_rain", "rain_wetness", "rain_puddles", "full", "full_reflection_refresh", "full_no_reflections" };
 
         public sealed class Scenario
         {
@@ -29,8 +30,9 @@ namespace XRay.Importer.Levels
             public string TickScope { get; }
             public string Evidence { get; }
             public string UnavailableReason { get; }
+            public int SampleFrames { get; }
 
-            public Scenario(string name, Action setup, Action<float> tick = null, Func<long> estimatedBytes = null, string tickScope = null, string evidence = null, string unavailableReason = null)
+            public Scenario(string name, Action setup, Action<float> tick = null, Func<long> estimatedBytes = null, string tickScope = null, string evidence = null, string unavailableReason = null, int sampleFrames = 0)
             {
                 Name = name;
                 Setup = setup;
@@ -39,6 +41,7 @@ namespace XRay.Importer.Levels
                 TickScope = tickScope;
                 Evidence = evidence;
                 UnavailableReason = unavailableReason;
+                SampleFrames = sampleFrames;
             }
         }
 
@@ -72,7 +75,8 @@ namespace XRay.Importer.Levels
                     var result = new ScenarioRecord { name = scenario.Name, evidence = scenario.Evidence, tickScope = scenario.TickScope ?? (scenario.Tick != null ? "Supplied scenario tick CPU wall time including submission and possible waits." : "No supplied tick callback."), status = string.IsNullOrEmpty(scenario.UnavailableReason) ? "Measured" : "Unavailable", unavailableReason = scenario.UnavailableReason };
                     report.scenarios[scenarioIndex] = result;
                     if (!string.IsNullOrEmpty(scenario.UnavailableReason)) continue;
-                    var samples = new Sample[settings.SampleFrames];
+                    var samples = new Sample[scenario.SampleFrames > 0 ? scenario.SampleFrames : settings.SampleFrames];
+                    result.sampleFrames = samples.Length;
                     var renderWall = new double[settings.CameraRenderWallSamples];
                     scenario.Setup();
                     PrecipitationConfig config = controller.EffectivePrecipitationConfig;
@@ -93,6 +97,7 @@ namespace XRay.Importer.Levels
                         result.estimatedSystemBytesScope = "Constant snapshot after warmup repeated in each CSV row. A second endpoint is read after native samples. Estimates include owned resource budgets and runtime clone allocations, not measured VRAM. Both expensive queries are outside timed samples. One unmeasured native yield isolates the first query from frame timing samples.";
                         yield return null;
                         result.rainDensityAfterWarmup = controller.Precipitation != null ? controller.Precipitation.RainDensity : 0.0f;
+                        result.reflectionCaptureRequestsBeforeSamples = controller.Precipitation?.Reflections?.CaptureRequests ?? 0;
                         result.precipitationEnabledAfterWarmup = controller.Precipitation != null && controller.Precipitation.Enabled;
                         result.rainVisualVisible = controller.RainVisualOverride ?? true;
                         result.cameraViewsAfterWarmup = controller.Precipitation != null && controller.Precipitation.Pass != null ? controller.Precipitation.Pass.ViewCount : 0;
@@ -137,6 +142,7 @@ namespace XRay.Importer.Levels
                             samples[sampleIndex] = sample;
                         }
                         result.estimatedSystemBytesAfterSamples = scenario.EstimatedBytes != null ? scenario.EstimatedBytes() : controller.Precipitation != null ? controller.Precipitation.EstimatedBytes : 0;
+                        result.reflectionCaptureRequestsAfterSamples = controller.Precipitation?.Reflections?.CaptureRequests ?? 0;
                         for (int renderIndex = 0; renderIndex < renderWall.Length; renderIndex++)
                         {
                             RequireCamera(camera, settings.AllowPersistentCameraTarget);
@@ -180,10 +186,11 @@ namespace XRay.Importer.Levels
             if (string.IsNullOrWhiteSpace(settings.ArchiveFolder) || !Path.GetFullPath(settings.ArchiveFolder).StartsWith(ARCHIVE + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase)) throw new ArgumentException("Performance reports require a task subdirectory under the project Archive.");
             if (string.IsNullOrWhiteSpace(settings.SourceRevision) || string.IsNullOrWhiteSpace(settings.SourceManifestSha256)) throw new ArgumentException("Supply the tested source revision and source manifest SHA256.");
             if (settings.WarmupFrames < 8 || settings.SampleFrames < 1 || settings.CameraRenderWallSamples < 0) throw new ArgumentOutOfRangeException(nameof(settings));
-            if (scenarios == null || scenarios.Length != SCENARIO_NAMES.Length) throw new ArgumentException("Provide all six precipitation scenarios, with an explicit reason for unavailable scenarios.", nameof(scenarios));
+            if (scenarios == null || scenarios.Length != SCENARIO_NAMES.Length && scenarios.Length != EXTENDED_SCENARIO_NAMES.Length) throw new ArgumentException("Provide the six base or eleven extended precipitation scenarios, with an explicit reason for unavailable scenarios.", nameof(scenarios));
+            string[] expected = scenarios.Length == SCENARIO_NAMES.Length ? SCENARIO_NAMES : EXTENDED_SCENARIO_NAMES;
             for (int i = 0; i < scenarios.Length; i++)
             {
-                if (scenarios[i] == null || scenarios[i].Name != SCENARIO_NAMES[i] || string.IsNullOrEmpty(scenarios[i].UnavailableReason) && scenarios[i].Setup == null) throw new ArgumentException("Unexpected precipitation scenario at index " + i + ". Expected " + SCENARIO_NAMES[i], nameof(scenarios));
+                if (scenarios[i] == null || scenarios[i].Name != expected[i] || scenarios[i].SampleFrames < 0 || string.IsNullOrEmpty(scenarios[i].UnavailableReason) && scenarios[i].Setup == null) throw new ArgumentException("Unexpected precipitation scenario at index " + i + ". Expected " + expected[i], nameof(scenarios));
             }
         }
 
@@ -333,6 +340,9 @@ namespace XRay.Importer.Levels
             public int maxDrops;
             public int dropBudget;
             public int atlasResolution;
+            public int sampleFrames;
+            public int reflectionCaptureRequestsBeforeSamples;
+            public int reflectionCaptureRequestsAfterSamples;
             public float rainDensityAfterWarmup;
             public bool precipitationEnabledAfterWarmup;
             public bool rainVisualVisible;

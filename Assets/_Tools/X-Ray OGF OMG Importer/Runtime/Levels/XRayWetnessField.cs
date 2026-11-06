@@ -27,6 +27,7 @@ namespace XRay.Importer.Levels
         private static readonly int _cellId = Shader.PropertyToID("_MonolithWetnessCellSize");
         private static readonly int _settingsId = Shader.PropertyToID("_MonolithWetnessSettings");
         private static readonly int _puddleId = Shader.PropertyToID("_MonolithPuddleSettings");
+        private static readonly int _reflectionId = Shader.PropertyToID("_MonolithWetReflectionIntensity");
 
         private readonly int _ownerToken;
         private readonly int[] _size = new int[2];
@@ -44,6 +45,7 @@ namespace XRay.Importer.Levels
         private Vector4 _savedSettings;
         private Vector4 _savedPuddle;
         private float _savedActive;
+        private float _savedReflection;
         private int _savedOwner;
         private int _updateKernel;
         private int _resampleKernel;
@@ -101,6 +103,7 @@ namespace XRay.Importer.Levels
                 _savedCell = Shader.GetGlobalVector(_cellId);
                 _savedSettings = Shader.GetGlobalVector(_settingsId);
                 _savedPuddle = Shader.GetGlobalVector(_puddleId);
+                _savedReflection = Shader.GetGlobalFloat(_reflectionId);
                 _published = true;
             }
             else if (Shader.GetGlobalInteger(_ownerId) != _ownerToken) throw new InvalidOperationException("The precipitation wetness field no longer owns its shader bindings.");
@@ -110,6 +113,7 @@ namespace XRay.Importer.Levels
             Shader.SetGlobalVector(_cellId, new Vector4(1.0f / (Width * _mapping.z), 1.0f / (Height * _mapping.w), Width, Height));
             Shader.SetGlobalVector(_settingsId, new Vector4(config.WetnessEnabled ? config.WetnessStrength : 0.0f, config.PuddlesEnabled ? config.PuddleStrength : 0.0f, config.ShelterTolerance, Mathf.Clamp01(rainDensity)));
             Shader.SetGlobalVector(_puddleId, new Vector4(config.RippleStrength, config.PuddleMaskScale, realTime, config.WetSurfaceTextures.depth));
+            Shader.SetGlobalFloat(_reflectionId, config.ReflectionIntensity);
             Shader.SetGlobalInteger(_ownerId, _ownerToken);
             Shader.SetGlobalFloat(_activeId, config.WetnessEnabled || config.PuddlesEnabled ? 1.0f : 0.0f);
         }
@@ -126,6 +130,7 @@ namespace XRay.Importer.Levels
                 Shader.SetGlobalVector(_cellId, _savedCell);
                 Shader.SetGlobalVector(_settingsId, _savedSettings);
                 Shader.SetGlobalVector(_puddleId, _savedPuddle);
+                Shader.SetGlobalFloat(_reflectionId, _savedReflection);
                 Shader.SetGlobalInteger(_ownerId, _savedOwner);
             }
             _published = false;

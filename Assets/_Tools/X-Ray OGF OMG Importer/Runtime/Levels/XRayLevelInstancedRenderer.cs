@@ -52,6 +52,8 @@ namespace XRay.Importer.Levels
         public int LastImpostors { get; private set; }
         public int LastLodShadowOnlyInstances { get; private set; }
         public int LastLodDiscardedInstances { get; private set; }
+        public long ReflectionSubmittedBatches { get; private set; }
+        public long ReflectionSubmittedInstances { get; private set; }
         public int LodMeshCount => _lodRenderer != null ? _lodRenderer.MeshCount : 0;
         public XRayShadowInfluence ExperimentalShadowInfluence { get; set; }
 
@@ -77,8 +79,13 @@ namespace XRay.Importer.Levels
 
         private void OnBeginCameraRendering(ScriptableRenderContext context, Camera camera)
         {
-            if (_batchSet == null || camera == null || camera.cameraType == CameraType.Preview || camera.cameraType == CameraType.Reflection)
+            if (_batchSet == null || camera == null || camera.cameraType == CameraType.Preview)
             {
+                return;
+            }
+            if (camera.cameraType == CameraType.Reflection)
+            {
+                RenderReflection(camera);
                 return;
             }
 
@@ -167,6 +174,48 @@ namespace XRay.Importer.Levels
             LastVisibleInstances = visibleInstances;
             LastShadowOnlyBatches = shadowOnlyBatches;
             LastRejectedShadowBatches = rejectedShadowBatches;
+        }
+
+        private void RenderReflection(Camera camera)
+        {
+            EnsureProperties();
+            GeometryUtility.CalculateFrustumPlanes(camera, _planes);
+            float distance = _maxDistance > 0.0f ? Mathf.Min(_maxDistance, camera.farClipPlane) : camera.farClipPlane;
+            float distanceSquared = distance * distance;
+            XRayFloraWindState wind = XRayFloraWindBounds.ActiveState();
+            IReadOnlyList<XRayInstanceBatch> batches = _batchSet.Batches;
+            for (int batchIndex = 0; batchIndex < batches.Count; batchIndex++)
+            {
+                XRayInstanceBatch batch = batches[batchIndex];
+                if (batch.Mesh == null || batch.Count == 0) continue;
+                Bounds bounds = XRayFloraWindBounds.Uses(batch.Materials, wind) ? XRayFloraWindBounds.Expand(batch.Bounds, wind) : batch.Bounds;
+                if (bounds.SqrDistance(camera.transform.position) > distanceSquared || !GeometryUtility.TestPlanesAABB(_planes, bounds)) continue;
+                bool submitted = false;
+                int submeshes = Mathf.Min(batch.Mesh.subMeshCount, batch.Materials.Length);
+                for (int submesh = 0; submesh < submeshes; submesh++)
+                {
+                    Material source = batch.Materials[submesh];
+                    Material material = source != null && MaterialResolver != null ? MaterialResolver(source) : source;
+                    if (material == null) continue;
+                    for (int start = 0; start < batch.Count; start += MAX_MOTION_INSTANCES)
+                    {
+                        int count = Mathf.Min(MAX_MOTION_INSTANCES, batch.Count - start);
+                        MaterialPropertyBlock properties = _properties[batchIndex];
+                        if (batch.Count > MAX_MOTION_INSTANCES)
+                        {
+                            for (int instance = 0; instance < count; instance++) _submissionData[instance] = batch.Data != null && start + instance < batch.Data.Length ? batch.Data[start + instance] : new Vector4(1.0f, 0.0f, 0.0f, 0.0f);
+                            _submissionBlock.SetVectorArray(_propertyId, _submissionData);
+                            properties = _submissionBlock;
+                        }
+                        var parameters = new RenderParams(material) { camera = camera, worldBounds = bounds, motionVectorMode = MotionVectorGenerationMode.ForceNoMotion, layer = gameObject.layer, shadowCastingMode = ShadowCastingMode.Off, receiveShadows = true, matProps = properties };
+                        Graphics.RenderMeshInstanced(parameters, batch.Mesh, submesh, batch.Matrices, count, start);
+                        submitted = true;
+                    }
+                }
+                if (!submitted) continue;
+                ReflectionSubmittedBatches++;
+                ReflectionSubmittedInstances += batch.Count;
+            }
         }
 
         private bool RenderLodBatch(Camera camera, int index, XRayInstanceBatch batch, InstanceHistory history, Bounds bounds, XRayFloraWindState wind, byte[] states, bool castShadows, ref int lodShadowOnly, ref int lodDiscarded)

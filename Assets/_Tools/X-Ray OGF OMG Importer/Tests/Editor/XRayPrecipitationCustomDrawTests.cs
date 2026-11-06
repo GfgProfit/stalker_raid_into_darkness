@@ -200,6 +200,37 @@ namespace XRay.Importer.Tests
             }
         }
 
+        [Test]
+        public void NativeReflectionCameraIncludesInstancedGeometryWithoutAdvancingMainViewHistoryOrCounters()
+        {
+            using var fixture = new Fixture();
+            fixture.Root.SetActive(true);
+            fixture.Instances.enabled = true;
+            fixture.Camera.transform.SetPositionAndRotation(new Vector3(0.0f, 4.5f, -10.0f), Quaternion.identity);
+            fixture.Camera.nearClipPlane = 0.1f;
+            fixture.Camera.farClipPlane = 30.0f;
+            Invoke(fixture.Instances, "OnBeginCameraRendering", default(ScriptableRenderContext), fixture.Camera);
+            int visible = fixture.Instances.LastVisibleInstances;
+            int batches = fixture.Instances.LastVisibleBatches;
+            Assert.AreEqual(2, visible);
+            var histories = (System.Collections.IList)typeof(XRayLevelInstancedRenderer).GetField("_histories", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(fixture.Instances);
+            object history = histories[0];
+            int historyFrame = (int)history.GetType().GetProperty("Frame").GetValue(history);
+            fixture.Camera.cameraType = CameraType.Reflection;
+            Invoke(fixture.Instances, "OnBeginCameraRendering", default(ScriptableRenderContext), fixture.Camera);
+            Assert.AreEqual(1L, fixture.Instances.ReflectionSubmittedBatches);
+            Assert.AreEqual(2L, fixture.Instances.ReflectionSubmittedInstances);
+            Assert.AreEqual(visible, fixture.Instances.LastVisibleInstances);
+            Assert.AreEqual(batches, fixture.Instances.LastVisibleBatches);
+            Assert.AreSame(history, histories[0]);
+            Assert.AreEqual(historyFrame, history.GetType().GetProperty("Frame").GetValue(history));
+            fixture.Camera.farClipPlane = 5.0f;
+            Invoke(fixture.Instances, "OnBeginCameraRendering", default(ScriptableRenderContext), fixture.Camera);
+            Assert.AreEqual(1L, fixture.Instances.ReflectionSubmittedBatches);
+            Assert.AreEqual(2L, fixture.Instances.ReflectionSubmittedInstances);
+            fixture.AssertReadOnly();
+        }
+
         private static object Invoke(object target, string method, params object[] arguments)
         {
             MethodInfo info = target.GetType().GetMethod(method, BindingFlags.Instance | BindingFlags.NonPublic);

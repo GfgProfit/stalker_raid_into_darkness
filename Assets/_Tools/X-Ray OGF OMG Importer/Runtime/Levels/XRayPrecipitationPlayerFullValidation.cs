@@ -93,7 +93,7 @@ namespace XRay.Importer.Levels
             if (_fullExposure != null) Destroy(_fullExposure);
             yield return Frames(6);
             _fullRecord.nativeErrors = ErrorCount();
-            _fullPassed = string.IsNullOrEmpty(_fullRecord.failure) && _fullRecord.configurationReadOnly && _fullRecord.nativeErrors == 0 && _fullRecord.cases.Count == 12 && _fullRecord.performancePassed;
+            _fullPassed = string.IsNullOrEmpty(_fullRecord.failure) && _fullRecord.configurationReadOnly && _fullRecord.nativeErrors == 0 && _fullRecord.cases.Count == 12 && _fullRecord.performancePassed && _fullRecord.reflections != null && _fullRecord.reflections.passed;
             foreach (FullCase record in _fullRecord.cases) _fullPassed &= record.passed;
             _fullRecord.passed = _fullPassed;
             Write(_fullOutput, "Result", _fullRecord);
@@ -132,8 +132,10 @@ namespace XRay.Importer.Levels
             yield return FullRainPair("05_Storm", storm, 43230.0, 1.0f);
             yield return FullMaterialResponses(clear);
             yield return FullGroundRain(rain);
+            yield return FullGroundCoverage(clear, rain);
             yield return FullShelter(rain);
             yield return FullMaterialPair("09_Puddles", clear, true);
+            yield return FullNativeReflections(clear);
             yield return FullDrying(clear);
             yield return FullNight(rain);
             yield return FullFx(clear);
@@ -331,6 +333,131 @@ namespace XRay.Importer.Levels
             _camera.transform.SetPositionAndRotation(previousPosition, previousRotation);
         }
 
+        private IEnumerator FullNativeReflections(XRayWeatherProfile clear)
+        {
+            Vector3 previousPosition = _camera.transform.position;
+            Quaternion previousRotation = _camera.transform.rotation;
+            FullPose pose = FullPoseNamed("Puddles");
+            _camera.transform.SetPositionAndRotation(pose.position, pose.rotation);
+            SetupFull(clear, 43230.0, 1.0f, true, true);
+            _controller.SetRainVisualOverride(false);
+            _controller.Precipitation.Wetness.SetUniformState(1.0f, 1.0f);
+            XRayWetnessReflection reflections = _controller.Precipitation.Reflections;
+            Require(reflections != null, "The existing weather pipeline must automatically own the native wet reflection probe.");
+            reflections.Dispose();
+            reflections.Tick(_controller.EffectivePrecipitationConfig, 0.0f);
+            HDAdditionalReflectionData probe = reflections.Probe;
+            Require(probe != null, "Enable the bounded non-camera reflection source in the inherited configuration.");
+            bool hadSsr = _fullExposure.TryGet(out ScreenSpaceReflection ssr);
+            if (!hadSsr) ssr = _fullExposure.Add<ScreenSpaceReflection>(true);
+            bool ssrActive = ssr.active;
+            bool ssrEnabled = ssr.enabled.value;
+            bool ssrOverride = ssr.enabled.overrideState;
+            bool transparentEnabled = ssr.enabledTransparent.value;
+            bool transparentOverride = ssr.enabledTransparent.overrideState;
+            float probeWeight = probe.weight;
+            var evidence = new FullReflectionEvidence { cameraPosition = pose.position, cameraRotation = pose.rotation, realGeometry = true };
+            _fullRecord.reflections = evidence;
+            string output = FullCaseFolder("09_NonScreenSpaceReflections");
+            try
+            {
+                ssr.active = true;
+                ssr.enabled.Override(false);
+                ssr.enabledTransparent.Override(false);
+                for (int frame = 0; frame < 180 && (probe.realtimeTexture == null || probe.realtimeTexture.updateCount == 0); frame++) yield return null;
+                RenderTexture cubemap = probe.realtimeTexture;
+                Require(cubemap != null && cubemap.updateCount > 0, "The native HDRP probe must finish all six faces before reflection acceptance.");
+                evidence.captureRequests = reflections.CaptureRequests;
+                evidence.textureUpdates = cubemap.updateCount;
+                evidence.resolution = cubemap.width;
+                evidence.estimatedBytes = reflections.EstimatedBytes;
+                foreach (GameObject root in _controller.gameObject.scene.GetRootGameObjects())
+                {
+                    foreach (XRayLevelInstancedRenderer renderer in root.GetComponentsInChildren<XRayLevelInstancedRenderer>(false))
+                    {
+                        evidence.instancedBatches += renderer.ReflectionSubmittedBatches;
+                        evidence.instancedInstances += renderer.ReflectionSubmittedInstances;
+                    }
+                }
+                AsyncGPUReadbackRequest request = AsyncGPUReadback.Request(cubemap, 0, TextureFormat.RGBAFloat);
+                while (!request.done) yield return null;
+                Require(!request.hasError && request.layerCount == 6, "Read all six actual native cubemap faces for off-screen reflection evidence.");
+                evidence.faces = request.layerCount;
+                evidence.faceMaximum = new float[6];
+                evidence.faceMean = new double[6];
+                Vector3[] axes = { Vector3.right, Vector3.left, Vector3.up, Vector3.down, Vector3.forward, Vector3.back };
+                for (int face = 0; face < 6; face++)
+                {
+                    Color[] pixels = request.GetData<Color>(face).ToArray();
+                    double sum = 0.0;
+                    float maximum = 0.0f;
+                    foreach (Color pixel in pixels)
+                    {
+                        Require(float.IsFinite(pixel.r) && float.IsFinite(pixel.g) && float.IsFinite(pixel.b), "Native reflection radiance must stay finite.");
+                        maximum = Mathf.Max(maximum, Mathf.Max(pixel.r, Mathf.Max(pixel.g, pixel.b)));
+                        sum += (pixel.r + pixel.g + pixel.b) / 3.0;
+                    }
+                    evidence.faceMaximum[face] = maximum;
+                    evidence.faceMean[face] = sum / pixels.Length;
+                    if (Vector3.Dot(axes[face], _camera.transform.forward) < -0.5f) evidence.offscreenMaximum = Mathf.Max(evidence.offscreenMaximum, maximum);
+                    var exr = new Texture2D(cubemap.width, cubemap.height, TextureFormat.RGBAFloat, false, true);
+                    var png = new Texture2D(cubemap.width, cubemap.height, TextureFormat.RGBA32, false, false);
+                    try
+                    {
+                        exr.SetPixels(pixels);
+                        exr.Apply(false, false);
+                        File.WriteAllBytes(Path.Combine(output, "ProbeFace" + face + ".exr"), exr.EncodeToEXR(Texture2D.EXRFlags.OutputAsFloat));
+                        for (int pixel = 0; pixel < pixels.Length; pixel++) pixels[pixel] = new Color(pixels[pixel].r / (1.0f + pixels[pixel].r), pixels[pixel].g / (1.0f + pixels[pixel].g), pixels[pixel].b / (1.0f + pixels[pixel].b), 1.0f).gamma;
+                        png.SetPixels(pixels);
+                        png.Apply(false, false);
+                        File.WriteAllBytes(Path.Combine(output, "ProbeFace" + face + "_Tonemapped.png"), png.EncodeToPNG());
+                    }
+                    finally
+                    {
+                        Destroy(exr);
+                        Destroy(png);
+                    }
+                }
+                probe.weight = 0.0f;
+                yield return Frames(30);
+                ScreenSpaceReflection appliedSsr = HDCamera.GetOrCreate(_camera).volumeStack.GetComponent<ScreenSpaceReflection>();
+                evidence.ssrDisabled = appliedSsr != null && !appliedSsr.enabled.value && !appliedSsr.enabledTransparent.value;
+                Require(evidence.ssrDisabled, "The actual main HDCamera VolumeStack must disable opaque and transparent screen-space reflections during the probe A/B.");
+                yield return Capture(output, "ProbeOffSsrOff");
+                Require(_captureFailure == null, _captureFailure?.ToString());
+                Color[] before = _lastPixels;
+                yield return Frames(8);
+                yield return Capture(output, "ProbeOffSsrOffRepeat");
+                Require(_captureFailure == null, _captureFailure?.ToString());
+                Color[] repeat = _lastPixels;
+                probe.weight = 1.0f;
+                yield return Frames(30);
+                yield return Capture(output, "ProbeOnSsrOff");
+                Require(_captureFailure == null, _captureFailure?.ToString());
+                appliedSsr = HDCamera.GetOrCreate(_camera).volumeStack.GetComponent<ScreenSpaceReflection>();
+                evidence.ssrDisabled &= appliedSsr != null && !appliedSsr.enabled.value && !appliedSsr.enabledTransparent.value;
+                evidence.comparison = FullDifference("09_NonScreenSpaceReflections", before, repeat, _lastPixels);
+                evidence.passed = evidence.ssrDisabled && evidence.captureRequests > 0 && evidence.textureUpdates > 0 && evidence.faces == 6 && evidence.instancedInstances > 0 && evidence.offscreenMaximum > 0.00001f && evidence.comparison.passed;
+                evidence.comparison.evidence = "Actual Military geometry and six native HDRP cubemap faces; an away-facing face contains radiance outside the main view. Screen-space reflections are explicitly disabled in the owned exposure Volume. Identical paused puddles and camera compare native probe weight0 twice against weight1; no synthetic geometry or persisted scene edits.";
+                Write(output, "NativeReflectionEvidence", evidence);
+            }
+            finally
+            {
+                if (probe != null) probe.weight = probeWeight;
+                ssr.active = ssrActive;
+                ssr.enabled.value = ssrEnabled;
+                ssr.enabled.overrideState = ssrOverride;
+                ssr.enabledTransparent.value = transparentEnabled;
+                ssr.enabledTransparent.overrideState = transparentOverride;
+                if (!hadSsr)
+                {
+                    _fullExposure.Remove<ScreenSpaceReflection>();
+                    Destroy(ssr);
+                }
+                _camera.transform.SetPositionAndRotation(previousPosition, previousRotation);
+            }
+        }
+
         private IEnumerator FullGroundRain(XRayWeatherProfile rain)
         {
             FullPose pose = FullPoseNamed("Earth");
@@ -341,6 +468,64 @@ namespace XRay.Importer.Levels
             rainCase.passed &= _fullLastPair.passed;
             rainCase.evidence += " Independent earth Wetness0/1 pair also passed.";
             _camera.transform.SetPositionAndRotation(_fullRecord.cameraPosition, _fullRecord.cameraRotation);
+        }
+
+        private IEnumerator FullGroundCoverage(XRayWeatherProfile clear, XRayWeatherProfile rain)
+        {
+            Vector3 previousPosition = _camera.transform.position;
+            Quaternion previousRotation = _camera.transform.rotation;
+            FullPose pose = FullPoseNamed("Earth");
+            _camera.transform.SetPositionAndRotation(pose.position, pose.rotation);
+            SetupFull(rain, 43230.0, 1.0f, true, true);
+            _controller.SetRainVisualOverride(false);
+            string output = FullCaseFolder("07_ControlledShelterCoverage_AfterOnly");
+            try
+            {
+                XRayPrecipitationSystem system = _controller.Precipitation;
+                PrecipitationConfig config = _controller.EffectivePrecipitationConfig;
+                system.Wetness.SetUniformState(0.0f, 0.0f);
+                system.Wetness.Tick(config, system.Geometry.Heights, system.Geometry.WorldMapping, 1.0f, 120.0f);
+                system.Wetness.Publish(config, system.RealTime, 1.0f);
+                yield return Frames(30);
+                yield return Capture(output, "ControlledShelter120s");
+                Require(_captureFailure == null, _captureFailure?.ToString());
+                var cells = new List<FullCoverageCell>();
+                Vector3 center = pose.position;
+                Ray ray = _camera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0.0f));
+                if (Mathf.Abs(ray.direction.y) > 0.0001f)
+                {
+                    float distance = (pose.groundY - ray.origin.y) / ray.direction.y;
+                    if (distance > 0.0f) center = ray.GetPoint(distance);
+                }
+                var evidence = new FullCoverageEvidence { afterOnly = true, acceleratedSingleTickSeconds = 120.0f, rainDensity = 1.0f, cameraPosition = pose.position, cameraRotation = pose.rotation, sampleCenter = center, worldMapping = system.Geometry.WorldMapping, cellSize = Shader.GetGlobalVector("_MonolithWetnessCellSize"), filmStrength = config.WetnessStrength, puddleStrength = config.PuddleStrength, paused = true, evidence = "After-only native Earth capture from the supplied audited pose. Both field layers start0, then one explicit GPU Tick of120seconds uses real top/bottom height geometry and rain1; the ordinary controller stays paused and visible rain stays disabled. This accelerated single step is a spatial shelter diagnostic, not a real-time120second accumulation acceptance or a paired frozen-before capture." };
+                for (int z = -4; z <= 4; z++)
+                {
+                    for (int x = -4; x <= 4; x++)
+                    {
+                        Vector3 point = new Vector3(center.x + x * 4.0f, pose.groundY, center.z + z * 4.0f);
+                        Vector4 mapping = system.Geometry.WorldMapping;
+                        int column = Mathf.FloorToInt((point.x - mapping.x) * mapping.z * system.Wetness.Width);
+                        int row = Mathf.FloorToInt((point.z - mapping.y) * mapping.w * system.Wetness.Height);
+                        if (!system.Wetness.TryReadCell(column, row, out XRayWetnessCell cell)) continue;
+                        bool valid = cell.Heights.x >= cell.Heights.y;
+                        bool upper = point.y >= cell.Heights.x - config.ShelterTolerance;
+                        if (valid) evidence.validCells++;
+                        if (valid && cell.Heights.x - cell.Heights.y > config.ShelterTolerance) evidence.shelteredColumns++;
+                        if (valid && Mathf.Abs(cell.Moisture.z - cell.Moisture.x) > 0.1f) evidence.contrastingLayers++;
+                        cells.Add(new FullCoverageCell { column = column, row = row, position = point, heights = cell.Heights, lowerWetness = cell.Moisture.x, lowerPuddles = cell.Moisture.y, upperWetness = cell.Moisture.z, upperPuddles = cell.Moisture.w, sampledUpperLayer = upper });
+                    }
+                }
+                evidence.cells = cells.ToArray();
+                _fullRecord.groundCoverage = evidence;
+                Write(output, "ControlledShelterCoverage", evidence);
+                Require(evidence.validCells > 0 && evidence.contrastingLayers > 0, "The after-only spatial diagnostic must contain actual exposed/covered moisture contrast.");
+            }
+            finally
+            {
+                SetupFull(clear, 43230.0, 1.0f, true, true);
+                _controller.SetRainVisualOverride(false);
+                _camera.transform.SetPositionAndRotation(previousPosition, previousRotation);
+            }
         }
 
         private IEnumerator FullShelter(XRayWeatherProfile rain)
@@ -480,25 +665,33 @@ namespace XRay.Importer.Levels
             var scenarios = new[]
             {
                 new XRayPrecipitationPerformanceProbe.Scenario("baseline", () => SetupFullPerformance(clear, 0.0f, false, false), evidence: "Prepared dry baseline: zero rain density; wetness/puddles disabled; bounded buffers retained from prior visual cases. Not a disposed-system memory baseline."),
+                new XRayPrecipitationPerformanceProbe.Scenario("wetness_only", () => SetupFullPerformance(clear, 0.0f, true, false)),
+                new XRayPrecipitationPerformanceProbe.Scenario("puddles_only", () => SetupFullPerformance(clear, 0.0f, false, true)),
+                new XRayPrecipitationPerformanceProbe.Scenario("wetness_puddles", () => SetupFullPerformance(clear, 0.0f, true, true)),
                 new XRayPrecipitationPerformanceProbe.Scenario("moderate_rain", () => SetupFullPerformance(rain, 0.35f, false, false)),
                 new XRayPrecipitationPerformanceProbe.Scenario("strong_rain", () => SetupFullPerformance(rain, 1.0f, false, false)),
                 new XRayPrecipitationPerformanceProbe.Scenario("rain_wetness", () => SetupFullPerformance(rain, 1.0f, true, false)),
                 new XRayPrecipitationPerformanceProbe.Scenario("rain_puddles", () => SetupFullPerformance(rain, 1.0f, false, true)),
-                new XRayPrecipitationPerformanceProbe.Scenario("full", () => SetupFullPerformance(rain, 1.0f, true, true))
+                new XRayPrecipitationPerformanceProbe.Scenario("full", () => SetupFullPerformance(rain, 1.0f, true, true)),
+                new XRayPrecipitationPerformanceProbe.Scenario("full_reflection_refresh", () => SetupFullReflectionPerformance(rain, true), evidence: "Real Puddles camera pose; includes at least one periodic cubemap refresh during360native sample frames.", sampleFrames: 360),
+                new XRayPrecipitationPerformanceProbe.Scenario("full_no_reflections", () => SetupFullReflectionPerformance(rain, false), evidence: "Same real Puddles camera pose and water state; non-camera reflections disabled on an owned session configuration.")
             };
             yield return XRayPrecipitationPerformanceProbe.Run(_camera, _controller, scenarios, new XRayPrecipitationPerformanceProbe.Settings { ArchiveFolder = _fullOutput, SourceRevision = "working-tree:" + _sourceHash, SourceManifestSha256 = _sourceHash, WarmupFrames = 30, SampleFrames = 120, CameraRenderWallSamples = 0, AllowPersistentCameraTarget = true }, path => _fullRecord.performance = path);
-            Require(!string.IsNullOrEmpty(_fullRecord.performance), "All six natural-frame performance scenarios must complete.");
+            Require(!string.IsNullOrEmpty(_fullRecord.performance), "All eleven natural-frame performance scenarios must complete.");
             PerformanceEvidence evidence = JsonUtility.FromJson<PerformanceEvidence>(File.ReadAllText(_fullRecord.performance));
-            Require(evidence != null && evidence.width == WIDTH && evidence.height == HEIGHT && !evidence.editor && evidence.scenarios != null && evidence.scenarios.Length == 6, "Performance JSON must contain the six1920x1080 Player measurements.");
-            string[] names = { "baseline", "moderate_rain", "strong_rain", "rain_wetness", "rain_puddles", "full" };
-            float[] densities = { 0.0f, 0.35f, 1.0f, 1.0f, 1.0f, 1.0f };
+            Require(evidence != null && evidence.width == WIDTH && evidence.height == HEIGHT && !evidence.editor && evidence.scenarios != null && evidence.scenarios.Length == 11, "Performance JSON must contain the eleven1920x1080 Player measurements.");
+            string[] names = { "baseline", "wetness_only", "puddles_only", "wetness_puddles", "moderate_rain", "strong_rain", "rain_wetness", "rain_puddles", "full", "full_reflection_refresh", "full_no_reflections" };
+            float[] densities = { 0.0f, 0.0f, 0.0f, 0.0f, 0.35f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f };
             for (int index = 0; index < names.Length; index++)
             {
                 PerformanceScenarioEvidence measured = evidence.scenarios[index];
-                Require(measured.name == names[index] && measured.status == "Measured" && measured.nativeIntervalMs != null && measured.nativeIntervalMs.available && measured.nativeIntervalMs.sampleCount == 120 && double.IsFinite(measured.nativeIntervalMs.mean) && measured.nativeIntervalMs.mean > 0.0, "Every scenario requires120 real native frame samples; unavailable optional GPU attribution stays explicitly unavailable.");
+                int sampleFrames = measured.name == "full_reflection_refresh" ? 360 : 120;
+                Require(measured.name == names[index] && measured.status == "Measured" && measured.nativeIntervalMs != null && measured.nativeIntervalMs.available && measured.nativeIntervalMs.sampleCount == sampleFrames && double.IsFinite(measured.nativeIntervalMs.mean) && measured.nativeIntervalMs.mean > 0.0, "Every scenario requires its declared real native frame samples; unavailable optional GPU attribution stays explicitly unavailable.");
                 Require(Mathf.Abs(measured.rainDensityAfterWarmup - densities[index]) < 0.001f, "The measured scenario must use its stated rain intensity.");
+                if (measured.name == "full_reflection_refresh") Require(measured.reflectionCaptureRequestsAfterSamples > measured.reflectionCaptureRequestsBeforeSamples, "The reflection performance interval must include an actual cubemap refresh request.");
+                if (measured.name == "full_no_reflections") Require(measured.reflectionCaptureRequestsBeforeSamples == 0 && measured.reflectionCaptureRequestsAfterSamples == 0, "The disabled reflection control must not request captures.");
             }
-            Require(_cameraRenders - rendersBefore >= 898, "The camera must actually render throughout the six native measurement intervals.");
+            Require(_cameraRenders - rendersBefore >= 1888, "The camera must actually render throughout the eleven native measurement intervals.");
             _fullRecord.performancePassed = true;
         }
 
@@ -506,6 +699,17 @@ namespace XRay.Importer.Levels
         {
             SetupFull(profile, 43230.0, density, wetness, puddles);
             if (_controller.Precipitation.Wetness != null) _controller.Precipitation.Wetness.SetUniformState(1.0f, puddles ? 1.0f : 0.0f);
+            _controller.SetPaused(false);
+        }
+
+        private void SetupFullReflectionPerformance(XRayWeatherProfile profile, bool enabled)
+        {
+            SetupFullPerformance(profile, 1.0f, true, true);
+            FullPose pose = FullPoseNamed("Puddles");
+            _camera.transform.SetPositionAndRotation(pose.position, pose.rotation);
+            JsonUtility.FromJsonOverwrite(enabled ? "{\"_nonCameraReflectionsEnabled\":true}" : "{\"_nonCameraReflectionsEnabled\":false}", _ownedConfigs[_ownedConfigs.Count - 1]);
+            _controller.ApplySettings();
+            _controller.Precipitation.Wetness.SetUniformState(1.0f, 1.0f);
             _controller.SetPaused(false);
         }
 
@@ -638,7 +842,65 @@ namespace XRay.Importer.Levels
             public bool canopyUnavailable;
             public int instancedInstanceCount;
             public long geometryEstimatedBytes;
+            public FullReflectionEvidence reflections;
+            public FullCoverageEvidence groundCoverage;
             public List<FullCase> cases = new List<FullCase>();
+        }
+
+        [Serializable]
+        private sealed class FullCoverageEvidence
+        {
+            public bool afterOnly;
+            public bool paused;
+            public float acceleratedSingleTickSeconds;
+            public float rainDensity;
+            public float filmStrength;
+            public float puddleStrength;
+            public Vector3 cameraPosition;
+            public Quaternion cameraRotation;
+            public Vector3 sampleCenter;
+            public Vector4 worldMapping;
+            public Vector4 cellSize;
+            public int validCells;
+            public int shelteredColumns;
+            public int contrastingLayers;
+            public FullCoverageCell[] cells;
+            public string evidence;
+        }
+
+        [Serializable]
+        private sealed class FullCoverageCell
+        {
+            public int column;
+            public int row;
+            public Vector3 position;
+            public Vector2 heights;
+            public float lowerWetness;
+            public float lowerPuddles;
+            public float upperWetness;
+            public float upperPuddles;
+            public bool sampledUpperLayer;
+        }
+
+        [Serializable]
+        private sealed class FullReflectionEvidence
+        {
+            public bool passed;
+            public bool ssrDisabled;
+            public bool realGeometry;
+            public int captureRequests;
+            public uint textureUpdates;
+            public int resolution;
+            public int faces;
+            public long estimatedBytes;
+            public long instancedBatches;
+            public long instancedInstances;
+            public float[] faceMaximum;
+            public double[] faceMean;
+            public float offscreenMaximum;
+            public Vector3 cameraPosition;
+            public Quaternion cameraRotation;
+            public FullCase comparison;
         }
 
         [Serializable]
@@ -689,6 +951,8 @@ namespace XRay.Importer.Levels
             public string name;
             public string status;
             public float rainDensityAfterWarmup;
+            public int reflectionCaptureRequestsBeforeSamples;
+            public int reflectionCaptureRequestsAfterSamples;
             public PerformanceMetricEvidence nativeIntervalMs;
         }
 

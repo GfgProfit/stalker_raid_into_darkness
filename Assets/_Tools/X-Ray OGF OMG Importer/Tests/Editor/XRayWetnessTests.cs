@@ -165,12 +165,14 @@ namespace XRay.Importer.Tests
             int patternsId = Shader.PropertyToID("_MonolithWetSurfaceTextures");
             int mappingId = Shader.PropertyToID("_MonolithWetnessMapping");
             int settingsId = Shader.PropertyToID("_MonolithWetnessSettings");
+            int reflectionId = Shader.PropertyToID("_MonolithWetReflectionIntensity");
             float originalActive = Shader.GetGlobalFloat(activeId);
             int originalOwner = Shader.GetGlobalInteger(ownerId);
             Texture originalPatterns = Shader.GetGlobalTexture(patternsId);
             var previousPatterns = new Texture2DArray(2, 2, 2, TextureFormat.RGBA32, false);
             Vector4 originalMapping = Shader.GetGlobalVector(mappingId);
             Vector4 originalSettings = Shader.GetGlobalVector(settingsId);
+            float originalReflection = Shader.GetGlobalFloat(reflectionId);
             Assert.AreEqual(0, originalOwner, "Preserve an existing published field owner.");
             Assert.LessOrEqual(originalActive, 0.5f, "Preserve an active field.");
             try
@@ -184,15 +186,18 @@ namespace XRay.Importer.Tests
                 Shader.SetGlobalTexture(patternsId, previousPatterns);
                 Shader.SetGlobalVector(mappingId, Vector4.one);
                 Shader.SetGlobalVector(settingsId, new Vector4(0.1f, 0.2f, 0.3f, 0.4f));
+                Shader.SetGlobalFloat(reflectionId, 0.37f);
                 field.Publish(configuration, 1.0f, 1.0f);
                 Assert.AreSame(configuration.WetSurfaceTextures, Shader.GetGlobalTexture(patternsId));
                 Assert.AreNotEqual(0, Shader.GetGlobalInteger(ownerId));
+                Assert.AreEqual(configuration.ReflectionIntensity, Shader.GetGlobalFloat(reflectionId));
                 field.Unpublish();
                 Assert.AreEqual(0.25f, Shader.GetGlobalFloat(activeId));
                 Assert.AreEqual(0, Shader.GetGlobalInteger(ownerId));
                 Assert.AreSame(previousPatterns, Shader.GetGlobalTexture(patternsId));
                 Assert.AreEqual(Vector4.one, Shader.GetGlobalVector(mappingId));
                 Assert.AreEqual(new Vector4(0.1f, 0.2f, 0.3f, 0.4f), Shader.GetGlobalVector(settingsId));
+                Assert.AreEqual(0.37f, Shader.GetGlobalFloat(reflectionId));
             }
             finally
             {
@@ -202,6 +207,7 @@ namespace XRay.Importer.Tests
                 Shader.SetGlobalTexture(patternsId, originalPatterns);
                 Shader.SetGlobalVector(mappingId, originalMapping);
                 Shader.SetGlobalVector(settingsId, originalSettings);
+                Shader.SetGlobalFloat(reflectionId, originalReflection);
                 Object.DestroyImmediate(previousPatterns);
                 Object.DestroyImmediate(heights);
                 Object.DestroyImmediate(configuration);

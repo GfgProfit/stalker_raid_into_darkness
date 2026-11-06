@@ -570,9 +570,12 @@ void GetSurfaceAndBuiltinData(FragInputs input, float3 V, inout PositionInputs p
     {
         surfaceData.normalWS = MonolithWetNormal(precipitationPosition, surfaceData.geomNormalWS, surfaceData.normalWS, precipitationSurface);
         surfaceData.tangentWS = Orthonormalize(surfaceData.tangentWS, surfaceData.normalWS);
-        surfaceData.coatMask = max(surfaceData.coatMask, saturate(precipitationSurface.y + precipitationSurface.x * 0.15));
+        surfaceData.specularColor = lerp(surfaceData.specularColor, 0.0204, precipitationSurface.y);
+        surfaceData.perceptualSmoothness = lerp(surfaceData.perceptualSmoothness, 0.965 - saturate(_MonolithWetnessSettings.w) * 0.04, precipitationSurface.y);
+        surfaceData.coatMask = max(surfaceData.coatMask, precipitationSurface.x * 0.15 * (1.0 - precipitationSurface.y));
         surfaceData.materialFeatures |= MATERIALFEATUREFLAGS_LIT_CLEAR_COAT;
     }
+    _MonolithPrecipitationSurface = precipitationSurface;
     #endif
     GetBuiltinData(input, V, posInput, surfaceData, baseSample.a * _BaseColor.a, surfaceData.normalWS, 0.0, builtinData);
     #if defined(MONOLITH_SOURCE_TERRAIN) && SHADERPASS == SHADERPASS_FORWARD

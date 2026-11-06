@@ -1,0 +1,40 @@
+#pragma kernel SampleMoisture
+#pragma kernel SampleSurface
+#include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Common.hlsl"
+
+SAMPLER(s_linear_repeat_sampler);
+float4 _MonolithWetResponse;
+float _MonolithPuddleMaskSlice;
+float _MonolithPuddleMaskFlipV;
+
+#include "../../../Runtime/Shaders/MonolithWetness.hlsl"
+
+StructuredBuffer<float4> _Positions;
+StructuredBuffer<float4> _Normals;
+StructuredBuffer<float4> _Moisture;
+RWStructuredBuffer<float4> _Results;
+RWStructuredBuffer<float4> _Albedo;
+RWStructuredBuffer<float4> _SurfaceNormals;
+uint _SampleCount;
+
+[numthreads(64, 1, 1)]
+void SampleMoisture(uint3 id : SV_DispatchThreadID)
+{
+    if (id.x >= _SampleCount) return;
+    _Results[id.x] = float4(MonolithSurfaceMoisture(_Positions[id.x].xyz, _Normals[id.x].xyz), 0.0, 1.0);
+}
+
+[numthreads(64, 1, 1)]
+void SampleSurface(uint3 id : SV_DispatchThreadID)
+{
+    if (id.x >= _SampleCount) return;
+    float3 albedo = float3(0.7, 0.6, 0.5);
+    float gloss = 0.25;
+    float3 worldPosition = _Positions[id.x].xyz;
+    float3 geometricNormal = _Normals[id.x].xyz;
+    float2 moisture = MonolithWetSurface(worldPosition, geometricNormal, worldPosition.xz, _Positions[id.x].w, _Moisture[id.x].xy, false, albedo, gloss);
+    float3 surfaceNormal = MonolithWetNormal(worldPosition, geometricNormal, normalize(float3(0.12, 0.985, 0.08)), moisture);
+    _Results[id.x] = float4(moisture, gloss, 1.0);
+    _Albedo[id.x] = float4(albedo, 1.0);
+    _SurfaceNormals[id.x] = float4(surfaceNormal, 1.0);
+}

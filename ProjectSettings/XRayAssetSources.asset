@@ -25,4 +25,4 @@ MonoBehaviour:
     _resolveBumpMaps: 1
     _logMissingTextures: 1
     _flipNormalGreen: 1
-    _materialGenerationMode: 0
+    _materialGenerationMode: 1

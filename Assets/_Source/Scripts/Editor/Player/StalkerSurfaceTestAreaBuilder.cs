@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
+using XRay.Importer.Editor;
 
 namespace RaidIntoDarkness.Player.Editor
 {
@@ -185,6 +186,7 @@ namespace RaidIntoDarkness.Player.Editor
             StalkerXRaySources.EnsureFolder(ASSET_FOLDER);
             material = new Material(shader) { name = name };
             material.SetColor("_BaseColor", color);
+            MonolithMaterialConfigurator.ConfigurePreservingSurface(material, null, null, null, null, true);
             AssetDatabase.CreateAsset(material, path);
             return material;
         }

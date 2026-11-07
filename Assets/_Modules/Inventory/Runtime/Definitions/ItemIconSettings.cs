@@ -6,6 +6,8 @@ namespace Inventory
     [Serializable]
     public struct ItemIconViewSettings
     {
+        public const float DEFAULT_LIGHT_INTENSITY = 20f;
+
         [SerializeField] private Vector3 _modelEulerAngles;
         [SerializeField] private Vector3 _modelScale;
         [SerializeField] private Vector3 _cameraEulerAngles;
@@ -23,7 +25,7 @@ namespace Inventory
             _lightIntensity = lightIntensity;
         }
 
-        public static ItemIconViewSettings Default => new(Vector3.zero, Vector3.one, new Vector3(25f, -135f, 0f), 1.15f, true, 10f);
+        public static ItemIconViewSettings Default => new(Vector3.zero, Vector3.one, new Vector3(25f, -135f, 0f), 1.15f, true, DEFAULT_LIGHT_INTENSITY);
 
         public Vector3 ModelEulerAngles => _modelEulerAngles;
         public Vector3 ModelScale => _modelScale == Vector3.zero ? Vector3.one : _modelScale;

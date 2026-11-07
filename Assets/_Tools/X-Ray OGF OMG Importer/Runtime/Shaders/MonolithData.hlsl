@@ -490,7 +490,14 @@ void GetSurfaceAndBuiltinData(FragInputs input, float3 V, inout PositionInputs p
     surfaceData.perceptualSmoothness = 1.0 - rough;
     surfaceData.materialFeatures = MATERIALFEATUREFLAGS_LIT_STANDARD | MATERIALFEATUREFLAGS_LIT_SPECULAR_COLOR;
     surfaceData.metallic = 0.0;
+    #if defined(_NORMALMAP) && !defined(_MONOLITH_LEVEL) && !defined(_MONOLITH_LEVEL_DETAIL) && !defined(_MONOLITH_LEVEL_LOD) && !defined(_MONOLITH_LEVEL_FLORA) && !defined(_MONOLITH_LEVEL_TERRAIN)
+    if (_MonolithHasBump > 0.5 || _MonolithDiagnosticOptions.y > 0.5)
+    {
+        surfaceData.normalWS = normalize(mul(tangentNormal, input.tangentToWorld));
+    }
+    #else
     surfaceData.normalWS = normalize(mul(tangentNormal, input.tangentToWorld));
+    #endif
     surfaceData.geomNormalWS = normalize(input.tangentToWorld[2]);
     surfaceData.tangentWS = Orthonormalize(input.tangentToWorld[0], surfaceData.normalWS);
     #ifdef _MONOLITH_ORIGINAL_TBN

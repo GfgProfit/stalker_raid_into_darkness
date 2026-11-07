@@ -18,29 +18,9 @@ MonoBehaviour:
     _width: 5
     _height: 2
     _profileType: 0
-    _visualSignature: 0fa8d3b5c384c05e
-    _spriteResourcePath: Generated/ItemIcons/36d0b42ed2880d842bd2f2fef624d0a0_5fb66b6354fc0b6e
-    _bakeSignature: f452bd2184824448f05a1860e72ae650
-    _sourceItemAssetGuid: 36d0b42ed2880d842bd2f2fef624d0a0
-    _estimatedTextureBytes: 655360
-  - _itemId: 36d0b42ed2880d842bd2f2fef624d0a0
-    _variantIds: []
-    _width: 2
-    _height: 1
-    _profileType: 1
-    _visualSignature: dba0d6c6bf28b2f9
-    _spriteResourcePath: Generated/ItemIcons/36d0b42ed2880d842bd2f2fef624d0a0_fa37f5517a8c8c3e
-    _bakeSignature: 03c52f53e2786d47f69e09cf98431c14
-    _sourceItemAssetGuid: 36d0b42ed2880d842bd2f2fef624d0a0
-    _estimatedTextureBytes: 131072
-  - _itemId: 36d0b42ed2880d842bd2f2fef624d0a0
-    _variantIds: []
-    _width: 5
-    _height: 2
-    _profileType: 1
-    _visualSignature: e968bcc6d2fd90c5
-    _spriteResourcePath: Generated/ItemIcons/36d0b42ed2880d842bd2f2fef624d0a0_8d6f3f6d33a96db6
-    _bakeSignature: e22b83f2814820e7f72e78c376a75cf4
+    _visualSignature: a2e64eab865da962
+    _spriteResourcePath: Generated/ItemIcons/36d0b42ed2880d842bd2f2fef624d0a0_2af0062ddefd558b
+    _bakeSignature: 5d3748b7743cf837edc846bc215075a0
     _sourceItemAssetGuid: 36d0b42ed2880d842bd2f2fef624d0a0
     _estimatedTextureBytes: 655360
   - _itemId: 36d0b42ed2880d842bd2f2fef624d0a0
@@ -49,20 +29,40 @@ MonoBehaviour:
     _width: 6
     _height: 2
     _profileType: 0
-    _visualSignature: 79eb944bc5a720d3
-    _spriteResourcePath: Generated/ItemIcons/36d0b42ed2880d842bd2f2fef624d0a0_ff82371538ee2d56
-    _bakeSignature: fd7ebfc891bcf870443ead0dd5b68d3a
+    _visualSignature: 4055161950437a87
+    _spriteResourcePath: Generated/ItemIcons/36d0b42ed2880d842bd2f2fef624d0a0_6ad6f6d7e4dcce8e
+    _bakeSignature: fc8cb3fefd7cbb7b769282e35d219a19
     _sourceItemAssetGuid: 36d0b42ed2880d842bd2f2fef624d0a0
     _estimatedTextureBytes: 786432
+  - _itemId: 36d0b42ed2880d842bd2f2fef624d0a0
+    _variantIds: []
+    _width: 2
+    _height: 1
+    _profileType: 1
+    _visualSignature: 8e6fa252ac626571
+    _spriteResourcePath: Generated/ItemIcons/36d0b42ed2880d842bd2f2fef624d0a0_e8586ff3afd85ef0
+    _bakeSignature: 4ef10121cbc4f1f5e59cdd4b45d5a345
+    _sourceItemAssetGuid: 36d0b42ed2880d842bd2f2fef624d0a0
+    _estimatedTextureBytes: 131072
+  - _itemId: 36d0b42ed2880d842bd2f2fef624d0a0
+    _variantIds: []
+    _width: 5
+    _height: 2
+    _profileType: 1
+    _visualSignature: 505ddf0780c847e5
+    _spriteResourcePath: Generated/ItemIcons/36d0b42ed2880d842bd2f2fef624d0a0_2debaa0d0bf2e0ba
+    _bakeSignature: ee955130b76141e8246650fca8815106
+    _sourceItemAssetGuid: 36d0b42ed2880d842bd2f2fef624d0a0
+    _estimatedTextureBytes: 655360
   - _itemId: 36d0b42ed2880d842bd2f2fef624d0a0
     _variantIds:
     - f7f361e0f578d344f8a8d69dae9300ea
     _width: 2
     _height: 1
     _profileType: 1
-    _visualSignature: dba0d6c6bf28b2f9
-    _spriteResourcePath: Generated/ItemIcons/36d0b42ed2880d842bd2f2fef624d0a0_5bf5b272c99399ff
-    _bakeSignature: c8f820f09bd63194d88613b05b036ca5
+    _visualSignature: 8e6fa252ac626571
+    _spriteResourcePath: Generated/ItemIcons/36d0b42ed2880d842bd2f2fef624d0a0_774146670782aced
+    _bakeSignature: 572291dc77bedbb44b43e3dafa8ef8b0
     _sourceItemAssetGuid: 36d0b42ed2880d842bd2f2fef624d0a0
     _estimatedTextureBytes: 131072
   - _itemId: 36d0b42ed2880d842bd2f2fef624d0a0
@@ -71,8 +71,8 @@ MonoBehaviour:
     _width: 5
     _height: 2
     _profileType: 1
-    _visualSignature: e968bcc6d2fd90c5
-    _spriteResourcePath: Generated/ItemIcons/36d0b42ed2880d842bd2f2fef624d0a0_19e543f087854f87
-    _bakeSignature: c0007da4c89af8a71cbd8309aaaa52d2
+    _visualSignature: 505ddf0780c847e5
+    _spriteResourcePath: Generated/ItemIcons/36d0b42ed2880d842bd2f2fef624d0a0_115bc2ffe200382b
+    _bakeSignature: 0284ac84651788c3d2397a65f0f280a3
     _sourceItemAssetGuid: 36d0b42ed2880d842bd2f2fef624d0a0
     _estimatedTextureBytes: 655360

@@ -20,6 +20,7 @@ namespace XRay.Importer.Editor
         private readonly string _texturesFolder;
         private readonly bool _searchByName;
         private readonly List<string> _warnings;
+        private readonly XRayMaterialGenerationMode _materialGenerationMode;
         private readonly Dictionary<string, Material> _materials = new Dictionary<string, Material>();
         private readonly Dictionary<string, Material> _externalMaterials = new Dictionary<string, Material>();
         private Material _fallback;
@@ -32,6 +33,7 @@ namespace XRay.Importer.Editor
             _texturesFolder = string.IsNullOrEmpty(texturesFolder) ? null : texturesFolder.Replace('\\', '/').TrimEnd('/');
             _searchByName = searchByName;
             _warnings = warnings;
+            _materialGenerationMode = XRayAssetSourceSettings.GetEffective().Import.MaterialGenerationMode;
             if (externalObjects == null)
             {
                 return;
@@ -66,12 +68,13 @@ namespace XRay.Importer.Editor
                 return material;
             }
 
-            Shader lit = Shader.Find("HDRP/Lit");
+            string shaderName = XRayMaterialGenerator.HDRP_LIT_SHADER;
+            Shader lit = Shader.Find(shaderName);
             if (lit == null)
             {
                 if (!_reportedMissingShader)
                 {
-                    _warnings.Add("Shader 'HDRP/Lit' not found; materials use the render pipeline default shader.");
+                    _warnings.Add($"Shader '{shaderName}' not found; materials use the render pipeline default shader.");
                     _reportedMissingShader = true;
                 }
 
@@ -93,6 +96,11 @@ namespace XRay.Importer.Editor
             }
 
             ConfigureSurface(material, shader ?? string.Empty);
+            if (_materialGenerationMode == XRayMaterialGenerationMode.MonolithHdrp)
+            {
+                MonolithMaterialConfigurator.ConfigurePreservingSurface(material, null, albedo, null, null, true);
+            }
+
             _materials.Add(key, material);
             _context.AddObjectToAsset("material:" + key, material);
             return material;
@@ -104,7 +112,7 @@ namespace XRay.Importer.Editor
             bool alphaTest = lower.Contains("aref");
             bool transparent = lower.Contains("transparent") || lower.Contains("glass") || lower.Contains("collimator");
 #if XRAY_HDRP
-            if (material.shader.name != "HDRP/Lit")
+            if (material.shader.name != XRayMaterialGenerator.HDRP_LIT_SHADER)
             {
                 return;
             }
@@ -128,6 +136,15 @@ namespace XRay.Importer.Editor
         {
             if (_fallback == null)
             {
+                Shader monolith = _materialGenerationMode == XRayMaterialGenerationMode.MonolithHdrp ? Shader.Find(MonolithMaterialConfigurator.SHADER_NAME) : null;
+                if (monolith != null)
+                {
+                    _fallback = new Material(Shader.Find(XRayMaterialGenerator.HDRP_LIT_SHADER) ?? monolith) { name = "xray_default" };
+                    MonolithMaterialConfigurator.ConfigurePreservingSurface(_fallback, null, null, null, null, true);
+                    _context.AddObjectToAsset("material:fallback", _fallback);
+                    return _fallback;
+                }
+
                 _fallback = GraphicsSettings.currentRenderPipeline != null ? GraphicsSettings.currentRenderPipeline.defaultMaterial : null;
                 if (_fallback == null)
                 {

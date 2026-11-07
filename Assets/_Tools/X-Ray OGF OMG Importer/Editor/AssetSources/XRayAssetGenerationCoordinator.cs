@@ -152,7 +152,7 @@ namespace XRay.Importer.Editor
 
                 if (options.Import.ResolveBumpMaps)
                 {
-                    if (options.Import.MaterialGenerationMode == XRayMaterialGenerationMode.MonolithHdrp && XRayMaterialGenerator.IsDefaultSurface(_shaderRules.Resolve(slots[i].Shader)))
+                    if (options.Import.MaterialGenerationMode == XRayMaterialGenerationMode.MonolithHdrp)
                     {
                         XRayTextureAssetResult packed = textureImporter.ImportPacked(resolution.Bump, texturesFolder);
                         XRayTextureAssetResult correction = textureImporter.ImportPacked(resolution.BumpCorrection, texturesFolder);

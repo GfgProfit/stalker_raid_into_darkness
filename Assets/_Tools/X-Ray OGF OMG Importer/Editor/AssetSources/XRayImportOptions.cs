@@ -21,7 +21,7 @@ namespace XRay.Importer.Editor
         [SerializeField] private bool _resolveBumpMaps = true;
         [SerializeField] private bool _logMissingTextures = true;
         [SerializeField] private bool _flipNormalGreen = true;
-        [SerializeField] private XRayMaterialGenerationMode _materialGenerationMode;
+        [SerializeField] private XRayMaterialGenerationMode _materialGenerationMode = XRayMaterialGenerationMode.MonolithHdrp;
 
         public XRayMaterialGenerationMode MaterialGenerationMode
         {

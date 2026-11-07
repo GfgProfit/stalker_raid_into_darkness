@@ -8,15 +8,17 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: act_stalker_neutral2e_selflight_det_3
-  m_Shader: {fileID: 4800000, guid: 6e4ae4064600d784cac1e41a9e6f2e59, type: 3}
+  m_Shader: {fileID: 4800000, guid: 200cb2cfd61fa7748a0ee2925b2a29ff, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords:
   - _DISABLE_SSR_TRANSPARENT
   - _EMISSIVE_COLOR_MAP
+  - _MATERIAL_FEATURE_SPECULAR_COLOR
   - _NORMALMAP
   - _NORMALMAP_TANGENT_SPACE
-  m_InvalidKeywords: []
+  m_InvalidKeywords:
+  - _MONOLITHENVCOMBINECLAMP_ON
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -77,6 +79,126 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MaskMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MonolithBump:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MonolithBumpCorrection:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MonolithDetailBump:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MonolithDetailBumpCorrection:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MonolithDetailMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MonolithEnv0:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MonolithEnv1:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MonolithLevelHemiMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MonolithPuddleMask:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MonolithTerrainBumpA:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MonolithTerrainBumpB:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MonolithTerrainBumpG:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MonolithTerrainBumpR:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MonolithTerrainDetailA:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MonolithTerrainDetailB:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MonolithTerrainDetailG:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MonolithTerrainDetailR:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MonolithTerrainHeightA:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MonolithTerrainHeightB:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MonolithTerrainHeightG:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MonolithTerrainHeightR:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MonolithTerrainLodAtlas:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MonolithTerrainMask:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MonolithTerrainSourceBase:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MonolithTerrainSourceColorA:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MonolithTerrainSourceColorB:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MonolithTerrainSourceColorG:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MonolithTerrainSourceColorR:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MonolithTrueStalkerMaterialLut:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MonolithWindWaves:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
@@ -171,7 +293,7 @@ Material:
     - _EnableBlendModePreserveSpecularLighting: 1
     - _EnableFogOnTransparent: 1
     - _EnableGeometricSpecularAA: 0
-    - _EnergyConservingSpecularColor: 1
+    - _EnergyConservingSpecularColor: 0
     - _HeightAmplitude: 0.02
     - _HeightCenter: 0.5
     - _HeightMapParametrization: 0
@@ -186,10 +308,87 @@ Material:
     - _IridescenceMask: 1
     - _IridescenceThickness: 1
     - _LinkDetailsWithBase: 1
-    - _MaterialID: 1
+    - _MaterialID: 4
     - _Metallic: 0
     - _MetallicRemapMax: 1
     - _MetallicRemapMin: 0
+    - _MonolithAlbedoSrgb: 1
+    - _MonolithBoneCount: 0
+    - _MonolithBumpFlipV: 0
+    - _MonolithDebug: 0
+    - _MonolithDetailFlipV: 0
+    - _MonolithDetailScale: 1
+    - _MonolithDetailSrgb: 0
+    - _MonolithDynamicGloss: 0.71864
+    - _MonolithEnvCombineClamp: 1
+    - _MonolithEnvHemisphere: 1
+    - _MonolithEnvHudHemi: 0
+    - _MonolithEnvHudMask: 0
+    - _MonolithEnvironmentMode: 0
+    - _MonolithFallbackGloss: 0.32215452
+    - _MonolithFlipGreen: 1
+    - _MonolithFloraSource: 0
+    - _MonolithFloraSubsurface: 1
+    - _MonolithFloraVariationEnabled: 0
+    - _MonolithFloraWetness: 0
+    - _MonolithFloraWind: 0
+    - _MonolithFloraWindPart: 0
+    - _MonolithGlossScale: 1
+    - _MonolithGrassAlign: 0
+    - _MonolithGrassHeight: 1
+    - _MonolithGrassHeightPrevious: 1
+    - _MonolithGrassRuntime: 0
+    - _MonolithGrassSource: 0
+    - _MonolithHasBump: 0
+    - _MonolithHasBumpCorrection: 0
+    - _MonolithHasDetail: 0
+    - _MonolithHasDetailBump: 0
+    - _MonolithHasPuddleMask: 0
+    - _MonolithHasTerrainHeight: 0
+    - _MonolithHasTerrainSourceColor: 0
+    - _MonolithHudNormal: 0
+    - _MonolithLevel: 0
+    - _MonolithLevelAmbientHemi: 1
+    - _MonolithLevelDetail: 0
+    - _MonolithLevelFlora: 0
+    - _MonolithLevelHemiFlipV: 1
+    - _MonolithLevelHemiMode: 0
+    - _MonolithLevelLod: 0
+    - _MonolithLevelTerrain: 0
+    - _MonolithLevelWind: 1
+    - _MonolithMaterialId: 1
+    - _MonolithMaterialWeight: 0
+    - _MonolithOriginalTbn: 0
+    - _MonolithParallaxHeight: 0.02
+    - _MonolithPuddleMaskFlipV: 0
+    - _MonolithPuddleMaskSlice: -1
+    - _MonolithSkinnedTbn: 0
+    - _MonolithSkinningActive: 0
+    - _MonolithSourceDetail: 0
+    - _MonolithSourceDetailRecommended: 0
+    - _MonolithSourceParallax: 0
+    - _MonolithSourceParallaxRecommended: 0
+    - _MonolithSourceProfile: 0
+    - _MonolithSourceTerrain: 0
+    - _MonolithSourceTextureRange: 50
+    - _MonolithSourceVirtualHeight: 0
+    - _MonolithTerrainBaseFlipV: 0
+    - _MonolithTerrainBumpScale: 0.6
+    - _MonolithTerrainDetailScale: 1
+    - _MonolithTerrainLodFlipV: 0
+    - _MonolithTerrainLowAvailable: 0
+    - _MonolithTerrainMaskFlipV: 0
+    - _MonolithTerrainMidAvailable: 0
+    - _MonolithTerrainOcclusion: 0
+    - _MonolithTerrainParallax: 0
+    - _MonolithTerrainQuality: 0
+    - _MonolithTerrainSource: 0
+    - _MonolithTerrainVirtualHeight: 0
+    - _MonolithTrueStalkerHasLookup: 0
+    - _MonolithTrueStalkerSourceTerrain: 0
+    - _MonolithTrueStalkerTerrain: 0
+    - _MonolithTrueStalkerVerified: 0
+    - _MonolithWindWavesFlipV: 0
     - _NormalMapSpace: 0
     - _NormalScale: 1
     - _ObjectSpaceUVMapping: 0
@@ -254,6 +453,31 @@ Material:
     - _EmissiveColorLDR: {r: 1, g: 1, b: 1, a: 1}
     - _InvPrimScale: {r: 1, g: 1, b: 0, a: 0}
     - _IridescenceThicknessRemap: {r: 0, g: 1, b: 0, a: 0}
+    - _MonolithDiagnosticOptions: {r: 0, g: 0, b: 0, a: 0}
+    - _MonolithEnvAmbient: {r: 0, g: 0, b: 0, a: 0}
+    - _MonolithEnvColor: {r: 1, g: 1, b: 1, a: 0}
+    - _MonolithEnvTestNormal: {r: 0, g: 0, b: 1, a: 0}
+    - _MonolithEnvTestView: {r: 0, g: 0, b: 1, a: -1}
+    - _MonolithFloraFixes1: {r: 0.3, g: 0.38, b: 0.5, a: 0.55}
+    - _MonolithFloraFixes2: {r: 1.5, g: 1, b: 0, a: 0}
+    - _MonolithFloraVariation: {r: 0.025, g: 0.1, b: 0.025, a: 0.05}
+    - _MonolithInstanceData: {r: 1, g: 0, b: 0, a: 0}
+    - _MonolithLightSetup: {r: 0.5, g: 1, b: 0, a: 0}
+    - _MonolithPom: {r: 36, g: 12, b: 0.035, a: 0.5}
+    - _MonolithSourceLight: {r: 1, g: 1, b: 1, a: 1}
+    - _MonolithSunColor: {r: 1, g: 1, b: 1, a: 0}
+    - _MonolithTerrainBumpFlipV: {r: 0, g: 0, b: 0, a: 0}
+    - _MonolithTerrainColorFlipV: {r: 0, g: 0, b: 0, a: 0}
+    - _MonolithTerrainColorSrgb: {r: 1, g: 1, b: 1, a: 1}
+    - _MonolithTerrainHeightFlipV: {r: 0, g: 0, b: 0, a: 0}
+    - _MonolithTerrainOffset: {r: -0.07, g: -0.05, b: -0.07, a: 0}
+    - _MonolithTerrainPom: {r: 36, g: 20, b: 0.04, a: 1}
+    - _MonolithWetResponse: {r: 0.8, g: 0.75, b: 0.35, a: 0}
+    - _MonolithWetTerrainResponseA: {r: 0, g: 0, b: 0, a: 0}
+    - _MonolithWetTerrainResponseB: {r: 0, g: 0, b: 0, a: 0}
+    - _MonolithWetTerrainResponseG: {r: 0, g: 0, b: 0, a: 0}
+    - _MonolithWetTerrainResponseR: {r: 0, g: 0, b: 0, a: 0}
+    - _MonolithWindGrassSetup: {r: 0, g: 0, b: 0, a: 0}
     - _SpecularColor: {r: 1, g: 1, b: 1, a: 1}
     - _ThicknessRemap: {r: 0, g: 1, b: 0, a: 0}
     - _TransmittanceColor: {r: 1, g: 1, b: 1, a: 1}

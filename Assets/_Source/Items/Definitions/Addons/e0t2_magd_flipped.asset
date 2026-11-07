@@ -13,15 +13,9 @@ MonoBehaviour:
   m_Name: e0t2_magd_flipped
   m_EditorClassIdentifier: Inventory::Inventory.ItemDefinition
   _definitionId: 0502abc6a72891b4aa2b7b9df8605b34
-  _displayName: "Eotech XPS3 + \u0443\u0432\u0435\u043B\u0438\u0447\u0438\u0442\u0435\u043B\u044C
-    Eotech G33 3x"
-  _shortName: "Eotech XPS3 + \u0443\u0432\u0435\u043B\u0438\u0447\u0438\u0442\u0435\u043B\u044C
-    Eotech G33 3x"
-  _description: "<color=#FFFFFF>\u0425\u0410\u0420\u0410\u041A\u0422\u0415\u0420\u0418\u0421\u0422\u0418\u041A\u0418:\n<color=#99FFFF>
-    \u2022 <color=#FFFFFF> \u0421\u0442\u0440\u0430\u043D\u0430: <color=#8C8C8C>\u0421\u0428\u0410\n<color=#99FFFF>
-    \u2022 <color=#FFFFFF> \u041F\u0440\u043E\u0438\u0437\u0432\u043E\u0434\u0438\u0442\u0435\u043B\u044C:
-    <color=#8C8C8C>EOTech\n<color=#99FFFF> \u2022 <color=#FFFFFF> \u0423\u0432\u0435\u043B\u0438\u0447\u0435\u043D\u0438\u0435:
-    <color=#8C8C8C>3.0x"
+  _displayName: "Eotech XPS3 + \u0443\u0432\u0435\u043B\u0438\u0447\u0438\u0442\u0435\u043B\u044C Eotech G33 3x"
+  _shortName: "Eotech XPS3 + \u0443\u0432\u0435\u043B\u0438\u0447\u0438\u0442\u0435\u043B\u044C Eotech G33 3x"
+  _description: "<color=#FFFFFF>\u0425\u0410\u0420\u0410\u041A\u0422\u0415\u0420\u0418\u0421\u0422\u0418\u041A\u0418:\n<color=#99FFFF> \u2022 <color=#FFFFFF> \u0421\u0442\u0440\u0430\u043D\u0430: <color=#8C8C8C>\u0421\u0428\u0410\n<color=#99FFFF> \u2022 <color=#FFFFFF> \u041F\u0440\u043E\u0438\u0437\u0432\u043E\u0434\u0438\u0442\u0435\u043B\u044C: <color=#8C8C8C>EOTech\n<color=#99FFFF> \u2022 <color=#FFFFFF> \u0423\u0432\u0435\u043B\u0438\u0447\u0435\u043D\u0438\u0435: <color=#8C8C8C>3.0x"
   _category: Attachment
   _tags:
   - Scope
@@ -49,7 +43,7 @@ MonoBehaviour:
       _cameraEulerAngles: {x: 0, y: -90, z: 0}
       _padding: 1.15
       _useDirectionalLight: 1
-      _lightIntensity: 40
+      _lightIntensity: 20
     _useCustomSlotView: 0
     _slotView:
       _modelEulerAngles: {x: 0, y: 0, z: 0}
@@ -57,7 +51,7 @@ MonoBehaviour:
       _cameraEulerAngles: {x: 0, y: -90, z: 0}
       _padding: 1.15
       _useDirectionalLight: 1
-      _lightIntensity: 40
+      _lightIntensity: 20
   _components:
   - rid: 3479885496768528412
   - rid: 3479885496768528558
@@ -78,6 +72,8 @@ MonoBehaviour:
         _camDispersionFactor: 1
         _camDispersionIncrementFactor: 1
         _scopeZoomFactor: 0
+        _attachSound: {fileID: 0}
+        _detachSound: {fileID: 0}
     - rid: 3479885496768528558
       type: {class: WorldItemComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
       data:

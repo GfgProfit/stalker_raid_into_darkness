@@ -263,6 +263,79 @@ namespace XRay.Importer.Tests
             }
         }
 
+        [Test]
+        public void MigratedMonolithMaterialKeepsGuidAndBindingWhenResourcesRefresh()
+        {
+            using (var directory = new TestDirectory())
+            {
+                Mo2Fixture fixture = CreateFixture(directory);
+                using (var scope = new XRayImportTestScope(fixture.CreateConfiguration("Main")))
+                {
+                    string model = scope.ImportModel("migrated.ogf", XRayTestBinaries.StaticOgf(new[] { new OgfTestMesh(BODY, "models\\weapons") }));
+                    Material material = XRayImportTestScope.GetRendererMaterial(model, 0);
+                    string identity = MaterialIdentity(material);
+                    List<string> remaps = DescribeMaterialRemaps(model);
+                    string[] materials = scope.FindAssets("t:Material", scope.MaterialsFolder);
+                    MonolithMaterialConfigurator.ConfigurePreservingSurface(material, null, material.GetTexture("_BaseColorMap") as Texture2D, null, null, true);
+                    material.SetFloat("_MonolithEnvironmentMode", 1.0f);
+                    material.EnableKeyword("_MONOLITH_ORIGINAL_ENVIRONMENT");
+                    AssetDatabase.SaveAssetIfDirty(material);
+                    scope.Options.Import.MaterialGenerationMode = XRayMaterialGenerationMode.MonolithHdrp;
+                    scope.Options.Import.PreserveExistingMaterials = false;
+                    XRayAssetGenerationCoordinator.Process(model, scope.Options, true, out _);
+                    scope.Settle();
+                    material = AssertPersistentMaterialBinding(model, scope, identity, remaps, materials, "Migrated material refresh");
+                    Assert.That(material.shader.name, Is.EqualTo(MonolithMaterialConfigurator.SHADER_NAME));
+                    Assert.That(material.GetTexture("_MonolithBump"), Is.Not.Null);
+                    Assert.That(material.GetFloat("_MonolithEnvironmentMode"), Is.EqualTo(1.0f));
+                    Assert.That(material.IsKeywordEnabled("_MONOLITH_ORIGINAL_ENVIRONMENT"), Is.True);
+                    scope.Reimport(model);
+                    material = AssertPersistentMaterialBinding(model, scope, identity, remaps, materials, "Migrated material reimport");
+                    Assert.That(material.GetFloat("_MonolithEnvironmentMode"), Is.EqualTo(1.0f));
+                    Assert.That(material.IsKeywordEnabled("_MONOLITH_ORIGINAL_ENVIRONMENT"), Is.True);
+                }
+            }
+        }
+
+        [TestCase("models\\model_aref", 0.0f, true, false)]
+        [TestCase("models\\model_fur", 0.0f, true, true)]
+        [TestCase("models\\glass", 1.0f, false, false)]
+        public void MonolithGenerationPreservesSurfaceStateWhenResourcesRefresh(string shader, float surfaceType, bool alphaTest, bool doubleSided)
+        {
+            using (var directory = new TestDirectory())
+            {
+                Mo2Fixture fixture = CreateFixture(directory);
+                using (var scope = new XRayImportTestScope(fixture.CreateConfiguration("Main")))
+                {
+                    scope.Options.Import.MaterialGenerationMode = XRayMaterialGenerationMode.MonolithHdrp;
+                    string model = scope.ImportModel("surface_monolith.ogf", XRayTestBinaries.StaticOgf(new[] { new OgfTestMesh(BODY, shader) }));
+                    Material material = XRayImportTestScope.GetRendererMaterial(model, 0);
+                    Assert.That(material.shader.name, Is.EqualTo(MonolithMaterialConfigurator.SHADER_NAME));
+                    Assert.That(material.GetFloat("_SurfaceType"), Is.EqualTo(surfaceType));
+                    Assert.That(material.IsKeywordEnabled("_SURFACE_TYPE_TRANSPARENT"), Is.EqualTo(surfaceType > 0.0f));
+                    Assert.That(material.IsKeywordEnabled("_ALPHATEST_ON"), Is.EqualTo(alphaTest));
+                    Assert.That(material.IsKeywordEnabled("_DOUBLESIDED_ON"), Is.EqualTo(doubleSided));
+                    Assert.That(material.GetFloat("_DstBlend"), Is.EqualTo(surfaceType > 0.0f ? 10.0f : 0.0f));
+                    int queue = material.renderQueue;
+                    string identity = MaterialIdentity(material);
+                    List<string> remaps = DescribeMaterialRemaps(model);
+                    string[] materials = scope.FindAssets("t:Material", scope.MaterialsFolder);
+                    scope.Options.Import.PreserveExistingMaterials = false;
+                    XRayAssetGenerationCoordinator.Process(model, scope.Options, true, out _);
+                    scope.Settle();
+                    AssertPersistentMaterialBinding(model, scope, identity, remaps, materials, shader + " refresh");
+                    scope.Reimport(model);
+                    material = AssertPersistentMaterialBinding(model, scope, identity, remaps, materials, shader + " reimport");
+                    Assert.That(material.GetFloat("_SurfaceType"), Is.EqualTo(surfaceType));
+                    Assert.That(material.IsKeywordEnabled("_SURFACE_TYPE_TRANSPARENT"), Is.EqualTo(surfaceType > 0.0f));
+                    Assert.That(material.IsKeywordEnabled("_ALPHATEST_ON"), Is.EqualTo(alphaTest));
+                    Assert.That(material.IsKeywordEnabled("_DOUBLESIDED_ON"), Is.EqualTo(doubleSided));
+                    Assert.That(material.GetFloat("_DstBlend"), Is.EqualTo(surfaceType > 0.0f ? 10.0f : 0.0f));
+                    Assert.That(material.renderQueue, Is.EqualTo(queue));
+                }
+            }
+        }
+
         public static Mo2Fixture CreateFixture(TestDirectory directory)
         {
             var fixture = new Mo2Fixture(directory);
@@ -289,6 +362,39 @@ namespace XRay.Importer.Tests
         private static int CountNormals(XRayImportTestScope scope)
         {
             return scope.FindAssets("body_diff_bump_normal t:Texture2D", scope.TexturesFolder).Length;
+        }
+
+        private static string MaterialIdentity(Material material)
+        {
+            Assert.That(material, Is.Not.Null);
+            Assert.That(AssetDatabase.TryGetGUIDAndLocalFileIdentifier(material, out string guid, out long localId), Is.True);
+            return $"{AssetDatabase.GetAssetPath(material)}|{guid}|{localId}";
+        }
+
+        private static List<string> DescribeMaterialRemaps(string model)
+        {
+            var description = new List<string>();
+            foreach (KeyValuePair<AssetImporter.SourceAssetIdentifier, Object> pair in AssetImporter.GetAtPath(model).GetExternalObjectMap())
+            {
+                if (pair.Value is Material material)
+                {
+                    description.Add($"{pair.Key.name}:{MaterialIdentity(material)}");
+                }
+            }
+
+            description.Sort(System.StringComparer.Ordinal);
+            return description;
+        }
+
+        private static Material AssertPersistentMaterialBinding(string model, XRayImportTestScope scope, string identity, List<string> remaps, string[] materials, string stage)
+        {
+            Material material = XRayImportTestScope.GetRendererMaterial(model, 0);
+            string actual = MaterialIdentity(material);
+            TestContext.WriteLine($"{stage}: Before={identity}; After={actual}");
+            Assert.That(actual, Is.EqualTo(identity), stage + " changed material path, GUID or local file ID.");
+            CollectionAssert.AreEqual(remaps, DescribeMaterialRemaps(model), stage + " changed importer material remaps.");
+            CollectionAssert.AreEqual(materials, scope.FindAssets("t:Material", scope.MaterialsFolder), stage + " changed the material asset set.");
+            return material;
         }
 
         private static List<string> DescribeModel(string model)

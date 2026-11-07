@@ -13,15 +13,9 @@ MonoBehaviour:
   m_Name: aim_acro
   m_EditorClassIdentifier: Inventory::Inventory.ItemDefinition
   _definitionId: bcfd82ef2c1a1324d8d0c68dac1e0786
-  _displayName: "Aimpoint ACRO P-1 \u043A\u043E\u043B\u043B\u0438\u043C\u0430\u0442\u043E\u0440\u043D\u044B\u0439
-    \u043F\u0440\u0438\u0446\u0435\u043B"
-  _shortName: "Aimpoint ACRO P-1 \u043A\u043E\u043B\u043B\u0438\u043C\u0430\u0442\u043E\u0440\u043D\u044B\u0439
-    \u043F\u0440\u0438\u0446\u0435\u043B"
-  _description: "<color=#FFFFFF>\u0425\u0410\u0420\u0410\u041A\u0422\u0415\u0420\u0418\u0421\u0422\u0418\u041A\u0418:\n<color=#99FFFF>
-    \u2022 <color=#FFFFFF> \u0421\u0442\u0440\u0430\u043D\u0430: <color=#8C8C8C>\u0428\u0432\u0435\u0446\u0438\u044F\n<color=#99FFFF>
-    \u2022 <color=#FFFFFF> \u041F\u0440\u043E\u0438\u0437\u0432\u043E\u0434\u0438\u0442\u0435\u043B\u044C:
-    <color=#8C8C8C>Aimpoint\n<color=#99FFFF> \u2022 <color=#FFFFFF> \u0423\u0432\u0435\u043B\u0438\u0447\u0435\u043D\u0438\u0435:
-    <color=#8C8C8C>1.0x"
+  _displayName: "Aimpoint ACRO P-1 \u043A\u043E\u043B\u043B\u0438\u043C\u0430\u0442\u043E\u0440\u043D\u044B\u0439 \u043F\u0440\u0438\u0446\u0435\u043B"
+  _shortName: "Aimpoint ACRO P-1 \u043A\u043E\u043B\u043B\u0438\u043C\u0430\u0442\u043E\u0440\u043D\u044B\u0439 \u043F\u0440\u0438\u0446\u0435\u043B"
+  _description: "<color=#FFFFFF>\u0425\u0410\u0420\u0410\u041A\u0422\u0415\u0420\u0418\u0421\u0422\u0418\u041A\u0418:\n<color=#99FFFF> \u2022 <color=#FFFFFF> \u0421\u0442\u0440\u0430\u043D\u0430: <color=#8C8C8C>\u0428\u0432\u0435\u0446\u0438\u044F\n<color=#99FFFF> \u2022 <color=#FFFFFF> \u041F\u0440\u043E\u0438\u0437\u0432\u043E\u0434\u0438\u0442\u0435\u043B\u044C: <color=#8C8C8C>Aimpoint\n<color=#99FFFF> \u2022 <color=#FFFFFF> \u0423\u0432\u0435\u043B\u0438\u0447\u0435\u043D\u0438\u0435: <color=#8C8C8C>1.0x"
   _category: Attachment
   _tags:
   - Scope
@@ -49,7 +43,7 @@ MonoBehaviour:
       _cameraEulerAngles: {x: 0, y: -90, z: 0}
       _padding: 1.15
       _useDirectionalLight: 1
-      _lightIntensity: 40
+      _lightIntensity: 20
     _useCustomSlotView: 0
     _slotView:
       _modelEulerAngles: {x: 0, y: 0, z: 0}
@@ -57,7 +51,7 @@ MonoBehaviour:
       _cameraEulerAngles: {x: 0, y: -90, z: 0}
       _padding: 1.15
       _useDirectionalLight: 1
-      _lightIntensity: 40
+      _lightIntensity: 20
   _components:
   - rid: 3479885496768528397
   - rid: 3479885496768528543

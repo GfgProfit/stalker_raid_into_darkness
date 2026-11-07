@@ -20,7 +20,7 @@ namespace XRay.Importer.Tests
             Directory = new TestDirectory();
             Folder = ROOT_FOLDER + "/" + Guid.NewGuid().ToString("N").Substring(0, 8);
             System.IO.Directory.CreateDirectory(Folder);
-            Options = new XRayAssetSourceOptions { Sources = sources ?? new XRaySourceConfiguration(), Import = new XRayImportOptions(), PersistIndexCache = false };
+            Options = new XRayAssetSourceOptions { Sources = sources ?? new XRaySourceConfiguration(), Import = new XRayImportOptions { MaterialGenerationMode = XRayMaterialGenerationMode.HdrpLitLegacy }, PersistIndexCache = false };
             XRayAssetSourceSettings.Override = Options;
             AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
         }

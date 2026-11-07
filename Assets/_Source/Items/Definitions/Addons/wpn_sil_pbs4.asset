@@ -15,15 +15,7 @@ MonoBehaviour:
   _definitionId: db6d446efcaadbb468defac519c9703d
   _displayName: "\u0413\u043B\u0443\u0448\u0438\u0442\u0435\u043B\u044C \u041F\u0411\u0421-4"
   _shortName: "\u0413\u043B\u0443\u0448\u0438\u0442\u0435\u043B\u044C \u041F\u0411\u0421-4"
-  _description: "<color=#8C8C8C>\u0421\u041E\u0412\u041C\u0415\u0421\u0422\u0418\u041C\u041E\u0421\u0422\u042C:\n\n<color=#99FFFF>
-    \u2022 <color=#8C8C8C> 5.45 \u043A\u0430\u043B\u0438\u0431\u0440\n\n<color=#AAAAAA>\u041F\u0411\u0421-4.
-    \u041F\u0440\u0438\u0431\u043E\u0440 \u0434\u043B\u044F \u0431\u0435\u0437\u0437\u0432\u0443\u0447\u043D\u043E\u0439
-    \u0438 \u0431\u0435\u0441\u043F\u043B\u0430\u043C\u0435\u043D\u043D\u043E\u0439
-    \u0441\u0442\u0440\u0435\u043B\u044C\u0431\u044B \u0438\u0437 5,45-\u043C\u043C
-    \u0430\u0432\u0442\u043E\u043C\u0430\u0442\u0430 \u041A\u0430\u043B\u0430\u0448\u043D\u0438\u043A\u043E\u0432\u0430
-    \u0443\u043A\u043E\u0440\u043E\u0447\u0435\u043D\u043D\u043E\u0433\u043E (\u0410\u041A\u0421-74\u0423).\n\n<color=#5D0074>
-    \u2022 <color=#8C8C8C> \u0413\u043B\u0443\u0448\u0435\u043D\u0438\u0435 \u0437\u0432\u0443\u043A\u0430:
-    <color=#AAAAAA>\u0441\u0440\u0435\u0434\u043D\u0435\u0435"
+  _description: "<color=#8C8C8C>\u0421\u041E\u0412\u041C\u0415\u0421\u0422\u0418\u041C\u041E\u0421\u0422\u042C:\n\n<color=#99FFFF> \u2022 <color=#8C8C8C> 5.45 \u043A\u0430\u043B\u0438\u0431\u0440\n\n<color=#AAAAAA>\u041F\u0411\u0421-4. \u041F\u0440\u0438\u0431\u043E\u0440 \u0434\u043B\u044F \u0431\u0435\u0437\u0437\u0432\u0443\u0447\u043D\u043E\u0439 \u0438 \u0431\u0435\u0441\u043F\u043B\u0430\u043C\u0435\u043D\u043D\u043E\u0439 \u0441\u0442\u0440\u0435\u043B\u044C\u0431\u044B \u0438\u0437 5,45-\u043C\u043C \u0430\u0432\u0442\u043E\u043C\u0430\u0442\u0430 \u041A\u0430\u043B\u0430\u0448\u043D\u0438\u043A\u043E\u0432\u0430 \u0443\u043A\u043E\u0440\u043E\u0447\u0435\u043D\u043D\u043E\u0433\u043E (\u0410\u041A\u0421-74\u0423).\n\n<color=#5D0074> \u2022 <color=#8C8C8C> \u0413\u043B\u0443\u0448\u0435\u043D\u0438\u0435 \u0437\u0432\u0443\u043A\u0430: <color=#AAAAAA>\u0441\u0440\u0435\u0434\u043D\u0435\u0435"
   _category: Attachment
   _tags:
   - Silencer
@@ -51,7 +43,7 @@ MonoBehaviour:
       _cameraEulerAngles: {x: 0, y: -90, z: 0}
       _padding: 1.15
       _useDirectionalLight: 1
-      _lightIntensity: 40
+      _lightIntensity: 20
     _useCustomSlotView: 0
     _slotView:
       _modelEulerAngles: {x: 0, y: 0, z: 0}
@@ -59,7 +51,7 @@ MonoBehaviour:
       _cameraEulerAngles: {x: 0, y: -90, z: 0}
       _padding: 1.15
       _useDirectionalLight: 1
-      _lightIntensity: 40
+      _lightIntensity: 20
   _components:
   - rid: 3479885496768528514
   - rid: 3479885496768528660

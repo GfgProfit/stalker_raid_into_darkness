@@ -262,7 +262,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
                     foreach (Material material in renderer.sharedMaterials)
                     {
                         Assert.That(material, Is.Not.Null, stats.Section);
-                        Assert.That(material.shader.name, Is.EqualTo("HDRP/Lit"), stats.Section);
+                        Assert.That(material.shader.name, Is.EqualTo("HDRP/MonolithLit"), stats.Section);
                         Assert.That(material.GetTexture("_BaseColorMap"), Is.Not.Null, stats.Section);
                     }
                 }

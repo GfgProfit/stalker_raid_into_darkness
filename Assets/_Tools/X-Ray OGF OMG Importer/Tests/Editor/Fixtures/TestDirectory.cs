@@ -8,7 +8,9 @@ namespace XRay.Importer.Tests
     {
         public TestDirectory(string parent = null)
         {
-            Root = System.IO.Path.Combine(parent ?? System.IO.Path.Combine(System.IO.Path.GetTempPath(), "XRayImporterTests"), Guid.NewGuid().ToString("N"));
+            string configuredRoot = Environment.GetEnvironmentVariable("XRAY_IMPORTER_TEST_DIRECTORY");
+            string defaultRoot = string.IsNullOrWhiteSpace(configuredRoot) ? System.IO.Path.Combine(System.IO.Path.GetTempPath(), "XRayImporterTests") : configuredRoot;
+            Root = System.IO.Path.Combine(parent ?? defaultRoot, Guid.NewGuid().ToString("N"));
             Directory.CreateDirectory(Root);
         }
 

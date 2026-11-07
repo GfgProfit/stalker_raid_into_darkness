@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &1
+MonoBehaviour:
+  m_ObjectHideFlags: 53
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ec1d1dae284b3e249bf1acf4fe91e426, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: XRay.Importer.Editor::XRay.Importer.Editor.XRayAssetSourceProjectSettings
+  _sourceMode: 1
+  _includeGameGamedata: 1
+  _treatModRootAsGamedata: 0
+  _importOptions:
+    _autoImportTextures: 1
+    _generateMaterials: 1
+    _createTexturesFolder: 1
+    _createMaterialsFolder: 1
+    _preserveExistingMaterials: 1
+    _overwriteExistingTextures: 0
+    _resolveBumpMaps: 1
+    _logMissingTextures: 1
+    _flipNormalGreen: 1
+    _materialGenerationMode: 0

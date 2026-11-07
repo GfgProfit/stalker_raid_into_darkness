@@ -46,6 +46,21 @@ MonoBehaviour:
   _rippleStrength: 0.025
   _puddleMaskScale: 1.1
   _shelterTolerance: 0.15
+  _artProfile: 2
+  _puddleDepth: 0.055
+  _puddleEdgeWidth: 0.004
+  _puddleBasinRadius: 2
+  _puddleMicroRelief: 0.085
+  _waterAbsorption: 5
+  _wetRoughnessFloor: 0.32
+  _waterRoughness: 0.12
+  _windRippleStrength: 0.12
+  _rippleDecaySeconds: 1.2
+  _nonCameraReflectionsEnabled: 1
+  _reflectionIntensity: 1
+  _reflectionRefreshSeconds: 5
+  _planarReflectionsEnabled: 1
+  _planarReflectionResolution: 256
   _wetnessCompute: {fileID: 7200000, guid: 3f90ce6d3ba67dc47898f08a4043f0f2, type: 3}
   _puddleNoise: {fileID: 0}
   _rippleNormal: {fileID: 0}

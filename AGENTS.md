@@ -66,7 +66,7 @@ All reports, validation results, diagnostic EXR/PNG/CSV files, logs, temporary P
 - Production code, essential automated regression tests, required production Unity Assets, `.meta` files, and configuration files must remain inside the production project.
 - Create a separate subdirectory in the archive for each task, for example, `XRayMO2LevelImporter_Validation`.
 - Always include absolute paths to reports and validation results in the final response.
-- Do not delete or overwrite previously saved results from other tasks.
+- Preserve final reports, unique evidence, source and asset backups, and required deliverables from other tasks. Automatically remove disposable generated artifacts under Archive according to Section F; never overwrite retained results.
 - If a tool requires temporarily creating files inside the project, remove them after validation only if they were created by the current task and are no longer required for the project to function.
 
 ## Communication Rules
@@ -185,9 +185,21 @@ When synchronization is required, identify and compare the exact source and dest
 
 ### F. Test Results and Archive
 
-Configure diagnostic output paths under Archive before running tools. Use a task-specific subdirectory and unique run directories or filenames; never overwrite previous results. Categories such as `CleanupAudits`, `ShaderValidation`, `RendererLifecycle`, `MO2ImporterValidation`, and `PerformanceBenchmarks` are illustrative, not alternate project roots.
+Configure diagnostic output paths under Archive before running tools. Use a task-specific subdirectory and unique run directories or filenames; never overwrite retained results. Categories such as `CleanupAudits`, `ShaderValidation`, `RendererLifecycle`, `MO2ImporterValidation`, and `PerformanceBenchmarks` are illustrative, not alternate project roots.
 
 Do not store permanent reports or large diagnostic artifacts in `Assets`, either Unity project's root, or the clean test project. Preserve required Unity fixtures and their `.meta` files inside the appropriate project. Keep unrelated historical reports unchanged.
+
+#### Artifact Lifetime and Automatic Cleanup
+
+Archive is a working output location. Keeping every generated run indefinitely is forbidden. Cleanup is part of completing any task that generates artifacts and does not require a separate user request or confirmation within the scope below.
+
+- Before bulk captures, benchmarks, profiling, or Player builds, check available disk space and estimate output size. Limit the capture matrix, resolution, frame count, and retained runs to what the task needs. Reuse a validated Player build when the tested code, assets, build settings, and configuration match.
+- Keep a concise final report, test results, necessary CSV/JSON metrics, and representative PNG evidence. Generate EXR, RGBA32F, full Profiler `.raw` files, and per-frame readbacks only when their precision or timeline is needed. After analysis, remove large intermediate data that is no longer needed to support the result. Preserve the minimal raw evidence needed for unresolved failures or checks that summaries and previews cannot establish; PNG previews do not preserve EXR HDR precision.
+- Automatically delete superseded and completed temporary Player builds, abandoned outputs from failed runs, disposable caches, duplicate delivery packages, temporary exports, and intermediate captures created by the current task once they are no longer needed. Stop only task-owned processes before removing their files. Preserve reports, manifests, metrics, screenshots, and source or material backups stored inside build directories before deleting runtime binaries. Do not delete a task directory merely because it contains a build.
+- Preserve builds and other deliverables explicitly requested by the user until delivery and while they remain required. Preserve original inputs, unique source and asset backups, rollback copies, required regression fixtures, `.meta` files and GUID references, final reports, and evidence still needed for investigation. If ownership, reproducibility, or remaining use is uncertain, retain the affected files and state the reason in the final response.
+- When revisiting an Archive task directory, also remove older generated bulk that is confirmed redundant or reproducible. Record proof that the original inputs still exist and regeneration is supported, or verify an exact retained duplicate before deleting it. A directory name, file extension, age, or a successful newer run alone is insufficient evidence. Do not run a full Archive scan for every small task.
+- This standing authorization applies only to disposable generated artifacts inside `E:\Projects\stalker_raid_into_darkness_Archive`. Resolve and verify every deletion target stays inside that root, reject reparse points and junction traversal, and exclude files used by other active tasks. It does not authorize cleanup of Production, Clean Tests, legacy projects, Git data, or unique backups. Use file selections or verified artifact directories; never construct broad recursive deletions from unchecked paths.
+- Before completing the task, measure retained output size and free disk space, remove only empty directories left by the current cleanup, and save a compact cleanup record with paths, reasons, deleted bytes, and any failures in the task's Archive directory. Report retained artifacts and actual reclaimed space within the existing final response sections. Retain only the reports and helpers needed to understand or reproduce the final result.
 
 ### G. Production Regression Tests
 
@@ -205,7 +217,7 @@ Report the absolute Windows paths of reports and diagnostic results. State wheth
 
 Before Git commands that inspect or modify repository state, verify the intended repository root. Prefer an explicit working directory or `git -C`. Do not confuse a copied Clean Tests repository with the production repository; a copied directory without Git metadata has no independently verified commit identity.
 
-Do not perform Git cleanup without explicit permission. Do not automatically stage, unstage, commit, reset, restore, delete untracked files, or rewrite history. During a read-only audit, modify only the instruction files explicitly authorized by that task; do not start cleanup until the user reviews and approves the audit.
+Do not perform Git cleanup without explicit permission. Do not automatically stage, unstage, commit, reset, restore, delete untracked repository files, or rewrite history. During a read-only repository audit, modify only the instruction files explicitly authorized by that task; do not start repository cleanup until the user reviews and approves the audit. Automatic cleanup of disposable Archive artifacts under Section F is authorized separately and must not use Git cleanup commands.
 
 ### J. Production Integration
 
@@ -805,6 +817,8 @@ Before completing the task, verify:
 - R3 subscriptions have valid lifetimes if R3 was used
 - UniTask cancellation is propagated if UniTask was used
 - Editor/runtime separation is preserved
+- Generated artifacts were reviewed, disposable outputs were removed under Section F, and required evidence and deliverables were preserved
+- Tasks that generated artifacts include retained output size, actual reclaimed space, and cleanup record paths in the final response
 - Final response is substantive, self-contained, sufficiently detailed, and uses the required format
 
 If any item fails, revise the implementation before responding.

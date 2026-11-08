@@ -33,7 +33,7 @@ namespace RaidIntoDarkness.Weapons
             _savedPosition = _hands.transform.localPosition;
             _savedRotation = _hands.transform.localRotation;
             _hands.transform.localPosition = definition.HandsPosition;
-            _hands.transform.localRotation = Quaternion.identity;
+            _hands.transform.localRotation = definition.HandsRotation;
             XRayModel handsModel = _hands.GetComponent<XRayModel>();
             Transform anchor = handsModel != null ? handsModel.FindBone(FirstPersonHudAnimator.ITEM_ANCHOR_BONE) : null;
             if (anchor == null)

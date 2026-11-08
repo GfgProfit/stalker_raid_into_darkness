@@ -17,6 +17,7 @@ MonoBehaviour:
   _handsMotions: {fileID: 8815230551390286010, guid: 2db35e10370f36b499b31203813dbefe, type: 3}
   _itemMotions: {fileID: 8815230551390286010, guid: e5f75a995fa5f944990a5e8493849676, type: 3}
   _handsPosition: {x: 0.033, y: -0.155, z: -0.15}
+  _handsRotation: {x: 0, y: 0, z: 0, w: 1}
   _hudFieldOfView: 0.78
   _throwReleaseTime: 0.2446667
   _transitionDuration: 0.2
@@ -25,6 +26,8 @@ MonoBehaviour:
   _holster: {fileID: 5011832066743288695, guid: 2db35e10370f36b499b31203813dbefe, type: 3}
   _idle: {fileID: -3872585363658314330, guid: 2db35e10370f36b499b31203813dbefe, type: 3}
   _moving: {fileID: 8537267993585411290, guid: 2db35e10370f36b499b31203813dbefe, type: 3}
+  _movingSlow: {fileID: 0}
+  _movingCrouch: {fileID: 0}
   _sprint: {fileID: 556868540520510436, guid: 2db35e10370f36b499b31203813dbefe, type: 3}
   _bore: {fileID: 821681765138536043, guid: 2db35e10370f36b499b31203813dbefe, type: 3}
   _throwBegin: {fileID: 3096706123045632850, guid: 2db35e10370f36b499b31203813dbefe, type: 3}
@@ -35,5 +38,6 @@ MonoBehaviour:
   _itemDraw: {fileID: -5882832242288324255, guid: e5f75a995fa5f944990a5e8493849676, type: 3}
   _itemDrawAlternate: {fileID: 5975186148527003257, guid: e5f75a995fa5f944990a5e8493849676, type: 3}
   _itemBore: {fileID: 821681765138536043, guid: e5f75a995fa5f944990a5e8493849676, type: 3}
+  _drawCameraEffect: {fileID: 0}
   _drawSound: {fileID: 8300000, guid: 1d284a6169c89c5499c0155dbb360a16, type: 3}
   _holsterSound: {fileID: 8300000, guid: 0e714b572ee7c234ebb680455faf1301, type: 3}

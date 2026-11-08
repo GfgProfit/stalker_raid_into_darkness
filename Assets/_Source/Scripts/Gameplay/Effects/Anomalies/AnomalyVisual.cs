@@ -6,10 +6,13 @@ namespace RaidIntoDarkness.Effects
     public abstract class AnomalyVisual : MonoBehaviour
     {
         [SerializeField] private ParticleSystem _idle;
+        [SerializeField] private ParticleSystem _awaking;
         [SerializeField] private AnomalyAudio _audio;
         [SerializeField] private AnomalyContactEffects _contactEffects;
         [SerializeField] private AnomalyContactEffects _entranceContactEffects;
         [SerializeField] private AnomalyContactEffects _idleContactEffects;
+        [SerializeField] private AnomalyContactEffects _smallEntranceContactEffects;
+        [SerializeField] private AnomalyContactEffects _smallIdleContactEffects;
         [SerializeField] private ParticleSystem[] _idleAuxiliarySystems;
         [SerializeField] private bool _playIdleChildren;
         [SerializeField] private bool _keepIdleDuringDischarge;
@@ -29,6 +32,7 @@ namespace RaidIntoDarkness.Effects
         public void ShowIdle()
         {
             StopDischarge();
+            Clear(_awaking);
             _isVisible = isActiveAndEnabled;
             TickVisual(0f);
             if (_audio != null)
@@ -81,6 +85,7 @@ namespace RaidIntoDarkness.Effects
         {
             _isVisible = false;
             StopDischarge();
+            Clear(_awaking);
             ClearIdle();
             if (_contactEffects != null)
             {
@@ -94,6 +99,14 @@ namespace RaidIntoDarkness.Effects
             {
                 _idleContactEffects.Clear();
             }
+            if (_smallEntranceContactEffects != null)
+            {
+                _smallEntranceContactEffects.Clear();
+            }
+            if (_smallIdleContactEffects != null)
+            {
+                _smallIdleContactEffects.Clear();
+            }
             TickVisual(0f);
             if (_audio != null)
             {
@@ -102,7 +115,7 @@ namespace RaidIntoDarkness.Effects
             Hidden?.Invoke();
         }
 
-        public void PlayEntrance(Transform target)
+        public void PlayEntrance(Transform target, bool small = false)
         {
             if (_isVisible == false || isActiveAndEnabled == false || target == null)
             {
@@ -112,22 +125,24 @@ namespace RaidIntoDarkness.Effects
             {
                 _audio.PlayEntrance(target.position);
             }
-            AnomalyContactEffects entrance = _entranceContactEffects != null ? _entranceContactEffects : _contactEffects;
+            AnomalyContactEffects entrance = small && _smallEntranceContactEffects != null ? _smallEntranceContactEffects : _entranceContactEffects != null ? _entranceContactEffects : _contactEffects;
             if (entrance != null)
             {
                 entrance.PlayEntrance(target);
             }
-            if (_idleContactEffects != null)
+            AnomalyContactEffects idle = small && _smallIdleContactEffects != null ? _smallIdleContactEffects : _idleContactEffects;
+            if (idle != null)
             {
-                _idleContactEffects.PlayHit(target);
+                idle.PlayHit(target);
             }
         }
 
-        public void StopContact(Transform target)
+        public void StopContact(Transform target, bool small = false)
         {
-            if (_idleContactEffects != null)
+            AnomalyContactEffects idle = small && _smallIdleContactEffects != null ? _smallIdleContactEffects : _idleContactEffects;
+            if (idle != null)
             {
-                _idleContactEffects.StopTarget(target);
+                idle.StopTarget(target);
             }
         }
 
@@ -144,6 +159,31 @@ namespace RaidIntoDarkness.Effects
             if (_contactEffects != null)
             {
                 _contactEffects.PlayHit(target);
+            }
+        }
+
+        public void PlayAwaking()
+        {
+            if (_isVisible == false || isActiveAndEnabled == false)
+            {
+                return;
+            }
+            if (_awaking != null)
+            {
+                Clear(_awaking);
+                _awaking.Play(true);
+            }
+            if (_audio != null)
+            {
+                _audio.PlayAwaking();
+            }
+        }
+
+        public void PlayAccumulate()
+        {
+            if (_isVisible && isActiveAndEnabled && _audio != null)
+            {
+                _audio.PlayAccumulate();
             }
         }
 

@@ -250,12 +250,13 @@ namespace RaidIntoDarkness.Weapons
         private void TickIdle(float deltaTime)
         {
             bool sprinting = _player != null && _player.Motor != null && _player.State.IsSprinting;
-            AnimationClip clip = sprinting ? _definition.Sprint : IsMoving ? _definition.Moving : _definition.Idle;
+            AnimationClip moving = _player != null && _player.Motor != null ? _player.State.IsCrouching ? _definition.MovingCrouch : _player.State.Flags.IsAccelerated() ? _definition.Moving : _definition.MovingSlow : _definition.Moving;
+            AnimationClip clip = sprinting ? _definition.Sprint : IsMoving ? moving : _definition.Idle;
             if (clip == null)
             {
                 clip = _definition.Idle;
             }
-            float speed = clip == _definition.Moving && _player != null && _player.Motor != null ? _player.State.IsCrouching ? 0.7f : _player.State.Flags.IsAccelerated() ? 1f : 0.75f : 1f;
+            float speed = _definition.HasDistinctMovement == false && clip == _definition.Moving && _player != null && _player.Motor != null ? _player.State.IsCrouching ? 0.7f : _player.State.Flags.IsAccelerated() ? 1f : 0.75f : 1f;
             if (_loop != clip || _loopSpeed != speed)
             {
                 _loop = clip;
@@ -301,6 +302,10 @@ namespace RaidIntoDarkness.Weapons
         {
             AnimationClip clip = _definition.DrawAlternate != null && Random.Range(0, 2) == 1 ? _definition.DrawAlternate : _definition.Draw;
             SetState(FirstPersonBoltState.Drawing, clip, false);
+            if (_definition.DrawCameraEffect != null && _player != null && _player.CameraEffects != null)
+            {
+                _player.CameraEffects.PlayItemEffect(_definition.DrawCameraEffect);
+            }
             if (playSound)
             {
                 PlaySound(_definition.DrawSound);

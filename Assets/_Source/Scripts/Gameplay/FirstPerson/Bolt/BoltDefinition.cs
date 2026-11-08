@@ -11,6 +11,7 @@ namespace RaidIntoDarkness.FirstPerson
         [SerializeField] private XRayMotionLibrary _handsMotions;
         [SerializeField] private XRayMotionLibrary _itemMotions;
         [SerializeField] private Vector3 _handsPosition = new Vector3(0.033f, -0.155f, -0.15f);
+        [SerializeField] private Quaternion _handsRotation = Quaternion.identity;
         [SerializeField] private float _hudFieldOfView = 0.78f;
         [SerializeField] private float _throwReleaseTime;
         [SerializeField, Min(0f)] private float _transitionDuration = 0.2f;
@@ -19,6 +20,8 @@ namespace RaidIntoDarkness.FirstPerson
         [SerializeField] private AnimationClip _holster;
         [SerializeField] private AnimationClip _idle;
         [SerializeField] private AnimationClip _moving;
+        [SerializeField] private AnimationClip _movingSlow;
+        [SerializeField] private AnimationClip _movingCrouch;
         [SerializeField] private AnimationClip _sprint;
         [SerializeField] private AnimationClip _bore;
         [SerializeField] private AnimationClip _throwBegin;
@@ -29,12 +32,14 @@ namespace RaidIntoDarkness.FirstPerson
         [SerializeField] private AnimationClip _itemDraw;
         [SerializeField] private AnimationClip _itemDrawAlternate;
         [SerializeField] private AnimationClip _itemBore;
+        [SerializeField] private XRayAnmAsset _drawCameraEffect;
         [SerializeField] private AudioClip _drawSound;
         [SerializeField] private AudioClip _holsterSound;
 
         public GameObject HudModel => _hudModel;
         public GameObject ProjectilePrefab => _projectilePrefab;
         public Vector3 HandsPosition => _handsPosition;
+        public Quaternion HandsRotation => _handsRotation;
         public float HudFieldOfView => _hudFieldOfView;
         public float ThrowReleaseTime => _throwReleaseTime;
         public float TransitionDuration => Mathf.Max(0f, _transitionDuration);
@@ -43,6 +48,9 @@ namespace RaidIntoDarkness.FirstPerson
         public AnimationClip Holster => _holster;
         public AnimationClip Idle => _idle;
         public AnimationClip Moving => _moving;
+        public AnimationClip MovingSlow => _movingSlow != null ? _movingSlow : _moving;
+        public AnimationClip MovingCrouch => _movingCrouch != null ? _movingCrouch : _moving;
+        public bool HasDistinctMovement => _movingSlow != null || _movingCrouch != null;
         public AnimationClip Sprint => _sprint;
         public AnimationClip Bore => _bore;
         public AnimationClip ThrowBegin => _throwBegin;
@@ -53,6 +61,7 @@ namespace RaidIntoDarkness.FirstPerson
         public AnimationClip ItemDraw => _itemDraw;
         public AnimationClip ItemDrawAlternate => _itemDrawAlternate;
         public AnimationClip ItemBore => _itemBore;
+        public XRayAnmAsset DrawCameraEffect => _drawCameraEffect;
         public AudioClip DrawSound => _drawSound;
         public AudioClip HolsterSound => _holsterSound;
 

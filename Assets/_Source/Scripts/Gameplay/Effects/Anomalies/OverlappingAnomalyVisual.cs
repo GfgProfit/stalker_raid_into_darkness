@@ -14,6 +14,7 @@ namespace RaidIntoDarkness.Effects
         [SerializeField] private int[] _stopEffectIndices;
         [SerializeField] private float[] _stopTimes;
         [SerializeField, Min(0f)] private float _groupDuration = 20f;
+        [SerializeField, Min(0f)] private float _dischargeEffectDelay;
         [SerializeField] private Light _dischargeLight;
         [SerializeField, Min(0f)] private float _dischargeLightIntensity = 30000f;
         [SerializeField, Min(0f)] private float _dischargeLightRange = 9f;
@@ -34,7 +35,7 @@ namespace RaidIntoDarkness.Effects
             GameObject instance = Instantiate(_dischargeTemplate, transform);
             instance.name = "Discharge";
             AnomalyParticlePlayback playback = new AnomalyParticlePlayback(instance, _dischargeRootIndex, _stopEffectIndices, _stopTimes, _groupDuration);
-            if (playback.IsValid == false || playback.Play() == false)
+            if (playback.IsValid == false || playback.Play(_dischargeEffectDelay) == false)
             {
                 Destroy(instance);
                 Debug.LogError("Anomaly discharge template has no configured root ParticleSystem.", this);

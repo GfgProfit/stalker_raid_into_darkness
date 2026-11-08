@@ -5,7 +5,6 @@ using UnityEngine;
 namespace RaidIntoDarkness.Player
 {
     [DisallowMultipleComponent]
-    [RequireComponent(typeof(SphereCollider), typeof(Rigidbody))]
     public sealed class AnomalyPlayerReaction : MonoBehaviour
     {
         [SerializeField] private AnomalyVisual _visual;
@@ -88,7 +87,7 @@ namespace RaidIntoDarkness.Player
             {
                 if (contact.Probe != null && _visual != null)
                 {
-                    _visual.StopContact(contact.Probe.transform);
+                    _visual.StopContact(contact.Probe.transform, true);
                 }
             }
             _probeContacts.Clear();
@@ -109,9 +108,21 @@ namespace RaidIntoDarkness.Player
             }
 
             RemoveExpiredContacts();
+            AnomalyPhase previous = _cycle.Phase;
             if (_cycle.Tick(Time.time, _contacts.Count > 0 || HasActiveProbe()))
             {
                 _visual.PlayDischarge();
+            }
+            if (_cycle.Phase != previous)
+            {
+                if (_cycle.Phase == AnomalyPhase.Awaking)
+                {
+                    _visual.PlayAwaking();
+                }
+                else if (_cycle.Phase == AnomalyPhase.Accumulate)
+                {
+                    _visual.PlayAccumulate();
+                }
             }
             if (_pulsePending && Time.time >= _pulseAt)
             {
@@ -136,7 +147,7 @@ namespace RaidIntoDarkness.Player
                 _probeContacts.Remove(other);
                 if (probeContact.Probe != null)
                 {
-                    _visual.StopContact(probeContact.Probe.transform);
+                    _visual.StopContact(probeContact.Probe.transform, true);
                 }
             }
             if (_contacts.TryGetValue(other, out StalkerPlayerController player))
@@ -207,7 +218,7 @@ namespace RaidIntoDarkness.Player
                 }
                 else if (contact.Value.IdleStopped == false && Time.time - contact.Value.EnteredAt > 0.1f)
                 {
-                    _visual.StopContact(contact.Value.Probe.transform);
+                    _visual.StopContact(contact.Value.Probe.transform, true);
                     contact.Value.IdleStopped = true;
                 }
             }
@@ -216,7 +227,7 @@ namespace RaidIntoDarkness.Player
                 ProbeContact contact = _probeContacts[collider];
                 if (contact.Probe != null)
                 {
-                    _visual.StopContact(contact.Probe.transform);
+                    _visual.StopContact(contact.Probe.transform, true);
                 }
                 _probeContacts.Remove(collider);
             }
@@ -234,7 +245,7 @@ namespace RaidIntoDarkness.Player
                 return;
             }
             _probeContacts.Add(collider, new ProbeContact(probe, Time.time));
-            _visual.PlayEntrance(probe.transform);
+            _visual.PlayEntrance(probe.transform, true);
         }
 
         private bool HasActiveProbe()

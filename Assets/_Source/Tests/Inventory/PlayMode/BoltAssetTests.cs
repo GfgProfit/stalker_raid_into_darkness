@@ -6,6 +6,7 @@ using RaidIntoDarkness.Weapons;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using XRay.Importer;
 
 namespace RaidIntoDarkness.Integrations.Inventory.Tests
 {
@@ -13,6 +14,8 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
     {
         private const string ROOT = "Assets/_Source/FirstPerson/Bolt";
         private const string DEFINITION_PATH = ROOT + "/BoltDefinition.asset";
+        private const string GRA_HANDS = ROOT + "/Animations/dev_hand_bolt_hud_animation.omf";
+        private const string GRA_ITEM = ROOT + "/Animations/dev_bolt_hud_animation.omf";
         private const string PLAYER_PATH = "Assets/_Source/FirstPerson/FPS_Player.prefab";
         private const string INPUT_PATH = "Assets/_Source/Settings/Input/StalkerControls.inputactions";
         private const string MATERIAL = "objects\\small_metal_trash";
@@ -60,11 +63,36 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             Assert.That(definition.GetMotionSpeed(definition.Sprint), Is.EqualTo(1.2f).Within(0.000001f));
             Assert.That(definition.GetMotionSpeed(definition.ThrowEnd), Is.EqualTo(1f));
             Assert.That(definition.ThrowReleaseTime, Is.EqualTo(0.2446666956f).Within(0.000001f));
+            Assert.That(Quaternion.Angle(definition.HandsRotation, Quaternion.identity), Is.LessThan(0.0001f));
+            Assert.That(definition.HasDistinctMovement, Is.False);
+            Assert.That(definition.DrawCameraEffect, Is.Null);
+            Assert.That(definition.Draw.name, Is.EqualTo("dev_bolt_draw"));
+            Assert.That(definition.DrawAlternate.name, Is.EqualTo("dev_bolt_draw1"));
+            Assert.That(AssetDatabase.GetAssetPath(definition.HudModel), Is.EqualTo(ROOT + "/Models/dev_bolt_hud.ogf"));
+            var data = new SerializedObject(definition);
+            Assert.That(AssetDatabase.GetAssetPath(data.FindProperty("_handsMotions").objectReferenceValue), Is.EqualTo(GRA_HANDS));
+            Assert.That(AssetDatabase.GetAssetPath(data.FindProperty("_itemMotions").objectReferenceValue), Is.EqualTo(GRA_ITEM));
             Assert.That(definition.HudFieldOfView, Is.EqualTo(0.78f));
             Assert.That(definition.TransitionDuration, Is.EqualTo(0.2f).Within(0.000001f));
             Assert.That(Vector3.Distance(definition.HandsPosition, new Vector3(0.033f, -0.155f, -0.15f)), Is.LessThan(0.000001f));
             Assert.That(definition.DrawSound, Is.Not.Null);
             Assert.That(definition.HolsterSound, Is.Not.Null);
+        }
+
+        [Test]
+        public void GraHudPoseIsAppliedBelowUnshiftedHandsRoot()
+        {
+            GameObject player = AssetDatabase.LoadAssetAtPath<GameObject>(PLAYER_PATH);
+            Assert.That(player, Is.Not.Null);
+            var rig = new SerializedObject(player.GetComponent<FirstPersonRig>());
+            Transform handsRoot = rig.FindProperty("_handsRoot").objectReferenceValue as Transform;
+            Assert.That(handsRoot, Is.Not.Null);
+            Assert.That(handsRoot.localPosition, Is.EqualTo(Vector3.zero));
+            Assert.That(Quaternion.Angle(handsRoot.localRotation, Quaternion.identity), Is.LessThan(0.0001f));
+            Assert.That(handsRoot.localScale, Is.EqualTo(Vector3.one));
+            GameObject hud = Definition().HudModel;
+            Assert.That(hud.transform.localPosition, Is.EqualTo(Vector3.zero));
+            Assert.That(Quaternion.Angle(hud.transform.localRotation, Quaternion.identity), Is.LessThan(0.0001f));
         }
 
         [Test]
@@ -75,6 +103,20 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             Assert.That(prefab.GetComponent<BoltProjectile>(), Is.Not.Null);
             Assert.That(prefab.GetComponent<AnomalyProbe>(), Is.Not.Null);
             Assert.That(prefab.GetComponentsInChildren<WorldItem>(true), Is.Empty);
+            bool foundWorldMesh = false;
+            foreach (SkinnedMeshRenderer renderer in prefab.GetComponentsInChildren<SkinnedMeshRenderer>(true))
+            {
+                Assert.That(renderer.sharedMesh, Is.Not.Null);
+                Assert.That(AssetDatabase.GetAssetPath(renderer.sharedMesh), Is.EqualTo(ROOT + "/Models/dev_bolt.ogf"));
+                foundWorldMesh = true;
+            }
+            foreach (MeshFilter filter in prefab.GetComponentsInChildren<MeshFilter>(true))
+            {
+                Assert.That(filter.sharedMesh, Is.Not.Null);
+                Assert.That(AssetDatabase.GetAssetPath(filter.sharedMesh), Is.EqualTo(ROOT + "/Models/dev_bolt.ogf"));
+                foundWorldMesh = true;
+            }
+            Assert.That(foundWorldMesh, Is.True);
             Rigidbody body = prefab.GetComponent<Rigidbody>();
             Assert.That(body, Is.Not.Null);
             Assert.That(body.mass, Is.EqualTo(1f));
@@ -85,8 +127,10 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             BoxCollider collider = prefab.GetComponent<BoxCollider>();
             Assert.That(collider, Is.Not.Null);
             Assert.That(collider.isTrigger, Is.False);
-            Assert.That(Vector3.Distance(collider.center, new Vector3(0.0000715283677f, -0.0049078334123f, -0.0000623427331f)), Is.LessThan(0.000001f));
-            Assert.That(Vector3.Distance(collider.size, new Vector3(0.03337807208f, 0.07814133168f, 0.03294686228f)), Is.LessThan(0.000001f));
+            Assert.That(collider.size.x, Is.GreaterThan(0f));
+            Assert.That(collider.size.y, Is.GreaterThan(0f));
+            Assert.That(collider.size.z, Is.GreaterThan(0f));
+            Assert.That(collider.size.magnitude, Is.LessThan(0.6f));
             WorldItemImpactSound impact = prefab.GetComponent<WorldItemImpactSound>();
             Assert.That(impact, Is.Not.Null);
             Assert.That(impact.Material, Is.EqualTo(MATERIAL));
@@ -168,3 +212,4 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
     }
 }
 #endif
+

@@ -13,7 +13,9 @@ namespace RaidIntoDarkness.Effects
         private readonly bool _bindingsValid;
 
         private float _elapsed;
+        private float _delayRemaining;
         private bool _playing;
+        private bool _started;
 
         public GameObject Root { get; }
         public bool IsValid => Root != null && _bindingsValid && _systems[_rootIndex] != null;
@@ -40,7 +42,7 @@ namespace RaidIntoDarkness.Effects
             }
         }
 
-        public bool Play()
+        public bool Play(float delay = 0f)
         {
             if (IsValid == false)
             {
@@ -49,9 +51,14 @@ namespace RaidIntoDarkness.Effects
 
             Stop();
             _elapsed = 0f;
+            _delayRemaining = Mathf.Max(0f, delay);
             _playing = true;
-            Root.SetActive(true);
-            _systems[_rootIndex].Play(true);
+            _started = _delayRemaining <= 0f;
+            Root.SetActive(_started);
+            if (_started)
+            {
+                _systems[_rootIndex].Play(true);
+            }
             return true;
         }
 
@@ -62,8 +69,21 @@ namespace RaidIntoDarkness.Effects
                 return false;
             }
 
+            float activeDelta = Mathf.Max(0f, deltaTime);
+            if (_started == false)
+            {
+                activeDelta = Mathf.Max(0f, activeDelta - _delayRemaining);
+                _delayRemaining = Mathf.Max(0f, _delayRemaining - Mathf.Max(0f, deltaTime));
+                if (_delayRemaining > 0f)
+                {
+                    return true;
+                }
+                _started = true;
+                Root.SetActive(true);
+                _systems[_rootIndex].Play(true);
+            }
             float previous = _elapsed;
-            _elapsed += Mathf.Max(0f, deltaTime);
+            _elapsed += activeDelta;
             for (int index = 0; index < _stopIndices.Length; index++)
             {
                 if (previous < _stopTimes[index] && _elapsed >= _stopTimes[index])
@@ -104,6 +124,8 @@ namespace RaidIntoDarkness.Effects
                 }
             }
             _playing = false;
+            _started = false;
+            _delayRemaining = 0f;
         }
     }
 }

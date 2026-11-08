@@ -84941,7 +84941,6 @@ GameObject:
   - component: {fileID: 1568900054068925385}
   - component: {fileID: 2127572662569318147}
   - component: {fileID: 5290107305091968687}
-  - component: {fileID: 9212775361344111670}
   - component: {fileID: 2374858350447174257}
   m_Layer: 0
   m_Name: Zharka
@@ -84986,6 +84985,9 @@ MonoBehaviour:
   _blowout: {fileID: 4325813099232324809}
   _entrance: {fileID: 5606579341489078966}
   _hit: {fileID: 1179362313102990635}
+  _awaking: {fileID: 0}
+  _accumulate: {fileID: 0}
+  _blowoutDelay: 0
 --- !u!114 &2127572662569318147
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -84999,10 +85001,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: RaidIntoDarkness.Effects::RaidIntoDarkness.Effects.OverlappingAnomalyVisual
   _idle: {fileID: 6473035539298428403}
+  _awaking: {fileID: 0}
   _audio: {fileID: 1568900054068925385}
   _contactEffects: {fileID: 0}
   _entranceContactEffects: {fileID: 0}
   _idleContactEffects: {fileID: 0}
+  _smallEntranceContactEffects: {fileID: 0}
+  _smallIdleContactEffects: {fileID: 0}
   _idleAuxiliarySystems: []
   _playIdleChildren: 1
   _keepIdleDuringDischarge: 1
@@ -85020,6 +85025,7 @@ MonoBehaviour:
   - 18
   - 9
   _groupDuration: 20
+  _dischargeEffectDelay: 0
   _dischargeLight: {fileID: 522995858296311764}
   _dischargeLightIntensity: 300000
   _dischargeLightRange: 9
@@ -85046,33 +85052,6 @@ SphereCollider:
   serializedVersion: 3
   m_Radius: 2
   m_Center: {x: 0, y: 0.75, z: 0}
---- !u!54 &9212775361344111670
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6036523816419366679}
-  serializedVersion: 5
-  m_Mass: 1
-  m_LinearDamping: 0
-  m_AngularDamping: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 0
-  m_IsKinematic: 1
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
 --- !u!114 &2374858350447174257
 MonoBehaviour:
   m_ObjectHideFlags: 0

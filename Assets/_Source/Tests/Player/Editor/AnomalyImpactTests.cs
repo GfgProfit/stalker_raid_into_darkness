@@ -46,6 +46,17 @@ namespace RaidIntoDarkness.Player.Tests
                 typeof(StalkerCharacterPhysics).GetProperty(nameof(StalkerCharacterPhysics.LoseControl)).SetValue(Physics, true);
             }
 
+            public StalkerAnomalyResponse AddResponse()
+            {
+                StalkerPlayerController player = _root.AddComponent<StalkerPlayerController>();
+                SetField(player, "_motor", Motor);
+                SetField(player, "_profile", _profile);
+                StalkerAnomalyResponse response = _root.AddComponent<StalkerAnomalyResponse>();
+                SetField(response, "_player", player);
+                _root.SetActive(true);
+                return response;
+            }
+
             public void Dispose()
             {
                 UnityEngine.Object.DestroyImmediate(_root);
@@ -178,6 +189,73 @@ namespace RaidIntoDarkness.Player.Tests
                 Assert.That(rig.Condition.SprintKoef, Is.EqualTo(sprint));
                 Assert.That(rig.Condition.RunModifiers.Count, Is.EqualTo(1));
                 Assert.That(rig.Condition.SprintModifiers.Count, Is.EqualTo(1));
+            }
+        }
+
+        [Test]
+        public void ChemicalPulsePreservesGroundedMovementSprintAndActorCondition()
+        {
+            AssertNonimpulsivePulse(AnomalyInfluenceKind.Chemical, false);
+        }
+
+        [Test]
+        public void ChemicalPulsePreservesAirborneMovementSprintAndActorCondition()
+        {
+            AssertNonimpulsivePulse(AnomalyInfluenceKind.Chemical, true);
+        }
+
+        [Test]
+        public void ThermalPulsePreservesGroundedMovementSprintAndActorCondition()
+        {
+            AssertNonimpulsivePulse(AnomalyInfluenceKind.Thermal, false);
+        }
+
+        [Test]
+        public void ThermalPulsePreservesAirborneMovementSprintAndActorCondition()
+        {
+            AssertNonimpulsivePulse(AnomalyInfluenceKind.Thermal, true);
+        }
+
+        private static void AssertNonimpulsivePulse(AnomalyInfluenceKind kind, bool airborne)
+        {
+            using (var rig = new Rig())
+            {
+                StalkerAnomalyResponse response = rig.AddResponse();
+                AnomalyInfluenceProfile profile = ScriptableObject.CreateInstance<AnomalyInfluenceProfile>();
+                try
+                {
+                    SetField(profile, "_kind", kind);
+                    Vector3 velocity = new Vector3(3.5f, -2f, 6f);
+                    StalkerMoveFlags flags = StalkerMoveFlags.Forward | StalkerMoveFlags.Sprint;
+                    if (airborne)
+                    {
+                        rig.SetAirborne();
+                    }
+                    rig.Physics.SetVelocity(velocity);
+                    rig.SetRealFlags(flags);
+                    rig.Motor.Wish = flags;
+                    SetField(rig.Condition, "_neutralHealth", 0.61f);
+                    rig.Condition.SetPower(0.37f);
+                    rig.Condition.SetSpeedModifier("AnomalyImpactTests.Nonimpulsive", 0.8f, false);
+                    float speed = rig.Condition.RunCoef;
+                    int impacts = 0;
+                    response.Impact += value => impacts++;
+
+                    response.ApplyPulse(profile);
+
+                    Assert.That(impacts, Is.EqualTo(1));
+                    Assert.That(rig.Motor.Velocity, Is.EqualTo(velocity));
+                    Assert.That(rig.Motor.Wish, Is.EqualTo(flags));
+                    Assert.That(rig.Motor.RealFlags, Is.EqualTo(flags));
+                    Assert.That(rig.Condition.Health, Is.EqualTo(0.61f));
+                    Assert.That(rig.Condition.Power, Is.EqualTo(0.37f));
+                    Assert.That(rig.Condition.RunCoef, Is.EqualTo(speed));
+                    Assert.That(rig.Condition.RunModifiers.Count, Is.EqualTo(1));
+                }
+                finally
+                {
+                    UnityEngine.Object.DestroyImmediate(profile);
+                }
             }
         }
 

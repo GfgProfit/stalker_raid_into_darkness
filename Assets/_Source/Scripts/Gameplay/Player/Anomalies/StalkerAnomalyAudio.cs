@@ -15,19 +15,27 @@ namespace RaidIntoDarkness.Player
 
         private AudioSource _shockSource;
         private AudioSource _thermalSource;
+        private AudioSource _chemicalSource;
         private AudioSource _strikeSource;
         private Vector3 _shockPosition;
         private Vector3 _thermalPosition;
+        private Vector3 _chemicalPosition;
         private Vector3 _strikePosition;
 
         public void Configure(AudioClip[] painClips)
         {
             Stop(_shockSource);
             Stop(_thermalSource);
+            Stop(_chemicalSource);
             _painClips = painClips;
         }
 
         public void PlayPain(bool shock, Vector3 position)
+        {
+            PlayPain(shock ? AnomalyInfluenceKind.Electric : AnomalyInfluenceKind.Thermal, position);
+        }
+
+        private void PlayPain(AnomalyInfluenceKind kind, Vector3 position)
         {
             if (isActiveAndEnabled == false || _painClips == null || _painClips.Length == 0)
             {
@@ -35,7 +43,7 @@ namespace RaidIntoDarkness.Player
             }
 
             EnsureSources();
-            AudioSource source = shock ? _shockSource : _thermalSource;
+            AudioSource source = kind == AnomalyInfluenceKind.Chemical ? _chemicalSource : kind == AnomalyInfluenceKind.Thermal ? _thermalSource : _shockSource;
             if (source.isPlaying)
             {
                 return;
@@ -47,7 +55,11 @@ namespace RaidIntoDarkness.Player
                 return;
             }
 
-            if (shock)
+            if (kind == AnomalyInfluenceKind.Chemical)
+            {
+                _chemicalPosition = position;
+            }
+            else if (kind != AnomalyInfluenceKind.Thermal)
             {
                 _shockPosition = position;
             }
@@ -64,7 +76,7 @@ namespace RaidIntoDarkness.Player
         {
             if (kind != AnomalyInfluenceKind.Vortex)
             {
-                PlayPain(kind != AnomalyInfluenceKind.Thermal, position);
+                PlayPain(kind, position);
                 return;
             }
             if (isActiveAndEnabled == false || _strikeClips == null || _strikeClips.Length == 0)
@@ -95,6 +107,7 @@ namespace RaidIntoDarkness.Player
         {
             Stop(_shockSource);
             Stop(_thermalSource);
+            Stop(_chemicalSource);
             Stop(_strikeSource);
         }
 
@@ -102,6 +115,7 @@ namespace RaidIntoDarkness.Player
         {
             DestroySource(_shockSource);
             DestroySource(_thermalSource);
+            DestroySource(_chemicalSource);
             DestroySource(_strikeSource);
         }
 
@@ -109,6 +123,7 @@ namespace RaidIntoDarkness.Player
         {
             KeepPosition(_shockSource, _shockPosition);
             KeepPosition(_thermalSource, _thermalPosition);
+            KeepPosition(_chemicalSource, _chemicalPosition);
             KeepPosition(_strikeSource, _strikePosition);
         }
 
@@ -121,6 +136,10 @@ namespace RaidIntoDarkness.Player
             if (_thermalSource == null)
             {
                 _thermalSource = CreateSource("ThermalPain");
+            }
+            if (_chemicalSource == null)
+            {
+                _chemicalSource = CreateSource("ChemicalPain");
             }
             if (_strikeSource == null && _strikeClips != null && _strikeClips.Length > 0)
             {

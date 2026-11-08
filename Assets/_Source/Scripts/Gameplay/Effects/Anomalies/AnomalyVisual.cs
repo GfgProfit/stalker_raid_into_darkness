@@ -7,6 +7,10 @@ namespace RaidIntoDarkness.Effects
     {
         [SerializeField] private ParticleSystem _idle;
         [SerializeField] private ParticleSystem _awaking;
+        [SerializeField] private Light _idleIllumination;
+        [SerializeField] private AnomalyLightAnimation _idleLightAnimation;
+        [SerializeField, Min(0f)] private float _idleLightRange;
+        [SerializeField, Min(0f)] private float _idleLightRangeJitter;
         [SerializeField] private AnomalyAudio _audio;
         [SerializeField] private AnomalyContactEffects _contactEffects;
         [SerializeField] private AnomalyContactEffects _entranceContactEffects;
@@ -200,6 +204,7 @@ namespace RaidIntoDarkness.Effects
         protected virtual void Update()
         {
             TickVisual(Time.deltaTime);
+            UpdateIdleLight(Time.time);
         }
 
         protected abstract bool StartDischarge();
@@ -216,6 +221,10 @@ namespace RaidIntoDarkness.Effects
 
         private void ClearIdle()
         {
+            if (_idleIllumination != null)
+            {
+                _idleIllumination.enabled = false;
+            }
             Clear(_idle);
             if (_idleAuxiliarySystems == null)
             {
@@ -229,9 +238,30 @@ namespace RaidIntoDarkness.Effects
 
         private void EnsureIdle()
         {
+            if (_idleIllumination != null)
+            {
+                _idleIllumination.enabled = _isVisible && isActiveAndEnabled;
+                UpdateIdleLight(Time.time);
+            }
             if (_idle != null && _isVisible && isActiveAndEnabled && _idle.isPlaying == false)
             {
                 _idle.Play(_playIdleChildren);
+            }
+        }
+
+        private void UpdateIdleLight(float globalTime)
+        {
+            if (_idleIllumination == null || _idleIllumination.enabled == false)
+            {
+                return;
+            }
+            if (_idleLightAnimation != null && _idleLightAnimation.IsValid)
+            {
+                _idleIllumination.color = _idleLightAnimation.Evaluate(globalTime);
+            }
+            if (_idleLightRange > 0f)
+            {
+                _idleIllumination.range = Mathf.Max(0.001f, _idleLightRange + _idleLightRangeJitter * UnityEngine.Random.Range(-1f, 1f));
             }
         }
     }

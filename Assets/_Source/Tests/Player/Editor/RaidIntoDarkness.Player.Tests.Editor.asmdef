@@ -6,6 +6,7 @@
         "UnityEditor.TestRunner",
         "RaidIntoDarkness.Player",
         "RaidIntoDarkness.Player.Editor",
+        "RaidIntoDarkness.Effects",
         "RaidIntoDarkness.FirstPerson",
         "XRay.Importer.Runtime"
     ],

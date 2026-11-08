@@ -56,7 +56,7 @@ namespace RaidIntoDarkness.Player
             {
                 return;
             }
-            bool shock = profile.Kind != AnomalyInfluenceKind.Thermal;
+            bool shock = profile.Kind == AnomalyInfluenceKind.Springboard || profile.Kind == AnomalyInfluenceKind.Electric || profile.Kind == AnomalyInfluenceKind.Vortex;
             if (shock)
             {
                 _player.Motor.ApplyAnomalyShock(profile.LaunchHeight <= 0f);

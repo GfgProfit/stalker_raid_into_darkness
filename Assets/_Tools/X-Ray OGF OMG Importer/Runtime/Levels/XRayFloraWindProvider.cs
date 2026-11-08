@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 namespace XRay.Importer.Levels
 {
@@ -20,7 +22,9 @@ namespace XRay.Importer.Levels
         [SerializeField, InspectorName("DIAGNOSTIC Scene View wind preview")] private bool _previewEnabled;
 
         private readonly XRayFloraWindState _state = new XRayFloraWindState();
+        private readonly XRayGrassBenderState _grassBenders = new XRayGrassBenderState();
         private int _lastFrame = -1;
+        private int _grassFrame = -1;
         private UnityEngine.Object _weatherOwner;
         private XRayFloraWindWeather _weatherInputs;
         private Vector4? _weatherTreesSetup;
@@ -28,9 +32,15 @@ namespace XRay.Importer.Levels
         public static XRayFloraWindProvider Active { get; private set; }
 
         public XRayFloraWindState State => _state;
+        public XRayGrassBenderState GrassBenders => _grassBenders;
         public bool InputsComplete => WeatherDriven || _profile == XRayFloraWindProfile.AnomalySsfx || _profile == XRayFloraWindProfile.TrueStalkerXRay && _trueStalkerDiagnosticConstants;
         public string Diagnostic { get; private set; }
         public bool WeatherDriven => _weatherOwner != null;
+
+        public bool TryAddGrassExplosion(UnityEngine.Object owner, Vector3 position, float fade, float speed, float intensity, float radius)
+        {
+            return Active == this && isActiveAndEnabled && _grassBenders.TryAddExplosion(owner, position, fade, speed, intensity, radius);
+        }
 
         public bool TryAcquireWeather(UnityEngine.Object owner, Vector4? treesSetup)
         {
@@ -127,12 +137,21 @@ namespace XRay.Importer.Levels
         private void OnEnable()
         {
             _lastFrame = -1;
+            _grassFrame = -1;
+            _grassBenders.Clear();
+            RenderPipelineManager.beginContextRendering += OnBeginContextRendering;
             if (Active == null) Active = this;
             ResetAnimation();
+            if (Active == this)
+            {
+                _grassBenders.Apply();
+            }
         }
 
         private void OnDisable()
         {
+            RenderPipelineManager.beginContextRendering -= OnBeginContextRendering;
+            _grassBenders.Clear();
             _weatherOwner = null;
             _weatherTreesSetup = null;
             if (Active == this)
@@ -143,10 +162,39 @@ namespace XRay.Importer.Levels
                     if (provider == this || !provider.isActiveAndEnabled || !provider.gameObject.scene.IsValid() || Application.isPlaying && !Application.IsPlaying(provider.gameObject)) continue;
                     Active = provider;
                     provider.Reinitialize();
+                    provider._grassBenders.Apply();
                     break;
                 }
-                if (Active == null) XRayFloraWindState.Clear();
+                if (Active == null)
+                {
+                    XRayFloraWindState.Clear();
+                    _grassBenders.Apply();
+                }
             }
+        }
+
+        private void OnBeginContextRendering(ScriptableRenderContext context, List<Camera> cameras)
+        {
+            if (Active != this)
+            {
+                return;
+            }
+            if (Application.IsPlaying(gameObject) == false)
+            {
+                if (_grassBenders.ActiveCount > 0 || _grassBenders.HasData)
+                {
+                    _grassBenders.Clear();
+                    _grassBenders.Apply();
+                }
+                return;
+            }
+            if (_grassFrame == Time.frameCount)
+            {
+                return;
+            }
+            _grassFrame = Time.frameCount;
+            _grassBenders.Advance(XRayFloraWindState.EngineDelta(Time.deltaTime, _paused));
+            _grassBenders.Apply();
         }
 
         private void Update()

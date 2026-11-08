@@ -6,6 +6,10 @@
 #define MONOLITH_FLORA_SOURCE_ANOMALY 1.0
 #define MONOLITH_FLORA_SOURCE_TRUE_STALKER 2.0
 
+int _MonolithGrassBenderCount;
+float4 _MonolithGrassBenders[16];
+float4 _MonolithGrassBendersPrevious[16];
+
 struct MonolithWindSetup
 {
     float2 direction;
@@ -178,6 +182,26 @@ float3 MonolithSsfxWindGrass(TEXTURE2D_PARAM(waves, wavesSampler), float3 positi
     float2 motion = (flow.xy * 2.0 - 1.0) * setup.grassTurbulence;
     float2 push = flow.z * setup.direction * setup.grassPush;
     return float3(motion.x + push.x, flow.z * setup.grassWave, motion.y + push.y) * setup.speed * limit;
+}
+
+float3 MonolithGrassBenderPosition(float3 position, float height, bool previous)
+{
+    for (int index = 0; index < min(_MonolithGrassBenderCount, 8); index++)
+    {
+        float4 sphere = previous ? _MonolithGrassBendersPrevious[index] : _MonolithGrassBenders[index];
+        float strength = previous ? _MonolithGrassBendersPrevious[index + 8].w : _MonolithGrassBenders[index + 8].w;
+        if (sphere.w <= 0.0 || strength <= 0.0)
+        {
+            continue;
+        }
+        float heightLimit = (1.0 - saturate(abs(position.y - sphere.y) / sphere.w)) * height;
+        float bend = 1.0 - saturate(distance(position.xz, sphere.xz) / (sphere.w + 0.001));
+        float3 relative = position - sphere.xyz;
+        float3 direction = relative * rsqrt(max(dot(relative, relative), 1e-12)) * bend;
+        position.xz += direction.xz * 2.0 * strength * heightLimit;
+        position.y -= bend * 0.6 * strength * heightLimit;
+    }
+    return position;
 }
 
 float MonolithFloraCyclic(float x)

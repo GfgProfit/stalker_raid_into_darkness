@@ -1,7 +1,9 @@
 {
     "name": "RaidIntoDarkness.Effects",
     "rootNamespace": "RaidIntoDarkness.Effects",
-    "references": [],
+    "references": [
+        "XRay.Importer.Runtime"
+    ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,

@@ -79,6 +79,7 @@ namespace XRay.Importer.Levels
         public int ResidentInstances { get; private set; }
         public double LastBuildMilliseconds { get; private set; }
         public float BoundsPadding => _modelExtent * 1.5f + _windExtent.magnitude;
+        public float MaximumModelHeight => _modelExtent;
         public bool NeedsStreaming => _cursor < _offsets.Count;
         public bool HasFadingCells { get; private set; }
 

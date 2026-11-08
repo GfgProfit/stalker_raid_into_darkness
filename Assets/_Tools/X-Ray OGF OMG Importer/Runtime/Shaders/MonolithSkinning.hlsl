@@ -62,6 +62,12 @@ AttributesMesh ApplyMeshModification(AttributesMesh input, float3 timeParameters
             float3 offset = MonolithSsfxWindGrass(TEXTURE2D_ARGS(_MonolithWindWaves, s_linear_repeat_sampler), position, positionAWS.y - baseHeight, flowAnim, setup);
             input.positionOS += mul((float3x3)GetWorldToObjectMatrix(), offset);
         }
+        if (_MonolithGrassSource > 0.5 && _MonolithGrassSource < 1.5 && _MonolithGrassBenderCount > 0)
+        {
+            float3 positionAWS = GetAbsolutePositionWS(TransformObjectToWorld(input.positionOS));
+            float3 bentPosition = MonolithGrassBenderPosition(positionAWS, alignedHeight, previous);
+            input.positionOS += mul((float3x3)GetWorldToObjectMatrix(), bentPosition - positionAWS);
+        }
         return input;
     }
     if (_MonolithLevelWind < 0.5 || instance.z < 0.5)

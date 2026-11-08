@@ -8,7 +8,8 @@ namespace RaidIntoDarkness.Player
         Springboard,
         Electric,
         Thermal,
-        Vortex
+        Vortex,
+        Chemical
     }
 
     public sealed class AnomalyInfluenceProfile : ScriptableObject

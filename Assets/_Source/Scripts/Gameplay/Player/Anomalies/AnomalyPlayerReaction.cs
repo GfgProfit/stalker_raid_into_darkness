@@ -14,11 +14,15 @@ namespace RaidIntoDarkness.Player
         [SerializeField, Min(0f)] private float _accumulateTime;
         [SerializeField] private bool _ignoreSmallObjects;
         [SerializeField] private float _smallObjectIgnoreDelay = 0.5f;
+        [SerializeField] private bool _randomizeRadius;
+        [SerializeField, Min(0)] private int _randomRadiusMin = 2;
+        [SerializeField, Min(0)] private int _randomRadiusMax = 3;
 
         private readonly Dictionary<Collider, StalkerPlayerController> _contacts = new Dictionary<Collider, StalkerPlayerController>();
         private readonly List<Collider> _expiredContacts = new List<Collider>();
         private readonly HashSet<StalkerPlayerController> _affectedPlayers = new HashSet<StalkerPlayerController>();
         private readonly Dictionary<Collider, ProbeContact> _probeContacts = new Dictionary<Collider, ProbeContact>();
+        private readonly HashSet<AnomalyProbe> _affectedProbes = new HashSet<AnomalyProbe>();
 
         private AnomalyCycle _cycle;
         private float _pulseAt;
@@ -49,6 +53,16 @@ namespace RaidIntoDarkness.Player
             if (_visual == null)
             {
                 _visual = GetComponent<AnomalyVisual>();
+            }
+            if (_randomizeRadius)
+            {
+                SphereCollider volume = GetComponent<SphereCollider>();
+                if (volume != null)
+                {
+                    int minimum = Mathf.Max(0, _randomRadiusMin);
+                    int maximum = Mathf.Max(minimum, _randomRadiusMax);
+                    volume.radius = Random.Range(minimum, maximum + 1);
+                }
             }
         }
 
@@ -93,6 +107,7 @@ namespace RaidIntoDarkness.Player
             _probeContacts.Clear();
             _expiredContacts.Clear();
             _affectedPlayers.Clear();
+            _affectedProbes.Clear();
             if (_cycle != null)
             {
                 _cycle.Reset();
@@ -285,6 +300,7 @@ namespace RaidIntoDarkness.Player
         {
             _pulsePending = false;
             _affectedPlayers.Clear();
+            _affectedProbes.Clear();
             foreach (KeyValuePair<Collider, StalkerPlayerController> contact in _contacts)
             {
                 if (IsContactActive(contact.Key, contact.Value) && _affectedPlayers.Add(contact.Value))
@@ -306,6 +322,14 @@ namespace RaidIntoDarkness.Player
                     {
                         response.ApplyPulse(_influenceProfile);
                     }
+                }
+            }
+            foreach (KeyValuePair<Collider, ProbeContact> contact in _probeContacts)
+            {
+                AnomalyProbe probe = contact.Value.Probe;
+                if (IsProbeActive(contact.Key, probe) && AnomalyProbe.CanActivate(Time.time - contact.Value.EnteredAt, _ignoreSmallObjects, _smallObjectIgnoreDelay) && _affectedProbes.Add(probe))
+                {
+                    _visual.PlayHit(probe.transform);
                 }
             }
         }

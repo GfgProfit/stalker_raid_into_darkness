@@ -11,11 +11,14 @@ namespace RaidIntoDarkness.Player
         private const int ROLLOFF_INTERVALS = 128;
 
         [SerializeField] private AudioClip[] _painClips;
+        [SerializeField] private AudioClip[] _strikeClips;
 
         private AudioSource _shockSource;
         private AudioSource _thermalSource;
+        private AudioSource _strikeSource;
         private Vector3 _shockPosition;
         private Vector3 _thermalPosition;
+        private Vector3 _strikePosition;
 
         public void Configure(AudioClip[] painClips)
         {
@@ -57,6 +60,32 @@ namespace RaidIntoDarkness.Player
             source.Play();
         }
 
+        public void PlayReaction(AnomalyInfluenceKind kind, Vector3 position)
+        {
+            if (kind != AnomalyInfluenceKind.Vortex)
+            {
+                PlayPain(kind != AnomalyInfluenceKind.Thermal, position);
+                return;
+            }
+            if (isActiveAndEnabled == false || _strikeClips == null || _strikeClips.Length == 0)
+            {
+                return;
+            }
+            EnsureSources();
+            if (_strikeSource.isPlaying)
+            {
+                return;
+            }
+            AudioClip clip = _strikeClips[Random.Range(0, _strikeClips.Length)];
+            if (clip != null)
+            {
+                _strikePosition = position;
+                _strikeSource.clip = clip;
+                _strikeSource.transform.position = position;
+                _strikeSource.Play();
+            }
+        }
+
         private void Awake()
         {
             EnsureSources();
@@ -66,18 +95,21 @@ namespace RaidIntoDarkness.Player
         {
             Stop(_shockSource);
             Stop(_thermalSource);
+            Stop(_strikeSource);
         }
 
         private void OnDestroy()
         {
             DestroySource(_shockSource);
             DestroySource(_thermalSource);
+            DestroySource(_strikeSource);
         }
 
         private void LateUpdate()
         {
             KeepPosition(_shockSource, _shockPosition);
             KeepPosition(_thermalSource, _thermalPosition);
+            KeepPosition(_strikeSource, _strikePosition);
         }
 
         private void EnsureSources()
@@ -90,9 +122,13 @@ namespace RaidIntoDarkness.Player
             {
                 _thermalSource = CreateSource("ThermalPain");
             }
+            if (_strikeSource == null && _strikeClips != null && _strikeClips.Length > 0)
+            {
+                _strikeSource = CreateSource("StrikePain", 0.5f, 10f);
+            }
         }
 
-        private AudioSource CreateSource(string name)
+        private AudioSource CreateSource(string name, float minimum = MINIMUM_DISTANCE, float maximum = MAXIMUM_DISTANCE)
         {
             GameObject child = new GameObject(name);
             child.transform.SetParent(transform, false);
@@ -104,23 +140,23 @@ namespace RaidIntoDarkness.Player
             source.spatialBlend = 1f;
             source.dopplerLevel = 0f;
             source.spread = 0f;
-            source.minDistance = MINIMUM_DISTANCE;
-            source.maxDistance = MAXIMUM_DISTANCE;
+            source.minDistance = minimum;
+            source.maxDistance = maximum;
             source.rolloffMode = AudioRolloffMode.Custom;
-            source.SetCustomCurve(AudioSourceCurveType.CustomRolloff, CreateRolloff());
+            source.SetCustomCurve(AudioSourceCurveType.CustomRolloff, CreateRolloff(minimum, maximum));
             return source;
         }
 
-        private static AnimationCurve CreateRolloff()
+        private static AnimationCurve CreateRolloff(float minimum, float maximum)
         {
             Keyframe[] keys = new Keyframe[ROLLOFF_INTERVALS + 2];
             keys[0] = new Keyframe(0f, 1f);
             for (int index = 0; index <= ROLLOFF_INTERVALS; index++)
             {
-                float distance = MINIMUM_DISTANCE * Mathf.Pow(MAXIMUM_DISTANCE / MINIMUM_DISTANCE, index / (float)ROLLOFF_INTERVALS);
-                float linear = Mathf.Clamp01((MAXIMUM_DISTANCE - distance) / (MAXIMUM_DISTANCE - MINIMUM_DISTANCE));
-                float inverse = MINIMUM_DISTANCE / (MINIMUM_DISTANCE + DISTANCE_ROLLOFF * (Mathf.Clamp(distance, MINIMUM_DISTANCE, MAXIMUM_DISTANCE) - MINIMUM_DISTANCE));
-                keys[index + 1] = new Keyframe(distance / MAXIMUM_DISTANCE, linear * inverse);
+                float distance = minimum * Mathf.Pow(maximum / minimum, index / (float)ROLLOFF_INTERVALS);
+                float linear = Mathf.Clamp01((maximum - distance) / (maximum - minimum));
+                float inverse = minimum / (minimum + DISTANCE_ROLLOFF * (Mathf.Clamp(distance, minimum, maximum) - minimum));
+                keys[index + 1] = new Keyframe(distance / maximum, linear * inverse);
             }
             for (int index = 0; index < keys.Length; index++)
             {

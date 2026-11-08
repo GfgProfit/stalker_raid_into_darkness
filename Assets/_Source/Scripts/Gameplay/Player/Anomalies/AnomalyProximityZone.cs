@@ -23,6 +23,11 @@ namespace RaidIntoDarkness.Player
         public float ZoneRadius => _sourceVolume != null ? _sourceVolume.radius * MaximumScale(_sourceVolume.transform.lossyScale) : 0f;
         public float ProximityRadius => (ZoneRadius + 1f) * 2f;
 
+        public bool IsPulling(StalkerPlayerController player)
+        {
+            return IsAvailable && _source.Phase == AnomalyPhase.Blowout && _source.IsTouching(player);
+        }
+
         private void Awake()
         {
             _volume = GetComponent<SphereCollider>();

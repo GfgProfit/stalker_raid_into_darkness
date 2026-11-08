@@ -55,6 +55,24 @@ namespace RaidIntoDarkness.Player.Tests
         }
 
         [Test]
+        public void LaunchingShockPreservesGroundedMomentumAndCancelsSprint()
+        {
+            using (var rig = new Rig())
+            {
+                Vector3 velocity = new Vector3(4f, 0f, -3f);
+                rig.Physics.SetVelocity(velocity);
+                rig.SetRealFlags(StalkerMoveFlags.Forward | StalkerMoveFlags.Sprint);
+                rig.Motor.Wish = StalkerMoveFlags.Forward | StalkerMoveFlags.Sprint;
+                rig.Motor.ApplyAnomalyShock(false);
+                rig.Motor.LaunchFromAnomaly(6f, 8f);
+                Assert.That(rig.Motor.Velocity.x, Is.EqualTo(velocity.x));
+                Assert.That(rig.Motor.Velocity.z, Is.EqualTo(velocity.z));
+                Assert.That(rig.Motor.Velocity.y, Is.GreaterThan(15f));
+                Assert.That(rig.Motor.Wish, Is.EqualTo(StalkerMoveFlags.Forward));
+            }
+        }
+
+        [Test]
         public void GroundedShockStopsAllVelocityAxesWithoutChangingControlAcceleration()
         {
             using (var rig = new Rig())

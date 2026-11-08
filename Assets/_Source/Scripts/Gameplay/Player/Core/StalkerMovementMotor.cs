@@ -45,6 +45,8 @@ namespace RaidIntoDarkness.Player
         private float _lastContactSpeed;
         private StalkerLadder _ladder;
         private bool _climbingUp;
+        private Vector3 _anomalyControl;
+        private bool _anomalyLaunchActive;
 
         public event Action JumpStarted;
         public event Action LeftGround;
@@ -92,6 +94,8 @@ namespace RaidIntoDarkness.Player
             _stance.Initialize(profile);
             _condition.Initialize(profile);
             _physics = new StalkerCharacterPhysics(profile);
+            _anomalyControl = Vector3.zero;
+            _anomalyLaunchActive = false;
             _fallTime = profile.Engine.FallTime;
             _jumpTime = 0.0f;
             _real = StalkerMoveFlags.None;
@@ -109,19 +113,41 @@ namespace RaidIntoDarkness.Player
             transform.position = position;
             _controller.enabled = true;
             _physics.SetVelocity(Vector3.zero);
+            _physics.SetExternalForce(Vector3.zero);
+            _physics.CancelLaunchControl();
+            _anomalyControl = Vector3.zero;
+            _anomalyLaunchActive = false;
         }
 
-        public void ApplyAnomalyShock()
+        public void ApplyAnomalyShock(bool stopVelocity = true)
         {
             if ((_real & StalkerMoveFlags.Sprint) != 0)
             {
                 _wish &= ~StalkerMoveFlags.Sprint;
             }
 
-            if (_physics != null && (_physics.Environment == StalkerEnvironment.OnGround || _physics.Environment == StalkerEnvironment.AtWall))
+            if (stopVelocity && _physics != null && (_physics.Environment == StalkerEnvironment.OnGround || _physics.Environment == StalkerEnvironment.AtWall))
             {
                 _physics.SetVelocity(Vector3.zero);
             }
+        }
+
+        public void LaunchFromAnomaly(float height, float airAcceleration = 0f)
+        {
+            if (_physics == null || height <= 0f)
+            {
+                return;
+            }
+            _ladder = null;
+            _physics.Launch(transform.position, height, airAcceleration);
+            _anomalyLaunchActive = true;
+            _airTime = 0f;
+            _leftGroundRaised = false;
+        }
+
+        public void SetAnomalyControl(Vector3 control)
+        {
+            _anomalyControl = control;
         }
 
         public void Tick(float deltaTime)
@@ -132,7 +158,8 @@ namespace RaidIntoDarkness.Player
             }
 
             CheckControls(_wish, deltaTime);
-            _physics.SetControl(_controlAccel);
+            _physics.SetControl(_controlAccel + _anomalyControl);
+            _physics.SetExternalForce(_anomalyControl);
             if (_jump > 0.0f)
             {
                 _physics.RequestJump();
@@ -192,12 +219,19 @@ namespace RaidIntoDarkness.Player
         private void PhysicsStep(float step)
         {
             Vector3 feet = transform.position;
-            UpdateLadder(feet);
+            if (_anomalyLaunchActive == false)
+            {
+                UpdateLadder(feet);
+            }
             _physics.ClambJump = _profile.Unity.EnableLedgeClimb && _physics.IsControl && !_physics.LoseControl && !_physics.Climbing && _physics.Contacts.Wall && ValidateWalkOnMesh(feet);
             Vector3 displacement = _physics.Step(feet, step);
             _physics.ResetContacts();
             _controller.Move(displacement);
             ProbeWall();
+            if (_anomalyLaunchActive && _physics.GoodGround && _physics.Velocity.y <= 0f)
+            {
+                _anomalyLaunchActive = false;
+            }
         }
 
         private void ProbeWall()

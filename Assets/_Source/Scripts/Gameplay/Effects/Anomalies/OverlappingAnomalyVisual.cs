@@ -18,10 +18,12 @@ namespace RaidIntoDarkness.Effects
         [SerializeField, Min(0f)] private float _dischargeLightIntensity = 30000f;
         [SerializeField, Min(0f)] private float _dischargeLightRange = 9f;
         [SerializeField, Min(0f)] private float _dischargeLightDuration = 10f;
+        [SerializeField, Min(0f)] private float _dischargeLightDelay;
 
         private readonly List<AnomalyParticlePlayback> _discharges = new List<AnomalyParticlePlayback>();
 
         private float _lightRemaining;
+        private float _lightDelayRemaining;
 
         public override bool IsDischarging => _discharges.Count > 0;
 
@@ -40,6 +42,7 @@ namespace RaidIntoDarkness.Effects
             }
             _discharges.Add(playback);
             _lightRemaining = _dischargeLightDuration;
+            _lightDelayRemaining = _dischargeLightDelay;
             UpdateLight(0f);
             return true;
         }
@@ -47,6 +50,7 @@ namespace RaidIntoDarkness.Effects
         protected override void StopDischarge()
         {
             _lightRemaining = 0f;
+            _lightDelayRemaining = 0f;
             UpdateLight(0f);
             ClearDischarges();
         }
@@ -67,13 +71,15 @@ namespace RaidIntoDarkness.Effects
 
         private void UpdateLight(float deltaTime)
         {
-            _lightRemaining = Mathf.Max(0f, _lightRemaining - deltaTime);
+            float activeDelta = Mathf.Max(0f, deltaTime - _lightDelayRemaining);
+            _lightDelayRemaining = Mathf.Max(0f, _lightDelayRemaining - deltaTime);
+            _lightRemaining = Mathf.Max(0f, _lightRemaining - activeDelta);
             if (_dischargeLight == null)
             {
                 return;
             }
 
-            bool active = IsVisible && _lightRemaining > 0f && _dischargeLightDuration > 0f;
+            bool active = IsVisible && _lightDelayRemaining <= 0f && _lightRemaining > 0f && _dischargeLightDuration > 0f;
             float strength = active ? Mathf.Pow(Mathf.Clamp01(_lightRemaining / _dischargeLightDuration) + LIGHT_EPSILON, LIGHT_EXPONENT) : 0f;
             _dischargeLight.intensity = _dischargeLightIntensity * strength;
             _dischargeLight.range = Mathf.Max(0.001f, _dischargeLightRange * strength);

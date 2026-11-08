@@ -40,14 +40,15 @@ namespace RaidIntoDarkness.Player
             _colorMap = colorMap;
         }
 
-        public float Evaluate(int channel, float time)
+        public float Evaluate(int channel, float time, bool cyclic = true)
         {
             if (_channels == null || channel < 0 || channel >= _channels.Length || _channels[channel] == null || _channels[channel].length == 0)
             {
                 return channel == NOISE_GRAIN ? 1.0f : channel == NOISE_FPS ? 30.0f : 0.0f;
             }
 
-            return _channels[channel].Evaluate(_duration > 0.0f ? Mathf.Repeat(time, _duration) : 0.0f);
+            float sample = cyclic && _duration > 0f ? Mathf.Repeat(time, _duration) : Mathf.Clamp(time, 0f, _duration);
+            return _channels[channel].Evaluate(sample);
         }
     }
 }

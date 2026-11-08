@@ -101,6 +101,38 @@ MonoBehaviour:
   _controller: {fileID: 6641122454229867537}
   _text: {fileID: 4483418681952694616}
   _root: {fileID: 5050187333319569232}
+--- !u!1 &2249986597949382555
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7995196186438848122}
+  m_Layer: 0
+  m_Name: AnomalyHudPivot
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7995196186438848122
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2249986597949382555}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 7536706216107034830}
+  m_Father: {fileID: 1853972464879935931}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2254128651989802172
 GameObject:
   m_ObjectHideFlags: 0
@@ -291,7 +323,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1853972464879935931}
+  m_Father: {fileID: 7995196186438848122}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &5050187333319569232
 GameObject:
@@ -589,8 +621,8 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 7536706216107034830}
   - {fileID: 6289932980763896100}
+  - {fileID: 7995196186438848122}
   m_Father: {fileID: 4506691865267215982}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &8428855730842573498
@@ -1157,6 +1189,7 @@ GameObject:
   - component: {fileID: 1921777604151695281}
   - component: {fileID: 3964460429694038608}
   - component: {fileID: 5825434680647000719}
+  - component: {fileID: 1402223458717569375}
   m_Layer: 0
   m_Name: FPS_Player
   m_TagString: Untagged
@@ -2087,6 +2120,11 @@ MonoBehaviour:
   - {fileID: 8300000, guid: cf51f97b5799de6c0c93a1744df650b0, type: 3}
   - {fileID: 8300000, guid: 602abf8412a76e6a67e9b13265af6aad, type: 3}
   - {fileID: 8300000, guid: ca0c56709cb5420d18c71a3b9ff68dc5, type: 3}
+  _strikeClips:
+  - {fileID: 8300000, guid: caee6708a6d0d8c438f0f55f61f4484c, type: 3}
+  - {fileID: 8300000, guid: 05d0c30269454fe4d8c9eaa38029cf36, type: 3}
+  - {fileID: 8300000, guid: 5e06b4df224060d4c85ca41f418751bc, type: 3}
+  - {fileID: 8300000, guid: 869eb3a82b9246a488ee491ccefa08ce, type: 3}
 --- !u!114 &3964460429694038608
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2116,3 +2154,18 @@ MonoBehaviour:
   _player: {fileID: 334293385447183373}
   _audio: {fileID: 1921777604151695281}
   _screen: {fileID: 3964460429694038608}
+--- !u!114 &1402223458717569375
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9095947929063771272}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9713173b939461e4aa714f9f8692c22f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: RaidIntoDarkness.Weapons::RaidIntoDarkness.Weapons.AnomalyHudImpact
+  _response: {fileID: 5825434680647000719}
+  _weapon: {fileID: 6641122454229867537}
+  _target: {fileID: 7995196186438848122}

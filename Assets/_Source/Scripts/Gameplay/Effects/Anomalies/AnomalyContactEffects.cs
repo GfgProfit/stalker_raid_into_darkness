@@ -71,6 +71,17 @@ namespace RaidIntoDarkness.Effects
             Create(target, anchor, true, Quaternion.FromToRotation(Vector3.forward, Vector3.up));
         }
 
+        public void StopTarget(Transform target)
+        {
+            for (int index = _instances.Count - 1; index >= 0; index--)
+            {
+                if (_instances[index].Target == target)
+                {
+                    Release(index);
+                }
+            }
+        }
+
         public void Clear()
         {
             for (int index = _instances.Count - 1; index >= 0; index--)

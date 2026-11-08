@@ -8,6 +8,8 @@ namespace RaidIntoDarkness.Effects
         [SerializeField] private ParticleSystem _idle;
         [SerializeField] private AnomalyAudio _audio;
         [SerializeField] private AnomalyContactEffects _contactEffects;
+        [SerializeField] private AnomalyContactEffects _entranceContactEffects;
+        [SerializeField] private AnomalyContactEffects _idleContactEffects;
         [SerializeField] private ParticleSystem[] _idleAuxiliarySystems;
         [SerializeField] private bool _playIdleChildren;
         [SerializeField] private bool _keepIdleDuringDischarge;
@@ -84,6 +86,14 @@ namespace RaidIntoDarkness.Effects
             {
                 _contactEffects.Clear();
             }
+            if (_entranceContactEffects != null)
+            {
+                _entranceContactEffects.Clear();
+            }
+            if (_idleContactEffects != null)
+            {
+                _idleContactEffects.Clear();
+            }
             TickVisual(0f);
             if (_audio != null)
             {
@@ -102,9 +112,22 @@ namespace RaidIntoDarkness.Effects
             {
                 _audio.PlayEntrance(target.position);
             }
-            if (_contactEffects != null)
+            AnomalyContactEffects entrance = _entranceContactEffects != null ? _entranceContactEffects : _contactEffects;
+            if (entrance != null)
             {
-                _contactEffects.PlayEntrance(target);
+                entrance.PlayEntrance(target);
+            }
+            if (_idleContactEffects != null)
+            {
+                _idleContactEffects.PlayHit(target);
+            }
+        }
+
+        public void StopContact(Transform target)
+        {
+            if (_idleContactEffects != null)
+            {
+                _idleContactEffects.StopTarget(target);
             }
         }
 

@@ -20,3 +20,10 @@ MonoBehaviour:
   _electric: {fileID: 0}
   _earthquake: {fileID: 4908183818744415850, guid: 8ff5d50d1e5643baa488ca2a38d03538, type: 3}
   _actorPainEnabled: 1
+  _launchHeight: 6
+  _launchAirAcceleration: 8
+  _pulseDelay: 0
+  _pullStrength: 0
+  _actorBlowoutRadius: 1
+  _impactPostProcess: {fileID: 0}
+  _impactAnimations: []

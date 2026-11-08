@@ -50,6 +50,9 @@ namespace RaidIntoDarkness.Player
         private Vector3 _departPosition;
         private Vector3 _jumpDepartPosition;
         private StalkerContacts _contacts;
+        private Vector3 _externalForce;
+        private float _launchAirAcceleration;
+        private float _launchAirSpeed;
 
         public StalkerCharacterPhysics(StalkerMovementProfile profile)
         {
@@ -128,6 +131,38 @@ namespace RaidIntoDarkness.Player
             _velocity = velocity;
         }
 
+        public void Launch(Vector3 position, float height, float airAcceleration = 0f)
+        {
+            if (height <= 0f || _profile.Engine.Gravity <= 0f)
+            {
+                return;
+            }
+            float gravity = _profile.Engine.Gravity;
+            _velocity.y = Mathf.Sqrt(2f * gravity * height) + gravity * _profile.Engine.FixedStep * 0.5f;
+            _contacts.Clear();
+            _wasContact = false;
+            _departPosition = position;
+            _jumpRequested = false;
+            _jumpStarted = false;
+            Jumping = false;
+            Climbing = false;
+            ClambJump = false;
+            NearUpTime = 0f;
+            LoseControl = true;
+            _launchAirAcceleration = Mathf.Max(0f, airAcceleration);
+            _launchAirSpeed = _profile.Actor.WalkAccel * _profile.Actor.RunCoef * _profile.Actor.SprintKoef / _profile.Engine.MaxVelocityDivider;
+        }
+
+        public void SetExternalForce(Vector3 force)
+        {
+            _externalForce = force;
+        }
+
+        public void CancelLaunchControl()
+        {
+            _launchAirAcceleration = 0f;
+        }
+
         public void ResetContacts()
         {
             _wasContact = _contacts.Any;
@@ -166,6 +201,10 @@ namespace RaidIntoDarkness.Player
         public Vector3 Step(Vector3 position, float deltaTime)
         {
             StalkerEngineValues engine = _profile.Engine;
+            if ((GoodGround && _velocity.y <= 0f) || Climbing)
+            {
+                _launchAirAcceleration = 0f;
+            }
             ContactSpeed = _contacts.ContactSpeed;
             FrictionFactor = _contacts.Any ? engine.ActorFriction * engine.GroundFriction : 0.0f;
             if (Climbing)
@@ -197,6 +236,10 @@ namespace RaidIntoDarkness.Player
             if (LoseControl && (onGround && _contacts.GroundNormal.y > SQRT1_2 * 0.5f || _velocity.sqrMagnitude <= 0.0f || Climbing))
             {
                 LoseControl = false;
+            }
+            if (_launchAirAcceleration > 0f)
+            {
+                LoseControl = true;
             }
 
             if (NearUpTime > 0.0f)
@@ -232,6 +275,7 @@ namespace RaidIntoDarkness.Player
             Vector3 controlForce = ControlForce();
             Vector3 acceleration = Vector3.zero;
             float mass = _profile.Actor.Mass;
+            acceleration += _externalForce / mass;
             if (IsControl)
             {
                 acceleration += controlForce;
@@ -264,6 +308,7 @@ namespace RaidIntoDarkness.Player
             }
 
             _velocity += acceleration * deltaTime;
+            ApplyLaunchSteering(deltaTime);
             Vector3 contactPush = Vector3.zero;
             if (_contacts.Ground && !Climbing && !_jumpStarted)
             {
@@ -311,6 +356,10 @@ namespace RaidIntoDarkness.Player
             StalkerEngineValues engine = _profile.Engine;
             if (LoseControl)
             {
+                if (_launchAirAcceleration > 0f)
+                {
+                    return _externalForce * _profile.Actor.AirControlParam;
+                }
                 return _acceleration * _profile.Actor.AirControlParam;
             }
 
@@ -351,6 +400,27 @@ namespace RaidIntoDarkness.Player
             }
 
             return force * FrictionFactor;
+        }
+
+        private void ApplyLaunchSteering(float deltaTime)
+        {
+            if (_launchAirAcceleration <= 0f)
+            {
+                return;
+            }
+            Vector3 command = _acceleration - _externalForce;
+            command.y = 0f;
+            float input = Mathf.Min(1f, command.magnitude);
+            if (input <= 0.000001f)
+            {
+                return;
+            }
+            Vector3 horizontal = new Vector3(_velocity.x, 0f, _velocity.z);
+            float speed = Mathf.Max(_launchAirSpeed, horizontal.magnitude);
+            Vector3 target = command.normalized * (speed * input);
+            horizontal = Vector3.MoveTowards(horizontal, target, _launchAirAcceleration * input * deltaTime);
+            _velocity.x = horizontal.x;
+            _velocity.z = horizontal.z;
         }
 
         private Vector3 JumpAirForce(Vector3 position)

@@ -38,6 +38,33 @@ namespace RaidIntoDarkness.Player.Tests
         }
 
         [Test]
+        public void OneShotFinishesWithoutLoopingOrWaitingForRemovalFade()
+        {
+            using (var rig = new Rig())
+            {
+                rig.Asset.SetImportData("test", 0.25f, new AnimationCurve[AnomalyPostProcessAsset.CHANNEL_COUNT], null);
+                rig.Effects.PlayOnce(11, rig.Asset, 1f);
+                rig.Effects.Tick(0.24f);
+                Assert.That(rig.Effects.ActiveLayerCount, Is.EqualTo(1));
+                rig.Effects.Tick(0.02f);
+                Assert.That(rig.Effects.ActiveLayerCount, Is.Zero);
+            }
+        }
+
+        [Test]
+        public void NoncyclicEnvelopeClampsItsFinalKeyWhileIdleLayersRepeat()
+        {
+            using (var rig = new Rig())
+            {
+                var channels = new AnimationCurve[AnomalyPostProcessAsset.CHANNEL_COUNT];
+                channels[AnomalyPostProcessAsset.BLUR] = AnimationCurve.Linear(0f, 1f, 0.25f, 0f);
+                rig.Asset.SetImportData("test", 0.25f, channels, null);
+                Assert.That(rig.Asset.Evaluate(AnomalyPostProcessAsset.BLUR, 0.5f, false), Is.Zero);
+                Assert.That(rig.Asset.Evaluate(AnomalyPostProcessAsset.BLUR, 0.5f), Is.EqualTo(1f));
+            }
+        }
+
+        [Test]
         public void DifferentIdsKeepIndependentLayerExpiries()
         {
             using (var rig = new Rig())

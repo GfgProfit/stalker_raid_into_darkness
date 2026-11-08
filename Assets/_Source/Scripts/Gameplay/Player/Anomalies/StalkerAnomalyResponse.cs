@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using RaidIntoDarkness.FirstPerson;
 using UnityEngine;
@@ -21,8 +22,11 @@ namespace RaidIntoDarkness.Player
         private readonly RaycastHit[] _rayHits = new RaycastHit[32];
 
         private Transform _spine;
+        private CharacterController _bodyCollider;
 
         public float ElectricFieldFactor { get; private set; }
+
+        public event Action<AnomalyInfluenceProfile> Impact;
 
         private bool IsAlive => _player != null && _player.isActiveAndEnabled && _player.Motor != null && (_player.Motor.Condition == null || _player.Motor.Condition.Health > 0f);
 
@@ -55,13 +59,22 @@ namespace RaidIntoDarkness.Player
             bool shock = profile.Kind != AnomalyInfluenceKind.Thermal;
             if (shock)
             {
-                _player.Motor.ApplyAnomalyShock();
+                _player.Motor.ApplyAnomalyShock(profile.LaunchHeight <= 0f);
+            }
+            if (profile.LaunchHeight > 0f)
+            {
+                _player.Motor.LaunchFromAnomaly(profile.LaunchHeight, profile.LaunchAirAcceleration);
             }
             if (profile.ActorPainEnabled && _audio != null)
             {
                 float height = _player.Motor.Stance != null ? _player.Motor.Stance.CameraHeight : 0f;
-                _audio.PlayPain(shock, _player.transform.position + Vector3.up * height);
+                _audio.PlayReaction(profile.Kind, _player.transform.position + Vector3.up * height);
             }
+            if (profile.ImpactPostProcess != null && _screen != null)
+            {
+                _screen.PlayOnce(UnityEngine.Random.Range(655808, 655821), profile.ImpactPostProcess, 1f);
+            }
+            Impact?.Invoke(profile);
         }
 
         private void Awake()
@@ -70,6 +83,7 @@ namespace RaidIntoDarkness.Player
             {
                 _player = GetComponent<StalkerPlayerController>();
             }
+            _bodyCollider = GetComponent<CharacterController>();
         }
 
         private void OnEnable()
@@ -90,6 +104,10 @@ namespace RaidIntoDarkness.Player
             _zones.Clear();
             _expiredZones.Clear();
             ElectricFieldFactor = 0f;
+            if (_player != null && _player.Motor != null)
+            {
+                _player.Motor.SetAnomalyControl(Vector3.zero);
+            }
             if (_screen != null)
             {
                 _screen.Clear();
@@ -104,6 +122,7 @@ namespace RaidIntoDarkness.Player
         {
             _expiredZones.Clear();
             ElectricFieldFactor = 0f;
+            Vector3 attraction = Vector3.zero;
             AnomalyInfluenceProfile electricProfile = null;
             foreach (KeyValuePair<AnomalyProximityZone, float> contact in _zones)
             {
@@ -114,6 +133,11 @@ namespace RaidIntoDarkness.Player
                     continue;
                 }
                 AnomalyInfluenceProfile profile = zone.Profile;
+                if (profile.PullStrength > 0f && zone.IsPulling(_player))
+                {
+                    Vector3 bodyCenter = _bodyCollider != null ? _bodyCollider.bounds.center : _player.transform.position;
+                    attraction += AnomalyAttraction.Evaluate(zone.Position - bodyCenter, zone.ZoneRadius, profile.ActorBlowoutRadius, profile.PullStrength);
+                }
                 UpdateInherent(zone, profile);
                 float distanceSquared = (_player.transform.position - zone.Position).sqrMagnitude;
                 float radiusSquared = zone.ProximityRadius * zone.ProximityRadius;
@@ -127,7 +151,7 @@ namespace RaidIntoDarkness.Player
                     ElectricFieldFactor += proximity * proximity * ObstacleReduction(zone, Mathf.Sqrt(distanceSquared));
                     electricProfile = profile;
                 }
-                else if (profile.Kind == AnomalyInfluenceKind.Springboard && _player.CameraEffects != null)
+                else if ((profile.Kind == AnomalyInfluenceKind.Springboard || profile.Kind == AnomalyInfluenceKind.Vortex) && _player.CameraEffects != null)
                 {
                     _player.CameraEffects.RefreshAnomalyShake(profile.Earthquake, 0.03f + proximity);
                 }
@@ -137,6 +161,10 @@ namespace RaidIntoDarkness.Player
                 RemoveZone(zone);
             }
             ElectricFieldFactor = Mathf.Clamp01(ElectricFieldFactor);
+            if (_player != null && _player.Motor != null)
+            {
+                _player.Motor.SetAnomalyControl(attraction);
+            }
             if (electricProfile != null && _screen != null)
             {
                 float factor = (ElectricFieldFactor + 0.05f) * 0.66f;

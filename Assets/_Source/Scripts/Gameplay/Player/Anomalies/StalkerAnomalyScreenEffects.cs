@@ -18,6 +18,7 @@ namespace RaidIntoDarkness.Player
             public float Factor { get; set; }
             public float Expiry { get; set; }
             public bool Stopping { get; set; }
+            public bool Cyclic { get; set; } = true;
         }
 
         [SerializeField] private Material _material;
@@ -63,6 +64,22 @@ namespace RaidIntoDarkness.Player
             layer.Factor = Mathf.Clamp01(factor);
             layer.Expiry = _time + Mathf.Max(0.0f, expirySeconds);
             layer.Stopping = false;
+            layer.Cyclic = true;
+        }
+
+        public void PlayOnce(int id, AnomalyPostProcessAsset asset, float factor)
+        {
+            if (asset == null)
+            {
+                return;
+            }
+            Refresh(id, asset, factor, asset.Duration);
+            Layer layer = Find(id);
+            if (layer != null)
+            {
+                layer.Time = 0f;
+                layer.Cyclic = false;
+            }
         }
 
         public void Remove(int id)
@@ -113,7 +130,7 @@ namespace RaidIntoDarkness.Player
                     layer.Factor -= deltaTime;
                 }
 
-                if (layer.Asset == null || layer.Factor <= MIN_FACTOR)
+                if (layer.Asset == null || layer.Factor <= MIN_FACTOR || (layer.Cyclic == false && layer.Time > layer.Asset.Duration))
                 {
                     _layers.RemoveAt(i);
                 }
@@ -184,16 +201,16 @@ namespace RaidIntoDarkness.Player
                 AnomalyPostProcessAsset asset = layer.Asset;
                 float time = layer.Time;
                 float factor = layer.Factor;
-                baseColor += new Vector3(asset.Evaluate(0, time), asset.Evaluate(1, time), asset.Evaluate(2, time)) * factor;
-                addColor += new Vector3(asset.Evaluate(3, time), asset.Evaluate(4, time), asset.Evaluate(5, time)) * factor;
-                grayColor += new Vector3(asset.Evaluate(6, time), asset.Evaluate(7, time), asset.Evaluate(8, time)) * factor;
-                geometry += new Vector4(asset.Evaluate(9, time), asset.Evaluate(10, time), asset.Evaluate(11, time), asset.Evaluate(12, time)) * factor;
-                noiseIntensity = Mathf.Max(noiseIntensity, asset.Evaluate(13, time));
-                noiseGrain = Mathf.Max(noiseGrain, asset.Evaluate(14, time));
-                noiseFps = Mathf.Max(noiseFps, asset.Evaluate(15, time));
+                baseColor += new Vector3(asset.Evaluate(0, time, layer.Cyclic), asset.Evaluate(1, time, layer.Cyclic), asset.Evaluate(2, time, layer.Cyclic)) * factor;
+                addColor += new Vector3(asset.Evaluate(3, time, layer.Cyclic), asset.Evaluate(4, time, layer.Cyclic), asset.Evaluate(5, time, layer.Cyclic)) * factor;
+                grayColor += new Vector3(asset.Evaluate(6, time, layer.Cyclic), asset.Evaluate(7, time, layer.Cyclic), asset.Evaluate(8, time, layer.Cyclic)) * factor;
+                geometry += new Vector4(asset.Evaluate(9, time, layer.Cyclic), asset.Evaluate(10, time, layer.Cyclic), asset.Evaluate(11, time, layer.Cyclic), asset.Evaluate(12, time, layer.Cyclic)) * factor;
+                noiseIntensity = Mathf.Max(noiseIntensity, asset.Evaluate(13, time, layer.Cyclic));
+                noiseGrain = Mathf.Max(noiseGrain, asset.Evaluate(14, time, layer.Cyclic));
+                noiseFps = Mathf.Max(noiseFps, asset.Evaluate(15, time, layer.Cyclic));
                 if (asset.ColorMap != null)
                 {
-                    float influence = asset.Evaluate(16, time) * factor;
+                    float influence = asset.Evaluate(16, time, layer.Cyclic) * factor;
                     if (firstMap == null)
                     {
                         firstMap = asset.ColorMap;

@@ -4,7 +4,7 @@ using UnityEngine;
 namespace RaidIntoDarkness.Effects
 {
     [DisallowMultipleComponent]
-    public sealed class ZharkaVisual : AnomalyVisual
+    public sealed class OverlappingAnomalyVisual : AnomalyVisual
     {
         private const float LIGHT_EPSILON = 0.001f;
         private const float LIGHT_EXPONENT = 0.15f;
@@ -19,7 +19,7 @@ namespace RaidIntoDarkness.Effects
         [SerializeField, Min(0f)] private float _dischargeLightRange = 9f;
         [SerializeField, Min(0f)] private float _dischargeLightDuration = 10f;
 
-        private readonly List<DischargeInstance> _discharges = new List<DischargeInstance>();
+        private readonly List<AnomalyParticlePlayback> _discharges = new List<AnomalyParticlePlayback>();
 
         private float _lightRemaining;
 
@@ -31,18 +31,16 @@ namespace RaidIntoDarkness.Effects
         {
             GameObject instance = Instantiate(_dischargeTemplate, transform);
             instance.name = "Discharge";
-            ParticleSystem[] systems = instance.GetComponentsInChildren<ParticleSystem>(true);
-            if (_dischargeRootIndex < 0 || _dischargeRootIndex >= systems.Length)
+            AnomalyParticlePlayback playback = new AnomalyParticlePlayback(instance, _dischargeRootIndex, _stopEffectIndices, _stopTimes, _groupDuration);
+            if (playback.IsValid == false || playback.Play() == false)
             {
                 Destroy(instance);
-                Debug.LogError("Zharka discharge template has no configured root ParticleSystem.", this);
+                Debug.LogError("Anomaly discharge template has no configured root ParticleSystem.", this);
                 return false;
             }
-            instance.SetActive(true);
-            _discharges.Add(new DischargeInstance(instance, systems));
+            _discharges.Add(playback);
             _lightRemaining = _dischargeLightDuration;
             UpdateLight(0f);
-            systems[_dischargeRootIndex].Play(true);
             return true;
         }
 
@@ -57,37 +55,8 @@ namespace RaidIntoDarkness.Effects
         {
             for (int index = _discharges.Count - 1; index >= 0; index--)
             {
-                DischargeInstance discharge = _discharges[index];
-                float previous = discharge.Elapsed;
-                discharge.Elapsed += deltaTime;
-                if (_stopEffectIndices != null && _stopTimes != null)
-                {
-                    int count = Mathf.Min(_stopEffectIndices.Length, _stopTimes.Length);
-                    for (int stopIndex = 0; stopIndex < count; stopIndex++)
-                    {
-                        if (previous < _stopTimes[stopIndex] && discharge.Elapsed >= _stopTimes[stopIndex])
-                        {
-                            int systemIndex = _stopEffectIndices[stopIndex];
-                            if (systemIndex >= 0 && systemIndex < discharge.Systems.Length)
-                            {
-                                Clear(discharge.Systems[systemIndex]);
-                            }
-                        }
-                    }
-                }
-                if (_groupDuration > 0f && previous < _groupDuration && discharge.Elapsed >= _groupDuration)
-                {
-                    foreach (ParticleSystem system in discharge.Systems)
-                    {
-                        system.Stop(false, ParticleSystemStopBehavior.StopEmitting);
-                    }
-                }
-                bool alive = false;
-                foreach (ParticleSystem system in discharge.Systems)
-                {
-                    alive |= system != null && system.IsAlive(false);
-                }
-                if (alive == false)
+                AnomalyParticlePlayback discharge = _discharges[index];
+                if (discharge.Tick(deltaTime) == false)
                 {
                     Destroy(discharge.Root);
                     _discharges.RemoveAt(index);
@@ -113,28 +82,12 @@ namespace RaidIntoDarkness.Effects
 
         private void ClearDischarges()
         {
-            foreach (DischargeInstance discharge in _discharges)
+            foreach (AnomalyParticlePlayback discharge in _discharges)
             {
-                foreach (ParticleSystem system in discharge.Systems)
-                {
-                    Clear(system);
-                }
+                discharge.Stop();
                 Destroy(discharge.Root);
             }
             _discharges.Clear();
-        }
-
-        private sealed class DischargeInstance
-        {
-            public GameObject Root { get; }
-            public ParticleSystem[] Systems { get; }
-            public float Elapsed { get; set; }
-
-            public DischargeInstance(GameObject root, ParticleSystem[] systems)
-            {
-                Root = root;
-                Systems = systems;
-            }
         }
     }
 }

@@ -22,6 +22,7 @@ namespace RaidIntoDarkness.Player
         private const float EPS = 0.0000001f;
         private const float MAX_PHASE_RATE = 3.0f;
         private const float SNAP_REMINDER = 0.2f;
+        private const float ANOMALY_REFRESH_SECONDS = 1.0f;
 
         private struct AnmEffect
         {
@@ -34,6 +35,7 @@ namespace RaidIntoDarkness.Player
 
         [SerializeField] private StalkerCameraEffectsProfile _profile;
         [SerializeField] private Transform _pivot;
+        [SerializeField] private Transform _anomalyCamera;
 
         private readonly AnmEffect[] _effects = new AnmEffect[SLOT_COUNT];
         private readonly AnmEffect[] _fading = new AnmEffect[SLOT_COUNT];
@@ -50,6 +52,12 @@ namespace RaidIntoDarkness.Player
         private StalkerMoveFlags _previousFlags;
         private Quaternion _baseMotionRotation = Quaternion.identity;
         private Quaternion _weaponAimRotation = Quaternion.identity;
+        private AnmEffect _anomalyEffect;
+        private float _anomalyRefreshTime;
+        private float _anomalyExpiry;
+        private Vector3 _anomalyRestPosition;
+        private Quaternion _anomalyRestRotation = Quaternion.identity;
+        private bool _anomalyRestCaptured;
 
         public StalkerCameraEffectsProfile Profile => _profile;
         public Transform Pivot => _pivot;
@@ -59,6 +67,7 @@ namespace RaidIntoDarkness.Player
         public Quaternion MotionRotation { get; private set; } = Quaternion.identity;
         public bool EffectsEnabled { get; set; } = true;
         public bool IsItemEffectPlaying => _itemEffects[0].Asset != null;
+        public bool IsAnomalyShakePlaying => _anomalyEffect.Asset != null;
 
         public bool IsPlaying(StalkerCameraEffectSlot slot)
         {
@@ -81,9 +90,43 @@ namespace RaidIntoDarkness.Player
             _itemEffects[0] = default;
         }
 
+        public void ConfigureAnomalyCamera(Transform camera)
+        {
+            StopAnomalyShake();
+            _anomalyCamera = camera;
+            _anomalyRestCaptured = false;
+            CaptureAnomalyCamera();
+        }
+
+        public void RefreshAnomalyShake(XRayAnmAsset asset, float power)
+        {
+            if (!isActiveAndEnabled || asset == null || power <= 0.0f || (_time < _anomalyRefreshTime && _time <= _anomalyExpiry))
+            {
+                return;
+            }
+
+            CaptureAnomalyCamera();
+            _anomalyEffect = new AnmEffect { Asset = asset, Time = 0.0f, Factor = power, Scale = 1.0f, Fade = 1.0f };
+            _anomalyRefreshTime = _time + ANOMALY_REFRESH_SECONDS;
+            _anomalyExpiry = _anomalyRefreshTime;
+        }
+
+        public void StopAnomalyShake()
+        {
+            _anomalyEffect = default;
+            _anomalyRefreshTime = 0.0f;
+            _anomalyExpiry = 0.0f;
+            if (_anomalyCamera != null && _anomalyRestCaptured)
+            {
+                _anomalyCamera.localPosition = _anomalyRestPosition;
+                _anomalyCamera.localRotation = _anomalyRestRotation;
+            }
+        }
+
         public void Tick(StalkerMovementState state, bool limping, float bodyPhase, float deltaTime)
         {
             _time += deltaTime;
+            TickAnomalyShake(deltaTime);
             if (_profile == null || _pivot == null)
             {
                 return;
@@ -184,6 +227,48 @@ namespace RaidIntoDarkness.Player
             {
                 _pivot.localRotation = MotionRotation;
             }
+        }
+
+        private void OnDisable()
+        {
+            StopAnomalyShake();
+        }
+
+        private void CaptureAnomalyCamera()
+        {
+            if (_anomalyCamera != null && !_anomalyRestCaptured)
+            {
+                _anomalyRestPosition = _anomalyCamera.localPosition;
+                _anomalyRestRotation = _anomalyCamera.localRotation;
+                _anomalyRestCaptured = true;
+            }
+        }
+
+        private void TickAnomalyShake(float deltaTime)
+        {
+            if (_anomalyEffect.Asset == null)
+            {
+                return;
+            }
+
+            if (_anomalyCamera == null || _time > _anomalyExpiry || _anomalyEffect.Time > _anomalyEffect.Asset.Duration || !_anomalyEffect.Asset.Evaluate(_anomalyEffect.Time, out Vector3 position, out Quaternion rotation))
+            {
+                StopAnomalyShake();
+                return;
+            }
+
+            float power = _anomalyEffect.Factor;
+            if (power != 1.0f)
+            {
+                Matrix4x4 matrix = Matrix4x4.Rotate(rotation);
+                Vector3 forward = new Vector3(matrix.m02 * power, matrix.m12 * power, 1.0f);
+                Vector3 up = new Vector3(matrix.m01 * power, 1.0f, matrix.m21 * power);
+                rotation = Quaternion.LookRotation(forward, up);
+            }
+
+            _anomalyCamera.localPosition = _anomalyRestPosition + _anomalyRestRotation * (position * power);
+            _anomalyCamera.localRotation = _anomalyRestRotation * rotation;
+            _anomalyEffect.Time += Mathf.Max(0.0f, deltaTime);
         }
 
         private void Play(StalkerCameraEffectSlot slot, XRayAnmAsset asset, float factor, float scale)

@@ -6,7 +6,7 @@ namespace RaidIntoDarkness.Player.Tests
     {
         private const float EPSILON = 0.00001f;
 
-        private static readonly float[][] _sourcePresets = { new[] { 0.1f, 0.1f, 1.5f, 1.6f }, new[] { 0.1f, 7f, 0.25f, 7.25f } };
+        private static readonly float[][] _sourcePresets = { new[] { 0.1f, 0.1f, 1.5f, 1.6f }, new[] { 0.1f, 7f, 0.25f, 7.25f }, new[] { 0.01f, 0.1f, 1f, 1.1f } };
 
         [Test]
         public void SourcePresetsExposeExpectedRemainingTimes()
@@ -14,18 +14,20 @@ namespace RaidIntoDarkness.Player.Tests
             foreach (float[] preset in _sourcePresets)
             {
                 var cycle = new AnomalyCycle(preset[0], preset[1], preset[2]);
+                float halfwayAwaking = preset[0] * 0.5f;
+                float halfwayBlowout = preset[0] + preset[1] * 0.5f;
                 Assert.That(cycle.Phase, Is.EqualTo(AnomalyPhase.Idle));
                 Assert.That(cycle.GetCooldownRemaining(0f), Is.Zero);
                 Assert.That(cycle.Tick(0f, true), Is.False);
                 Assert.That(cycle.Phase, Is.EqualTo(AnomalyPhase.Awaking));
-                Assert.That(cycle.GetCooldownRemaining(0f), Is.EqualTo(0.1f).Within(EPSILON));
-                Assert.That(cycle.Tick(0.05f, true), Is.False);
-                Assert.That(cycle.GetCooldownRemaining(0.05f), Is.EqualTo(0.05f).Within(EPSILON));
-                Assert.That(cycle.Tick(0.1f, true), Is.True);
+                Assert.That(cycle.GetCooldownRemaining(0f), Is.EqualTo(preset[0]).Within(EPSILON));
+                Assert.That(cycle.Tick(halfwayAwaking, true), Is.False);
+                Assert.That(cycle.GetCooldownRemaining(halfwayAwaking), Is.EqualTo(halfwayAwaking).Within(EPSILON));
+                Assert.That(cycle.Tick(preset[0], true), Is.True);
                 Assert.That(cycle.Phase, Is.EqualTo(AnomalyPhase.Blowout));
-                Assert.That(cycle.GetCooldownRemaining(0.1f), Is.EqualTo(preset[3]).Within(EPSILON));
-                Assert.That(cycle.Tick(0.15f, true), Is.False);
-                Assert.That(cycle.GetCooldownRemaining(0.15f), Is.EqualTo(preset[3] - 0.05f).Within(EPSILON));
+                Assert.That(cycle.GetCooldownRemaining(preset[0]), Is.EqualTo(preset[3]).Within(EPSILON));
+                Assert.That(cycle.Tick(halfwayBlowout, true), Is.False);
+                Assert.That(cycle.GetCooldownRemaining(halfwayBlowout), Is.EqualTo(preset[3] - preset[1] * 0.5f).Within(EPSILON));
             }
         }
 
@@ -96,17 +98,20 @@ namespace RaidIntoDarkness.Player.Tests
         [Test]
         public void OccupiedZoneRepeatsWithoutAnotherAwakingPhase()
         {
-            var cycle = new AnomalyCycle(0.125f, 0.25f, 0.5f);
-            cycle.RecordDischarge(0f);
-            Assert.That(cycle.Tick(0.25f, true), Is.False);
-            Assert.That(cycle.Phase, Is.EqualTo(AnomalyPhase.Accumulate));
-            Assert.That(cycle.Tick(0.75f, true), Is.True);
-            Assert.That(cycle.Phase, Is.EqualTo(AnomalyPhase.Blowout));
-            Assert.That(cycle.GetCooldownRemaining(0.75f), Is.EqualTo(0.75f).Within(EPSILON));
-            Assert.That(cycle.Tick(1f, true), Is.False);
-            Assert.That(cycle.Phase, Is.EqualTo(AnomalyPhase.Accumulate));
-            Assert.That(cycle.Tick(1.5f, true), Is.True);
-            Assert.That(cycle.Phase, Is.EqualTo(AnomalyPhase.Blowout));
+            foreach (float[] preset in _sourcePresets)
+            {
+                var cycle = new AnomalyCycle(preset[0], preset[1], preset[2]);
+                cycle.RecordDischarge(0f);
+                Assert.That(cycle.Tick(preset[1], true), Is.False);
+                Assert.That(cycle.Phase, Is.EqualTo(AnomalyPhase.Accumulate));
+                Assert.That(cycle.Tick(preset[3], true), Is.True);
+                Assert.That(cycle.Phase, Is.EqualTo(AnomalyPhase.Blowout));
+                Assert.That(cycle.GetCooldownRemaining(preset[3]), Is.EqualTo(preset[3]).Within(EPSILON));
+                Assert.That(cycle.Tick(preset[3] + preset[1], true), Is.False);
+                Assert.That(cycle.Phase, Is.EqualTo(AnomalyPhase.Accumulate));
+                Assert.That(cycle.Tick(preset[3] * 2f, true), Is.True);
+                Assert.That(cycle.Phase, Is.EqualTo(AnomalyPhase.Blowout));
+            }
         }
 
         [Test]

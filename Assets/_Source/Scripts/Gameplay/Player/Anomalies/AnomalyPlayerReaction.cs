@@ -9,6 +9,7 @@ namespace RaidIntoDarkness.Player
     public sealed class AnomalyPlayerReaction : MonoBehaviour
     {
         [SerializeField] private AnomalyVisual _visual;
+        [SerializeField] private AnomalyInfluenceProfile _influenceProfile;
         [SerializeField, Min(0f)] private float _awakingTime;
         [SerializeField, Min(0f)] private float _blowoutTime;
         [SerializeField, Min(0f)] private float _accumulateTime;
@@ -22,6 +23,8 @@ namespace RaidIntoDarkness.Player
         public AnomalyPhase Phase => _cycle != null ? _cycle.Phase : AnomalyPhase.Idle;
         public float CooldownRemaining => _cycle != null ? _cycle.GetCooldownRemaining(Time.time) : 0f;
         public bool IsReady => CanDetect && Phase == AnomalyPhase.Idle;
+        public AnomalyInfluenceProfile InfluenceProfile => _influenceProfile;
+        public bool IsInfluencing => CanDetect;
 
         private bool CanDetect => isActiveAndEnabled && _visual != null && _visual.isActiveAndEnabled && _visual.IsVisible;
 
@@ -117,9 +120,9 @@ namespace RaidIntoDarkness.Player
                 }
             }
             _contacts.Add(other, player);
-            if (entered && _visual.Audio != null)
+            if (entered)
             {
-                _visual.Audio.PlayEntrance(player.transform.position);
+                _visual.PlayEntrance(player.transform);
             }
         }
 
@@ -150,9 +153,13 @@ namespace RaidIntoDarkness.Player
             _affectedPlayers.Clear();
             foreach (KeyValuePair<Collider, StalkerPlayerController> contact in _contacts)
             {
-                if (IsContactActive(contact.Key, contact.Value) && _affectedPlayers.Add(contact.Value) && _visual.Audio != null)
+                if (IsContactActive(contact.Key, contact.Value) && _affectedPlayers.Add(contact.Value))
                 {
-                    _visual.Audio.PlayHit(contact.Value.transform.position);
+                    _visual.PlayHit(contact.Value.transform);
+                    if (contact.Value.TryGetComponent(out StalkerAnomalyResponse response))
+                    {
+                        response.ApplyPulse(_influenceProfile);
+                    }
                 }
             }
         }

@@ -7,6 +7,8 @@ namespace RaidIntoDarkness.Effects
     {
         [SerializeField] private ParticleSystem _idle;
         [SerializeField] private AnomalyAudio _audio;
+        [SerializeField] private AnomalyContactEffects _contactEffects;
+        [SerializeField] private ParticleSystem[] _idleAuxiliarySystems;
         [SerializeField] private bool _playIdleChildren;
         [SerializeField] private bool _keepIdleDuringDischarge;
 
@@ -50,7 +52,7 @@ namespace RaidIntoDarkness.Effects
             }
             else
             {
-                Clear(_idle);
+                ClearIdle();
             }
             if (StartDischarge() == false)
             {
@@ -61,7 +63,7 @@ namespace RaidIntoDarkness.Effects
                 }
                 else
                 {
-                    Clear(_idle);
+                    ClearIdle();
                 }
                 return;
             }
@@ -77,13 +79,49 @@ namespace RaidIntoDarkness.Effects
         {
             _isVisible = false;
             StopDischarge();
-            Clear(_idle);
+            ClearIdle();
+            if (_contactEffects != null)
+            {
+                _contactEffects.Clear();
+            }
             TickVisual(0f);
             if (_audio != null)
             {
                 _audio.SetVisible(false);
             }
             Hidden?.Invoke();
+        }
+
+        public void PlayEntrance(Transform target)
+        {
+            if (_isVisible == false || isActiveAndEnabled == false || target == null)
+            {
+                return;
+            }
+            if (_audio != null)
+            {
+                _audio.PlayEntrance(target.position);
+            }
+            if (_contactEffects != null)
+            {
+                _contactEffects.PlayEntrance(target);
+            }
+        }
+
+        public void PlayHit(Transform target)
+        {
+            if (_isVisible == false || isActiveAndEnabled == false || target == null)
+            {
+                return;
+            }
+            if (_audio != null)
+            {
+                _audio.PlayHit(target.position);
+            }
+            if (_contactEffects != null)
+            {
+                _contactEffects.PlayHit(target);
+            }
         }
 
         protected virtual void OnEnable()
@@ -110,6 +148,19 @@ namespace RaidIntoDarkness.Effects
             if (system != null)
             {
                 system.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+            }
+        }
+
+        private void ClearIdle()
+        {
+            Clear(_idle);
+            if (_idleAuxiliarySystems == null)
+            {
+                return;
+            }
+            foreach (ParticleSystem system in _idleAuxiliarySystems)
+            {
+                Clear(system);
             }
         }
 

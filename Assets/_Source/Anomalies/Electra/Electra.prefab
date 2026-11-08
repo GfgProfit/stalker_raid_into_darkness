@@ -39,6 +39,7 @@ Transform:
   - {fileID: 6702213298429380534}
   - {fileID: 5570047502828830916}
   - {fileID: 45875952669007760}
+  - {fileID: 2004608332439325097}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2900644173621633808
@@ -55,6 +56,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: RaidIntoDarkness.Effects::RaidIntoDarkness.Effects.ElectraVisual
   _idle: {fileID: 3114857361002102683}
   _audio: {fileID: 1954715554957267370}
+  _contactEffects: {fileID: 0}
+  _idleAuxiliarySystems: []
   _playIdleChildren: 0
   _keepIdleDuringDischarge: 0
   _discharge: {fileID: 2760770493036228057}
@@ -183,6 +186,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: RaidIntoDarkness.Player::RaidIntoDarkness.Player.ElectraPlayerReaction
   _visual: {fileID: 2900644173621633808}
+  _influenceProfile: {fileID: 11400000, guid: c5a12392d414627488313d7a114bc3f0, type: 2}
   _awakingTime: 0.1
   _blowoutTime: 0.1
   _accumulateTime: 1.5
@@ -24727,6 +24731,102 @@ ParticleSystemRenderer:
   m_MeshWeighting1: 1
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
+--- !u!1 &4528120960309308399
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2004608332439325097}
+  - component: {fileID: 6229765265300207730}
+  - component: {fileID: 2118962728173063066}
+  - component: {fileID: 1413608742210311424}
+  m_Layer: 0
+  m_Name: PlayerProximity
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2004608332439325097
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4528120960309308399}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2121698778301167349}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!54 &6229765265300207730
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4528120960309308399}
+  serializedVersion: 5
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 0
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
+--- !u!135 &2118962728173063066
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4528120960309308399}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 7
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &1413608742210311424
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4528120960309308399}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9344d7ef78020004e93ae5f0629b4845, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: RaidIntoDarkness.Player::RaidIntoDarkness.Player.AnomalyProximityZone
+  _source: {fileID: 6900053619303508921}
+  _sourceVolume: {fileID: 1900613701109408422}
 --- !u!1 &5107403971380248929
 GameObject:
   m_ObjectHideFlags: 0

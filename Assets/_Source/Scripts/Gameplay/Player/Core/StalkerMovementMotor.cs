@@ -111,6 +111,19 @@ namespace RaidIntoDarkness.Player
             _physics.SetVelocity(Vector3.zero);
         }
 
+        public void ApplyAnomalyShock()
+        {
+            if ((_real & StalkerMoveFlags.Sprint) != 0)
+            {
+                _wish &= ~StalkerMoveFlags.Sprint;
+            }
+
+            if (_physics != null && (_physics.Environment == StalkerEnvironment.OnGround || _physics.Environment == StalkerEnvironment.AtWall))
+            {
+                _physics.SetVelocity(Vector3.zero);
+            }
+        }
+
         public void Tick(float deltaTime)
         {
             if (_physics == null || deltaTime <= 0.0f)

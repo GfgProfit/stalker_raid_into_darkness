@@ -2,6 +2,7 @@
     "name": "RaidIntoDarkness.Player.Tests.PlayMode",
     "rootNamespace": "RaidIntoDarkness.Player.Tests",
     "references": [
+        "RaidIntoDarkness.Effects",
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
         "RaidIntoDarkness.Player",

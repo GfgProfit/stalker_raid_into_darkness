@@ -31,7 +31,7 @@ MonoBehaviour:
     _profileType: 0
     _visualSignature: 4055161950437a87
     _spriteResourcePath: Generated/ItemIcons/36d0b42ed2880d842bd2f2fef624d0a0_6ad6f6d7e4dcce8e
-    _bakeSignature: fc8cb3fefd7cbb7b769282e35d219a19
+    _bakeSignature: 4990de0809ee09b249ed2537183738c5
     _sourceItemAssetGuid: 36d0b42ed2880d842bd2f2fef624d0a0
     _estimatedTextureBytes: 786432
   - _itemId: 36d0b42ed2880d842bd2f2fef624d0a0
@@ -62,7 +62,7 @@ MonoBehaviour:
     _profileType: 1
     _visualSignature: 8e6fa252ac626571
     _spriteResourcePath: Generated/ItemIcons/36d0b42ed2880d842bd2f2fef624d0a0_774146670782aced
-    _bakeSignature: 572291dc77bedbb44b43e3dafa8ef8b0
+    _bakeSignature: 802e1087ed644f3823ba82786e6cd23c
     _sourceItemAssetGuid: 36d0b42ed2880d842bd2f2fef624d0a0
     _estimatedTextureBytes: 131072
   - _itemId: 36d0b42ed2880d842bd2f2fef624d0a0
@@ -73,6 +73,6 @@ MonoBehaviour:
     _profileType: 1
     _visualSignature: 505ddf0780c847e5
     _spriteResourcePath: Generated/ItemIcons/36d0b42ed2880d842bd2f2fef624d0a0_115bc2ffe200382b
-    _bakeSignature: 0284ac84651788c3d2397a65f0f280a3
+    _bakeSignature: 7b9e22378768d7e503e011425546ef7a
     _sourceItemAssetGuid: 36d0b42ed2880d842bd2f2fef624d0a0
     _estimatedTextureBytes: 655360

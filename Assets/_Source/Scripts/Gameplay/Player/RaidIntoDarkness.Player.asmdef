@@ -2,6 +2,7 @@
     "name": "RaidIntoDarkness.Player",
     "rootNamespace": "RaidIntoDarkness.Player",
     "references": [
+        "RaidIntoDarkness.Effects",
         "RaidIntoDarkness.FirstPerson",
         "XRay.Importer.Runtime",
         "Unity.InputSystem",

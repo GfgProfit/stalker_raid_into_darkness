@@ -54,10 +54,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: RaidIntoDarkness.Effects::RaidIntoDarkness.Effects.ElectraVisual
   _idle: {fileID: 3114857361002102683}
+  _audio: {fileID: 1954715554957267370}
+  _playIdleChildren: 0
+  _keepIdleDuringDischarge: 0
   _discharge: {fileID: 2760770493036228057}
   _idleLight: {fileID: 550920189758117783}
   _dischargeLight: {fileID: 1751052751538058768}
-  _audio: {fileID: 1954715554957267370}
   _idleLightIntensity: 50000
   _dischargeLightIntensity: 500000
   _dischargeLightEnvelope:

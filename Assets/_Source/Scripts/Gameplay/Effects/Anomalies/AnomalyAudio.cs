@@ -3,7 +3,7 @@ using UnityEngine;
 namespace RaidIntoDarkness.Effects
 {
     [DisallowMultipleComponent]
-    public sealed class ElectraAudio : MonoBehaviour
+    public sealed class AnomalyAudio : MonoBehaviour
     {
         [SerializeField] private AudioSource _idle;
         [SerializeField] private AudioSource _blowout;

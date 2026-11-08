@@ -26,7 +26,7 @@ namespace RaidIntoDarkness.Player.Tests
         private GameObject _holder;
         private GameObject _electra;
         private StalkerPlayerController _player;
-        private ElectraPlayerReaction _reaction;
+        private AnomalyPlayerReaction _reaction;
         private ElectraVisual _visual;
         private Vector3 _origin;
         private float _previousTimeScale;
@@ -88,7 +88,7 @@ namespace RaidIntoDarkness.Player.Tests
             var anomalyHolder = new GameObject("ElectraReactionAnomaly");
             anomalyHolder.SetActive(false);
             _electra = Object.Instantiate(electraPrefab, _origin, Quaternion.identity, anomalyHolder.transform);
-            _reaction = _electra.GetComponent<ElectraPlayerReaction>();
+            _reaction = _electra.GetComponent<AnomalyPlayerReaction>();
             _visual = _electra.GetComponent<ElectraVisual>();
             Assert.That(_reaction, Is.Not.Null);
             Assert.That(_visual, Is.Not.Null);
@@ -133,40 +133,40 @@ namespace RaidIntoDarkness.Player.Tests
             prop.transform.position = _origin + Vector3.up;
             yield return WaitUntil(() => _reaction.IsReady, "Electra did not become ready.");
             yield return WaitPhysics(0.1f);
-            Assert.That(_reaction.Phase, Is.EqualTo(ElectraPhase.Idle), "A non-player collider triggered Electra.");
+            Assert.That(_reaction.Phase, Is.EqualTo(AnomalyPhase.Idle), "A non-player collider triggered Electra.");
             Assert.That(_reaction.CooldownRemaining, Is.Zero);
             prop.transform.position = _origin + Vector3.forward * 8f;
 
             MovePlayer(true);
-            yield return WaitUntil(() => _reaction.Phase == ElectraPhase.Awaking, "The real CharacterController did not start awaking.");
+            yield return WaitUntil(() => _reaction.Phase == AnomalyPhase.Awaking, "The real CharacterController did not start awaking.");
             Assert.That(_visual.IsDischarging, Is.False, "Discharge started before awaking completed.");
             MovePlayer(false);
-            yield return WaitUntil(() => _reaction.Phase == ElectraPhase.Blowout, "Leaving during awaking cancelled the committed discharge.");
+            yield return WaitUntil(() => _reaction.Phase == AnomalyPhase.Blowout, "Leaving during awaking cancelled the committed discharge.");
             Assert.That(_visual.IsDischarging, Is.True);
-            yield return WaitUntil(() => _reaction.Phase == ElectraPhase.Accumulate, "Blowout did not start accumulation.");
+            yield return WaitUntil(() => _reaction.Phase == AnomalyPhase.Accumulate, "Blowout did not start accumulation.");
             float firstDeadline = Time.time + _reaction.CooldownRemaining;
 
             MovePlayer(true);
             yield return WaitPhysics(0.08f);
-            Assert.That(_reaction.Phase, Is.EqualTo(ElectraPhase.Accumulate), "Re-entry bypassed accumulation.");
+            Assert.That(_reaction.Phase, Is.EqualTo(AnomalyPhase.Accumulate), "Re-entry bypassed accumulation.");
             Assert.That(Time.time + _reaction.CooldownRemaining, Is.EqualTo(firstDeadline).Within(0.04f), "Re-entry or multiple player colliders restarted accumulation.");
             Assert.That(_visual.IsDischarging, Is.True);
-            yield return WaitUntil(() => _reaction.Phase == ElectraPhase.Blowout, "Long presentation particles blocked the next original-rhythm discharge.");
+            yield return WaitUntil(() => _reaction.Phase == AnomalyPhase.Blowout, "Long presentation particles blocked the next original-rhythm discharge.");
             Assert.That(_visual.IsDischarging, Is.True);
 
             _visual.Hide();
             _visual.ShowIdle();
-            Assert.That(_reaction.Phase, Is.EqualTo(ElectraPhase.Idle), "Hide followed by ShowIdle in the same frame retained the previous cycle.");
+            Assert.That(_reaction.Phase, Is.EqualTo(AnomalyPhase.Idle), "Hide followed by ShowIdle in the same frame retained the previous cycle.");
             Assert.That(_reaction.CooldownRemaining, Is.Zero);
-            yield return WaitUntil(() => _reaction.Phase == ElectraPhase.Awaking, "A retained player was not detected again after same-frame Hide and ShowIdle.");
+            yield return WaitUntil(() => _reaction.Phase == AnomalyPhase.Awaking, "A retained player was not detected again after same-frame Hide and ShowIdle.");
             Assert.That(_visual.IsDischarging, Is.False);
 
             _electra.SetActive(false);
-            Assert.That(_reaction.Phase, Is.EqualTo(ElectraPhase.Idle));
+            Assert.That(_reaction.Phase, Is.EqualTo(AnomalyPhase.Idle));
             Assert.That(_reaction.CooldownRemaining, Is.Zero, "Disabling the anomaly did not reset its cycle.");
             yield return WaitPhysics(0.05f);
             _electra.SetActive(true);
-            yield return WaitUntil(() => _reaction.Phase == ElectraPhase.Awaking, "An anomaly enabled around the player did not start a new awaking phase.");
+            yield return WaitUntil(() => _reaction.Phase == AnomalyPhase.Awaking, "An anomaly enabled around the player did not start a new awaking phase.");
             Assert.That(_visual.IsDischarging, Is.False);
 
             foreach (ParticleSystem system in _electra.GetComponentsInChildren<ParticleSystem>(true))
@@ -178,33 +178,33 @@ namespace RaidIntoDarkness.Player.Tests
             _visual.Hide();
             yield return WaitPhysics(CYCLE_TIME + 0.15f);
             Assert.That(_visual.IsVisible, Is.False, "Trigger stay re-enabled a hidden effect.");
-            Assert.That(_reaction.Phase, Is.EqualTo(ElectraPhase.Idle));
+            Assert.That(_reaction.Phase, Is.EqualTo(AnomalyPhase.Idle));
             Assert.That(_reaction.CooldownRemaining, Is.Zero);
 
             _reaction.enabled = false;
             _visual.ShowIdle();
             yield return WaitPhysics(0.15f);
-            Assert.That(_reaction.Phase, Is.EqualTo(ElectraPhase.Idle), "A disabled reaction processed trigger callbacks.");
+            Assert.That(_reaction.Phase, Is.EqualTo(AnomalyPhase.Idle), "A disabled reaction processed trigger callbacks.");
             Assert.That(_reaction.CooldownRemaining, Is.Zero);
             _reaction.enabled = true;
-            yield return WaitUntil(() => _reaction.Phase == ElectraPhase.Awaking, "Enabling the reaction while the player stayed inside did not start awaking.");
+            yield return WaitUntil(() => _reaction.Phase == AnomalyPhase.Awaking, "Enabling the reaction while the player stayed inside did not start awaking.");
 
             MovePlayer(false);
-            yield return WaitUntil(() => _reaction.Phase == ElectraPhase.Idle, "The committed cycle did not finish after the player left.");
-            Assert.That(_reaction.Phase, Is.EqualTo(ElectraPhase.Idle));
+            yield return WaitUntil(() => _reaction.Phase == AnomalyPhase.Idle, "The committed cycle did not finish after the player left.");
+            Assert.That(_reaction.Phase, Is.EqualTo(AnomalyPhase.Idle));
             _player.enabled = false;
             MovePlayer(true);
             yield return WaitPhysics(AWAKING_TIME + 0.15f);
-            Assert.That(_reaction.Phase, Is.EqualTo(ElectraPhase.Idle), "A disabled player controller triggered Electra.");
+            Assert.That(_reaction.Phase, Is.EqualTo(AnomalyPhase.Idle), "A disabled player controller triggered Electra.");
             Assert.That(_reaction.CooldownRemaining, Is.Zero);
             _player.enabled = true;
-            yield return WaitUntil(() => _reaction.Phase == ElectraPhase.Awaking, "Re-enabled player inside was not detected.");
+            yield return WaitUntil(() => _reaction.Phase == AnomalyPhase.Awaking, "Re-enabled player inside was not detected.");
 
             Object.Destroy(_holder);
             yield return null;
-            yield return WaitUntil(() => _reaction.Phase == ElectraPhase.Idle, "The committed cycle did not finish after the player was destroyed.");
+            yield return WaitUntil(() => _reaction.Phase == AnomalyPhase.Idle, "The committed cycle did not finish after the player was destroyed.");
             yield return WaitPhysics(0.2f);
-            Assert.That(_reaction.Phase, Is.EqualTo(ElectraPhase.Idle), "Destroyed player left a repeating reaction behind.");
+            Assert.That(_reaction.Phase, Is.EqualTo(AnomalyPhase.Idle), "Destroyed player left a repeating reaction behind.");
             Assert.That(_reaction.CooldownRemaining, Is.Zero);
             LogAssert.NoUnexpectedReceived();
         }

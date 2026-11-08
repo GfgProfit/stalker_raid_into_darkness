@@ -5,23 +5,23 @@ using UnityEngine;
 namespace RaidIntoDarkness.Player
 {
     [DisallowMultipleComponent]
-    [RequireComponent(typeof(ElectraVisual), typeof(SphereCollider), typeof(Rigidbody))]
-    public sealed class ElectraPlayerReaction : MonoBehaviour
+    [RequireComponent(typeof(SphereCollider), typeof(Rigidbody))]
+    public sealed class AnomalyPlayerReaction : MonoBehaviour
     {
-        [SerializeField] private ElectraVisual _visual;
-        [SerializeField, Min(0f)] private float _awakingTime = 0.1f;
-        [SerializeField, Min(0f)] private float _blowoutTime = 0.1f;
-        [SerializeField, Min(0f)] private float _accumulateTime = 1.5f;
+        [SerializeField] private AnomalyVisual _visual;
+        [SerializeField, Min(0f)] private float _awakingTime;
+        [SerializeField, Min(0f)] private float _blowoutTime;
+        [SerializeField, Min(0f)] private float _accumulateTime;
 
         private readonly Dictionary<Collider, StalkerPlayerController> _contacts = new Dictionary<Collider, StalkerPlayerController>();
         private readonly List<Collider> _expiredContacts = new List<Collider>();
         private readonly HashSet<StalkerPlayerController> _affectedPlayers = new HashSet<StalkerPlayerController>();
 
-        private ElectraCycle _cycle;
+        private AnomalyCycle _cycle;
 
-        public ElectraPhase Phase => _cycle != null ? _cycle.Phase : ElectraPhase.Idle;
+        public AnomalyPhase Phase => _cycle != null ? _cycle.Phase : AnomalyPhase.Idle;
         public float CooldownRemaining => _cycle != null ? _cycle.GetCooldownRemaining(Time.time) : 0f;
-        public bool IsReady => CanDetect && Phase == ElectraPhase.Idle;
+        public bool IsReady => CanDetect && Phase == AnomalyPhase.Idle;
 
         private bool CanDetect => isActiveAndEnabled && _visual != null && _visual.isActiveAndEnabled && _visual.IsVisible;
 
@@ -29,13 +29,13 @@ namespace RaidIntoDarkness.Player
         {
             if (_visual == null)
             {
-                _visual = GetComponent<ElectraVisual>();
+                _visual = GetComponent<AnomalyVisual>();
             }
         }
 
         private void OnEnable()
         {
-            _cycle = new ElectraCycle(_awakingTime, _blowoutTime, _accumulateTime);
+            _cycle = new AnomalyCycle(_awakingTime, _blowoutTime, _accumulateTime);
             if (_visual != null)
             {
                 _visual.DischargeStarted += OnDischargeStarted;

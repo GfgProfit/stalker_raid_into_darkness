@@ -2,7 +2,7 @@ using System;
 
 namespace RaidIntoDarkness.Player
 {
-    public enum ElectraPhase
+    public enum AnomalyPhase
     {
         Idle,
         Awaking,
@@ -10,7 +10,7 @@ namespace RaidIntoDarkness.Player
         Accumulate
     }
 
-    public sealed class ElectraCycle
+    public sealed class AnomalyCycle
     {
         private readonly float _awakingDuration;
         private readonly float _blowoutDuration;
@@ -18,9 +18,9 @@ namespace RaidIntoDarkness.Player
 
         private float _stateStartedAt;
 
-        public ElectraPhase Phase { get; private set; }
+        public AnomalyPhase Phase { get; private set; }
 
-        public ElectraCycle(float awakingDuration = 0.1f, float blowoutDuration = 0.1f, float accumulateDuration = 1.5f)
+        public AnomalyCycle(float awakingDuration, float blowoutDuration, float accumulateDuration)
         {
             _awakingDuration = Math.Max(0f, awakingDuration);
             _blowoutDuration = Math.Max(0f, blowoutDuration);
@@ -31,28 +31,28 @@ namespace RaidIntoDarkness.Player
         {
             switch (Phase)
             {
-                case ElectraPhase.Idle:
+                case AnomalyPhase.Idle:
                     if (hasContact)
                     {
-                        Phase = ElectraPhase.Awaking;
+                        Phase = AnomalyPhase.Awaking;
                         _stateStartedAt = now;
                     }
                     break;
-                case ElectraPhase.Awaking:
+                case AnomalyPhase.Awaking:
                     if (now - _stateStartedAt >= _awakingDuration)
                     {
                         RecordDischarge(now);
                         return true;
                     }
                     break;
-                case ElectraPhase.Blowout:
+                case AnomalyPhase.Blowout:
                     if (now - _stateStartedAt >= _blowoutDuration)
                     {
-                        Phase = ElectraPhase.Accumulate;
+                        Phase = AnomalyPhase.Accumulate;
                         _stateStartedAt = now;
                     }
                     break;
-                case ElectraPhase.Accumulate:
+                case AnomalyPhase.Accumulate:
                     if (now - _stateStartedAt >= _accumulateDuration)
                     {
                         if (hasContact)
@@ -70,7 +70,7 @@ namespace RaidIntoDarkness.Player
 
         public void RecordDischarge(float now)
         {
-            Phase = ElectraPhase.Blowout;
+            Phase = AnomalyPhase.Blowout;
             _stateStartedAt = now;
         }
 
@@ -79,11 +79,11 @@ namespace RaidIntoDarkness.Player
             float elapsed = Math.Max(0f, now - _stateStartedAt);
             switch (Phase)
             {
-                case ElectraPhase.Awaking:
+                case AnomalyPhase.Awaking:
                     return Math.Max(0f, _awakingDuration - elapsed);
-                case ElectraPhase.Blowout:
+                case AnomalyPhase.Blowout:
                     return Math.Max(0f, _blowoutDuration - elapsed) + _accumulateDuration;
-                case ElectraPhase.Accumulate:
+                case AnomalyPhase.Accumulate:
                     return Math.Max(0f, _accumulateDuration - elapsed);
                 default:
                     return 0f;
@@ -92,7 +92,7 @@ namespace RaidIntoDarkness.Player
 
         public void Reset()
         {
-            Phase = ElectraPhase.Idle;
+            Phase = AnomalyPhase.Idle;
             _stateStartedAt = 0f;
         }
     }

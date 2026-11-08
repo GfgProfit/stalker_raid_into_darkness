@@ -85001,6 +85001,8 @@ MonoBehaviour:
   _idle: {fileID: 6473035539298428403}
   _audio: {fileID: 1568900054068925385}
   _contactEffects: {fileID: 0}
+  _entranceContactEffects: {fileID: 0}
+  _idleContactEffects: {fileID: 0}
   _idleAuxiliarySystems: []
   _playIdleChildren: 1
   _keepIdleDuringDischarge: 1
@@ -85022,6 +85024,7 @@ MonoBehaviour:
   _dischargeLightIntensity: 300000
   _dischargeLightRange: 9
   _dischargeLightDuration: 10
+  _dischargeLightDelay: 0
 --- !u!135 &5290107305091968687
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -85087,6 +85090,8 @@ MonoBehaviour:
   _awakingTime: 0.1
   _blowoutTime: 7
   _accumulateTime: 0.25
+  _ignoreSmallObjects: 0
+  _smallObjectIgnoreDelay: -1
 --- !u!1 &6071270127157639024
 GameObject:
   m_ObjectHideFlags: 0

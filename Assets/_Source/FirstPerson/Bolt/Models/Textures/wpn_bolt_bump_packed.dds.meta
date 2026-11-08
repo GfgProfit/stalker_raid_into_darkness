@@ -1,0 +1,21 @@
+fileFormatVersion: 2
+guid: e6f01431c71bfb343ac43655d1407748
+IHVImageFormatImporter:
+  externalObjects: {}
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 0
+    wrapV: 0
+    wrapW: 0
+  isReadable: 0
+  sRGBTexture: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  ignoreMipmapLimit: 0
+  mipmapLimitGroupName: 
+  userData: xray-asset:{"_key":"textures/wpn/wpn_bolt_bump.dds#packed","_role":"Packed","_source":"Base Anomaly","_sourcePath":"D:\\GRA2.5\\Anomaly 1.5.3 up\\tools\\_unpacked\\textures\\wpn\\wpn_bolt_bump.dds","_stamp":"1398256:639289713318856687"}
+  assetBundleName: 
+  assetBundleVariant: 

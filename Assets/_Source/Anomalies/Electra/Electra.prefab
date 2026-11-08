@@ -57,6 +57,8 @@ MonoBehaviour:
   _idle: {fileID: 3114857361002102683}
   _audio: {fileID: 1954715554957267370}
   _contactEffects: {fileID: 0}
+  _entranceContactEffects: {fileID: 0}
+  _idleContactEffects: {fileID: 0}
   _idleAuxiliarySystems: []
   _playIdleChildren: 0
   _keepIdleDuringDischarge: 0
@@ -190,6 +192,8 @@ MonoBehaviour:
   _awakingTime: 0.1
   _blowoutTime: 0.1
   _accumulateTime: 1.5
+  _ignoreSmallObjects: 0
+  _smallObjectIgnoreDelay: 0.5
 --- !u!114 &1954715554957267370
 MonoBehaviour:
   m_ObjectHideFlags: 0

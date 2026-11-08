@@ -1,0 +1,187 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b5046bbd246df943b778a5cacf8a9c6a, type: 3}
+  m_Name: BoltCollideSounds
+  m_EditorClassIdentifier: RaidIntoDarkness.Player::RaidIntoDarkness.Player.StalkerCollideSoundLibrary
+  _velocityCriterion: 10
+  _minVolume: 0.1
+  _maxVolume: 200
+  _maxDistance: 70
+  _entries:
+  - _objectMaterial: objects\small_metal_trash
+    _surface: 0
+    _origin: gamemtl.xr
+    _clips:
+    - {fileID: 8300000, guid: c9c7fcd93f16b7b4dbafc77f534cf870, type: 3}
+    - {fileID: 8300000, guid: 79e92465c8c006f42a27ed737952e60a, type: 3}
+    - {fileID: 8300000, guid: 7703a3c3f57f80e4ebc9740b9279ecb7, type: 3}
+    - {fileID: 8300000, guid: 8f0f2431f7b0dad478329b2b9ff9f696, type: 3}
+  - _objectMaterial: objects\small_metal_trash
+    _surface: 1
+    _origin: gamemtl.xr
+    _clips: []
+  - _objectMaterial: objects\small_metal_trash
+    _surface: 2
+    _origin: gamemtl.xr
+    _clips: []
+  - _objectMaterial: objects\small_metal_trash
+    _surface: 3
+    _origin: gamemtl.xr
+    _clips:
+    - {fileID: 8300000, guid: c9c7fcd93f16b7b4dbafc77f534cf870, type: 3}
+    - {fileID: 8300000, guid: 79e92465c8c006f42a27ed737952e60a, type: 3}
+    - {fileID: 8300000, guid: 7703a3c3f57f80e4ebc9740b9279ecb7, type: 3}
+    - {fileID: 8300000, guid: 8f0f2431f7b0dad478329b2b9ff9f696, type: 3}
+  - _objectMaterial: objects\small_metal_trash
+    _surface: 4
+    _origin: gamemtl.xr
+    _clips: []
+  - _objectMaterial: objects\small_metal_trash
+    _surface: 5
+    _origin: gamemtl.xr
+    _clips: []
+  - _objectMaterial: objects\small_metal_trash
+    _surface: 6
+    _origin: gamemtl.xr
+    _clips:
+    - {fileID: 8300000, guid: c9c7fcd93f16b7b4dbafc77f534cf870, type: 3}
+    - {fileID: 8300000, guid: 79e92465c8c006f42a27ed737952e60a, type: 3}
+    - {fileID: 8300000, guid: 7703a3c3f57f80e4ebc9740b9279ecb7, type: 3}
+    - {fileID: 8300000, guid: 8f0f2431f7b0dad478329b2b9ff9f696, type: 3}
+  - _objectMaterial: objects\small_metal_trash
+    _surface: 7
+    _origin: gamemtl.xr
+    _clips:
+    - {fileID: 8300000, guid: c9c7fcd93f16b7b4dbafc77f534cf870, type: 3}
+    - {fileID: 8300000, guid: 79e92465c8c006f42a27ed737952e60a, type: 3}
+    - {fileID: 8300000, guid: 7703a3c3f57f80e4ebc9740b9279ecb7, type: 3}
+    - {fileID: 8300000, guid: 8f0f2431f7b0dad478329b2b9ff9f696, type: 3}
+  - _objectMaterial: objects\small_metal_trash
+    _surface: 8
+    _origin: gamemtl.xr
+    _clips:
+    - {fileID: 8300000, guid: c9c7fcd93f16b7b4dbafc77f534cf870, type: 3}
+    - {fileID: 8300000, guid: 79e92465c8c006f42a27ed737952e60a, type: 3}
+    - {fileID: 8300000, guid: 7703a3c3f57f80e4ebc9740b9279ecb7, type: 3}
+    - {fileID: 8300000, guid: 8f0f2431f7b0dad478329b2b9ff9f696, type: 3}
+  - _objectMaterial: objects\small_metal_trash
+    _surface: 9
+    _origin: gamemtl.xr
+    _clips:
+    - {fileID: 8300000, guid: c9c7fcd93f16b7b4dbafc77f534cf870, type: 3}
+    - {fileID: 8300000, guid: 79e92465c8c006f42a27ed737952e60a, type: 3}
+    - {fileID: 8300000, guid: 7703a3c3f57f80e4ebc9740b9279ecb7, type: 3}
+    - {fileID: 8300000, guid: 8f0f2431f7b0dad478329b2b9ff9f696, type: 3}
+  - _objectMaterial: objects\small_metal_trash
+    _surface: 10
+    _origin: gamemtl.xr
+    _clips:
+    - {fileID: 8300000, guid: c9c7fcd93f16b7b4dbafc77f534cf870, type: 3}
+    - {fileID: 8300000, guid: 79e92465c8c006f42a27ed737952e60a, type: 3}
+    - {fileID: 8300000, guid: 7703a3c3f57f80e4ebc9740b9279ecb7, type: 3}
+    - {fileID: 8300000, guid: 8f0f2431f7b0dad478329b2b9ff9f696, type: 3}
+  - _objectMaterial: objects\small_metal_trash
+    _surface: 11
+    _origin: gamemtl.xr
+    _clips:
+    - {fileID: 8300000, guid: c9c7fcd93f16b7b4dbafc77f534cf870, type: 3}
+    - {fileID: 8300000, guid: 79e92465c8c006f42a27ed737952e60a, type: 3}
+    - {fileID: 8300000, guid: 7703a3c3f57f80e4ebc9740b9279ecb7, type: 3}
+    - {fileID: 8300000, guid: 8f0f2431f7b0dad478329b2b9ff9f696, type: 3}
+  - _objectMaterial: objects\small_metal_trash
+    _surface: 12
+    _origin: gamemtl.xr
+    _clips:
+    - {fileID: 8300000, guid: c9c7fcd93f16b7b4dbafc77f534cf870, type: 3}
+    - {fileID: 8300000, guid: 79e92465c8c006f42a27ed737952e60a, type: 3}
+    - {fileID: 8300000, guid: 7703a3c3f57f80e4ebc9740b9279ecb7, type: 3}
+    - {fileID: 8300000, guid: 8f0f2431f7b0dad478329b2b9ff9f696, type: 3}
+  - _objectMaterial: objects\small_metal_trash
+    _surface: 13
+    _origin: gamemtl.xr
+    _clips:
+    - {fileID: 8300000, guid: c9c7fcd93f16b7b4dbafc77f534cf870, type: 3}
+    - {fileID: 8300000, guid: 79e92465c8c006f42a27ed737952e60a, type: 3}
+    - {fileID: 8300000, guid: 7703a3c3f57f80e4ebc9740b9279ecb7, type: 3}
+    - {fileID: 8300000, guid: 8f0f2431f7b0dad478329b2b9ff9f696, type: 3}
+  - _objectMaterial: objects\small_metal_trash
+    _surface: 14
+    _origin: gamemtl.xr
+    _clips:
+    - {fileID: 8300000, guid: c9c7fcd93f16b7b4dbafc77f534cf870, type: 3}
+    - {fileID: 8300000, guid: 79e92465c8c006f42a27ed737952e60a, type: 3}
+    - {fileID: 8300000, guid: 7703a3c3f57f80e4ebc9740b9279ecb7, type: 3}
+    - {fileID: 8300000, guid: 8f0f2431f7b0dad478329b2b9ff9f696, type: 3}
+  - _objectMaterial: objects\small_metal_trash
+    _surface: 15
+    _origin: gamemtl.xr
+    _clips:
+    - {fileID: 8300000, guid: c9c7fcd93f16b7b4dbafc77f534cf870, type: 3}
+    - {fileID: 8300000, guid: 79e92465c8c006f42a27ed737952e60a, type: 3}
+    - {fileID: 8300000, guid: 7703a3c3f57f80e4ebc9740b9279ecb7, type: 3}
+    - {fileID: 8300000, guid: 8f0f2431f7b0dad478329b2b9ff9f696, type: 3}
+  - _objectMaterial: objects\small_metal_trash
+    _surface: 16
+    _origin: gamemtl.xr
+    _clips:
+    - {fileID: 8300000, guid: c9c7fcd93f16b7b4dbafc77f534cf870, type: 3}
+    - {fileID: 8300000, guid: 79e92465c8c006f42a27ed737952e60a, type: 3}
+    - {fileID: 8300000, guid: 7703a3c3f57f80e4ebc9740b9279ecb7, type: 3}
+    - {fileID: 8300000, guid: 8f0f2431f7b0dad478329b2b9ff9f696, type: 3}
+  - _objectMaterial: objects\small_metal_trash
+    _surface: 17
+    _origin: gamemtl.xr
+    _clips:
+    - {fileID: 8300000, guid: c9c7fcd93f16b7b4dbafc77f534cf870, type: 3}
+    - {fileID: 8300000, guid: 79e92465c8c006f42a27ed737952e60a, type: 3}
+    - {fileID: 8300000, guid: 7703a3c3f57f80e4ebc9740b9279ecb7, type: 3}
+    - {fileID: 8300000, guid: 8f0f2431f7b0dad478329b2b9ff9f696, type: 3}
+  - _objectMaterial: objects\small_metal_trash
+    _surface: 18
+    _origin: gamemtl.xr
+    _clips:
+    - {fileID: 8300000, guid: c9c7fcd93f16b7b4dbafc77f534cf870, type: 3}
+    - {fileID: 8300000, guid: 79e92465c8c006f42a27ed737952e60a, type: 3}
+    - {fileID: 8300000, guid: 7703a3c3f57f80e4ebc9740b9279ecb7, type: 3}
+    - {fileID: 8300000, guid: 8f0f2431f7b0dad478329b2b9ff9f696, type: 3}
+  - _objectMaterial: objects\small_metal_trash
+    _surface: 19
+    _origin: gamemtl.xr
+    _clips:
+    - {fileID: 8300000, guid: 3aebfa8082c204d458cf45b2b1575208, type: 3}
+    - {fileID: 8300000, guid: 413113388f70997498bc357da105c0ec, type: 3}
+  - _objectMaterial: objects\small_metal_trash
+    _surface: 20
+    _origin: gamemtl.xr
+    _clips: []
+  - _objectMaterial: objects\small_metal_trash
+    _surface: 21
+    _origin: gamemtl.xr
+    _clips:
+    - {fileID: 8300000, guid: c9c7fcd93f16b7b4dbafc77f534cf870, type: 3}
+    - {fileID: 8300000, guid: 79e92465c8c006f42a27ed737952e60a, type: 3}
+    - {fileID: 8300000, guid: 7703a3c3f57f80e4ebc9740b9279ecb7, type: 3}
+    - {fileID: 8300000, guid: 8f0f2431f7b0dad478329b2b9ff9f696, type: 3}
+  - _objectMaterial: objects\small_metal_trash
+    _surface: 22
+    _origin: gamemtl.xr
+    _clips:
+    - {fileID: 8300000, guid: c9c7fcd93f16b7b4dbafc77f534cf870, type: 3}
+    - {fileID: 8300000, guid: 79e92465c8c006f42a27ed737952e60a, type: 3}
+    - {fileID: 8300000, guid: 7703a3c3f57f80e4ebc9740b9279ecb7, type: 3}
+    - {fileID: 8300000, guid: 8f0f2431f7b0dad478329b2b9ff9f696, type: 3}
+  - _objectMaterial: objects\small_metal_trash
+    _surface: 23
+    _origin: gamemtl.xr
+    _clips:
+    - {fileID: 8300000, guid: 391d546686f187c4c9ac59772ebbd00d, type: 3}
+  _sourceReport: "MO2 profile: 1v2(DX11) (v_12gb) 2.5, \u0412\u0441\u0435 \u0432\u043A\u043B\u044E\u0447\u0435\u043D\u043E (168), active mods: 191, indexed files: 11136\r\nmeshes/dynamics/devices/dev_bolt/dev_bolt.ogf <- Base Anomaly -> Assets/_Source/FirstPerson/Bolt/Models/dev_bolt.ogf\r\nmeshes/dynamics/devices/dev_bolt/dev_bolt_hud.ogf <- Base Anomaly -> Assets/_Source/FirstPerson/Bolt/Models/dev_bolt_hud.ogf\r\nmeshes/anomaly_weapons/hud_hands_animation/dev_hand_bolt_hud_animation.omf <- Base Anomaly -> Assets/_Source/FirstPerson/Bolt/Animations/dev_hand_bolt_hud_animation.omf\r\nmeshes/dynamics/devices/dev_bolt/dev_bolt_hud_animation.omf <- Base Anomaly -> Assets/_Source/FirstPerson/Bolt/Animations/dev_bolt_hud_animation.omf\r\nsounds/weapons/bolt_draw.ogg <- [\u0417\u0432\u0443\u043A_\u04321] Audio Expansion 29.10.25 -> Assets/_Source/FirstPerson/Bolt/Sounds/bolt_draw.ogg\r\nsounds/weapons/bolt_holster.ogg <- [\u0417\u0432\u0443\u043A_\u04321] Audio Expansion 29.10.25 -> Assets/_Source/FirstPerson/Bolt/Sounds/bolt_holster.ogg\r\nanm_show = dev_bolt_draw: 1.1 seconds\r\nanm_hide = dev_bolt_holster: 0.6 seconds\r\nanm_idle = dev_bolt_idle: 3.433333 seconds\r\nanm_idle_moving = dev_bolt_idle_moving: 2.6 seconds\r\nanm_idle_sprint = dev_bolt_idle_sprint: 0.9333334 seconds\r\nanm_bore = dev_bolt_idle_bore: 3.6 seconds\r\nanm_throw_begin = dev_bolt_shoot_start: 0.5666667 seconds\r\nanm_throw_idle = dev_bolt_shoot_idle: 0.6 seconds\r\nanm_throw = dev_bolt_shoot_end: 0.5666667 seconds\r\nThrow mark Left: 0,244666695594788,0,466666698455811\r\nThrow mark Right: \r\nThrow release seconds = 0.2446667\r\nPhysics bone bolt: mass=1, material=objects\\small_metal_trash, shape=1\r\nobjects\\small_metal_trash @ default <- gamemtl.xr\r\nobjects\\small_metal_trash @ materials\\earth <- gamemtl.xr\r\nobjects\\small_metal_trash @ materials\\grass <- gamemtl.xr\r\nobjects\\small_metal_trash @ materials\\gravel <- gamemtl.xr\r\nobjects\\small_metal_trash @ materials\\sand <- gamemtl.xr\r\nobjects\\small_metal_trash @ materials\\dirt <- gamemtl.xr\r\nobjects\\small_metal_trash @ materials\\asphalt <- gamemtl.xr\r\nobjects\\small_metal_trash @ materials\\concrete <- gamemtl.xr\r\nobjects\\small_metal_trash @ materials\\bricks <- gamemtl.xr\r\nobjects\\small_metal_trash @ materials\\stucco <- gamemtl.xr\r\nobjects\\small_metal_trash @ materials\\flooring_tile <- gamemtl.xr\r\nobjects\\small_metal_trash @ materials\\metal <- gamemtl.xr\r\nobjects\\small_metal_trash @ materials\\metal_pipe <- gamemtl.xr\r\nobjects\\small_metal_trash @ materials\\metal_plate <- gamemtl.xr\r\nobjects\\small_metal_trash @ materials\\tin <- gamemtl.xr\r\nobjects\\small_metal_trash @ materials\\shifer <- gamemtl.xr\r\nobjects\\small_metal_trash @ materials\\wood <- gamemtl.xr\r\nobjects\\small_metal_trash @ materials\\wooden_board <- gamemtl.xr\r\nobjects\\small_metal_trash @ materials\\tree_trunk <- gamemtl.xr\r\nobjects\\small_metal_trash @ materials\\bush <- gamemtl.xr\r\nobjects\\small_metal_trash @ materials\\cloth <- gamemtl.xr\r\nobjects\\small_metal_trash @ materials\\setka_rabica <- gamemtl.xr\r\nobjects\\small_metal_trash @ materials\\glass <- gamemtl.xr\r\nobjects\\small_metal_trash @ materials\\water <- gamemtl.xr\r\n"

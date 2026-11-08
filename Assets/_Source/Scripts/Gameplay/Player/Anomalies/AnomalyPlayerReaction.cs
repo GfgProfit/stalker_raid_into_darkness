@@ -13,10 +13,13 @@ namespace RaidIntoDarkness.Player
         [SerializeField, Min(0f)] private float _awakingTime;
         [SerializeField, Min(0f)] private float _blowoutTime;
         [SerializeField, Min(0f)] private float _accumulateTime;
+        [SerializeField] private bool _ignoreSmallObjects;
+        [SerializeField] private float _smallObjectIgnoreDelay = 0.5f;
 
         private readonly Dictionary<Collider, StalkerPlayerController> _contacts = new Dictionary<Collider, StalkerPlayerController>();
         private readonly List<Collider> _expiredContacts = new List<Collider>();
         private readonly HashSet<StalkerPlayerController> _affectedPlayers = new HashSet<StalkerPlayerController>();
+        private readonly Dictionary<Collider, ProbeContact> _probeContacts = new Dictionary<Collider, ProbeContact>();
 
         private AnomalyCycle _cycle;
         private float _pulseAt;
@@ -81,6 +84,14 @@ namespace RaidIntoDarkness.Player
                 }
             }
             _contacts.Clear();
+            foreach (ProbeContact contact in _probeContacts.Values)
+            {
+                if (contact.Probe != null && _visual != null)
+                {
+                    _visual.StopContact(contact.Probe.transform);
+                }
+            }
+            _probeContacts.Clear();
             _expiredContacts.Clear();
             _affectedPlayers.Clear();
             if (_cycle != null)
@@ -98,7 +109,7 @@ namespace RaidIntoDarkness.Player
             }
 
             RemoveExpiredContacts();
-            if (_cycle.Tick(Time.time, _contacts.Count > 0))
+            if (_cycle.Tick(Time.time, _contacts.Count > 0 || HasActiveProbe()))
             {
                 _visual.PlayDischarge();
             }
@@ -120,6 +131,14 @@ namespace RaidIntoDarkness.Player
 
         private void OnTriggerExit(Collider other)
         {
+            if (_probeContacts.TryGetValue(other, out ProbeContact probeContact))
+            {
+                _probeContacts.Remove(other);
+                if (probeContact.Probe != null)
+                {
+                    _visual.StopContact(probeContact.Probe.transform);
+                }
+            }
             if (_contacts.TryGetValue(other, out StalkerPlayerController player))
             {
                 _contacts.Remove(other);
@@ -132,7 +151,7 @@ namespace RaidIntoDarkness.Player
 
         private void RegisterContact(Collider other)
         {
-            if (CanDetect == false || other == null || other.enabled == false || other.gameObject.activeInHierarchy == false || _contacts.ContainsKey(other))
+            if (CanDetect == false || other == null || other.enabled == false || other.gameObject.activeInHierarchy == false || _contacts.ContainsKey(other) || _probeContacts.ContainsKey(other))
             {
                 return;
             }
@@ -140,6 +159,7 @@ namespace RaidIntoDarkness.Player
             StalkerPlayerController player = other.GetComponentInParent<StalkerPlayerController>();
             if (player == null || player.isActiveAndEnabled == false)
             {
+                RegisterProbe(other);
                 return;
             }
 
@@ -178,6 +198,60 @@ namespace RaidIntoDarkness.Player
                     _visual.StopContact(player.transform);
                 }
             }
+            _expiredContacts.Clear();
+            foreach (KeyValuePair<Collider, ProbeContact> contact in _probeContacts)
+            {
+                if (IsProbeActive(contact.Key, contact.Value.Probe) == false)
+                {
+                    _expiredContacts.Add(contact.Key);
+                }
+                else if (contact.Value.IdleStopped == false && Time.time - contact.Value.EnteredAt > 0.1f)
+                {
+                    _visual.StopContact(contact.Value.Probe.transform);
+                    contact.Value.IdleStopped = true;
+                }
+            }
+            foreach (Collider collider in _expiredContacts)
+            {
+                ProbeContact contact = _probeContacts[collider];
+                if (contact.Probe != null)
+                {
+                    _visual.StopContact(contact.Probe.transform);
+                }
+                _probeContacts.Remove(collider);
+            }
+        }
+
+        private void RegisterProbe(Collider collider)
+        {
+            if (_probeContacts.ContainsKey(collider))
+            {
+                return;
+            }
+            AnomalyProbe probe = collider.GetComponentInParent<AnomalyProbe>();
+            if (probe == null || probe.isActiveAndEnabled == false)
+            {
+                return;
+            }
+            _probeContacts.Add(collider, new ProbeContact(probe, Time.time));
+            _visual.PlayEntrance(probe.transform);
+        }
+
+        private bool HasActiveProbe()
+        {
+            foreach (ProbeContact contact in _probeContacts.Values)
+            {
+                if (AnomalyProbe.CanActivate(Time.time - contact.EnteredAt, _ignoreSmallObjects, _smallObjectIgnoreDelay))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private static bool IsProbeActive(Collider collider, AnomalyProbe probe)
+        {
+            return collider != null && collider.enabled && collider.gameObject.activeInHierarchy && probe != null && probe.isActiveAndEnabled;
         }
 
         private void OnDischargeStarted()
@@ -228,6 +302,19 @@ namespace RaidIntoDarkness.Player
         private static bool IsContactActive(Collider collider, StalkerPlayerController player)
         {
             return collider != null && collider.enabled && collider.gameObject.activeInHierarchy && player != null && player.isActiveAndEnabled;
+        }
+
+        private sealed class ProbeContact
+        {
+            public AnomalyProbe Probe { get; }
+            public float EnteredAt { get; }
+            public bool IdleStopped { get; set; }
+
+            public ProbeContact(AnomalyProbe probe, float enteredAt)
+            {
+                Probe = probe;
+                EnteredAt = enteredAt;
+            }
         }
     }
 }

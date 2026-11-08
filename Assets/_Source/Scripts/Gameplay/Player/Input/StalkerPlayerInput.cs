@@ -28,6 +28,7 @@ namespace RaidIntoDarkness.Player
         private InputAction _fireMode;
         private InputAction _primaryWeapon;
         private InputAction _secondaryWeapon;
+        private InputAction _bolt;
         private InputAction _toggleOverlay;
         private InputAction _toggleCombat;
         private InputAction _nextOutfit;
@@ -38,12 +39,16 @@ namespace RaidIntoDarkness.Player
         public bool CaptureCursorPressed => WasPressed(_captureCursor);
         public bool FirePressed => WasPressed(_fire);
         public bool FireHeld => _fire != null && _fire.IsPressed();
+        public bool FireReleased => WasReleased(_fire);
+        public bool AimPressed => WasPressed(_aim);
+        public bool AimReleased => WasReleased(_aim);
         public bool AimHeld => _aim != null && _aim.IsPressed();
         public bool ReloadPressed => WasPressed(_reload);
         public bool NextAmmoPressed => WasPressed(_nextAmmo);
         public bool FireModePressed => WasPressed(_fireMode);
         public bool PrimaryWeaponPressed => WasPressed(_primaryWeapon);
         public bool SecondaryWeaponPressed => WasPressed(_secondaryWeapon);
+        public bool BoltPressed => WasPressed(_bolt);
         public bool ToggleOverlayPressed => WasPressed(_toggleOverlay);
         public bool ToggleCombatPressed => WasPressed(_toggleCombat);
         public bool CrouchKeyPressed => WasPressed(_crouch) || WasPressed(_lowCrouch);
@@ -77,6 +82,7 @@ namespace RaidIntoDarkness.Player
             _fireMode = player.FindAction("FireMode", true);
             _primaryWeapon = player.FindAction("PrimaryWeapon", true);
             _secondaryWeapon = player.FindAction("SecondaryWeapon", true);
+            _bolt = player.FindAction("Bolt", false);
             InputActionMap debug = _actions.FindActionMap(DEBUG_MAP, false);
             if (debug != null)
             {

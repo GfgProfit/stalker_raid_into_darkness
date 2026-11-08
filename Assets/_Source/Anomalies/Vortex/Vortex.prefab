@@ -139736,6 +139736,8 @@ MonoBehaviour:
   _awakingTime: 0.3
   _blowoutTime: 2.5
   _accumulateTime: 1
+  _ignoreSmallObjects: 1
+  _smallObjectIgnoreDelay: 0.5
 --- !u!1 &7318099957935849003
 GameObject:
   m_ObjectHideFlags: 0

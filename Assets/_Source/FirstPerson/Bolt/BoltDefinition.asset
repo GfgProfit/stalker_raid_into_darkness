@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 659528da59298634fb36c32057c3f15f, type: 3}
+  m_Name: BoltDefinition
+  m_EditorClassIdentifier: RaidIntoDarkness.FirstPerson::RaidIntoDarkness.FirstPerson.BoltDefinition
+  _hudModel: {fileID: -2791990800955563500, guid: 9b14935681a975541b518f5446d7ce0f, type: 3}
+  _projectilePrefab: {fileID: 1947686147855210964, guid: 9e8f31ae1f57be849ae5706709d058bb, type: 3}
+  _handsMotions: {fileID: 8815230551390286010, guid: 2db35e10370f36b499b31203813dbefe, type: 3}
+  _itemMotions: {fileID: 8815230551390286010, guid: e5f75a995fa5f944990a5e8493849676, type: 3}
+  _handsPosition: {x: 0.033, y: -0.155, z: -0.15}
+  _hudFieldOfView: 0.78
+  _throwReleaseTime: 0.2446667
+  _transitionDuration: 0.2
+  _draw: {fileID: -5882832242288324255, guid: 2db35e10370f36b499b31203813dbefe, type: 3}
+  _drawAlternate: {fileID: 5975186148527003257, guid: 2db35e10370f36b499b31203813dbefe, type: 3}
+  _holster: {fileID: 5011832066743288695, guid: 2db35e10370f36b499b31203813dbefe, type: 3}
+  _idle: {fileID: -3872585363658314330, guid: 2db35e10370f36b499b31203813dbefe, type: 3}
+  _moving: {fileID: 8537267993585411290, guid: 2db35e10370f36b499b31203813dbefe, type: 3}
+  _sprint: {fileID: 556868540520510436, guid: 2db35e10370f36b499b31203813dbefe, type: 3}
+  _bore: {fileID: 821681765138536043, guid: 2db35e10370f36b499b31203813dbefe, type: 3}
+  _throwBegin: {fileID: 3096706123045632850, guid: 2db35e10370f36b499b31203813dbefe, type: 3}
+  _throwIdle: {fileID: 8743286171037841231, guid: 2db35e10370f36b499b31203813dbefe, type: 3}
+  _throwEnd: {fileID: -2924317127529156319, guid: 2db35e10370f36b499b31203813dbefe, type: 3}
+  _itemIdle: {fileID: -3872585363658314330, guid: e5f75a995fa5f944990a5e8493849676, type: 3}
+  _itemFallback: {fileID: -1965084331185687820, guid: e5f75a995fa5f944990a5e8493849676, type: 3}
+  _itemDraw: {fileID: -5882832242288324255, guid: e5f75a995fa5f944990a5e8493849676, type: 3}
+  _itemDrawAlternate: {fileID: 5975186148527003257, guid: e5f75a995fa5f944990a5e8493849676, type: 3}
+  _itemBore: {fileID: 821681765138536043, guid: e5f75a995fa5f944990a5e8493849676, type: 3}
+  _drawSound: {fileID: 8300000, guid: 1d284a6169c89c5499c0155dbb360a16, type: 3}
+  _holsterSound: {fileID: 8300000, guid: 0e714b572ee7c234ebb680455faf1301, type: 3}

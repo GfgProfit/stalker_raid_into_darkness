@@ -14,6 +14,8 @@ namespace RaidIntoDarkness.Effects
         [SerializeField, Min(0f)] private float _groupDuration = 3f;
         [SerializeField] private bool _entranceEnabled;
         [SerializeField] private bool _entranceSmallOnly;
+        [SerializeField] private bool _useRootBone;
+        [SerializeField] private string _sourceEffectKey;
         [SerializeField, Min(0f)] private float _smallObjectRadius = 0.6f;
 
         private readonly List<ContactInstance> _instances = new List<ContactInstance>();
@@ -48,6 +50,19 @@ namespace RaidIntoDarkness.Effects
             Create(target, anchor, false, Quaternion.FromToRotation(Vector3.forward, direction));
         }
 
+        public void PlayIdle(Transform target)
+        {
+            if (CanPlay(target) == false)
+            {
+                return;
+            }
+            if (string.IsNullOrEmpty(_sourceEffectKey) == false && target.TryGetComponent(out AnomalyContactRegistry registry))
+            {
+                registry.Stop(_sourceEffectKey);
+            }
+            PlayHit(target);
+        }
+
         public void PlayHit(Transform target)
         {
             if (CanPlay(target) == false)
@@ -56,6 +71,10 @@ namespace RaidIntoDarkness.Effects
             }
 
             Transform anchor = ChooseAnchor(target, FindLargestRenderer(target));
+            if (string.IsNullOrEmpty(_sourceEffectKey) == false && target.TryGetComponent(out AnomalyContactRegistry registry) && registry.IsPlaying(_sourceEffectKey, anchor))
+            {
+                return;
+            }
             for (int index = _instances.Count - 1; index >= 0; index--)
             {
                 ContactInstance instance = _instances[index];
@@ -73,6 +92,10 @@ namespace RaidIntoDarkness.Effects
 
         public void StopTarget(Transform target)
         {
+            if (target != null && string.IsNullOrEmpty(_sourceEffectKey) == false && target.TryGetComponent(out AnomalyContactRegistry registry))
+            {
+                registry.Stop(_sourceEffectKey);
+            }
             for (int index = _instances.Count - 1; index >= 0; index--)
             {
                 if (_instances[index].Target == target)
@@ -87,6 +110,36 @@ namespace RaidIntoDarkness.Effects
             for (int index = _instances.Count - 1; index >= 0; index--)
             {
                 Release(index);
+            }
+        }
+
+        internal bool IsRegistrationPlaying(AnomalyContactRegistry registry, int token)
+        {
+            for (int index = _instances.Count - 1; index >= 0; index--)
+            {
+                ContactInstance instance = _instances[index];
+                if (instance.Registry == registry && instance.RegistrationToken == token)
+                {
+                    if (instance.Playback.Tick(0f))
+                    {
+                        return true;
+                    }
+                    Release(index);
+                    return false;
+                }
+            }
+            return false;
+        }
+
+        internal void StopRegistration(AnomalyContactRegistry registry, int token)
+        {
+            for (int index = _instances.Count - 1; index >= 0; index--)
+            {
+                ContactInstance instance = _instances[index];
+                if (instance.Registry == registry && instance.RegistrationToken == token)
+                {
+                    Release(index);
+                }
             }
         }
 
@@ -121,6 +174,21 @@ namespace RaidIntoDarkness.Effects
 
         private void Create(Transform target, Transform anchor, bool follow, Quaternion rotation)
         {
+            AnomalyContactRegistry registry = null;
+            int registrationToken = 0;
+            if (follow && string.IsNullOrEmpty(_sourceEffectKey) == false)
+            {
+                registry = target.GetComponent<AnomalyContactRegistry>();
+                if (registry == null)
+                {
+                    registry = target.gameObject.AddComponent<AnomalyContactRegistry>();
+                }
+                registrationToken = registry.Register(_sourceEffectKey, anchor, this);
+                if (registrationToken == 0)
+                {
+                    return;
+                }
+            }
             Vector3 position = anchor.position;
             GameObject root = Instantiate(_template, position, rotation);
             root.name = "AnomalyContactEffect";
@@ -131,17 +199,26 @@ namespace RaidIntoDarkness.Effects
             AnomalyParticlePlayback playback = new AnomalyParticlePlayback(root, _rootIndex, _stopEffectIndices, _stopTimes, _groupDuration);
             if (playback.IsValid == false || playback.Play() == false)
             {
+                if (registry != null)
+                {
+                    registry.Forget(registrationToken, this);
+                }
                 playback.Stop();
                 Destroy(root);
                 Debug.LogError("Anomaly contact template has invalid ParticleSystem bindings.", this);
                 return;
             }
-            _instances.Add(new ContactInstance(playback, target, anchor, position, rotation, follow));
+            _instances.Add(new ContactInstance(playback, target, anchor, position, rotation, follow, registry, registrationToken));
         }
 
         private void Release(int index)
         {
-            AnomalyParticlePlayback playback = _instances[index].Playback;
+            ContactInstance instance = _instances[index];
+            if (instance.Registry != null)
+            {
+                instance.Registry.Forget(instance.RegistrationToken, this);
+            }
+            AnomalyParticlePlayback playback = instance.Playback;
             playback.Stop();
             if (playback.Root != null)
             {
@@ -193,8 +270,12 @@ namespace RaidIntoDarkness.Effects
             return radius;
         }
 
-        private static Transform ChooseAnchor(Transform target, SkinnedMeshRenderer renderer)
+        private Transform ChooseAnchor(Transform target, SkinnedMeshRenderer renderer)
         {
+            if (_useRootBone)
+            {
+                return renderer != null && renderer.rootBone != null && renderer.rootBone.IsChildOf(target) ? renderer.rootBone : target;
+            }
             if (renderer != null)
             {
                 Transform[] bones = renderer.bones;
@@ -222,8 +303,10 @@ namespace RaidIntoDarkness.Effects
             public Vector3 Position { get; }
             public Quaternion Rotation { get; }
             public bool Follow { get; }
+            public AnomalyContactRegistry Registry { get; }
+            public int RegistrationToken { get; }
 
-            public ContactInstance(AnomalyParticlePlayback playback, Transform target, Transform anchor, Vector3 position, Quaternion rotation, bool follow)
+            public ContactInstance(AnomalyParticlePlayback playback, Transform target, Transform anchor, Vector3 position, Quaternion rotation, bool follow, AnomalyContactRegistry registry, int registrationToken)
             {
                 Playback = playback;
                 Target = target;
@@ -231,6 +314,8 @@ namespace RaidIntoDarkness.Effects
                 Position = position;
                 Rotation = rotation;
                 Follow = follow;
+                Registry = registry;
+                RegistrationToken = registrationToken;
             }
         }
     }

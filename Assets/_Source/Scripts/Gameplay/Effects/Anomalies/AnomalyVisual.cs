@@ -137,7 +137,7 @@ namespace RaidIntoDarkness.Effects
             AnomalyContactEffects idle = small && _smallIdleContactEffects != null ? _smallIdleContactEffects : _idleContactEffects;
             if (idle != null)
             {
-                idle.PlayHit(target);
+                idle.PlayIdle(target);
             }
         }
 

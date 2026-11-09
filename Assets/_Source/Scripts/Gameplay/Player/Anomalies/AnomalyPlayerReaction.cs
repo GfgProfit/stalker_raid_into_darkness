@@ -14,6 +14,8 @@ namespace RaidIntoDarkness.Player
         [SerializeField, Min(0f)] private float _accumulateTime;
         [SerializeField] private bool _ignoreSmallObjects;
         [SerializeField] private float _smallObjectIgnoreDelay = 0.5f;
+        [SerializeField] private float _nonlivingIdleStopDelay = 0.1f;
+        [SerializeField] private bool _repeatNonlivingIdleStop;
         [SerializeField] private bool _randomizeRadius;
         [SerializeField, Min(0)] private int _randomRadiusMin = 2;
         [SerializeField, Min(0)] private int _randomRadiusMax = 3;
@@ -231,7 +233,7 @@ namespace RaidIntoDarkness.Player
                 {
                     _expiredContacts.Add(contact.Key);
                 }
-                else if (contact.Value.IdleStopped == false && Time.time - contact.Value.EnteredAt > 0.1f)
+                else if ((contact.Value.IdleStopped == false || _repeatNonlivingIdleStop) && _nonlivingIdleStopDelay >= 0f && Time.time - contact.Value.EnteredAt > _nonlivingIdleStopDelay)
                 {
                     _visual.StopContact(contact.Value.Probe.transform, true);
                     contact.Value.IdleStopped = true;

@@ -34,6 +34,9 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
     public sealed class XRayParticleGroupEffectData
     {
         public string EffectName { get; set; }
+        public string OnPlayChild { get; set; } = string.Empty;
+        public string OnBirthChild { get; set; } = string.Empty;
+        public string OnDeathChild { get; set; } = string.Empty;
         public float Time0 { get; set; }
         public float Time1 { get; set; }
         public uint Flags { get; set; }
@@ -276,9 +279,9 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
                 for (uint i = 0; i < count; i++)
                 {
                     var effect = new XRayParticleGroupEffectData { EffectName = StringZ(data, p, out p) };
-                    StringZ(data, p, out p);
-                    StringZ(data, p, out p);
-                    StringZ(data, p, out p);
+                    effect.OnPlayChild = StringZ(data, p, out p);
+                    effect.OnBirthChild = StringZ(data, p, out p);
+                    effect.OnDeathChild = StringZ(data, p, out p);
                     effect.Time0 = Float(data, ref p);
                     effect.Time1 = Float(data, ref p);
                     effect.Flags = BitConverter.ToUInt32(data, p);

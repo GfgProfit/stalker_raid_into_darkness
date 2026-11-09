@@ -1,0 +1,93 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: SpatialBubbleMesh
+  m_Shader: {fileID: 4800000, guid: 6117f643423ac824a8afabd926fdcd4d, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 1
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: 3000
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _DestinationViewTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _BubbleCharge: 0
+    - _BubbleFlowOffset: 0
+    - _BubbleImpact: 0
+    - _BubbleProximity: 0
+    - _ChargeBoost: 1.4
+    - _ChargeContraction: 0.2
+    - _CoreDistortionPixels: 16
+    - _CoreEnergyFade: 1
+    - _CoreRadius: 1
+    - _CoreSoftness: 0.652
+    - _Density: 0.55
+    - _DepthFade: 2.5
+    - _DestinationChromaticAberrationEnabled: 1
+    - _DestinationChromaticAberrationPixels: 2
+    - _DestinationEdgeStart: 0.55
+    - _DestinationGrainEnabled: 1
+    - _DestinationGrainSize: 1
+    - _DestinationGrainStrength: 0.12
+    - _DestinationOpacity: 1
+    - _DestinationViewAspect: 1
+    - _DestinationViewAvailable: 0
+    - _DestinationViewBlend: 1
+    - _DestinationViewHeightOffset: 3
+    - _DestinationViewParallax: 0
+    - _DistortionOpacity: 1
+    - _DistortionPixels: 3
+    - _FlowSpeed: 3
+    - _ImpactBoost: 4
+    - _ImpactCollapse: 0.345
+    - _Intensity: 1.4
+    - _LiveEdgeAmount: 0.2
+    - _LiveEdgeEnabled: 1
+    - _LiveEdgeGlow: 3
+    - _LiveEdgeScale: 20
+    - _LiveEdgeSpeed: 3
+    - _LiveEdgeWidth: 0.005
+    - _NoiseScale: 3.2
+    - _OuterFadeDistortion: 1
+    - _OuterFadeEnabled: 1
+    - _OuterFadeInsideTransition: 0.08
+    - _OuterFadePower: 1.25
+    - _OuterFadeShell: 1
+    - _OuterFadeView: 1
+    - _OuterFadeWidth: 0.2
+    - _ProximityBoost: 1.11
+    - _ReactionEnabled: 1
+    - _RimOpacity: 0.4
+    - _RimPower: 3
+    - _ShellOpacity: 1
+    - _Warp: 0.025
+    - _WaveEmission: 0.3
+    - _WaveInterval: 3.4
+    - _WaveSpeed: 0.8
+    - _WaveStrength: 16
+    - _WaveWidth: 0.12
+    - _WavesEnabled: 1
+    m_Colors:
+    - _EnergyColor: {r: 0.38823533, g: 0.758188, b: 1, a: 1}
+    - _VolumeColor: {r: 0.42745098, g: 0.533333, b: 0.62745106, a: 1}
+    - _WarmColor: {r: 0.792157, g: 0.26274496, b: 0.26274496, a: 1}
+  m_BuildTextureStacks: []
+  m_AllowLocking: 1

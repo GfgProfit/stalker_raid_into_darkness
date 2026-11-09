@@ -4,6 +4,8 @@ Shader "RaidIntoDarkness/Anomalies/ElectraDistortion"
     {
         _MainTex("Distortion", 2D) = "gray" {}
         _Strength("Strength In Pixels", Range(0, 16)) = 3
+        _FrameSize("Frame Size", Vector) = (1, 1, 0, 0)
+        _FrameColumns("Frame Columns", Float) = 1
     }
 
     SubShader
@@ -48,13 +50,15 @@ Shader "RaidIntoDarkness/Anomalies/ElectraDistortion"
             CBUFFER_START(UnityPerMaterial)
                 float4 _MainTex_ST;
                 float _Strength;
+                float4 _FrameSize;
+                float _FrameColumns;
             CBUFFER_END
 
             struct Attributes
             {
                 float3 positionOS : POSITION;
                 float4 color : COLOR;
-                float2 uv : TEXCOORD0;
+                float3 uv : TEXCOORD0;
             };
 
             struct Varyings
@@ -69,7 +73,15 @@ Shader "RaidIntoDarkness/Anomalies/ElectraDistortion"
                 Varyings output;
                 output.positionCS = TransformWorldToHClip(TransformObjectToWorld(input.positionOS));
                 output.color = input.color;
-                output.uv = input.uv;
+                output.uv = input.uv.xy;
+                if (_FrameSize.x != 1.0 || _FrameSize.y != 1.0)
+                {
+                    float frame = input.uv.z;
+                    float columns = max(1.0, _FrameColumns);
+                    float2 origin = float2(fmod(frame, columns), floor(frame / columns)) * _FrameSize.xy;
+                    float2 xray = origin + float2(input.uv.x, 1.0 - input.uv.y) * _FrameSize.xy;
+                    output.uv = float2(xray.x, 1.0 - xray.y);
+                }
                 return output;
             }
 

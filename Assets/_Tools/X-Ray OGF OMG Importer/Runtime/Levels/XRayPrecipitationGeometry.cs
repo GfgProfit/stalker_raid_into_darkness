@@ -119,7 +119,7 @@ namespace XRay.Importer.Levels
             {
                 signature = signature * 31 + (material != null ? material.GetEntityId().GetHashCode() : 0);
                 if (material == null) return signature;
-                Texture texture = material.HasProperty("_BaseColorMap") ? material.GetTexture("_BaseColorMap") : material.mainTexture;
+                Texture texture = ResolveTexture(material);
                 signature = signature * 31 + (texture != null ? texture.GetEntityId().GetHashCode() : 0);
                 signature = signature * 31 + material.renderQueue;
                 signature = signature * 31 + (material.HasProperty("_AlphaCutoff") ? material.GetFloat("_AlphaCutoff").GetHashCode() : 0);
@@ -131,6 +131,22 @@ namespace XRay.Importer.Levels
                 }
                 return signature;
             }
+        }
+
+        private static Texture ResolveTexture(Material material)
+        {
+            Shader shader = material.shader;
+            if (shader == null) return null;
+            if (material.HasProperty("_BaseColorMap")) return material.GetTexture("_BaseColorMap");
+            int count = shader.GetPropertyCount();
+            for (int index = 0; index < count; index++)
+            {
+                if (shader.GetPropertyType(index) == ShaderPropertyType.Texture && (shader.GetPropertyFlags(index) & ShaderPropertyFlags.MainTexture) != 0)
+                {
+                    return material.GetTexture(shader.GetPropertyNameId(index));
+                }
+            }
+            return material.HasProperty("_MainTex") ? material.GetTexture("_MainTex") : null;
         }
 
         private static Material ResolveMaterial(XRayLevelInstancedRenderer renderer, Material material)
@@ -235,7 +251,7 @@ namespace XRay.Importer.Levels
             if (source == null || source.renderQueue >= (int)RenderQueue.Transparent || source.shader == null || source.shader.name.IndexOf("Sky", StringComparison.OrdinalIgnoreCase) >= 0) return false;
             if (source.HasProperty("_SurfaceType") && source.GetFloat("_SurfaceType") > 0.5f) return false;
             properties = new MaterialPropertyBlock();
-            Texture texture = source.HasProperty("_BaseColorMap") ? source.GetTexture("_BaseColorMap") : source.mainTexture;
+            Texture texture = ResolveTexture(source);
             properties.SetTexture(_textureId, texture != null ? texture : Texture2D.whiteTexture);
             Vector2 scale = source.HasProperty("_BaseColorMap") ? source.GetTextureScale("_BaseColorMap") : Vector2.one;
             Vector2 offset = source.HasProperty("_BaseColorMap") ? source.GetTextureOffset("_BaseColorMap") : Vector2.zero;

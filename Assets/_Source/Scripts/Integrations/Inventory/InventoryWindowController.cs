@@ -375,9 +375,9 @@ namespace RaidIntoDarkness.Integrations.Inventory
                 _weaponBinder.Refresh();
             }
 
-            if (_player != null && _player.HudAnimator != null && _player.HudAnimator.Library != null)
+            if (weapons != null || (_player != null && _player.HudAnimator != null && _player.HudAnimator.Library != null))
             {
-                _equipmentAnimations = new EquipmentAnimationQueue(_window, _player);
+                _equipmentAnimations = new EquipmentAnimationQueue(_window, _player, weapons);
             }
 
             if (_player != null && _player.Motor != null && _player.Motor.Condition != null)

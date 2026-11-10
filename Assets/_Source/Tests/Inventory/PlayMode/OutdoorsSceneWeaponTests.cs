@@ -610,9 +610,33 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
 
             yield return Tap(_keyboard.rKey);
             Assert.That(weapons.State, Is.EqualTo(FirstPersonWeaponState.Reloading));
+            WorldItem reloadPickup = interactor.Spawn(FindWorldDefinition("ammo_5.56x45_fmj"), 1);
+            Assert.That(reloadPickup, Is.Not.Null);
+            reloadPickup.GetComponent<Rigidbody>().isKinematic = true;
+            Transform pickupView = player.CameraController.Camera.transform;
+            Vector3 pickupOffset = reloadPickup.GetComponent<Collider>().bounds.center - reloadPickup.transform.position;
+            reloadPickup.transform.position = pickupView.position + pickupView.forward * 1.2f - pickupOffset;
+            Physics.SyncTransforms();
+            Assert.That(interactor.FindTarget(), Is.SameAs(reloadPickup));
+            Assert.That(interactor.BeginPickUp(reloadPickup), Is.False, "pickup started during reload");
+            Assert.That(interactor.TryPickUp(reloadPickup), Is.False, "direct pickup bypassed reload");
+            yield return Tap(_keyboard.fKey);
+            Assert.That(interactor.IsPickingUp, Is.False, "F started pickup during reload");
+            Assert.That(player.Pickup.IsPlaying, Is.False);
+            Assert.That(window.Hint, Is.Empty, "pickup hint remains visible during reload");
+            Assert.That(reloadPickup != null && reloadPickup.gameObject.activeSelf, Is.True);
             yield return WaitWhile(() => weapons.State != FirstPersonWeaponState.Ready, 8.0f);
             Assert.That(weapons.Magazine, Is.EqualTo(30));
             Assert.That(weapons.Reserve, Is.EqualTo(afterBurst));
+            yield return null;
+            Assert.That(interactor.IsPickingUp, Is.False, "blocked F was queued until reload completed");
+            Assert.That(reloadPickup != null && reloadPickup.gameObject.activeSelf, Is.True);
+            reloadPickup.transform.position = pickupView.position + pickupView.forward * 1.2f - pickupOffset;
+            Physics.SyncTransforms();
+            yield return Tap(_keyboard.fKey);
+            Assert.That(interactor.IsPickingUp, Is.True, "F did not resume after reload");
+            yield return WaitWhile(() => interactor.IsPickingUp);
+            Assert.That(reloadPickup == null, Is.True, "pickup after reload did not take the item");
 
             Transform finger = FindChild(player.Rig.Hands.transform, LEFT_FINGER);
             Assert.That(finger, Is.Not.Null, "hands have no " + LEFT_FINGER);

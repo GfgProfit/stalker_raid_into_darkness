@@ -1,6 +1,7 @@
 using Inventory;
 using Inventory.UI;
 using RaidIntoDarkness.FirstPerson;
+using RaidIntoDarkness.Weapons;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -74,7 +75,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
 
         public bool BeginPickUp(WorldItem worldItem)
         {
-            if (worldItem == null || _pickupPending)
+            if (worldItem == null || _pickupPending || IsReloading())
             {
                 return false;
             }
@@ -104,7 +105,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
 
         public bool TryPickUp(WorldItem worldItem)
         {
-            if (worldItem == null || worldItem.Definition == null || _controller == null || _controller.Inventory == null || _controller.Window == null)
+            if (worldItem == null || worldItem.Definition == null || _controller == null || _controller.Inventory == null || _controller.Window == null || IsReloading())
             {
                 return false;
             }
@@ -221,7 +222,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
                 return;
             }
 
-            if (_controller.IsOpen || _controller.GameplayBlocked)
+            if (_controller.IsOpen || _controller.GameplayBlocked || IsReloading())
             {
                 SetHintTarget(null);
                 return;
@@ -290,6 +291,8 @@ namespace RaidIntoDarkness.Integrations.Inventory
                 _controller.ItemSounds.PlayTake(item);
             }
         }
+
+        private bool IsReloading() => _controller != null && _controller.Player != null && _controller.Player.Rig != null && _controller.Player.Rig.HandsOwner is FirstPersonWeaponController weapon && weapon.State == FirstPersonWeaponState.Reloading;
 
         private FirstPersonPickupAnimator GetPickupAnimator() => _controller != null && _controller.Player != null ? _controller.Player.Pickup : null;
 

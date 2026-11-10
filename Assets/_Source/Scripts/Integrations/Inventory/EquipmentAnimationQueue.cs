@@ -4,6 +4,7 @@ using Inventory;
 using Inventory.UI;
 using RaidIntoDarkness.FirstPerson;
 using RaidIntoDarkness.Player;
+using RaidIntoDarkness.Weapons;
 using UnityEngine;
 
 namespace RaidIntoDarkness.Integrations.Inventory
@@ -29,7 +30,8 @@ namespace RaidIntoDarkness.Integrations.Inventory
         {
             Move,
             Animation,
-            Fade
+            Fade,
+            WeaponHolster
         }
 
         private sealed class Request
@@ -51,10 +53,12 @@ namespace RaidIntoDarkness.Integrations.Inventory
             public bool FadeStarted { get; set; }
             public bool FadeStopped { get; set; }
             public float Time { get; set; }
+            public ItemInstance Item { get; set; }
         }
 
         private readonly InventoryWindow _window;
         private readonly StalkerPlayerController _player;
+        private readonly FirstPersonWeaponController _weapons;
         private readonly Func<ItemInstance, InventoryItemDecoration> _decorator;
         private readonly Queue<Request> _requests = new Queue<Request>();
         private readonly Queue<Step> _steps = new Queue<Step>();
@@ -62,10 +66,11 @@ namespace RaidIntoDarkness.Integrations.Inventory
         private readonly List<string> _outfitMemory = new List<string>();
         private string _community = FirstPersonEquipmentAnimationLibrary.DEFAULT_COMMUNITY;
 
-        public EquipmentAnimationQueue(InventoryWindow window, StalkerPlayerController player)
+        public EquipmentAnimationQueue(InventoryWindow window, StalkerPlayerController player, FirstPersonWeaponController weapons = null)
         {
             _window = window;
             _player = player;
+            _weapons = weapons;
             _decorator = window.ItemDecorator;
             _window.ItemDecorator = Decorate;
             _window.EquipmentGate = this;
@@ -88,14 +93,14 @@ namespace RaidIntoDarkness.Integrations.Inventory
 
         public bool HandleEquip(ItemInstance item, SlotDefinition slot)
         {
+            if (IsInUse(item))
+            {
+                return true;
+            }
+
             if (IsAnimated(item) == false || _window.IsEquipped(item))
             {
                 return false;
-            }
-
-            if (_inUse.Contains(item))
-            {
-                return true;
             }
 
             if (_window.CanEquipItem(item) == false)
@@ -109,31 +114,33 @@ namespace RaidIntoDarkness.Integrations.Inventory
 
         public bool HandleUnequip(ItemInstance item, InventoryUnequipTarget target)
         {
+            if (IsInUse(item))
+            {
+                return true;
+            }
+
             if (IsAnimated(item) == false || _window.IsEquipped(item) == false)
             {
                 return false;
             }
 
-            if (_inUse.Contains(item) == false)
-            {
-                Enqueue(new Request { Kind = RequestKind.Unequip, Item = item, Target = target });
-            }
-
+            Enqueue(new Request { Kind = RequestKind.Unequip, Item = item, Target = target });
             return true;
         }
 
         public bool HandleDrop(ItemInstance item)
         {
+            if (IsInUse(item))
+            {
+                return true;
+            }
+
             if (IsAnimated(item) == false || _window.IsEquipped(item) == false)
             {
                 return false;
             }
 
-            if (_inUse.Contains(item) == false)
-            {
-                Enqueue(new Request { Kind = RequestKind.Drop, Item = item });
-            }
-
+            Enqueue(new Request { Kind = RequestKind.Drop, Item = item });
             return true;
         }
 
@@ -183,6 +190,11 @@ namespace RaidIntoDarkness.Integrations.Inventory
 
         private bool IsAnimated(ItemInstance item)
         {
+            if (IsWeaponInHands(item))
+            {
+                return true;
+            }
+
             FirstPersonEquipmentAnimationLibrary library = Library;
             if (item == null || library == null)
             {
@@ -201,6 +213,18 @@ namespace RaidIntoDarkness.Integrations.Inventory
             }
 
             return definition.IsCategory(EquipmentStatsFormatter.BACKPACK_CATEGORY) && library.BackpackEnabled;
+        }
+
+        private bool IsWeaponInHands(ItemInstance item)
+        {
+            if (item == null || _weapons == null || _weapons.State == FirstPersonWeaponState.Hidden || _weapons.ActiveSlot < 0)
+            {
+                return false;
+            }
+
+            SlottedContainer equipment = _window.Model?.GetContainer(_window.EquipmentContainerId) as SlottedContainer;
+            string slotId = _weapons.ActiveSlot == FirstPersonWeaponController.PRIMARY_SLOT ? FirstPersonWeaponBinder.PRIMARY_SLOT : FirstPersonWeaponBinder.SECONDARY_SLOT;
+            return equipment != null && equipment.GetSlotOccupant(slotId) == item;
         }
 
         private void Enqueue(Request request)
@@ -231,7 +255,12 @@ namespace RaidIntoDarkness.Integrations.Inventory
             }
 
             ItemDefinition definition = item.Definition;
-            if (definition.IsCategory(EquipmentStatsFormatter.OUTFIT_CATEGORY))
+            if (definition.GetComponent<WeaponHudComponent>() != null)
+            {
+                _steps.Enqueue(new Step { Kind = StepKind.WeaponHolster, Item = item });
+                AddMove(request);
+            }
+            else if (definition.IsCategory(EquipmentStatsFormatter.OUTFIT_CATEGORY))
             {
                 ExpandOutfit(request);
             }
@@ -405,6 +434,14 @@ namespace RaidIntoDarkness.Integrations.Inventory
                     return true;
                 case StepKind.Fade:
                     return AdvanceFade(step, deltaTime);
+                case StepKind.WeaponHolster:
+                    if (IsWeaponInHands(step.Item))
+                    {
+                        _weapons.Holster();
+                        return IsWeaponInHands(step.Item) == false;
+                    }
+
+                    return true;
                 default:
                     return AdvanceAnimation(step, deltaTime);
             }

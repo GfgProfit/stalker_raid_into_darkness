@@ -9,6 +9,8 @@ namespace RaidIntoDarkness.Player
         private const float EPS = 0.0000001f;
         private const string STAMINA_SPEED_KEY = "ASS_speed_stamina";
         private const string HILL_SPEED_KEY = "ASS_speed_hill";
+        private const string MATERIAL_SPEED_KEY = "ASS_speed";
+        private const float MATERIAL_POWER_SCALE = 0.005f;
 
         [SerializeField] private StalkerMovementProfile _profile;
         [SerializeField] private MonoBehaviour _carryWeightSource;
@@ -36,6 +38,7 @@ namespace RaidIntoDarkness.Player
         private float _runCoef;
         private float _runBackCoef;
         private float _sprintKoef;
+        private StalkerSurfaceType _footstepSurface;
 
         public float Power => _power;
         public float MaxPower => _maxPower;
@@ -71,6 +74,21 @@ namespace RaidIntoDarkness.Player
         public void SetPower(float power)
         {
             _power = Mathf.Clamp(power, 0.0f, _maxPower);
+        }
+
+        public void SetFootstepSurface(StalkerSurfaceType surface)
+        {
+            _footstepSurface = surface;
+            if (_profile.StaminaMod.EnableMaterialDrain)
+            {
+                _runModifiers[MATERIAL_SPEED_KEY] = GetMaterialSpeed();
+            }
+            else
+            {
+                _runModifiers.Remove(MATERIAL_SPEED_KEY);
+            }
+
+            RecalculateSpeeds();
         }
 
         public void SetSpeedModifier(string key, float multiplier, bool sprint)
@@ -220,6 +238,11 @@ namespace RaidIntoDarkness.Player
                     _runModifiers[HILL_SPEED_KEY] = 1.0f - difference * coeff * values.UphillSpeedModifierModifier;
                 }
 
+                if (values.EnableMaterialDrain && realFlags.Has(StalkerMoveFlags.AnyMove))
+                {
+                    _power = Mathf.Clamp(_power + GetMaterialPower() * MATERIAL_POWER_SCALE * values.MaterialDrainModifier, 0.0f, _maxPower);
+                }
+
                 if (values.EnableStaminaSpeedModifier)
                 {
                     float normalized = (_power - values.PowerSpeedMin) / (values.PowerSpeedMax - values.PowerSpeedMin);
@@ -228,6 +251,64 @@ namespace RaidIntoDarkness.Player
 
                 _lastPositionY = positionY;
                 RecalculateSpeeds();
+            }
+        }
+
+        private float GetMaterialSpeed()
+        {
+            switch (_footstepSurface)
+            {
+                case StalkerSurfaceType.Bush:
+                case StalkerSurfaceType.BushSux:
+                    return 0.85f;
+                case StalkerSurfaceType.Water:
+                    return 0.8f;
+                case StalkerSurfaceType.Asphalt:
+                    return 1.055f;
+                case StalkerSurfaceType.Concrete:
+                case StalkerSurfaceType.Stucco:
+                    return 1.04f;
+                case StalkerSurfaceType.Metal:
+                case StalkerSurfaceType.MetalPipe:
+                case StalkerSurfaceType.MetalPlate:
+                case StalkerSurfaceType.Wood:
+                case StalkerSurfaceType.WoodenBoard:
+                case StalkerSurfaceType.FlooringTile:
+                    return 1.025f;
+                case StalkerSurfaceType.Earth:
+                    return 0.98f;
+                case StalkerSurfaceType.Grass:
+                    return 0.97f;
+                default:
+                    return 1.0f;
+            }
+        }
+
+        private float GetMaterialPower()
+        {
+            switch (_footstepSurface)
+            {
+                case StalkerSurfaceType.Bush:
+                case StalkerSurfaceType.BushSux:
+                    return -0.12f;
+                case StalkerSurfaceType.Water:
+                    return -0.15f;
+                case StalkerSurfaceType.Asphalt:
+                    return 0.035f;
+                case StalkerSurfaceType.Concrete:
+                case StalkerSurfaceType.Stucco:
+                    return 0.0275f;
+                case StalkerSurfaceType.Metal:
+                case StalkerSurfaceType.MetalPipe:
+                case StalkerSurfaceType.MetalPlate:
+                case StalkerSurfaceType.Wood:
+                case StalkerSurfaceType.WoodenBoard:
+                case StalkerSurfaceType.FlooringTile:
+                    return 0.015f;
+                case StalkerSurfaceType.Grass:
+                    return -0.02f;
+                default:
+                    return 0.0f;
             }
         }
 

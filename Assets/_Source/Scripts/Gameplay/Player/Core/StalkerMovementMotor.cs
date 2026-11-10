@@ -47,6 +47,7 @@ namespace RaidIntoDarkness.Player
         private bool _climbingUp;
         private Vector3 _anomalyControl;
         private bool _anomalyLaunchActive;
+        private float _physicsRemainder;
 
         public event Action JumpStarted;
         public event Action LeftGround;
@@ -99,6 +100,7 @@ namespace RaidIntoDarkness.Player
             _fallTime = profile.Engine.FallTime;
             _jumpTime = 0.0f;
             _real = StalkerMoveFlags.None;
+            _physicsRemainder = 0f;
         }
 
         public void SetView(float yaw, Vector3 cameraDirection)
@@ -167,12 +169,11 @@ namespace RaidIntoDarkness.Player
             }
 
             float fixedStep = _profile.Engine.FixedStep;
-            float remaining = deltaTime;
-            while (remaining > EPS)
+            _physicsRemainder += deltaTime;
+            while (_physicsRemainder + EPS >= fixedStep)
             {
-                float step = Mathf.Min(fixedStep, remaining);
-                PhysicsStep(step);
-                remaining -= step;
+                PhysicsStep(fixedStep);
+                _physicsRemainder = Mathf.Max(0f, _physicsRemainder - fixedStep);
             }
 
             _actualVelocity = _physics.Velocity.magnitude;

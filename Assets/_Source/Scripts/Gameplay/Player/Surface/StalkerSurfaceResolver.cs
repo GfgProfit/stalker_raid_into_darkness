@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using XRay.Importer.Levels;
 
 namespace RaidIntoDarkness.Player
 {
@@ -37,8 +38,44 @@ namespace RaidIntoDarkness.Player
 
         public StalkerSurfaceAudioLibrary Library => _library;
 
+        public StalkerSurfaceType Resolve(RaycastHit hit, out StalkerSurfaceSource source)
+        {
+            StalkerSurfaceType type = ResolveComponent(hit.collider, out bool hasComponent);
+            if (hasComponent)
+            {
+                source = StalkerSurfaceSource.Component;
+                return type;
+            }
+
+            if (XRayLevelContactSource.TryResolveMaterial(hit, out var material) && StalkerSurfaceTypes.TryGetType(material.Name, out type))
+            {
+                source = StalkerSurfaceSource.XRayMaterial;
+                return type;
+            }
+
+            return ResolveMappings(hit.collider, hit.point, out source);
+        }
+
         public StalkerSurfaceType Resolve(Collider collider, Vector3 point, out StalkerSurfaceSource source)
         {
+            StalkerSurfaceType type = ResolveComponent(collider, out bool hasComponent);
+            if (hasComponent)
+            {
+                source = StalkerSurfaceSource.Component;
+                return type;
+            }
+
+            return ResolveMappings(collider, point, out source);
+        }
+
+        private StalkerSurfaceType ResolveComponent(Collider collider, out bool hasComponent)
+        {
+            hasComponent = false;
+            if (collider == null)
+            {
+                return StalkerSurfaceType.Default;
+            }
+
             if (!_components.TryGetValue(collider, out StalkerSurface surface))
             {
                 surface = collider.GetComponentInParent<StalkerSurface>();
@@ -47,8 +84,19 @@ namespace RaidIntoDarkness.Player
 
             if (surface != null)
             {
-                source = StalkerSurfaceSource.Component;
+                hasComponent = true;
                 return surface.Type;
+            }
+
+            return StalkerSurfaceType.Default;
+        }
+
+        private StalkerSurfaceType ResolveMappings(Collider collider, Vector3 point, out StalkerSurfaceSource source)
+        {
+            if (collider == null)
+            {
+                source = StalkerSurfaceSource.None;
+                return _library != null ? _library.FallbackSurface : StalkerSurfaceType.Earth;
             }
 
             PhysicsMaterial material = collider.sharedMaterial;

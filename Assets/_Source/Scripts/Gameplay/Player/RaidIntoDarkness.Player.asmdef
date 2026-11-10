@@ -5,6 +5,7 @@
         "RaidIntoDarkness.Effects",
         "RaidIntoDarkness.FirstPerson",
         "XRay.Importer.Runtime",
+        "XRay.Importer.Core",
         "Unity.InputSystem",
         "Unity.RenderPipelines.Core.Runtime",
         "Unity.RenderPipelines.HighDefinition.Runtime"

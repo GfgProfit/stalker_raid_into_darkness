@@ -1644,7 +1644,14 @@ namespace XRay.Importer.Editor.Levels
                 return;
             }
 
-            _content.Collision.AddRange(XRayLevelCollisionBuilder.Build(_entry.Name, _collision, _passable, _request.Settings.CollisionChunkSize, _record));
+            XRayGameMaterials materials = XRayLevelSourceCache.GetGameMaterials(_info, _record.Warnings);
+            bool[] actorPassable = materials != null ? materials.CreateActorPassableMask() : _passable;
+            _content.Collision.AddRange(XRayLevelCollisionBuilder.Build(_entry.Name, _collision, actorPassable, _request.Settings.CollisionChunkSize, _record));
+            if (_passable != null)
+            {
+                byte[] materialData = _info.Effective != null ? _info.ReadAllBytes("gamemtl.xr") : File.ReadAllBytes(_info.GameMaterialsPath);
+                XRayLevelContactImporter.Prepare(_entry.Name, LevelFile("level.cform"), materialData, _content, _record);
+            }
         }
 
         private void BuildScene()

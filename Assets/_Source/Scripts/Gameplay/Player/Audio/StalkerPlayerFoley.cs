@@ -59,7 +59,7 @@ namespace RaidIntoDarkness.Player
             FootstepCount++;
             StalkerSurfaceSounds surface = _library.GetSurface(surfaceType);
             string fallback = string.Empty;
-            if (!HasFootsteps(surface))
+            if (surface == null || (!HasFootsteps(surface) && _detector.CurrentSource != StalkerSurfaceSource.XRayMaterial))
             {
                 surface = _library.GetSurface(_library.FallbackSurface);
                 fallback = $" -> fallback {_library.FallbackSurface} (no original clips)";

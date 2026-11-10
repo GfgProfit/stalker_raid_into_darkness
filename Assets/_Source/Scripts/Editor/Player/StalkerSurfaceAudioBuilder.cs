@@ -82,6 +82,8 @@ namespace RaidIntoDarkness.Player.Editor
                     {
                         Queue(sources, "sounds\\" + sound + ".ogg", "Footsteps/" + sound + ".ogg", surface.PairStepClips, imported);
                     }
+
+                    QueueContacts(sources, surface, pair, imported, log);
                 }
 
                 log.AppendLine($"{materialName}: pair [{ACTOR_MATERIAL}] step_sounds {(pair == null ? "pair absent" : $"{StalkerGameMtlLibrary.SplitSounds(pair.StepSounds).Count} files <- {pair.Origin}")}");
@@ -156,6 +158,71 @@ namespace RaidIntoDarkness.Player.Editor
             EditorUtility.SetDirty(library);
             AssetDatabase.SaveAssets();
             return library;
+        }
+
+        public static bool BuildContactSounds(out string report)
+        {
+            var log = new StringBuilder();
+            StalkerXRaySources sources = StalkerXRaySources.Open(INDEX_SCOPE, out string error);
+            var library = AssetDatabase.LoadAssetAtPath<StalkerSurfaceAudioLibrary>(LIBRARY_PATH);
+            if (sources == null || library == null)
+            {
+                report = sources == null ? error : "Missing surface audio library: " + LIBRARY_PATH;
+                return false;
+            }
+
+            log.AppendLine(sources.Describe());
+            StalkerGameMtlLibrary materials = StalkerGameMtlLibrary.Load(sources);
+            if (materials == null)
+            {
+                report = "gamemtl.xr not found in the active MO2 profile.";
+                return false;
+            }
+
+            foreach (string line in materials.Log)
+            {
+                log.AppendLine(line);
+            }
+
+            var imported = new List<KeyValuePair<List<AudioClip>, string>>();
+            var surfaces = new List<StalkerSurfaceSounds>(library.Surfaces);
+            for (int i = 0; i < StalkerSurfaceTypes.Count; i++)
+            {
+                var type = (StalkerSurfaceType)i;
+                StalkerSurfaceSounds surface = surfaces.Find(item => item.Type == type);
+                if (surface == null)
+                {
+                    surface = new StalkerSurfaceSounds(type, StalkerSurfaceTypes.GetMaterialName(type));
+                    surfaces.Add(surface);
+                }
+
+                surface.CollideClips.Clear();
+                StalkerGameMtlPair pair = materials.FindPair(ACTOR_MATERIAL, surface.MaterialName);
+                if (pair != null)
+                {
+                    QueueContacts(sources, surface, pair, imported, log);
+                }
+            }
+
+            ImportAudio(imported, log);
+            library.SetImportedSurfaces(surfaces);
+            EditorUtility.SetDirty(library);
+            AssetDatabase.SaveAssetIfDirty(library);
+            StalkerSurfaceSounds bush = library.GetSurface(StalkerSurfaceType.Bush);
+            bool success = bush != null && bush.CollideClips.Count > 0;
+            log.AppendLine($"Actor bush contact clips: {bush?.CollideClips.Count ?? 0}");
+            report = log.ToString();
+            return success;
+        }
+
+        private static void QueueContacts(StalkerXRaySources sources, StalkerSurfaceSounds surface, StalkerGameMtlPair pair, List<KeyValuePair<List<AudioClip>, string>> imported, StringBuilder log)
+        {
+            foreach (string sound in StalkerGameMtlLibrary.SplitSounds(pair.CollideSounds))
+            {
+                string virtualPath = "sounds/" + sound.Replace('\\', '/') + ".ogg";
+                Queue(sources, virtualPath, "Contacts/" + sound + ".ogg", surface.CollideClips, imported);
+                log.AppendLine($"{surface.MaterialName}: actor collide '{sound}' <- {sources.GetSourceName(virtualPath) ?? "MISSING"}; pair <- {pair.Origin}");
+            }
         }
 
         private static Dictionary<string, MovingModeEntry> ReadMovingModes(StalkerXRaySources sources, StringBuilder log, out HashSet<string> moveStates)

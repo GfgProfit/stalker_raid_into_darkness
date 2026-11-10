@@ -203,6 +203,8 @@ namespace RaidIntoDarkness.Player
         [SerializeField] private float _uphillDrainModifier = 0.6f;
         [SerializeField] private float _uphillDrainCoeff = 0.033f;
         [SerializeField] private float _uphillDrainDownhillReduction = 0.43f;
+        [SerializeField] private bool _enableMaterialDrain = true;
+        [SerializeField] private float _materialDrainModifier = 0.8f;
         [SerializeField] private float _updateInterval = 0.06f;
         [SerializeField] private float _speedCoefMin = 1.0f;
         [SerializeField] private float _speedCoefMax = 10.0f;
@@ -219,6 +221,8 @@ namespace RaidIntoDarkness.Player
         public float UphillDrainModifier => _uphillDrainModifier;
         public float UphillDrainCoeff => _uphillDrainCoeff;
         public float UphillDrainDownhillReduction => _uphillDrainDownhillReduction;
+        public bool EnableMaterialDrain => _enableMaterialDrain;
+        public float MaterialDrainModifier => _materialDrainModifier;
         public float UpdateInterval => _updateInterval;
         public float SpeedCoefMin => _speedCoefMin;
         public float SpeedCoefMax => _speedCoefMax;

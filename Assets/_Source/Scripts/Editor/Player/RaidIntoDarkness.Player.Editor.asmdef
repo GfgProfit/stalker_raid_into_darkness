@@ -2,6 +2,7 @@
     "name": "RaidIntoDarkness.Player.Editor",
     "rootNamespace": "RaidIntoDarkness.Player.Editor",
     "references": [
+        "com.alexeyperov.unity-open-mcp-bridge.Editor",
         "RaidIntoDarkness.Player",
         "RaidIntoDarkness.Effects",
         "RaidIntoDarkness.FirstPerson",

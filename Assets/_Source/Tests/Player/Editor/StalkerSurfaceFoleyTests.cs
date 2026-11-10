@@ -1,8 +1,11 @@
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
+using System.Text;
 using NUnit.Framework;
 using UnityEditor;
 using UnityEngine;
+using XRay.Importer.Levels;
 
 namespace RaidIntoDarkness.Player.Tests
 {
@@ -87,6 +90,133 @@ namespace RaidIntoDarkness.Player.Tests
         }
 
         [Test]
+        public void ImportedCollisionSelectsDifferentFootstepsOnTheSameMeshCollider()
+        {
+            StalkerSurfaceAudioLibrary library = CreateLibrary();
+            GameObject level = CreateImportedFloor("materials\\earth", "materials\\metal");
+            StalkerSurfaceDetector detector = CreateDetector(library);
+            StalkerPlayerFoley foley = CreateFoley(library, detector);
+            Physics.SyncTransforms();
+            Collider collider = level.GetComponent<MeshCollider>();
+            var step = new StalkerFootstep(StalkerFootSide.Left, 1.0f, "norm_walk_fwd_0", "body", 0.2f, StalkerFootstepSource.XRayLegsTiming, StalkerMovingMode.Walk);
+
+            detector.transform.position = level.transform.position + new Vector3(-1.0f, 0.0f, 0.0f);
+            foley.PlayFootstep(step);
+            Assert.That(detector.CurrentCollider, Is.SameAs(collider));
+            Assert.That(detector.CurrentSource, Is.EqualTo(StalkerSurfaceSource.XRayMaterial));
+            StringAssert.StartsWith("walk_earth_", foley.LastClipName);
+
+            detector.transform.position = level.transform.position + new Vector3(1.0f, 0.0f, 0.0f);
+            foley.PlayFootstep(step);
+            Assert.That(detector.CurrentCollider, Is.SameAs(collider));
+            Assert.That(detector.Current, Is.EqualTo(StalkerSurfaceType.Metal));
+            Assert.That(detector.CurrentSource, Is.EqualTo(StalkerSurfaceSource.XRayMaterial));
+            StringAssert.StartsWith("walk_metal_", foley.LastClipName);
+
+            level.AddComponent<StalkerSurface>().Type = StalkerSurfaceType.Wood;
+            detector.Initialize(library, ~0);
+            Assert.That(detector.Detect(), Is.EqualTo(StalkerSurfaceType.Wood));
+            Assert.That(detector.CurrentSource, Is.EqualTo(StalkerSurfaceSource.Component));
+        }
+
+        [Test]
+        public void UnknownImportedMaterialKeepsPhysicsMappingAndFallback()
+        {
+            StalkerSurfaceAudioLibrary library = CreateLibrary();
+            var material = Track(new PhysicsMaterial("ImportedFallback"));
+            library.SetSurfaceMappings(new List<StalkerPhysicsMaterialSurface> { new StalkerPhysicsMaterialSurface(material, StalkerSurfaceType.Concrete) }, new List<StalkerTerrainLayerSurface>());
+            GameObject level = CreateImportedFloor("materials\\unmapped", "materials\\metal");
+            level.GetComponent<MeshCollider>().sharedMaterial = material;
+            StalkerSurfaceDetector detector = CreateDetector(library);
+            Physics.SyncTransforms();
+
+            Assert.That(DetectAt(detector, level.transform.position + new Vector3(-1.0f, 0.0f, 0.0f)), Is.EqualTo(StalkerSurfaceType.Concrete));
+            Assert.That(detector.CurrentSource, Is.EqualTo(StalkerSurfaceSource.PhysicsMaterial));
+            level.GetComponent<MeshCollider>().sharedMaterial = null;
+            Assert.That(detector.Detect(), Is.EqualTo(StalkerSurfaceType.Earth));
+            Assert.That(detector.CurrentSource, Is.EqualTo(StalkerSurfaceSource.Fallback));
+        }
+
+        [TestCase("materials\\bush", 128u, StalkerSurfaceType.Bush)]
+        [TestCase("materials\\bush_sux", 128u, StalkerSurfaceType.BushSux)]
+        [TestCase("materials\\bush", 268435584u, StalkerSurfaceType.Concrete)]
+        public void BodyContactOverridesGroundExceptInjuriousMaterials(string materialName, uint flags, StalkerSurfaceType expected)
+        {
+            StalkerSurfaceAudioLibrary library = CreateLibrary();
+            GameObject level = CreateVegetationFloor(materialName, flags);
+            StalkerSurfaceDetector detector = CreateDetector(library);
+            CharacterController controller = detector.gameObject.AddComponent<CharacterController>();
+            controller.height = 1.8f;
+            controller.radius = 0.3f;
+            controller.center = new Vector3(0.0f, 0.9f, 0.0f);
+            detector.Initialize(library, ~0);
+            Physics.SyncTransforms();
+
+            Assert.That(DetectAt(detector, level.transform.position + new Vector3(0.1f, 0.0f, 0.0f)), Is.EqualTo(expected));
+            Assert.That(detector.HasGround, Is.True);
+            Assert.That(detector.CurrentCollider, Is.SameAs(level.GetComponent<MeshCollider>()));
+            Assert.That(detector.CurrentSource, Is.EqualTo(StalkerSurfaceSource.XRayMaterial));
+            Assert.That(DetectAt(detector, level.transform.position + new Vector3(1.0f, 0.0f, 0.0f)), Is.EqualTo(StalkerSurfaceType.Concrete));
+        }
+
+        [Test]
+        public void VegetationRustleRequiresMovementAndActualCapsuleContact()
+        {
+            StalkerSurfaceAudioLibrary library = CreateLibrary();
+            library.GetSurface(StalkerSurfaceType.Bush).CollideClips.Add(Clip("bushes1"));
+            GameObject level = CreateVegetationFloor("materials\\bush", 128u);
+            StalkerSurfaceDetector detector = CreateDetector(library);
+            CharacterController controller = detector.gameObject.AddComponent<CharacterController>();
+            controller.height = 1.8f;
+            controller.radius = 0.3f;
+            controller.center = new Vector3(0f, 0.9f, 0f);
+            StalkerPlayerFoley foley = CreateFoley(library, detector);
+            detector.transform.position = level.transform.position + new Vector3(0.1f, 0f, 0f);
+            using (var audio = new StalkerVegetationAudio(foley))
+            {
+                audio.Tick(controller, Vector3.zero);
+                audio.Tick(controller, Vector3.forward * 0.09f);
+                Assert.That(audio.Source, Is.Null);
+                audio.Tick(controller, Vector3.forward);
+                Assert.That(audio.PlayedCount, Is.EqualTo(1));
+                Assert.That(audio.LastMaterial, Is.EqualTo("materials\\bush"));
+                Assert.That(audio.Source.clip.name, Is.EqualTo("bushes1"));
+                Assert.That(audio.Source.spatialBlend, Is.EqualTo(1f));
+                Assert.That(audio.Source.loop, Is.False);
+                detector.transform.position = level.transform.position + Vector3.right;
+                audio.Tick(controller, Vector3.forward);
+                Assert.That(audio.PlayedCount, Is.EqualTo(1));
+            }
+        }
+
+        [Test]
+        public void BushSuxContactDoesNotInventEarthFootsteps()
+        {
+            StalkerSurfaceAudioLibrary library = CreateLibrary();
+            StalkerSurfaceSounds silent = library.GetSurface(StalkerSurfaceType.BushSux);
+            silent.WalkClips.Clear();
+            silent.RunClips.Clear();
+            silent.CrouchClips.Clear();
+            GameObject level = CreateVegetationFloor("materials\\bush_sux", 128u);
+            StalkerSurfaceDetector detector = CreateDetector(library);
+            CharacterController controller = detector.gameObject.AddComponent<CharacterController>();
+            controller.height = 1.8f;
+            controller.radius = 0.3f;
+            controller.center = new Vector3(0.0f, 0.9f, 0.0f);
+            detector.Initialize(library, ~0);
+            StalkerPlayerFoley foley = CreateFoley(library, detector);
+            detector.transform.position = level.transform.position + new Vector3(0.1f, 0.0f, 0.0f);
+            Physics.SyncTransforms();
+            foley.PlayFootstep(new StalkerFootstep(StalkerFootSide.Left, 1.0f, "norm_walk_fwd_0", "body", 0.2f, StalkerFootstepSource.XRayLegsTiming, StalkerMovingMode.Walk));
+
+            Assert.That(detector.Current, Is.EqualTo(StalkerSurfaceType.BushSux));
+            StringAssert.DoesNotContain("fallback", foley.LastReason);
+            StringAssert.Contains("pair []", foley.LastReason);
+            StringAssert.Contains("mode Walk []", foley.LastReason);
+            StringAssert.StartsWith("tac_gear_", foley.LastClipName);
+        }
+
+        [Test]
         public void LandingSoundRespectsEftThresholdAndFallback()
         {
             StalkerSurfaceAudioLibrary library = CreateLibrary();
@@ -127,6 +257,14 @@ namespace RaidIntoDarkness.Player.Tests
 
             Assert.That(library.GearRustleClips.Count, Is.GreaterThan(0));
             Assert.That(library.GetSurface(library.FallbackSurface).WalkClips.Count, Is.GreaterThan(0), "fallback surface has no clips");
+            StalkerSurfaceSounds bush = library.GetSurface(StalkerSurfaceType.Bush);
+            StalkerSurfaceSounds bushSux = library.GetSurface(StalkerSurfaceType.BushSux);
+            Assert.That(bush.CollideClips.Count, Is.EqualTo(2), "actor bush contact sounds");
+            Assert.That(bush.CollideClips[0].name, Is.EqualTo("bushes1"));
+            Assert.That(bush.CollideClips[1].name, Is.EqualTo("bushes2"));
+            Assert.That(bushSux, Is.Not.Null, "bush_sux must preserve its original silent step pair");
+            Assert.That(bushSux.CollideClips, Is.EqualTo(bush.CollideClips));
+            Assert.That(bushSux.PairStepClips.Count + bushSux.WalkClips.Count + bushSux.RunClips.Count + bushSux.CrouchClips.Count, Is.EqualTo(0));
         }
 
         [Test]
@@ -241,6 +379,119 @@ namespace RaidIntoDarkness.Player.Tests
             box.transform.position = position;
             box.transform.localScale = new Vector3(8.0f, 0.5f, 8.0f);
             return box;
+        }
+
+        private GameObject CreateImportedFloor(string leftMaterial, string rightMaterial)
+        {
+            var vertices = new[] { new Vector3(-2.0f, 0.0f, -2.0f), new Vector3(0.0f, 0.0f, -2.0f), new Vector3(0.0f, 0.0f, 2.0f), new Vector3(-2.0f, 0.0f, 2.0f), new Vector3(0.0f, 0.0f, -2.0f), new Vector3(2.0f, 0.0f, -2.0f), new Vector3(2.0f, 0.0f, 2.0f), new Vector3(0.0f, 0.0f, 2.0f) };
+            var triangles = new[] { 0, 2, 1, 0, 3, 2, 4, 6, 5, 4, 7, 6 };
+            var mesh = Track(new Mesh());
+            mesh.vertices = vertices;
+            mesh.triangles = triangles;
+            mesh.RecalculateBounds();
+            var root = Track(new GameObject("ImportedFloor"));
+            root.transform.position = new Vector3(20000.0f, 0.0f, 20000.0f);
+            root.AddComponent<MeshCollider>().sharedMesh = mesh;
+            root.AddComponent<XRayLevelContactSource>().InitializeData(CreateCollisionData(vertices, triangles), CreateMaterialData(leftMaterial, rightMaterial));
+            return root;
+        }
+
+        private static byte[] CreateCollisionData(Vector3[] vertices, int[] triangles)
+        {
+            using (var stream = new MemoryStream())
+            using (var writer = new BinaryWriter(stream))
+            {
+                writer.Write(4u);
+                writer.Write(vertices.Length);
+                writer.Write(triangles.Length / 3);
+                Bounds bounds = new Bounds(vertices[0], Vector3.zero);
+                foreach (Vector3 vertex in vertices)
+                {
+                    bounds.Encapsulate(vertex);
+                }
+
+                writer.Write(bounds.min.x);
+                writer.Write(bounds.min.y);
+                writer.Write(bounds.min.z);
+                writer.Write(bounds.max.x);
+                writer.Write(bounds.max.y);
+                writer.Write(bounds.max.z);
+                foreach (Vector3 vertex in vertices)
+                {
+                    writer.Write(vertex.x);
+                    writer.Write(vertex.y);
+                    writer.Write(vertex.z);
+                }
+
+                for (int face = 0; face < triangles.Length / 3; face++)
+                {
+                    writer.Write(triangles[face * 3]);
+                    writer.Write(triangles[face * 3 + 1]);
+                    writer.Write(triangles[face * 3 + 2]);
+                    writer.Write((uint)(101 + face / 2));
+                }
+
+                return stream.ToArray();
+            }
+        }
+
+        private static byte[] CreateMaterialData(params string[] names)
+        {
+            return CreateMaterialData(new uint[names.Length], names);
+        }
+
+        private static byte[] CreateMaterialData(uint[] flags, params string[] names)
+        {
+            using (var stream = new MemoryStream())
+            using (var writer = new BinaryWriter(stream))
+            {
+                WriteChunk(writer, 0x1000, chunk => chunk.Write((ushort)1));
+                WriteChunk(writer, 0x1002, materials =>
+                {
+                    for (int i = 0; i < names.Length; i++)
+                    {
+                        int index = i;
+                        WriteChunk(materials, (uint)i, material =>
+                        {
+                            WriteChunk(material, 0x1000, main =>
+                            {
+                                main.Write((uint)(101 + index));
+                                main.Write(Encoding.ASCII.GetBytes(names[index]));
+                                main.Write((byte)0);
+                            });
+                            WriteChunk(material, 0x1001, value => value.Write(flags[index]));
+                        });
+                    }
+                });
+                return stream.ToArray();
+            }
+        }
+
+        private GameObject CreateVegetationFloor(string materialName, uint flags)
+        {
+            var vertices = new[] { new Vector3(-2.0f, 0.0f, -2.0f), new Vector3(2.0f, 0.0f, -2.0f), new Vector3(2.0f, 0.0f, 2.0f), new Vector3(-2.0f, 0.0f, 2.0f), new Vector3(0.0f, 0.0f, -2.0f), new Vector3(0.0f, 2.0f, -2.0f), new Vector3(0.0f, 2.0f, 2.0f), new Vector3(0.0f, 0.0f, 2.0f) };
+            var mesh = Track(new Mesh());
+            mesh.vertices = vertices;
+            mesh.triangles = new[] { 0, 2, 1, 0, 3, 2 };
+            mesh.RecalculateBounds();
+            var root = Track(new GameObject("VegetationFloor"));
+            root.transform.position = new Vector3(20000.0f, 0.0f, 20000.0f);
+            root.AddComponent<MeshCollider>().sharedMesh = mesh;
+            root.AddComponent<XRayLevelContactSource>().InitializeData(CreateCollisionData(vertices, new[] { 0, 2, 1, 0, 3, 2, 4, 5, 6, 4, 6, 7 }), CreateMaterialData(new[] { 0u, flags }, "materials\\concrete", materialName));
+            return root;
+        }
+
+        private static void WriteChunk(BinaryWriter writer, uint id, System.Action<BinaryWriter> write)
+        {
+            using (var stream = new MemoryStream())
+            using (var chunk = new BinaryWriter(stream))
+            {
+                write(chunk);
+                byte[] data = stream.ToArray();
+                writer.Write(id);
+                writer.Write(data.Length);
+                writer.Write(data);
+            }
         }
 
         private Terrain CreateTerrain(Vector3 position, TerrainLayer left, TerrainLayer right)

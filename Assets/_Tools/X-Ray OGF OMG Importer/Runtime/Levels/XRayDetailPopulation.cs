@@ -42,8 +42,7 @@ namespace XRay.Importer.Levels
         public XRayDetailPopulation(XRayDetailDatabase database, XRayGrassDefaults defaults)
         {
             _details = XRayDetails.Read(database.SourceDetails.bytes, database.LevelName + " level.details");
-            XRayCollisionModel collision = XRayCollisionModel.Read(database.SourceCollision.bytes, database.LevelName + " level.cform");
-            collision.BuildGrid(XRayDetails.SLOT_SIZE);
+            XRayCollisionModel collision = XRayRuntimeCollisionSource.Load(database.SourceCollision);
             _alignment = database.SourceProfile == 1 && defaults.TerrainAlignment;
             float horizontal = Mathf.Abs(defaults.WindGrass.y) + Mathf.Abs(defaults.WindGrass.z);
             _windExtent = new Vector3(horizontal, Mathf.Abs(defaults.WindGrass.w), horizontal);

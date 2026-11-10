@@ -307,6 +307,8 @@ namespace RaidIntoDarkness.Player.Editor
             writer.Float("_staminaMod._uphillSpeedModifierModifier", Get(values, "advanced_stamina_system/uphill_speed_modifier_modifier"), origin + "advanced_stamina_system/uphill_speed_modifier_modifier");
             writer.Bool("_staminaMod._enableUphillDrain", Get(values, "advanced_stamina_system/enable_uphill_drain"), origin + "advanced_stamina_system/enable_uphill_drain");
             writer.Float("_staminaMod._uphillDrainModifier", Get(values, "advanced_stamina_system/uphill_drain_modifier"), origin + "advanced_stamina_system/uphill_drain_modifier");
+            writer.Bool("_staminaMod._enableMaterialDrain", Get(values, "advanced_stamina_system/enable_material_drain"), origin + "advanced_stamina_system/enable_material_drain");
+            writer.Float("_staminaMod._materialDrainModifier", Get(values, "advanced_stamina_system/material_drain_modifier"), origin + "advanced_stamina_system/material_drain_modifier");
         }
 
         private static void ReadSwmScript(XRayAssetIndex index, Writer writer)

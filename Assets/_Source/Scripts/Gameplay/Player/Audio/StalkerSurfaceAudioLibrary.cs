@@ -22,6 +22,7 @@ namespace RaidIntoDarkness.Player
         [SerializeField] private List<AudioClip> _crouchClips = new List<AudioClip>();
         [SerializeField] private List<AudioClip> _jumpClips = new List<AudioClip>();
         [SerializeField] private List<AudioClip> _landClips = new List<AudioClip>();
+        [SerializeField] private List<AudioClip> _collideClips = new List<AudioClip>();
 
         public StalkerSurfaceSounds(StalkerSurfaceType type, string materialName)
         {
@@ -37,6 +38,7 @@ namespace RaidIntoDarkness.Player
         public List<AudioClip> CrouchClips => _crouchClips;
         public List<AudioClip> JumpClips => _jumpClips;
         public List<AudioClip> LandClips => _landClips;
+        public List<AudioClip> CollideClips => _collideClips;
 
         public List<AudioClip> GetMovingModeClips(StalkerMovingMode mode)
         {
@@ -161,6 +163,12 @@ namespace RaidIntoDarkness.Player
         {
             _physicsMaterials = physicsMaterials;
             _terrainLayers = terrainLayers;
+        }
+
+        public void SetImportedSurfaces(List<StalkerSurfaceSounds> surfaces)
+        {
+            _surfaces = surfaces;
+            _byType = null;
         }
 
         private void OnValidate()

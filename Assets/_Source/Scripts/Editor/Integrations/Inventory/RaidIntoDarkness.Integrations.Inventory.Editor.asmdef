@@ -2,6 +2,7 @@
     "name": "RaidIntoDarkness.Integrations.Inventory.Editor",
     "rootNamespace": "RaidIntoDarkness.Integrations.Inventory.Editor",
     "references": [
+        "com.alexeyperov.unity-open-mcp-bridge.Editor",
         "RaidIntoDarkness.Integrations.Inventory",
         "RaidIntoDarkness.Player",
         "RaidIntoDarkness.Player.Editor",

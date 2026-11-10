@@ -37,6 +37,8 @@ namespace XRay.Importer.Editor.Levels
         public XRayWeatherCatalog WeatherCatalog { get; set; }
         public bool InheritWeather { get; set; }
         public List<XRayLevelCollisionChunk> Collision { get; } = new List<XRayLevelCollisionChunk>();
+        public TextAsset ContactCollision { get; set; }
+        public TextAsset ContactMaterials { get; set; }
         public bool ImportLights { get; set; }
         public bool LightShadows { get; set; }
         public bool OpenScene { get; set; }
@@ -53,6 +55,11 @@ namespace XRay.Importer.Editor.Levels
         {
             var root = new GameObject(content.LevelName);
             SceneManager.MoveGameObjectToScene(root, scene);
+            if (content.ContactCollision != null && content.ContactMaterials != null)
+            {
+                root.AddComponent<XRayLevelContactSource>().Initialize(content.ContactCollision, content.ContactMaterials);
+            }
+
             Transform geometry = Child(root.transform, "Geometry");
             var sectors = new Dictionary<int, Transform>();
             var decals = new List<MeshRenderer>();

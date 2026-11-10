@@ -10,11 +10,13 @@ using RaidIntoDarkness.Player;
 using RaidIntoDarkness.Player.Editor;
 using UnityEditor;
 using UnityEngine;
+using UnityOpenMcpBridge;
 using XRay.Importer.Core.Ogf;
 using XRay.Importer.Sources.Ltx;
 
 namespace RaidIntoDarkness.Integrations.Inventory.Editor
 {
+    [BridgeToolType]
     public static class GraInventorySoundSetup
     {
         public const string SOUND_SET_PATH = "Assets/_Source/UI/Inventory/GRA/GraInventorySounds.asset";
@@ -306,6 +308,105 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
 
             serialized.ApplyModifiedPropertiesWithoutUndo();
             EditorUtility.SetDirty(definition);
+        }
+
+        [ProjectCommand("project.inventory.prepare_vegetation_contacts", Title = "Prepare Vegetation Contact Sounds", Package = "RaidIntoDarkness.Integrations.Inventory.Editor", Description = "Import missing original object contact sound pairs for bush_sux into the existing collide library without changing scenes, prefabs or item definitions.", IsMutating = true, IdempotentHint = true, Lifecycle = LifecyclePolicy.EditorSettle)]
+        public static string PrepareVegetationContacts()
+        {
+            if (!SetupMissingSurfaceCollideSounds(StalkerSurfaceType.BushSux, out string report))
+            {
+                throw new InvalidOperationException(report);
+            }
+
+            return JsonUtility.ToJson(new VegetationContactResult { Imported = true, Report = report });
+        }
+
+        [Serializable]
+        private sealed class VegetationContactResult
+        {
+            public bool Imported;
+            public string Report;
+        }
+
+        public static bool SetupMissingSurfaceCollideSounds(StalkerSurfaceType surface, out string report)
+        {
+            var library = AssetDatabase.LoadAssetAtPath<StalkerCollideSoundLibrary>(COLLIDE_LIBRARY_PATH);
+            if (library == null)
+            {
+                report = "Missing collide sound library: " + COLLIDE_LIBRARY_PATH;
+                return false;
+            }
+
+            StalkerXRaySources sources = StalkerXRaySources.Open(new[] { "materials", "sounds/material", StalkerGameMtlLibrary.GAMEMTL }, out string error);
+            if (sources == null)
+            {
+                report = error;
+                return false;
+            }
+
+            StalkerGameMtlLibrary materials = StalkerGameMtlLibrary.Load(sources);
+            if (materials == null)
+            {
+                report = "gamemtl.xr not found in the active MO2 profile.";
+                return false;
+            }
+
+            var log = new StringBuilder(sources.Describe()).AppendLine();
+            var entries = new List<StalkerCollideSounds>(library.Entries);
+            var objectMaterials = new SortedSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (StalkerCollideSounds entry in entries)
+            {
+                objectMaterials.Add(entry.ObjectMaterial);
+            }
+
+            var pending = new List<KeyValuePair<List<AudioClip>, string>>();
+            int added = 0;
+            foreach (string material in objectMaterials)
+            {
+                if (library.Find(material, surface) != null)
+                {
+                    continue;
+                }
+
+                string surfaceName = StalkerSurfaceTypes.GetMaterialName(surface);
+                StalkerGameMtlPair pair = materials.FindPair(material, surfaceName);
+                var clips = new List<AudioClip>();
+                foreach (string sound in StalkerGameMtlLibrary.SplitSounds(pair?.CollideSounds))
+                {
+                    string virtualPath = SoundPath(sound);
+                    string assetPath = sources.CopyToProject(virtualPath, COLLIDE_AUDIO, virtualPath.Substring("sounds/".Length));
+                    if (assetPath != null)
+                    {
+                        pending.Add(new KeyValuePair<List<AudioClip>, string>(clips, assetPath));
+                    }
+
+                    log.AppendLine($"{material} @ {surfaceName}: '{sound}' <- {sources.GetSourceName(virtualPath) ?? "MISSING"}; pair <- {pair?.Origin ?? "no pair"}");
+                }
+
+                entries.Add(new StalkerCollideSounds(material, surface, pair?.Origin ?? "no pair", clips));
+                added++;
+            }
+
+            AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
+            foreach (KeyValuePair<List<AudioClip>, string> item in pending)
+            {
+                AudioClip clip = ImportClip(item.Value);
+                if (clip != null)
+                {
+                    item.Key.Add(clip);
+                }
+            }
+
+            if (added > 0)
+            {
+                library.SetImportData(entries, library.MinVolume, library.MaxVolume, library.SourceReport + Environment.NewLine + log);
+                EditorUtility.SetDirty(library);
+                AssetDatabase.SaveAssetIfDirty(library);
+            }
+
+            log.AppendLine($"Added {added} missing object material pairs for {surface}.");
+            report = log.ToString();
+            return library.Find("objects\\clothes", surface)?.Count > 0;
         }
 
         internal static StalkerCollideSoundLibrary SetupCollideSounds(StalkerXRaySources sources, StringBuilder log)

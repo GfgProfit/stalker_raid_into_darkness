@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using UnityEngine;
+using XRay.Importer.Levels;
 
 namespace RaidIntoDarkness.Player
 {
@@ -8,7 +10,8 @@ namespace RaidIntoDarkness.Player
         Component,
         PhysicsMaterial,
         TerrainLayer,
-        Fallback
+        Fallback,
+        XRayMaterial
     }
 
     [DisallowMultipleComponent]
@@ -17,19 +20,23 @@ namespace RaidIntoDarkness.Player
         [SerializeField] private StalkerSurfaceAudioLibrary _library;
         [SerializeField] private LayerMask _mask = ~0;
 
+        private readonly List<XRayPassableContact> _passableContacts = new List<XRayPassableContact>();
         private StalkerSurfaceResolver _resolver;
+        private CharacterController _controller;
 
         public StalkerSurfaceAudioLibrary Library => _library;
         public StalkerSurfaceType Current { get; private set; }
         public StalkerSurfaceSource CurrentSource { get; private set; }
         public Collider CurrentCollider { get; private set; }
         public bool HasGround { get; private set; }
+        public string CurrentMaterialName => StalkerSurfaceTypes.GetMaterialName(Current);
 
         public void Initialize(StalkerSurfaceAudioLibrary library, LayerMask mask)
         {
             _library = library;
             _mask = mask;
             _resolver = null;
+            _controller = GetComponent<CharacterController>();
             EnsureMappings();
         }
 
@@ -50,13 +57,43 @@ namespace RaidIntoDarkness.Player
             CurrentCollider = hit.collider;
             Current = Resolve(hit, out StalkerSurfaceSource source);
             CurrentSource = source;
+            if (source != StalkerSurfaceSource.Component)
+            {
+                ApplyPassableMaterial();
+            }
+
             return Current;
+        }
+
+        private void ApplyPassableMaterial()
+        {
+            if (_controller == null || !_controller.enabled)
+            {
+                return;
+            }
+
+            Transform controllerTransform = _controller.transform;
+            Vector3 scale = controllerTransform.lossyScale;
+            float radius = _controller.radius * Mathf.Max(Mathf.Abs(scale.x), Mathf.Abs(scale.z));
+            float halfAxis = Mathf.Max(0.0f, _controller.height * Mathf.Abs(scale.y) * 0.5f - radius);
+            Vector3 center = controllerTransform.TransformPoint(_controller.center);
+            Vector3 offset = controllerTransform.up * halfAxis;
+            XRayLevelContactSource.GetPassableContacts(center - offset, center + offset, radius, _passableContacts);
+            for (int i = 0; i < _passableContacts.Count; i++)
+            {
+                var material = _passableContacts[i].Material;
+                if (!material.IsInjurious && StalkerSurfaceTypes.TryGetType(material.Name, out StalkerSurfaceType type))
+                {
+                    Current = type;
+                    CurrentSource = StalkerSurfaceSource.XRayMaterial;
+                }
+            }
         }
 
         public StalkerSurfaceType Resolve(RaycastHit hit, out StalkerSurfaceSource source)
         {
             EnsureMappings();
-            return _resolver.Resolve(hit.collider, hit.point, out source);
+            return _resolver.Resolve(hit, out source);
         }
 
         private void EnsureMappings()

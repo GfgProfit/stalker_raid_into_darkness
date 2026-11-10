@@ -25,7 +25,8 @@ namespace RaidIntoDarkness.Player
         Cloth,
         SetkaRabica,
         Glass,
-        Water
+        Water,
+        BushSux
     }
 
     public static class StalkerSurfaceTypes
@@ -55,7 +56,8 @@ namespace RaidIntoDarkness.Player
             "materials\\cloth",
             "materials\\setka_rabica",
             "materials\\glass",
-            "materials\\water"
+            "materials\\water",
+            "materials\\bush_sux"
         };
 
         public static int Count => MATERIAL_NAMES.Length;
@@ -70,6 +72,21 @@ namespace RaidIntoDarkness.Player
             string name = MATERIAL_NAMES[(int)type];
             int slash = name.LastIndexOf('\\');
             return slash >= 0 ? name.Substring(slash + 1) : name;
+        }
+
+        public static bool TryGetType(string materialName, out StalkerSurfaceType type)
+        {
+            for (int i = 0; i < MATERIAL_NAMES.Length; i++)
+            {
+                if (string.Equals(MATERIAL_NAMES[i], materialName, System.StringComparison.OrdinalIgnoreCase))
+                {
+                    type = (StalkerSurfaceType)i;
+                    return true;
+                }
+            }
+
+            type = StalkerSurfaceType.Default;
+            return false;
         }
     }
 }

@@ -28,6 +28,8 @@ namespace RaidIntoDarkness.Player
         private string _appliedSection;
         private int _outfitIndex = -1;
         private float _savedHudFieldOfView = -1.0f;
+        private CharacterController _characterController;
+        private StalkerVegetationAudio _vegetationAudio;
 
         public StalkerMovementProfile Profile => _profile;
         public StalkerMovementMotor Motor => _motor;
@@ -42,6 +44,7 @@ namespace RaidIntoDarkness.Player
         public StalkerFootstepSynchronizer Footsteps => _footsteps;
         public StalkerPlayerFoley Foley => _foley;
         public StalkerSurfaceDetector SurfaceDetector => _surfaceDetector;
+        public StalkerVegetationAudio VegetationAudio => _vegetationAudio;
         public StalkerMovementState State => _motor.State;
         public string OutfitSection => _appliedSection;
 
@@ -70,6 +73,7 @@ namespace RaidIntoDarkness.Player
             }
 
             _motor.Initialize(_profile);
+            _characterController = _motor.GetComponent<CharacterController>();
             _camera.Initialize(_profile);
             if (_surfaceDetector != null)
             {
@@ -79,6 +83,7 @@ namespace RaidIntoDarkness.Player
             if (_foley != null)
             {
                 _foley.Initialize();
+                _vegetationAudio = new StalkerVegetationAudio(_foley);
             }
 
             _motor.JumpStarted += OnJumpStarted;
@@ -109,6 +114,7 @@ namespace RaidIntoDarkness.Player
 
         private void OnDestroy()
         {
+            _vegetationAudio?.Dispose();
             if (_rig != null)
             {
                 _rig.OutfitApplied -= OnOutfitApplied;
@@ -183,6 +189,7 @@ namespace RaidIntoDarkness.Player
             _camera.Apply(_motor.Stance.CameraHeight);
             _motor.SetView(_camera.YawDegrees, _camera.Direction);
             _motor.Tick(deltaTime);
+            _vegetationAudio?.Tick(_characterController, _motor.Velocity);
             _motor.ClearHeldCommands();
             _camera.Apply(_motor.Stance.CameraHeight);
             _visibleBody.Tick(_motor.State, _camera, deltaTime);
@@ -241,6 +248,19 @@ namespace RaidIntoDarkness.Player
             if (_foley != null)
             {
                 _foley.PlayFootstep(step);
+            }
+
+            if (_surfaceDetector != null)
+            {
+                if (_foley == null)
+                {
+                    _surfaceDetector.Detect();
+                }
+
+                if (_surfaceDetector.HasGround)
+                {
+                    _motor.Condition.SetFootstepSurface(_surfaceDetector.Current);
+                }
             }
 
             if (_cameraEffects != null)

@@ -52,6 +52,7 @@ namespace RaidIntoDarkness.Player
         private float _legsStart;
         private int _currentCycle = 1;
         private float _time;
+        private bool _hasGroundSupport = true;
 
         public event Action<StalkerFootstep> Footstep;
 
@@ -63,8 +64,9 @@ namespace RaidIntoDarkness.Player
         public bool HasLastStep { get; private set; }
         public StalkerFootstep LastStep { get; private set; }
 
-        public void Tick(StalkerMovementState state, StalkerBodyAnimationPlayer player, float deltaTime)
+        public void Tick(StalkerMovementState state, StalkerBodyAnimationPlayer player, float deltaTime, bool hasGroundSupport = true)
         {
+            _hasGroundSupport = hasGroundSupport;
             _time += deltaTime;
             CyclePhase = -1.0f;
             if (_library == null)
@@ -316,6 +318,17 @@ namespace RaidIntoDarkness.Player
 
             float cycleTime = steps.CycleTime / Mathf.Max(steps.Cycles, 1);
             float elapsed = _time - _legsStart;
+            if (_hasGroundSupport == false)
+            {
+                if (steps.StopAtEnd == false && elapsed >= steps.CycleTime)
+                {
+                    _legsStart += Mathf.Floor(elapsed / steps.CycleTime) * steps.CycleTime;
+                    _currentCycle = 1;
+                    ResetHandled();
+                    elapsed = _time - _legsStart;
+                }
+                _currentCycle = Mathf.Clamp(1 + Mathf.FloorToInt(elapsed / cycleTime), 1, Mathf.Max(steps.Cycles, 1));
+            }
             Phase = Mathf.Repeat(elapsed / steps.CycleTime, 1.0f);
             CyclePhase = GetStepCycle(Mathf.Repeat(elapsed / cycleTime, 1.0f), steps.LeftTime, steps.RightTime);
             for (int leg = 0; leg < LEGS; leg++)
@@ -367,6 +380,10 @@ namespace RaidIntoDarkness.Player
 
         private void Raise(StalkerFootstep step)
         {
+            if (_hasGroundSupport == false)
+            {
+                return;
+            }
             LastStep = step;
             HasLastStep = true;
             _lastStepTime = _time;

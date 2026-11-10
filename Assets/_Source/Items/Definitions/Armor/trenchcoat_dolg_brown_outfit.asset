@@ -73,15 +73,15 @@ MonoBehaviour:
         _community: dolg
         _communityIcon: {fileID: -326114190, guid: d56bb8268bdae76448be8781bc547c55, type: 3}
         _communityIconSize: {x: 20, y: 19}
-        _burnProtection: 0.128
-        _shockProtection: 0.65
-        _chemicalBurnProtection: 0.036
-        _radiationProtection: 0.003
+        _burnProtection: 7
+        _shockProtection: 7
+        _chemicalBurnProtection: 10
+        _radiationProtection: 5
         _telepaticProtection: 0
-        _woundProtection: 0.48
-        _strikeProtection: 0.36
-        _explosionProtection: 0.32
-        _fireWoundProtection: 0.24
+        _woundProtection: 26
+        _strikeProtection: 18
+        _explosionProtection: 11
+        _fireWoundProtection: 19
         _helmetFireWoundProtection: 0
         _artefactCount: 1
         _additionalWeight: 8
@@ -90,8 +90,8 @@ MonoBehaviour:
         _sprintAllowed: 1
         _nightVisionSection: 
         _speed: 1.04
-        _physicalDurability: 0.151142
-        _anomalyDurability: 0.6871167
+        _physicalDurability: 16
+        _anomalyDurability: 69
     - rid: 3479885472039698588
       type: {class: WorldItemComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
       data:

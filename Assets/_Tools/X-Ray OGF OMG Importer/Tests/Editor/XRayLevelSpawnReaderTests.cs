@@ -63,6 +63,59 @@ namespace XRay.Importer.Tests
             Assert.AreEqual(0, data.Anomalies.Count);
         }
 
+        [Test]
+        public void ReadsOriginalMotionTailForMovingAnomalies()
+        {
+            const string MOTION = "camera_effects\\scenario_cam\\jupiter\\jup_b213.anm";
+            foreach (string section in new[] { "fireball_zone", "fireball_electric_zone", "fireball_acidic_zone", "generator_torrid", "generator_dust" })
+            {
+                XRayLevelSpawnData data = XRayLevelSpawnReader.Read(Fixture(section: section, motionName: MOTION), "fixture", new HashSet<string> { section });
+                Assert.AreEqual(MOTION, data.Anomalies[0].MotionName, section);
+                Assert.AreEqual(56u, data.Anomalies[0].StartTimeShift);
+            }
+        }
+
+        [Test]
+        public void DoesNotInterpretStaticGeneratorTailAsMotion()
+        {
+            const string SECTION = "generator_dust_static";
+            XRayLevelSpawnData data = XRayLevelSpawnReader.Read(Fixture(section: SECTION), "fixture", new HashSet<string> { SECTION });
+            Assert.IsNull(data.Anomalies[0].MotionName);
+        }
+
+        [Test]
+        public void RejectsMissingMotionTailForMovingAnomaly()
+        {
+            const string SECTION = "fireball_zone";
+            Assert.Throws<XRayFormatException>(() => XRayLevelSpawnReader.Read(Fixture(section: SECTION, omitTail: true), "fixture", new HashSet<string> { SECTION }));
+        }
+
+        [Test]
+        public void ReadsScriptedTorridMotionWithSourceLegacyEmptyRespawnFlag()
+        {
+            const string SECTION = "fireball_zone";
+            const string MOTION = "path\\rostok_jarka_krondor.anm";
+            XRayLevelSpawnData data = XRayLevelSpawnReader.Read(Fixture(section: SECTION, motionName: MOTION, motionTail: new byte[] { 0 }), "fixture", new HashSet<string> { SECTION });
+            Assert.AreEqual(MOTION, data.Anomalies[0].MotionName);
+        }
+
+        [Test]
+        public void RejectsUnknownScriptedTorridMotionTrailers()
+        {
+            const string SECTION = "fireball_zone";
+            foreach (byte[] tail in new[] { new byte[] { 1 }, new byte[] { 0, 0 } })
+            {
+                Assert.Throws<XRayFormatException>(() => XRayLevelSpawnReader.Read(Fixture(section: SECTION, motionName: "motion.anm", motionTail: tail), "fixture", new HashSet<string> { SECTION }));
+            }
+        }
+
+        [Test]
+        public void RejectsLegacyScriptByteForNativeTorridClass()
+        {
+            const string SECTION = "generator_torrid";
+            Assert.Throws<XRayFormatException>(() => XRayLevelSpawnReader.Read(Fixture(section: SECTION, motionName: "gen_torrid_line.anm", motionTail: new byte[] { 0 }), "fixture", new HashSet<string> { SECTION }));
+        }
+
         [TestCase(117)]
         [TestCase(129)]
         public void RejectsUnsupportedObjectVersions(int version)
@@ -148,7 +201,7 @@ namespace XRay.Importer.Tests
             return XRayLevelSpawnReader.Read(bytes, "fixture", new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "zone_electro" });
         }
 
-        internal static byte[] Fixture(string section = "zone_electro", ushort version = 128, bool graphMismatch = false, byte vertexLevel = 42, ushort gameVertex = 1, byte shapeType = 0, float radius = 2.5f, uint objectCount = 1, string levelName = "l02_target")
+        internal static byte[] Fixture(string section = "zone_electro", ushort version = 128, bool graphMismatch = false, byte vertexLevel = 42, ushort gameVertex = 1, byte shapeType = 0, float radius = 2.5f, uint objectCount = 1, string levelName = "l02_target", string motionName = null, bool omitTail = false, byte[] motionTail = null)
         {
             byte[] guid = new Guid("e6584793-5ae4-40bd-9ef0-b86f7796084d").ToByteArray();
             byte[] header = Bytes(writer =>
@@ -201,7 +254,18 @@ namespace XRay.Importer.Tests
                 writer.Write(12u);
                 writer.Write(34u);
                 writer.Write(56u);
-                writer.Write(new byte[11]);
+                if (motionName != null)
+                {
+                    StringZ(writer, motionName);
+                    if (motionTail != null)
+                    {
+                        writer.Write(motionTail);
+                    }
+                }
+                else if (!omitTail)
+                {
+                    writer.Write(new byte[11]);
+                }
             });
             byte[] packet = Bytes(writer =>
             {

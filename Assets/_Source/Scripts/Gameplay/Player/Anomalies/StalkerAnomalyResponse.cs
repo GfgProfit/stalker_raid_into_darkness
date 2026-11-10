@@ -12,6 +12,12 @@ namespace RaidIntoDarkness.Player
         private const int ELECTRIC_MINE_ID = 98324;
         private const int ELECTRIC_ID = 98325;
         private const float CONTACT_EXPIRY = 0.2f;
+        private const string NO_GRAVITY_SPEED_KEY = "zone_no_gravity";
+        private const float NO_GRAVITY_HOLD = 1f;
+        private const float NO_GRAVITY_UPDATE_INTERVAL = 0.1f;
+        private const float NO_GRAVITY_ENTER_STEPS = 70f;
+        private const float NO_GRAVITY_EXIT_STEPS = 22f;
+        private const float NO_GRAVITY_RELEASE_THRESHOLD = 0.98f;
 
         [SerializeField] private StalkerPlayerController _player;
         [SerializeField] private StalkerAnomalyAudio _audio;
@@ -23,6 +29,12 @@ namespace RaidIntoDarkness.Player
 
         private Transform _spine;
         private CharacterController _bodyCollider;
+        private float _runSpeedFactor = 1f;
+        private float _runSpeedTarget = 1f;
+        private float _runSpeedHoldUntil;
+        private float _runSpeedUpdateAt;
+        private bool _runSpeedActive;
+        private bool _runSpeedInitialized;
 
         public float ElectricFieldFactor { get; private set; }
 
@@ -57,6 +69,10 @@ namespace RaidIntoDarkness.Player
                 return;
             }
             bool shock = profile.Kind == AnomalyInfluenceKind.Springboard || profile.Kind == AnomalyInfluenceKind.Electric || profile.Kind == AnomalyInfluenceKind.Vortex;
+            if (profile.InterruptSprint)
+            {
+                _player.Motor.ApplyAnomalyShock(false);
+            }
             if (shock)
             {
                 _player.Motor.ApplyAnomalyShock(profile.LaunchHeight <= 0f);
@@ -104,6 +120,7 @@ namespace RaidIntoDarkness.Player
             _zones.Clear();
             _expiredZones.Clear();
             ElectricFieldFactor = 0f;
+            ClearRunSpeed();
             if (_player != null && _player.Motor != null)
             {
                 _player.Motor.SetAnomalyControl(Vector3.zero);
@@ -123,6 +140,8 @@ namespace RaidIntoDarkness.Player
             _expiredZones.Clear();
             ElectricFieldFactor = 0f;
             Vector3 attraction = Vector3.zero;
+            float runSpeedMultiplier = 1f;
+            bool hasRunSpeed = false;
             AnomalyInfluenceProfile electricProfile = null;
             foreach (KeyValuePair<AnomalyProximityZone, float> contact in _zones)
             {
@@ -146,6 +165,11 @@ namespace RaidIntoDarkness.Player
                     continue;
                 }
                 float proximity = 1f - distanceSquared / radiusSquared;
+                if (profile.Kind == AnomalyInfluenceKind.NoGravity && profile.RunSpeedMultiplier < 1f)
+                {
+                    runSpeedMultiplier = Mathf.Min(runSpeedMultiplier, profile.RunSpeedMultiplier);
+                    hasRunSpeed = true;
+                }
                 if (profile.Kind == AnomalyInfluenceKind.Electric)
                 {
                     ElectricFieldFactor += proximity * proximity * ObstacleReduction(zone, Mathf.Sqrt(distanceSquared));
@@ -161,6 +185,14 @@ namespace RaidIntoDarkness.Player
                 RemoveZone(zone);
             }
             ElectricFieldFactor = Mathf.Clamp01(ElectricFieldFactor);
+            if (IsAlive)
+            {
+                UpdateRunSpeed(hasRunSpeed, runSpeedMultiplier, Time.time, Time.deltaTime);
+            }
+            else
+            {
+                ClearRunSpeed();
+            }
             if (_player != null && _player.Motor != null)
             {
                 _player.Motor.SetAnomalyControl(attraction);
@@ -171,6 +203,62 @@ namespace RaidIntoDarkness.Player
                 _screen.Refresh(ELECTRIC_MINE_ID, electricProfile.ElectricMine, factor * 0.5f, CONTACT_EXPIRY);
                 _screen.Refresh(ELECTRIC_ID, electricProfile.Electric, factor, CONTACT_EXPIRY);
             }
+        }
+
+        private void UpdateRunSpeed(bool nearby, float multiplier, float now, float deltaTime)
+        {
+            StalkerActorCondition condition = _player != null && _player.Motor != null ? _player.Motor.Condition : null;
+            if (condition == null)
+            {
+                return;
+            }
+            if (nearby)
+            {
+                _runSpeedTarget = Mathf.Clamp01(multiplier);
+                _runSpeedHoldUntil = now + NO_GRAVITY_HOLD;
+                if (_runSpeedActive == false)
+                {
+                    _runSpeedActive = true;
+                    _runSpeedUpdateAt = now;
+                }
+            }
+            if (_runSpeedActive == false)
+            {
+                return;
+            }
+            if (now <= _runSpeedHoldUntil)
+            {
+                if (now >= _runSpeedUpdateAt)
+                {
+                    _runSpeedFactor = _runSpeedInitialized ? _runSpeedFactor + 2f / (NO_GRAVITY_ENTER_STEPS + 1f) * (_runSpeedTarget - _runSpeedFactor) : 1f;
+                    _runSpeedInitialized = true;
+                    _runSpeedUpdateAt = now + NO_GRAVITY_UPDATE_INTERVAL;
+                    condition.SetSpeedModifier(NO_GRAVITY_SPEED_KEY, _runSpeedFactor, false);
+                }
+                return;
+            }
+            float smoothing = Mathf.Min(2f / (NO_GRAVITY_EXIT_STEPS + 1f) * Mathf.Max(0f, deltaTime) * 100f / NO_GRAVITY_EXIT_STEPS, 1f);
+            _runSpeedFactor += smoothing * (1f - _runSpeedFactor);
+            condition.SetSpeedModifier(NO_GRAVITY_SPEED_KEY, _runSpeedFactor, false);
+            if (_runSpeedFactor >= NO_GRAVITY_RELEASE_THRESHOLD)
+            {
+                condition.RemoveSpeedModifier(NO_GRAVITY_SPEED_KEY);
+                _runSpeedActive = false;
+            }
+        }
+
+        private void ClearRunSpeed()
+        {
+            if (_runSpeedActive && _player != null && _player.Motor != null && _player.Motor.Condition != null)
+            {
+                _player.Motor.Condition.RemoveSpeedModifier(NO_GRAVITY_SPEED_KEY);
+            }
+            _runSpeedActive = false;
+            _runSpeedInitialized = false;
+            _runSpeedFactor = 1f;
+            _runSpeedTarget = 1f;
+            _runSpeedHoldUntil = 0f;
+            _runSpeedUpdateAt = 0f;
         }
 
         private void UpdateInherent(AnomalyProximityZone zone, AnomalyInfluenceProfile profile)

@@ -13,6 +13,8 @@ namespace RaidIntoDarkness.Effects
         [SerializeField, Min(0f)] private float _idleLightRangeJitter;
         [SerializeField] private AnomalyAudio _audio;
         [SerializeField] private AnomalyContactEffects _contactEffects;
+        [SerializeField] private AnomalyContactEffects _smallContactEffects;
+        [SerializeField] private bool _useSourceContactEffects;
         [SerializeField] private AnomalyContactEffects _entranceContactEffects;
         [SerializeField] private AnomalyContactEffects _idleContactEffects;
         [SerializeField] private AnomalyContactEffects _smallEntranceContactEffects;
@@ -22,6 +24,7 @@ namespace RaidIntoDarkness.Effects
         [SerializeField] private bool _keepIdleDuringDischarge;
 
         private bool _isVisible;
+        private bool _sourceActive = true;
 
         public bool IsVisible => _isVisible;
         public AnomalyAudio Audio => _audio;
@@ -37,7 +40,7 @@ namespace RaidIntoDarkness.Effects
         {
             StopDischarge();
             Clear(_awaking);
-            _isVisible = isActiveAndEnabled;
+            _isVisible = isActiveAndEnabled && _sourceActive;
             TickVisual(0f);
             if (_audio != null)
             {
@@ -49,7 +52,7 @@ namespace RaidIntoDarkness.Effects
         [ContextMenu("Visual/Play Discharge")]
         public void PlayDischarge()
         {
-            if (isActiveAndEnabled == false || HasDischarge == false)
+            if (isActiveAndEnabled == false || _sourceActive == false || HasDischarge == false)
             {
                 return;
             }
@@ -95,6 +98,10 @@ namespace RaidIntoDarkness.Effects
             {
                 _contactEffects.Clear();
             }
+            if (_smallContactEffects != null)
+            {
+                _smallContactEffects.Clear();
+            }
             if (_entranceContactEffects != null)
             {
                 _entranceContactEffects.Clear();
@@ -119,6 +126,32 @@ namespace RaidIntoDarkness.Effects
             Hidden?.Invoke();
         }
 
+        public void SetSourceActive(bool active)
+        {
+            _sourceActive = active;
+            _isVisible = active && isActiveAndEnabled;
+            if (_isVisible == false)
+            {
+                ClearIdle();
+                if (_idleContactEffects != null)
+                {
+                    _idleContactEffects.Clear();
+                }
+                if (_smallIdleContactEffects != null)
+                {
+                    _smallIdleContactEffects.Clear();
+                }
+            }
+            if (_audio != null)
+            {
+                _audio.SetVisible(_isVisible);
+            }
+            if (_isVisible)
+            {
+                EnsureIdle();
+            }
+        }
+
         public void PlayEntrance(Transform target, bool small = false)
         {
             if (_isVisible == false || isActiveAndEnabled == false || target == null)
@@ -129,12 +162,12 @@ namespace RaidIntoDarkness.Effects
             {
                 _audio.PlayEntrance(target.position);
             }
-            AnomalyContactEffects entrance = small && _smallEntranceContactEffects != null ? _smallEntranceContactEffects : _entranceContactEffects != null ? _entranceContactEffects : _contactEffects;
+            AnomalyContactEffects entrance = SelectContact(_entranceContactEffects != null || _useSourceContactEffects ? _entranceContactEffects : _contactEffects, _smallEntranceContactEffects, small);
             if (entrance != null)
             {
                 entrance.PlayEntrance(target);
             }
-            AnomalyContactEffects idle = small && _smallIdleContactEffects != null ? _smallIdleContactEffects : _idleContactEffects;
+            AnomalyContactEffects idle = SelectContact(_idleContactEffects, _smallIdleContactEffects, small);
             if (idle != null)
             {
                 idle.PlayIdle(target);
@@ -143,14 +176,14 @@ namespace RaidIntoDarkness.Effects
 
         public void StopContact(Transform target, bool small = false)
         {
-            AnomalyContactEffects idle = small && _smallIdleContactEffects != null ? _smallIdleContactEffects : _idleContactEffects;
+            AnomalyContactEffects idle = SelectContact(_idleContactEffects, _smallIdleContactEffects, small);
             if (idle != null)
             {
                 idle.StopTarget(target);
             }
         }
 
-        public void PlayHit(Transform target)
+        public void PlayHit(Transform target, bool small = false)
         {
             if (_isVisible == false || isActiveAndEnabled == false || target == null)
             {
@@ -160,9 +193,10 @@ namespace RaidIntoDarkness.Effects
             {
                 _audio.PlayHit(target.position);
             }
-            if (_contactEffects != null)
+            AnomalyContactEffects contact = SelectContact(_contactEffects, _smallContactEffects, small);
+            if (contact != null)
             {
-                _contactEffects.PlayHit(target);
+                contact.PlayHit(target);
             }
         }
 
@@ -210,6 +244,11 @@ namespace RaidIntoDarkness.Effects
         protected abstract bool StartDischarge();
         protected abstract void StopDischarge();
         protected abstract void TickVisual(float deltaTime);
+
+        private AnomalyContactEffects SelectContact(AnomalyContactEffects large, AnomalyContactEffects small, bool isSmall)
+        {
+            return isSmall && (_useSourceContactEffects || small != null) ? small : large;
+        }
 
         protected static void Clear(ParticleSystem system)
         {

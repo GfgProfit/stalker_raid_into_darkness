@@ -16,17 +16,6 @@ namespace RaidIntoDarkness.Integrations.Inventory
         public const string CONDITION_STATE = "condition";
         public const char NUMBER_SEPARATOR = '.';
 
-        internal const double MAX_FIRE_WOUND_DAMAGE = 1.3;
-        internal const double MAX_WOUND_DAMAGE = 1.9;
-        internal const double MAX_STRIKE_DAMAGE = 2.0;
-        internal const double MAX_EXPLOSION_DAMAGE = 3.0;
-        internal const double MAX_BURN_DAMAGE = 0.19;
-        internal const double MAX_SHOCK_DAMAGE = 1.0;
-        internal const double MAX_CHEMICAL_DAMAGE = 0.033;
-        internal const double MAX_RADIATION_DAMAGE = 0.0062;
-        internal const double MAX_TELEPATIC_DAMAGE = 0.6;
-        internal const double ELEMENTAL_FACTOR = 10.0;
-
         private const double PERCENT = 100.0;
         private const string PERCENT_UNIT = "%";
         private const string KILOGRAM_UNIT = "stat_unit_kg";
@@ -60,21 +49,21 @@ namespace RaidIntoDarkness.Integrations.Inventory
 
         private static readonly StatRow[] OUTFIT_ROWS =
         {
-            new("stat_fire_wound", "Ballistic protection", ICON_BALLISTIC, null, EquipmentStat.FireWound, PERCENT / MAX_FIRE_WOUND_DAMAGE, PERCENT_UNIT, true, true),
-            new("stat_fire_wound_helmet", "Helmet ballistic protection", ICON_BALLISTIC, null, EquipmentStat.HelmetFireWound, PERCENT / MAX_FIRE_WOUND_DAMAGE, PERCENT_UNIT, true, true),
-            new("stat_wound", "Rupture protection", ICON_WOUND, null, EquipmentStat.Wound, PERCENT / MAX_WOUND_DAMAGE, PERCENT_UNIT, true, true),
-            new("stat_strike", "Impact protection", ICON_STRIKE, null, EquipmentStat.Strike, PERCENT / MAX_STRIKE_DAMAGE, PERCENT_UNIT, true, true),
-            new("stat_explosion", "Explosion protection", ICON_EXPLOSION, null, EquipmentStat.Explosion, PERCENT / MAX_EXPLOSION_DAMAGE, PERCENT_UNIT, true, true),
-            new("stat_radiation", "Radiation protection", ICON_RADIATION, null, EquipmentStat.Radiation, PERCENT / (MAX_RADIATION_DAMAGE * ELEMENTAL_FACTOR), PERCENT_UNIT, true, true),
-            new("stat_telepatic", "Psy protection", ICON_TELEPATIC, null, EquipmentStat.Telepatic, PERCENT / MAX_TELEPATIC_DAMAGE, PERCENT_UNIT, true, true),
-            new("stat_burn", "Burn protection", ICON_BURN, null, EquipmentStat.Burn, PERCENT / (MAX_BURN_DAMAGE * ELEMENTAL_FACTOR), PERCENT_UNIT, true, true),
-            new("stat_shock", "Shock protection", ICON_SHOCK, null, EquipmentStat.Shock, PERCENT / (MAX_SHOCK_DAMAGE * ELEMENTAL_FACTOR), PERCENT_UNIT, true, true),
-            new("stat_chemical_burn", "Chemical protection", ICON_CHEMICAL, null, EquipmentStat.ChemicalBurn, PERCENT / (MAX_CHEMICAL_DAMAGE * ELEMENTAL_FACTOR), PERCENT_UNIT, true, true),
+            new("stat_fire_wound", "Ballistic protection", ICON_BALLISTIC, null, EquipmentStat.FireWound, 1.0, PERCENT_UNIT, true, true),
+            new("stat_fire_wound_helmet", "Helmet ballistic protection", ICON_BALLISTIC, null, EquipmentStat.HelmetFireWound, 1.0, PERCENT_UNIT, true, true),
+            new("stat_wound", "Rupture protection", ICON_WOUND, null, EquipmentStat.Wound, 1.0, PERCENT_UNIT, true, true),
+            new("stat_strike", "Impact protection", ICON_STRIKE, null, EquipmentStat.Strike, 1.0, PERCENT_UNIT, true, true),
+            new("stat_explosion", "Explosion protection", ICON_EXPLOSION, null, EquipmentStat.Explosion, 1.0, PERCENT_UNIT, true, true),
+            new("stat_radiation", "Radiation protection", ICON_RADIATION, null, EquipmentStat.Radiation, 1.0, PERCENT_UNIT, true, true),
+            new("stat_telepatic", "Psy protection", ICON_TELEPATIC, null, EquipmentStat.Telepatic, 1.0, PERCENT_UNIT, true, true),
+            new("stat_burn", "Burn protection", ICON_BURN, null, EquipmentStat.Burn, 1.0, PERCENT_UNIT, true, true),
+            new("stat_shock", "Shock protection", ICON_SHOCK, null, EquipmentStat.Shock, 1.0, PERCENT_UNIT, true, true),
+            new("stat_chemical_burn", "Chemical protection", ICON_CHEMICAL, null, EquipmentStat.ChemicalBurn, 1.0, PERCENT_UNIT, true, true),
             new("stat_artefact_count", "Artefact slots", ICON_ARTEFACT, null, EquipmentStat.ArtefactCount, 1.0, string.Empty, false, false),
             new("stat_additional_weight", "Carry weight", ICON_WEIGHT, ICON_WEIGHT_NEGATIVE, EquipmentStat.AdditionalWeight, 1.0, KILOGRAM_UNIT, true, false),
             new("stat_speed", "Mobility multiplier", ICON_SPEED, null, EquipmentStat.Speed, PERCENT, PERCENT_UNIT, false, false),
-            new("stat_durability_physical", "Physical durability", ICON_PHYSICAL, null, EquipmentStat.PhysicalDurability, PERCENT, PERCENT_UNIT, false, false),
-            new("stat_durability_anomaly", "Anomaly durability", ICON_ANOMALY, null, EquipmentStat.AnomalyDurability, PERCENT, PERCENT_UNIT, false, false)
+            new("stat_durability_physical", "Physical durability", ICON_PHYSICAL, null, EquipmentStat.PhysicalDurability, 1.0, PERCENT_UNIT, false, false),
+            new("stat_durability_anomaly", "Anomaly durability", ICON_ANOMALY, null, EquipmentStat.AnomalyDurability, 1.0, PERCENT_UNIT, false, false)
         };
 
         private static readonly StatRow[] BACKPACK_ROWS =
@@ -172,8 +161,14 @@ namespace RaidIntoDarkness.Integrations.Inventory
             for (int i = 0; i < rows.Length; i++)
             {
                 StatRow row = rows[i];
-                float value = component.GetValue(row.Stat) * (row.Condition ? condition : 1f);
-                float otherValue = other != null ? other.GetValue(row.Stat) * (row.Condition ? otherCondition : 1f) : 0f;
+                float value = component.GetValue(row.Stat);
+                float otherValue = other != null ? other.GetValue(row.Stat) : 0f;
+
+                if (row.Condition)
+                {
+                    value *= FullCondition && row.LiteralPercent ? 1f : condition;
+                    otherValue *= otherCondition;
+                }
                 Add(stats, row, value, otherValue, row.Unit == KILOGRAM_UNIT ? kilograms : row.Unit);
             }
         }
@@ -238,6 +233,12 @@ namespace RaidIntoDarkness.Integrations.Inventory
                 return;
             }
 
+            if (row.LiteralPercent)
+            {
+                AddPercentage(stats, row, value, otherValue);
+                return;
+            }
+
             double raw = (double)(decimal)value * row.Magnitude;
             double scaled = Math.Ceiling(raw);
             InventoryStatTone tone = scaled >= 0 ? InventoryStatTone.Normal : InventoryStatTone.Negative;
@@ -258,6 +259,22 @@ namespace RaidIntoDarkness.Integrations.Inventory
             string text = unit.Length > 0 ? number + " " + unit : number;
             string iconId = value < 0f && row.NegativeIcon != null ? row.NegativeIcon : row.Icon;
             stats.Add(new InventoryItemStat(_window.Label(row.Key, row.Fallback), text, _window.Theme != null ? _window.Theme.Icon(iconId) : null, tone, comparison));
+        }
+
+        private void AddPercentage(List<InventoryItemStat> stats, StatRow row, float value, float otherValue)
+        {
+            InventoryStatTone tone = value >= 0f ? InventoryStatTone.Normal : InventoryStatTone.Negative;
+            string comparison = null;
+
+            if (otherValue != 0f && value != otherValue)
+            {
+                float difference = value - otherValue;
+                comparison = "(" + (difference > 0f ? "+" : string.Empty) + difference.ToString("0.##", CultureInfo.InvariantCulture) + ")";
+                tone = value > otherValue ? InventoryStatTone.Better : InventoryStatTone.Worse;
+            }
+
+            string text = value.ToString("0.##", CultureInfo.InvariantCulture) + PERCENT_UNIT;
+            stats.Add(new InventoryItemStat(_window.Label(row.Key, row.Fallback), text, _window.Theme != null ? _window.Theme.Icon(row.Icon) : null, tone, comparison));
         }
 
         private readonly struct StatRow
@@ -284,6 +301,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
             public string Unit { get; }
             public bool Sign { get; }
             public bool Condition { get; }
+            public bool LiteralPercent => Unit == PERCENT_UNIT && Stat != EquipmentStat.Speed;
         }
     }
 }

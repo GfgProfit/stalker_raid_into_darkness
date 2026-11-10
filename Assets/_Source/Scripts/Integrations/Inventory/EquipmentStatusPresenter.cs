@@ -14,21 +14,19 @@ namespace RaidIntoDarkness.Integrations.Inventory
         public const string STATUS_WOUND = "wound";
         public const string STATUS_FIRE_WOUND = "fire_wound";
 
-        private const float ELEMENTAL_SCALE = 0.1f;
-
         private static readonly Color POSITIVE_COLOR = new(0f, 1f, 0f, 1f);
         private static readonly Color NEGATIVE_COLOR = new(1f, 0f, 0f, 1f);
         private static readonly Color NEUTRAL_COLOR = new(100f / 255f, 100f / 255f, 100f / 255f, 1f);
 
         private static readonly StatusBar[] BARS =
         {
-            new(STATUS_RADIATION, EquipmentStat.Radiation, EquipmentStatsFormatter.MAX_RADIATION_DAMAGE, true),
-            new(STATUS_CHEMICAL, EquipmentStat.ChemicalBurn, EquipmentStatsFormatter.MAX_CHEMICAL_DAMAGE, true),
-            new(STATUS_SHOCK, EquipmentStat.Shock, EquipmentStatsFormatter.MAX_SHOCK_DAMAGE, true),
-            new(STATUS_FIRE, EquipmentStat.Burn, EquipmentStatsFormatter.MAX_BURN_DAMAGE, true),
-            new(STATUS_PSI, EquipmentStat.Telepatic, EquipmentStatsFormatter.MAX_TELEPATIC_DAMAGE, false),
-            new(STATUS_WOUND, EquipmentStat.Wound, EquipmentStatsFormatter.MAX_WOUND_DAMAGE, false),
-            new(STATUS_FIRE_WOUND, EquipmentStat.FireWound, EquipmentStatsFormatter.MAX_FIRE_WOUND_DAMAGE, false)
+            new(STATUS_RADIATION, EquipmentStat.Radiation),
+            new(STATUS_CHEMICAL, EquipmentStat.ChemicalBurn),
+            new(STATUS_SHOCK, EquipmentStat.Shock),
+            new(STATUS_FIRE, EquipmentStat.Burn),
+            new(STATUS_PSI, EquipmentStat.Telepatic),
+            new(STATUS_WOUND, EquipmentStat.Wound),
+            new(STATUS_FIRE_WOUND, EquipmentStat.FireWound)
         };
 
         private readonly InventoryWindow _window;
@@ -45,13 +43,9 @@ namespace RaidIntoDarkness.Integrations.Inventory
             ItemInstance outfit = EquipmentStatsFormatter.FindEquipped(_window, EquipmentStatsFormatter.OUTFIT_CATEGORY);
             ItemInstance helmet = EquipmentStatsFormatter.FindEquipped(_window, EquipmentStatsFormatter.HELMET_CATEGORY);
             EquipmentStatsComponent outfitStats = GetStats(outfit);
-            EquipmentStatsComponent helmetStats = GetStats(helmet);
-            float outfitCondition = fullCondition ? 1f : EquipmentStatsFormatter.GetCondition(outfit);
-            float helmetCondition = fullCondition ? 1f : EquipmentStatsFormatter.GetCondition(helmet);
             EquipmentStatsComponent hoveredStats = IsBonusCandidate(hovered) ? GetStats(hovered) : null;
             bool hoveredOutfit = hoveredStats != null && hovered.Definition.IsCategory(EquipmentStatsFormatter.OUTFIT_CATEGORY);
             bool hoveredHelmet = hoveredStats != null && hovered.Definition.IsCategory(EquipmentStatsFormatter.HELMET_CATEGORY);
-            float hoveredCondition = fullCondition ? 1f : EquipmentStatsFormatter.GetCondition(hovered);
 
             if (hoveredHelmet && outfitStats != null && outfitStats.HelmetAvailable == false)
             {
@@ -63,9 +57,9 @@ namespace RaidIntoDarkness.Integrations.Inventory
             for (int i = 0; i < BARS.Length; i++)
             {
                 StatusBar bar = BARS[i];
-                float outfitValue = GetProtection(outfitStats, bar, outfitCondition);
-                float helmetValue = GetProtection(helmetStats, bar, helmetCondition);
-                float current = Normalize(outfitValue + helmetValue, bar);
+                float outfitValue = GetProtection(outfit, bar, fullCondition);
+                float helmetValue = GetProtection(helmet, bar, fullCondition);
+                float current = Normalize(outfitValue + helmetValue);
                 _status.SetValue(bar.Id, current);
 
                 if (hoveredOutfit == false && hoveredHelmet == false)
@@ -77,11 +71,11 @@ namespace RaidIntoDarkness.Integrations.Inventory
 
                 if (hoveredOutfit)
                 {
-                    bonus = Normalize(GetProtection(hoveredStats, bar, hoveredCondition) + (hoveredStats.HelmetAvailable ? helmetValue : 0f), bar);
+                    bonus = Normalize(GetProtection(hovered, bar, fullCondition) + (hoveredStats.HelmetAvailable ? helmetValue : 0f));
                 }
                 else
                 {
-                    bonus = Normalize(outfitValue + GetProtection(hoveredStats, bar, hoveredCondition), bar);
+                    bonus = Normalize(outfitValue + GetProtection(hovered, bar, fullCondition));
                 }
 
                 _status.SetBonus(bar.Id, bonus, bonus > current ? POSITIVE_COLOR : bonus < current ? NEGATIVE_COLOR : NEUTRAL_COLOR);
@@ -92,10 +86,11 @@ namespace RaidIntoDarkness.Integrations.Inventory
 
         private static EquipmentStatsComponent GetStats(ItemInstance item) => item != null ? item.Definition.GetComponent<EquipmentStatsComponent>() : null;
 
-        private static float Normalize(float value, StatusBar bar) => Mathf.Clamp01((float)(value / bar.Max));
+        private static float Normalize(float value) => Mathf.Clamp01(value / 100f);
 
-        private static float GetProtection(EquipmentStatsComponent stats, StatusBar bar, float condition)
+        private static float GetProtection(ItemInstance item, StatusBar bar, bool fullCondition)
         {
+            EquipmentStatsComponent stats = GetStats(item);
             if (stats == null)
             {
                 return 0f;
@@ -108,23 +103,19 @@ namespace RaidIntoDarkness.Integrations.Inventory
                 value += stats.GetValue(EquipmentStat.HelmetFireWound);
             }
 
-            return value * condition * (bar.Elemental ? ELEMENTAL_SCALE : 1f);
+            return value * (fullCondition ? 1f : EquipmentStatsFormatter.GetCondition(item));
         }
 
         private readonly struct StatusBar
         {
-            public StatusBar(string id, EquipmentStat stat, double max, bool elemental)
+            public StatusBar(string id, EquipmentStat stat)
             {
                 Id = id;
                 Stat = stat;
-                Max = max;
-                Elemental = elemental;
             }
 
             public string Id { get; }
             public EquipmentStat Stat { get; }
-            public double Max { get; }
-            public bool Elemental { get; }
         }
     }
 }

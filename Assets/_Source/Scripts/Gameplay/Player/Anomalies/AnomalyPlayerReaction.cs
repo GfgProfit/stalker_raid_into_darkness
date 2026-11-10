@@ -1,11 +1,12 @@
 using System.Collections.Generic;
 using RaidIntoDarkness.Effects;
 using UnityEngine;
+using XRay.Importer.Levels;
 
 namespace RaidIntoDarkness.Player
 {
     [DisallowMultipleComponent]
-    public sealed class AnomalyPlayerReaction : MonoBehaviour
+    public sealed class AnomalyPlayerReaction : MonoBehaviour, IXRayAnomalyActivitySource
     {
         [SerializeField] private AnomalyVisual _visual;
         [SerializeField] private AnomalyInfluenceProfile _influenceProfile;
@@ -13,6 +14,9 @@ namespace RaidIntoDarkness.Player
         [SerializeField, Min(0f)] private float _blowoutTime;
         [SerializeField, Min(0f)] private float _accumulateTime;
         [SerializeField] private bool _ignoreSmallObjects;
+        [SerializeField] private bool _actorOnly;
+        [SerializeField] private bool _ignoreNonlivingObjects;
+        [SerializeField, Min(0f)] private float _minimumPlayerSpeed;
         [SerializeField] private float _smallObjectIgnoreDelay = 0.5f;
         [SerializeField] private float _nonlivingIdleStopDelay = 0.1f;
         [SerializeField] private bool _repeatNonlivingIdleStop;
@@ -29,12 +33,36 @@ namespace RaidIntoDarkness.Player
         private AnomalyCycle _cycle;
         private float _pulseAt;
         private bool _pulsePending;
+        private bool _sourceActive = true;
+        private XRayAnomalyActivationVolume _activationVolume;
 
         public AnomalyPhase Phase => _cycle != null ? _cycle.Phase : AnomalyPhase.Idle;
         public float CooldownRemaining => _cycle != null ? _cycle.GetCooldownRemaining(Time.time) : 0f;
         public bool IsReady => CanDetect && Phase == AnomalyPhase.Idle;
         public AnomalyInfluenceProfile InfluenceProfile => _influenceProfile;
         public bool IsInfluencing => CanDetect;
+        public bool CanDeactivate => Phase == AnomalyPhase.Idle;
+
+        public void SetSourceActive(bool active)
+        {
+            if (_sourceActive == active)
+            {
+                return;
+            }
+            _sourceActive = active;
+            if (_visual == null)
+            {
+                _visual = GetComponent<AnomalyVisual>();
+            }
+            if (_visual != null)
+            {
+                _visual.SetSourceActive(active);
+            }
+            if (active == false)
+            {
+                ResetCycle();
+            }
+        }
 
         public bool IsTouching(StalkerPlayerController player)
         {
@@ -48,10 +76,11 @@ namespace RaidIntoDarkness.Player
             return false;
         }
 
-        private bool CanDetect => isActiveAndEnabled && _visual != null && _visual.isActiveAndEnabled && _visual.IsVisible;
+        private bool CanDetect => _sourceActive && isActiveAndEnabled && _visual != null && _visual.isActiveAndEnabled && _visual.IsVisible;
 
         private void Awake()
         {
+            _activationVolume = GetComponent<XRayAnomalyActivationVolume>();
             if (_visual == null)
             {
                 _visual = GetComponent<AnomalyVisual>();
@@ -126,7 +155,7 @@ namespace RaidIntoDarkness.Player
 
             RemoveExpiredContacts();
             AnomalyPhase previous = _cycle.Phase;
-            if (_cycle.Tick(Time.time, _contacts.Count > 0 || HasActiveProbe()))
+            if (_cycle.Tick(Time.time, HasActivePlayer() || HasActiveProbe()))
             {
                 _visual.PlayDischarge();
             }
@@ -159,6 +188,10 @@ namespace RaidIntoDarkness.Player
 
         private void OnTriggerExit(Collider other)
         {
+            if (other == null || _activationVolume != null && _activationVolume.Overlaps(other))
+            {
+                return;
+            }
             if (_probeContacts.TryGetValue(other, out ProbeContact probeContact))
             {
                 _probeContacts.Remove(other);
@@ -179,7 +212,7 @@ namespace RaidIntoDarkness.Player
 
         private void RegisterContact(Collider other)
         {
-            if (CanDetect == false || other == null || other.enabled == false || other.gameObject.activeInHierarchy == false || _contacts.ContainsKey(other) || _probeContacts.ContainsKey(other))
+            if (CanDetect == false || other == null || other.enabled == false || other.gameObject.activeInHierarchy == false || IsWithinSourceShapes(other) == false || _contacts.ContainsKey(other) || _probeContacts.ContainsKey(other))
             {
                 return;
             }
@@ -252,7 +285,7 @@ namespace RaidIntoDarkness.Player
 
         private void RegisterProbe(Collider collider)
         {
-            if (_probeContacts.ContainsKey(collider))
+            if (_actorOnly || _probeContacts.ContainsKey(collider))
             {
                 return;
             }
@@ -267,9 +300,13 @@ namespace RaidIntoDarkness.Player
 
         private bool HasActiveProbe()
         {
-            foreach (ProbeContact contact in _probeContacts.Values)
+            if (_actorOnly || _ignoreNonlivingObjects || _minimumPlayerSpeed > 0f)
             {
-                if (AnomalyProbe.CanActivate(Time.time - contact.EnteredAt, _ignoreSmallObjects, _smallObjectIgnoreDelay))
+                return false;
+            }
+            foreach (KeyValuePair<Collider, ProbeContact> contact in _probeContacts)
+            {
+                if (IsProbeActive(contact.Key, contact.Value.Probe) && AnomalyProbe.CanActivate(Time.time - contact.Value.EnteredAt, _ignoreSmallObjects, _smallObjectIgnoreDelay))
                 {
                     return true;
                 }
@@ -277,9 +314,21 @@ namespace RaidIntoDarkness.Player
             return false;
         }
 
-        private static bool IsProbeActive(Collider collider, AnomalyProbe probe)
+        private bool HasActivePlayer()
         {
-            return collider != null && collider.enabled && collider.gameObject.activeInHierarchy && probe != null && probe.isActiveAndEnabled;
+            foreach (KeyValuePair<Collider, StalkerPlayerController> contact in _contacts)
+            {
+                if (IsContactActive(contact.Key, contact.Value) && (_minimumPlayerSpeed <= 0f || contact.Value.Motor != null && contact.Value.Motor.ActualVelocity > _minimumPlayerSpeed))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private bool IsProbeActive(Collider collider, AnomalyProbe probe)
+        {
+            return collider != null && collider.enabled && collider.gameObject.activeInHierarchy && probe != null && probe.isActiveAndEnabled && IsWithinSourceShapes(collider);
         }
 
         private void OnDischargeStarted()
@@ -329,16 +378,21 @@ namespace RaidIntoDarkness.Player
             foreach (KeyValuePair<Collider, ProbeContact> contact in _probeContacts)
             {
                 AnomalyProbe probe = contact.Value.Probe;
-                if (IsProbeActive(contact.Key, probe) && AnomalyProbe.CanActivate(Time.time - contact.Value.EnteredAt, _ignoreSmallObjects, _smallObjectIgnoreDelay) && _affectedProbes.Add(probe))
+                if (IsProbeActive(contact.Key, probe) && AnomalyProbe.CanActivate(Time.time - contact.Value.EnteredAt, _ignoreSmallObjects || _ignoreNonlivingObjects || _actorOnly, _smallObjectIgnoreDelay) && _affectedProbes.Add(probe))
                 {
-                    _visual.PlayHit(probe.transform);
+                    _visual.PlayHit(probe.transform, true);
                 }
             }
         }
 
-        private static bool IsContactActive(Collider collider, StalkerPlayerController player)
+        private bool IsContactActive(Collider collider, StalkerPlayerController player)
         {
-            return collider != null && collider.enabled && collider.gameObject.activeInHierarchy && player != null && player.isActiveAndEnabled;
+            return collider != null && collider.enabled && collider.gameObject.activeInHierarchy && player != null && player.isActiveAndEnabled && IsWithinSourceShapes(collider);
+        }
+
+        private bool IsWithinSourceShapes(Collider collider)
+        {
+            return _activationVolume == null || _activationVolume.Overlaps(collider);
         }
 
         private sealed class ProbeContact

@@ -268,7 +268,30 @@ namespace XRay.Importer.Core.Spawn
             result.EnabledTime = state.ReadUInt32();
             result.DisabledTime = state.ReadUInt32();
             result.StartTimeShift = state.ReadUInt32();
+            if (IsMovingAnomaly(section))
+            {
+                result.MotionName = StringZ(state);
+                if (state.Remaining > 0 && IsScriptedMovingAnomaly(section))
+                {
+                    byte legacyRespawnTime = state.ReadByte();
+                    if (legacyRespawnTime != 0)
+                    {
+                        throw new XRayFormatException($"{state.Context}: unsupported legacy anomaly respawn timestamp flag {legacyRespawnTime}.");
+                    }
+                }
+                End(state);
+            }
             return result;
+        }
+
+        private static bool IsMovingAnomaly(string section)
+        {
+            return IsScriptedMovingAnomaly(section) || string.Equals(section, "generator_torrid", StringComparison.OrdinalIgnoreCase) || string.Equals(section, "generator_dust", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static bool IsScriptedMovingAnomaly(string section)
+        {
+            return string.Equals(section, "fireball_zone", StringComparison.OrdinalIgnoreCase) || string.Equals(section, "fireball_electric_zone", StringComparison.OrdinalIgnoreCase) || string.Equals(section, "fireball_acidic_zone", StringComparison.OrdinalIgnoreCase);
         }
 
         private static void ReadShapes(XRayReader reader, XRaySpawnAnomaly anomaly)

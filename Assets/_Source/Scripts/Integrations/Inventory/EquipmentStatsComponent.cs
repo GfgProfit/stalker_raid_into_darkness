@@ -34,16 +34,16 @@ namespace RaidIntoDarkness.Integrations.Inventory
         [SerializeField] private string _community;
         [SerializeField] private Sprite _communityIcon;
         [SerializeField] private Vector2 _communityIconSize;
-        [SerializeField] private float _burnProtection;
-        [SerializeField] private float _shockProtection;
-        [SerializeField] private float _chemicalBurnProtection;
-        [SerializeField] private float _radiationProtection;
-        [SerializeField] private float _telepaticProtection;
-        [SerializeField] private float _woundProtection;
-        [SerializeField] private float _strikeProtection;
-        [SerializeField] private float _explosionProtection;
-        [SerializeField] private float _fireWoundProtection;
-        [SerializeField] private float _helmetFireWoundProtection;
+        [SerializeField] [Range(0f, 100f)] private float _burnProtection;
+        [SerializeField] [Range(0f, 100f)] private float _shockProtection;
+        [SerializeField] [Range(0f, 100f)] private float _chemicalBurnProtection;
+        [SerializeField] [Range(0f, 100f)] private float _radiationProtection;
+        [SerializeField] [Range(0f, 100f)] private float _telepaticProtection;
+        [SerializeField] [Range(0f, 100f)] private float _woundProtection;
+        [SerializeField] [Range(0f, 100f)] private float _strikeProtection;
+        [SerializeField] [Range(0f, 100f)] private float _explosionProtection;
+        [SerializeField] [Range(0f, 100f)] private float _fireWoundProtection;
+        [SerializeField] [Range(0f, 100f)] private float _helmetFireWoundProtection;
         [SerializeField] private int _artefactCount;
         [SerializeField] private float _additionalWeight;
         [SerializeField] private float _powerLoss;
@@ -51,8 +51,8 @@ namespace RaidIntoDarkness.Integrations.Inventory
         [SerializeField] private bool _sprintAllowed = true;
         [SerializeField] private string _nightVisionSection;
         [SerializeField] private float _speed = 1f;
-        [SerializeField] private float _physicalDurability;
-        [SerializeField] private float _anomalyDurability;
+        [SerializeField] [Range(0f, 100f)] private float _physicalDurability;
+        [SerializeField] [Range(0f, 100f)] private float _anomalyDurability;
 
         public string Section => _section ?? string.Empty;
         public int Cost => _cost;

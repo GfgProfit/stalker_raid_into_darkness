@@ -62,7 +62,6 @@ namespace XRay.Importer.Editor.Levels
             var result = new XRayLevelAnomalyPlacementResult();
             var missing = new SortedDictionary<string, int>(StringComparer.Ordinal);
             var unsupported = new SortedDictionary<string, int>(StringComparer.Ordinal);
-            int periodic = 0;
             var staging = new GameObject(GROUP_NAME);
             SceneManager.MoveGameObjectToScene(staging, levelRoot.scene);
             staging.SetActive(false);
@@ -85,17 +84,17 @@ namespace XRay.Importer.Editor.Levels
                         continue;
                     }
 
-                    if (anomaly.Shapes.Count != 1)
-                    {
-                        Count(unsupported, description + ": составной объём (форм: " + anomaly.Shapes.Count + ")");
-                        continue;
-                    }
-
-                    XRaySpawnShape shape = anomaly.Shapes[0];
-                    string reason = ValidateShape(shape);
+                    string reason = ValidateShapes(anomaly.Shapes);
                     if (reason != null)
                     {
                         Count(unsupported, description + ": " + reason);
+                        continue;
+                    }
+
+                    string motionError = ValidateMotion(entry.Prefab, anomaly.MotionName, catalog, out XRayAnmAsset motionAsset);
+                    if (motionError != null)
+                    {
+                        Count(unsupported, description + ": " + motionError);
                         continue;
                     }
 
@@ -105,14 +104,12 @@ namespace XRay.Importer.Editor.Levels
                     instance.transform.localPosition = XRayUnitySpace.Position(anomaly.Position, 1f);
                     instance.transform.localRotation = SourceRotation(anomaly.Angles);
                     instance.transform.localScale = Vector3.one;
-                    ConfigureVolume(instance, shape, description);
+                    ConfigureVolumes(instance, anomaly.Shapes, description);
                     DisableRandomRadius(instance);
+                    ConfigureMotion(instance, motionAsset);
+                    ConfigureSchedule(instance, anomaly);
                     PrefabUtility.RecordPrefabInstancePropertyModifications(instance.transform);
                     result.ImportedCount++;
-                    if (anomaly.EnabledTime != 0 || anomaly.DisabledTime != 0 || anomaly.StartTimeShift != 0)
-                    {
-                        periodic++;
-                    }
                 }
 
                 foreach (KeyValuePair<string, int> item in missing)
@@ -123,11 +120,6 @@ namespace XRay.Importer.Editor.Levels
                 foreach (KeyValuePair<string, int> item in unsupported)
                 {
                     result.Unsupported.Add("Не импортировано «" + item.Key + "»: " + item.Value + ".");
-                }
-
-                if (periodic > 0)
-                {
-                    result.Warnings.Add("Аномалии с расписанием активности all.spawn: " + periodic + ". Используется игровой цикл назначенного префаба; расписание X-Ray не переносится.");
                 }
 
                 result.Group = staging.AddComponent<XRayLevelAnomalyGroup>();
@@ -155,6 +147,10 @@ namespace XRay.Importer.Editor.Levels
 
         private static string ValidateShape(XRaySpawnShape shape)
         {
+            if (shape == null)
+            {
+                return "пустая форма";
+            }
             if (shape.Type == XRaySpawnShapeType.Sphere)
             {
                 return shape.Radius <= 0.0 ? "нулевой радиус сферы" : null;
@@ -179,6 +175,86 @@ namespace XRay.Importer.Editor.Levels
             }
 
             return null;
+        }
+
+        private static string ValidateShapes(IReadOnlyList<XRaySpawnShape> shapes)
+        {
+            if (shapes == null || shapes.Count == 0)
+            {
+                return "пустой объём (форм: 0)";
+            }
+            for (int index = 0; index < shapes.Count; index++)
+            {
+                string error = ValidateShape(shapes[index]);
+                if (error != null)
+                {
+                    return "форма " + index + ": " + error;
+                }
+            }
+            return null;
+        }
+
+        private static string ValidateMotion(GameObject prefab, string motionName, XRayLevelAnomalyCatalog catalog, out XRayAnmAsset motionAsset)
+        {
+            motionAsset = null;
+            bool hasAdapter = FindMotionSource(prefab) != null;
+            if (string.IsNullOrWhiteSpace(motionName))
+            {
+                return hasAdapter ? "в all.spawn отсутствует исходный motion" : null;
+            }
+            if (!hasAdapter)
+            {
+                return "префаб не поддерживает исходный motion «" + motionName + "»";
+            }
+            if (!catalog.TryGetMotion(motionName, out motionAsset) || !motionAsset.HasCurves)
+            {
+                return "не назначен XRayAnmAsset с исходными кривыми для motion «" + motionName + "»";
+            }
+            return null;
+        }
+
+        private static IXRayAnmSource FindMotionSource(GameObject root)
+        {
+            foreach (MonoBehaviour component in root.GetComponents<MonoBehaviour>())
+            {
+                if (component != null && component is IXRayAnmSource source)
+                {
+                    return source;
+                }
+            }
+            return null;
+        }
+
+        private static void ConfigureMotion(GameObject instance, XRayAnmAsset asset)
+        {
+            if (asset == null)
+            {
+                return;
+            }
+            IXRayAnmSource source = FindMotionSource(instance);
+            source.Configure(asset, false);
+            var component = (MonoBehaviour)source;
+            PrefabUtility.RecordPrefabInstancePropertyModifications(component);
+            XRayAnmPlayer player = instance.GetComponent<XRayAnmPlayer>();
+            if (player != null)
+            {
+                PrefabUtility.RecordPrefabInstancePropertyModifications(player);
+            }
+        }
+
+        private static void ConfigureSchedule(GameObject instance, XRaySpawnAnomaly anomaly)
+        {
+            if (anomaly.EnabledTime == 0 && anomaly.DisabledTime == 0 && anomaly.StartTimeShift == 0)
+            {
+                return;
+            }
+            XRayAnomalySchedule schedule = instance.GetComponent<XRayAnomalySchedule>();
+            if (schedule == null)
+            {
+                schedule = instance.AddComponent<XRayAnomalySchedule>();
+            }
+            schedule.Configure(anomaly.EnabledTime, anomaly.DisabledTime, anomaly.StartTimeShift);
+            PrefabUtility.RecordPrefabInstancePropertyModifications(schedule);
         }
 
         private static void ConfigureVolume(GameObject instance, XRaySpawnShape shape, string description)
@@ -221,9 +297,93 @@ namespace XRay.Importer.Editor.Levels
                 box.center = volume.center;
                 box.size = new Vector3(x.magnitude, y.magnitude, z.magnitude);
                 box.isTrigger = true;
+                ConfigureActivation(instance, volume, new Collider[] { box });
             }
 
             PrefabUtility.RecordPrefabInstancePropertyModifications(volume);
+        }
+
+        private static void ConfigureVolumes(GameObject instance, IReadOnlyList<XRaySpawnShape> shapes, string description)
+        {
+            if (shapes.Count == 1)
+            {
+                ConfigureVolume(instance, shapes[0], description);
+                return;
+            }
+            SphereCollider proxy = instance.GetComponent<SphereCollider>();
+            if (proxy == null)
+            {
+                throw new InvalidOperationException("Префаб «" + description + "» должен иметь корневой SphereCollider для системы влияния аномалий.");
+            }
+            var actual = new Collider[shapes.Count];
+            Bounds bounds = default;
+            for (int index = 0; index < shapes.Count; index++)
+            {
+                XRaySpawnShape shape = shapes[index];
+                var child = new GameObject("ActivationShape_" + index.ToString("D4"));
+                child.layer = instance.layer;
+                child.transform.SetParent(instance.transform, false);
+                Vector3 center = XRayUnitySpace.Position(shape.Center, 1f);
+                child.transform.localPosition = center;
+                Vector3 extents;
+                if (shape.Type == XRaySpawnShapeType.Sphere)
+                {
+                    var sphere = child.AddComponent<SphereCollider>();
+                    sphere.radius = (float)shape.Radius;
+                    sphere.isTrigger = true;
+                    extents = Vector3.one * sphere.radius;
+                    actual[index] = sphere;
+                }
+                else
+                {
+                    Vector3 x = Column(shape.Box, 0);
+                    Vector3 y = Column(shape.Box, 1);
+                    Vector3 z = Column(shape.Box, 2);
+                    child.transform.localRotation = Quaternion.LookRotation(z.normalized, y.normalized);
+                    var box = child.AddComponent<BoxCollider>();
+                    box.size = new Vector3(x.magnitude, y.magnitude, z.magnitude);
+                    box.isTrigger = true;
+                    extents = (Absolute(x) + Absolute(y) + Absolute(z)) * 0.5f;
+                    actual[index] = box;
+                }
+                var shapeBounds = new Bounds(center, extents * 2f);
+                if (index == 0)
+                {
+                    bounds = shapeBounds;
+                }
+                else
+                {
+                    bounds.Encapsulate(shapeBounds);
+                }
+            }
+            proxy.enabled = true;
+            proxy.isTrigger = true;
+            proxy.center = bounds.center;
+            proxy.radius = bounds.extents.magnitude;
+            proxy.includeLayers = 0;
+            proxy.excludeLayers = ~0;
+            proxy.layerOverridePriority = int.MaxValue;
+            Rigidbody body = instance.GetComponent<Rigidbody>();
+            if (body == null)
+            {
+                body = instance.AddComponent<Rigidbody>();
+            }
+            body.isKinematic = true;
+            body.useGravity = false;
+            PrefabUtility.RecordPrefabInstancePropertyModifications(proxy);
+            PrefabUtility.RecordPrefabInstancePropertyModifications(body);
+            ConfigureActivation(instance, proxy, actual);
+        }
+
+        private static void ConfigureActivation(GameObject instance, SphereCollider proxy, Collider[] actualShapes)
+        {
+            XRayAnomalyActivationVolume activation = instance.GetComponent<XRayAnomalyActivationVolume>();
+            if (activation == null)
+            {
+                activation = instance.AddComponent<XRayAnomalyActivationVolume>();
+            }
+            activation.Configure(proxy, actualShapes);
+            PrefabUtility.RecordPrefabInstancePropertyModifications(activation);
         }
 
         private static void DisableRandomRadius(GameObject instance)

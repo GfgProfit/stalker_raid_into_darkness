@@ -10,6 +10,7 @@ namespace RaidIntoDarkness.Effects
         private const float LIGHT_EXPONENT = 0.15f;
 
         [SerializeField] private GameObject _dischargeTemplate;
+        [SerializeField] private bool _freezeDischargeAtStart;
         [SerializeField] private int _dischargeRootIndex;
         [SerializeField] private int[] _stopEffectIndices;
         [SerializeField] private float[] _stopTimes;
@@ -34,6 +35,10 @@ namespace RaidIntoDarkness.Effects
         {
             GameObject instance = Instantiate(_dischargeTemplate, transform);
             instance.name = "Discharge";
+            if (_freezeDischargeAtStart)
+            {
+                instance.transform.SetParent(null, true);
+            }
             AnomalyParticlePlayback playback = new AnomalyParticlePlayback(instance, _dischargeRootIndex, _stopEffectIndices, _stopTimes, _groupDuration);
             if (playback.IsValid == false || playback.Play(_dischargeEffectDelay) == false)
             {
@@ -80,7 +85,7 @@ namespace RaidIntoDarkness.Effects
                 return;
             }
 
-            bool active = IsVisible && _lightDelayRemaining <= 0f && _lightRemaining > 0f && _dischargeLightDuration > 0f;
+            bool active = _lightDelayRemaining <= 0f && _lightRemaining > 0f && _dischargeLightDuration > 0f;
             float strength = active ? Mathf.Pow(Mathf.Clamp01(_lightRemaining / _dischargeLightDuration) + LIGHT_EPSILON, LIGHT_EXPONENT) : 0f;
             _dischargeLight.intensity = _dischargeLightIntensity * strength;
             _dischargeLight.range = Mathf.Max(0.001f, _dischargeLightRange * strength);

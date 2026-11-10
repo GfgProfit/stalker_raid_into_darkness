@@ -73,16 +73,16 @@ MonoBehaviour:
         _community: bandit
         _communityIcon: {fileID: -452201656, guid: d56bb8268bdae76448be8781bc547c55, type: 3}
         _communityIconSize: {x: 17, y: 20}
-        _burnProtection: 0.44
-        _shockProtection: 1.8
-        _chemicalBurnProtection: 0.38
-        _radiationProtection: 0.033
-        _telepaticProtection: 0.07
-        _woundProtection: 0.82
-        _strikeProtection: 0.9
-        _explosionProtection: 1
-        _fireWoundProtection: 0.67
-        _helmetFireWoundProtection: 0.41
+        _burnProtection: 24
+        _shockProtection: 18
+        _chemicalBurnProtection: 54
+        _radiationProtection: 54
+        _telepaticProtection: 12
+        _woundProtection: 44
+        _strikeProtection: 45
+        _explosionProtection: 34
+        _fireWoundProtection: 52
+        _helmetFireWoundProtection: 32
         _artefactCount: 3
         _additionalWeight: 46
         _powerLoss: 0.1
@@ -90,8 +90,8 @@ MonoBehaviour:
         _sprintAllowed: 1
         _nightVisionSection: 
         _speed: 0.97
-        _physicalDurability: 0.9938797
-        _anomalyDurability: 0.71498466
+        _physicalDurability: 100
+        _anomalyDurability: 72
     - rid: 3479885472039698435
       type: {class: WorldItemComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
       data:

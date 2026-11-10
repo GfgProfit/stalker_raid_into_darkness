@@ -250,6 +250,7 @@ namespace RaidIntoDarkness.Player
             if (Jumping && (GoodGround || Climbing && _contacts.Wall))
             {
                 Jumping = false;
+                _jumpStarted = false;
             }
 
             if (!onGround && !Climbing)

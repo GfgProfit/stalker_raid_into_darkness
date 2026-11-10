@@ -73,15 +73,15 @@ MonoBehaviour:
         _community: csky
         _communityIcon: {fileID: -955415911, guid: d56bb8268bdae76448be8781bc547c55, type: 3}
         _communityIconSize: {x: 19, y: 20}
-        _burnProtection: 0.48
-        _shockProtection: 1.6
-        _chemicalBurnProtection: 0.17
-        _radiationProtection: 0.009
+        _burnProtection: 26
+        _shockProtection: 16
+        _chemicalBurnProtection: 34
+        _radiationProtection: 15
         _telepaticProtection: 0
-        _woundProtection: 0.76
-        _strikeProtection: 0.68
-        _explosionProtection: 0.48
-        _fireWoundProtection: 0.34
+        _woundProtection: 40
+        _strikeProtection: 34
+        _explosionProtection: 16
+        _fireWoundProtection: 27
         _helmetFireWoundProtection: 0
         _artefactCount: 3
         _additionalWeight: 85
@@ -90,8 +90,8 @@ MonoBehaviour:
         _sprintAllowed: 0
         _nightVisionSection: 
         _speed: 1.08
-        _physicalDurability: 0.9540976
-        _anomalyDurability: 0.71498466
+        _physicalDurability: 96
+        _anomalyDurability: 72
     - rid: 3479885472039698455
       type: {class: WorldItemComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
       data:

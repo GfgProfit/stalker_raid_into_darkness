@@ -195,7 +195,7 @@ namespace RaidIntoDarkness.Player
             _visibleBody.Tick(_motor.State, _camera, deltaTime);
             if (_footsteps != null)
             {
-                _footsteps.Tick(_motor.State, _bodyPlayer, deltaTime);
+                _footsteps.Tick(_motor.State, _bodyPlayer, deltaTime, _motor.HasFootstepSupport);
             }
 
             if (_cameraEffects != null)
@@ -265,7 +265,7 @@ namespace RaidIntoDarkness.Player
 
             if (_cameraEffects != null)
             {
-                _cameraEffects.OnFootstep(_motor.State, _motor.Condition.Power);
+                _cameraEffects.OnFootstep(_motor.State, _motor.Condition.GetStat(StalkerStatKind.Stamina).NormalizedValue);
             }
         }
 

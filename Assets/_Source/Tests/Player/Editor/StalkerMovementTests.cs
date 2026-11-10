@@ -250,7 +250,7 @@ namespace RaidIntoDarkness.Player.Tests
         public void SprintStopsWithoutStaminaAndDrainsPower()
         {
             StalkerActorCondition condition = _rig.Motor.Condition;
-            condition.SetPower(0.05f);
+            condition.SetPower(0.05f * condition.PowerCapacity);
             _rig.Run(StalkerMoveFlags.Forward | StalkerMoveFlags.Sprint, 1.0f, DT);
             Assert.That(_rig.Motor.RealFlags.Has(StalkerMoveFlags.Sprint), Is.False);
             TestContext.WriteLine($"power 0.05: run_coef after stamina modifier {F(condition.RunCoef)}, speed {F(_rig.HorizontalSpeed)} m/s, limping {condition.IsLimping()}");

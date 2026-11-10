@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using XRay.Importer.Levels;
 
 namespace RaidIntoDarkness.Player
 {
@@ -26,6 +27,8 @@ namespace RaidIntoDarkness.Player
         private StalkerPlayerController _activatedPlayer;
         private float _elapsed;
         private bool _activated;
+        private XRayAnomalyActivationVolume _sourceShapes;
+        private AnomalyPlayerReaction _sourceReaction;
 
         public Transform Destination
         {
@@ -37,8 +40,12 @@ namespace RaidIntoDarkness.Player
         public float DelayRemaining => _activated ? Mathf.Max(0f, TELEPORT_DELAY - _elapsed) : 0f;
         public float ActivationProgress => _activated ? Mathf.Clamp01(_elapsed / TELEPORT_DELAY) : 0f;
 
+        private bool IsSourceActive => _sourceReaction == null || _sourceReaction.IsInfluencing;
+
         private void Awake()
         {
+            _sourceShapes = GetComponent<XRayAnomalyActivationVolume>();
+            _sourceReaction = GetComponent<AnomalyPlayerReaction>();
             if (_activationVolume == null)
             {
                 _activationVolume = GetComponent<SphereCollider>();
@@ -72,12 +79,16 @@ namespace RaidIntoDarkness.Player
 
         private void OnTriggerExit(Collider other)
         {
+            if (other == null || _sourceShapes != null && _sourceShapes.Overlaps(other))
+            {
+                return;
+            }
             _contacts.Remove(other);
         }
 
         private void RegisterContact(Collider other)
         {
-            if (isActiveAndEnabled == false || other == null || other.transform.IsChildOf(transform))
+            if (isActiveAndEnabled == false || IsSourceActive == false || other == null || other.transform.IsChildOf(transform) || _sourceShapes != null && _sourceShapes.Overlaps(other) == false)
             {
                 return;
             }
@@ -96,6 +107,13 @@ namespace RaidIntoDarkness.Player
         {
             if (isActiveAndEnabled == false)
             {
+                return;
+            }
+            if (IsSourceActive == false)
+            {
+                CancelActivation();
+                _contacts.Clear();
+                _players.Clear();
                 return;
             }
             RemoveExpiredContacts();
@@ -141,6 +159,10 @@ namespace RaidIntoDarkness.Player
             if (_activationVolume == null || _activationVolume.enabled == false || _activationVolume.gameObject.activeInHierarchy == false || body == null || body.enabled == false || body.gameObject.activeInHierarchy == false)
             {
                 return false;
+            }
+            if (_sourceShapes != null)
+            {
+                return _sourceShapes.Overlaps(body);
             }
             Vector3 sphereCenter = _activationVolume.transform.TransformPoint(_activationVolume.center);
             Vector3 scale = body.transform.lossyScale;

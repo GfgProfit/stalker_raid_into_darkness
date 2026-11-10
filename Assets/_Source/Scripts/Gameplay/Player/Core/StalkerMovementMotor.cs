@@ -72,7 +72,7 @@ namespace RaidIntoDarkness.Player
         public StalkerStanceController Stance => _stance;
         public StalkerLadder Ladder => _ladder;
         public Vector3 ControlAcceleration => _controlAccel;
-
+        public bool HasFootstepSupport => _physics != null && (_physics.Climbing || _physics.GoodGround || _controller != null && _controller.isGrounded);
         public bool IsSlowedDown => _condition.RunCoef <= _profile.VisibleBody.SlowedRunCoef || _condition.SprintKoef <= _profile.VisibleBody.SlowedSprintKoef;
 
         public StalkerMovementState State

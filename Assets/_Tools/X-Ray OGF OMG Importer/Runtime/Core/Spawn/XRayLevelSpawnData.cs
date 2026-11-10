@@ -51,6 +51,7 @@ namespace XRay.Importer.Core.Spawn
         public byte LevelId { get; internal set; }
         public string LevelName { get; internal set; }
         public string IniString { get; internal set; }
+        public string MotionName { get; internal set; }
         public uint EnabledTime { get; internal set; }
         public uint DisabledTime { get; internal set; }
         public uint StartTimeShift { get; internal set; }

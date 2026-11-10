@@ -39,7 +39,7 @@ namespace RaidIntoDarkness.Player.Tests
                     Vector3 start = rig.Transform.position;
                     for (int frame = 0; frame < rate; frame++)
                     {
-                        rig.Motor.Condition.SetPower(1.0f);
+                        rig.Motor.Condition.SetPower(rig.Motor.Condition.MaxPower);
                         rig.Frame(StalkerMoveFlags.Forward, 1.0f / rate);
                     }
 

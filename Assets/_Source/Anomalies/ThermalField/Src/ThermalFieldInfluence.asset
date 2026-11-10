@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 427cf5f92b2a1e6468d7c40aef92f0a3, type: 3}
+  m_Name: ThermalFieldInfluence
+  m_EditorClassIdentifier: RaidIntoDarkness.Player::RaidIntoDarkness.Player.AnomalyInfluenceProfile
+  _kind: 2
+  _inherentPostProcess: {fileID: 11400000, guid: 72fabdc16fb79a14f868410dcba5af36, type: 2}
+  _radiusMin: 0.3
+  _radiusMax: 1
+  _electricMine: {fileID: 0}
+  _electric: {fileID: 0}
+  _earthquake: {fileID: 0}
+  _actorPainEnabled: 1
+  _interruptSprint: 0
+  _launchHeight: 0
+  _launchAirAcceleration: 0
+  _pulseDelay: 0
+  _pullStrength: 0
+  _actorBlowoutRadius: 1
+  _impactPostProcess: {fileID: 0}
+  _impactAnimations: []
+  _runSpeedMultiplier: 1

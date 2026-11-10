@@ -22,6 +22,23 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
         public Vector3 DefaultRotation { get; set; }
         public List<XRayParticleAction> Actions { get; } = new List<XRayParticleAction>();
         public List<string> Unsupported { get; } = new List<string>();
+        public List<XRayParticleActionPayload> UnsupportedPayloads { get; } = new List<XRayParticleActionPayload>();
+    }
+
+    public sealed class XRayParticleActionPayload
+    {
+        public int Ordinal { get; }
+        public XRayParticleActionType Type { get; }
+        public uint Flags { get; }
+        public byte[] Bytes { get; }
+
+        public XRayParticleActionPayload(int ordinal, XRayParticleActionType type, uint flags, byte[] bytes)
+        {
+            Ordinal = ordinal;
+            Type = type;
+            Flags = flags;
+            Bytes = bytes;
+        }
     }
 
     public sealed class XRayParticleGroupData
@@ -208,12 +225,24 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
                         effect.Actions.Add(XRayParticleAction.CreateDomain(type, flags, Domain(data, ref p)));
                         break;
                     case XRayParticleActionType.Damping:
+                        int dampingStart = p;
                         Vector3 damping = Vector(data, ref p);
                         p += 8;
                         effect.Actions.Add(XRayParticleAction.CreateVector(type, flags, damping, Vector3.zero, 0f));
+                        var dampingPayload = new byte[p - dampingStart];
+                        Buffer.BlockCopy(data, dampingStart, dampingPayload, 0, dampingPayload.Length);
+                        effect.UnsupportedPayloads.Add(new XRayParticleActionPayload((int)i, type, flags, dampingPayload));
                         break;
                     default:
-                        p = SkipUnsupported(type, p);
+                        int end = SkipUnsupported(type, p);
+                        if (end > range.End)
+                        {
+                            throw new FormatException("Truncated X-Ray particle action " + type);
+                        }
+                        var payload = new byte[end - p];
+                        Buffer.BlockCopy(data, p, payload, 0, payload.Length);
+                        effect.UnsupportedPayloads.Add(new XRayParticleActionPayload((int)i, type, flags, payload));
+                        p = end;
                         effect.Unsupported.Add(type.ToString());
                         break;
                 }

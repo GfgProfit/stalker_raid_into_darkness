@@ -12,6 +12,7 @@ namespace RaidIntoDarkness.Effects
         [SerializeField] private AudioSource _awaking;
         [SerializeField] private AudioSource _accumulate;
         [SerializeField, Min(0f)] private float _blowoutDelay;
+        [SerializeField] private bool _followZone;
 
         private bool _visible;
         private Vector3 _blowoutPosition;
@@ -114,6 +115,12 @@ namespace RaidIntoDarkness.Effects
 
         private void LateUpdate()
         {
+            if (_followZone)
+            {
+                _blowoutPosition = transform.position;
+                _entrancePosition = transform.position;
+                _hitPosition = transform.position;
+            }
             if (_blowoutPending && Time.time >= _blowoutAt)
             {
                 _blowoutPending = false;

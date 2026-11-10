@@ -189,6 +189,154 @@ namespace RaidIntoDarkness.Player.Tests
             Assert.That(locomotion, Is.GreaterThan(5));
         }
 
+        [Test]
+        public void UnsupportedGroundGraceConsumesContactWithoutRestartingCadence()
+        {
+            StalkerMovementState state = TimingState(StalkerMoveFlags.Forward | StalkerMoveFlags.Accel);
+            _footsteps.Tick(state, null, 0f, true);
+            _footsteps.Tick(state, null, 0.15f, true);
+            _footsteps.Tick(state, null, 0.1f, false);
+            Assert.That(_steps, Is.Empty);
+            Assert.That(_footsteps.Phase, Is.EqualTo(0.25f).Within(0.00001f));
+            _footsteps.Tick(state, null, 0f, true);
+            Assert.That(_steps, Is.Empty);
+            _footsteps.Tick(state, null, 0.39f, true);
+            Assert.That(_steps, Is.Empty);
+            _footsteps.Tick(state, null, 0.02f, true);
+            Assert.That(_steps.Count, Is.EqualTo(1));
+            Assert.That(_steps[0].Side, Is.EqualTo(StalkerFootSide.Right));
+        }
+
+        [Test]
+        public void RepeatedShortSupportGapsKeepTheNextValidContactAvailable()
+        {
+            StalkerMovementState state = TimingState(StalkerMoveFlags.Forward | StalkerMoveFlags.Accel);
+            _footsteps.Tick(state, null, 0f, true);
+            for (int frame = 0; frame < 180; frame++)
+            {
+                bool supported = frame % 10 >= 2;
+                int previous = _steps.Count;
+                _footsteps.Tick(state, null, DT, supported);
+                Assert.That(_steps.Count - previous, Is.LessThanOrEqualTo(1));
+                if (supported == false)
+                {
+                    Assert.That(_steps.Count, Is.EqualTo(previous));
+                }
+            }
+            Assert.That(_steps.Count, Is.GreaterThanOrEqualTo(2));
+            Assert.That(_steps.Count, Is.LessThanOrEqualTo(6));
+        }
+
+        [Test]
+        public void UnsupportedMultipleCyclesCannotReplayQueuedContacts()
+        {
+            StalkerMovementState state = TimingState(StalkerMoveFlags.Forward | StalkerMoveFlags.Accel);
+            _footsteps.Tick(state, null, 0f, true);
+            _footsteps.Tick(state, null, 3.66f, false);
+            Assert.That(_steps, Is.Empty);
+            _footsteps.Tick(state, null, 0f, true);
+            Assert.That(_steps, Is.Empty);
+            _footsteps.Tick(state, null, 0.05f, true);
+            Assert.That(_steps, Is.Empty);
+            for (int frame = 0; frame < 35; frame++)
+            {
+                int previous = _steps.Count;
+                _footsteps.Tick(state, null, DT, true);
+                Assert.That(_steps.Count - previous, Is.LessThanOrEqualTo(1));
+            }
+            Assert.That(_steps.Count, Is.EqualTo(1));
+            Assert.That(_steps[0].Side, Is.EqualTo(StalkerFootSide.Left));
+        }
+
+        [TestCase(-3f)]
+        [TestCase(3f)]
+        public void SupportedSlopeVelocityDoesNotSuppressFootsteps(float verticalVelocity)
+        {
+            StalkerMovementState state = TimingState(StalkerMoveFlags.Forward | StalkerMoveFlags.Accel, StalkerEnvironment.OnGround, verticalVelocity);
+            for (int frame = 0; frame < 120; frame++)
+            {
+                _footsteps.Tick(state, null, DT, true);
+            }
+            Assert.That(_steps.Count, Is.EqualTo(4));
+            AssertAlternating();
+        }
+
+        [TestCase(StalkerMoveFlags.Forward | StalkerMoveFlags.Jump, StalkerEnvironment.OnGround)]
+        [TestCase(StalkerMoveFlags.Forward, StalkerEnvironment.InAir)]
+        public void AirborneStateStillBlocksEventsEvenWhenSupportIsReported(StalkerMoveFlags flags, StalkerEnvironment environment)
+        {
+            StalkerMovementState state = TimingState(flags, environment);
+            for (int frame = 0; frame < 120; frame++)
+            {
+                _footsteps.Tick(state, null, DT, true);
+            }
+            Assert.That(_steps, Is.Empty);
+            Assert.That(_footsteps.LegsMotion, Is.Null);
+        }
+
+        [Test]
+        public void ExplicitLadderSupportKeepsTheExistingClimbTimingChannel()
+        {
+            StalkerMovementState state = TimingState(StalkerMoveFlags.Forward | StalkerMoveFlags.Climb, StalkerEnvironment.AtWall);
+            string motion = StalkerFootstepSynchronizer.GetLegsMotion(state.Flags);
+            var library = ScriptableObject.CreateInstance<StalkerFootstepTimingLibrary>();
+            library.SetImportData(new List<StalkerBodyMotionSteps>(), new List<StalkerLegsMotionSteps> { new StalkerLegsMotionSteps(motion, 1f, 1, 0.2f, 1f, 0.65f, 1f, false) }, string.Empty);
+            var serialized = new SerializedObject(_footsteps);
+            serialized.FindProperty("_library").objectReferenceValue = library;
+            serialized.ApplyModifiedPropertiesWithoutUndo();
+            try
+            {
+                for (int frame = 0; frame < 120; frame++)
+                {
+                    _footsteps.Tick(state, null, DT, true);
+                }
+                Assert.That(_steps.Count, Is.EqualTo(4));
+                Assert.That(_footsteps.LegsMotion, Is.EqualTo(motion));
+            }
+            finally
+            {
+                serialized.FindProperty("_library").objectReferenceValue = _library;
+                serialized.ApplyModifiedPropertiesWithoutUndo();
+                UnityEngine.Object.DestroyImmediate(library);
+            }
+        }
+
+        [Test]
+        public void UnsupportedSubcyclesConsumeAlreadyPassedMarkersBeforeRecontact()
+        {
+            StalkerMovementState state = TimingState(StalkerMoveFlags.Forward | StalkerMoveFlags.Accel);
+            string motion = StalkerFootstepSynchronizer.GetLegsMotion(state.Flags);
+            var library = ScriptableObject.CreateInstance<StalkerFootstepTimingLibrary>();
+            library.SetImportData(new List<StalkerBodyMotionSteps>(), new List<StalkerLegsMotionSteps> { new StalkerLegsMotionSteps(motion, 1.2f, 3, 0.2f, 1f, 0.65f, 1f, false) }, string.Empty);
+            var serialized = new SerializedObject(_footsteps);
+            serialized.FindProperty("_library").objectReferenceValue = library;
+            serialized.ApplyModifiedPropertiesWithoutUndo();
+            try
+            {
+                _footsteps.Tick(state, null, 0f, true);
+                _footsteps.Tick(state, null, 0.7f, false);
+                Assert.That(_steps, Is.Empty);
+                _footsteps.Tick(state, null, 0f, true);
+                Assert.That(_steps, Is.Empty);
+                _footsteps.Tick(state, null, 0.17f, true);
+                Assert.That(_steps, Is.Empty);
+                _footsteps.Tick(state, null, 0.02f, true);
+                Assert.That(_steps.Count, Is.EqualTo(1));
+                Assert.That(_steps[0].Side, Is.EqualTo(StalkerFootSide.Left));
+            }
+            finally
+            {
+                serialized.FindProperty("_library").objectReferenceValue = _library;
+                serialized.ApplyModifiedPropertiesWithoutUndo();
+                UnityEngine.Object.DestroyImmediate(library);
+            }
+        }
+
+        private static StalkerMovementState TimingState(StalkerMoveFlags flags, StalkerEnvironment environment = StalkerEnvironment.OnGround, float verticalVelocity = 0f)
+        {
+            return new StalkerMovementState(flags, environment, new Vector3(0f, verticalVelocity, 2f), Vector3.forward, 0, false, 2f, 2f);
+        }
+
         private static bool HasSide(IReadOnlyList<StalkerFootContact> contacts, StalkerFootSide side)
         {
             foreach (StalkerFootContact contact in contacts)

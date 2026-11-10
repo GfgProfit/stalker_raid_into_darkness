@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Reflection;
 using NUnit.Framework;
 using UnityEditor;
 using UnityEngine;
@@ -205,6 +206,32 @@ namespace RaidIntoDarkness.Player.Tests
             Assert.That(_effects.IsPlaying(StalkerCameraEffectSlot.Landing), Is.True);
             Run(StalkerMoveFlags.None, 3.0f, DT);
             Assert.That(_pivot.localPosition.magnitude, Is.LessThan(0.000001f));
+        }
+
+        [TestCase(100f, 20f, true)]
+        [TestCase(100f, 30f, false)]
+        [TestCase(200f, 40f, true)]
+        [TestCase(200f, 60f, false)]
+        public void PlayerFootstepsUseNormalizedStaminaForCameraEffects(float capacity, float power, bool tired)
+        {
+            Assert.That(_profile.Anm.TiredStep, Is.Not.Null);
+            Assert.That(_profile.Anm.MoveStep, Is.Not.Null);
+            GameObject player = _rig.Motor.gameObject;
+            player.SetActive(false);
+            StalkerPlayerController controller = player.AddComponent<StalkerPlayerController>();
+            var serialized = new SerializedObject(controller);
+            serialized.FindProperty("_motor").objectReferenceValue = _rig.Motor;
+            serialized.FindProperty("_cameraEffects").objectReferenceValue = _effects;
+            serialized.ApplyModifiedPropertiesWithoutUndo();
+            _rig.Motor.Condition.GetStat(StalkerStatKind.Stamina).SetCapacity(capacity);
+            _rig.Motor.Condition.SetPower(power);
+            MethodInfo onFootstep = typeof(StalkerPlayerController).GetMethod("OnFootstep", BindingFlags.Instance | BindingFlags.NonPublic);
+            Assert.That(onFootstep, Is.Not.Null);
+
+            onFootstep.Invoke(controller, new object[] { default(StalkerFootstep) });
+
+            Assert.That(_effects.IsPlaying(StalkerCameraEffectSlot.TiredStep), Is.EqualTo(tired));
+            Assert.That(_effects.IsPlaying(StalkerCameraEffectSlot.MoveStep), Is.EqualTo(!tired));
         }
 
         [Test]

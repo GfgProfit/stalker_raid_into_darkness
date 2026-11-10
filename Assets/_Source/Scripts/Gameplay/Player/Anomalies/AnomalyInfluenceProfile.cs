@@ -9,7 +9,11 @@ namespace RaidIntoDarkness.Player
         Electric,
         Thermal,
         Vortex,
-        Chemical
+        Chemical,
+        Psychic,
+        Radiation,
+        NoGravity,
+        None
     }
 
     public sealed class AnomalyInfluenceProfile : ScriptableObject
@@ -22,6 +26,7 @@ namespace RaidIntoDarkness.Player
         [SerializeField] private AnomalyPostProcessAsset _electric;
         [SerializeField] private XRayAnmAsset _earthquake;
         [SerializeField] private bool _actorPainEnabled = true;
+        [SerializeField] private bool _interruptSprint;
         [SerializeField, Min(0f)] private float _launchHeight;
         [SerializeField, Min(0f)] private float _launchAirAcceleration;
         [SerializeField, Min(0f)] private float _pulseDelay;
@@ -29,6 +34,7 @@ namespace RaidIntoDarkness.Player
         [SerializeField, Range(0f, 1f)] private float _actorBlowoutRadius = 1f;
         [SerializeField] private AnomalyPostProcessAsset _impactPostProcess;
         [SerializeField] private XRayAnmAsset[] _impactAnimations;
+        [SerializeField, Range(0f, 1f)] private float _runSpeedMultiplier = 1f;
 
         public AnomalyInfluenceKind Kind => _kind;
         public AnomalyPostProcessAsset InherentPostProcess => _inherentPostProcess;
@@ -38,6 +44,7 @@ namespace RaidIntoDarkness.Player
         public AnomalyPostProcessAsset Electric => _electric;
         public XRayAnmAsset Earthquake => _earthquake;
         public bool ActorPainEnabled => _actorPainEnabled;
+        public bool InterruptSprint => _interruptSprint;
         public float LaunchHeight => _launchHeight;
         public float LaunchAirAcceleration => _launchAirAcceleration;
         public float PulseDelay => _pulseDelay;
@@ -45,5 +52,6 @@ namespace RaidIntoDarkness.Player
         public float ActorBlowoutRadius => _actorBlowoutRadius;
         public AnomalyPostProcessAsset ImpactPostProcess => _impactPostProcess;
         public XRayAnmAsset[] ImpactAnimations => _impactAnimations;
+        public float RunSpeedMultiplier => _runSpeedMultiplier;
     }
 }

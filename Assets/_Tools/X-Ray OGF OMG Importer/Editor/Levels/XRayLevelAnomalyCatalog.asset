@@ -14,200 +14,255 @@ MonoBehaviour:
   m_EditorClassIdentifier: XRay.Importer.Editor::XRay.Importer.Editor.Levels.XRayLevelAnomalyCatalog
   _entries:
   - _section: fireball_acidic_zone
-    _displayName: "Кислотная комета"
-    _prefab: {fileID: 0}
+    _displayName: "\u041A\u0438\u0441\u043B\u043E\u0442\u043D\u0430\u044F \u043A\u043E\u043C\u0435\u0442\u0430"
+    _prefab: {fileID: 2616313968990000645, guid: 6c016ba218b7a554d832769cd1aaae04, type: 3}
   - _section: fireball_electric_zone
-    _displayName: "Тесла"
-    _prefab: {fileID: 0}
+    _displayName: "\u0422\u0435\u0441\u043B\u0430"
+    _prefab: {fileID: 3878934981636310289, guid: ab2a2316d20689d4981daf7c13e01daa, type: 3}
   - _section: fireball_zone
-    _displayName: "Комета"
-    _prefab: {fileID: 0}
+    _displayName: "\u041A\u043E\u043C\u0435\u0442\u0430"
+    _prefab: {fileID: 248714951878494221, guid: 02a237de7d345164cb9cdff100244fcb, type: 3}
   - _section: generator_dust_static
-    _displayName: "Пылевой вихрь генератора"
-    _prefab: {fileID: 0}
+    _displayName: "\u041F\u044B\u043B\u0435\u0432\u043E\u0439 \u0432\u0438\u0445\u0440\u044C \u0433\u0435\u043D\u0435\u0440\u0430\u0442\u043E\u0440\u0430"
+    _prefab: {fileID: 6803863700715777244, guid: 9b1864c752d37b14ba94ca2d9ce47896, type: 3}
   - _section: generator_electra
-    _displayName: "Электро генератора"
-    _prefab: {fileID: 0}
+    _displayName: "\u042D\u043B\u0435\u043A\u0442\u0440\u043E \u0433\u0435\u043D\u0435\u0440\u0430\u0442\u043E\u0440\u0430"
+    _prefab: {fileID: 6049450527168691728, guid: fac5ed82151239f4b8b6981debd0f6d2, type: 3}
   - _section: generator_torrid
-    _displayName: "Жар генератора"
-    _prefab: {fileID: 0}
+    _displayName: "\u0416\u0430\u0440 \u0433\u0435\u043D\u0435\u0440\u0430\u0442\u043E\u0440\u0430"
+    _prefab: {fileID: 4393034817434973559, guid: 0503fcd536acfc34d85804ac2b14e79b, type: 3}
   - _section: zone_burning_fuzz
-    _displayName: "Жгучий пух"
-    _prefab: {fileID: 0}
+    _displayName: "\u0416\u0433\u0443\u0447\u0438\u0439 \u043F\u0443\u0445"
+    _prefab: {fileID: 4175284429545975241, guid: ceb9b97044f535a43ad1b4d909fd5dac, type: 3}
   - _section: zone_burning_fuzz_average
-    _displayName: "Жгучий пух"
-    _prefab: {fileID: 0}
+    _displayName: "\u0416\u0433\u0443\u0447\u0438\u0439 \u043F\u0443\u0445 \u2014 \u0441\u0440\u0435\u0434\u043D\u0438\u0439 \u0432\u0430\u0440\u0438\u0430\u043D\u0442"
+    _prefab: {fileID: 7587894703893024321, guid: 193407dadd2e3b149bd43232e71fb927, type: 3}
   - _section: zone_burning_fuzz_strong
-    _displayName: "Жгучий пух"
-    _prefab: {fileID: 0}
+    _displayName: "\u0416\u0433\u0443\u0447\u0438\u0439 \u043F\u0443\u0445 \u2014 \u0441\u0438\u043B\u044C\u043D\u044B\u0439 \u0432\u0430\u0440\u0438\u0430\u043D\u0442"
+    _prefab: {fileID: 5903467947819448391, guid: 337c083a72cbd6340808e28094dc91df, type: 3}
   - _section: zone_burning_fuzz_weak
-    _displayName: "Жгучий пух"
-    _prefab: {fileID: 0}
+    _displayName: "\u0416\u0433\u0443\u0447\u0438\u0439 \u043F\u0443\u0445 \u2014 \u0441\u043B\u0430\u0431\u044B\u0439 \u0432\u0430\u0440\u0438\u0430\u043D\u0442"
+    _prefab: {fileID: 398927717036913871, guid: bdbd33f0e4f7c41479720604d1dd5921, type: 3}
   - _section: zone_burning_fuzz1
-    _displayName: "Жгучий пух"
-    _prefab: {fileID: 0}
+    _displayName: "\u0416\u0433\u0443\u0447\u0438\u0439 \u043F\u0443\u0445"
+    _prefab: {fileID: 4175284429545975241, guid: ceb9b97044f535a43ad1b4d909fd5dac, type: 3}
   - _section: zone_buzz
-    _displayName: "Кисель"
+    _displayName: "\u041A\u0438\u0441\u0435\u043B\u044C"
     _prefab: {fileID: 6341456586046015985, guid: f55d417a9b75a5f469d4d95e71cd516d, type: 3}
   - _section: zone_buzz_average
-    _displayName: "Кисель"
-    _prefab: {fileID: 6341456586046015985, guid: f55d417a9b75a5f469d4d95e71cd516d, type: 3}
+    _displayName: "\u041A\u0438\u0441\u0435\u043B\u044C \u2014 \u0441\u0440\u0435\u0434\u043D\u0438\u0439 \u0432\u0430\u0440\u0438\u0430\u043D\u0442"
+    _prefab: {fileID: 6046771901911665186, guid: 9c2be3abf2328ee4ab5eb72c6f86de0d, type: 3}
   - _section: zone_buzz_strong
-    _displayName: "Кисель"
-    _prefab: {fileID: 6341456586046015985, guid: f55d417a9b75a5f469d4d95e71cd516d, type: 3}
+    _displayName: "\u041A\u0438\u0441\u0435\u043B\u044C \u2014 \u0441\u0438\u043B\u044C\u043D\u044B\u0439 \u0432\u0430\u0440\u0438\u0430\u043D\u0442"
+    _prefab: {fileID: 361810011616585584, guid: 12c2f2cc7fb8420479b82033dbed7661, type: 3}
   - _section: zone_buzz_weak
-    _displayName: "Кисель"
-    _prefab: {fileID: 6341456586046015985, guid: f55d417a9b75a5f469d4d95e71cd516d, type: 3}
+    _displayName: "\u041A\u0438\u0441\u0435\u043B\u044C \u2014 \u0441\u043B\u0430\u0431\u044B\u0439 \u0432\u0430\u0440\u0438\u0430\u043D\u0442"
+    _prefab: {fileID: 8148783088855360829, guid: 302b40ba852184f439b117ab3ce4c399, type: 3}
   - _section: zone_emi
-    _displayName: "Импульс"
-    _prefab: {fileID: 0}
+    _displayName: "\u0418\u043C\u043F\u0443\u043B\u044C\u0441"
+    _prefab: {fileID: 6016032626334787235, guid: 7986d4e311c9b574d8d6996a9110871f, type: 3}
   - _section: zone_field_acidic_average
-    _displayName: "Кислотный туман"
-    _prefab: {fileID: 0}
+    _displayName: "\u041A\u0438\u0441\u043B\u043E\u0442\u043D\u044B\u0439 \u0442\u0443\u043C\u0430\u043D \u2014 \u0441\u0440\u0435\u0434\u043D\u0438\u0439 \u0432\u0430\u0440\u0438\u0430\u043D\u0442"
+    _prefab: {fileID: 4845326394968237844, guid: 3cde6b3a2f43eb84d868e3fff7b46dff, type: 3}
   - _section: zone_field_acidic_strong
-    _displayName: "Кислотный туман"
-    _prefab: {fileID: 0}
+    _displayName: "\u041A\u0438\u0441\u043B\u043E\u0442\u043D\u044B\u0439 \u0442\u0443\u043C\u0430\u043D \u2014 \u0441\u0438\u043B\u044C\u043D\u044B\u0439 \u0432\u0430\u0440\u0438\u0430\u043D\u0442"
+    _prefab: {fileID: 7831420339941512695, guid: 29864175cb38a1845af75cb5e1bc8108, type: 3}
   - _section: zone_field_acidic_weak
-    _displayName: "Кислотный туман"
-    _prefab: {fileID: 0}
+    _displayName: "\u041A\u0438\u0441\u043B\u043E\u0442\u043D\u044B\u0439 \u0442\u0443\u043C\u0430\u043D \u2014 \u0441\u043B\u0430\u0431\u044B\u0439 \u0432\u0430\u0440\u0438\u0430\u043D\u0442"
+    _prefab: {fileID: 8292548283249020822, guid: 87f9cc6dd057ec04383813efd2bc67ff, type: 3}
   - _section: zone_field_psychic_average
-    _displayName: "Пси-поле"
-    _prefab: {fileID: 0}
+    _displayName: "\u041F\u0441\u0438-\u043F\u043E\u043B\u0435 \u2014 \u0441\u0440\u0435\u0434\u043D\u0438\u0439 \u0432\u0430\u0440\u0438\u0430\u043D\u0442"
+    _prefab: {fileID: 4119722679173329120, guid: 45c0816f2ab58444a94669223c4d4f20, type: 3}
   - _section: zone_field_psychic_strong
-    _displayName: "Пси-поле"
-    _prefab: {fileID: 0}
+    _displayName: "\u041F\u0441\u0438-\u043F\u043E\u043B\u0435 \u2014 \u0441\u0438\u043B\u044C\u043D\u044B\u0439 \u0432\u0430\u0440\u0438\u0430\u043D\u0442"
+    _prefab: {fileID: 1731793081650531280, guid: 98b91be915545f74bb78df55b2c081ac, type: 3}
   - _section: zone_field_psychic_weak
-    _displayName: "Пси-поле"
-    _prefab: {fileID: 0}
+    _displayName: "\u041F\u0441\u0438-\u043F\u043E\u043B\u0435 \u2014 \u0441\u043B\u0430\u0431\u044B\u0439 \u0432\u0430\u0440\u0438\u0430\u043D\u0442"
+    _prefab: {fileID: 2261538687951924012, guid: 81eee178b9570664784acdb80c33eefc, type: 3}
   - _section: zone_field_radioactive_average
-    _displayName: "Очаг радиации"
-    _prefab: {fileID: 0}
+    _displayName: "\u041E\u0447\u0430\u0433 \u0440\u0430\u0434\u0438\u0430\u0446\u0438\u0438 \u2014 \u0441\u0440\u0435\u0434\u043D\u0438\u0439 \u0432\u0430\u0440\u0438\u0430\u043D\u0442"
+    _prefab: {fileID: 3600653727517201224, guid: d047ff2f58f7a5b4590bf50c83792fb2, type: 3}
   - _section: zone_field_radioactive_strong
-    _displayName: "Очаг радиации"
-    _prefab: {fileID: 0}
+    _displayName: "\u041E\u0447\u0430\u0433 \u0440\u0430\u0434\u0438\u0430\u0446\u0438\u0438 \u2014 \u0441\u0438\u043B\u044C\u043D\u044B\u0439 \u0432\u0430\u0440\u0438\u0430\u043D\u0442"
+    _prefab: {fileID: 1500573115180090612, guid: 02b04ff566231a1438f5488965799f22, type: 3}
   - _section: zone_field_radioactive_weak
-    _displayName: "Очаг радиации"
-    _prefab: {fileID: 0}
+    _displayName: "\u041E\u0447\u0430\u0433 \u0440\u0430\u0434\u0438\u0430\u0446\u0438\u0438 \u2014 \u0441\u043B\u0430\u0431\u044B\u0439 \u0432\u0430\u0440\u0438\u0430\u043D\u0442"
+    _prefab: {fileID: 5088797321284754201, guid: b41eb07b52be17f468c505e920569f64, type: 3}
   - _section: zone_field_thermal_average
-    _displayName: "Термическое поле"
-    _prefab: {fileID: 0}
+    _displayName: "\u0422\u0435\u0440\u043C\u0438\u0447\u0435\u0441\u043A\u043E\u0435 \u043F\u043E\u043B\u0435 \u2014 \u0441\u0440\u0435\u0434\u043D\u0438\u0439 \u0432\u0430\u0440\u0438\u0430\u043D\u0442"
+    _prefab: {fileID: 5232294282292395555, guid: 1874f20a18f1e504e9f03a679566c097, type: 3}
   - _section: zone_field_thermal_strong
-    _displayName: "Термическое поле"
-    _prefab: {fileID: 0}
+    _displayName: "\u0422\u0435\u0440\u043C\u0438\u0447\u0435\u0441\u043A\u043E\u0435 \u043F\u043E\u043B\u0435 \u2014 \u0441\u0438\u043B\u044C\u043D\u044B\u0439 \u0432\u0430\u0440\u0438\u0430\u043D\u0442"
+    _prefab: {fileID: 7711066887630803436, guid: 25f912fb07e12c64aba37beb8b9429a3, type: 3}
   - _section: zone_field_thermal_weak
-    _displayName: "Термическое поле"
-    _prefab: {fileID: 0}
+    _displayName: "\u0422\u0435\u0440\u043C\u0438\u0447\u0435\u0441\u043A\u043E\u0435 \u043F\u043E\u043B\u0435 \u2014 \u0441\u043B\u0430\u0431\u044B\u0439 \u0432\u0430\u0440\u0438\u0430\u043D\u0442"
+    _prefab: {fileID: 6121650632866003243, guid: 4867a8c237742d74d8ce62662bb417ea, type: 3}
   - _section: zone_gravi_zone
-    _displayName: "Воронка"
+    _displayName: "\u0412\u043E\u0440\u043E\u043D\u043A\u0430"
     _prefab: {fileID: 7296845186965445704, guid: 57fe2d45e2d10c546ba3c7b47b5b06f8, type: 3}
   - _section: zone_mine_acidic_average
-    _displayName: "Газировка"
-    _prefab: {fileID: 6534194022986100575, guid: edd76411fe76bcb4f9128d7dcf32e3b8, type: 3}
+    _displayName: "\u0413\u0430\u0437\u0438\u0440\u043E\u0432\u043A\u0430 \u2014 \u0441\u0440\u0435\u0434\u043D\u0438\u0439 \u0432\u0430\u0440\u0438\u0430\u043D\u0442"
+    _prefab: {fileID: 4646665592717263780, guid: 223770682e3f5904fbc5b0a90d1fd138, type: 3}
   - _section: zone_mine_acidic_strong
-    _displayName: "Газировка"
-    _prefab: {fileID: 6534194022986100575, guid: edd76411fe76bcb4f9128d7dcf32e3b8, type: 3}
+    _displayName: "\u0413\u0430\u0437\u0438\u0440\u043E\u0432\u043A\u0430 \u2014 \u0441\u0438\u043B\u044C\u043D\u044B\u0439 \u0432\u0430\u0440\u0438\u0430\u043D\u0442"
+    _prefab: {fileID: 7973469289989766872, guid: 412ddc8313fc5c8498a7d9fe4cca35f7, type: 3}
   - _section: zone_mine_acidic_weak
-    _displayName: "Газировка"
-    _prefab: {fileID: 6534194022986100575, guid: edd76411fe76bcb4f9128d7dcf32e3b8, type: 3}
+    _displayName: "\u0413\u0430\u0437\u0438\u0440\u043E\u0432\u043A\u0430 \u2014 \u0441\u043B\u0430\u0431\u044B\u0439 \u0432\u0430\u0440\u0438\u0430\u043D\u0442"
+    _prefab: {fileID: 8097806152153227771, guid: f3c299f599b7aa441a16da6d2d25df94, type: 3}
   - _section: zone_mine_chemical_average
-    _displayName: "Кисель"
-    _prefab: {fileID: 6341456586046015985, guid: f55d417a9b75a5f469d4d95e71cd516d, type: 3}
+    _displayName: "\u041A\u0438\u0441\u0435\u043B\u044C \u2014 \u0441\u0440\u0435\u0434\u043D\u0438\u0439 \u0432\u0430\u0440\u0438\u0430\u043D\u0442"
+    _prefab: {fileID: 6046771901911665186, guid: 9c2be3abf2328ee4ab5eb72c6f86de0d, type: 3}
   - _section: zone_mine_chemical_strong
-    _displayName: "Кисель"
-    _prefab: {fileID: 6341456586046015985, guid: f55d417a9b75a5f469d4d95e71cd516d, type: 3}
+    _displayName: "\u041A\u0438\u0441\u0435\u043B\u044C \u2014 \u0441\u0438\u043B\u044C\u043D\u044B\u0439 \u0432\u0430\u0440\u0438\u0430\u043D\u0442"
+    _prefab: {fileID: 361810011616585584, guid: 12c2f2cc7fb8420479b82033dbed7661, type: 3}
   - _section: zone_mine_chemical_weak
-    _displayName: "Кисель"
-    _prefab: {fileID: 6341456586046015985, guid: f55d417a9b75a5f469d4d95e71cd516d, type: 3}
+    _displayName: "\u041A\u0438\u0441\u0435\u043B\u044C \u2014 \u0441\u043B\u0430\u0431\u044B\u0439 \u0432\u0430\u0440\u0438\u0430\u043D\u0442"
+    _prefab: {fileID: 8148783088855360829, guid: 302b40ba852184f439b117ab3ce4c399, type: 3}
   - _section: zone_mine_electric_average
-    _displayName: "Электро"
-    _prefab: {fileID: 122456809518884124, guid: e4fcbbdd51e69a94fa41cacdf195f1b6, type: 3}
+    _displayName: "\u042D\u043B\u0435\u043A\u0442\u0440\u043E \u2014 \u0441\u0440\u0435\u0434\u043D\u0438\u0439 \u0432\u0430\u0440\u0438\u0430\u043D\u0442"
+    _prefab: {fileID: 427570970095678616, guid: fdc6c6b82a4ac344db1b7897d0638ea5, type: 3}
   - _section: zone_mine_electric_strong
-    _displayName: "Электро"
-    _prefab: {fileID: 122456809518884124, guid: e4fcbbdd51e69a94fa41cacdf195f1b6, type: 3}
+    _displayName: "\u042D\u043B\u0435\u043A\u0442\u0440\u043E \u2014 \u0441\u0438\u043B\u044C\u043D\u044B\u0439 \u0432\u0430\u0440\u0438\u0430\u043D\u0442"
+    _prefab: {fileID: 868497823517841008, guid: 8a8c6915b7515d547b6f2fa6ab232b86, type: 3}
   - _section: zone_mine_electric_weak
-    _displayName: "Электро"
-    _prefab: {fileID: 122456809518884124, guid: e4fcbbdd51e69a94fa41cacdf195f1b6, type: 3}
+    _displayName: "\u042D\u043B\u0435\u043A\u0442\u0440\u043E \u2014 \u0441\u043B\u0430\u0431\u044B\u0439 \u0432\u0430\u0440\u0438\u0430\u043D\u0442"
+    _prefab: {fileID: 5184217107601116629, guid: b7f9284247e044049a57a196dbf8d158, type: 3}
   - _section: zone_mine_field_soc
-    _displayName: "Мина"
-    _prefab: {fileID: 0}
+    _displayName: "\u041C\u0438\u043D\u0430"
+    _prefab: {fileID: 2569250995206166475, guid: 3bb71be827698994394ac26bc5c21bad, type: 3}
   - _section: zone_mine_gravitational_average
-    _displayName: "Воронка"
-    _prefab: {fileID: 7296845186965445704, guid: 57fe2d45e2d10c546ba3c7b47b5b06f8, type: 3}
+    _displayName: "\u0412\u043E\u0440\u043E\u043D\u043A\u0430 \u2014 \u0441\u0440\u0435\u0434\u043D\u0438\u0439 \u0432\u0430\u0440\u0438\u0430\u043D\u0442"
+    _prefab: {fileID: 1451177680650567557, guid: 1dcac2d8307c18e4b8fb90b4b75d2967, type: 3}
   - _section: zone_mine_gravitational_strong
-    _displayName: "Карусель"
-    _prefab: {fileID: 3525461912719225073, guid: 7574aac041b53704ebf4b2110384d0d7, type: 3}
+    _displayName: "\u041A\u0430\u0440\u0443\u0441\u0435\u043B\u044C \u2014 \u0441\u0438\u043B\u044C\u043D\u044B\u0439 \u0432\u0430\u0440\u0438\u0430\u043D\u0442"
+    _prefab: {fileID: 1462180616827717532, guid: a6efe806b2b115b4189d79fd2f9fb4d5, type: 3}
   - _section: zone_mine_gravitational_weak
-    _displayName: "Трамплин"
-    _prefab: {fileID: 1877172421583510763, guid: bc6367c4932433a4eaa67d191519601b, type: 3}
+    _displayName: "\u0422\u0440\u0430\u043C\u043F\u043B\u0438\u043D \u2014 \u0441\u043B\u0430\u0431\u044B\u0439 \u0432\u0430\u0440\u0438\u0430\u043D\u0442"
+    _prefab: {fileID: 4793625872598464912, guid: 4edd76b6106e8eb4bb70735b782dff13, type: 3}
   - _section: zone_mine_static_strong
-    _displayName: "Электро"
-    _prefab: {fileID: 122456809518884124, guid: e4fcbbdd51e69a94fa41cacdf195f1b6, type: 3}
+    _displayName: "\u042D\u043B\u0435\u043A\u0442\u0440\u043E \u2014 \u0441\u0438\u043B\u044C\u043D\u044B\u0439 \u0432\u0430\u0440\u0438\u0430\u043D\u0442"
+    _prefab: {fileID: 868497823517841008, guid: 8a8c6915b7515d547b6f2fa6ab232b86, type: 3}
   - _section: zone_mine_steam_average
-    _displayName: "Жарка"
-    _prefab: {fileID: 6036523816419366679, guid: bb71a7a9124edab409ed0f17d98e4634, type: 3}
+    _displayName: "\u0416\u0430\u0440\u043A\u0430 \u2014 \u0441\u0440\u0435\u0434\u043D\u0438\u0439 \u0432\u0430\u0440\u0438\u0430\u043D\u0442"
+    _prefab: {fileID: 4239177811404025723, guid: 8559944df4283fe4db869ac4adcea607, type: 3}
   - _section: zone_mine_steam_weak
-    _displayName: "Жарка"
-    _prefab: {fileID: 6036523816419366679, guid: bb71a7a9124edab409ed0f17d98e4634, type: 3}
+    _displayName: "\u0416\u0430\u0440\u043A\u0430 \u2014 \u0441\u043B\u0430\u0431\u044B\u0439 \u0432\u0430\u0440\u0438\u0430\u043D\u0442"
+    _prefab: {fileID: 5802999050321614370, guid: eccb11fc425a8bc4487febcda6d0502f, type: 3}
   - _section: zone_mine_thermal_average
-    _displayName: "Жарка"
-    _prefab: {fileID: 6036523816419366679, guid: bb71a7a9124edab409ed0f17d98e4634, type: 3}
+    _displayName: "\u0416\u0430\u0440\u043A\u0430 \u2014 \u0441\u0440\u0435\u0434\u043D\u0438\u0439 \u0432\u0430\u0440\u0438\u0430\u043D\u0442"
+    _prefab: {fileID: 4239177811404025723, guid: 8559944df4283fe4db869ac4adcea607, type: 3}
   - _section: zone_mine_thermal_strong
-    _displayName: "Жарка"
-    _prefab: {fileID: 6036523816419366679, guid: bb71a7a9124edab409ed0f17d98e4634, type: 3}
+    _displayName: "\u0416\u0430\u0440\u043A\u0430 \u2014 \u0441\u0438\u043B\u044C\u043D\u044B\u0439 \u0432\u0430\u0440\u0438\u0430\u043D\u0442"
+    _prefab: {fileID: 1515571501402123512, guid: 9c0e949a651f48c40bc2f667d4203e25, type: 3}
   - _section: zone_mine_thermal_weak
-    _displayName: "Жарка"
-    _prefab: {fileID: 6036523816419366679, guid: bb71a7a9124edab409ed0f17d98e4634, type: 3}
+    _displayName: "\u0416\u0430\u0440\u043A\u0430 \u2014 \u0441\u043B\u0430\u0431\u044B\u0439 \u0432\u0430\u0440\u0438\u0430\u043D\u0442"
+    _prefab: {fileID: 5802999050321614370, guid: eccb11fc425a8bc4487febcda6d0502f, type: 3}
   - _section: zone_monolith
-    _displayName: "Исполнитель желаний"
-    _prefab: {fileID: 0}
+    _displayName: "\u0418\u0441\u043F\u043E\u043B\u043D\u0438\u0442\u0435\u043B\u044C \u0436\u0435\u043B\u0430\u043D\u0438\u0439"
+    _prefab: {fileID: 395277137754914886, guid: 4c42e546ffdc8894ea2912de0c3612cc, type: 3}
   - _section: zone_mosquito_bald
-    _displayName: "Трамплин"
+    _displayName: "\u0422\u0440\u0430\u043C\u043F\u043B\u0438\u043D"
     _prefab: {fileID: 1877172421583510763, guid: bc6367c4932433a4eaa67d191519601b, type: 3}
   - _section: zone_mosquito_bald_average
-    _displayName: "Трамплин"
-    _prefab: {fileID: 1877172421583510763, guid: bc6367c4932433a4eaa67d191519601b, type: 3}
+    _displayName: "\u0422\u0440\u0430\u043C\u043F\u043B\u0438\u043D \u2014 \u0441\u0440\u0435\u0434\u043D\u0438\u0439 \u0432\u0430\u0440\u0438\u0430\u043D\u0442"
+    _prefab: {fileID: 5691003409381644893, guid: 2da64f35ea1ac2d44b98d61854784456, type: 3}
   - _section: zone_mosquito_bald_strong
-    _displayName: "Трамплин"
-    _prefab: {fileID: 1877172421583510763, guid: bc6367c4932433a4eaa67d191519601b, type: 3}
+    _displayName: "\u0422\u0440\u0430\u043C\u043F\u043B\u0438\u043D \u2014 \u0441\u0438\u043B\u044C\u043D\u044B\u0439 \u0432\u0430\u0440\u0438\u0430\u043D\u0442"
+    _prefab: {fileID: 3856995293331584720, guid: 3c8aef6c37d35834da638b53649cba9a, type: 3}
   - _section: zone_mosquito_bald_weak
-    _displayName: "Трамплин"
-    _prefab: {fileID: 1877172421583510763, guid: bc6367c4932433a4eaa67d191519601b, type: 3}
+    _displayName: "\u0422\u0440\u0430\u043C\u043F\u043B\u0438\u043D \u2014 \u0441\u043B\u0430\u0431\u044B\u0439 \u0432\u0430\u0440\u0438\u0430\u043D\u0442"
+    _prefab: {fileID: 4793625872598464912, guid: 4edd76b6106e8eb4bb70735b782dff13, type: 3}
   - _section: zone_no_gravity
-    _displayName: "Невесомость"
-    _prefab: {fileID: 0}
+    _displayName: "\u041D\u0435\u0432\u0435\u0441\u043E\u043C\u043E\u0441\u0442\u044C"
+    _prefab: {fileID: 3011614965034572002, guid: 7d1db57fa0204524d9daac32225403d1, type: 3}
   - _section: zone_radioactive_average
-    _displayName: "Очаг радиации"
-    _prefab: {fileID: 0}
+    _displayName: "\u041E\u0447\u0430\u0433 \u0440\u0430\u0434\u0438\u0430\u0446\u0438\u0438 \u2014 \u0441\u0440\u0435\u0434\u043D\u0438\u0439 \u0432\u0430\u0440\u0438\u0430\u043D\u0442"
+    _prefab: {fileID: 3600653727517201224, guid: d047ff2f58f7a5b4590bf50c83792fb2, type: 3}
   - _section: zone_radioactive_strong
-    _displayName: "Очаг радиации"
-    _prefab: {fileID: 0}
+    _displayName: "\u041E\u0447\u0430\u0433 \u0440\u0430\u0434\u0438\u0430\u0446\u0438\u0438 \u2014 \u0441\u0438\u043B\u044C\u043D\u044B\u0439 \u0432\u0430\u0440\u0438\u0430\u043D\u0442"
+    _prefab: {fileID: 1500573115180090612, guid: 02b04ff566231a1438f5488965799f22, type: 3}
   - _section: zone_radioactive_weak
-    _displayName: "Очаг радиации"
-    _prefab: {fileID: 0}
+    _displayName: "\u041E\u0447\u0430\u0433 \u0440\u0430\u0434\u0438\u0430\u0446\u0438\u0438 \u2014 \u0441\u043B\u0430\u0431\u044B\u0439 \u0432\u0430\u0440\u0438\u0430\u043D\u0442"
+    _prefab: {fileID: 5088797321284754201, guid: b41eb07b52be17f468c505e920569f64, type: 3}
   - _section: zone_teleport
-    _displayName: "Телепорт"
-    _prefab: {fileID: 0}
+    _displayName: "\u0422\u0435\u043B\u0435\u043F\u043E\u0440\u0442"
+    _prefab: {fileID: 3435257070114805463, guid: f085bcbce6576e249a6ff4ae8a5baef4, type: 3}
   - _section: zone_witches_galantine
-    _displayName: "Электро"
+    _displayName: "\u042D\u043B\u0435\u043A\u0442\u0440\u043E"
     _prefab: {fileID: 122456809518884124, guid: e4fcbbdd51e69a94fa41cacdf195f1b6, type: 3}
   - _section: zone_witches_galantine_average
-    _displayName: "Электро"
-    _prefab: {fileID: 122456809518884124, guid: e4fcbbdd51e69a94fa41cacdf195f1b6, type: 3}
+    _displayName: "\u042D\u043B\u0435\u043A\u0442\u0440\u043E \u2014 \u0441\u0440\u0435\u0434\u043D\u0438\u0439 \u0432\u0430\u0440\u0438\u0430\u043D\u0442"
+    _prefab: {fileID: 427570970095678616, guid: fdc6c6b82a4ac344db1b7897d0638ea5, type: 3}
   - _section: zone_witches_galantine_strong
-    _displayName: "Электро"
-    _prefab: {fileID: 122456809518884124, guid: e4fcbbdd51e69a94fa41cacdf195f1b6, type: 3}
+    _displayName: "\u042D\u043B\u0435\u043A\u0442\u0440\u043E \u2014 \u0441\u0438\u043B\u044C\u043D\u044B\u0439 \u0432\u0430\u0440\u0438\u0430\u043D\u0442"
+    _prefab: {fileID: 868497823517841008, guid: 8a8c6915b7515d547b6f2fa6ab232b86, type: 3}
   - _section: zone_witches_galantine_weak
-    _displayName: "Электро"
-    _prefab: {fileID: 122456809518884124, guid: e4fcbbdd51e69a94fa41cacdf195f1b6, type: 3}
+    _displayName: "\u042D\u043B\u0435\u043A\u0442\u0440\u043E \u2014 \u0441\u043B\u0430\u0431\u044B\u0439 \u0432\u0430\u0440\u0438\u0430\u043D\u0442"
+    _prefab: {fileID: 5184217107601116629, guid: b7f9284247e044049a57a196dbf8d158, type: 3}
   - _section: zone_zhar
-    _displayName: "Жар"
-    _prefab: {fileID: 0}
+    _displayName: "\u0416\u0430\u0440"
+    _prefab: {fileID: 199375251455078767, guid: ec76289f1fb1f864883a837abcfc9f14, type: 3}
   - _section: zone_zharka_static_average
-    _displayName: "Жарка"
-    _prefab: {fileID: 6036523816419366679, guid: bb71a7a9124edab409ed0f17d98e4634, type: 3}
+    _displayName: "\u0416\u0430\u0440\u043A\u0430 \u2014 \u0441\u0440\u0435\u0434\u043D\u0438\u0439 \u0432\u0430\u0440\u0438\u0430\u043D\u0442"
+    _prefab: {fileID: 4239177811404025723, guid: 8559944df4283fe4db869ac4adcea607, type: 3}
   - _section: zone_zharka_static_strong
-    _displayName: "Жарка"
-    _prefab: {fileID: 6036523816419366679, guid: bb71a7a9124edab409ed0f17d98e4634, type: 3}
+    _displayName: "\u0416\u0430\u0440\u043A\u0430 \u2014 \u0441\u0438\u043B\u044C\u043D\u044B\u0439 \u0432\u0430\u0440\u0438\u0430\u043D\u0442"
+    _prefab: {fileID: 1515571501402123512, guid: 9c0e949a651f48c40bc2f667d4203e25, type: 3}
   - _section: zone_zharka_static_weak
-    _displayName: "Жарка"
-    _prefab: {fileID: 6036523816419366679, guid: bb71a7a9124edab409ed0f17d98e4634, type: 3}
+    _displayName: "\u0416\u0430\u0440\u043A\u0430 \u2014 \u0441\u043B\u0430\u0431\u044B\u0439 \u0432\u0430\u0440\u0438\u0430\u043D\u0442"
+    _prefab: {fileID: 5802999050321614370, guid: eccb11fc425a8bc4487febcda6d0502f, type: 3}
+  _motionBindings:
+  - _motionName: artefact_tc_electric_ball_cam.anm
+    _asset: {fileID: 4908183818744415850, guid: 238f064a891f24248bd0c9c4949ce416, type: 3}
+  - _motionName: camera_effects\scenario_cam\agraprom_underground\fire_camera.anm
+    _asset: {fileID: 4908183818744415850, guid: 66488471b6cff8548a62778e7a0141db, type: 3}
+  - _motionName: camera_effects\scenario_cam\jupiter\jup_b1_fireball_cam.anm
+    _asset: {fileID: 4908183818744415850, guid: b03b326969f18204997145767657090f, type: 3}
+  - _motionName: camera_effects\scenario_cam\jupiter\jup_b213.anm
+    _asset: {fileID: 4908183818744415850, guid: 0cea698ef5fa47243aae2e375c3b3ab7, type: 3}
+  - _motionName: camera_effects\scenario_cam\pripyat\labx8_electro_fireball.anm
+    _asset: {fileID: 4908183818744415850, guid: 6159ef02a5873ea498ca5f4c64ccba67, type: 3}
+  - _motionName: camera_effects\scenario_cam\pripyat\pri_b302_fireball_acidic_cam.anm
+    _asset: {fileID: 4908183818744415850, guid: 1fe59ef6b10352e4db831a97580a069b, type: 3}
+  - _motionName: camera_effects\scenario_cam\pripyat\pri_b304_fireball_cam.anm
+    _asset: {fileID: 4908183818744415850, guid: 740f7e173b6a2b44e881ac30432fa7f6, type: 3}
+  - _motionName: camera_effects\scenario_cam\pripyat\pri_b307_fireball_1.anm
+    _asset: {fileID: 4908183818744415850, guid: e10fbdf4dc1c606419528cf2fd52d237, type: 3}
+  - _motionName: camera_effects\scenario_cam\pripyat\pri_b307_fireball_2.anm
+    _asset: {fileID: 4908183818744415850, guid: 03f1fb73373f73d4fb09951dc171ba31, type: 3}
+  - _motionName: camera_effects\scenario_cam\pripyat\pri_b307_fireball_3.anm
+    _asset: {fileID: 4908183818744415850, guid: 831e374e99a97be4d9c75b6aea015f9c, type: 3}
+  - _motionName: camera_effects\scenario_cam\projy\cyclone_electra.anm
+    _asset: {fileID: 4908183818744415850, guid: 9912ef40c48b26d42bc1d535fe0e8e1f, type: 3}
+  - _motionName: camera_effects\scenario_cam\zaton\zat_b44_fireball_1_cam.anm
+    _asset: {fileID: 4908183818744415850, guid: d8442165eae2b9e4c84b2ae6d7246345, type: 3}
+  - _motionName: camera_effects\scenario_cam\zaton\zat_b44_fireball_2_cam.anm
+    _asset: {fileID: 4908183818744415850, guid: c1c81fb4ff21a1b48b1cb069c9403a72, type: 3}
+  - _motionName: camera_effects\scenario_cam\zaton\zaton_b56_01.anm
+    _asset: {fileID: 4908183818744415850, guid: 6b96074597b401845950c1e1b15c3d1f, type: 3}
+  - _motionName: camera_effects\scenario_cam\zaton\zaton_b56_02.anm
+    _asset: {fileID: 4908183818744415850, guid: 980d6763f28acca4580ba5971461db5d, type: 3}
+  - _motionName: camera_effects\val_fireball.anm
+    _asset: {fileID: 4908183818744415850, guid: 2cdd352dc9a17e94082e48f83255091d, type: 3}
+  - _motionName: gen_torrid_line.anm
+    _asset: {fileID: 4908183818744415850, guid: a5b5d6f6e5083e5409761f6d416b2ab1, type: 3}
+  - _motionName: gen_torrid_line1.anm
+    _asset: {fileID: 4908183818744415850, guid: d377777d31063a54084fca0eeeed843b, type: 3}
+  - _motionName: gen_torrid_line2.anm
+    _asset: {fileID: 4908183818744415850, guid: 0b4b3abb3a8c7ad47a5590b51e92c1d1, type: 3}
+  - _motionName: gen_torrid_line3.anm
+    _asset: {fileID: 4908183818744415850, guid: 0484c20a4e8ed524597284daa0addee2, type: 3}
+  - _motionName: path\agroprom_zharka.anm
+    _asset: {fileID: 4908183818744415850, guid: 6e4f2924b0fc26d4ba81307f42c118b6, type: 3}
+  - _motionName: path\deadcity_zharka.anm
+    _asset: {fileID: 4908183818744415850, guid: 632da3a6b71bde6439927ebddb9548c2, type: 3}
+  - _motionName: path\lestat_military1.anm
+    _asset: {fileID: 4908183818744415850, guid: 54314241306256941874f5eb316e2a4b, type: 3}
+  - _motionName: path\military_fireball1.anm
+    _asset: {fileID: 4908183818744415850, guid: 7f53d9396807f62408ecfcc2c30d8e41, type: 3}
+  - _motionName: path\military_torrid1.anm
+    _asset: {fileID: 4908183818744415850, guid: cbf51ea9384ef3b448fd884145ca663b, type: 3}
+  - _motionName: path\rostok_jarka_krondor.anm
+    _asset: {fileID: 4908183818744415850, guid: d8d01c86a3482d94583d5f8cde4f4c81, type: 3}
+  - _motionName: path\torid_stancia_vxod1.anm
+    _asset: {fileID: 4908183818744415850, guid: 54c773c5e6a31314ca0730138657a1f8, type: 3}

@@ -34,7 +34,7 @@ namespace RaidIntoDarkness.Player.Tests
                 serialized.ApplyModifiedPropertiesWithoutUndo();
                 Condition = _root.AddComponent<StalkerActorCondition>();
                 Condition.Initialize(Profile);
-                Condition.SetPower(0.8f);
+                Condition.SetPower(0.8f * Condition.PowerCapacity);
             }
 
             public void Dispose()
@@ -100,7 +100,7 @@ namespace RaidIntoDarkness.Player.Tests
                 neutral.Condition.Tick(StalkerMoveFlags.Forward, false, 0.0f, 0.06f);
 
                 Assert.That(material.Condition.RunCoef, Is.EqualTo(material.Profile.Actor.RunCoef * speed).Within(0.000001f));
-                Assert.That(material.Condition.Power - neutral.Condition.Power, Is.EqualTo(stamina * 0.005f * 0.8f).Within(0.000001f));
+                Assert.That(material.Condition.Power - neutral.Condition.Power, Is.EqualTo(stamina * 0.005f * 0.8f * material.Condition.PowerCapacity).Within(0.00001f));
             }
         }
 
@@ -120,7 +120,7 @@ namespace RaidIntoDarkness.Player.Tests
                 vegetation.Condition.Tick(StalkerMoveFlags.Forward, false, 0.0f, 0.03f);
                 earth.Condition.Tick(StalkerMoveFlags.Forward, false, 0.0f, 0.03f);
 
-                Assert.That(earth.Condition.Power - vegetation.Condition.Power, Is.EqualTo(0.00048f).Within(0.000001f));
+                Assert.That(earth.Condition.Power - vegetation.Condition.Power, Is.EqualTo(0.00048f * earth.Condition.PowerCapacity).Within(0.00001f));
             }
         }
 

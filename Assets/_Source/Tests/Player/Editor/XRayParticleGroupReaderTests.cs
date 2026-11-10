@@ -11,6 +11,62 @@ namespace RaidIntoDarkness.Player.Tests
     public sealed class XRayParticleGroupReaderTests
     {
         [Test]
+        public void UnsupportedAndDampingPayloadsRetainOriginalOrderFlagsAndBytes()
+        {
+            byte[] scatter = Bytes(writer =>
+            {
+                for (int index = 0; index < 6; index++) writer.Write(index * 0.25f);
+            });
+            byte[] damping = Bytes(writer =>
+            {
+                for (int index = 0; index < 5; index++) writer.Write(index + 0.5f);
+            });
+            byte[] actions = Bytes(writer =>
+            {
+                writer.Write(3u);
+                writer.Write(31u);
+                writer.Write(2u);
+                writer.Write(0u);
+                writer.Write(scatter);
+                writer.Write(4u);
+                writer.Write(6u);
+                writer.Write(0u);
+                writer.Write(damping);
+                writer.Write(12u);
+                writer.Write(0u);
+                writer.Write(0u);
+            });
+            IList effects = ReadEffects(EffectLibrary(actions));
+            Assert.That(effects.Count, Is.EqualTo(1));
+            IList payloads = Get<IList>(effects[0], "UnsupportedPayloads");
+            Assert.That(payloads.Count, Is.EqualTo(2));
+            Assert.That(Get<int>(payloads[0], "Ordinal"), Is.Zero);
+            Assert.That(Get<object>(payloads[0], "Type").ToString(), Is.EqualTo("Scatter"));
+            Assert.That(Get<uint>(payloads[0], "Flags"), Is.EqualTo(2u));
+            Assert.That(Get<byte[]>(payloads[0], "Bytes"), Is.EqualTo(scatter));
+            Assert.That(Get<int>(payloads[1], "Ordinal"), Is.EqualTo(1));
+            Assert.That(Get<object>(payloads[1], "Type").ToString(), Is.EqualTo("Damping"));
+            Assert.That(Get<uint>(payloads[1], "Flags"), Is.EqualTo(6u));
+            Assert.That(Get<byte[]>(payloads[1], "Bytes"), Is.EqualTo(damping));
+            Assert.That(Get<IList>(effects[0], "Actions").Count, Is.EqualTo(2));
+        }
+
+        [Test]
+        public void TruncatedUnsupportedPayloadIsRejectedBeforeReadingAnotherChunk()
+        {
+            byte[] actions = Bytes(writer =>
+            {
+                writer.Write(1u);
+                writer.Write(31u);
+                writer.Write(2u);
+                writer.Write(0u);
+                writer.Write(new byte[20]);
+            });
+            TargetInvocationException exception = Assert.Throws<TargetInvocationException>(() => ReadEffects(EffectLibrary(actions)));
+            Assert.That(exception.InnerException, Is.TypeOf<FormatException>());
+        }
+
+        [Test]
         public void PackedGroupPreservesNamedChildLinksTimesFlagsAndEmptyChildren()
         {
             Type reader = Type.GetType("RaidIntoDarkness.Integrations.Inventory.Editor.XRayParticleLibraryReader, RaidIntoDarkness.Integrations.Inventory.Editor", true);
@@ -48,6 +104,29 @@ namespace RaidIntoDarkness.Player.Tests
             PropertyInfo property = value.GetType().GetProperty(name);
             Assert.NotNull(property, name);
             return (T)property.GetValue(value);
+        }
+
+        private static IList ReadEffects(byte[] bytes)
+        {
+            Type reader = Type.GetType("RaidIntoDarkness.Integrations.Inventory.Editor.XRayParticleLibraryReader, RaidIntoDarkness.Integrations.Inventory.Editor", true);
+            Type effectType = reader.Assembly.GetType("RaidIntoDarkness.Integrations.Inventory.Editor.XRayParticleEffectData", true);
+            Type groupType = reader.Assembly.GetType("RaidIntoDarkness.Integrations.Inventory.Editor.XRayParticleGroupData", true);
+            var effects = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(effectType));
+            var groups = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(groupType));
+            reader.GetMethod("Read", BindingFlags.Public | BindingFlags.Static).Invoke(null, new object[] { bytes, new Func<string, bool>(_ => true), effects, groups });
+            return effects;
+        }
+
+        private static byte[] EffectLibrary(byte[] actions)
+        {
+            byte[] effect = Bytes(writer =>
+            {
+                Chunk(writer, 2u, Bytes(output => String(output, "anomaly2\\payload_test")));
+                Chunk(writer, 3u, Bytes(output => output.Write(10u)));
+                Chunk(writer, 4u, actions);
+                Chunk(writer, 5u, Bytes(output => output.Write(0u)));
+            });
+            return Bytes(writer => Chunk(writer, 3u, Bytes(output => Chunk(output, 0u, effect))));
         }
 
         private static byte[] Library()

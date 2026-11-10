@@ -5,6 +5,7 @@ namespace XRay.Importer.Levels
     public sealed class GameConfig : ScriptableObject
     {
         public const float MAX_FX_LIGHTING_ADAPTATION = 4.0f;
+        public const float DEFAULT_PLAYER_STAT_CAPACITY = 100.0f;
 
         private const string RESOURCE_PATH = "GameConfig";
 
@@ -23,6 +24,7 @@ namespace XRay.Importer.Levels
         [SerializeField] private bool _adaptLensFlareToWeather = true;
         [SerializeField, Min(0.0f)] private float _expressiveFlareIntensity = 1.0f;
         [SerializeField, Range(0.0f, MAX_FX_LIGHTING_ADAPTATION)] private float _fxLightingAdaptation = 1.0f;
+        [SerializeField, Min(0.0001f)] private float _defaultPlayerStatCapacity = DEFAULT_PLAYER_STAT_CAPACITY;
 
         public float DefaultTimeScale => _defaultTimeScale;
         public float DefaultTimeOfDay => _defaultTimeOfDay;
@@ -39,6 +41,7 @@ namespace XRay.Importer.Levels
         public bool AdaptLensFlareToWeather => _adaptLensFlareToWeather;
         public float ExpressiveFlareIntensity => _expressiveFlareIntensity;
         public float FxLightingAdaptation => _fxLightingAdaptation;
+        public float DefaultPlayerStatCapacity => _defaultPlayerStatCapacity;
         public int Revision { get; private set; }
 
         public static GameConfig Load()
@@ -61,6 +64,7 @@ namespace XRay.Importer.Levels
             else if (!float.IsFinite(_lensFlareIntensity) || _lensFlareIntensity < 0.0f) diagnostic = "GameConfig LensFlareIntensity must be finite and non-negative.";
             else if (!float.IsFinite(_expressiveFlareIntensity) || _expressiveFlareIntensity < 0.0f) diagnostic = "GameConfig ExpressiveFlareIntensity must be finite and non-negative.";
             else if (!float.IsFinite(_fxLightingAdaptation) || _fxLightingAdaptation < 0.0f || _fxLightingAdaptation > MAX_FX_LIGHTING_ADAPTATION) diagnostic = "GameConfig FxLightingAdaptation must be within its supported range.";
+            else if (!float.IsFinite(_defaultPlayerStatCapacity) || _defaultPlayerStatCapacity <= 0.0f) diagnostic = "GameConfig DefaultPlayerStatCapacity must be finite and positive.";
             return diagnostic == null;
         }
 

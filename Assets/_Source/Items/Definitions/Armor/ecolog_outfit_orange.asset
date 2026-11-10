@@ -73,16 +73,16 @@ MonoBehaviour:
         _community: 
         _communityIcon: {fileID: 0}
         _communityIconSize: {x: 0, y: 0}
-        _burnProtection: 1.2
-        _shockProtection: 1.35
-        _chemicalBurnProtection: 0.85
-        _radiationProtection: 0.044
-        _telepaticProtection: 0.135
-        _woundProtection: 0.3
-        _strikeProtection: 0.3
-        _explosionProtection: 0.3
-        _fireWoundProtection: 0.12
-        _helmetFireWoundProtection: 0.12
+        _burnProtection: 64
+        _shockProtection: 14
+        _chemicalBurnProtection: 72
+        _radiationProtection: 71
+        _telepaticProtection: 23
+        _woundProtection: 16
+        _strikeProtection: 15
+        _explosionProtection: 10
+        _fireWoundProtection: 10
+        _helmetFireWoundProtection: 10
         _artefactCount: 3
         _additionalWeight: 20
         _powerLoss: 0.1
@@ -90,8 +90,8 @@ MonoBehaviour:
         _sprintAllowed: 1
         _nightVisionSection: 
         _speed: 1.02
-        _physicalDurability: 0.3809136
-        _anomalyDurability: 1
+        _physicalDurability: 39
+        _anomalyDurability: 100
     - rid: 3479885472039698477
       type: {class: WorldItemComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
       data:

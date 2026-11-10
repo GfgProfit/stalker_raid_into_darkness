@@ -17,14 +17,26 @@ namespace XRay.Importer.Editor.Levels
         public GameObject Prefab => _prefab;
     }
 
+    [Serializable]
+    public sealed class XRayLevelAnomalyMotionBinding
+    {
+        [SerializeField] private string _motionName;
+        [SerializeField] private XRayAnmAsset _asset;
+
+        public string MotionName => _motionName;
+        public XRayAnmAsset Asset => _asset;
+    }
+
     [CreateAssetMenu(fileName = "XRayLevelAnomalyCatalog", menuName = "X-Ray/Levels/Anomaly Catalog")]
     public sealed class XRayLevelAnomalyCatalog : ScriptableObject
     {
         public const string DEFAULT_ASSET_PATH = "Assets/_Tools/X-Ray OGF OMG Importer/Editor/Levels/XRayLevelAnomalyCatalog.asset";
 
         [SerializeField, Tooltip("Секции аномалий из all.spawn. Для отсутствующих в проекте аномалий оставьте Prefab пустым: импортёр покажет их названия и количество.")] private List<XRayLevelAnomalyEntry> _entries = new List<XRayLevelAnomalyEntry>();
+        [SerializeField] private List<XRayLevelAnomalyMotionBinding> _motionBindings = new List<XRayLevelAnomalyMotionBinding>();
 
         public IReadOnlyList<XRayLevelAnomalyEntry> Entries => _entries != null ? _entries : Array.Empty<XRayLevelAnomalyEntry>();
+        public IReadOnlyList<XRayLevelAnomalyMotionBinding> MotionBindings => _motionBindings != null ? _motionBindings : Array.Empty<XRayLevelAnomalyMotionBinding>();
 
         public static XRayLevelAnomalyCatalog LoadDefault()
         {
@@ -76,8 +88,57 @@ namespace XRay.Importer.Editor.Levels
                 }
             }
 
+            var motions = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (XRayLevelAnomalyMotionBinding binding in MotionBindings)
+            {
+                string motionName = binding != null ? NormalizeMotionName(binding.MotionName) : null;
+                if (string.IsNullOrWhiteSpace(motionName))
+                {
+                    error = "В конфиге аномалий есть motion binding без имени all.spawn.";
+                    return false;
+                }
+                if (!motions.Add(motionName))
+                {
+                    error = "В конфиге аномалий повторяется motion: " + binding.MotionName + ".";
+                    return false;
+                }
+                if (binding.Asset != null && !EditorUtility.IsPersistent(binding.Asset))
+                {
+                    error = "Для motion «" + binding.MotionName + "» требуется сохранённый XRayAnmAsset.";
+                    return false;
+                }
+            }
+
             error = null;
             return true;
+        }
+
+        public bool TryGetMotion(string motionName, out XRayAnmAsset asset)
+        {
+            string name = NormalizeMotionName(motionName);
+            if (!string.IsNullOrWhiteSpace(name))
+            {
+                foreach (XRayLevelAnomalyMotionBinding binding in MotionBindings)
+                {
+                    if (binding != null && binding.Asset != null && string.Equals(NormalizeMotionName(binding.MotionName), name, StringComparison.OrdinalIgnoreCase))
+                    {
+                        asset = binding.Asset;
+                        return true;
+                    }
+                }
+            }
+            asset = null;
+            return false;
+        }
+
+        public static string NormalizeMotionName(string motionName)
+        {
+            if (string.IsNullOrWhiteSpace(motionName))
+            {
+                return string.Empty;
+            }
+            string name = motionName.Trim().Replace('\\', '/');
+            return name.StartsWith("anims/", StringComparison.OrdinalIgnoreCase) ? name.Substring(6) : name;
         }
     }
 }

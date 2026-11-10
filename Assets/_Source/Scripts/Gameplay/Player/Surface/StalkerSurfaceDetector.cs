@@ -45,6 +45,16 @@ namespace RaidIntoDarkness.Player
             EnsureMappings();
             float start = _library != null ? _library.RayStartHeight : 1.0f;
             float length = _library != null ? _library.RayLength : 1.1f;
+            if (_controller != null)
+            {
+                Vector3 scale = transform.lossyScale;
+                float radius = _controller.radius * Mathf.Max(Mathf.Abs(scale.x), Mathf.Abs(scale.z));
+                float slopeCosine = Mathf.Cos(Mathf.Clamp(_controller.slopeLimit, 0.0f, 89.0f) * Mathf.Deg2Rad);
+                float slopeHeight = radius * (1.0f / slopeCosine - 1.0f);
+                float skin = _controller.skinWidth * Mathf.Max(Mathf.Abs(scale.x), Mathf.Abs(scale.y), Mathf.Abs(scale.z));
+                length = Mathf.Max(length, start + slopeHeight + skin);
+            }
+
             Vector3 origin = transform.position + Vector3.up * start;
             HasGround = Physics.Raycast(origin, Vector3.down, out RaycastHit hit, length, _mask, QueryTriggerInteraction.Ignore);
             if (!HasGround)

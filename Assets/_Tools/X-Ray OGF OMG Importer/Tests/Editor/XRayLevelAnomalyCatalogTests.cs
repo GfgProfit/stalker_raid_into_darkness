@@ -1,3 +1,5 @@
+using System;
+using System.IO;
 using NUnit.Framework;
 using UnityEditor;
 using UnityEngine;
@@ -22,10 +24,10 @@ namespace XRay.Importer.Tests
             AssertPrefab(catalog, "zone_mine_chemical_average", "Kisel");
             AssertPrefab(catalog, "zone_mine_acidic_average", "Gazirovka");
             Assert.That(catalog.TryGet("zone_burning_fuzz1", out XRayLevelAnomalyEntry missing), Is.True);
-            Assert.That(missing.Prefab, Is.Null);
+            Assert.That(missing.Prefab, Is.Not.Null);
             Assert.That(missing.DisplayName, Does.Contain("пух"));
             Assert.That(catalog.TryGet("zone_teleport", out XRayLevelAnomalyEntry teleport), Is.True);
-            Assert.That(teleport.Prefab, Is.Null);
+            Assert.That(teleport.Prefab, Is.Not.Null);
         }
 
         [Test]
@@ -101,11 +103,98 @@ namespace XRay.Importer.Tests
             }
         }
 
+        [Test]
+        public void MotionLookupNormalizesSourcePrefixesAndSlashesWithoutBasenameFallback()
+        {
+            XRayLevelAnomalyCatalog catalog = ScriptableObject.CreateInstance<XRayLevelAnomalyCatalog>();
+            XRayAnmAsset asset = ScriptableObject.CreateInstance<XRayAnmAsset>();
+            try
+            {
+                SetMotions(catalog, asset, "camera_effects\\source_motion.anm");
+                Assert.That(catalog.TryGetMotion("ANIMS/CAMERA_EFFECTS/source_motion.anm", out XRayAnmAsset found), Is.True);
+                Assert.That(found, Is.SameAs(asset));
+                Assert.That(catalog.TryGetMotion("other/source_motion.anm", out found), Is.False);
+                Assert.That(catalog.TryGetMotion(null, out found), Is.False);
+                Assert.That(found, Is.Null);
+            }
+            finally
+            {
+                UnityEngine.Object.DestroyImmediate(asset);
+                UnityEngine.Object.DestroyImmediate(catalog);
+            }
+        }
+
+        [Test]
+        public void DuplicateNormalizedMotionBindingsAreRejected()
+        {
+            XRayLevelAnomalyCatalog catalog = ScriptableObject.CreateInstance<XRayLevelAnomalyCatalog>();
+            try
+            {
+                SetMotions(catalog, null, "path\\source.anm", "anims/PATH/source.anm");
+                Assert.That(catalog.Validate(out string error), Is.False);
+                Assert.That(error, Does.Contain("повторяется motion"));
+            }
+            finally
+            {
+                UnityEngine.Object.DestroyImmediate(catalog);
+            }
+        }
+
+        [Test]
+        public void TransientMotionAssetsCannotBecomeImportAssignments()
+        {
+            XRayLevelAnomalyCatalog catalog = ScriptableObject.CreateInstance<XRayLevelAnomalyCatalog>();
+            XRayAnmAsset asset = ScriptableObject.CreateInstance<XRayAnmAsset>();
+            try
+            {
+                SetMotions(catalog, asset, "source.anm");
+                Assert.That(catalog.Validate(out string error), Is.False);
+                Assert.That(error, Does.Contain("сохранённый XRayAnmAsset"));
+            }
+            finally
+            {
+                UnityEngine.Object.DestroyImmediate(asset);
+                UnityEngine.Object.DestroyImmediate(catalog);
+            }
+        }
+
+        private static void SetMotions(XRayLevelAnomalyCatalog catalog, XRayAnmAsset asset, params string[] names)
+        {
+            var data = new SerializedObject(catalog);
+            SerializedProperty bindings = data.FindProperty("_motionBindings");
+            bindings.arraySize = names.Length;
+            for (int index = 0; index < names.Length; index++)
+            {
+                SerializedProperty binding = bindings.GetArrayElementAtIndex(index);
+                binding.FindPropertyRelative("_motionName").stringValue = names[index];
+                binding.FindPropertyRelative("_asset").objectReferenceValue = asset;
+            }
+            data.ApplyModifiedPropertiesWithoutUndo();
+        }
+
         private static void AssertPrefab(XRayLevelAnomalyCatalog catalog, string section, string family)
         {
             Assert.That(catalog.TryGet(section, out XRayLevelAnomalyEntry entry), Is.True, section);
             Assert.That(entry.Prefab, Is.Not.Null, section);
-            Assert.That(AssetDatabase.GetAssetPath(entry.Prefab), Is.EqualTo("Assets/_Source/Anomalies/" + family + "/" + family + ".prefab"), section);
+            string basePath = "Assets/_Source/Anomalies/" + family + "/" + family + ".prefab";
+            GameObject source = entry.Prefab;
+            bool inheritsFamily = false;
+            for (int depth = 0; source != null && depth < 64; depth++)
+            {
+                if (AssetDatabase.GetAssetPath(source) == basePath)
+                {
+                    inheritsFamily = true;
+                    break;
+                }
+                source = PrefabUtility.GetCorrespondingObjectFromSource(source);
+            }
+            Assert.That(inheritsFamily, Is.True, section + " must inherit " + basePath);
+            string difficulty = section.EndsWith("_weak", StringComparison.OrdinalIgnoreCase) ? "Weak" : section.EndsWith("_average", StringComparison.OrdinalIgnoreCase) ? "Average" : section.EndsWith("_strong", StringComparison.OrdinalIgnoreCase) ? "Strong" : null;
+            if (difficulty != null)
+            {
+                Assert.That(PrefabUtility.GetPrefabAssetType(entry.Prefab), Is.EqualTo(PrefabAssetType.Variant), section);
+                Assert.That(Path.GetFileNameWithoutExtension(AssetDatabase.GetAssetPath(entry.Prefab)), Does.EndWith(difficulty), section);
+            }
         }
 
         private static void SetSections(XRayLevelAnomalyCatalog catalog, params string[] sections)

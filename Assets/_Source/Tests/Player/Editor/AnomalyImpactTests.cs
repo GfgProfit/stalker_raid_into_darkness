@@ -172,9 +172,9 @@ namespace RaidIntoDarkness.Player.Tests
         {
             using (var rig = new Rig())
             {
-                SetField(rig.Condition, "_neutralHealth", 0.61f);
-                SetField(rig.Condition, "_neutralSatiety", 0.43f);
-                rig.Condition.SetPower(0.37f);
+                rig.Condition.SetHealth(61f);
+                rig.Condition.SetHunger(43f);
+                rig.Condition.SetPower(37f);
                 rig.Condition.SetSpeedModifier("AnomalyImpactTests.Run", 0.8f, false);
                 rig.Condition.SetSpeedModifier("AnomalyImpactTests.Sprint", 0.7f, true);
                 float run = rig.Condition.RunCoef;
@@ -182,9 +182,9 @@ namespace RaidIntoDarkness.Player.Tests
 
                 rig.Motor.ApplyAnomalyShock();
 
-                Assert.That(rig.Condition.Health, Is.EqualTo(0.61f));
+                Assert.That(rig.Condition.Health, Is.EqualTo(61f));
                 Assert.That(rig.Condition.Satiety, Is.EqualTo(0.43f));
-                Assert.That(rig.Condition.Power, Is.EqualTo(0.37f));
+                Assert.That(rig.Condition.Power, Is.EqualTo(37f));
                 Assert.That(rig.Condition.RunCoef, Is.EqualTo(run));
                 Assert.That(rig.Condition.SprintKoef, Is.EqualTo(sprint));
                 Assert.That(rig.Condition.RunModifiers.Count, Is.EqualTo(1));
@@ -216,6 +216,39 @@ namespace RaidIntoDarkness.Player.Tests
             AssertNonimpulsivePulse(AnomalyInfluenceKind.Thermal, true);
         }
 
+        [Test]
+        public void MinePulseCancelsSprintWithoutStoppingVelocityOrChangingHealthAndPower()
+        {
+            using (var rig = new Rig())
+            {
+                StalkerAnomalyResponse response = rig.AddResponse();
+                AnomalyInfluenceProfile profile = ScriptableObject.CreateInstance<AnomalyInfluenceProfile>();
+                try
+                {
+                    SetField(profile, "_kind", AnomalyInfluenceKind.None);
+                    SetField(profile, "_interruptSprint", true);
+                    Vector3 velocity = new Vector3(3.5f, -2f, 6f);
+                    StalkerMoveFlags flags = StalkerMoveFlags.Forward | StalkerMoveFlags.Sprint;
+                    rig.Physics.SetVelocity(velocity);
+                    rig.SetRealFlags(flags);
+                    rig.Motor.Wish = flags;
+                    rig.Condition.SetHealth(61f);
+                    rig.Condition.SetPower(37f);
+
+                    response.ApplyPulse(profile);
+
+                    Assert.That(rig.Motor.Wish, Is.EqualTo(StalkerMoveFlags.Forward));
+                    Assert.That(rig.Motor.Velocity, Is.EqualTo(velocity));
+                    Assert.That(rig.Condition.Health, Is.EqualTo(61f));
+                    Assert.That(rig.Condition.Power, Is.EqualTo(37f));
+                }
+                finally
+                {
+                    UnityEngine.Object.DestroyImmediate(profile);
+                }
+            }
+        }
+
         private static void AssertNonimpulsivePulse(AnomalyInfluenceKind kind, bool airborne)
         {
             using (var rig = new Rig())
@@ -234,8 +267,8 @@ namespace RaidIntoDarkness.Player.Tests
                     rig.Physics.SetVelocity(velocity);
                     rig.SetRealFlags(flags);
                     rig.Motor.Wish = flags;
-                    SetField(rig.Condition, "_neutralHealth", 0.61f);
-                    rig.Condition.SetPower(0.37f);
+                    rig.Condition.SetHealth(61f);
+                    rig.Condition.SetPower(37f);
                     rig.Condition.SetSpeedModifier("AnomalyImpactTests.Nonimpulsive", 0.8f, false);
                     float speed = rig.Condition.RunCoef;
                     int impacts = 0;
@@ -247,8 +280,8 @@ namespace RaidIntoDarkness.Player.Tests
                     Assert.That(rig.Motor.Velocity, Is.EqualTo(velocity));
                     Assert.That(rig.Motor.Wish, Is.EqualTo(flags));
                     Assert.That(rig.Motor.RealFlags, Is.EqualTo(flags));
-                    Assert.That(rig.Condition.Health, Is.EqualTo(0.61f));
-                    Assert.That(rig.Condition.Power, Is.EqualTo(0.37f));
+                    Assert.That(rig.Condition.Health, Is.EqualTo(61f));
+                    Assert.That(rig.Condition.Power, Is.EqualTo(37f));
                     Assert.That(rig.Condition.RunCoef, Is.EqualTo(speed));
                     Assert.That(rig.Condition.RunModifiers.Count, Is.EqualTo(1));
                 }

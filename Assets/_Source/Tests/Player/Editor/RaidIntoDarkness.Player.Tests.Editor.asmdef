@@ -4,6 +4,7 @@
     "references": [
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
+        "Unity.ugui",
         "RaidIntoDarkness.Player",
         "RaidIntoDarkness.Player.Editor",
         "RaidIntoDarkness.Effects",

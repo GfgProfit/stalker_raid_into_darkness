@@ -73,16 +73,16 @@ MonoBehaviour:
         _community: stalker
         _communityIcon: {fileID: 164985583, guid: d56bb8268bdae76448be8781bc547c55, type: 3}
         _communityIconSize: {x: 20, y: 20}
-        _burnProtection: 1
-        _shockProtection: 2.5
-        _chemicalBurnProtection: 0.5
-        _radiationProtection: 0.034
-        _telepaticProtection: 0.12
-        _woundProtection: 0.6
-        _strikeProtection: 0.45
-        _explosionProtection: 0.44
-        _fireWoundProtection: 0.53
-        _helmetFireWoundProtection: 0.18
+        _burnProtection: 53
+        _shockProtection: 25
+        _chemicalBurnProtection: 60
+        _radiationProtection: 55
+        _telepaticProtection: 20
+        _woundProtection: 32
+        _strikeProtection: 23
+        _explosionProtection: 15
+        _fireWoundProtection: 41
+        _helmetFireWoundProtection: 14
         _artefactCount: 3
         _additionalWeight: 16
         _powerLoss: 0.1
@@ -90,8 +90,8 @@ MonoBehaviour:
         _sprintAllowed: 1
         _nightVisionSection: 
         _speed: 0.99
-        _physicalDurability: 0.8348086
-        _anomalyDurability: 0.9670139
+        _physicalDurability: 84
+        _anomalyDurability: 97
     - rid: 3479885472039698564
       type: {class: WorldItemComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
       data:

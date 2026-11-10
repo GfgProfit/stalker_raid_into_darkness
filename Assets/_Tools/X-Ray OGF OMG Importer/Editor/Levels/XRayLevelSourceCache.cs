@@ -16,7 +16,7 @@ namespace XRay.Importer.Editor.Levels
     {
         public const string INDEX_PATH = XRayAssetIndexCache.CACHE_FOLDER + "/LevelIndex.bin";
         public const int PROFILE_SLUG_LENGTH = 40;
-        public static readonly string[] MO2_INDEX_SCOPE = { "textures", "textures.ltx", "levels", "shaders.xr", "gamemtl.xr", "configs", "shaders" };
+        public static readonly string[] MO2_INDEX_SCOPE = { "textures", "textures.ltx", "levels", "shaders.xr", "gamemtl.xr", "configs", "shaders", "spawns" };
 
         private static XRayLevelGamedataInfo _info;
         private static string _infoFolder;

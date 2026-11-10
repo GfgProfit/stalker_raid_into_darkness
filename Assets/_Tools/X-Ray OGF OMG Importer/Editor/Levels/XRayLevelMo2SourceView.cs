@@ -105,6 +105,7 @@ namespace XRay.Importer.Editor.Levels
             }
 
             string scene = XRayLevelPaths.ScenePath(root, entry.Name);
+            XRayLevelAnomalyImporter.DrawLevelAction(entry, root);
             using (new EditorGUI.DisabledScope(!File.Exists(scene)))
             {
                 if (GUILayout.Button("Scene", GUILayout.Width(SCENE_WIDTH)))
@@ -118,6 +119,7 @@ namespace XRay.Importer.Editor.Levels
 
             EditorGUILayout.EndHorizontal();
             EditorGUILayout.LabelField(new GUIContent(StatusText(entry, probe, imported, diff), StatusTooltip(entry, probe, diff)), EditorStyles.miniLabel, GUILayout.MinWidth(0.0f));
+            XRayLevelAnomalyImporter.DrawLastResult(entry.Name, root);
             string origin = (entry.IsModded ? "[new] " : entry.IsReplaced ? "[replaced] " : string.Empty) + entry.Origin;
             if (GUILayout.Button(new GUIContent(origin, $"{entry.LevelPath}\n{entry.OriginCandidates} candidates. Click to inspect all files of the level."), EditorStyles.linkLabel, GUILayout.MinWidth(0.0f)))
             {

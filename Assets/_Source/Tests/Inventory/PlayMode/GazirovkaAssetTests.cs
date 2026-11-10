@@ -222,7 +222,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
         public void PrefabContainsOnlySharedPresentationAndReactionComponents()
         {
             GameObject prefab = Prefab();
-            var allowed = new HashSet<Type> { typeof(AnomalyPlayerReaction), typeof(AnomalyProximityZone), typeof(OverlappingAnomalyVisual), typeof(AnomalyAudio), typeof(AnomalyAudioGain) };
+            var allowed = new HashSet<Type> { typeof(AnomalyPlayerReaction), typeof(AnomalyProximityZone), typeof(OverlappingAnomalyVisual), typeof(AnomalyAudio), typeof(AnomalyAudioGain), typeof(AnomalyParticleEmission), typeof(AnomalyParticleFrames) };
             bool hasGrassBender = false;
             foreach (MonoBehaviour component in prefab.GetComponentsInChildren<MonoBehaviour>(true))
             {

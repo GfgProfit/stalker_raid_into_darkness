@@ -116,7 +116,7 @@ namespace XRay.Importer.Sources.Levels
     {
         public const string SOURCE_NAME = "Level Gamedata";
         public const string LEVEL_FILE = "level";
-        public static readonly string[] INDEX_SCOPE = { "textures", "textures.ltx", "levels", "shaders", "shaders.xr" };
+        public static readonly string[] INDEX_SCOPE = { "textures", "textures.ltx", "levels", "shaders", "shaders.xr", "configs", "spawns" };
 
         private static readonly string[] MARKER_FOLDERS = { "levels", "textures", "meshes", "shaders" };
 

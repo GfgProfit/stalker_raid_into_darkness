@@ -3,6 +3,7 @@
     "rootNamespace": "RaidIntoDarkness.Player.Editor",
     "references": [
         "RaidIntoDarkness.Player",
+        "RaidIntoDarkness.Effects",
         "RaidIntoDarkness.FirstPerson",
         "XRay.Importer.Core",
         "XRay.Importer.Runtime",

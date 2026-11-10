@@ -17558,6 +17558,7 @@ GameObject:
   - component: {fileID: 3522951698426389749}
   - component: {fileID: 6844276828462332383}
   - component: {fileID: 4798299675626964077}
+  - component: {fileID: 1877689978028440653}
   m_Layer: 0
   m_Name: Tramplin
   m_TagString: Untagged
@@ -17607,6 +17608,8 @@ MonoBehaviour:
   _groupDuration: 3
   _entranceEnabled: 1
   _entranceSmallOnly: 1
+  _useRootBone: 0
+  _sourceEffectKey: 
   _smallObjectRadius: 0.6
 --- !u!114 &3386189348370233706
 MonoBehaviour:
@@ -17641,6 +17644,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: RaidIntoDarkness.Effects::RaidIntoDarkness.Effects.OverlappingAnomalyVisual
   _idle: {fileID: 1913631812097276458}
   _awaking: {fileID: 0}
+  _idleIllumination: {fileID: 0}
+  _idleLightAnimation:
+    _fps: 0
+    _frameCount: 0
+    _frames: 
+    _colors: []
+  _idleLightRange: 0
+  _idleLightRangeJitter: 0
   _audio: {fileID: 3386189348370233706}
   _contactEffects: {fileID: 3958856286014058144}
   _entranceContactEffects: {fileID: 0}
@@ -17710,6 +17721,42 @@ MonoBehaviour:
   _accumulateTime: 1
   _ignoreSmallObjects: 0
   _smallObjectIgnoreDelay: 0.5
+  _nonlivingIdleStopDelay: 0.1
+  _repeatNonlivingIdleStop: 0
+  _randomizeRadius: 0
+  _randomRadiusMin: 2
+  _randomRadiusMax: 3
+--- !u!114 &1877689978028440653
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1877172421583510763}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7487ed5cf3ef48ad956adee84e91ea4e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: RaidIntoDarkness.Effects::RaidIntoDarkness.Effects.AnomalyParticleEmission
+  _sources:
+  - _system: {fileID: 3183152992096346471}
+    _rate: 6
+    _timeLimit: 0
+  - _system: {fileID: 951585445848467826}
+    _rate: 6
+    _timeLimit: 0
+  - _system: {fileID: 4101243155423635630}
+    _rate: 32
+    _timeLimit: 0
+  - _system: {fileID: 5085196133545706583}
+    _rate: 8999.999
+    _timeLimit: 0
+  - _system: {fileID: 5294157908098329009}
+    _rate: 120
+    _timeLimit: 0
+  - _system: {fileID: 930588075196532107}
+    _rate: 22
+    _timeLimit: 0
 --- !u!1 &3030963088386547082
 GameObject:
   m_ObjectHideFlags: 0
@@ -23408,11 +23455,29 @@ ParticleSystem:
     rateOverTime:
       serializedVersion: 3
       minMaxState: 0
-      scalar: 8999.999
+      scalar: 0
       minScalar: 10
       maxCurve:
         serializedVersion: 2
-        m_Curve: []
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0.33333334
+          outWeight: 0.33333334
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0.33333334
+          outWeight: 0.33333334
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
@@ -32973,6 +33038,7 @@ GameObject:
   - component: {fileID: 4105115992158523781}
   - component: {fileID: 3183152992096346471}
   - component: {fileID: 429198863647262037}
+  - component: {fileID: 8693924951331120925}
   m_Layer: 0
   m_Name: zone_graviti_mine_idle_leaves
   m_TagString: Untagged
@@ -33364,11 +33430,29 @@ ParticleSystem:
     rateOverTime:
       serializedVersion: 3
       minMaxState: 0
-      scalar: 6
+      scalar: 0
       minScalar: 10
       maxCurve:
         serializedVersion: 2
-        m_Curve: []
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0.33333334
+          outWeight: 0.33333334
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0.33333334
+          outWeight: 0.33333334
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
@@ -37636,6 +37720,26 @@ ParticleSystemRenderer:
   m_MeshWeighting1: 1
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
+--- !u!114 &8693924951331120925
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5010934379126716533}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0d00a3585dd14b82b99404473dfd7c67, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: RaidIntoDarkness.Effects::RaidIntoDarkness.Effects.AnomalyParticleFrames
+  _system: {fileID: 3183152992096346471}
+  _frameCount: 4
+  _frameColumns: 4
+  _frameSize: {x: 0.25, y: 0.25}
+  _framesPerSecond: 24
+  _animated: 0
+  _randomStart: 1
+  _randomPlayback: 0
 --- !u!1 &5201783183191331015
 GameObject:
   m_ObjectHideFlags: 0
@@ -41762,6 +41866,7 @@ GameObject:
   - component: {fileID: 632922877801190701}
   - component: {fileID: 5294157908098329009}
   - component: {fileID: 1531850596646560312}
+  - component: {fileID: 6705203015528786414}
   m_Layer: 0
   m_Name: anomaly_spiky_00
   m_TagString: Untagged
@@ -42153,11 +42258,29 @@ ParticleSystem:
     rateOverTime:
       serializedVersion: 3
       minMaxState: 0
-      scalar: 120
+      scalar: 0
       minScalar: 10
       maxCurve:
         serializedVersion: 2
-        m_Curve: []
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0.33333334
+          outWeight: 0.33333334
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0.33333334
+          outWeight: 0.33333334
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
@@ -46693,8 +46816,8 @@ ParticleSystem:
     colorLabel0: Color
     vector0_0:
       serializedVersion: 3
-      minMaxState: 1
-      scalar: 1
+      minMaxState: 0
+      scalar: 0
       minScalar: 0
       maxCurve:
         serializedVersion: 2
@@ -47424,6 +47547,26 @@ ParticleSystemRenderer:
   m_MeshWeighting1: 1
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
+--- !u!114 &6705203015528786414
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5674640269091895025}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0d00a3585dd14b82b99404473dfd7c67, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: RaidIntoDarkness.Effects::RaidIntoDarkness.Effects.AnomalyParticleFrames
+  _system: {fileID: 5294157908098329009}
+  _frameCount: 64
+  _frameColumns: 8
+  _frameSize: {x: 0.125, y: 0.125}
+  _framesPerSecond: 24
+  _animated: 1
+  _randomStart: 0
+  _randomPlayback: 0
 --- !u!1 &5725470749999148456
 GameObject:
   m_ObjectHideFlags: 0
@@ -67061,6 +67204,7 @@ GameObject:
   - component: {fileID: 4909333821117564965}
   - component: {fileID: 951585445848467826}
   - component: {fileID: 1656452689442116395}
+  - component: {fileID: 2752927669046693374}
   m_Layer: 0
   m_Name: zone_graviti_leaves_pulsing
   m_TagString: Untagged
@@ -67452,11 +67596,29 @@ ParticleSystem:
     rateOverTime:
       serializedVersion: 3
       minMaxState: 0
-      scalar: 6
+      scalar: 0
       minScalar: 10
       maxCurve:
         serializedVersion: 2
-        m_Curve: []
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0.33333334
+          outWeight: 0.33333334
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0.33333334
+          outWeight: 0.33333334
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
@@ -72300,6 +72462,26 @@ ParticleSystemRenderer:
   m_MeshWeighting1: 1
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
+--- !u!114 &2752927669046693374
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7454080569763587992}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0d00a3585dd14b82b99404473dfd7c67, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: RaidIntoDarkness.Effects::RaidIntoDarkness.Effects.AnomalyParticleFrames
+  _system: {fileID: 951585445848467826}
+  _frameCount: 16
+  _frameColumns: 4
+  _frameSize: {x: 0.25, y: 0.25}
+  _framesPerSecond: 24
+  _animated: 0
+  _randomStart: 1
+  _randomPlayback: 0
 --- !u!1 &7615465824683950503
 GameObject:
   m_ObjectHideFlags: 0
@@ -73992,11 +74174,29 @@ ParticleSystem:
     rateOverTime:
       serializedVersion: 3
       minMaxState: 0
-      scalar: 22
+      scalar: 0
       minScalar: 10
       maxCurve:
         serializedVersion: 2
-        m_Curve: []
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0.33333334
+          outWeight: 0.33333334
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0.33333334
+          outWeight: 0.33333334
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
@@ -86450,11 +86650,29 @@ ParticleSystem:
     rateOverTime:
       serializedVersion: 3
       minMaxState: 0
-      scalar: 32
+      scalar: 0
       minScalar: 10
       maxCurve:
         serializedVersion: 2
-        m_Curve: []
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0.33333334
+          outWeight: 0.33333334
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0.33333334
+          outWeight: 0.33333334
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
@@ -96089,6 +96307,7 @@ GameObject:
   - component: {fileID: 1134773597111501550}
   - component: {fileID: 5413975961233744412}
   - component: {fileID: 3760487457371983538}
+  - component: {fileID: 7755546506735004738}
   m_Layer: 0
   m_Name: heat_sparks_idle_00
   m_TagString: Untagged
@@ -100738,6 +100957,26 @@ ParticleSystemRenderer:
   m_MeshWeighting1: 1
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
+--- !u!114 &7755546506735004738
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9162031541354755271}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0d00a3585dd14b82b99404473dfd7c67, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: RaidIntoDarkness.Effects::RaidIntoDarkness.Effects.AnomalyParticleFrames
+  _system: {fileID: 5413975961233744412}
+  _frameCount: 6
+  _frameColumns: 2
+  _frameSize: {x: 0.5, y: 0.5}
+  _framesPerSecond: 30
+  _animated: 0
+  _randomStart: 0
+  _randomPlayback: 0
 --- !u!1 &9182995532552591288
 GameObject:
   m_ObjectHideFlags: 0

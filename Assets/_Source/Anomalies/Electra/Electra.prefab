@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 1900613701109408422}
   - component: {fileID: 6900053619303508921}
   - component: {fileID: 1954715554957267370}
+  - component: {fileID: 5884421759954241517}
   m_Layer: 0
   m_Name: Electra
   m_TagString: Untagged
@@ -55,6 +56,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: RaidIntoDarkness.Effects::RaidIntoDarkness.Effects.ElectraVisual
   _idle: {fileID: 3114857361002102683}
   _awaking: {fileID: 0}
+  _idleIllumination: {fileID: 0}
+  _idleLightAnimation:
+    _fps: 0
+    _frameCount: 0
+    _frames: 
+    _colors: []
+  _idleLightRange: 0
+  _idleLightRangeJitter: 0
   _audio: {fileID: 1954715554957267370}
   _contactEffects: {fileID: 0}
   _entranceContactEffects: {fileID: 0}
@@ -169,6 +178,11 @@ MonoBehaviour:
   _accumulateTime: 1.5
   _ignoreSmallObjects: 0
   _smallObjectIgnoreDelay: 0.5
+  _nonlivingIdleStopDelay: 0.1
+  _repeatNonlivingIdleStop: 0
+  _randomizeRadius: 0
+  _randomRadiusMin: 2
+  _randomRadiusMax: 3
 --- !u!114 &1954715554957267370
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -188,6 +202,22 @@ MonoBehaviour:
   _awaking: {fileID: 0}
   _accumulate: {fileID: 0}
   _blowoutDelay: 0
+--- !u!114 &5884421759954241517
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 122456809518884124}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7487ed5cf3ef48ad956adee84e91ea4e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: RaidIntoDarkness.Effects::RaidIntoDarkness.Effects.AnomalyParticleEmission
+  _sources:
+  - _system: {fileID: 3114857361002102683}
+    _rate: 2
+    _timeLimit: 0
 --- !u!1 &212758882120912016
 GameObject:
   m_ObjectHideFlags: 0
@@ -9514,6 +9544,7 @@ GameObject:
   - component: {fileID: 7859229073626042909}
   - component: {fileID: 189895682177421201}
   - component: {fileID: 709727883316427107}
+  - component: {fileID: 7201263548859231543}
   m_Layer: 0
   m_Name: BirthVapor
   m_TagString: Untagged
@@ -10191,7 +10222,7 @@ ParticleSystem:
         m_NumAlphaKeys: 2
   UVModule:
     serializedVersion: 2
-    enabled: 1
+    enabled: 0
     mode: 0
     timeMode: 2
     fps: 64
@@ -11823,6 +11854,26 @@ ParticleSystemRenderer:
   m_MeshWeighting1: 1
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
+--- !u!114 &7201263548859231543
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2787208666033152618}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0d00a3585dd14b82b99404473dfd7c67, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: RaidIntoDarkness.Effects::RaidIntoDarkness.Effects.AnomalyParticleFrames
+  _system: {fileID: 189895682177421201}
+  _frameCount: 16
+  _frameColumns: 4
+  _frameSize: {x: 0.25, y: 0.25}
+  _framesPerSecond: 64
+  _animated: 0
+  _randomStart: 1
+  _randomPlayback: 0
 --- !u!1 &2977701694662416453
 GameObject:
   m_ObjectHideFlags: 0
@@ -34339,6 +34390,7 @@ GameObject:
   - component: {fileID: 6640242340256401165}
   - component: {fileID: 3114857361002102683}
   - component: {fileID: 3120547596146087498}
+  - component: {fileID: 1568334707871322226}
   m_Layer: 0
   m_Name: Idle
   m_TagString: Untagged
@@ -34731,11 +34783,29 @@ ParticleSystem:
     rateOverTime:
       serializedVersion: 3
       minMaxState: 0
-      scalar: 2
+      scalar: 0
       minScalar: 10
       maxCurve:
         serializedVersion: 2
-        m_Curve: []
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0.33333334
+          outWeight: 0.33333334
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0.33333334
+          outWeight: 0.33333334
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
@@ -34995,7 +35065,7 @@ ParticleSystem:
         m_NumAlphaKeys: 2
   UVModule:
     serializedVersion: 2
-    enabled: 1
+    enabled: 0
     mode: 0
     timeMode: 2
     fps: 24
@@ -36627,6 +36697,26 @@ ParticleSystemRenderer:
   m_MeshWeighting1: 1
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
+--- !u!114 &1568334707871322226
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7433943137070009131}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0d00a3585dd14b82b99404473dfd7c67, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: RaidIntoDarkness.Effects::RaidIntoDarkness.Effects.AnomalyParticleFrames
+  _system: {fileID: 3114857361002102683}
+  _frameCount: 64
+  _frameColumns: 8
+  _frameSize: {x: 0.125, y: 0.125}
+  _framesPerSecond: 24
+  _animated: 1
+  _randomStart: 1
+  _randomPlayback: 0
 --- !u!1 &7668548744666204824
 GameObject:
   m_ObjectHideFlags: 0

@@ -73,6 +73,8 @@ namespace XRay.Importer.Editor.Levels
         [SerializeField] private XRayFloraWindImportMode _floraWindMode;
         [SerializeField] private XRayWeatherImportMode _weatherImportMode;
         [SerializeField] private XRayWeatherProfile _weatherProfile;
+        [SerializeField] private bool _importAnomalies = true;
+        [SerializeField] private XRayLevelAnomalyCatalog _anomalyCatalog;
         [SerializeField] private bool _openSceneAfterImport = true;
         [SerializeField] private bool _copySourceFiles = true;
         [SerializeField] private bool _autoImportDroppedLevels = true;
@@ -189,6 +191,18 @@ namespace XRay.Importer.Editor.Levels
         {
             get => _openSceneAfterImport;
             set => _openSceneAfterImport = value;
+        }
+
+        public bool ImportAnomalies
+        {
+            get => _importAnomalies;
+            set => _importAnomalies = value;
+        }
+
+        public XRayLevelAnomalyCatalog AnomalyCatalog
+        {
+            get => _anomalyCatalog;
+            set => _anomalyCatalog = value;
         }
 
         public bool CopySourceFiles

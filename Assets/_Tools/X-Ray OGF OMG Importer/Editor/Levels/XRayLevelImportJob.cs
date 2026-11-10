@@ -84,6 +84,7 @@ namespace XRay.Importer.Editor.Levels
         private XRaySourcePlan _sourcePlan;
         private XRayAssetIndex _sourceIndex;
         private string _previousRoot;
+        private XRayLevelAnomalyImportPlan _anomalyPlan;
 
         private XRayLevelImportJob(XRayLevelImportRequest request)
         {
@@ -287,6 +288,10 @@ namespace XRay.Importer.Editor.Levels
             if (_resourcesOnly && _materials.Created == 0)
             {
                 ReuseGeometry();
+                if (_anomalyPlan != null)
+                {
+                    RecordAnomalies(XRayLevelAnomalyImporter.UpdatePrefab(_record.PrefabPath, _anomalyPlan));
+                }
                 SetStage("Done", 1.0f);
                 yield break;
             }
@@ -406,6 +411,18 @@ namespace XRay.Importer.Editor.Levels
             _content.ImportLights = _request.Settings.ImportLights;
             _content.LightShadows = _request.Settings.StaticLightShadows;
             _content.OpenScene = _request.Settings.OpenSceneAfterImport;
+            if (_request.Settings.ImportAnomalies)
+            {
+                XRayAssetIndex index = _info.Effective?.Index ?? _sourceIndex;
+                if (index != null && index.TryGet(XRayLevelAnomalyImporter.SPAWN_PATH, out XRayIndexedFile _))
+                {
+                    _anomalyPlan = XRayLevelAnomalyImporter.Prepare(index, _entry.Name, XRayLevelPaths.Root, _request.Settings.AnomalyCatalog);
+                }
+                else
+                {
+                    _record.Warnings.Add("Аномалии не импортированы: в источнике отсутствует spawns/all.spawn. Обновите виртуальный индекс с папкой spawns.");
+                }
+            }
         }
 
         private void CopySourceFiles()
@@ -540,6 +557,8 @@ namespace XRay.Importer.Editor.Levels
 
             parsed.MaterialUpdateMode = XRayLevelMaterialUpdateMode.Preserve;
             parsed.OpenSceneAfterImport = false;
+            parsed.ImportAnomalies = false;
+            parsed.AnomalyCatalog = null;
             return JsonUtility.ToJson(parsed);
         }
 
@@ -1634,11 +1653,16 @@ namespace XRay.Importer.Editor.Levels
             string scenePath = XRayLevelPaths.ScenePath(_entry.Name);
             Scene preview = EditorSceneManager.NewPreviewScene();
             GameObject prefab;
+            XRayLevelAnomalyPlacementResult anomalies = null;
             try
             {
                 _content.FloraWindAccepted = _windAccepted;
                 _content.DetailSettingsSource = _sourcePlan;
                 GameObject root = XRayLevelSceneBuilder.BuildRoot(preview, _content, _record);
+                if (_anomalyPlan != null)
+                {
+                    anomalies = XRayLevelAnomalyImporter.Apply(root, _anomalyPlan);
+                }
                 prefab = PrefabUtility.SaveAsPrefabAsset(root, prefabPath, out bool success);
                 if (!success || prefab == null)
                 {
@@ -1653,6 +1677,10 @@ namespace XRay.Importer.Editor.Levels
             _record.PrefabPath = prefabPath;
             _record.ScenePath = scenePath;
             _record.GeneratedAssets.Add(prefabPath);
+            if (anomalies != null)
+            {
+                RecordAnomalies(anomalies);
+            }
             bool sceneExists = File.Exists(scenePath);
             if (!sceneExists)
             {
@@ -1697,6 +1725,18 @@ namespace XRay.Importer.Editor.Levels
             }
         }
 
+        private void RecordAnomalies(XRayLevelAnomalyPlacementResult result)
+        {
+            XRayLevelAnomalyImportReport report = XRayLevelAnomalyImporter.Record(_record.PrefabPath, _anomalyPlan, result);
+            _record.SetMetric("AnomaliesSource", result.SourceCount);
+            _record.SetMetric("AnomaliesImported", result.ImportedCount);
+            _record.Warnings.AddRange(result.Warnings);
+            _record.Warnings.AddRange(result.Missing);
+            _record.Warnings.AddRange(result.Unsupported);
+            _record.GeneratedAssets.Add(_anomalyPlan.SpawnAssetPath);
+            Debug.Log("[X-Ray Anomalies] " + _entry.Name + ": " + result.ImportedCount + "/" + result.SourceCount + ". " + report.ReportPath);
+        }
+
         private void SaveManifest()
         {
             if (string.IsNullOrEmpty(_record.LevelName))
@@ -1734,7 +1774,7 @@ namespace XRay.Importer.Editor.Levels
 
             XRayLevelSourceManifest.Collect(_record, _info.Effective ?? new XRayEffectiveGamedata(_sourceIndex), _entry);
 
-            bool unchanged = _record.Completed && _resourcesOnly && _previous != null && !_materials.Changed && _textures.Imported == 0 && _previous.Settings == _record.Settings && _record.Source.ChangesSincePrevious.Count == 0 && _record.Source.ProfileFingerprint == _previous.Source.ProfileFingerprint && _record.Source.IndexFingerprint == _previous.Source.IndexFingerprint;
+            bool unchanged = _record.Completed && _resourcesOnly && _anomalyPlan == null && _previous != null && !_materials.Changed && _textures.Imported == 0 && _previous.Settings == _record.Settings && _record.Source.ChangesSincePrevious.Count == 0 && _record.Source.ProfileFingerprint == _previous.Source.ProfileFingerprint && _record.Source.IndexFingerprint == _previous.Source.IndexFingerprint;
             string reportPath = XRayLevelPaths.AttemptReportPath(_record.LevelName, _record.Source.ProfileId);
             if (unchanged)
             {

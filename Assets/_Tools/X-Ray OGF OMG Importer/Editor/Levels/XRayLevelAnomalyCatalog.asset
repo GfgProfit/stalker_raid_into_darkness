@@ -1,0 +1,213 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9eebfe129ec24a0438cce87bdd27754a, type: 3}
+  m_Name: XRayLevelAnomalyCatalog
+  m_EditorClassIdentifier: XRay.Importer.Editor::XRay.Importer.Editor.Levels.XRayLevelAnomalyCatalog
+  _entries:
+  - _section: fireball_acidic_zone
+    _displayName: "Кислотная комета"
+    _prefab: {fileID: 0}
+  - _section: fireball_electric_zone
+    _displayName: "Тесла"
+    _prefab: {fileID: 0}
+  - _section: fireball_zone
+    _displayName: "Комета"
+    _prefab: {fileID: 0}
+  - _section: generator_dust_static
+    _displayName: "Пылевой вихрь генератора"
+    _prefab: {fileID: 0}
+  - _section: generator_electra
+    _displayName: "Электро генератора"
+    _prefab: {fileID: 0}
+  - _section: generator_torrid
+    _displayName: "Жар генератора"
+    _prefab: {fileID: 0}
+  - _section: zone_burning_fuzz
+    _displayName: "Жгучий пух"
+    _prefab: {fileID: 0}
+  - _section: zone_burning_fuzz_average
+    _displayName: "Жгучий пух"
+    _prefab: {fileID: 0}
+  - _section: zone_burning_fuzz_strong
+    _displayName: "Жгучий пух"
+    _prefab: {fileID: 0}
+  - _section: zone_burning_fuzz_weak
+    _displayName: "Жгучий пух"
+    _prefab: {fileID: 0}
+  - _section: zone_burning_fuzz1
+    _displayName: "Жгучий пух"
+    _prefab: {fileID: 0}
+  - _section: zone_buzz
+    _displayName: "Кисель"
+    _prefab: {fileID: 6341456586046015985, guid: f55d417a9b75a5f469d4d95e71cd516d, type: 3}
+  - _section: zone_buzz_average
+    _displayName: "Кисель"
+    _prefab: {fileID: 6341456586046015985, guid: f55d417a9b75a5f469d4d95e71cd516d, type: 3}
+  - _section: zone_buzz_strong
+    _displayName: "Кисель"
+    _prefab: {fileID: 6341456586046015985, guid: f55d417a9b75a5f469d4d95e71cd516d, type: 3}
+  - _section: zone_buzz_weak
+    _displayName: "Кисель"
+    _prefab: {fileID: 6341456586046015985, guid: f55d417a9b75a5f469d4d95e71cd516d, type: 3}
+  - _section: zone_emi
+    _displayName: "Импульс"
+    _prefab: {fileID: 0}
+  - _section: zone_field_acidic_average
+    _displayName: "Кислотный туман"
+    _prefab: {fileID: 0}
+  - _section: zone_field_acidic_strong
+    _displayName: "Кислотный туман"
+    _prefab: {fileID: 0}
+  - _section: zone_field_acidic_weak
+    _displayName: "Кислотный туман"
+    _prefab: {fileID: 0}
+  - _section: zone_field_psychic_average
+    _displayName: "Пси-поле"
+    _prefab: {fileID: 0}
+  - _section: zone_field_psychic_strong
+    _displayName: "Пси-поле"
+    _prefab: {fileID: 0}
+  - _section: zone_field_psychic_weak
+    _displayName: "Пси-поле"
+    _prefab: {fileID: 0}
+  - _section: zone_field_radioactive_average
+    _displayName: "Очаг радиации"
+    _prefab: {fileID: 0}
+  - _section: zone_field_radioactive_strong
+    _displayName: "Очаг радиации"
+    _prefab: {fileID: 0}
+  - _section: zone_field_radioactive_weak
+    _displayName: "Очаг радиации"
+    _prefab: {fileID: 0}
+  - _section: zone_field_thermal_average
+    _displayName: "Термическое поле"
+    _prefab: {fileID: 0}
+  - _section: zone_field_thermal_strong
+    _displayName: "Термическое поле"
+    _prefab: {fileID: 0}
+  - _section: zone_field_thermal_weak
+    _displayName: "Термическое поле"
+    _prefab: {fileID: 0}
+  - _section: zone_gravi_zone
+    _displayName: "Воронка"
+    _prefab: {fileID: 7296845186965445704, guid: 57fe2d45e2d10c546ba3c7b47b5b06f8, type: 3}
+  - _section: zone_mine_acidic_average
+    _displayName: "Газировка"
+    _prefab: {fileID: 6534194022986100575, guid: edd76411fe76bcb4f9128d7dcf32e3b8, type: 3}
+  - _section: zone_mine_acidic_strong
+    _displayName: "Газировка"
+    _prefab: {fileID: 6534194022986100575, guid: edd76411fe76bcb4f9128d7dcf32e3b8, type: 3}
+  - _section: zone_mine_acidic_weak
+    _displayName: "Газировка"
+    _prefab: {fileID: 6534194022986100575, guid: edd76411fe76bcb4f9128d7dcf32e3b8, type: 3}
+  - _section: zone_mine_chemical_average
+    _displayName: "Кисель"
+    _prefab: {fileID: 6341456586046015985, guid: f55d417a9b75a5f469d4d95e71cd516d, type: 3}
+  - _section: zone_mine_chemical_strong
+    _displayName: "Кисель"
+    _prefab: {fileID: 6341456586046015985, guid: f55d417a9b75a5f469d4d95e71cd516d, type: 3}
+  - _section: zone_mine_chemical_weak
+    _displayName: "Кисель"
+    _prefab: {fileID: 6341456586046015985, guid: f55d417a9b75a5f469d4d95e71cd516d, type: 3}
+  - _section: zone_mine_electric_average
+    _displayName: "Электро"
+    _prefab: {fileID: 122456809518884124, guid: e4fcbbdd51e69a94fa41cacdf195f1b6, type: 3}
+  - _section: zone_mine_electric_strong
+    _displayName: "Электро"
+    _prefab: {fileID: 122456809518884124, guid: e4fcbbdd51e69a94fa41cacdf195f1b6, type: 3}
+  - _section: zone_mine_electric_weak
+    _displayName: "Электро"
+    _prefab: {fileID: 122456809518884124, guid: e4fcbbdd51e69a94fa41cacdf195f1b6, type: 3}
+  - _section: zone_mine_field_soc
+    _displayName: "Мина"
+    _prefab: {fileID: 0}
+  - _section: zone_mine_gravitational_average
+    _displayName: "Воронка"
+    _prefab: {fileID: 7296845186965445704, guid: 57fe2d45e2d10c546ba3c7b47b5b06f8, type: 3}
+  - _section: zone_mine_gravitational_strong
+    _displayName: "Карусель"
+    _prefab: {fileID: 3525461912719225073, guid: 7574aac041b53704ebf4b2110384d0d7, type: 3}
+  - _section: zone_mine_gravitational_weak
+    _displayName: "Трамплин"
+    _prefab: {fileID: 1877172421583510763, guid: bc6367c4932433a4eaa67d191519601b, type: 3}
+  - _section: zone_mine_static_strong
+    _displayName: "Электро"
+    _prefab: {fileID: 122456809518884124, guid: e4fcbbdd51e69a94fa41cacdf195f1b6, type: 3}
+  - _section: zone_mine_steam_average
+    _displayName: "Жарка"
+    _prefab: {fileID: 6036523816419366679, guid: bb71a7a9124edab409ed0f17d98e4634, type: 3}
+  - _section: zone_mine_steam_weak
+    _displayName: "Жарка"
+    _prefab: {fileID: 6036523816419366679, guid: bb71a7a9124edab409ed0f17d98e4634, type: 3}
+  - _section: zone_mine_thermal_average
+    _displayName: "Жарка"
+    _prefab: {fileID: 6036523816419366679, guid: bb71a7a9124edab409ed0f17d98e4634, type: 3}
+  - _section: zone_mine_thermal_strong
+    _displayName: "Жарка"
+    _prefab: {fileID: 6036523816419366679, guid: bb71a7a9124edab409ed0f17d98e4634, type: 3}
+  - _section: zone_mine_thermal_weak
+    _displayName: "Жарка"
+    _prefab: {fileID: 6036523816419366679, guid: bb71a7a9124edab409ed0f17d98e4634, type: 3}
+  - _section: zone_monolith
+    _displayName: "Исполнитель желаний"
+    _prefab: {fileID: 0}
+  - _section: zone_mosquito_bald
+    _displayName: "Трамплин"
+    _prefab: {fileID: 1877172421583510763, guid: bc6367c4932433a4eaa67d191519601b, type: 3}
+  - _section: zone_mosquito_bald_average
+    _displayName: "Трамплин"
+    _prefab: {fileID: 1877172421583510763, guid: bc6367c4932433a4eaa67d191519601b, type: 3}
+  - _section: zone_mosquito_bald_strong
+    _displayName: "Трамплин"
+    _prefab: {fileID: 1877172421583510763, guid: bc6367c4932433a4eaa67d191519601b, type: 3}
+  - _section: zone_mosquito_bald_weak
+    _displayName: "Трамплин"
+    _prefab: {fileID: 1877172421583510763, guid: bc6367c4932433a4eaa67d191519601b, type: 3}
+  - _section: zone_no_gravity
+    _displayName: "Невесомость"
+    _prefab: {fileID: 0}
+  - _section: zone_radioactive_average
+    _displayName: "Очаг радиации"
+    _prefab: {fileID: 0}
+  - _section: zone_radioactive_strong
+    _displayName: "Очаг радиации"
+    _prefab: {fileID: 0}
+  - _section: zone_radioactive_weak
+    _displayName: "Очаг радиации"
+    _prefab: {fileID: 0}
+  - _section: zone_teleport
+    _displayName: "Телепорт"
+    _prefab: {fileID: 0}
+  - _section: zone_witches_galantine
+    _displayName: "Электро"
+    _prefab: {fileID: 122456809518884124, guid: e4fcbbdd51e69a94fa41cacdf195f1b6, type: 3}
+  - _section: zone_witches_galantine_average
+    _displayName: "Электро"
+    _prefab: {fileID: 122456809518884124, guid: e4fcbbdd51e69a94fa41cacdf195f1b6, type: 3}
+  - _section: zone_witches_galantine_strong
+    _displayName: "Электро"
+    _prefab: {fileID: 122456809518884124, guid: e4fcbbdd51e69a94fa41cacdf195f1b6, type: 3}
+  - _section: zone_witches_galantine_weak
+    _displayName: "Электро"
+    _prefab: {fileID: 122456809518884124, guid: e4fcbbdd51e69a94fa41cacdf195f1b6, type: 3}
+  - _section: zone_zhar
+    _displayName: "Жар"
+    _prefab: {fileID: 0}
+  - _section: zone_zharka_static_average
+    _displayName: "Жарка"
+    _prefab: {fileID: 6036523816419366679, guid: bb71a7a9124edab409ed0f17d98e4634, type: 3}
+  - _section: zone_zharka_static_strong
+    _displayName: "Жарка"
+    _prefab: {fileID: 6036523816419366679, guid: bb71a7a9124edab409ed0f17d98e4634, type: 3}
+  - _section: zone_zharka_static_weak
+    _displayName: "Жарка"
+    _prefab: {fileID: 6036523816419366679, guid: bb71a7a9124edab409ed0f17d98e4634, type: 3}

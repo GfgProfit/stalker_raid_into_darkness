@@ -166,7 +166,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             Assert.That(grass.FindProperty("_speed").floatValue, Is.EqualTo(3f));
             Assert.That(grass.FindProperty("_intensity").floatValue, Is.EqualTo(1f));
             Assert.That(grass.FindProperty("_radius").floatValue, Is.EqualTo(3f));
-            var allowed = new HashSet<Type> { typeof(AnomalyPlayerReaction), typeof(AnomalyProximityZone), typeof(OverlappingAnomalyVisual), typeof(AnomalyContactEffects), typeof(AnomalyGrassBender), typeof(AnomalyAudio), typeof(AnomalyAudioGain) };
+            var allowed = new HashSet<Type> { typeof(AnomalyPlayerReaction), typeof(AnomalyProximityZone), typeof(OverlappingAnomalyVisual), typeof(AnomalyContactEffects), typeof(AnomalyGrassBender), typeof(AnomalyAudio), typeof(AnomalyAudioGain), typeof(AnomalyParticleEmission), typeof(AnomalyParticleFrames) };
             foreach (MonoBehaviour component in prefab.GetComponentsInChildren<MonoBehaviour>(true))
             {
                 Assert.That(component, Is.Not.Null, "Missing prefab script");

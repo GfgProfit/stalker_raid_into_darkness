@@ -186,6 +186,7 @@ namespace XRay.Importer.Editor.Levels
                 settings.WeatherProfile = (XRay.Importer.Levels.XRayWeatherProfile)EditorGUILayout.ObjectField(new GUIContent("Weather Profile Override", "A selected profile takes precedence over automatic weather and is never overwritten. Selected Profile Only requires this field; Disabled preserves it without connecting weather."), settings.WeatherProfile, typeof(XRay.Importer.Levels.XRayWeatherProfile), false);
             }
             settings.CopySourceFiles = EditorGUILayout.Toggle("Copy level.geom/geomx/cform/details", settings.CopySourceFiles);
+            XRayLevelAnomalyImporter.DrawSettings(settings);
             settings.OpenSceneAfterImport = EditorGUILayout.Toggle("Open Scene After Import", settings.OpenSceneAfterImport);
             settings.AutoImportDroppedLevels = EditorGUILayout.Toggle(new GUIContent("Auto Import Dropped 'level'", "Import extensionless 'level' files dropped into the Project window."), settings.AutoImportDroppedLevels);
         }
@@ -311,6 +312,7 @@ namespace XRay.Importer.Editor.Levels
                     }
                 }
 
+                XRayLevelAnomalyImporter.DrawLevelAction(entry, XRayLevelPaths.Root);
                 using (new EditorGUI.DisabledScope(!File.Exists(XRayLevelPaths.ScenePath(entry.Name))))
                 {
                     if (GUILayout.Button("Scene", GUILayout.Width(56.0f)))
@@ -321,6 +323,7 @@ namespace XRay.Importer.Editor.Levels
                 }
 
                 EditorGUILayout.EndHorizontal();
+                XRayLevelAnomalyImporter.DrawLastResult(entry.Name, XRayLevelPaths.Root);
             }
 
             EditorGUILayout.EndScrollView();

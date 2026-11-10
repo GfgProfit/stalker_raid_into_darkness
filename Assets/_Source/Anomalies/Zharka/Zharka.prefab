@@ -4874,6 +4874,7 @@ GameObject:
   - component: {fileID: 5598717339586839928}
   - component: {fileID: 7603943244801444536}
   - component: {fileID: 2804354991958908065}
+  - component: {fileID: 2572094293863028054}
   m_Layer: 0
   m_Name: campfire_flame_hd_smoke_00
   m_TagString: Untagged
@@ -5265,11 +5266,29 @@ ParticleSystem:
     rateOverTime:
       serializedVersion: 3
       minMaxState: 0
-      scalar: 3
+      scalar: 0
       minScalar: 10
       maxCurve:
         serializedVersion: 2
-        m_Curve: []
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0.33333334
+          outWeight: 0.33333334
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0.33333334
+          outWeight: 0.33333334
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
@@ -8653,8 +8672,8 @@ ParticleSystem:
     colorLabel0: Color
     vector0_0:
       serializedVersion: 3
-      minMaxState: 1
-      scalar: 1
+      minMaxState: 0
+      scalar: 0
       minScalar: 0
       maxCurve:
         serializedVersion: 2
@@ -10392,6 +10411,26 @@ ParticleSystemRenderer:
   m_MeshWeighting1: 1
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
+--- !u!114 &2572094293863028054
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 672709977467751348}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0d00a3585dd14b82b99404473dfd7c67, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: RaidIntoDarkness.Effects::RaidIntoDarkness.Effects.AnomalyParticleFrames
+  _system: {fileID: 7603943244801444536}
+  _frameCount: 64
+  _frameColumns: 7
+  _frameSize: {x: 0.142857, y: 0.142857}
+  _framesPerSecond: 32
+  _animated: 1
+  _randomStart: 1
+  _randomPlayback: 0
 --- !u!1 &762863185510951977
 GameObject:
   m_ObjectHideFlags: 0
@@ -20636,6 +20675,7 @@ GameObject:
   - component: {fileID: 7768191372519524841}
   - component: {fileID: 7179701069155205701}
   - component: {fileID: 3922228661256851850}
+  - component: {fileID: 210712462462093130}
   m_Layer: 0
   m_Name: campfire_flame_hd_smoke_01
   m_TagString: Untagged
@@ -21027,11 +21067,29 @@ ParticleSystem:
     rateOverTime:
       serializedVersion: 3
       minMaxState: 0
-      scalar: 5
+      scalar: 0
       minScalar: 10
       maxCurve:
         serializedVersion: 2
-        m_Curve: []
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0.33333334
+          outWeight: 0.33333334
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0.33333334
+          outWeight: 0.33333334
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
@@ -24973,8 +25031,8 @@ ParticleSystem:
     colorLabel0: Color
     vector0_0:
       serializedVersion: 3
-      minMaxState: 1
-      scalar: 1
+      minMaxState: 0
+      scalar: 0
       minScalar: 0
       maxCurve:
         serializedVersion: 2
@@ -26028,6 +26086,26 @@ ParticleSystemRenderer:
   m_MeshWeighting1: 1
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
+--- !u!114 &210712462462093130
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1371145243491785543}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0d00a3585dd14b82b99404473dfd7c67, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: RaidIntoDarkness.Effects::RaidIntoDarkness.Effects.AnomalyParticleFrames
+  _system: {fileID: 7179701069155205701}
+  _frameCount: 64
+  _frameColumns: 6
+  _frameSize: {x: 0.142857, y: 0.142857}
+  _framesPerSecond: 28
+  _animated: 1
+  _randomStart: 0
+  _randomPlayback: 1
 --- !u!1 &1780543701047613839
 GameObject:
   m_ObjectHideFlags: 0
@@ -38749,6 +38827,7 @@ GameObject:
   - component: {fileID: 1665149210446057567}
   - component: {fileID: 6062680397498983499}
   - component: {fileID: 9085737377997593524}
+  - component: {fileID: 4735293238063681334}
   m_Layer: 0
   m_Name: monsters_fire_flame_burst_line_06
   m_TagString: Untagged
@@ -39140,11 +39219,29 @@ ParticleSystem:
     rateOverTime:
       serializedVersion: 3
       minMaxState: 0
-      scalar: 4
+      scalar: 0
       minScalar: 10
       maxCurve:
         serializedVersion: 2
-        m_Curve: []
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0.33333334
+          outWeight: 0.33333334
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0.33333334
+          outWeight: 0.33333334
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
@@ -42528,8 +42625,8 @@ ParticleSystem:
     colorLabel0: Color
     vector0_0:
       serializedVersion: 3
-      minMaxState: 1
-      scalar: 1
+      minMaxState: 0
+      scalar: 0
       minScalar: 0
       maxCurve:
         serializedVersion: 2
@@ -43907,6 +44004,26 @@ ParticleSystemRenderer:
   m_MeshWeighting1: 1
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
+--- !u!114 &4735293238063681334
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2954895427466804818}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0d00a3585dd14b82b99404473dfd7c67, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: RaidIntoDarkness.Effects::RaidIntoDarkness.Effects.AnomalyParticleFrames
+  _system: {fileID: 6062680397498983499}
+  _frameCount: 4
+  _frameColumns: 2
+  _frameSize: {x: 0.5, y: 0.5}
+  _framesPerSecond: 24
+  _animated: 1
+  _randomStart: 0
+  _randomPlayback: 0
 --- !u!1 &3155757968845815709
 GameObject:
   m_ObjectHideFlags: 0
@@ -44105,15 +44222,15 @@ MonoBehaviour:
   m_MaxDepthBias: 0.001
   m_ShadowResolution:
     m_Override: 512
-    m_UseOverride: 1
-    m_Level: 0
+    m_UseOverride: 0
+    m_Level: 3
   m_ShadowDimmer: 1
   m_VolumetricShadowDimmer: 1
   m_ShadowFadeDistance: 10000
   m_UseContactShadow:
-    m_Override: 0
-    m_UseOverride: 1
-    m_Level: 0
+    m_Override: 1
+    m_UseOverride: 0
+    m_Level: 2
   m_RayTracedContactShadow: 0
   m_ShadowTint: {r: 0, g: 0, b: 0, a: 1}
   m_PenumbraTint: 0
@@ -84942,6 +85059,7 @@ GameObject:
   - component: {fileID: 2127572662569318147}
   - component: {fileID: 5290107305091968687}
   - component: {fileID: 2374858350447174257}
+  - component: {fileID: 2209004526330796241}
   m_Layer: 0
   m_Name: Zharka
   m_TagString: Untagged
@@ -85002,6 +85120,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: RaidIntoDarkness.Effects::RaidIntoDarkness.Effects.OverlappingAnomalyVisual
   _idle: {fileID: 6473035539298428403}
   _awaking: {fileID: 0}
+  _idleIllumination: {fileID: 0}
+  _idleLightAnimation:
+    _fps: 0
+    _frameCount: 0
+    _frames: 
+    _colors: []
+  _idleLightRange: 0
+  _idleLightRangeJitter: 0
   _audio: {fileID: 1568900054068925385}
   _contactEffects: {fileID: 0}
   _entranceContactEffects: {fileID: 0}
@@ -85071,6 +85197,33 @@ MonoBehaviour:
   _accumulateTime: 0.25
   _ignoreSmallObjects: 0
   _smallObjectIgnoreDelay: -1
+  _nonlivingIdleStopDelay: 0.1
+  _repeatNonlivingIdleStop: 0
+  _randomizeRadius: 0
+  _randomRadiusMin: 2
+  _randomRadiusMax: 3
+--- !u!114 &2209004526330796241
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6036523816419366679}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7487ed5cf3ef48ad956adee84e91ea4e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: RaidIntoDarkness.Effects::RaidIntoDarkness.Effects.AnomalyParticleEmission
+  _sources:
+  - _system: {fileID: 6062680397498983499}
+    _rate: 4
+    _timeLimit: 0
+  - _system: {fileID: 7603943244801444536}
+    _rate: 3
+    _timeLimit: 0
+  - _system: {fileID: 7179701069155205701}
+    _rate: 5
+    _timeLimit: 0
 --- !u!1 &6071270127157639024
 GameObject:
   m_ObjectHideFlags: 0

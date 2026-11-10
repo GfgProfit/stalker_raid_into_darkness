@@ -1,0 +1,1935 @@
+{
+  "schemaVersion": 1,
+  "sourceAuditSha256": "03FE6BA362DBA6915F0A69E284BD8AD77038AA512673AF7781C66FED98BAF683",
+  "families": [
+    {
+      "family": "Electra",
+      "prefab": "Assets/_Source/Anomalies/Electra/Electra.prefab",
+      "effects": [
+        {
+          "sourceEffect": "semitone\\anomalies\\electra\\effects\\idle\\zone_electric_mine_idle_sparks",
+          "basename": "zone_electric_mine_idle_sparks",
+          "unityAliases": [
+            "Idle"
+          ],
+          "unityBindings": [
+            {
+              "path": "Idle",
+              "driveEmission": true,
+              "eventControlled": false,
+              "canonicalDirectional": false,
+              "duplicateDirectional": false
+            }
+          ],
+          "nativeMaxParticles": 4,
+          "framed": true,
+          "animated": true,
+          "randomStartFrame": true,
+          "randomPlayback": false,
+          "frameCount": 64,
+          "frameColumns": 8,
+          "frameSizeX": 0.125,
+          "frameSizeY": 0.125,
+          "fps": 24,
+          "finiteEmitter": false,
+          "emitterTimeLimit": 0,
+          "sourceActions": [
+            {
+              "ratePerSecond": 2
+            }
+          ]
+        },
+        {
+          "sourceEffect": "semitone\\anomalies\\electra\\effects\\idle\\zone_electric_mine_idle_disk",
+          "basename": "zone_electric_mine_idle_disk",
+          "unityAliases": [
+            "Idle/BirthVapor"
+          ],
+          "unityBindings": [
+            {
+              "path": "Idle/BirthVapor",
+              "driveEmission": false,
+              "eventControlled": true,
+              "canonicalDirectional": false,
+              "duplicateDirectional": false
+            }
+          ],
+          "nativeMaxParticles": 1,
+          "framed": true,
+          "animated": false,
+          "randomStartFrame": true,
+          "randomPlayback": false,
+          "frameCount": 16,
+          "frameColumns": 4,
+          "frameSizeX": 0.25,
+          "frameSizeY": 0.25,
+          "fps": 64,
+          "finiteEmitter": true,
+          "emitterTimeLimit": 0.1,
+          "sourceActions": [
+            {
+              "ratePerSecond": 1000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "family": "Zharka",
+      "prefab": "Assets/_Source/Anomalies/Zharka/Zharka.prefab",
+      "effects": [
+        {
+          "sourceEffect": "semitone\\anomalies\\zharka\\effects\\monsters_fire_flame_burst_line_06",
+          "basename": "monsters_fire_flame_burst_line_06",
+          "unityAliases": [
+            "Idle/monsters_fire_flame_burst_line_06"
+          ],
+          "unityBindings": [
+            {
+              "path": "Idle/monsters_fire_flame_burst_line_06",
+              "driveEmission": true,
+              "eventControlled": false,
+              "canonicalDirectional": false,
+              "duplicateDirectional": false
+            }
+          ],
+          "nativeMaxParticles": 12,
+          "framed": true,
+          "animated": true,
+          "randomStartFrame": false,
+          "randomPlayback": false,
+          "frameCount": 4,
+          "frameColumns": 2,
+          "frameSizeX": 0.5,
+          "frameSizeY": 0.5,
+          "fps": 24,
+          "finiteEmitter": false,
+          "emitterTimeLimit": 0,
+          "sourceActions": [
+            {
+              "ratePerSecond": 4
+            }
+          ]
+        },
+        {
+          "sourceEffect": "semitone\\anomalies\\zharka\\effects\\campfire_flame_hd_smoke_00",
+          "basename": "campfire_flame_hd_smoke_00",
+          "unityAliases": [
+            "Idle/campfire_flame_hd_smoke_00"
+          ],
+          "unityBindings": [
+            {
+              "path": "Idle/campfire_flame_hd_smoke_00",
+              "driveEmission": true,
+              "eventControlled": false,
+              "canonicalDirectional": false,
+              "duplicateDirectional": false
+            }
+          ],
+          "nativeMaxParticles": 4,
+          "framed": true,
+          "animated": true,
+          "randomStartFrame": true,
+          "randomPlayback": false,
+          "frameCount": 64,
+          "frameColumns": 7,
+          "frameSizeX": 0.142857,
+          "frameSizeY": 0.142857,
+          "fps": 32,
+          "finiteEmitter": false,
+          "emitterTimeLimit": 0,
+          "sourceActions": [
+            {
+              "ratePerSecond": 3
+            }
+          ]
+        },
+        {
+          "sourceEffect": "semitone\\anomalies\\zharka\\effects\\campfire_flame_hd_smoke_01",
+          "basename": "campfire_flame_hd_smoke_01",
+          "unityAliases": [
+            "Idle/campfire_flame_hd_smoke_01"
+          ],
+          "unityBindings": [
+            {
+              "path": "Idle/campfire_flame_hd_smoke_01",
+              "driveEmission": true,
+              "eventControlled": false,
+              "canonicalDirectional": false,
+              "duplicateDirectional": false
+            }
+          ],
+          "nativeMaxParticles": 2,
+          "framed": true,
+          "animated": true,
+          "randomStartFrame": false,
+          "randomPlayback": true,
+          "frameCount": 64,
+          "frameColumns": 6,
+          "frameSizeX": 0.142857,
+          "frameSizeY": 0.142857,
+          "fps": 28,
+          "finiteEmitter": false,
+          "emitterTimeLimit": 0,
+          "sourceActions": [
+            {
+              "ratePerSecond": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "family": "Tramplin",
+      "prefab": "Assets/_Source/Anomalies/Tramplin/Tramplin.prefab",
+      "effects": [
+        {
+          "sourceEffect": "semitone\\anomalies\\springboard\\effects\\idle\\zone_graviti_mine_idle_leaves",
+          "basename": "zone_graviti_mine_idle_leaves",
+          "unityAliases": [
+            "Idle/zone_graviti_mine_idle_leaves"
+          ],
+          "unityBindings": [
+            {
+              "path": "Idle/zone_graviti_mine_idle_leaves",
+              "driveEmission": true,
+              "eventControlled": false,
+              "canonicalDirectional": false,
+              "duplicateDirectional": false
+            }
+          ],
+          "nativeMaxParticles": 14,
+          "framed": true,
+          "animated": false,
+          "randomStartFrame": true,
+          "randomPlayback": false,
+          "frameCount": 4,
+          "frameColumns": 4,
+          "frameSizeX": 0.25,
+          "frameSizeY": 0.25,
+          "fps": 24,
+          "finiteEmitter": false,
+          "emitterTimeLimit": 0,
+          "sourceActions": [
+            {
+              "ratePerSecond": 6
+            }
+          ]
+        },
+        {
+          "sourceEffect": "semitone\\anomalies\\springboard\\effects\\idle\\zone_graviti_leaves_pulsing",
+          "basename": "zone_graviti_leaves_pulsing",
+          "unityAliases": [
+            "Idle/zone_graviti_leaves_pulsing"
+          ],
+          "unityBindings": [
+            {
+              "path": "Idle/zone_graviti_leaves_pulsing",
+              "driveEmission": true,
+              "eventControlled": false,
+              "canonicalDirectional": false,
+              "duplicateDirectional": false
+            }
+          ],
+          "nativeMaxParticles": 12,
+          "framed": true,
+          "animated": false,
+          "randomStartFrame": true,
+          "randomPlayback": false,
+          "frameCount": 16,
+          "frameColumns": 4,
+          "frameSizeX": 0.25,
+          "frameSizeY": 0.25,
+          "fps": 24,
+          "finiteEmitter": false,
+          "emitterTimeLimit": 0,
+          "sourceActions": [
+            {
+              "ratePerSecond": 6
+            }
+          ]
+        },
+        {
+          "sourceEffect": "semitone\\anomalies\\springboard\\effects\\idle\\radar_leaves_damping",
+          "basename": "radar_leaves_damping",
+          "unityAliases": [
+            "Idle/radar_leaves_damping"
+          ],
+          "unityBindings": [
+            {
+              "path": "Idle/radar_leaves_damping",
+              "driveEmission": true,
+              "eventControlled": false,
+              "canonicalDirectional": false,
+              "duplicateDirectional": false
+            }
+          ],
+          "nativeMaxParticles": 14,
+          "framed": false,
+          "animated": false,
+          "randomStartFrame": true,
+          "randomPlayback": false,
+          "frameCount": 1,
+          "frameColumns": 1,
+          "frameSizeX": 1,
+          "frameSizeY": 1,
+          "fps": 0,
+          "finiteEmitter": false,
+          "emitterTimeLimit": 0,
+          "sourceActions": [
+            {
+              "ratePerSecond": 32
+            }
+          ]
+        },
+        {
+          "sourceEffect": "semitone\\anomalies\\springboard\\effects\\idle\\gravi_rocks2",
+          "basename": "gravi_rocks2",
+          "unityAliases": [
+            "Idle/gravi_rocks2"
+          ],
+          "unityBindings": [
+            {
+              "path": "Idle/gravi_rocks2",
+              "driveEmission": true,
+              "eventControlled": false,
+              "canonicalDirectional": false,
+              "duplicateDirectional": false
+            }
+          ],
+          "nativeMaxParticles": 15,
+          "framed": false,
+          "animated": true,
+          "randomStartFrame": true,
+          "randomPlayback": false,
+          "frameCount": 1,
+          "frameColumns": 1,
+          "frameSizeX": 1,
+          "frameSizeY": 1,
+          "fps": 0,
+          "finiteEmitter": false,
+          "emitterTimeLimit": 0,
+          "sourceActions": [
+            {
+              "ratePerSecond": 8999.999488
+            }
+          ]
+        },
+        {
+          "sourceEffect": "semitone\\anomalies\\springboard\\effects\\idle\\anomaly_spiky_00",
+          "basename": "anomaly_spiky_00",
+          "unityAliases": [
+            "Idle/anomaly_spiky_00"
+          ],
+          "unityBindings": [
+            {
+              "path": "Idle/anomaly_spiky_00",
+              "driveEmission": true,
+              "eventControlled": false,
+              "canonicalDirectional": false,
+              "duplicateDirectional": false
+            }
+          ],
+          "nativeMaxParticles": 25,
+          "framed": true,
+          "animated": true,
+          "randomStartFrame": false,
+          "randomPlayback": false,
+          "frameCount": 64,
+          "frameColumns": 8,
+          "frameSizeX": 0.125,
+          "frameSizeY": 0.125,
+          "fps": 24,
+          "finiteEmitter": false,
+          "emitterTimeLimit": 0,
+          "sourceActions": [
+            {
+              "ratePerSecond": 120
+            }
+          ]
+        },
+        {
+          "sourceEffect": "semitone\\anomalies\\springboard\\effects\\idle\\heat_sparks_idle_00",
+          "basename": "heat_sparks_idle_00",
+          "unityAliases": [
+            "IdleSubEmitters/heat_sparks_idle_00"
+          ],
+          "unityBindings": [
+            {
+              "path": "IdleSubEmitters/heat_sparks_idle_00",
+              "driveEmission": false,
+              "eventControlled": true,
+              "canonicalDirectional": false,
+              "duplicateDirectional": false
+            }
+          ],
+          "nativeMaxParticles": 2,
+          "framed": true,
+          "animated": false,
+          "randomStartFrame": false,
+          "randomPlayback": false,
+          "frameCount": 6,
+          "frameColumns": 2,
+          "frameSizeX": 0.5,
+          "frameSizeY": 0.5,
+          "fps": 30,
+          "finiteEmitter": true,
+          "emitterTimeLimit": 1,
+          "sourceActions": [
+            {
+              "ratePerSecond": 55
+            }
+          ]
+        },
+        {
+          "sourceEffect": "semitone\\anomalies\\springboard\\effects\\idle\\gravi_rocks2_00",
+          "basename": "gravi_rocks2_00",
+          "unityAliases": [
+            "Idle/gravi_rocks2_00"
+          ],
+          "unityBindings": [
+            {
+              "path": "Idle/gravi_rocks2_00",
+              "driveEmission": true,
+              "eventControlled": false,
+              "canonicalDirectional": false,
+              "duplicateDirectional": false
+            }
+          ],
+          "nativeMaxParticles": 5,
+          "framed": false,
+          "animated": true,
+          "randomStartFrame": true,
+          "randomPlayback": false,
+          "frameCount": 1,
+          "frameColumns": 1,
+          "frameSizeX": 1,
+          "frameSizeY": 1,
+          "fps": 0,
+          "finiteEmitter": false,
+          "emitterTimeLimit": 0,
+          "sourceActions": [
+            {
+              "ratePerSecond": 22
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "family": "Vortex",
+      "prefab": "Assets/_Source/Anomalies/Vortex/Vortex.prefab",
+      "effects": [
+        {
+          "sourceEffect": "semitone\\anomalies\\gravitational_average\\effects\\idle\\gravi_we_leaves_small",
+          "basename": "gravi_we_leaves_small",
+          "unityAliases": [
+            "Idle/gravi_we_leaves_small"
+          ],
+          "unityBindings": [
+            {
+              "path": "Idle/gravi_we_leaves_small",
+              "driveEmission": true,
+              "eventControlled": false,
+              "canonicalDirectional": false,
+              "duplicateDirectional": false
+            }
+          ],
+          "nativeMaxParticles": 25,
+          "framed": true,
+          "animated": false,
+          "randomStartFrame": true,
+          "randomPlayback": false,
+          "frameCount": 16,
+          "frameColumns": 4,
+          "frameSizeX": 0.25,
+          "frameSizeY": 0.25,
+          "fps": 2,
+          "finiteEmitter": false,
+          "emitterTimeLimit": 0,
+          "sourceActions": [
+            {
+              "ratePerSecond": 50
+            }
+          ]
+        },
+        {
+          "sourceEffect": "semitone\\anomalies\\gravitational_average\\effects\\idle\\gravi_we_ground_dist",
+          "basename": "gravi_we_ground_dist",
+          "unityAliases": [
+            "Idle/gravi_we_ground_dist"
+          ],
+          "unityBindings": [
+            {
+              "path": "Idle/gravi_we_ground_dist",
+              "driveEmission": true,
+              "eventControlled": false,
+              "canonicalDirectional": false,
+              "duplicateDirectional": false
+            }
+          ],
+          "nativeMaxParticles": 5,
+          "framed": false,
+          "animated": true,
+          "randomStartFrame": false,
+          "randomPlayback": false,
+          "frameCount": 1,
+          "frameColumns": 1,
+          "frameSizeX": 1,
+          "frameSizeY": 1,
+          "fps": 0,
+          "finiteEmitter": false,
+          "emitterTimeLimit": 0,
+          "sourceActions": [
+            {
+              "ratePerSecond": 4
+            }
+          ]
+        },
+        {
+          "sourceEffect": "semitone\\anomalies\\gravitational_average\\effects\\idle\\gravi_we_leaves_small_00",
+          "basename": "gravi_we_leaves_small_00",
+          "unityAliases": [
+            "Idle/gravi_we_leaves_small_00"
+          ],
+          "unityBindings": [
+            {
+              "path": "Idle/gravi_we_leaves_small_00",
+              "driveEmission": true,
+              "eventControlled": false,
+              "canonicalDirectional": false,
+              "duplicateDirectional": false
+            }
+          ],
+          "nativeMaxParticles": 3,
+          "framed": false,
+          "animated": false,
+          "randomStartFrame": true,
+          "randomPlayback": false,
+          "frameCount": 1,
+          "frameColumns": 1,
+          "frameSizeX": 1,
+          "frameSizeY": 1,
+          "fps": 0,
+          "finiteEmitter": false,
+          "emitterTimeLimit": 0,
+          "sourceActions": [
+            {
+              "ratePerSecond": 50
+            }
+          ]
+        },
+        {
+          "sourceEffect": "semitone\\anomalies\\gravitational_average\\effects\\idle\\zone_graviti_mine_idle_leaves_,_00",
+          "basename": "zone_graviti_mine_idle_leaves_,_00",
+          "unityAliases": [
+            "Idle/zone_graviti_mine_idle_leaves_,_00"
+          ],
+          "unityBindings": [
+            {
+              "path": "Idle/zone_graviti_mine_idle_leaves_,_00",
+              "driveEmission": true,
+              "eventControlled": false,
+              "canonicalDirectional": false,
+              "duplicateDirectional": false
+            }
+          ],
+          "nativeMaxParticles": 5,
+          "framed": true,
+          "animated": true,
+          "randomStartFrame": false,
+          "randomPlayback": false,
+          "frameCount": 128,
+          "frameColumns": 8,
+          "frameSizeX": 0.125,
+          "frameSizeY": 0.125,
+          "fps": 32,
+          "finiteEmitter": false,
+          "emitterTimeLimit": 0,
+          "sourceActions": [
+            {
+              "ratePerSecond": 1
+            }
+          ]
+        },
+        {
+          "sourceEffect": "semitone\\anomalies\\gravitational_average\\effects\\idle\\gravi_we_leaves_small_new",
+          "basename": "gravi_we_leaves_small_new",
+          "unityAliases": [
+            "Idle/gravi_we_leaves_small_new"
+          ],
+          "unityBindings": [
+            {
+              "path": "Idle/gravi_we_leaves_small_new",
+              "driveEmission": true,
+              "eventControlled": false,
+              "canonicalDirectional": false,
+              "duplicateDirectional": false
+            }
+          ],
+          "nativeMaxParticles": 5,
+          "framed": false,
+          "animated": false,
+          "randomStartFrame": true,
+          "randomPlayback": false,
+          "frameCount": 1,
+          "frameColumns": 1,
+          "frameSizeX": 1,
+          "frameSizeY": 1,
+          "fps": 0,
+          "finiteEmitter": false,
+          "emitterTimeLimit": 0,
+          "sourceActions": [
+            {
+              "ratePerSecond": 50
+            }
+          ]
+        },
+        {
+          "sourceEffect": "semitone\\anomalies\\gravitational_average\\effects\\idle\\gravi_we_leaves_small_new_00",
+          "basename": "gravi_we_leaves_small_new_00",
+          "unityAliases": [
+            "IdleSubEmitters/gravi_we_leaves_small_new_00",
+            "Idle/gravi_we_leaves_small_new_00"
+          ],
+          "unityBindings": [
+            {
+              "path": "IdleSubEmitters/gravi_we_leaves_small_new_00",
+              "driveEmission": false,
+              "eventControlled": true,
+              "canonicalDirectional": false,
+              "duplicateDirectional": false
+            },
+            {
+              "path": "Idle/gravi_we_leaves_small_new_00",
+              "driveEmission": true,
+              "eventControlled": false,
+              "canonicalDirectional": false,
+              "duplicateDirectional": false
+            }
+          ],
+          "nativeMaxParticles": 4,
+          "framed": false,
+          "animated": false,
+          "randomStartFrame": false,
+          "randomPlayback": false,
+          "frameCount": 1,
+          "frameColumns": 1,
+          "frameSizeX": 1,
+          "frameSizeY": 1,
+          "fps": 0,
+          "finiteEmitter": false,
+          "emitterTimeLimit": 0,
+          "sourceActions": [
+            {
+              "ratePerSecond": 50
+            }
+          ]
+        },
+        {
+          "sourceEffect": "semitone\\anomalies\\gravitational_average\\effects\\idle\\gravi_we_leaves_small_new_01",
+          "basename": "gravi_we_leaves_small_new_01",
+          "unityAliases": [],
+          "unityBindings": [],
+          "nativeMaxParticles": 10,
+          "framed": true,
+          "animated": false,
+          "randomStartFrame": true,
+          "randomPlayback": false,
+          "frameCount": 16,
+          "frameColumns": 8,
+          "frameSizeX": 0.125,
+          "frameSizeY": 0.125,
+          "fps": 2,
+          "finiteEmitter": false,
+          "emitterTimeLimit": 0,
+          "sourceActions": [
+            {
+              "ratePerSecond": 50
+            }
+          ]
+        },
+        {
+          "sourceEffect": "semitone\\anomalies\\gravitational_average\\effects\\idle\\zone_graviti_mine_idle_leaves_,_01",
+          "basename": "zone_graviti_mine_idle_leaves_,_01",
+          "unityAliases": [
+            "IdleSubEmitters/zone_graviti_mine_idle_leaves_,_01"
+          ],
+          "unityBindings": [
+            {
+              "path": "IdleSubEmitters/zone_graviti_mine_idle_leaves_,_01",
+              "driveEmission": false,
+              "eventControlled": true,
+              "canonicalDirectional": false,
+              "duplicateDirectional": false
+            }
+          ],
+          "nativeMaxParticles": 1,
+          "framed": true,
+          "animated": true,
+          "randomStartFrame": false,
+          "randomPlayback": false,
+          "frameCount": 128,
+          "frameColumns": 8,
+          "frameSizeX": 0.125,
+          "frameSizeY": 0.125,
+          "fps": 32,
+          "finiteEmitter": true,
+          "emitterTimeLimit": 1,
+          "sourceActions": [
+            {
+              "ratePerSecond": 1
+            }
+          ]
+        },
+        {
+          "sourceEffect": "semitone\\anomalies\\gravitational_average\\effects\\idle\\gravi_we_ground_dust",
+          "basename": "gravi_we_ground_dust",
+          "unityAliases": [
+            "Idle/gravi_we_ground_dust"
+          ],
+          "unityBindings": [
+            {
+              "path": "Idle/gravi_we_ground_dust",
+              "driveEmission": true,
+              "eventControlled": false,
+              "canonicalDirectional": false,
+              "duplicateDirectional": false
+            }
+          ],
+          "nativeMaxParticles": 15,
+          "framed": true,
+          "animated": true,
+          "randomStartFrame": false,
+          "randomPlayback": false,
+          "frameCount": 16,
+          "frameColumns": 8,
+          "frameSizeX": 0.125,
+          "frameSizeY": 0.125,
+          "fps": 24,
+          "finiteEmitter": false,
+          "emitterTimeLimit": 0,
+          "sourceActions": [
+            {
+              "ratePerSecond": 14
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "family": "Carousel",
+      "prefab": "Assets/_Source/Anomalies/Carousel/Carousel.prefab",
+      "effects": [
+        {
+          "sourceEffect": "semitone\\anomalies\\gravitational_strong\\effects\\idle\\gravitational_ripples",
+          "basename": "gravitational_ripples",
+          "unityAliases": [
+            "Idle/gravitational_ripples"
+          ],
+          "unityBindings": [
+            {
+              "path": "Idle/gravitational_ripples",
+              "driveEmission": true,
+              "eventControlled": false,
+              "canonicalDirectional": false,
+              "duplicateDirectional": false
+            }
+          ],
+          "nativeMaxParticles": 5,
+          "framed": false,
+          "animated": true,
+          "randomStartFrame": false,
+          "randomPlayback": false,
+          "frameCount": 1,
+          "frameColumns": 1,
+          "frameSizeX": 1,
+          "frameSizeY": 1,
+          "fps": 0,
+          "finiteEmitter": false,
+          "emitterTimeLimit": 0,
+          "sourceActions": [
+            {
+              "ratePerSecond": 4
+            }
+          ]
+        },
+        {
+          "sourceEffect": "semitone\\anomalies\\gravitational_strong\\effects\\idle\\zone_graviti_mine_idle_leaves_00",
+          "basename": "zone_graviti_mine_idle_leaves_00",
+          "unityAliases": [
+            "Idle/zone_graviti_mine_idle_leaves_00"
+          ],
+          "unityBindings": [
+            {
+              "path": "Idle/zone_graviti_mine_idle_leaves_00",
+              "driveEmission": true,
+              "eventControlled": false,
+              "canonicalDirectional": false,
+              "duplicateDirectional": false
+            }
+          ],
+          "nativeMaxParticles": 15,
+          "framed": true,
+          "animated": false,
+          "randomStartFrame": true,
+          "randomPlayback": false,
+          "frameCount": 16,
+          "frameColumns": 4,
+          "frameSizeX": 0.25,
+          "frameSizeY": 0.25,
+          "fps": 24,
+          "finiteEmitter": false,
+          "emitterTimeLimit": 0,
+          "sourceActions": [
+            {
+              "ratePerSecond": 6
+            }
+          ]
+        },
+        {
+          "sourceEffect": "semitone\\anomalies\\gravitational_strong\\effects\\idle\\gravitat_dist_ring_single",
+          "basename": "gravitat_dist_ring_single",
+          "unityAliases": [
+            "Idle/gravitat_dist_ring_single"
+          ],
+          "unityBindings": [
+            {
+              "path": "Idle/gravitat_dist_ring_single",
+              "driveEmission": true,
+              "eventControlled": false,
+              "canonicalDirectional": false,
+              "duplicateDirectional": false
+            }
+          ],
+          "nativeMaxParticles": 4,
+          "framed": false,
+          "animated": false,
+          "randomStartFrame": false,
+          "randomPlayback": false,
+          "frameCount": 1,
+          "frameColumns": 1,
+          "frameSizeX": 1,
+          "frameSizeY": 1,
+          "fps": 0,
+          "finiteEmitter": false,
+          "emitterTimeLimit": 0,
+          "sourceActions": [
+            {
+              "ratePerSecond": 220
+            }
+          ]
+        },
+        {
+          "sourceEffect": "semitone\\anomalies\\gravitational_strong\\effects\\idle\\gravi_rocks1",
+          "basename": "gravi_rocks1",
+          "unityAliases": [
+            "Idle/gravi_rocks1"
+          ],
+          "unityBindings": [
+            {
+              "path": "Idle/gravi_rocks1",
+              "driveEmission": true,
+              "eventControlled": false,
+              "canonicalDirectional": false,
+              "duplicateDirectional": false
+            }
+          ],
+          "nativeMaxParticles": 20,
+          "framed": true,
+          "animated": true,
+          "randomStartFrame": true,
+          "randomPlayback": false,
+          "frameCount": 16,
+          "frameColumns": 4,
+          "frameSizeX": 0.25,
+          "frameSizeY": 0.25,
+          "fps": 24,
+          "finiteEmitter": false,
+          "emitterTimeLimit": 0,
+          "sourceActions": [
+            {
+              "ratePerSecond": 8999.999488
+            }
+          ]
+        },
+        {
+          "sourceEffect": "semitone\\anomalies\\gravitational_strong\\effects\\idle\\gravitational_core_bubble_small",
+          "basename": "gravitational_core_bubble_small",
+          "unityAliases": [
+            "Idle/gravitational_core_bubble_small"
+          ],
+          "unityBindings": [
+            {
+              "path": "Idle/gravitational_core_bubble_small",
+              "driveEmission": true,
+              "eventControlled": false,
+              "canonicalDirectional": false,
+              "duplicateDirectional": false
+            }
+          ],
+          "nativeMaxParticles": 1,
+          "framed": false,
+          "animated": true,
+          "randomStartFrame": false,
+          "randomPlayback": false,
+          "frameCount": 1,
+          "frameColumns": 1,
+          "frameSizeX": 1,
+          "frameSizeY": 1,
+          "fps": 0,
+          "finiteEmitter": false,
+          "emitterTimeLimit": 0,
+          "sourceActions": [
+            {
+              "ratePerSecond": 25
+            }
+          ]
+        },
+        {
+          "sourceEffect": "semitone\\anomalies\\gravitational_strong\\effects\\idle\\gravitational_core_bubble2",
+          "basename": "gravitational_core_bubble2",
+          "unityAliases": [
+            "Idle/gravitational_core_bubble2"
+          ],
+          "unityBindings": [
+            {
+              "path": "Idle/gravitational_core_bubble2",
+              "driveEmission": true,
+              "eventControlled": false,
+              "canonicalDirectional": false,
+              "duplicateDirectional": false
+            }
+          ],
+          "nativeMaxParticles": 1,
+          "framed": false,
+          "animated": true,
+          "randomStartFrame": false,
+          "randomPlayback": false,
+          "frameCount": 1,
+          "frameColumns": 1,
+          "frameSizeX": 1,
+          "frameSizeY": 1,
+          "fps": 0,
+          "finiteEmitter": false,
+          "emitterTimeLimit": 0,
+          "sourceActions": [
+            {
+              "ratePerSecond": 25
+            }
+          ]
+        },
+        {
+          "sourceEffect": "semitone\\anomalies\\gravitational_strong\\effects\\idle\\zone_graviti_leaves_pulsing",
+          "basename": "zone_graviti_leaves_pulsing",
+          "unityAliases": [
+            "Idle/zone_graviti_leaves_pulsing"
+          ],
+          "unityBindings": [
+            {
+              "path": "Idle/zone_graviti_leaves_pulsing",
+              "driveEmission": true,
+              "eventControlled": false,
+              "canonicalDirectional": false,
+              "duplicateDirectional": false
+            }
+          ],
+          "nativeMaxParticles": 12,
+          "framed": true,
+          "animated": false,
+          "randomStartFrame": true,
+          "randomPlayback": false,
+          "frameCount": 16,
+          "frameColumns": 4,
+          "frameSizeX": 0.25,
+          "frameSizeY": 0.25,
+          "fps": 24,
+          "finiteEmitter": false,
+          "emitterTimeLimit": 0,
+          "sourceActions": [
+            {
+              "ratePerSecond": 6
+            }
+          ]
+        },
+        {
+          "sourceEffect": "semitone\\anomalies\\gravitational_strong\\effects\\idle\\gravitat_bottom_dist_00",
+          "basename": "gravitat_bottom_dist_00",
+          "unityAliases": [
+            "Idle/gravitat_bottom_dist_00"
+          ],
+          "unityBindings": [
+            {
+              "path": "Idle/gravitat_bottom_dist_00",
+              "driveEmission": true,
+              "eventControlled": false,
+              "canonicalDirectional": false,
+              "duplicateDirectional": false
+            }
+          ],
+          "nativeMaxParticles": 5,
+          "framed": false,
+          "animated": true,
+          "randomStartFrame": false,
+          "randomPlayback": false,
+          "frameCount": 1,
+          "frameColumns": 1,
+          "frameSizeX": 1,
+          "frameSizeY": 1,
+          "fps": 0,
+          "finiteEmitter": false,
+          "emitterTimeLimit": 0,
+          "sourceActions": [
+            {
+              "ratePerSecond": 12
+            }
+          ]
+        },
+        {
+          "sourceEffect": "semitone\\anomalies\\gravitational_strong\\effects\\idle\\radar_leaves_damping_00",
+          "basename": "radar_leaves_damping_00",
+          "unityAliases": [
+            "Idle/radar_leaves_damping_00"
+          ],
+          "unityBindings": [
+            {
+              "path": "Idle/radar_leaves_damping_00",
+              "driveEmission": true,
+              "eventControlled": false,
+              "canonicalDirectional": false,
+              "duplicateDirectional": false
+            }
+          ],
+          "nativeMaxParticles": 12,
+          "framed": false,
+          "animated": true,
+          "randomStartFrame": true,
+          "randomPlayback": false,
+          "frameCount": 1,
+          "frameColumns": 1,
+          "frameSizeX": 1,
+          "frameSizeY": 1,
+          "fps": 0,
+          "finiteEmitter": false,
+          "emitterTimeLimit": 0,
+          "sourceActions": [
+            {
+              "ratePerSecond": 22
+            }
+          ]
+        },
+        {
+          "sourceEffect": "semitone\\anomalies\\gravitational_strong\\effects\\idle\\nyah_idle_00",
+          "basename": "nyah_idle_00",
+          "unityAliases": [
+            "IdleSubEmitters/nyah_idle_00"
+          ],
+          "unityBindings": [
+            {
+              "path": "IdleSubEmitters/nyah_idle_00",
+              "driveEmission": false,
+              "eventControlled": true,
+              "canonicalDirectional": false,
+              "duplicateDirectional": false
+            }
+          ],
+          "nativeMaxParticles": 8,
+          "framed": true,
+          "animated": true,
+          "randomStartFrame": false,
+          "randomPlayback": false,
+          "frameCount": 64,
+          "frameColumns": 8,
+          "frameSizeX": 0.125,
+          "frameSizeY": 0.125,
+          "fps": 24,
+          "finiteEmitter": false,
+          "emitterTimeLimit": 0,
+          "sourceActions": [
+            {
+              "ratePerSecond": 2
+            }
+          ]
+        },
+        {
+          "sourceEffect": "semitone\\anomalies\\gravitational_strong\\effects\\idle\\gravi_rocks2",
+          "basename": "gravi_rocks2",
+          "unityAliases": [
+            "Idle/gravi_rocks2"
+          ],
+          "unityBindings": [
+            {
+              "path": "Idle/gravi_rocks2",
+              "driveEmission": true,
+              "eventControlled": false,
+              "canonicalDirectional": false,
+              "duplicateDirectional": false
+            }
+          ],
+          "nativeMaxParticles": 8,
+          "framed": true,
+          "animated": true,
+          "randomStartFrame": true,
+          "randomPlayback": false,
+          "frameCount": 16,
+          "frameColumns": 4,
+          "frameSizeX": 0.25,
+          "frameSizeY": 0.25,
+          "fps": 24,
+          "finiteEmitter": false,
+          "emitterTimeLimit": 0,
+          "sourceActions": [
+            {
+              "ratePerSecond": 8999.999488
+            }
+          ]
+        },
+        {
+          "sourceEffect": "semitone\\anomalies\\gravitational_strong\\effects\\idle\\zone_graviti_mine_idle_leaves_,_01",
+          "basename": "zone_graviti_mine_idle_leaves_,_01",
+          "unityAliases": [
+            "Idle/zone_graviti_mine_idle_leaves_,_01"
+          ],
+          "unityBindings": [
+            {
+              "path": "Idle/zone_graviti_mine_idle_leaves_,_01",
+              "driveEmission": true,
+              "eventControlled": false,
+              "canonicalDirectional": false,
+              "duplicateDirectional": false
+            }
+          ],
+          "nativeMaxParticles": 2,
+          "framed": true,
+          "animated": true,
+          "randomStartFrame": false,
+          "randomPlayback": false,
+          "frameCount": 128,
+          "frameColumns": 8,
+          "frameSizeX": 0.125,
+          "frameSizeY": 0.125,
+          "fps": 32,
+          "finiteEmitter": false,
+          "emitterTimeLimit": 0,
+          "sourceActions": [
+            {
+              "ratePerSecond": 4
+            }
+          ]
+        },
+        {
+          "sourceEffect": "semitone\\anomalies\\gravitational_strong\\effects\\idle\\gravi_we_leaves_small_01",
+          "basename": "gravi_we_leaves_small_01",
+          "unityAliases": [
+            "Idle/gravi_we_leaves_small_01"
+          ],
+          "unityBindings": [
+            {
+              "path": "Idle/gravi_we_leaves_small_01",
+              "driveEmission": true,
+              "eventControlled": false,
+              "canonicalDirectional": false,
+              "duplicateDirectional": false
+            }
+          ],
+          "nativeMaxParticles": 12,
+          "framed": true,
+          "animated": false,
+          "randomStartFrame": true,
+          "randomPlayback": false,
+          "frameCount": 16,
+          "frameColumns": 4,
+          "frameSizeX": 0.25,
+          "frameSizeY": 0.25,
+          "fps": 2,
+          "finiteEmitter": false,
+          "emitterTimeLimit": 0,
+          "sourceActions": [
+            {
+              "ratePerSecond": 50
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "family": "Kisel",
+      "prefab": "Assets/_Source/Anomalies/Kisel/Kisel.prefab",
+      "effects": [
+        {
+          "sourceEffect": "semitone\\anomalies\\acidic\\effects\\idle\\studen_idle_bottom_02",
+          "basename": "studen_idle_bottom_02",
+          "unityAliases": [
+            "Idle/studen_idle_bottom_02"
+          ],
+          "unityBindings": [
+            {
+              "path": "Idle/studen_idle_bottom_02",
+              "driveEmission": true,
+              "eventControlled": false,
+              "canonicalDirectional": false,
+              "duplicateDirectional": false
+            }
+          ],
+          "nativeMaxParticles": 12,
+          "framed": true,
+          "animated": true,
+          "randomStartFrame": true,
+          "randomPlayback": false,
+          "frameCount": 64,
+          "frameColumns": 8,
+          "frameSizeX": 0.125,
+          "frameSizeY": 0.125,
+          "fps": 32,
+          "finiteEmitter": false,
+          "emitterTimeLimit": 0,
+          "sourceActions": [
+            {
+              "ratePerSecond": 12
+            }
+          ]
+        },
+        {
+          "sourceEffect": "semitone\\anomalies\\acidic\\effects\\idle\\studen_idle_bottom_08",
+          "basename": "studen_idle_bottom_08",
+          "unityAliases": [
+            "Idle/studen_idle_bottom_08"
+          ],
+          "unityBindings": [
+            {
+              "path": "Idle/studen_idle_bottom_08",
+              "driveEmission": true,
+              "eventControlled": false,
+              "canonicalDirectional": false,
+              "duplicateDirectional": false
+            }
+          ],
+          "nativeMaxParticles": 14,
+          "framed": true,
+          "animated": false,
+          "randomStartFrame": true,
+          "randomPlayback": false,
+          "frameCount": 4,
+          "frameColumns": 2,
+          "frameSizeX": 0.5,
+          "frameSizeY": 0.5,
+          "fps": 32,
+          "finiteEmitter": false,
+          "emitterTimeLimit": 0,
+          "sourceActions": [
+            {
+              "ratePerSecond": 8
+            }
+          ]
+        },
+        {
+          "sourceEffect": "semitone\\anomalies\\acidic\\effects\\idle\\studen_idle_bottom_05",
+          "basename": "studen_idle_bottom_05",
+          "unityAliases": [
+            "Idle/studen_idle_bottom_05"
+          ],
+          "unityBindings": [
+            {
+              "path": "Idle/studen_idle_bottom_05",
+              "driveEmission": true,
+              "eventControlled": false,
+              "canonicalDirectional": false,
+              "duplicateDirectional": false
+            }
+          ],
+          "nativeMaxParticles": 10,
+          "framed": true,
+          "animated": true,
+          "randomStartFrame": false,
+          "randomPlayback": false,
+          "frameCount": 125,
+          "frameColumns": 4,
+          "frameSizeX": 0.25,
+          "frameSizeY": 0.25,
+          "fps": 32,
+          "finiteEmitter": false,
+          "emitterTimeLimit": 0,
+          "sourceActions": [
+            {
+              "ratePerSecond": 8
+            }
+          ]
+        },
+        {
+          "sourceEffect": "semitone\\anomalies\\acidic\\effects\\idle\\studen_idle_glow_00",
+          "basename": "studen_idle_glow_00",
+          "unityAliases": [
+            "Idle/studen_idle_bottom_05/studen_idle_glow_00__Related"
+          ],
+          "unityBindings": [
+            {
+              "path": "Idle/studen_idle_bottom_05/studen_idle_glow_00__Related",
+              "driveEmission": false,
+              "eventControlled": true,
+              "canonicalDirectional": false,
+              "duplicateDirectional": false
+            }
+          ],
+          "nativeMaxParticles": 1,
+          "framed": false,
+          "animated": true,
+          "randomStartFrame": true,
+          "randomPlayback": false,
+          "frameCount": 1,
+          "frameColumns": 1,
+          "frameSizeX": 1,
+          "frameSizeY": 1,
+          "fps": 0,
+          "finiteEmitter": true,
+          "emitterTimeLimit": 0.1,
+          "sourceActions": [
+            {
+              "ratePerSecond": 8999.999488
+            }
+          ]
+        },
+        {
+          "sourceEffect": "semitone\\anomalies\\acidic\\effects\\idle\\studen_idle_bottom_07",
+          "basename": "studen_idle_bottom_07",
+          "unityAliases": [
+            "Idle/studen_idle_bottom_07"
+          ],
+          "unityBindings": [
+            {
+              "path": "Idle/studen_idle_bottom_07",
+              "driveEmission": true,
+              "eventControlled": false,
+              "canonicalDirectional": false,
+              "duplicateDirectional": false
+            }
+          ],
+          "nativeMaxParticles": 15,
+          "framed": true,
+          "animated": true,
+          "randomStartFrame": false,
+          "randomPlayback": false,
+          "frameCount": 128,
+          "frameColumns": 8,
+          "frameSizeX": 0.125,
+          "frameSizeY": 0.125,
+          "fps": 32,
+          "finiteEmitter": false,
+          "emitterTimeLimit": 0,
+          "sourceActions": [
+            {
+              "ratePerSecond": 2
+            }
+          ]
+        },
+        {
+          "sourceEffect": "semitone\\anomalies\\acidic\\effects\\idle\\studen_idle_glow_02",
+          "basename": "studen_idle_glow_02",
+          "unityAliases": [
+            "Idle/studen_idle_glow_02"
+          ],
+          "unityBindings": [
+            {
+              "path": "Idle/studen_idle_glow_02",
+              "driveEmission": true,
+              "eventControlled": false,
+              "canonicalDirectional": false,
+              "duplicateDirectional": false
+            }
+          ],
+          "nativeMaxParticles": 6,
+          "framed": true,
+          "animated": false,
+          "randomStartFrame": true,
+          "randomPlayback": false,
+          "frameCount": 16,
+          "frameColumns": 4,
+          "frameSizeX": 0.25,
+          "frameSizeY": 0.25,
+          "fps": 24,
+          "finiteEmitter": false,
+          "emitterTimeLimit": 0,
+          "sourceActions": [
+            {
+              "ratePerSecond": 4
+            }
+          ]
+        },
+        {
+          "sourceEffect": "semitone\\anomalies\\acidic\\effects\\idle\\studen_idle_bottom_07_00",
+          "basename": "studen_idle_bottom_07_00",
+          "unityAliases": [
+            "Idle/studen_idle_bottom_07_00"
+          ],
+          "unityBindings": [
+            {
+              "path": "Idle/studen_idle_bottom_07_00",
+              "driveEmission": true,
+              "eventControlled": false,
+              "canonicalDirectional": false,
+              "duplicateDirectional": false
+            }
+          ],
+          "nativeMaxParticles": 15,
+          "framed": true,
+          "animated": true,
+          "randomStartFrame": false,
+          "randomPlayback": false,
+          "frameCount": 128,
+          "frameColumns": 8,
+          "frameSizeX": 0.125,
+          "frameSizeY": 0.125,
+          "fps": 32,
+          "finiteEmitter": false,
+          "emitterTimeLimit": 0,
+          "sourceActions": [
+            {
+              "ratePerSecond": 2
+            }
+          ]
+        },
+        {
+          "sourceEffect": "semitone\\anomalies\\acidic\\effects\\idle\\studen_idle_bottom_shader",
+          "basename": "studen_idle_bottom_shader",
+          "unityAliases": [
+            "Idle/studen_idle_bottom_shader"
+          ],
+          "unityBindings": [
+            {
+              "path": "Idle/studen_idle_bottom_shader",
+              "driveEmission": true,
+              "eventControlled": false,
+              "canonicalDirectional": false,
+              "duplicateDirectional": false
+            }
+          ],
+          "nativeMaxParticles": 20,
+          "framed": false,
+          "animated": true,
+          "randomStartFrame": false,
+          "randomPlayback": false,
+          "frameCount": 1,
+          "frameColumns": 1,
+          "frameSizeX": 1,
+          "frameSizeY": 1,
+          "fps": 0,
+          "finiteEmitter": false,
+          "emitterTimeLimit": 0,
+          "sourceActions": [
+            {
+              "ratePerSecond": 8
+            }
+          ]
+        },
+        {
+          "sourceEffect": "semitone\\anomalies\\acidic\\effects\\idle\\studen_idle_top_heat_00",
+          "basename": "studen_idle_top_heat_00",
+          "unityAliases": [
+            "Idle/studen_idle_top_heat_00"
+          ],
+          "unityBindings": [
+            {
+              "path": "Idle/studen_idle_top_heat_00",
+              "driveEmission": true,
+              "eventControlled": false,
+              "canonicalDirectional": false,
+              "duplicateDirectional": false
+            }
+          ],
+          "nativeMaxParticles": 4,
+          "framed": false,
+          "animated": true,
+          "randomStartFrame": false,
+          "randomPlayback": true,
+          "frameCount": 1,
+          "frameColumns": 1,
+          "frameSizeX": 1,
+          "frameSizeY": 1,
+          "fps": 0,
+          "finiteEmitter": false,
+          "emitterTimeLimit": 0,
+          "sourceActions": [
+            {
+              "ratePerSecond": 2
+            }
+          ]
+        },
+        {
+          "sourceEffect": "semitone\\anomalies\\acidic\\effects\\idle\\anomaly_toxic_particle_test",
+          "basename": "anomaly_toxic_particle_test",
+          "unityAliases": [
+            "Idle/anomaly_toxic_particle_test"
+          ],
+          "unityBindings": [
+            {
+              "path": "Idle/anomaly_toxic_particle_test",
+              "driveEmission": true,
+              "eventControlled": false,
+              "canonicalDirectional": false,
+              "duplicateDirectional": false
+            }
+          ],
+          "nativeMaxParticles": 35,
+          "framed": false,
+          "animated": true,
+          "randomStartFrame": true,
+          "randomPlayback": false,
+          "frameCount": 1,
+          "frameColumns": 1,
+          "frameSizeX": 1,
+          "frameSizeY": 1,
+          "fps": 0,
+          "finiteEmitter": false,
+          "emitterTimeLimit": 0,
+          "sourceActions": [
+            {
+              "ratePerSecond": 13
+            }
+          ]
+        },
+        {
+          "sourceEffect": "semitone\\anomalies\\acidic\\effects\\idle\\studen_idle_bottom_03",
+          "basename": "studen_idle_bottom_03",
+          "unityAliases": [
+            "Idle/studen_idle_bottom_03"
+          ],
+          "unityBindings": [
+            {
+              "path": "Idle/studen_idle_bottom_03",
+              "driveEmission": true,
+              "eventControlled": false,
+              "canonicalDirectional": false,
+              "duplicateDirectional": false
+            }
+          ],
+          "nativeMaxParticles": 10,
+          "framed": true,
+          "animated": true,
+          "randomStartFrame": false,
+          "randomPlayback": false,
+          "frameCount": 64,
+          "frameColumns": 4,
+          "frameSizeX": 0.25,
+          "frameSizeY": 0.25,
+          "fps": 32,
+          "finiteEmitter": false,
+          "emitterTimeLimit": 0,
+          "sourceActions": [
+            {
+              "ratePerSecond": 8
+            }
+          ]
+        },
+        {
+          "sourceEffect": "semitone\\anomalies\\acidic\\effects\\idle\\studen_idle_bottom_20",
+          "basename": "studen_idle_bottom_20",
+          "unityAliases": [
+            "Idle/studen_idle_bottom_20"
+          ],
+          "unityBindings": [
+            {
+              "path": "Idle/studen_idle_bottom_20",
+              "driveEmission": true,
+              "eventControlled": false,
+              "canonicalDirectional": false,
+              "duplicateDirectional": false
+            }
+          ],
+          "nativeMaxParticles": 14,
+          "framed": true,
+          "animated": true,
+          "randomStartFrame": false,
+          "randomPlayback": false,
+          "frameCount": 125,
+          "frameColumns": 4,
+          "frameSizeX": 0.25,
+          "frameSizeY": 0.25,
+          "fps": 32,
+          "finiteEmitter": false,
+          "emitterTimeLimit": 0,
+          "sourceActions": [
+            {
+              "ratePerSecond": 4
+            }
+          ]
+        },
+        {
+          "sourceEffect": "semitone\\anomalies\\acidic\\effects\\idle\\studen_idle_bottom_09",
+          "basename": "studen_idle_bottom_09",
+          "unityAliases": [
+            "Idle/studen_idle_bottom_20/studen_idle_bottom_09__Birth"
+          ],
+          "unityBindings": [
+            {
+              "path": "Idle/studen_idle_bottom_20/studen_idle_bottom_09__Birth",
+              "driveEmission": false,
+              "eventControlled": true,
+              "canonicalDirectional": false,
+              "duplicateDirectional": false
+            }
+          ],
+          "nativeMaxParticles": 4,
+          "framed": true,
+          "animated": false,
+          "randomStartFrame": true,
+          "randomPlayback": false,
+          "frameCount": 4,
+          "frameColumns": 2,
+          "frameSizeX": 0.5,
+          "frameSizeY": 0.5,
+          "fps": 32,
+          "finiteEmitter": true,
+          "emitterTimeLimit": 0.1,
+          "sourceActions": [
+            {
+              "ratePerSecond": 900
+            }
+          ]
+        },
+        {
+          "sourceEffect": "semitone\\anomalies\\acidic\\effects\\idle\\studen_idle_bottom_00",
+          "basename": "studen_idle_bottom_00",
+          "unityAliases": [
+            "Idle/studen_idle_bottom_00"
+          ],
+          "unityBindings": [
+            {
+              "path": "Idle/studen_idle_bottom_00",
+              "driveEmission": true,
+              "eventControlled": false,
+              "canonicalDirectional": false,
+              "duplicateDirectional": false
+            }
+          ],
+          "nativeMaxParticles": 24,
+          "framed": false,
+          "animated": false,
+          "randomStartFrame": true,
+          "randomPlayback": false,
+          "frameCount": 1,
+          "frameColumns": 1,
+          "frameSizeX": 1,
+          "frameSizeY": 1,
+          "fps": 0,
+          "finiteEmitter": false,
+          "emitterTimeLimit": 0,
+          "sourceActions": [
+            {
+              "ratePerSecond": 8
+            }
+          ]
+        },
+        {
+          "sourceEffect": "semitone\\anomalies\\acidic\\effects\\idle\\studen_idle_bottom_12",
+          "basename": "studen_idle_bottom_12",
+          "unityAliases": [
+            "Idle/studen_idle_bottom_12"
+          ],
+          "unityBindings": [
+            {
+              "path": "Idle/studen_idle_bottom_12",
+              "driveEmission": true,
+              "eventControlled": false,
+              "canonicalDirectional": false,
+              "duplicateDirectional": false
+            }
+          ],
+          "nativeMaxParticles": 24,
+          "framed": true,
+          "animated": false,
+          "randomStartFrame": true,
+          "randomPlayback": false,
+          "frameCount": 4,
+          "frameColumns": 2,
+          "frameSizeX": 0.5,
+          "frameSizeY": 0.5,
+          "fps": 32,
+          "finiteEmitter": false,
+          "emitterTimeLimit": 0,
+          "sourceActions": [
+            {
+              "ratePerSecond": 8
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "family": "Gazirovka",
+      "prefab": "Assets/_Source/Anomalies/Gazirovka/Gazirovka.prefab",
+      "effects": [
+        {
+          "sourceEffect": "semitone\\anomalies\\acidic\\effects\\idle\\studen_idle_bottom_02",
+          "basename": "studen_idle_bottom_02",
+          "unityAliases": [
+            "Idle/studen_idle_bottom_02"
+          ],
+          "unityBindings": [
+            {
+              "path": "Idle/studen_idle_bottom_02",
+              "driveEmission": true,
+              "eventControlled": false,
+              "canonicalDirectional": false,
+              "duplicateDirectional": false
+            }
+          ],
+          "nativeMaxParticles": 12,
+          "framed": true,
+          "animated": true,
+          "randomStartFrame": true,
+          "randomPlayback": false,
+          "frameCount": 64,
+          "frameColumns": 8,
+          "frameSizeX": 0.125,
+          "frameSizeY": 0.125,
+          "fps": 32,
+          "finiteEmitter": false,
+          "emitterTimeLimit": 0,
+          "sourceActions": [
+            {
+              "ratePerSecond": 12
+            }
+          ]
+        },
+        {
+          "sourceEffect": "semitone\\anomalies\\acidic\\effects\\idle\\acidic_mine_smok",
+          "basename": "acidic_mine_smok",
+          "unityAliases": [
+            "Idle/acidic_mine_smok"
+          ],
+          "unityBindings": [
+            {
+              "path": "Idle/acidic_mine_smok",
+              "driveEmission": true,
+              "eventControlled": false,
+              "canonicalDirectional": false,
+              "duplicateDirectional": false
+            }
+          ],
+          "nativeMaxParticles": 12,
+          "framed": false,
+          "animated": false,
+          "randomStartFrame": false,
+          "randomPlayback": false,
+          "frameCount": 1,
+          "frameColumns": 1,
+          "frameSizeX": 1,
+          "frameSizeY": 1,
+          "fps": 0,
+          "finiteEmitter": false,
+          "emitterTimeLimit": 0,
+          "sourceActions": [
+            {
+              "ratePerSecond": 8
+            }
+          ]
+        },
+        {
+          "sourceEffect": "semitone\\anomalies\\acidic\\effects\\idle\\studen_idle_bottom_shader",
+          "basename": "studen_idle_bottom_shader",
+          "unityAliases": [
+            "Idle/studen_idle_bottom_shader"
+          ],
+          "unityBindings": [
+            {
+              "path": "Idle/studen_idle_bottom_shader",
+              "driveEmission": true,
+              "eventControlled": false,
+              "canonicalDirectional": false,
+              "duplicateDirectional": false
+            }
+          ],
+          "nativeMaxParticles": 20,
+          "framed": false,
+          "animated": true,
+          "randomStartFrame": false,
+          "randomPlayback": false,
+          "frameCount": 1,
+          "frameColumns": 1,
+          "frameSizeX": 1,
+          "frameSizeY": 1,
+          "fps": 0,
+          "finiteEmitter": false,
+          "emitterTimeLimit": 0,
+          "sourceActions": [
+            {
+              "ratePerSecond": 8
+            }
+          ]
+        },
+        {
+          "sourceEffect": "semitone\\anomalies\\acidic\\effects\\idle\\anomaly_toxic_particle_test_00",
+          "basename": "anomaly_toxic_particle_test_00",
+          "unityAliases": [
+            "Idle/anomaly_toxic_particle_test_00"
+          ],
+          "unityBindings": [
+            {
+              "path": "Idle/anomaly_toxic_particle_test_00",
+              "driveEmission": true,
+              "eventControlled": false,
+              "canonicalDirectional": false,
+              "duplicateDirectional": false
+            }
+          ],
+          "nativeMaxParticles": 35,
+          "framed": false,
+          "animated": true,
+          "randomStartFrame": true,
+          "randomPlayback": false,
+          "frameCount": 1,
+          "frameColumns": 1,
+          "frameSizeX": 1,
+          "frameSizeY": 1,
+          "fps": 0,
+          "finiteEmitter": false,
+          "emitterTimeLimit": 0,
+          "sourceActions": [
+            {
+              "ratePerSecond": 32
+            }
+          ]
+        },
+        {
+          "sourceEffect": "semitone\\anomalies\\acidic\\effects\\idle\\studen_idle_bottom_glow_02",
+          "basename": "studen_idle_bottom_glow_02",
+          "unityAliases": [
+            "Idle/studen_idle_bottom_glow_02__forward",
+            "Idle/studen_idle_bottom_glow_02__backward"
+          ],
+          "unityBindings": [
+            {
+              "path": "Idle/studen_idle_bottom_glow_02__forward",
+              "driveEmission": true,
+              "eventControlled": false,
+              "canonicalDirectional": true,
+              "duplicateDirectional": false
+            },
+            {
+              "path": "Idle/studen_idle_bottom_glow_02__backward",
+              "driveEmission": false,
+              "eventControlled": false,
+              "canonicalDirectional": false,
+              "duplicateDirectional": true
+            }
+          ],
+          "nativeMaxParticles": 12,
+          "framed": true,
+          "animated": true,
+          "randomStartFrame": false,
+          "randomPlayback": true,
+          "frameCount": 66,
+          "frameColumns": 6,
+          "frameSizeX": 0.166667,
+          "frameSizeY": 0.090909,
+          "fps": 24,
+          "finiteEmitter": false,
+          "emitterTimeLimit": 0,
+          "sourceActions": [
+            {
+              "ratePerSecond": 24
+            }
+          ]
+        },
+        {
+          "sourceEffect": "semitone\\anomalies\\acidic\\effects\\idle\\studen_idle_bottom_12",
+          "basename": "studen_idle_bottom_12",
+          "unityAliases": [
+            "Idle/studen_idle_bottom_12"
+          ],
+          "unityBindings": [
+            {
+              "path": "Idle/studen_idle_bottom_12",
+              "driveEmission": true,
+              "eventControlled": false,
+              "canonicalDirectional": false,
+              "duplicateDirectional": false
+            }
+          ],
+          "nativeMaxParticles": 24,
+          "framed": true,
+          "animated": false,
+          "randomStartFrame": true,
+          "randomPlayback": false,
+          "frameCount": 4,
+          "frameColumns": 2,
+          "frameSizeX": 0.5,
+          "frameSizeY": 0.5,
+          "fps": 32,
+          "finiteEmitter": false,
+          "emitterTimeLimit": 0,
+          "sourceActions": [
+            {
+              "ratePerSecond": 8
+            }
+          ]
+        },
+        {
+          "sourceEffect": "semitone\\anomalies\\acidic\\effects\\idle\\studen_idle_bottom_00",
+          "basename": "studen_idle_bottom_00",
+          "unityAliases": [
+            "Idle/studen_idle_bottom_00"
+          ],
+          "unityBindings": [
+            {
+              "path": "Idle/studen_idle_bottom_00",
+              "driveEmission": true,
+              "eventControlled": false,
+              "canonicalDirectional": false,
+              "duplicateDirectional": false
+            }
+          ],
+          "nativeMaxParticles": 24,
+          "framed": false,
+          "animated": false,
+          "randomStartFrame": true,
+          "randomPlayback": false,
+          "frameCount": 1,
+          "frameColumns": 1,
+          "frameSizeX": 1,
+          "frameSizeY": 1,
+          "fps": 0,
+          "finiteEmitter": false,
+          "emitterTimeLimit": 0,
+          "sourceActions": [
+            {
+              "ratePerSecond": 8
+            }
+          ]
+        },
+        {
+          "sourceEffect": "semitone\\anomalies\\acidic\\effects\\idle\\studen_idle_bottom_01",
+          "basename": "studen_idle_bottom_01",
+          "unityAliases": [
+            "Idle/studen_idle_bottom_01"
+          ],
+          "unityBindings": [
+            {
+              "path": "Idle/studen_idle_bottom_01",
+              "driveEmission": true,
+              "eventControlled": false,
+              "canonicalDirectional": false,
+              "duplicateDirectional": false
+            }
+          ],
+          "nativeMaxParticles": 4,
+          "framed": true,
+          "animated": false,
+          "randomStartFrame": true,
+          "randomPlayback": false,
+          "frameCount": 4,
+          "frameColumns": 2,
+          "frameSizeX": 0.5,
+          "frameSizeY": 0.5,
+          "fps": 32,
+          "finiteEmitter": false,
+          "emitterTimeLimit": 0,
+          "sourceActions": [
+            {
+              "ratePerSecond": 900
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

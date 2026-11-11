@@ -266,7 +266,9 @@ PrefabInstance:
       value: leupold
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 6571472788212844938, guid: 179974e6743f85946b493224651e2ca6, type: 3}
+    - {fileID: -105618535192313169, guid: 179974e6743f85946b493224651e2ca6, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: -9137962142385034750, guid: 179974e6743f85946b493224651e2ca6, type: 3}

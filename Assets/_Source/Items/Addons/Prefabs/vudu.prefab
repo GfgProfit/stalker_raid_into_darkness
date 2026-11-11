@@ -266,7 +266,9 @@ PrefabInstance:
       value: vudu
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: -8292060115051458879, guid: bd42d81b854e1594ebd4d9c2c16fc02e, type: 3}
+    - {fileID: 3184633722775916033, guid: bd42d81b854e1594ebd4d9c2c16fc02e, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: -9137962142385034750, guid: bd42d81b854e1594ebd4d9c2c16fc02e, type: 3}

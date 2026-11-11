@@ -10,6 +10,7 @@
         "Unity.InputSystem",
         "Inventory",
         "Inventory.UI",
+        "Inventory.IconGeneration",
         "Unity.TextMeshPro",
         "UnityEngine.UI"
     ],

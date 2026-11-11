@@ -25,6 +25,8 @@ namespace RaidIntoDarkness.Integrations.Inventory
         private const string ICON_UNSTAR = "ui_cmo_unstar";
         private const string ICON_TRASHBIN = "ui_cmo_trashbin";
         private const string ICON_UNTRASHBIN = "ui_cmo_untrashbin";
+        private const string ICON_SCOPE = "ui_cmo_scope";
+        private const string ICON_SILENCER = "ui_cmo_silencer";
         private const string TAG_DRINK = "drink";
         private const string TAG_FOOD = "food";
         private const string TAG_MEDKIT = "medkit";
@@ -52,7 +54,9 @@ namespace RaidIntoDarkness.Integrations.Inventory
                 case InventoryBuiltInActions.UNEQUIP:
                     return Style(SlotIcon(definition, ICON_BACKPACK), DEFAULT_GROUP);
                 case InventoryWeaponAttachments.DETACH_ACTION:
-                    return Style("ui_cmo_silencer", DEFAULT_GROUP);
+                    return Style(ICON_SILENCER, DEFAULT_GROUP);
+                case InventoryWeaponAttachments.DETACH_SCOPE_ACTION:
+                    return Style(ICON_SCOPE, DEFAULT_GROUP);
                 case InventoryBuiltInActions.MOVE:
                     return Style(ICON_ARROWS, DEFAULT_GROUP);
                 case InventoryBuiltInActions.SPLIT:
@@ -64,7 +68,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
                 case InventoryWindowController.JUNK_ACTION:
                     return Style(_sorting != null && _sorting.IsJunk(definition) ? ICON_UNTRASHBIN : ICON_TRASHBIN, MARK_GROUP);
                 default:
-                    return Style(action.Id.StartsWith(InventoryWeaponAttachments.ATTACH_ACTION, System.StringComparison.Ordinal) ? "ui_cmo_silencer" : null, DEFAULT_GROUP);
+                    return Style(action.Id.StartsWith(InventoryWeaponAttachments.ATTACH_ACTION, System.StringComparison.Ordinal) ? definition.GetComponent<WeaponAddonComponent>()?.Kind == WeaponAddonKind.Scope ? ICON_SCOPE : ICON_SILENCER : null, DEFAULT_GROUP);
             }
         }
 

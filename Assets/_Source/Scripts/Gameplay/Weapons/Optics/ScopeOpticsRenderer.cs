@@ -1,0 +1,522 @@
+using System.Collections.Generic;
+using Unity.Profiling;
+using UnityEngine;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.HighDefinition;
+
+namespace RaidIntoDarkness.Weapons.Optics
+{
+    [DisallowMultipleComponent]
+    [DefaultExecutionOrder(200)]
+    public sealed class ScopeOpticsRenderer : MonoBehaviour
+    {
+        private static readonly ProfilerMarker UPDATE_MARKER = new ProfilerMarker("ScopeOptics.Update");
+        private static readonly int SCOPE_AVAILABLE = Shader.PropertyToID("_ScopeAvailable");
+        private static readonly int SCOPE_PRO_STYLE = Shader.PropertyToID("_ScopeProStyle");
+        private static readonly int SCOPE_PRO_TEXTURE = Shader.PropertyToID("_RenderTexture");
+        private static readonly int SCOPE_PRO_RIGHT = Shader.PropertyToID("_ScopeRightWS");
+        private static readonly int SCOPE_PRO_UP = Shader.PropertyToID("_ScopeUpWS");
+        private static readonly int SCOPE_PRO_RETICLE_SCALE = Shader.PropertyToID("_ReticleRuntimeScale");
+        private static readonly int SCOPE_PRO_RENDER_SIZE = Shader.PropertyToID("_RenderSize");
+
+        [SerializeField] private ScopeOpticsConfig _configuration;
+        [SerializeField] private Camera _scopeCamera;
+        [SerializeField] private HDAdditionalCameraData _scopeCameraData;
+        [SerializeField] private Transform _opticalAxis;
+        [SerializeField] private Renderer _lensRenderer;
+        [SerializeField, Min(0)] private int _materialIndex;
+        [SerializeField] private Vector2 _lensHalfSizeMeters = new Vector2(0.014f, 0.014f);
+        [SerializeField] private bool _followOpticalAxisScale;
+        [SerializeField, Range(128, 2048)] private int _resolution = 768;
+        [SerializeField, Min(0.0f)] private float _magnificationResponse = 12.0f;
+        [SerializeField] private bool _disableVolumetrics;
+        [SerializeField] private bool _disableShadows;
+
+        private readonly List<Material> _materials = new List<Material>();
+
+        private Camera _viewerCamera;
+        private ScopeOpticsState _state;
+        private Camera _controlledCamera;
+        private HDAdditionalCameraData _controlledCameraData;
+        private ScopeOpticsCameraState _cameraState;
+        private GameObject _excludedRoot;
+        private ScopeCaptureExclusion _captureExclusion;
+        private Renderer _boundRenderer;
+        private int _boundMaterialIndex;
+        private MaterialPropertyBlock _propertyBlock;
+        private MaterialPropertyBlock _originalPropertyBlock;
+        private RenderTexture _target;
+        private Vector3 _eyeLocal;
+        private Vector3 _projectionEyeLocal;
+        private Vector2 _effectiveLensHalfSizeMeters;
+        private Quaternion _opticalRotation;
+        private float _lensShear;
+        private float _scopeProRenderSize = 1f;
+        private string _lastDiagnostic;
+        private bool _subscribed;
+        private bool _isRendering;
+
+        public ScopeOpticsConfig Configuration => _configuration;
+        public ScopeOpticsState State => _state;
+        public bool IsRendering => _isRendering;
+        public RenderTexture Target => _target;
+
+        private void OnEnable()
+        {
+            if (!Application.isPlaying || _subscribed)
+            {
+                return;
+            }
+
+            RenderPipelineManager.beginCameraRendering += BeginCameraRendering;
+            RenderPipelineManager.endCameraRendering += EndCameraRendering;
+            _subscribed = true;
+        }
+
+        private void LateUpdate()
+        {
+            if (!Application.isPlaying)
+            {
+                return;
+            }
+
+            using (UPDATE_MARKER.Auto())
+            {
+                if (_controlledCamera != _scopeCamera || _controlledCameraData != _scopeCameraData)
+                {
+                    ReleaseResources();
+                    OnEnable();
+                }
+
+                if (_scopeCamera != null && _scopeCamera != _viewerCamera && _scopeCameraData != null && _scopeCameraData.gameObject == _scopeCamera.gameObject)
+                {
+                    TakeCameraControl();
+                }
+
+                if (!TryValidate(out string diagnostic))
+                {
+                    SuspendCapture();
+                    ReportDiagnostic(diagnostic);
+                    return;
+                }
+
+                _lastDiagnostic = null;
+                EnsureState();
+                TakeCameraControl();
+                _state.Tick(Time.deltaTime, _magnificationResponse, _configuration);
+                if (!_state.Active || !_viewerCamera.isActiveAndEnabled || !_lensRenderer.enabled || !_lensRenderer.gameObject.activeInHierarchy)
+                {
+                    SuspendCapture();
+                    return;
+                }
+
+                if (!UpdateLensGeometry())
+                {
+                    SuspendCapture();
+                    ReportDiagnostic("ScopeOpticsRenderer requires a finite non-mirrored Optical Axis transform with nonzero lens dimensions.");
+                    return;
+                }
+
+                if (_eyeLocal.z >= -0.001f)
+                {
+                    SuspendCapture();
+                    return;
+                }
+
+                if (!EnsureTarget())
+                {
+                    SuspendCapture();
+                    ReportDiagnostic("ScopeOpticsRenderer could not create its linear HDR render target.");
+                    return;
+                }
+
+                ConfigureCapture(_projectionEyeLocal);
+                BindSurface(false);
+                _controlledCamera.enabled = true;
+            }
+        }
+
+        private void OnDisable()
+        {
+            ReleaseResources();
+        }
+
+        private void OnDestroy()
+        {
+            ReleaseResources();
+        }
+
+        public void BindViewerCamera(Camera viewer, GameObject excludedRoot = null)
+        {
+            if (_viewerCamera == viewer && _excludedRoot == excludedRoot)
+            {
+                return;
+            }
+
+            SetActive(false);
+            ReleaseResources();
+            _viewerCamera = viewer;
+            _excludedRoot = excludedRoot;
+            _captureExclusion = excludedRoot != null ? new ScopeCaptureExclusion(excludedRoot) : null;
+            if (Application.isPlaying && isActiveAndEnabled)
+            {
+                OnEnable();
+            }
+        }
+
+        public void SetActive(bool active)
+        {
+            EnsureState();
+            if (_state != null)
+            {
+                _state.SetActive(active);
+            }
+
+            if (!active)
+            {
+                SuspendCapture();
+            }
+        }
+
+        public void SetMagnification(float magnification, bool immediate = false)
+        {
+            EnsureState();
+            if (_state != null && _configuration != null)
+            {
+                _state.SetMagnification(magnification, _configuration, immediate);
+            }
+        }
+
+        public void SetCorrections(float windageMilliradians, float elevationMilliradians)
+        {
+            EnsureState();
+            if (_state != null && _configuration != null)
+            {
+                _state.SetCorrections(windageMilliradians, elevationMilliradians, _configuration);
+            }
+        }
+
+        public bool TryValidate(out string diagnostic)
+        {
+            diagnostic = null;
+            if (_configuration == null) diagnostic = "ScopeOpticsRenderer requires Configuration.";
+            else if (!_configuration.TryValidate(out diagnostic)) return false;
+            else if (_viewerCamera == null) diagnostic = "ScopeOpticsRenderer requires Viewer Camera.";
+            else if (_scopeCamera == null) diagnostic = "ScopeOpticsRenderer requires an explicitly assigned Scope Camera.";
+            else if (_scopeCamera == _viewerCamera) diagnostic = "Scope Camera and Viewer Camera must be different cameras.";
+            else if (_scopeCameraData == null || _scopeCameraData.gameObject != _scopeCamera.gameObject) diagnostic = "Scope Camera Data must be the existing HDAdditionalCameraData on Scope Camera.";
+            else if (_opticalAxis == null) diagnostic = "ScopeOpticsRenderer requires Optical Axis at the ocular plane, with +Z toward the target.";
+            else if (_opticalAxis.IsChildOf(_scopeCamera.transform) || _viewerCamera.transform.IsChildOf(_scopeCamera.transform)) diagnostic = "Scope Camera must not be an ancestor of Optical Axis or Viewer Camera.";
+            else if (_lensRenderer == null) diagnostic = "ScopeOpticsRenderer requires Lens Renderer.";
+            else if ((_scopeCamera.cullingMask & (1 << _lensRenderer.gameObject.layer)) != 0 && (_captureExclusion == null || !_captureExclusion.Contains(_lensRenderer))) diagnostic = "Scope Camera must exclude the lens through its Culling Mask or explicit HUD capture exclusion.";
+            else if (!float.IsFinite(_lensHalfSizeMeters.x) || !float.IsFinite(_lensHalfSizeMeters.y) || _lensHalfSizeMeters.x < 0.0001f || _lensHalfSizeMeters.y < 0.0001f || _lensHalfSizeMeters.x > 10.0f || _lensHalfSizeMeters.y > 10.0f) diagnostic = "Lens Half Size Meters must contain finite half extents between 0.0001 and 10 meters; they are local to Optical Axis when Follow Optical Axis Scale is enabled.";
+            else if (!float.IsFinite(_scopeCamera.nearClipPlane) || !float.IsFinite(_scopeCamera.farClipPlane) || _scopeCamera.nearClipPlane <= 0.0f || _scopeCamera.farClipPlane <= _scopeCamera.nearClipPlane) diagnostic = "Scope Camera requires finite positive Near/Far clip planes.";
+            else
+            {
+                _lensRenderer.GetSharedMaterials(_materials);
+                if (_materialIndex < 0 || _materialIndex >= _materials.Count || _materials[_materialIndex] == null || !_materials[_materialIndex].HasProperty(SCOPE_PRO_STYLE))
+                {
+                    diagnostic = "Lens Renderer Material Index must select a ScopeProLens optics material.";
+                }
+                else
+                {
+                    Material material = _materials[_materialIndex];
+                    _scopeProRenderSize = ScopeOpticsMath.FiniteClamp(material.GetFloat(SCOPE_PRO_RENDER_SIZE), 0.001f, 2f, 1f);
+                }
+            }
+
+            return diagnostic == null;
+        }
+
+        public void ReleaseResources()
+        {
+            if (_subscribed)
+            {
+                RenderPipelineManager.beginCameraRendering -= BeginCameraRendering;
+                RenderPipelineManager.endCameraRendering -= EndCameraRendering;
+                _subscribed = false;
+            }
+
+            _captureExclusion?.Restore();
+            RestoreSurface();
+            if (_controlledCamera != null)
+            {
+                _controlledCamera.enabled = false;
+                _controlledCamera.targetTexture = null;
+            }
+
+            ReleaseTarget();
+            if (_cameraState != null)
+            {
+                _cameraState.Restore(_controlledCamera, _controlledCameraData);
+            }
+
+            _cameraState = null;
+            _controlledCamera = null;
+            _controlledCameraData = null;
+            _isRendering = false;
+        }
+
+        private void EnsureState()
+        {
+            if (_configuration == null)
+            {
+                return;
+            }
+
+            if (_state == null)
+            {
+                _state = new ScopeOpticsState(_configuration);
+            }
+
+            _state.Sanitize(_configuration);
+        }
+
+        private void TakeCameraControl()
+        {
+            if (_cameraState != null)
+            {
+                return;
+            }
+
+            _controlledCamera = _scopeCamera;
+            _controlledCameraData = _scopeCameraData;
+            _cameraState = new ScopeOpticsCameraState(_controlledCamera, _controlledCameraData);
+            _controlledCamera.enabled = false;
+        }
+
+        private bool UpdateLensGeometry()
+        {
+            _effectiveLensHalfSizeMeters = _lensHalfSizeMeters;
+            _opticalRotation = _opticalAxis.rotation;
+            _eyeLocal = Quaternion.Inverse(_opticalRotation) * (_viewerCamera.transform.position - _opticalAxis.position);
+            _projectionEyeLocal = _eyeLocal;
+            _lensShear = 0f;
+            if (!_followOpticalAxisScale)
+            {
+                return true;
+            }
+
+            if (!ScopeLensGeometry.TryCreate(_opticalAxis.localToWorldMatrix, _viewerCamera.transform.position, _lensHalfSizeMeters, out ScopeLensGeometry geometry))
+            {
+                return false;
+            }
+
+            _effectiveLensHalfSizeMeters = geometry.HalfSizeMeters;
+            _opticalRotation = geometry.Rotation;
+            _eyeLocal = geometry.EyeLocal;
+            _projectionEyeLocal = geometry.ProjectionEyeLocal;
+            _lensShear = geometry.Shear;
+            return true;
+        }
+
+        private bool EnsureTarget()
+        {
+            int longestSide = Mathf.Clamp(_resolution, 128, 2048);
+            float aspect = _effectiveLensHalfSizeMeters.x / _effectiveLensHalfSizeMeters.y;
+            int width = aspect >= 1.0f ? longestSide : Mathf.Max(1, Mathf.RoundToInt(longestSide * aspect));
+            int height = aspect >= 1.0f ? Mathf.Max(1, Mathf.RoundToInt(longestSide / aspect)) : longestSide;
+            if (_target != null && _target.width == width && _target.height == height && _target.IsCreated())
+            {
+                return true;
+            }
+
+            ReleaseTarget();
+            _target = new RenderTexture(width, height, 24, RenderTextureFormat.ARGBHalf, RenderTextureReadWrite.Linear);
+            _target.name = "Scope Optics Linear HDR";
+            _target.hideFlags = HideFlags.HideAndDontSave;
+            _target.filterMode = FilterMode.Bilinear;
+            _target.wrapMode = TextureWrapMode.Clamp;
+            _target.useMipMap = false;
+            _target.autoGenerateMips = false;
+            _target.antiAliasing = 1;
+            _target.useDynamicScale = false;
+            return _target.Create();
+        }
+
+        private void ConfigureCapture(Vector3 eyeLocal)
+        {
+            _controlledCamera.enabled = false;
+            _controlledCamera.targetTexture = _target;
+            _controlledCamera.allowHDR = true;
+            _controlledCamera.allowMSAA = false;
+            _controlledCamera.allowDynamicResolution = false;
+            _controlledCamera.orthographic = false;
+            _controlledCamera.rect = new Rect(0.0f, 0.0f, 1.0f, 1.0f);
+            _controlledCamera.aspect = _effectiveLensHalfSizeMeters.x / _effectiveLensHalfSizeMeters.y;
+            _controlledCamera.depth = _viewerCamera.depth - 1.0f;
+            Quaternion correction = Quaternion.Euler(-_state.ElevationMilliradians * 0.001f * Mathf.Rad2Deg, _state.WindageMilliradians * 0.001f * Mathf.Rad2Deg, 0.0f);
+            Quaternion rotation = _opticalRotation * correction;
+            _controlledCamera.transform.SetPositionAndRotation(_viewerCamera.transform.position, rotation);
+            if (_followOpticalAxisScale)
+            {
+                _controlledCamera.worldToCameraMatrix = Matrix4x4.Scale(new Vector3(1f, 1f, -1f)) * Matrix4x4.TRS(_viewerCamera.transform.position, rotation, Vector3.one).inverse;
+            }
+            else
+            {
+                _controlledCamera.ResetWorldToCameraMatrix();
+            }
+            Vector3 projectionEye = new Vector3(0f, 0f, eyeLocal.z);
+            Matrix4x4 projection = ScopeOpticsMath.BuildProjection(_configuration, _state.Magnification, _effectiveLensHalfSizeMeters, projectionEye, _controlledCamera.nearClipPlane, _controlledCamera.farClipPlane);
+            if (_configuration.ProjectionMode != ScopeProjectionMode.CalibratedFieldOfView)
+            {
+                Vector2 projectionScale = ScopeProProjection.GetCaptureProjectionScale(_effectiveLensHalfSizeMeters, -eyeLocal.z, _scopeProRenderSize);
+                projection.m00 *= projectionScale.x;
+                projection.m11 *= projectionScale.y;
+            }
+
+            projection.m01 = -_lensShear * projection.m00;
+            _controlledCamera.fieldOfView = 2f * Mathf.Atan(1f / projection.m11) * Mathf.Rad2Deg;
+            _controlledCamera.projectionMatrix = projection;
+            _controlledCamera.ResetCullingMatrix();
+            _controlledCameraData.customRenderingSettings = true;
+            _controlledCameraData.volumeAnchorOverride = _viewerCamera.transform;
+            _controlledCameraData.allowDynamicResolution = false;
+            _controlledCameraData.xrRendering = false;
+            _controlledCameraData.fullscreenPassthrough = false;
+            _controlledCameraData.clearDepth = true;
+            _controlledCameraData.dithering = false;
+            _controlledCameraData.antialiasing = HDAdditionalCameraData.AntialiasingMode.None;
+            _controlledCameraData.flipYMode = HDAdditionalCameraData.FlipYMode.Automatic;
+            SetFrameSetting(FrameSettingsField.Postprocess, false);
+            SetFrameSetting(FrameSettingsField.ExposureControl, false);
+            SetFrameSetting(FrameSettingsField.Antialiasing, false);
+            if (_disableVolumetrics)
+            {
+                SetFrameSetting(FrameSettingsField.Volumetrics, false);
+            }
+            else
+            {
+                RestoreFrameSetting(FrameSettingsField.Volumetrics);
+            }
+
+            if (_disableShadows)
+            {
+                SetFrameSetting(FrameSettingsField.ShadowMaps, false);
+            }
+            else
+            {
+                RestoreFrameSetting(FrameSettingsField.ShadowMaps);
+            }
+        }
+
+        private void SetFrameSetting(FrameSettingsField field, bool enabled)
+        {
+            _controlledCameraData.renderingPathCustomFrameSettings.SetEnabled(field, enabled);
+            _controlledCameraData.renderingPathCustomFrameSettingsOverrideMask.mask[(uint)field] = true;
+        }
+
+        private void RestoreFrameSetting(FrameSettingsField field)
+        {
+            _controlledCameraData.renderingPathCustomFrameSettings.SetEnabled(field, _cameraState.FrameSettings.IsEnabled(field));
+            _controlledCameraData.renderingPathCustomFrameSettingsOverrideMask.mask[(uint)field] = _cameraState.FrameSettingsMask.mask[(uint)field];
+        }
+
+        private void BeginCameraRendering(ScriptableRenderContext context, Camera camera)
+        {
+            if (camera == _controlledCamera && camera != null && camera.enabled && _state != null && _state.Active)
+            {
+                _captureExclusion?.Hide();
+            }
+            else
+            {
+                _captureExclusion?.Restore();
+            }
+        }
+
+        private void EndCameraRendering(ScriptableRenderContext context, Camera camera)
+        {
+            _captureExclusion?.Restore();
+            if (camera == _controlledCamera && camera != null && camera.enabled && _target != null && _target.IsCreated() && _state != null && _state.Active)
+            {
+                BindSurface(true);
+            }
+        }
+
+        private void BindSurface(bool available)
+        {
+            if (_configuration == null || _state == null || _lensRenderer == null)
+            {
+                _isRendering = false;
+                return;
+            }
+
+            if (_boundRenderer != _lensRenderer || _boundMaterialIndex != _materialIndex)
+            {
+                RestoreSurface();
+                _boundRenderer = _lensRenderer;
+                _boundMaterialIndex = _materialIndex;
+                _originalPropertyBlock ??= new MaterialPropertyBlock();
+                _boundRenderer.GetPropertyBlock(_originalPropertyBlock, _boundMaterialIndex);
+            }
+
+            _propertyBlock ??= new MaterialPropertyBlock();
+            _boundRenderer.GetPropertyBlock(_propertyBlock, _boundMaterialIndex);
+            _propertyBlock.SetFloat(SCOPE_AVAILABLE, available ? 1.0f : 0.0f);
+            _propertyBlock.SetTexture(SCOPE_PRO_TEXTURE, _target != null ? _target : Texture2D.blackTexture);
+            _propertyBlock.SetVector(SCOPE_PRO_RIGHT, _opticalRotation * Vector3.right);
+            _propertyBlock.SetVector(SCOPE_PRO_UP, _opticalRotation * Vector3.up);
+            float scale = ScopeOpticsMath.GetReticleScale(_configuration, _state.Magnification, _effectiveLensHalfSizeMeters.y, Mathf.Max(0.001f, -_eyeLocal.z));
+            _propertyBlock.SetFloat(SCOPE_PRO_RETICLE_SCALE, scale);
+            _boundRenderer.SetPropertyBlock(_propertyBlock, _boundMaterialIndex);
+            _isRendering = available;
+        }
+
+        private void RestoreSurface()
+        {
+            if (_boundRenderer != null)
+            {
+                _boundRenderer.SetPropertyBlock(_originalPropertyBlock, _boundMaterialIndex);
+            }
+
+            _boundRenderer = null;
+            _isRendering = false;
+        }
+
+        private void SuspendCapture()
+        {
+            _captureExclusion?.Restore();
+            if (_controlledCamera != null)
+            {
+                _controlledCamera.enabled = false;
+            }
+
+            if (_boundRenderer != null && _propertyBlock != null)
+            {
+                _boundRenderer.GetPropertyBlock(_propertyBlock, _boundMaterialIndex);
+                _propertyBlock.SetFloat(SCOPE_AVAILABLE, 0.0f);
+                _boundRenderer.SetPropertyBlock(_propertyBlock, _boundMaterialIndex);
+            }
+
+            _isRendering = false;
+        }
+
+        private void ReleaseTarget()
+        {
+            if (_target == null)
+            {
+                return;
+            }
+
+            if (_controlledCamera != null && _controlledCamera.targetTexture == _target)
+            {
+                _controlledCamera.targetTexture = null;
+            }
+
+            _target.Release();
+            CoreUtils.Destroy(_target);
+            _target = null;
+        }
+
+        private void ReportDiagnostic(string diagnostic)
+        {
+            if (_lastDiagnostic == diagnostic)
+            {
+                return;
+            }
+
+            _lastDiagnostic = diagnostic;
+            Debug.LogWarning(diagnostic, this);
+        }
+    }
+}

@@ -266,7 +266,8 @@ PrefabInstance:
       value: rakurs
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: -2450626079478768543, guid: c60e7675f3082534c869cea0189c6197, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: -9137962142385034750, guid: c60e7675f3082534c869cea0189c6197, type: 3}

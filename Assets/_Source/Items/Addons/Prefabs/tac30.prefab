@@ -266,7 +266,9 @@ PrefabInstance:
       value: tac30
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 4633516876120667648, guid: d8bf494081306964db9fac7aa8426b0c, type: 3}
+    - {fileID: -5888961116525582323, guid: d8bf494081306964db9fac7aa8426b0c, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: -9137962142385034750, guid: d8bf494081306964db9fac7aa8426b0c, type: 3}

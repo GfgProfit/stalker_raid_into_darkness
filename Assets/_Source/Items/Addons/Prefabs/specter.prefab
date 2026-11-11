@@ -266,7 +266,9 @@ PrefabInstance:
       value: specter
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 5997143681291363419, guid: 7c75cdfadd9c1c8459bcc6910d050c88, type: 3}
+    - {fileID: -6795017188388179834, guid: 7c75cdfadd9c1c8459bcc6910d050c88, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: -9137962142385034750, guid: 7c75cdfadd9c1c8459bcc6910d050c88, type: 3}

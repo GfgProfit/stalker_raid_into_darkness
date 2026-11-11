@@ -266,7 +266,10 @@ PrefabInstance:
       value: razorhd
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: -6344719811345169641, guid: b0ebfb3115d37cc4fa9f7c9696ce806c, type: 3}
+    - {fileID: 1867588057910387522, guid: b0ebfb3115d37cc4fa9f7c9696ce806c, type: 3}
+    - {fileID: -7059128839771322180, guid: b0ebfb3115d37cc4fa9f7c9696ce806c, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: -9137962142385034750, guid: b0ebfb3115d37cc4fa9f7c9696ce806c, type: 3}

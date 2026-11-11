@@ -266,7 +266,10 @@ PrefabInstance:
       value: march_f_shorty_alt
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 1843603325127623344, guid: a94b26e96a37320498d5e160ff0663ee, type: 3}
+    - {fileID: -2467239881896467714, guid: a94b26e96a37320498d5e160ff0663ee, type: 3}
+    - {fileID: 8335090653531944641, guid: a94b26e96a37320498d5e160ff0663ee, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: -9137962142385034750, guid: a94b26e96a37320498d5e160ff0663ee, type: 3}

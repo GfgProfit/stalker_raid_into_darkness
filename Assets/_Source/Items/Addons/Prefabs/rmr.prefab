@@ -266,7 +266,8 @@ PrefabInstance:
       value: rmr
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: -2627990372321112801, guid: 4f6808e5a74a83c40a0f439f429b357e, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: -9137962142385034750, guid: 4f6808e5a74a83c40a0f439f429b357e, type: 3}

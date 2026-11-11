@@ -37,6 +37,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
         [SerializeField] private string _silencerSection;
         [SerializeField] private WeaponAddonStatus _scopeStatus;
         [SerializeField] private string[] _scopes = Array.Empty<string>();
+        [SerializeField] private ItemDefinition[] _compatibleScopes = Array.Empty<ItemDefinition>();
         [SerializeField] private WeaponAddonStatus _grenadeLauncherStatus;
         [SerializeField] private string _grenadeLauncherSection;
 
@@ -64,12 +65,13 @@ namespace RaidIntoDarkness.Integrations.Inventory
         public string SilencerSection => _silencerSection ?? string.Empty;
         public WeaponAddonStatus ScopeStatus => _scopeStatus;
         public string[] Scopes => _scopes ?? Array.Empty<string>();
+        public IReadOnlyList<ItemDefinition> CompatibleScopes => _compatibleScopes ?? Array.Empty<ItemDefinition>();
         public WeaponAddonStatus GrenadeLauncherStatus => _grenadeLauncherStatus;
         public string GrenadeLauncherSection => _grenadeLauncherSection ?? string.Empty;
 
         public override float GetAdditionalWeight(ItemInstance item, IItemDefinitionResolver resolver)
         {
-            float silencerWeight = GetSilencer(item, resolver)?.Weight ?? 0f;
+            float silencerWeight = (GetSilencer(item, resolver)?.Weight ?? 0f) + (GetScope(item, resolver)?.Weight ?? 0f);
             string section = item.GetState(InventoryWeaponAmmoSource.AMMO_SECTION_STATE);
 
             if (SupportsAmmo(section) == false || int.TryParse(item.GetState(InventoryWeaponAmmoSource.MAGAZINE_STATE), NumberStyles.Integer, CultureInfo.InvariantCulture, out int magazine) == false || resolver is not ItemDatabase database)
@@ -109,6 +111,32 @@ namespace RaidIntoDarkness.Integrations.Inventory
         {
             string id = item.GetState(InventoryWeaponAttachments.SILENCER_STATE);
             return resolver != null && string.IsNullOrEmpty(id) == false && resolver.TryResolve(id, out ItemDefinition definition) && SupportsSilencer(definition) ? definition : null;
+        }
+
+        public bool SupportsScope(ItemDefinition definition)
+        {
+            WeaponAddonComponent addon = definition != null ? definition.GetComponent<WeaponAddonComponent>() : null;
+
+            if (addon == null || addon.Kind != WeaponAddonKind.Scope)
+            {
+                return false;
+            }
+
+            foreach (ItemDefinition compatible in CompatibleScopes)
+            {
+                if (compatible != null && compatible == definition)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public ItemDefinition GetScope(ItemInstance item, IItemDefinitionResolver resolver)
+        {
+            string id = item?.GetState(InventoryWeaponAttachments.SCOPE_STATE);
+            return resolver != null && string.IsNullOrEmpty(id) == false && resolver.TryResolve(id, out ItemDefinition definition) && SupportsScope(definition) ? definition : null;
         }
 
         public bool SupportsAmmo(string section)

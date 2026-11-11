@@ -266,7 +266,8 @@ PrefabInstance:
       value: docter
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 2792034893407931175, guid: 188e2ec3107243a448e257fb1589fe84, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: -9137962142385034750, guid: 188e2ec3107243a448e257fb1589fe84, type: 3}

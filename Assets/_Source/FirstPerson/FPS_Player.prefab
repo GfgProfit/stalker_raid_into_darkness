@@ -1839,7 +1839,7 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: 0.05
+  near clip plane: 0.01
   far clip plane: 1000
   field of view: 95
   orthographic: 0
@@ -2169,6 +2169,7 @@ GameObject:
   - component: {fileID: 1402223458717569375}
   - component: {fileID: 9082889536266957315}
   - component: {fileID: 6816063066189536554}
+  - component: {fileID: 3751062407146555283}
   m_Layer: 0
   m_Name: FPS_Player
   m_TagString: Untagged
@@ -3180,3 +3181,23 @@ MonoBehaviour:
   m_EditorClassIdentifier: RaidIntoDarkness.Player::RaidIntoDarkness.Player.AnomalyDamageReceiver
   _condition: {fileID: 5917588425433027955}
   _protectionSources: []
+  _authoritySource: {fileID: 0}
+--- !u!114 &3751062407146555283
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9095947929063771272}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a0b0eb698c4734f80061b93ab7063f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: RaidIntoDarkness.Weapons::WeaponSway
+  _swayAmount: 0.1
+  _maxSwayX: 2
+  _maxSwayY: 1.5
+  _smoothTime: 15
+  _swayOffset: 1
+  _playerInput: {fileID: 5296497837016955254}
+  _cameraController: {fileID: 4431073648799198191}

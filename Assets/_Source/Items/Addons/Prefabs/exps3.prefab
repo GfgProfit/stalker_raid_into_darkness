@@ -266,7 +266,8 @@ PrefabInstance:
       value: exps3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: -8169138149036799604, guid: 2de87574aafde5240a8bb8f2546e7d21, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: -9137962142385034750, guid: 2de87574aafde5240a8bb8f2546e7d21, type: 3}

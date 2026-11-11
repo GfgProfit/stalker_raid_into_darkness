@@ -1,0 +1,24 @@
+{
+    "name": "RaidIntoDarkness.Weapons.Optics.Editor",
+    "rootNamespace": "RaidIntoDarkness.Weapons.Optics.Editor",
+    "references": [
+        "RaidIntoDarkness.Weapons.Optics",
+        "RaidIntoDarkness.Weapons",
+        "RaidIntoDarkness.FirstPerson",
+        "RaidIntoDarkness.Player",
+        "XRay.Importer.Runtime",
+        "Unity.RenderPipelines.Core.Runtime",
+        "Unity.RenderPipelines.HighDefinition.Runtime"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

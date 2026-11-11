@@ -1,0 +1,19 @@
+{
+    "disabledTools": [],
+    "defaultGateMode": "enforce",
+    "autoStart": true,
+    "verboseActivityLog": false,
+    "authMode": "none",
+    "csharpDenyPatterns": [],
+    "menuDenyPatterns": [],
+    "projectCommandDenyPatterns": [],
+    "bindAddress": "127.0.0.1",
+    "auditLogEnabled": false,
+    "verifyCacheTtlSeconds": 60,
+    "editorSettleCapMs": 5000,
+    "restartSettleCapMs": 60000,
+    "fairQueueEnabled": true,
+    "fairQueueReadsPerFrame": 5,
+    "autoSaveDirtyScenes": false,
+    "batchExecuteMaxCommands": 25
+}

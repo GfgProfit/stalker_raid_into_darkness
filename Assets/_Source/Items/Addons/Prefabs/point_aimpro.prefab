@@ -266,7 +266,8 @@ PrefabInstance:
       value: aimpoint_pro
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 3767664292581121199, guid: d2efbf0de566d5c499d86da5107f0f82, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: -9137962142385034750, guid: d2efbf0de566d5c499d86da5107f0f82, type: 3}

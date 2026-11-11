@@ -266,7 +266,10 @@ PrefabInstance:
       value: bravo4
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: -4649014117328309471, guid: b01de2cfd9d80eb4abef7fb18fc08b4f, type: 3}
+    - {fileID: -4479635376238593491, guid: b01de2cfd9d80eb4abef7fb18fc08b4f, type: 3}
+    - {fileID: 7127478280671463928, guid: b01de2cfd9d80eb4abef7fb18fc08b4f, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: -9137962142385034750, guid: b01de2cfd9d80eb4abef7fb18fc08b4f, type: 3}

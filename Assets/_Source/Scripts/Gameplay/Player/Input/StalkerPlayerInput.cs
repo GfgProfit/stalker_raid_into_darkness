@@ -35,6 +35,7 @@ namespace RaidIntoDarkness.Player
         private InputAction _previousOutfit;
 
         public Vector2 LookDelta => _look != null ? _look.ReadValue<Vector2>() : Vector2.zero;
+        public float ScopeZoomScroll => isActiveAndEnabled && Cursor.lockState == CursorLockMode.Locked && Mouse.current != null ? Mouse.current.scroll.ReadValue().y : 0f;
         public bool ReleaseCursorPressed => WasPressed(_releaseCursor);
         public bool CaptureCursorPressed => WasPressed(_captureCursor);
         public bool FirePressed => WasPressed(_fire);

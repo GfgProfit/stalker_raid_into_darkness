@@ -24,6 +24,8 @@ namespace RaidIntoDarkness.Integrations.Inventory
         [SerializeField] private float _camDispersionFactor = 1f;
         [SerializeField] private float _camDispersionIncrementFactor = 1f;
         [SerializeField] private float _scopeZoomFactor;
+        [SerializeField] private bool _overrideAimOffsetPosition;
+        [SerializeField] private Vector3 _aimOffsetPosition;
         [SerializeField] private AudioClip _attachSound;
         [SerializeField] private AudioClip _detachSound;
 
@@ -37,6 +39,8 @@ namespace RaidIntoDarkness.Integrations.Inventory
         public float CamDispersionFactor => _camDispersionFactor;
         public float CamDispersionIncrementFactor => _camDispersionIncrementFactor;
         public float ScopeZoomFactor => _scopeZoomFactor;
+        public bool OverrideAimOffsetPosition => _overrideAimOffsetPosition;
+        public Vector3 AimOffsetPosition => _aimOffsetPosition;
         public AudioClip AttachSound => _attachSound;
         public AudioClip DetachSound => _detachSound;
     }

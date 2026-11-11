@@ -11,9 +11,11 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
     {
         private const string SCENE = "OutdoorsScene";
 
+        protected virtual string SceneName => SCENE;
+
         public override void Setup()
         {
-            DisposeSceneInput();
+            DisposeSceneInput(SceneName);
             base.Setup();
         }
 
@@ -21,7 +23,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
         {
             try
             {
-                DisposeSceneInput();
+                DisposeSceneInput(SceneName);
             }
             finally
             {
@@ -29,9 +31,9 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             }
         }
 
-        private static void DisposeSceneInput()
+        private static void DisposeSceneInput(string sceneName)
         {
-            Scene scene = SceneManager.GetSceneByName(SCENE);
+            Scene scene = SceneManager.GetSceneByName(sceneName);
             if (!scene.IsValid() || !scene.isLoaded)
             {
                 return;

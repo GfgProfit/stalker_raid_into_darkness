@@ -266,7 +266,10 @@ PrefabInstance:
       value: triji
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 7446786133826109831, guid: 13238a01adc89b54dbc37493c3e01950, type: 3}
+    - {fileID: 1664597093129666920, guid: 13238a01adc89b54dbc37493c3e01950, type: 3}
+    - {fileID: -4458771003622900778, guid: 13238a01adc89b54dbc37493c3e01950, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: -9137962142385034750, guid: 13238a01adc89b54dbc37493c3e01950, type: 3}

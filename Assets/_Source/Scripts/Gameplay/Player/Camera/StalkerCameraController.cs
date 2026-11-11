@@ -22,6 +22,7 @@ namespace RaidIntoDarkness.Player
         private float _ladderYaw;
 
         public Transform CameraRoot => _cameraRoot;
+        public Transform HudRoot => _hudRoot;
         public Camera Camera => _camera;
         public StalkerCameraRecoil Recoil => _recoil;
         public float YawDegrees => _yaw * Mathf.Rad2Deg;

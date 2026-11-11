@@ -39,6 +39,7 @@ namespace RaidIntoDarkness.Weapons
 
         private readonly Slot[] _slots = { new Slot(), new Slot() };
         private readonly Dictionary<object, WeaponState> _weaponStates = new Dictionary<object, WeaponState>();
+        private readonly List<MonoBehaviour> _opticsBindings = new List<MonoBehaviour>();
         private IFirstPersonWeaponAmmoSource _ammoSource;
         private FirstPersonWeaponGraph _graph;
         private FirstPersonWeaponEffects _effects;
@@ -76,6 +77,7 @@ namespace RaidIntoDarkness.Weapons
 
         public event Action<int, int> AmmoChanged;
         public event Action<FirstPersonWeaponState> StateChanged;
+        public event Action<GameObject> VisualCreated;
 
         public FirstPersonWeaponState State { get; private set; }
         public int ActiveSlot { get; private set; } = -1;
@@ -87,7 +89,10 @@ namespace RaidIntoDarkness.Weapons
         public int FireMode => ActiveWeapon != null ? ActiveWeapon.FireModes[Mathf.Clamp(_slots[ActiveSlot].WeaponState.FireModeIndex, 0, ActiveWeapon.FireModes.Count - 1)] : 0;
         public bool IsAiming => _aiming;
         public float AimFactor => _aim;
+        public Vector3 AimOffsetPosition => ActiveWeapon != null ? _slots[ActiveSlot].AimOffsetPosition ?? ActiveWeapon.AimOffsetPosition : Vector3.zero;
         public GameObject Model => _model;
+        public GameObject HandsModel => _boundHands;
+        public float ScopeZoomScroll => _player != null && !_player.GameplayInputBlocked && _input != null ? _input.ScopeZoomScroll : 0f;
         public Transform Muzzle => _muzzle;
         public bool IsSilenced => ActiveSlot >= 0 && _slots[ActiveSlot].Silenced;
         public FirstPersonWeaponMotionKind CurrentMotion { get; private set; }
@@ -132,6 +137,14 @@ namespace RaidIntoDarkness.Weapons
                 }
 
                 ApplySilencerVisual();
+            }
+        }
+
+        public void SetSlotAimOffset(int slot, Vector3? position)
+        {
+            if (IsSlot(slot))
+            {
+                _slots[slot].AimOffsetPosition = position;
             }
         }
 
@@ -1018,7 +1031,8 @@ namespace RaidIntoDarkness.Weapons
         {
             if (_player != null && _player.CameraController != null)
             {
-                _player.CameraController.SetWeaponZoom(Mathf.Lerp(1f, asset != null ? asset.AimZoom : 1f, _aim));
+                float zoom = asset != null ? asset.AimZoom : 1f;
+                _player.CameraController.SetWeaponZoom(Mathf.Lerp(1f, zoom, _aim));
             }
 
             float target = asset != null ? asset.AimCameraRoll * 4f * _aim * (1f - _aim) * (_aiming ? 1f : -1f) : 0f;
@@ -1062,7 +1076,7 @@ namespace RaidIntoDarkness.Weapons
             }
 
             Quaternion aimRotation = FirstPersonWeaponAsset.ToAimRotation(asset.AimOffsetRotation * _aim);
-            Vector3 position = asset.AimOffsetPosition * _aim + aimRotation * asset.HandsPosition;
+            Vector3 position = AimOffsetPosition * _aim + aimRotation * asset.HandsPosition;
             Quaternion rotation = aimRotation * asset.HandsRotation;
             if (EvaluateAimBlend(asset, out Vector3 blendPosition, out Quaternion blendRotation))
             {
@@ -1150,10 +1164,25 @@ namespace RaidIntoDarkness.Weapons
 
             _modelRoot = FindModelRoot(_model);
             ApplySilencerVisual();
+            VisualCreated?.Invoke(_model);
+            BindOptics();
             Animator handsAnimator = GetAnimator(hands);
             Animator weaponAnimator = GetAnimator(_model);
             _graph = new FirstPersonWeaponGraph($"{name}.FirstPersonWeapon", handsAnimator, weaponAnimator, FirstPersonWeaponGraph.CreateMask(hands.transform, asset.OverlayBones));
             _hasLoop = false;
+        }
+
+        private void BindOptics()
+        {
+            Camera viewer = _player != null && _player.CameraController != null ? _player.CameraController.Camera : null;
+            foreach (MonoBehaviour behaviour in _model.GetComponentsInChildren<MonoBehaviour>(true))
+            {
+                if (behaviour != null && behaviour is IFirstPersonWeaponOptics optics)
+                {
+                    _opticsBindings.Add(behaviour);
+                    optics.Bind(this, viewer);
+                }
+            }
         }
 
         private void ApplySilencerVisual()
@@ -1190,6 +1219,15 @@ namespace RaidIntoDarkness.Weapons
 
         private void DestroyVisuals(bool releaseHands)
         {
+            foreach (MonoBehaviour behaviour in _opticsBindings)
+            {
+                if (behaviour != null && behaviour is IFirstPersonWeaponOptics optics)
+                {
+                    optics.Bind(null, null);
+                }
+            }
+
+            _opticsBindings.Clear();
             if (_graph != null)
             {
                 _graph.Destroy();
@@ -1336,6 +1374,7 @@ namespace RaidIntoDarkness.Weapons
             public object Key { get; set; }
             public WeaponState WeaponState { get; set; }
             public bool Silenced { get; set; }
+            public Vector3? AimOffsetPosition { get; set; }
         }
 
         private sealed class WeaponState

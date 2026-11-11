@@ -48,16 +48,9 @@ namespace Inventory.UI
                 return _highlight;
             }
 
-            RectTransform iconRect = _icon.rectTransform;
-            RectTransform rect = InventoryUIFactory.CreateRect(HIGHLIGHT_NAME, iconRect.parent);
-            rect.anchorMin = iconRect.anchorMin;
-            rect.anchorMax = iconRect.anchorMax;
-            rect.pivot = iconRect.pivot;
-            rect.sizeDelta = iconRect.sizeDelta;
-            rect.anchoredPosition = iconRect.anchoredPosition;
-            rect.localRotation = iconRect.localRotation;
-            rect.localScale = iconRect.localScale;
-            rect.SetSiblingIndex(iconRect.GetSiblingIndex());
+            RectTransform rect = InventoryUIFactory.CreateRect(HIGHLIGHT_NAME, transform);
+            InventoryUIFactory.SetLayout(rect, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
+            rect.SetAsFirstSibling();
             _highlight = rect.gameObject.AddComponent<Image>();
             _highlight.raycastTarget = false;
             _highlight.enabled = false;

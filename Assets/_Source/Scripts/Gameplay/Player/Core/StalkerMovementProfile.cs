@@ -29,7 +29,7 @@ namespace RaidIntoDarkness.Player
         [SerializeField] private float _mass = 94.0f;
         [SerializeField] private float _crashSpeedMin = 15.0f;
         [SerializeField] private float _crashSpeedMax = 41.0f;
-        [SerializeField] private float _maxItemMass = 50.0f;
+        [SerializeField] private float _maxItemMass = 16.0f;
         [SerializeField] private string _material = "creatures\\actor";
 
         public float WalkAccel => _walkAccel;
@@ -154,7 +154,7 @@ namespace RaidIntoDarkness.Player
         [SerializeField] private float _cantSprintPowerBegin = 0.08f;
         [SerializeField] private float _cantSprintPowerEnd = 0.1f;
         [SerializeField] private float _maxPowerLeakSpeed = 0.000001f;
-        [SerializeField] private float _maxWalkWeight = 70.0f;
+        [SerializeField] private float _maxWalkWeight = 24.0f;
         [SerializeField] private float _satietyPowerV = 0.00325f;
         [Tooltip("[alife] time_factor: condition deltas use game time.")]
         [SerializeField] private float _timeFactor = 6.0f;

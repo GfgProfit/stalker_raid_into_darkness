@@ -35,7 +35,7 @@ MonoBehaviour:
     _mass: 94
     _crashSpeedMin: 15
     _crashSpeedMax: 41
-    _maxItemMass: 50
+    _maxItemMass: 16
     _material: creatures\actor
   _engine:
     _pullForce: 25
@@ -85,7 +85,7 @@ MonoBehaviour:
     _cantSprintPowerBegin: 0.08
     _cantSprintPowerEnd: 0.1
     _maxPowerLeakSpeed: 0.000001
-    _maxWalkWeight: 70
+    _maxWalkWeight: 24
     _satietyPowerV: 0.00325
     _timeFactor: 6
     _powerLossBias: 0.4

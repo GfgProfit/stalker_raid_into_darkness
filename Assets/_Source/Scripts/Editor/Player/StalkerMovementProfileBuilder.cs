@@ -96,7 +96,7 @@ namespace RaidIntoDarkness.Player.Editor
             ReadActor(system, writer);
             ReadCondition(system, writer);
             ReadCamera(system, writer);
-            ReadUserLtx(plan, writer);
+            ReadUserLtx(index, plan, writer);
             ReadMaterials(index, writer);
             ReadOptions(index, writer);
             ReadSwmScript(index, writer);
@@ -157,7 +157,7 @@ namespace RaidIntoDarkness.Player.Editor
             writer.Vector2("_camera._ladderYawLimits", system.GetValue("actor_ladder_cam", "lim_yaw"), "[actor_ladder_cam] lim_yaw");
         }
 
-        private static void ReadUserLtx(XRaySourcePlan plan, Writer writer)
+        private static void ReadUserLtx(XRayAssetIndex index, XRaySourcePlan plan, Writer writer)
         {
             string gamePath = plan.Installation != null ? plan.Installation.GamePath : null;
             if (string.IsNullOrEmpty(gamePath) && !string.IsNullOrEmpty(plan.Configuration.BaseAnomalyFolder))
@@ -180,6 +180,26 @@ namespace RaidIntoDarkness.Player.Editor
                 {
                     values[line.Substring(0, space).Trim()] = line.Substring(space + 1).Trim();
                 }
+            }
+
+            string difficultySection = Get(values, "g_game_difficulty") switch
+            {
+                "gd_novice" => "gdiff_1",
+                "gd_stalker" => "gdiff_2",
+                "gd_veteran" => "gdiff_3",
+                "gd_master" => "gdiff_4",
+                _ => null
+            };
+            XRayLtxDatabase difficulty = XRayLtxDatabase.LoadFile(index, "configs/plugins/difficulty.ltx");
+            if (difficultySection != null && TryFloat(difficulty.GetValue(difficultySection, "max_weight"), out float carryWeight) && carryWeight > 0f)
+            {
+                string weightOrigin = difficulty.GetOrigin(difficultySection) + " [" + difficultySection + "] max_weight";
+                writer.Float("_actor._maxItemMass", carryWeight.ToString(CultureInfo.InvariantCulture), weightOrigin);
+                writer.Float("_condition._maxWalkWeight", (carryWeight + Mathf.Ceil(carryWeight / 5f) * 2f).ToString(CultureInfo.InvariantCulture), "game_difficulties.script set_actor_weight: " + weightOrigin);
+            }
+            else
+            {
+                writer.Warning("Gameplay difficulty max_weight not found; carry limits keep actor.ltx values.");
             }
 
             string origin = "user.ltx ";

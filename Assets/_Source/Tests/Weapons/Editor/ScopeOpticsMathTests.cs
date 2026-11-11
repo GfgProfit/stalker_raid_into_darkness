@@ -23,6 +23,16 @@ namespace RaidIntoDarkness.Weapons.Tests
             Object.DestroyImmediate(_configuration);
         }
 
+        [TestCase(0f, 0f)]
+        [TestCase(0.475f, 0f)]
+        [TestCase(0.7125f, 0.5f)]
+        [TestCase(0.95f, 1f)]
+        [TestCase(1f, 1f)]
+        public void AimVisibilitySmoothlyBlendsBeforeActivation(float aim, float expected)
+        {
+            Assert.That(ScopeOpticsMath.GetAimVisibility(aim, 0.95f), Is.EqualTo(expected).Within(0.00001f));
+        }
+
         [Test]
         public void MagnificationScalesAngularImageThroughTangentHalfAngle()
         {

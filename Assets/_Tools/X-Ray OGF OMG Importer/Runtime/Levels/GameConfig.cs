@@ -26,6 +26,7 @@ namespace XRay.Importer.Levels
         [SerializeField, Range(0.0f, MAX_FX_LIGHTING_ADAPTATION)] private float _fxLightingAdaptation = 1.0f;
         [SerializeField, Min(0.0001f)] private float _defaultPlayerStatCapacity = DEFAULT_PLAYER_STAT_CAPACITY;
         [SerializeField] private AnomalyBalanceConfig _anomalyBalance;
+        [SerializeField] private WeaponCrosshairSettings _weaponCrosshair = new WeaponCrosshairSettings();
 
         public float DefaultTimeScale => _defaultTimeScale;
         public float DefaultTimeOfDay => _defaultTimeOfDay;
@@ -44,6 +45,7 @@ namespace XRay.Importer.Levels
         public float FxLightingAdaptation => _fxLightingAdaptation;
         public float DefaultPlayerStatCapacity => _defaultPlayerStatCapacity;
         public AnomalyBalanceConfig AnomalyBalance => _anomalyBalance;
+        public WeaponCrosshairSettings WeaponCrosshair => _weaponCrosshair;
         public int Revision { get; private set; }
 
         public static GameConfig Load()

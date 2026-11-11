@@ -62,7 +62,7 @@ namespace RaidIntoDarkness.Weapons.Tests
             }
 
             var report = new ValidationReport();
-            Type[] fixtures = { typeof(ScopeOpticsMathTests), typeof(ScopeOpticsStateTests), typeof(ScopeOpticsRendererTests), typeof(ScopeLensGeometryTests), typeof(ScopeMarchBindingTests), typeof(ScopeProProjectionTests) };
+            Type[] fixtures = { typeof(ScopeOpticsMathTests), typeof(ScopeOpticsStateTests), typeof(ScopeOpticsRendererTests), typeof(ScopeLensGeometryTests), typeof(ScopeMarchBindingTests), typeof(ScopeProProjectionTests), typeof(WeaponWorldCrosshairTests) };
             foreach (Type fixture in fixtures)
             {
                 foreach (MethodInfo method in fixture.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly))

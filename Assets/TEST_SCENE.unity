@@ -6045,6 +6045,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 1634215613}
   - {fileID: 1747418707}
   - {fileID: 505181942}
   - {fileID: 505232212}
@@ -6803,7 +6804,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1035079565101877359, guid: 0c8cbe402baa4ee47a196114d953d7e3, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.08
+      value: -11.31
       objectReference: {fileID: 0}
     - target: {fileID: 1035079565101877359, guid: 0c8cbe402baa4ee47a196114d953d7e3, type: 3}
       propertyPath: m_LocalPosition.y
@@ -6811,7 +6812,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1035079565101877359, guid: 0c8cbe402baa4ee47a196114d953d7e3, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 4.71
+      value: 3.53
       objectReference: {fileID: 0}
     - target: {fileID: 1035079565101877359, guid: 0c8cbe402baa4ee47a196114d953d7e3, type: 3}
       propertyPath: m_LocalRotation.w
@@ -6844,10 +6845,6 @@ PrefabInstance:
     - target: {fileID: 5375876459936235655, guid: 0c8cbe402baa4ee47a196114d953d7e3, type: 3}
       propertyPath: m_Name
       value: SpatialBubbleMesh
-      objectReference: {fileID: 0}
-    - target: {fileID: 5375876459936235655, guid: 0c8cbe402baa4ee47a196114d953d7e3, type: 3}
-      propertyPath: m_IsActive
-      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -23962,7 +23959,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1147281852
 Transform:
   m_ObjectHideFlags: 0
@@ -32530,12 +32527,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1634215609}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 10, y: 1, z: 10}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 301080810}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1635739226
 PrefabInstance:
@@ -37234,6 +37231,52 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4601214233880738761, guid: 1385bb3a6f37840438b5ae451a3ba565, type: 3}
   m_PrefabInstance: {fileID: 1917331109}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1921225290
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1921225292}
+  - component: {fileID: 1921225291}
+  m_Layer: 0
+  m_Name: Scope Lens Environment
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1921225291
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1921225290}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4bc7d53269294eebb099639bc8009c36, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: RaidIntoDarkness.Weapons.Optics::RaidIntoDarkness.Weapons.Optics.ScopeLensEnvironment
+  _useBakedEnvironment: 1
+  _cubemap: {fileID: 8900000, guid: 304b86a0da5c60044ba35594d4f8fd54, type: 2}
+--- !u!4 &1921225292
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1921225290}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 1.6759999, z: -6}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1925485557
 GameObject:
   m_ObjectHideFlags: 0
@@ -42181,13 +42224,13 @@ SceneRoots:
   - {fileID: 157207114}
   - {fileID: 432432461}
   - {fileID: 2013410475}
-  - {fileID: 1634215613}
   - {fileID: 301080810}
   - {fileID: 1482659389}
   - {fileID: 1552057646}
   - {fileID: 1606962978}
   - {fileID: 1503779142}
   - {fileID: 1391388810}
+  - {fileID: 1921225292}
   - {fileID: 1855267366}
   - {fileID: 1606049729}
   - {fileID: 1147281852}

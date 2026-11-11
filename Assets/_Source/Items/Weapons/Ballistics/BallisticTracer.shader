@@ -36,6 +36,9 @@ Shader "RaidIntoDarkness/BallisticTracer"
             #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Common.hlsl"
             #include "Packages/com.unity.render-pipelines.high-definition/Runtime/ShaderLibrary/ShaderVariables.hlsl"
 
+            TEXTURE2D(_ScopeTracerViewerExposure);
+            float _ScopeTracerExposureEnabled;
+
             CBUFFER_START(UnityPerMaterial)
                 float4 _BaseColor;
             CBUFFER_END
@@ -66,7 +69,19 @@ Shader "RaidIntoDarkness/BallisticTracer"
 
             float4 Frag(Varyings input) : SV_Target
             {
-                return input.color * _BaseColor;
+                UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
+                float4 color = input.color * _BaseColor;
+                #if SHADEROPTIONS_PRE_EXPOSITION
+                if (_ScopeTracerExposureEnabled > 0.5)
+                {
+                    float exposure = LOAD_TEXTURE2D(_ScopeTracerViewerExposure, int2(0, 0)).r;
+                    float maximumColor = max(max(color.r, color.g), max(color.b, 0.000001));
+                    float compensation = min(rcp(max(exposure, 0.000001)), 60000.0 / maximumColor);
+                    color.rgb *= compensation;
+                }
+                #endif
+
+                return color;
             }
             ENDHLSL
         }

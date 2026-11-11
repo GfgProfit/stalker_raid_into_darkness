@@ -29,3 +29,16 @@ MonoBehaviour:
   _fxLightingAdaptation: 1
   _defaultPlayerStatCapacity: 100
   _anomalyBalance: {fileID: 11400000, guid: 9d988dbce831bf7479069388c8ac460f, type: 2}
+  _weaponCrosshair:
+    _enabled: 1
+    _material: {fileID: 2100000, guid: 0ab84bfd99d44732822126186ace7275, type: 2}
+    _color: {r: 1, g: 1, b: 1, a: 0.85}
+    _maximumDistanceMeters: 2000
+    _lineLengthPixels: 6
+    _lineWidthPixels: 1.5
+    _minimumGapPixels: 3
+    _maximumGapPixels: 60
+    _fadeDurationSeconds: 0.12
+    _spreadResponse: 16
+    _surfaceOffsetMeters: 0.015
+    _barrelOffsetMeters: 1

@@ -265,6 +265,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: wpn_aug_a3
       objectReference: {fileID: 0}
+    - target: {fileID: 8943683500985242767, guid: 261ddaccf4301cb4f89dc914f8ccbf26, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8943683500985242767, guid: 261ddaccf4301cb4f89dc914f8ccbf26, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -0.0534
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

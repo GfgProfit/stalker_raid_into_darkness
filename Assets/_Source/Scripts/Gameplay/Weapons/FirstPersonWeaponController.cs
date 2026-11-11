@@ -43,6 +43,7 @@ namespace RaidIntoDarkness.Weapons
         private IFirstPersonWeaponAmmoSource _ammoSource;
         private FirstPersonWeaponGraph _graph;
         private FirstPersonWeaponEffects _effects;
+        private WeaponWorldCrosshair _worldCrosshair;
         private FirstPersonRig _subscribedRig;
         private GameObject _boundHands;
         private GameObject _model;
@@ -71,6 +72,7 @@ namespace RaidIntoDarkness.Weapons
         private float _aimCameraRoll;
         private float _aimCameraVelocity;
         private bool _aiming;
+        private bool _developmentAimOverride;
         private AimPhase _aimPhase;
         private float _aimBlendTime;
         private FirstPersonWeaponAsset _recoilSource;
@@ -88,12 +90,19 @@ namespace RaidIntoDarkness.Weapons
         public string AmmoName => ActiveSlot >= 0 && _ammoSource != null ? _ammoSource.GetAmmoName(_slots[ActiveSlot].Key) : string.Empty;
         public int FireMode => ActiveWeapon != null ? ActiveWeapon.FireModes[Mathf.Clamp(_slots[ActiveSlot].WeaponState.FireModeIndex, 0, ActiveWeapon.FireModes.Count - 1)] : 0;
         public bool IsAiming => _aiming;
+        public bool DevelopmentAimOverride
+        {
+            get => _developmentAimOverride && (Application.isEditor || Debug.isDebugBuild);
+            set => _developmentAimOverride = value;
+        }
         public float AimFactor => _aim;
         public Vector3 AimOffsetPosition => ActiveWeapon != null ? _slots[ActiveSlot].AimOffsetPosition ?? ActiveWeapon.AimOffsetPosition : Vector3.zero;
         public GameObject Model => _model;
         public GameObject HandsModel => _boundHands;
         public float ScopeZoomScroll => _player != null && !_player.GameplayInputBlocked && _input != null ? _input.ScopeZoomScroll : 0f;
         public Transform Muzzle => _muzzle;
+        public float ShotDispersionDegrees => ActiveSlot >= 0 && _ammoSource != null ? _ammoSource.GetDispersionDegrees(_slots[ActiveSlot].Key) : 0f;
+        public float ShotMaximumDistance => ActiveSlot >= 0 && _ammoSource != null ? _ammoSource.GetFireDistance(_slots[ActiveSlot].Key) * (_ammoSource.GetBallistics(_slots[ActiveSlot].Key)?.DistanceMultiplier ?? 1f) : 0f;
         public bool IsSilenced => ActiveSlot >= 0 && _slots[ActiveSlot].Silenced;
         public FirstPersonWeaponMotionKind CurrentMotion { get; private set; }
 
@@ -270,18 +279,54 @@ namespace RaidIntoDarkness.Weapons
             }
         }
 
+        public bool TryGetMuzzleRay(out Ray ray)
+        {
+            ray = default;
+            if (!_muzzleFromView || _muzzle == null)
+            {
+                return false;
+            }
+
+            Vector3 origin = _muzzle.position;
+            Vector3 direction = _muzzle.TransformVector(Vector3.forward);
+            if (!float.IsFinite(origin.x) || !float.IsFinite(origin.y) || !float.IsFinite(origin.z) || !float.IsFinite(direction.sqrMagnitude) || !float.IsFinite(direction.x) || !float.IsFinite(direction.y) || !float.IsFinite(direction.z) || direction.sqrMagnitude < 0.000001f)
+            {
+                return false;
+            }
+
+            ray = new Ray(origin, direction.normalized);
+            return true;
+        }
+
         private void Awake()
         {
             _effects = new FirstPersonWeaponEffects(null);
+            _worldCrosshair = GetComponent<WeaponWorldCrosshair>();
+            if (_worldCrosshair == null)
+            {
+                _worldCrosshair = gameObject.AddComponent<WeaponWorldCrosshair>();
+            }
+
+            _worldCrosshair.Initialize(this, _player);
         }
 
         private void OnEnable()
         {
+            if (_worldCrosshair != null)
+            {
+                _worldCrosshair.enabled = true;
+            }
+
             Subscribe();
         }
 
         private void OnDisable()
         {
+            if (_worldCrosshair != null)
+            {
+                _worldCrosshair.enabled = false;
+            }
+
             Hide();
             Unsubscribe();
         }
@@ -334,7 +379,7 @@ namespace RaidIntoDarkness.Weapons
             else
             {
                 _burstLeft = 0;
-                SetAiming(false);
+                SetAiming(DevelopmentAimOverride && State == FirstPersonWeaponState.Ready);
             }
 
             TickState(deltaTime);
@@ -490,7 +535,7 @@ namespace RaidIntoDarkness.Weapons
             FirstPersonWeaponAsset asset = ActiveWeapon;
             bool ready = State == FirstPersonWeaponState.Ready;
             bool sprinting = _player.State.IsSprinting;
-            SetAiming(_input.AimHeld && ready && !sprinting);
+            SetAiming((_input.AimHeld || DevelopmentAimOverride) && ready && (DevelopmentAimOverride || !sprinting));
             if (!ready)
             {
                 _burstLeft = 0;
@@ -552,7 +597,7 @@ namespace RaidIntoDarkness.Weapons
             float fireDistance = _ammoSource?.GetFireDistance(_slots[ActiveSlot].Key) ?? 0f;
             float dispersion = _ammoSource?.GetDispersionDegrees(_slots[ActiveSlot].Key) ?? 0f;
 
-            if (!_muzzleFromView || _muzzle == null || ammo == null || !ammo.IsConfigured || bulletSpeed <= 0f || fireDistance <= 0f || asset.Ballistics == null || asset.Ballistics.BulletPrefab == null)
+            if (!TryGetMuzzleRay(out Ray muzzleRay) || ammo == null || !ammo.IsConfigured || bulletSpeed <= 0f || fireDistance <= 0f || asset.Ballistics == null || asset.Ballistics.BulletPrefab == null)
             {
                 _burstLeft = 0;
 
@@ -565,8 +610,8 @@ namespace RaidIntoDarkness.Weapons
                 return;
             }
 
-            Vector3 launchPosition = _muzzle.position;
-            Quaternion launchRotation = Quaternion.LookRotation(_muzzle.TransformVector(Vector3.forward).normalized, Vector3.up);
+            Vector3 launchPosition = muzzleRay.origin;
+            Quaternion launchRotation = Quaternion.LookRotation(muzzleRay.direction, Vector3.up);
 
             if (_ammoSource == null || _ammoSource.TryShoot(_slots[ActiveSlot].Key) == false)
             {
@@ -1033,6 +1078,17 @@ namespace RaidIntoDarkness.Weapons
             {
                 float zoom = asset != null ? asset.AimZoom : 1f;
                 _player.CameraController.SetWeaponZoom(Mathf.Lerp(1f, zoom, _aim));
+                float hudFieldOfView = 0f;
+                foreach (MonoBehaviour behaviour in _opticsBindings)
+                {
+                    if (behaviour != null && behaviour is IFirstPersonWeaponOptics optics && optics.UsesOpticalMagnification)
+                    {
+                        hudFieldOfView = optics.AimHudFieldOfView;
+                        break;
+                    }
+                }
+
+                _player.CameraController.SetWeaponHudFieldOfView(hudFieldOfView, _aim);
             }
 
             float target = asset != null ? asset.AimCameraRoll * 4f * _aim * (1f - _aim) * (_aiming ? 1f : -1f) : 0f;
@@ -1059,6 +1115,7 @@ namespace RaidIntoDarkness.Weapons
             if (_player != null && _player.CameraController != null)
             {
                 _player.CameraController.SetWeaponZoom(1f);
+                _player.CameraController.SetWeaponHudFieldOfView(0f, 0f);
             }
 
             if (_player != null && _player.CameraEffects != null)

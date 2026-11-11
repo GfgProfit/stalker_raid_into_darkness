@@ -62,6 +62,35 @@ namespace RaidIntoDarkness.Weapons.Tests
         }
 
         [Test]
+        public void AimHudFieldOfViewRequiresAnOwnedScopeAndExplicitOverride()
+        {
+            _binding.Bind(_controller, _viewer);
+            Assert.That(_binding.AimHudFieldOfView, Is.Zero);
+            SetField(_configuration, "_overrideAimHudFieldOfView", true);
+            SetField(_configuration, "_aimHudFieldOfView", 0.6f);
+            Assert.That(_binding.AimHudFieldOfView, Is.EqualTo(0.6f));
+            _binding.Bind(null, null);
+            Assert.That(_binding.AimHudFieldOfView, Is.Zero);
+        }
+
+        [Test]
+        public void DevTestReleasesItsAimOverrideWhenDisabled()
+        {
+            DevTest test = _root.AddComponent<DevTest>();
+            Invoke(test, "OnEnable");
+            SetField(test, "_inZoom", true);
+            Invoke(test, "Update");
+            Assert.That(_controller.DevelopmentAimOverride, Is.True);
+            SetField(test, "_inZoom", false);
+            Invoke(test, "Update");
+            Assert.That(_controller.DevelopmentAimOverride, Is.False);
+            SetField(test, "_inZoom", true);
+            Invoke(test, "Update");
+            Invoke(test, "OnDisable");
+            Assert.That(_controller.DevelopmentAimOverride, Is.False);
+        }
+
+        [Test]
         public void ScrollOutsideAimingDoesNotChangeMagnification()
         {
             float initial = _binding.Magnification;

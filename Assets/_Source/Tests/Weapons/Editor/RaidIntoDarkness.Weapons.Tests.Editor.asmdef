@@ -5,6 +5,7 @@
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
         "RaidIntoDarkness.Weapons",
+        "RaidIntoDarkness.Player",
         "RaidIntoDarkness.Weapons.Optics",
         "Unity.RenderPipelines.Core.Runtime",
         "Unity.RenderPipelines.HighDefinition.Runtime"

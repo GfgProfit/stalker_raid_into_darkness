@@ -25,6 +25,9 @@ namespace RaidIntoDarkness.Weapons.Optics
         [SerializeField, Range(0.01f, 170f)] private float _calibrationVerticalFov = 5f;
         [SerializeField, Range(0.25f, 4f)] private float _trueOnePowerCalibration = 1f;
         [SerializeField] private AnimationCurve _fieldOfViewMultiplier = AnimationCurve.Linear(1f, 1f, 6f, 1f);
+        [Header("ADS View")]
+        [SerializeField] private bool _overrideAimHudFieldOfView;
+        [SerializeField, Range(0.1f, 1f)] private float _aimHudFieldOfView = 0.6f;
         [Header("Reticle")]
         [SerializeField] private ScopeReticlePlane _reticlePlane;
         [Header("Sight Corrections")]
@@ -36,6 +39,7 @@ namespace RaidIntoDarkness.Weapons.Optics
         public ScopeProjectionMode ProjectionMode => _projectionMode;
         public float CalibrationVerticalFov => ScopeOpticsMath.FiniteClamp(_calibrationVerticalFov, 0.01f, 170f, 5f);
         public float TrueOnePowerCalibration => ScopeOpticsMath.FiniteClamp(_trueOnePowerCalibration, 0.25f, 4f, 1f);
+        public float AimHudFieldOfView => _overrideAimHudFieldOfView ? ScopeOpticsMath.FiniteClamp(_aimHudFieldOfView, 0.1f, 1f, 0.6f) : 0f;
         public ScopeReticlePlane ReticlePlane => _reticlePlane;
         public float MaximumCorrectionMilliradians => ScopeOpticsMath.FiniteClamp(_maximumCorrectionMilliradians, 0f, 100f, 30f);
 
@@ -53,6 +57,7 @@ namespace RaidIntoDarkness.Weapons.Optics
             else if (_projectionMode != ScopeProjectionMode.GeometricLens && _projectionMode != ScopeProjectionMode.CalibratedFieldOfView) diagnostic = "Scope ProjectionMode is invalid.";
             else if (_reticlePlane != ScopeReticlePlane.FirstFocalPlane && _reticlePlane != ScopeReticlePlane.SecondFocalPlane) diagnostic = "Scope ReticlePlane is invalid.";
             else if (!float.IsFinite(_calibrationVerticalFov) || _calibrationVerticalFov < 0.01f || _calibrationVerticalFov > 170f) diagnostic = "Scope CalibrationVerticalFov must be between 0.01 and 170 degrees.";
+            else if (_overrideAimHudFieldOfView && (!float.IsFinite(_aimHudFieldOfView) || _aimHudFieldOfView < 0.1f || _aimHudFieldOfView > 1f)) diagnostic = "Scope AimHudFieldOfView must be finite and between 0.1 and 1.";
             return diagnostic == null;
         }
 

@@ -2170,6 +2170,7 @@ GameObject:
   - component: {fileID: 9082889536266957315}
   - component: {fileID: 6816063066189536554}
   - component: {fileID: 3751062407146555283}
+  - component: {fileID: 8202790095508886212}
   m_Layer: 0
   m_Name: FPS_Player
   m_TagString: Untagged
@@ -3201,3 +3202,16 @@ MonoBehaviour:
   _swayOffset: 1
   _playerInput: {fileID: 5296497837016955254}
   _cameraController: {fileID: 4431073648799198191}
+--- !u!114 &8202790095508886212
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9095947929063771272}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a1ac4d1a4fd2463dbd34aed60a8389d5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: RaidIntoDarkness.Weapons::RaidIntoDarkness.Weapons.DevTest
+  _inZoom: 0

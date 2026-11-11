@@ -16,6 +16,7 @@ namespace RaidIntoDarkness.Weapons.Optics
 
         public ScopeOpticsRenderer Renderer => _renderer;
         public float Magnification => _magnification;
+        public float AimHudFieldOfView => UsesOpticalMagnification ? _renderer.Configuration.AimHudFieldOfView : 0f;
         public bool UsesOpticalMagnification => isActiveAndEnabled && IsOwned() && _controller.isActiveAndEnabled && _renderer != null && _renderer.enabled && _renderer.Configuration != null;
 
         public void Bind(FirstPersonWeaponController controller, Camera viewer)
@@ -53,7 +54,13 @@ namespace RaidIntoDarkness.Weapons.Optics
 
         private void LateUpdate()
         {
-            if (!Application.isPlaying || _renderer == null || _controller == null)
+            if (!Application.isPlaying || _renderer == null)
+            {
+                return;
+            }
+
+            _renderer.UpdateLensEnvironment();
+            if (_controller == null)
             {
                 return;
             }
@@ -71,7 +78,7 @@ namespace RaidIntoDarkness.Weapons.Optics
             }
 
             ApplySettings(false);
-            _renderer.SetActive(aiming);
+            _renderer.SetAimVisibility(ScopeOpticsMath.GetAimVisibility(_controller.AimFactor, _activationAimFactor));
         }
 
         public void ApplyMagnificationScroll(float scroll)

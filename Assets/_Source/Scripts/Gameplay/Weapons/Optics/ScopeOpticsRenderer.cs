@@ -3,6 +3,7 @@ using Unity.Profiling;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.HighDefinition;
+using UnityEngine.SceneManagement;
 
 namespace RaidIntoDarkness.Weapons.Optics
 {
@@ -11,6 +12,8 @@ namespace RaidIntoDarkness.Weapons.Optics
     public sealed class ScopeOpticsRenderer : MonoBehaviour
     {
         private static readonly ProfilerMarker UPDATE_MARKER = new ProfilerMarker("ScopeOptics.Update");
+        private static readonly int TRACER_VIEWER_EXPOSURE = Shader.PropertyToID("_ScopeTracerViewerExposure");
+        private static readonly int TRACER_EXPOSURE_ENABLED = Shader.PropertyToID("_ScopeTracerExposureEnabled");
         private static readonly int SCOPE_AVAILABLE = Shader.PropertyToID("_ScopeAvailable");
         private static readonly int SCOPE_PRO_STYLE = Shader.PropertyToID("_ScopeProStyle");
         private static readonly int SCOPE_PRO_TEXTURE = Shader.PropertyToID("_RenderTexture");
@@ -18,6 +21,11 @@ namespace RaidIntoDarkness.Weapons.Optics
         private static readonly int SCOPE_PRO_UP = Shader.PropertyToID("_ScopeUpWS");
         private static readonly int SCOPE_PRO_RETICLE_SCALE = Shader.PropertyToID("_ReticleRuntimeScale");
         private static readonly int SCOPE_PRO_RENDER_SIZE = Shader.PropertyToID("_RenderSize");
+        private static readonly int LENS_ENVIRONMENT = Shader.PropertyToID("_LensEnvironment");
+        private static readonly int LENS_USE_ENVIRONMENT = Shader.PropertyToID("_LensUseEnvironment");
+        private static readonly int SCOPE_VISIBILITY = Shader.PropertyToID("_ScopeVisibility");
+        private static readonly int RETICLE_SDF = Shader.PropertyToID("_ReticleSdf");
+        private static readonly int RETICLE_SDF_AVAILABLE = Shader.PropertyToID("_ReticleSdfAvailable");
 
         [SerializeField] private ScopeOpticsConfig _configuration;
         [SerializeField] private Camera _scopeCamera;
@@ -39,10 +47,12 @@ namespace RaidIntoDarkness.Weapons.Optics
         private Camera _controlledCamera;
         private HDAdditionalCameraData _controlledCameraData;
         private ScopeOpticsCameraState _cameraState;
+        private Material _lensMaterial;
         private GameObject _excludedRoot;
         private ScopeCaptureExclusion _captureExclusion;
         private Renderer _boundRenderer;
         private int _boundMaterialIndex;
+        private MotionVectorGenerationMode _originalLensMotionVectorMode;
         private MaterialPropertyBlock _propertyBlock;
         private MaterialPropertyBlock _originalPropertyBlock;
         private RenderTexture _target;
@@ -51,10 +61,18 @@ namespace RaidIntoDarkness.Weapons.Optics
         private Vector2 _effectiveLensHalfSizeMeters;
         private Quaternion _opticalRotation;
         private float _lensShear;
+        private float _aimVisibility = 1f;
         private float _scopeProRenderSize = 1f;
+        private ScopeLensEnvironment _lensEnvironment;
+        private Scene _environmentScene;
         private string _lastDiagnostic;
         private bool _subscribed;
         private bool _isRendering;
+        private bool _tracerExposureBound;
+        private float _previousTracerExposureEnabled;
+        private Texture _previousTracerExposureTexture;
+        private CustomPass _tracerExposureStartPass;
+        private CustomPass _tracerExposureEndPass;
 
         public ScopeOpticsConfig Configuration => _configuration;
         public ScopeOpticsState State => _state;
@@ -68,6 +86,10 @@ namespace RaidIntoDarkness.Weapons.Optics
                 return;
             }
 
+            _tracerExposureStartPass = new TracerExposurePass(this, false);
+            _tracerExposureEndPass = new TracerExposurePass(this, true);
+            CustomPassVolume.RegisterGlobalCustomPass(CustomPassInjectionPoint.BeforeTransparent, _tracerExposureStartPass);
+            CustomPassVolume.RegisterGlobalCustomPass(CustomPassInjectionPoint.BeforePostProcess, _tracerExposureEndPass);
             RenderPipelineManager.beginCameraRendering += BeginCameraRendering;
             RenderPipelineManager.endCameraRendering += EndCameraRendering;
             _subscribed = true;
@@ -164,6 +186,12 @@ namespace RaidIntoDarkness.Weapons.Optics
             }
         }
 
+        public void SetAimVisibility(float visibility)
+        {
+            _aimVisibility = ScopeOpticsMath.FiniteClamp(visibility, 0f, 1f, 0f);
+            SetActive(_aimVisibility > 0f);
+        }
+
         public void SetActive(bool active)
         {
             EnsureState();
@@ -221,6 +249,7 @@ namespace RaidIntoDarkness.Weapons.Optics
                 else
                 {
                     Material material = _materials[_materialIndex];
+                    _lensMaterial = material;
                     _scopeProRenderSize = ScopeOpticsMath.FiniteClamp(material.GetFloat(SCOPE_PRO_RENDER_SIZE), 0.001f, 2f, 1f);
                 }
             }
@@ -230,6 +259,19 @@ namespace RaidIntoDarkness.Weapons.Optics
 
         public void ReleaseResources()
         {
+            RestoreTracerExposure();
+            if (_tracerExposureStartPass != null)
+            {
+                CustomPassVolume.UnregisterGlobalCustomPass(CustomPassInjectionPoint.BeforeTransparent, _tracerExposureStartPass);
+                _tracerExposureStartPass = null;
+            }
+
+            if (_tracerExposureEndPass != null)
+            {
+                CustomPassVolume.UnregisterGlobalCustomPass(CustomPassInjectionPoint.BeforePostProcess, _tracerExposureEndPass);
+                _tracerExposureEndPass = null;
+            }
+
             if (_subscribed)
             {
                 RenderPipelineManager.beginCameraRendering -= BeginCameraRendering;
@@ -251,6 +293,8 @@ namespace RaidIntoDarkness.Weapons.Optics
                 _cameraState.Restore(_controlledCamera, _controlledCameraData);
             }
 
+            _environmentScene = default;
+            _lensEnvironment = null;
             _cameraState = null;
             _controlledCamera = null;
             _controlledCameraData = null;
@@ -378,6 +422,7 @@ namespace RaidIntoDarkness.Weapons.Optics
             _controlledCameraData.dithering = false;
             _controlledCameraData.antialiasing = HDAdditionalCameraData.AntialiasingMode.None;
             _controlledCameraData.flipYMode = HDAdditionalCameraData.FlipYMode.Automatic;
+            SetFrameSetting(FrameSettingsField.CustomPass, true);
             SetFrameSetting(FrameSettingsField.Postprocess, false);
             SetFrameSetting(FrameSettingsField.ExposureControl, false);
             SetFrameSetting(FrameSettingsField.Antialiasing, false);
@@ -420,16 +465,128 @@ namespace RaidIntoDarkness.Weapons.Optics
             }
             else
             {
+                RestoreTracerExposure();
                 _captureExclusion?.Restore();
             }
         }
 
         private void EndCameraRendering(ScriptableRenderContext context, Camera camera)
         {
+            RestoreTracerExposure();
             _captureExclusion?.Restore();
             if (camera == _controlledCamera && camera != null && camera.enabled && _target != null && _target.IsCreated() && _state != null && _state.Active)
             {
                 BindSurface(true);
+            }
+        }
+
+        private void BindTracerExposure(CommandBuffer commands)
+        {
+            if (_tracerExposureBound || _viewerCamera == null || !(RenderPipelineManager.currentPipeline is HDRenderPipeline))
+            {
+                return;
+            }
+
+            HDCamera viewer = HDCamera.GetOrCreate(_viewerCamera);
+            RTHandle exposure = viewer.frameSettings.IsEnabled(FrameSettingsField.ExposureControl) ? viewer.GetPreviousFrameRT((int)HDCameraFrameHistoryType.Exposure) : null;
+            _previousTracerExposureEnabled = Shader.GetGlobalFloat(TRACER_EXPOSURE_ENABLED);
+            _previousTracerExposureTexture = Shader.GetGlobalTexture(TRACER_VIEWER_EXPOSURE);
+            commands.SetGlobalTexture(TRACER_VIEWER_EXPOSURE, exposure != null && exposure.rt != null ? exposure.rt : Texture2D.whiteTexture);
+            commands.SetGlobalFloat(TRACER_EXPOSURE_ENABLED, 1f);
+            _tracerExposureBound = true;
+        }
+
+        private void RestoreTracerExposure(CommandBuffer commands = null)
+        {
+            if (!_tracerExposureBound)
+            {
+                return;
+            }
+
+            Texture previous = _previousTracerExposureTexture != null ? _previousTracerExposureTexture : Texture2D.whiteTexture;
+            if (commands != null)
+            {
+                commands.SetGlobalFloat(TRACER_EXPOSURE_ENABLED, _previousTracerExposureEnabled);
+                commands.SetGlobalTexture(TRACER_VIEWER_EXPOSURE, previous);
+            }
+            else
+            {
+                Shader.SetGlobalFloat(TRACER_EXPOSURE_ENABLED, _previousTracerExposureEnabled);
+                Shader.SetGlobalTexture(TRACER_VIEWER_EXPOSURE, previous);
+            }
+            _previousTracerExposureTexture = null;
+            _tracerExposureBound = false;
+        }
+
+        public void UpdateLensEnvironment()
+        {
+            if (!EnsureSurfaceBinding())
+            {
+                return;
+            }
+
+            _propertyBlock ??= new MaterialPropertyBlock();
+            _boundRenderer.GetPropertyBlock(_propertyBlock, _boundMaterialIndex);
+            ApplyLensEnvironment();
+            _boundRenderer.SetPropertyBlock(_propertyBlock, _boundMaterialIndex);
+        }
+
+        private bool EnsureSurfaceBinding()
+        {
+            if (_lensRenderer == null || _materialIndex < 0)
+            {
+                return false;
+            }
+
+            if (_boundRenderer != _lensRenderer || _boundMaterialIndex != _materialIndex)
+            {
+                _lensRenderer.GetSharedMaterials(_materials);
+                if (_materialIndex >= _materials.Count || _materials[_materialIndex] == null || !_materials[_materialIndex].HasProperty(SCOPE_PRO_STYLE))
+                {
+                    return false;
+                }
+
+                RestoreSurface();
+                _boundRenderer = _lensRenderer;
+                _boundMaterialIndex = _materialIndex;
+                _originalLensMotionVectorMode = _boundRenderer.motionVectorGenerationMode;
+                _boundRenderer.motionVectorGenerationMode = MotionVectorGenerationMode.ForceNoMotion;
+                _originalPropertyBlock ??= new MaterialPropertyBlock();
+                _boundRenderer.GetPropertyBlock(_originalPropertyBlock, _boundMaterialIndex);
+            }
+
+            return true;
+        }
+
+        private void ApplyLensEnvironment()
+        {
+            Scene scene = SceneManager.GetActiveScene();
+            if (_environmentScene != scene)
+            {
+                _environmentScene = scene;
+                _lensEnvironment = null;
+                foreach (GameObject root in scene.GetRootGameObjects())
+                {
+                    foreach (ScopeLensEnvironment candidate in root.GetComponentsInChildren<ScopeLensEnvironment>(true))
+                    {
+                        if (_lensEnvironment != null)
+                        {
+                            _lensEnvironment = null;
+                            Debug.LogWarning("Only one ScopeLensEnvironment is supported in the active location scene. Falling back to the HDRP sky.", this);
+                            _propertyBlock.SetFloat(LENS_USE_ENVIRONMENT, 0f);
+                            return;
+                        }
+
+                        _lensEnvironment = candidate;
+                    }
+                }
+            }
+
+            Cubemap cubemap = _lensEnvironment != null && _lensEnvironment.isActiveAndEnabled && _lensEnvironment.UseBakedEnvironment ? _lensEnvironment.Cubemap : null;
+            _propertyBlock.SetFloat(LENS_USE_ENVIRONMENT, cubemap != null ? 1f : 0f);
+            if (cubemap != null)
+            {
+                _propertyBlock.SetTexture(LENS_ENVIRONMENT, cubemap);
             }
         }
 
@@ -441,18 +598,18 @@ namespace RaidIntoDarkness.Weapons.Optics
                 return;
             }
 
-            if (_boundRenderer != _lensRenderer || _boundMaterialIndex != _materialIndex)
+            if (!EnsureSurfaceBinding())
             {
-                RestoreSurface();
-                _boundRenderer = _lensRenderer;
-                _boundMaterialIndex = _materialIndex;
-                _originalPropertyBlock ??= new MaterialPropertyBlock();
-                _boundRenderer.GetPropertyBlock(_originalPropertyBlock, _boundMaterialIndex);
+                _isRendering = false;
+                return;
             }
 
             _propertyBlock ??= new MaterialPropertyBlock();
             _boundRenderer.GetPropertyBlock(_propertyBlock, _boundMaterialIndex);
             _propertyBlock.SetFloat(SCOPE_AVAILABLE, available ? 1.0f : 0.0f);
+            _propertyBlock.SetFloat(SCOPE_VISIBILITY, _aimVisibility);
+            ApplyLensEnvironment();
+            _propertyBlock.SetFloat(RETICLE_SDF_AVAILABLE, _lensMaterial != null && _lensMaterial.HasProperty(RETICLE_SDF) && _lensMaterial.GetTexture(RETICLE_SDF) != null ? 1f : 0f);
             _propertyBlock.SetTexture(SCOPE_PRO_TEXTURE, _target != null ? _target : Texture2D.blackTexture);
             _propertyBlock.SetVector(SCOPE_PRO_RIGHT, _opticalRotation * Vector3.right);
             _propertyBlock.SetVector(SCOPE_PRO_UP, _opticalRotation * Vector3.up);
@@ -467,6 +624,7 @@ namespace RaidIntoDarkness.Weapons.Optics
             if (_boundRenderer != null)
             {
                 _boundRenderer.SetPropertyBlock(_originalPropertyBlock, _boundMaterialIndex);
+                _boundRenderer.motionVectorGenerationMode = _originalLensMotionVectorMode;
             }
 
             _boundRenderer = null;
@@ -475,6 +633,7 @@ namespace RaidIntoDarkness.Weapons.Optics
 
         private void SuspendCapture()
         {
+            RestoreTracerExposure();
             _captureExclusion?.Restore();
             if (_controlledCamera != null)
             {
@@ -517,6 +676,38 @@ namespace RaidIntoDarkness.Weapons.Optics
 
             _lastDiagnostic = diagnostic;
             Debug.LogWarning(diagnostic, this);
+        }
+
+        private sealed class TracerExposurePass : CustomPass
+        {
+            private readonly ScopeOpticsRenderer _owner;
+            private readonly bool _restore;
+
+            public TracerExposurePass(ScopeOpticsRenderer owner, bool restore)
+            {
+                _owner = owner;
+                _restore = restore;
+                name = restore ? "Scope Tracer Exposure Restore" : "Scope Tracer Exposure";
+                targetColorBuffer = TargetBuffer.None;
+                targetDepthBuffer = TargetBuffer.None;
+            }
+
+            protected override void Execute(CustomPassContext context)
+            {
+                if (_owner == null || context.hdCamera.camera != _owner._controlledCamera)
+                {
+                    return;
+                }
+
+                if (_restore)
+                {
+                    _owner.RestoreTracerExposure(context.cmd);
+                }
+                else if (_owner._state != null && _owner._state.Active)
+                {
+                    _owner.BindTracerExposure(context.cmd);
+                }
+            }
         }
     }
 }

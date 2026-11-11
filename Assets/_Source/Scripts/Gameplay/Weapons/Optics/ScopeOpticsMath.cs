@@ -30,6 +30,14 @@ namespace RaidIntoDarkness.Weapons.Optics
             return 2f * Mathf.Atan(tangent) * Mathf.Rad2Deg;
         }
 
+        public static float GetAimVisibility(float aimFactor, float activationAimFactor)
+        {
+            float end = FiniteClamp(activationAimFactor, 0.001f, 1f, 0.95f);
+            float start = end * 0.5f;
+            float progress = Mathf.InverseLerp(start, end, FiniteClamp(aimFactor, 0f, 1f, 0f));
+            return progress * progress * (3f - 2f * progress);
+        }
+
         public static Matrix4x4 BuildProjection(ScopeOpticsConfig config, float magnification, Vector2 lensHalfSizeMeters, Vector3 eyeLocal, float near, float far)
         {
             float halfHeight = FiniteClamp(lensHalfSizeMeters.y, 0.0001f, 10f, 0.014f);

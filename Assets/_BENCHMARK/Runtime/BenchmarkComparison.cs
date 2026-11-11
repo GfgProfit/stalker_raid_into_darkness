@@ -27,6 +27,8 @@ namespace Rvm.Benchmark
         public string baseline;
         public string candidate;
         public bool comparable;
+        public string baselineGit;
+        public string candidateGit;
         public double practicalTolerancePercent;
         public List<string> warnings = new List<string>();
         public List<BenchmarkDelta> deltas = new List<BenchmarkDelta>();
@@ -63,6 +65,29 @@ namespace Rvm.Benchmark
                 throw new ArgumentOutOfRangeException(nameof(tolerancePercent));
             }
             var result = new BenchmarkComparisonResult { baseline = baseline.runId, candidate = candidate.runId, practicalTolerancePercent = tolerancePercent };
+            result.baselineGit = baselineMetadata.gitSha + "/" + baselineMetadata.gitDirty;
+            result.candidateGit = candidateMetadata.gitSha + "/" + candidateMetadata.gitDirty;
+            if (baselineMetadata.metadataVersion < 2 || candidateMetadata.metadataVersion < 2)
+            {
+                result.warnings.Add("Legacy metadata: refresh rate, timer availability and instrumentation cannot be verified.");
+            }
+            else if (string.IsNullOrEmpty(baselineMetadata.timerSignature) || string.IsNullOrEmpty(candidateMetadata.timerSignature) || string.IsNullOrEmpty(baselineMetadata.instrumentationSignature) || string.IsNullOrEmpty(candidateMetadata.instrumentationSignature))
+            {
+                result.warnings.Add("V2 timer/instrumentation metadata is incomplete.");
+            }
+            Difference(result, "Refresh/render interval", baselineMetadata.refreshRateHz + "/" + baselineMetadata.renderFrameInterval, candidateMetadata.refreshRateHz + "/" + candidateMetadata.renderFrameInterval);
+            Difference(result, "Instrumentation", baselineMetadata.instrumentationSignature, candidateMetadata.instrumentationSignature);
+            Difference(result, "Timer availability/alignment", baselineMetadata.timerSignature, candidateMetadata.timerSignature);
+            Difference(result, "Fixed world scope", baselineMetadata.fixedWorldState, candidateMetadata.fixedWorldState);
+            Difference(result, "Final frame pacing", baselineMetadata.finalFramePacing, candidateMetadata.finalFramePacing);
+            Difference(result, "Final Quality", baselineMetadata.finalQuality, candidateMetadata.finalQuality);
+            foreach (var metadata in new[] { baselineMetadata, candidateMetadata })
+            {
+                if (metadata.metadataVersion >= 2 && (metadata.finalQuality != metadata.quality || metadata.finalFramePacing != metadata.vsync + "/" + metadata.targetFrameRate + "/" + metadata.renderFrameInterval))
+                {
+                    result.warnings.Add("Quality/pacing changed within run " + metadata.runId + ". Intermediate conditions cannot be reconstructed from start/end values.");
+                }
+            }
             Difference(result, "Graphics API", baselineMetadata.graphicsApi, candidateMetadata.graphicsApi);
             Difference(result, "Resolution", baselineMetadata.width + "x" + baselineMetadata.height + "/" + baselineMetadata.cameraPixelWidth + "x" + baselineMetadata.cameraPixelHeight, candidateMetadata.width + "x" + candidateMetadata.height + "/" + candidateMetadata.cameraPixelWidth + "x" + candidateMetadata.cameraPixelHeight);
             Difference(result, "Quality", baselineMetadata.quality, candidateMetadata.quality);
@@ -90,6 +115,7 @@ namespace Rvm.Benchmark
                 }
             }
             CompareEnvironment(result, baselineMetadata.environment, candidateMetadata.environment);
+            CompareEnvironment(result, baselineMetadata.endEnvironment, candidateMetadata.endEnvironment);
             if (baselineMetadata.runtimeErrors > 0 || candidateMetadata.runtimeErrors > 0)
             {
                 result.warnings.Add("Runtime errors occurred during a run; clean A/B comparison is not established.");
@@ -97,6 +123,17 @@ namespace Rvm.Benchmark
             if (baseline.status != "completed" || candidate.status != "completed" || baseline.windows.Count != 10 || candidate.windows.Count != 10)
             {
                 result.warnings.Add("Only completed runs with ten Full/Stable windows can be compared.");
+            }
+            foreach (var metric in baseline.availability)
+            {
+                if (metric.unit == "ms")
+                {
+                    var other = candidate.availability.Find(value => value.id == metric.id);
+                    if (other == null || other.available != metric.available || other.source != metric.source)
+                    {
+                        result.warnings.Add("Timer differs: " + metric.id);
+                    }
+                }
             }
             result.comparable = result.warnings.Count == 0;
             foreach (var window in baseline.windows)
@@ -140,9 +177,21 @@ namespace Rvm.Benchmark
             ReadRun(baselinePath, out var baselineMetadata, out var baseline);
             ReadRun(candidatePath, out var candidateMetadata, out var candidate);
             var result = Compare(baselineMetadata, baseline, candidateMetadata, candidate, tolerancePercent);
+            if (baselineMetadata.mode == "Diagnostic" || candidateMetadata.mode == "Diagnostic")
+            {
+                CompareDiagnostics(result, baselinePath, candidatePath, baselineMetadata, candidateMetadata);
+            }
+            if (!result.comparable)
+            {
+                foreach (var delta in result.deltas)
+                {
+                    delta.classification = "Incomparable / insufficient data";
+                }
+            }
             string folder = NewReportDirectory("Comparisons");
             BenchmarkOutput.WriteJson(Path.Combine(folder, "comparison.json"), result);
             var text = new StringBuilder("# RVM comparison\n\nBaseline: " + result.baseline + "\n\nCandidate: " + result.candidate + "\n\nComparable: " + result.comparable + "\n\nObserved direction only; no statistical significance inferred from one run. Practical tolerance supplied by operator: " + BenchmarkOutput.Number(tolerancePercent) + "%.\n");
+            text.AppendLine("\nGit (different revisions are allowed): " + result.baselineGit + " -> " + result.candidateGit);
             foreach (string warning in result.warnings)
             {
                 text.AppendLine("\n- " + warning);
@@ -203,11 +252,12 @@ namespace Rvm.Benchmark
             }
             string folder = NewReportDirectory("Series");
             BenchmarkOutput.WriteJson(Path.Combine(folder, "series.json"), result);
-            var text = new StringBuilder("# RVM series " + seriesId + "\n\nRuns are retained separately. Median, minimum and maximum are calculated across per-run statistics, never pooled frames. Only metrics available in all runs are suitable for series comparison. World state is not reset between repetitions.\n");
+            var text = new StringBuilder("# RVM series " + seriesId + "\n\nRuns are retained separately. Median, minimum and maximum are calculated across per-run statistics, never pooled frames. Only metrics available in all runs are suitable for series comparison. Weather/time is reset only when explicitly enabled; other dynamic state evolves.\n");
             foreach (string directory in directories)
             {
                 text.AppendLine("\n- " + directory);
             }
+
             foreach (string warning in result.warnings)
             {
                 text.AppendLine("\n- " + warning);
@@ -250,6 +300,61 @@ namespace Rvm.Benchmark
             }
         }
 
+        private static void CompareDiagnostics(BenchmarkComparisonResult result, string baselinePath, string candidatePath, BenchmarkMetadata baseline, BenchmarkMetadata candidate)
+        {
+            if (baseline.mode != "Diagnostic" || candidate.mode != "Diagnostic" || string.IsNullOrEmpty(baseline.instrumentationSignature) || baseline.instrumentationSignature != candidate.instrumentationSignature)
+            {
+                result.warnings.Add("Diagnostic-only metrics skipped: instrumented modes/signatures differ or are unavailable.");
+                result.comparable = false;
+                return;
+            }
+            foreach (string category in new[] { "cpu", "memory", "rendering" })
+            {
+                string first = Path.Combine(Directory.Exists(baselinePath) ? baselinePath : Path.GetDirectoryName(baselinePath), "diagnostic", category + ".json");
+                string second = Path.Combine(Directory.Exists(candidatePath) ? candidatePath : Path.GetDirectoryName(candidatePath), "diagnostic", category + ".json");
+                if (!File.Exists(first) || !File.Exists(second))
+                {
+                    result.warnings.Add("Diagnostic-only metrics unavailable: missing " + category + ".json");
+                    result.comparable = false;
+                    continue;
+                }
+                var a = JsonUtility.FromJson<BenchmarkDiagnosticDocument>(File.ReadAllText(first));
+                var b = JsonUtility.FromJson<BenchmarkDiagnosticDocument>(File.ReadAllText(second));
+                if (a.runId != baseline.runId || b.runId != candidate.runId || a.signature != b.signature || a.signature != baseline.instrumentationSignature)
+                {
+                    result.warnings.Add("Diagnostic document identity/signature mismatch: " + category);
+                    result.comparable = false;
+                    continue;
+                }
+                foreach (var marker in a.markers)
+                {
+                    var other = b.markers.Find(value => value.name == marker.name && value.category == marker.category && value.unit == marker.unit);
+                    if (other == null)
+                    {
+                        continue;
+                    }
+                    foreach (var window in marker.windows)
+                    {
+                        var match = other.windows.Find(value => value.position == window.position && value.window == window.window);
+                        bool available = marker.available && other.available && match != null && window.inclusive.available && match.inclusive.available && window.inclusive.samples >= 2 && match.inclusive.samples >= 2;
+                        var selector = new BenchmarkWindow { position = window.position, window = window.window };
+                        Add(result, selector, "diagnostic/" + category + "/" + marker.name + "/mean", marker.unit, window.inclusive.mean, match == null ? 0 : match.inclusive.mean, available, false);
+                        if (marker.unit == "ms")
+                        {
+                            Add(result, selector, "diagnostic/" + category + "/" + marker.name + "/p95", marker.unit, window.inclusive.p95, match == null ? 0 : match.inclusive.p95, available && window.inclusive.samples >= 30 && match.inclusive.samples >= 30, false);
+                        }
+                    }
+                }
+            }
+            if (!result.comparable)
+            {
+                foreach (var delta in result.deltas)
+                {
+                    delta.classification = "Incomparable / insufficient data";
+                }
+            }
+        }
+
         private static BenchmarkWindow Find(BenchmarkSummary summary, int position, string window)
         {
             return summary.windows.Find(value => value.position == position && value.window == window);
@@ -267,7 +372,7 @@ namespace Rvm.Benchmark
 
         private static void Difference(BenchmarkComparisonResult result, string label, string baseline, string candidate)
         {
-            if (baseline != candidate)
+            if ((baseline ?? "") != (candidate ?? ""))
             {
                 result.warnings.Add(label + " differs: " + baseline + " -> " + candidate);
             }
@@ -275,7 +380,7 @@ namespace Rvm.Benchmark
 
         private static void CompareEnvironment(BenchmarkComparisonResult result, List<BenchmarkEntry> baseline, List<BenchmarkEntry> candidate)
         {
-            Difference(result, "World/camera conditions", JsonUtility.ToJson(new EntryList { entries = baseline }), JsonUtility.ToJson(new EntryList { entries = candidate }));
+            Difference(result, "World/camera conditions", JsonUtility.ToJson(new EntryList { entries = baseline.FindAll(value => !value.key.StartsWith("observation.", StringComparison.Ordinal)) }), JsonUtility.ToJson(new EntryList { entries = candidate.FindAll(value => !value.key.StartsWith("observation.", StringComparison.Ordinal)) }));
             foreach (var entry in baseline)
             {
                 if (entry.value != null && entry.value.StartsWith("unavailable", StringComparison.Ordinal))

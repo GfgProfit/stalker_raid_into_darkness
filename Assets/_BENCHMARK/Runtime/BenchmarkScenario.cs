@@ -22,6 +22,14 @@ namespace Rvm.Benchmark
         [SerializeField] private bool _profilerCapture;
         [SerializeField] private int _frameCapacity = 65536;
         [SerializeField] private string[] _tags = { "Baseline" };
+        [SerializeField] private bool _diagnosticCpu = true;
+        [SerializeField] private bool _diagnosticGpu = true;
+        [SerializeField] private bool _diagnosticRendering = true;
+        [SerializeField] private bool _diagnosticMemory = true;
+        [SerializeField] private double _snapshotSeconds = 1;
+        [SerializeField] private bool _fixedWeatherTime;
+        [SerializeField] private double _fixedTimeHours = 12;
+        [SerializeField] private string _expectedWeatherProfile;
 
         public string ScenarioId => _scenarioId;
         public string ScenePath => _scenePath;
@@ -33,9 +41,21 @@ namespace Rvm.Benchmark
         public bool ProfilerCapture => _profilerCapture;
         public int FrameCapacity => _frameCapacity;
         public string[] Tags => (string[])_tags.Clone();
+        public bool DiagnosticCpu => _diagnosticCpu;
+        public bool DiagnosticGpu => _diagnosticGpu;
+        public bool DiagnosticRendering => _diagnosticRendering;
+        public bool DiagnosticMemory => _diagnosticMemory;
+        public double SnapshotSeconds => _snapshotSeconds;
+        public bool FixedWeatherTime => _fixedWeatherTime;
+        public double FixedTimeHours => _fixedTimeHours;
+        public string ExpectedWeatherProfile => _expectedWeatherProfile;
 
         public string Validate()
         {
+            if (!IsFinite(_snapshotSeconds) || _snapshotSeconds < 0.5 || !IsFinite(_fixedTimeHours) || _fixedTimeHours < 0 || _fixedTimeHours >= 24)
+            {
+                return "Diagnostic snapshot interval must be >= 0.5 seconds; fixed time must be in [0, 24).";
+            }
             if (string.IsNullOrWhiteSpace(_scenarioId) || string.IsNullOrWhiteSpace(_scenePath))
             {
                 return "Scenario ID and scene path are required.";

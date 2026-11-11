@@ -13,6 +13,12 @@ namespace Rvm.Benchmark
         {
             var result = new BenchmarkMetadata
             {
+                metadataVersion = 2,
+                vSyncCount = QualitySettings.vSyncCount,
+                refreshRateHz = Screen.currentResolution.refreshRateRatio.value,
+                renderFrameInterval = OnDemandRendering.renderFrameInterval,
+                instrumentationSignature = scenario.Mode == BenchmarkMode.Standard ? "V2/Standard/legacy23" : "V2/Diagnostic/rev2/ownedCpuArea/preparationFrame/capacity=" + scenario.FrameCapacity + "/cpu=" + scenario.DiagnosticCpu + "/gpu=" + scenario.DiagnosticGpu + "/render=" + scenario.DiagnosticRendering + "/memory=" + scenario.DiagnosticMemory + "/snapshot=" + scenario.SnapshotSeconds.ToString("R", CultureInfo.InvariantCulture) + "/binary=" + scenario.ProfilerCapture,
+                fixedWorldState = scenario.FixedWeatherTime ? "Existing stable profile; paused at " + scenario.FixedTimeHours.ToString("R", CultureInfo.InvariantCulture) + " hours; expected=" + scenario.ExpectedWeatherProfile : "Uncontrolled evolving world",
                 runId = DateTime.UtcNow.ToString("yyyyMMdd_HHmmss_fffffff", CultureInfo.InvariantCulture) + "_" + Guid.NewGuid().ToString("N"),
                 seriesId = seriesId,
                 repetition = repetition,
@@ -54,7 +60,11 @@ namespace Rvm.Benchmark
                 result.positions[i] = new BenchmarkPose { key = keys[i], position = positions[i].position, rotation = positions[i].rotation };
             }
             result.warnings.Add("20 seconds is a short sample and does not characterize rare long stalls. FPS lows need at least 100/1000 valid frames respectively.");
-            result.warnings.Add("World simulation, weather, physics, random state and time are not frozen or reset. Warmup and repeated runs advance them naturally.");
+            result.warnings.Add(scenario.FixedWeatherTime ? "Only weather clock is fixed. Anomaly cycles, NPCs, physics and random state are not reset." : "World simulation and weather clock evolve during warmup/repeats. Initial world conditions must be reviewed before comparison.");
+            if (result.vsync != 0 || result.targetFrameRate > 0 || result.renderFrameInterval != 1)
+            {
+                result.warnings.Add("Frame pacing may be limited: VSync=" + result.vsync + ", targetFrameRate=" + result.targetFrameRate + ", renderFrameInterval=" + result.renderFrameInterval + ". Benchmark does not change pacing.");
+            }
             result.warnings.Add("Recorder values are process/frame totals, not camera-exclusive; Editor/SceneView work and other cameras can contribute.");
             result.warnings.Add("Graphics memory counters represent Unity accounting, not a complete hardware VRAM residency measurement. CPU and GPU times overlap and are not summed.");
             CollectWorld(camera, result.environment, result.warnings);
@@ -68,15 +78,12 @@ namespace Rvm.Benchmark
 
         public static void CollectWorld(Camera camera, List<BenchmarkEntry> entries, List<string> warnings)
         {
-            int weatherCount = 0;
+            Add(entries, "graphics.pipelineSettings", GraphicsSettings.currentRenderPipeline == null ? "unavailable" : JsonUtility.ToJson(GraphicsSettings.currentRenderPipeline));
+            new BenchmarkSceneDiagnostics(camera, false).CollectWorld(entries);
             foreach (var root in camera.gameObject.scene.GetRootGameObjects())
             {
                 foreach (var component in root.GetComponentsInChildren<MonoBehaviour>(true))
                 {
-                    if (component == null)
-                    {
-                        continue;
-                    }
                     if (component is IBenchmarkMetadataProvider provider)
                     {
                         try
@@ -85,37 +92,11 @@ namespace Rvm.Benchmark
                         }
                         catch (Exception exception)
                         {
-                            warnings.Add("Metadata provider failed: " + component.GetType().FullName + ": " + exception.Message);
-                        }
-                    }
-                    if (component.GetType().FullName != "XRay.Importer.Levels.XRayWeatherController")
-                    {
-                        continue;
-                    }
-                    string prefix = "weather." + weatherCount++ + ".";
-                    Add(entries, prefix + "enabled", component.isActiveAndEnabled.ToString());
-                    foreach (string propertyName in new[] { "GameTimeSeconds", "Paused", "TimeScale", "ConfiguredTimeOfDay", "ActiveProfile", "ActiveFx", "FxPhase", "Diagnostic" })
-                    {
-                        try
-                        {
-                            PropertyInfo property = component.GetType().GetProperty(propertyName, BindingFlags.Public | BindingFlags.Instance);
-                            object value = property == null ? null : property.GetValue(component);
-                            string text = value is UnityEngine.Object asset ? asset == null ? "none" : asset.name : Convert.ToString(value, CultureInfo.InvariantCulture);
-                            Add(entries, prefix + propertyName, property == null ? "unavailable" : text ?? "none");
-                        }
-                        catch (Exception exception)
-                        {
-                            Add(entries, prefix + propertyName, "unavailable: " + exception.GetType().Name);
+                            warnings.Add("Metadata provider failed: " + exception.Message);
                         }
                     }
                 }
             }
-            if (weatherCount == 0)
-            {
-                Add(entries, "weather", "unavailable: no known public weather provider in the benchmark scene");
-            }
-            Add(entries, "anomalies", "unavailable: no validated state provider; attach IBenchmarkMetadataProvider for explicit conditions");
-            Add(entries, "weatherSampling", "Start/end snapshots only; intervening weather evolution is not captured or controlled");
             foreach (var component in camera.GetComponents<Component>())
             {
                 if (component != null && component.GetType().FullName == "UnityEngine.Rendering.HighDefinition.HDAdditionalCameraData")

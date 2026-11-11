@@ -19,6 +19,8 @@ namespace Rvm.Benchmark
 
         private BenchmarkSequence _sequence;
         private BenchmarkCollector _collector;
+        private BenchmarkDiagnostics _diagnostics;
+        private BenchmarkWorldState _worldState;
         private BenchmarkFrame[] _frames;
         private BenchmarkMetadata _metadata;
         private Vector3 _savedLocalPosition;
@@ -142,11 +144,21 @@ namespace Rvm.Benchmark
             Saved = false;
             LastSummary = null;
             LastDirectory = null;
-            _metadata = BenchmarkEnvironment.Capture(_scenario, _camera, _positions, seriesId, repetition);
-            _metadata.gitSha = _buildGitSha;
-            _metadata.gitDirty = _buildGitDirty;
-            _metadata.hdrp = _buildHdrp;
-            LastDirectory = BenchmarkOutput.Prepare(outputRoot, _metadata);
+            try
+            {
+                _worldState = BenchmarkWorldState.Acquire(_camera, _scenario);
+                _metadata = BenchmarkEnvironment.Capture(_scenario, _camera, _positions, seriesId, repetition);
+                _metadata.gitSha = _buildGitSha;
+                _metadata.gitDirty = _buildGitDirty;
+                _metadata.hdrp = _buildHdrp;
+                LastDirectory = BenchmarkOutput.Prepare(outputRoot, _metadata);
+            }
+            catch
+            {
+                _worldState?.Dispose();
+                _worldState = null;
+                throw;
+            }
             _savedLocalPosition = _camera.transform.localPosition;
             _savedLocalRotation = _camera.transform.localRotation;
             _cameraSaved = true;
@@ -160,6 +172,7 @@ namespace Rvm.Benchmark
                 _collector = new BenchmarkCollector(_frames.Length, _scenario.Mode);
                 _sequence = new BenchmarkSequence(_scenario.PositionSeconds, _scenario.WarmupSeconds);
                 StartCapture();
+                _diagnostics = _scenario.Mode == BenchmarkMode.Diagnostic ? new BenchmarkDiagnostics(_scenario, _camera, _metadata) : null;
                 MoveCamera(0);
                 _gc0 = GC.CollectionCount(0);
                 _gc1 = GC.CollectionCount(1);
@@ -214,6 +227,14 @@ namespace Rvm.Benchmark
                     }
                     return;
                 }
+                if (_diagnostics != null && !_diagnostics.Sampling && (_sequence.Measuring || now - _sequence.PhaseStart >= _scenario.WarmupSeconds))
+                {
+                    _diagnostics.BeginSampling();
+                    _sequence = new BenchmarkSequence(_scenario.PositionSeconds, 0);
+                    _sequenceStarted = false;
+                    MoveCamera(0);
+                    return;
+                }
                 bool changed = _sequence.Advance(now);
                 if (_sequence.Complete)
                 {
@@ -228,6 +249,7 @@ namespace Rvm.Benchmark
                     }
                     if (_count == 0)
                     {
+                        _diagnostics?.Position(0);
                         _gc0 = GC.CollectionCount(0);
                         _gc1 = GC.CollectionCount(1);
                         _gc2 = GC.CollectionCount(2);
@@ -309,7 +331,9 @@ namespace Rvm.Benchmark
             _gc0 = gc0;
             _gc1 = gc1;
             _gc2 = gc2;
-            _collector.ReadPreviousFrame(_count++);
+            _collector.ReadPreviousFrame(_count);
+            _diagnostics?.ReadPrevious(_count, _frames[_count]);
+            _count++;
         }
 
         private void MoveCamera(int position)
@@ -321,6 +345,7 @@ namespace Rvm.Benchmark
             _expectedPosition = _metadata.positions[position].position;
             _expectedRotation = _metadata.positions[position].rotation;
             _camera.transform.SetPositionAndRotation(_expectedPosition, _expectedRotation);
+            _diagnostics?.Position(position);
         }
 
         private void Finish()
@@ -332,7 +357,18 @@ namespace Rvm.Benchmark
             long endTicks = BenchmarkClock.GetTimestamp();
             try
             {
+                _diagnostics?.Dispose();
                 StopCapture();
+                _metadata.finalFramePacing = QualitySettings.vSyncCount + "/" + Application.targetFrameRate + "/" + UnityEngine.Rendering.OnDemandRendering.renderFrameInterval;
+                _metadata.finalQuality = QualitySettings.names[QualitySettings.GetQualityLevel()];
+                if (_metadata.finalQuality != _metadata.quality)
+                {
+                    _metadata.warnings.Add("Quality changed during the run: " + _metadata.quality + " -> " + _metadata.finalQuality);
+                }
+                if (_metadata.finalFramePacing != _metadata.vsync + "/" + _metadata.targetFrameRate + "/" + _metadata.renderFrameInterval)
+                {
+                    _metadata.warnings.Add("Frame pacing changed during the run: " + _metadata.finalFramePacing);
+                }
                 _metadata.runtimeErrors = _runtimeErrors;
                 if (_runtimeErrors > 0)
                 {
@@ -346,6 +382,16 @@ namespace Rvm.Benchmark
                         _metadata.warnings.Add("Camera render settings changed during the run. Comparison requires review.");
                     }
                 }
+                try
+                {
+                    _worldState?.Dispose();
+                }
+                catch (Exception exception)
+                {
+                    _error = "Weather/time restoration failed: " + exception.Message;
+                    _metadata.warnings.Add(_error);
+                }
+                _worldState = null;
                 if (_collector != null)
                 {
                     bool windows = Application.platform == RuntimePlatform.WindowsEditor || Application.platform == RuntimePlatform.WindowsPlayer;
@@ -354,7 +400,28 @@ namespace Rvm.Benchmark
                     _metadata.frameTimingAlignment = _collector.Alignment;
                     _metadata.finishedUtc = DateTime.UtcNow.ToString("O");
                     LastSummary = BenchmarkOutput.Summarize(_metadata, _frames, _count, _collector, _error);
-                    Saved = BenchmarkOutput.Save(LastDirectory, _metadata, LastSummary, _frames, _count, _collector);
+                    var timers = new System.Text.StringBuilder(_metadata.frameTimingAlignment);
+                    foreach (var metric in _collector.Metrics)
+                    {
+                        if (metric.unit == "ms")
+                        {
+                            timers.Append('|').Append(metric.id).Append('=').Append(metric.available).Append('/').Append(metric.source);
+                        }
+                    }
+                    _metadata.timerSignature = timers.ToString();
+                    bool diagnosticsSaved = true;
+                    try
+                    {
+                        _diagnostics?.Save(LastDirectory, _frames, _count, LastSummary);
+                    }
+                    catch (Exception exception)
+                    {
+                        diagnosticsSaved = false;
+                        string warning = "Diagnostic save failed; standard raw results retained: " + exception.Message;
+                        _metadata.warnings.Add(warning);
+                        LastSummary.warnings.Add(warning);
+                    }
+                    Saved = BenchmarkOutput.Save(LastDirectory, _metadata, LastSummary, _frames, _count, _collector) && diagnosticsSaved;
                 }
             }
             catch (Exception exception)
@@ -365,7 +432,19 @@ namespace Rvm.Benchmark
             finally
             {
                 _collector?.Dispose();
+                _diagnostics?.Dispose();
+                _diagnostics = null;
                 StopCapture();
+                try
+                {
+                    _worldState?.Dispose();
+                }
+                catch (Exception exception)
+                {
+                    Saved = false;
+                    Debug.LogError("Benchmark weather restore failed: " + exception);
+                }
+                _worldState = null;
                 if (_cameraSaved && _camera != null)
                 {
                     _camera.transform.localPosition = _savedLocalPosition;

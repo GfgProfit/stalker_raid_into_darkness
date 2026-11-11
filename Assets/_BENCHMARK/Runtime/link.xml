@@ -1,0 +1,15 @@
+<linker>
+  <assembly fullname="XRay.Importer.Runtime" ignoreIfMissing="1">
+    <type fullname="XRay.Importer.Levels.XRayWeatherController" preserve="all" />
+    <type fullname="XRay.Importer.Levels.XRayWeatherSnapshot" preserve="all" />
+    <type fullname="XRay.Importer.Levels.XRayLevelInstancedRenderer" preserve="all" />
+    <type fullname="XRay.Importer.Levels.XRayInstanceBatchSet" preserve="all" />
+    <type fullname="XRay.Importer.Levels.XRayInstanceBatch" preserve="all" />
+  </assembly>
+  <assembly fullname="RaidIntoDarkness.Player" ignoreIfMissing="1">
+    <type fullname="RaidIntoDarkness.Player.AnomalyPlayerReaction" preserve="all" />
+  </assembly>
+  <assembly fullname="RaidIntoDarkness.Effects" ignoreIfMissing="1">
+    <type fullname="RaidIntoDarkness.Effects.AnomalyVisual" preserve="all" />
+  </assembly>
+</linker>

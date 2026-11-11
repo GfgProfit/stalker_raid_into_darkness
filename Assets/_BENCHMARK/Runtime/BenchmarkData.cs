@@ -68,6 +68,15 @@ namespace Rvm.Benchmark
         public bool profilerWasEnabled;
         public int runtimeErrors;
         public string frameTimingAlignment;
+        public int metadataVersion;
+        public int vSyncCount;
+        public double refreshRateHz;
+        public int renderFrameInterval;
+        public string instrumentationSignature;
+        public string timerSignature;
+        public string fixedWorldState;
+        public string finalFramePacing;
+        public string finalQuality;
         public List<BenchmarkEntry> environment = new List<BenchmarkEntry>();
         public List<BenchmarkEntry> endEnvironment = new List<BenchmarkEntry>();
         public List<string> warnings = new List<string>();

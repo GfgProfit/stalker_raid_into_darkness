@@ -92,7 +92,7 @@ namespace XRay.Importer.Levels
             File.Copy(_buildManifestPath, Path.Combine(_output, "TestedBuildManifest.json"));
             _instance = this;
             Application.runInBackground = true;
-            Application.targetFrameRate = 60;
+            Application.targetFrameRate = -1;
             QualitySettings.vSyncCount = 0;
             _capture = new RenderTexture(WIDTH, HEIGHT, 0, RenderTextureFormat.ARGBFloat, RenderTextureReadWrite.Linear);
             _capture.name = "Persistent native framebuffer evidence";

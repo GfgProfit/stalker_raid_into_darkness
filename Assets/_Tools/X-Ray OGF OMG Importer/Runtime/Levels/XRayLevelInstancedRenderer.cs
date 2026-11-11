@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Profiling;
 using UnityEngine.Rendering;
 
 namespace XRay.Importer.Levels
@@ -11,6 +12,14 @@ namespace XRay.Importer.Levels
         public const string INSTANCE_DATA_PROPERTY = "_MonolithInstanceData";
 
         private const int MAX_MOTION_INSTANCES = 511;
+
+        private static readonly ProfilerMarker CAMERA_MARKER = new ProfilerMarker("RVM.XRay.InstancedRenderer");
+        private static readonly ProfilerMarker HISTORY_MARKER = new ProfilerMarker("RVM.XRay.MatrixHistory");
+        private static readonly ProfilerMarker SUBMISSION_MARKER = new ProfilerMarker("RVM.XRay.Submission");
+        private static readonly ProfilerMarker LOD_MARKER = new ProfilerMarker("RVM.XRay.Lod");
+        private static readonly ProfilerMarker REFLECTION_MARKER = new ProfilerMarker("RVM.XRay.Reflection");
+
+        public static bool DiagnosticMarkersEnabled { get; set; }
 
         [SerializeField] private XRayInstanceBatchSet _batchSet;
         [SerializeField] private float _maxDistance;
@@ -25,6 +34,7 @@ namespace XRay.Importer.Levels
         private MaterialPropertyBlock _submissionBlock;
         private XRayLevelLodRenderer _lodRenderer;
         private int _propertyId;
+        private HashSet<XRayInstanceBatch> _diagnosticSubmitted;
 
         public XRayInstanceBatchSet BatchSet
         {
@@ -44,6 +54,11 @@ namespace XRay.Importer.Levels
             set => _lodImpostors = value;
         }
 
+        public Camera DiagnosticCamera { get; private set; }
+        public int DiagnosticFrame { get; private set; } = -1;
+        public int DiagnosticCpuSubmissions { get; private set; }
+        public int DiagnosticSubmittedBatches => _diagnosticSubmitted?.Count ?? 0;
+        public int DiagnosticSubmissionInstanceReferences { get; private set; }
         public Func<Material, Material> MaterialResolver { get; set; }
         public int LastVisibleBatches { get; private set; }
         public int LastVisibleInstances { get; private set; }
@@ -89,6 +104,14 @@ namespace XRay.Importer.Levels
                 return;
             }
 
+            using var diagnosticScope = new DiagnosticScope(CAMERA_MARKER);
+            if (DiagnosticMarkersEnabled)
+            {
+                _diagnosticSubmitted ??= new HashSet<XRayInstanceBatch>(_batchSet.Batches.Count);
+                _diagnosticSubmitted.Clear();
+                DiagnosticCpuSubmissions = 0;
+                DiagnosticSubmissionInstanceReferences = 0;
+            }
             EnsureProperties();
             GeometryUtility.CalculateFrustumPlanes(camera, _planes);
             ExperimentalShadowInfluence?.Prepare(camera);
@@ -174,10 +197,16 @@ namespace XRay.Importer.Levels
             LastVisibleInstances = visibleInstances;
             LastShadowOnlyBatches = shadowOnlyBatches;
             LastRejectedShadowBatches = rejectedShadowBatches;
+            if (DiagnosticMarkersEnabled)
+            {
+                DiagnosticCamera = camera;
+                DiagnosticFrame = Time.frameCount;
+            }
         }
 
         private void RenderReflection(Camera camera)
         {
+            using var diagnosticScope = new DiagnosticScope(REFLECTION_MARKER);
             EnsureProperties();
             GeometryUtility.CalculateFrustumPlanes(camera, _planes);
             float distance = _maxDistance > 0.0f ? Mathf.Min(_maxDistance, camera.farClipPlane) : camera.farClipPlane;
@@ -220,6 +249,7 @@ namespace XRay.Importer.Levels
 
         private bool RenderLodBatch(Camera camera, int index, XRayInstanceBatch batch, InstanceHistory history, Bounds bounds, XRayFloraWindState wind, byte[] states, bool castShadows, ref int lodShadowOnly, ref int lodDiscarded)
         {
+            using var diagnosticScope = new DiagnosticScope(LOD_MARKER);
             int full = 0;
             for (int instance = 0; instance < batch.Count; instance++)
             {
@@ -294,6 +324,7 @@ namespace XRay.Importer.Levels
 
         private void Submit(Camera camera, XRayInstanceBatch batch, Bounds bounds, XRayFloraWindState wind, MaterialPropertyBlock block, InstanceData[] matrices, Vector4[] data, int count, ShadowCastingMode mode, bool moving)
         {
+            using var diagnosticScope = new DiagnosticScope(SUBMISSION_MARKER);
             int submeshes = Mathf.Min(batch.Mesh.subMeshCount, batch.Materials.Length);
             for (int submesh = 0; submesh < submeshes; submesh++)
             {
@@ -316,6 +347,12 @@ namespace XRay.Importer.Levels
                     }
                     var parameters = new RenderParams(material) { camera = camera, worldBounds = bounds, motionVectorMode = moving || XRayFloraWindBounds.Uses(material, wind) ? MotionVectorGenerationMode.Object : MotionVectorGenerationMode.Camera, layer = gameObject.layer, shadowCastingMode = mode, receiveShadows = true, matProps = properties };
                     Graphics.RenderMeshInstanced(parameters, batch.Mesh, submesh, matrices, length, start);
+                    if (DiagnosticMarkersEnabled)
+                    {
+                        DiagnosticCpuSubmissions++;
+                        DiagnosticSubmissionInstanceReferences += length;
+                        _diagnosticSubmitted.Add(batch);
+                    }
                 }
             }
         }
@@ -327,6 +364,7 @@ namespace XRay.Importer.Levels
 
         private InstanceHistory History(int index, XRayInstanceBatch batch)
         {
+            using var diagnosticScope = new DiagnosticScope(HISTORY_MARKER);
             while (_histories.Count <= index) _histories.Add(null);
             InstanceHistory history = _histories[index];
             if (history == null || !ReferenceEquals(history.Source, batch) || history.Instances.Length != batch.Count)
@@ -345,6 +383,30 @@ namespace XRay.Importer.Levels
             }
             history.Frame = Time.frameCount;
             return history;
+        }
+
+        private readonly struct DiagnosticScope : IDisposable
+        {
+            private readonly ProfilerMarker _marker;
+            private readonly bool _enabled;
+
+            public DiagnosticScope(ProfilerMarker marker)
+            {
+                _marker = marker;
+                _enabled = DiagnosticMarkersEnabled;
+                if (_enabled)
+                {
+                    _marker.Begin();
+                }
+            }
+
+            public void Dispose()
+            {
+                if (_enabled)
+                {
+                    _marker.End();
+                }
+            }
         }
 
         private struct InstanceData

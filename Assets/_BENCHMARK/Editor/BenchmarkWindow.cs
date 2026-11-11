@@ -27,6 +27,11 @@ namespace Rvm.Benchmark.Editor
         {
             _scroll = EditorGUILayout.BeginScrollView(_scroll);
             EditorGUILayout.LabelField("Бенчмарк локации", EditorStyles.boldLabel);
+            EditorGUILayout.LabelField("Frame pacing", "VSync=" + QualitySettings.vSyncCount + "; targetFrameRate=" + Application.targetFrameRate + "; refresh=" + Screen.currentResolution.refreshRateRatio.value.ToString("F2") + " Hz; interval=" + UnityEngine.Rendering.OnDemandRendering.renderFrameInterval);
+            if (QualitySettings.vSyncCount != 0 || Application.targetFrameRate > 0 || UnityEngine.Rendering.OnDemandRendering.renderFrameInterval != 1)
+            {
+                EditorGUILayout.HelpBox("Обнаружен VSync или программный лимит кадров. Benchmark записывает фактические значения и не меняет их во время замера.", MessageType.Warning);
+            }
             var selected = (BenchmarkScenario)EditorGUILayout.ObjectField("Scenario", _scenario, typeof(BenchmarkScenario), false);
             if (selected != _scenario)
             {
@@ -45,7 +50,29 @@ namespace Rvm.Benchmark.Editor
                 EditorGUILayout.PropertyField(serialized.FindProperty("_warmupSeconds"), new GUIContent("Прогрев, секунд"));
                 EditorGUILayout.PropertyField(serialized.FindProperty("_stabilizationSeconds"), new GUIContent("Transition, секунд"));
                 EditorGUILayout.PropertyField(serialized.FindProperty("_mode"), new GUIContent("Режим"));
-                EditorGUILayout.PropertyField(serialized.FindProperty("_profilerCapture"), new GUIContent("Binary capture (Diagnostic)"));
+                if ((BenchmarkMode)serialized.FindProperty("_mode").enumValueIndex == BenchmarkMode.Diagnostic)
+                {
+                    EditorGUILayout.LabelField("Diagnostic", EditorStyles.boldLabel);
+                    EditorGUILayout.PropertyField(serialized.FindProperty("_diagnosticCpu"), new GUIContent("CPU markers"));
+                    EditorGUILayout.PropertyField(serialized.FindProperty("_diagnosticGpu"), new GUIContent("GPU observations"));
+                    EditorGUILayout.PropertyField(serialized.FindProperty("_diagnosticRendering"), new GUIContent("Rendering snapshots"));
+                    EditorGUILayout.PropertyField(serialized.FindProperty("_diagnosticMemory"), new GUIContent("Memory counters"));
+                    EditorGUILayout.PropertyField(serialized.FindProperty("_snapshotSeconds"), new GUIContent("Snapshot interval, seconds"));
+                    EditorGUILayout.PropertyField(serialized.FindProperty("_profilerCapture"), new GUIContent("Binary CPU capture"));
+                    EditorGUILayout.HelpBox("Inclusive CPU markers нельзя складывать. GPU observations запаздывают и не привязаны к исходному POS. Процедура GPU capture и анализ CPU Timeline описаны в diagnostic-report.md каждого запуска.", MessageType.Info);
+                }
+                else
+                {
+                    serialized.FindProperty("_profilerCapture").boolValue = false;
+                }
+                EditorGUILayout.LabelField("Условия запуска", EditorStyles.boldLabel);
+                EditorGUILayout.PropertyField(serialized.FindProperty("_fixedWeatherTime"), new GUIContent("Фиксировать погоду / часы"));
+                if (serialized.FindProperty("_fixedWeatherTime").boolValue)
+                {
+                    EditorGUILayout.PropertyField(serialized.FindProperty("_fixedTimeHours"), new GUIContent("Час [0, 24)"));
+                    EditorGUILayout.PropertyField(serialized.FindProperty("_expectedWeatherProfile"), new GUIContent("Ожидаемый профиль"));
+                    EditorGUILayout.HelpBox("Используется уже выбранный стабильный профиль. Переходы/FX запрещены; часы ставятся на паузу и восстанавливаются после остановки. Аномалии, NPC и физика продолжают работу.", MessageType.Info);
+                }
                 serialized.ApplyModifiedProperties();
                 EditorGUILayout.LabelField("Измеряемое время", BenchmarkOutput.Number(_scenario.PositionSeconds * 4) + " секунд; основной протокол — 4 × 5");
                 _camera = (Camera)EditorGUILayout.ObjectField("Рабочая камера", _camera, typeof(Camera), true);
@@ -86,6 +113,18 @@ namespace Rvm.Benchmark.Editor
             if (GUILayout.Button("Открыть последний отчёт") && File.Exists(BenchmarkEditorSession.LastReport))
             {
                 Application.OpenURL(new Uri(BenchmarkEditorSession.LastReport).AbsoluteUri);
+            }
+            if (GUILayout.Button("Открыть Diagnostic Report / capture workflow"))
+            {
+                string path = string.IsNullOrEmpty(BenchmarkEditorSession.LastReport) ? "" : Path.Combine(Path.GetDirectoryName(BenchmarkEditorSession.LastReport), "diagnostic", "diagnostic-report.md");
+                if (File.Exists(path))
+                {
+                    Application.OpenURL(new Uri(path).AbsoluteUri);
+                }
+                else
+                {
+                    _error = "Нет Diagnostic Report: выполните прогон в режиме Diagnostic.";
+                }
             }
             EditorGUILayout.Space();
             EditorGUILayout.LabelField("Сравнение сохранённых прогонов", EditorStyles.boldLabel);

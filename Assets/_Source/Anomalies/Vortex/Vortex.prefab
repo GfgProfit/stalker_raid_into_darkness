@@ -143806,6 +143806,7 @@ GameObject:
   - component: {fileID: 8877876097575596947}
   - component: {fileID: 3380067854915241451}
   - component: {fileID: 5979227429481312428}
+  - component: {fileID: 5465464842102847460}
   m_Layer: 0
   m_Name: Vortex
   m_TagString: Untagged
@@ -143855,6 +143856,7 @@ MonoBehaviour:
   _awaking: {fileID: 0}
   _accumulate: {fileID: 0}
   _blowoutDelay: 0
+  _followZone: 0
 --- !u!114 &2997765004951359794
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -143879,6 +143881,8 @@ MonoBehaviour:
   _idleLightRangeJitter: 0
   _audio: {fileID: 6588520462955023629}
   _contactEffects: {fileID: 0}
+  _smallContactEffects: {fileID: 0}
+  _useSourceContactEffects: 0
   _entranceContactEffects: {fileID: 7477496169620942354}
   _idleContactEffects: {fileID: 5373092190160638594}
   _smallEntranceContactEffects: {fileID: 0}
@@ -143889,6 +143893,7 @@ MonoBehaviour:
   _playIdleChildren: 1
   _keepIdleDuringDischarge: 1
   _dischargeTemplate: {fileID: 5016160966146688315}
+  _freezeDischargeAtStart: 0
   _dischargeRootIndex: 0
   _stopEffectIndices: 05000000060000000700000008000000090000000c0000000d0000000e00000019000000i
   _stopTimes:
@@ -143947,6 +143952,9 @@ MonoBehaviour:
   _blowoutTime: 2.5
   _accumulateTime: 1
   _ignoreSmallObjects: 1
+  _actorOnly: 0
+  _ignoreNonlivingObjects: 0
+  _minimumPlayerSpeed: 0
   _smallObjectIgnoreDelay: 0.5
   _nonlivingIdleStopDelay: 0.1
   _repeatNonlivingIdleStop: 0
@@ -143987,6 +143995,20 @@ MonoBehaviour:
   - _system: {fileID: 1159267979666322344}
     _rate: 14
     _timeLimit: 0
+--- !u!114 &5465464842102847460
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7296845186965445704}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 06e2e3b853eeca64ea97774cd24d1f89, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: RaidIntoDarkness.Player::RaidIntoDarkness.Player.AnomalyDamageSource
+  _variant: {fileID: 11400000, guid: 3e47b034c4af9af4eb9cf24213164b28, type: 2}
+  _sourceSection: zone_gravi_zone
 --- !u!1 &7318099957935849003
 GameObject:
   m_ObjectHideFlags: 0

@@ -2,10 +2,13 @@ using System.Collections.Generic;
 using Inventory;
 using Inventory.UI;
 using NUnit.Framework;
+using TMPro;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
+using XRay.Importer.Levels;
 using Object = UnityEngine.Object;
 
 namespace RaidIntoDarkness.Integrations.Inventory.Tests
@@ -17,6 +20,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
         private Scene _preview;
         private GameObject _root;
         private InventoryWindow _window;
+        private AnomalyBalanceConfig _anomalyConfig;
 
         [SetUp]
         public void SetUp()
@@ -25,6 +29,10 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             _root = new GameObject("EquipmentPercentageStatsTests") { hideFlags = HideFlags.HideAndDontSave };
             SceneManager.MoveGameObjectToScene(_root, _preview);
             _window = _root.AddComponent<InventoryWindow>();
+            _anomalyConfig = ScriptableObject.CreateInstance<AnomalyBalanceConfig>();
+            using var serialized = new SerializedObject(_anomalyConfig);
+            serialized.FindProperty("_conditionEfficiencyCurve").animationCurveValue = new AnimationCurve(new Keyframe(0f, 0f, 0.7f, 0.7f), new Keyframe(50f, 35f, 0.7f, 1.35f), new Keyframe(70f, 62f, 1.35f, 1.6f), new Keyframe(80f, 78f, 1.6f, 1.6f), new Keyframe(85f, 86f, 1.6f, 1.4f), new Keyframe(90f, 93f, 1.4f, 0.8f), new Keyframe(95f, 97f, 0.8f, 0.6f), new Keyframe(100f, 100f, 0.6f, 0.6f));
+            serialized.ApplyModifiedPropertiesWithoutUndo();
         }
 
         [TearDown]
@@ -41,6 +49,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             }
 
             _definitions.Clear();
+            Object.DestroyImmediate(_anomalyConfig);
 
             if (_preview.IsValid() && _preview.isLoaded)
             {
@@ -48,28 +57,28 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             }
         }
 
-        [TestCase("_fireWoundProtection", "Ballistic protection", true)]
-        [TestCase("_helmetFireWoundProtection", "Helmet ballistic protection", true)]
-        [TestCase("_woundProtection", "Rupture protection", true)]
-        [TestCase("_strikeProtection", "Impact protection", true)]
-        [TestCase("_explosionProtection", "Explosion protection", true)]
-        [TestCase("_radiationProtection", "Radiation protection", true)]
-        [TestCase("_telepaticProtection", "Psy protection", true)]
-        [TestCase("_burnProtection", "Burn protection", true)]
-        [TestCase("_shockProtection", "Shock protection", true)]
-        [TestCase("_chemicalBurnProtection", "Chemical protection", true)]
-        [TestCase("_physicalDurability", "Physical durability", false)]
-        [TestCase("_anomalyDurability", "Anomaly durability", false)]
-        public void StoredPercentUsesConditionOnlyForProtection(string field, string label, bool affectedByCondition)
+        [TestCase("_fireWoundProtection", "Ballistic protection", true, false)]
+        [TestCase("_helmetFireWoundProtection", "Helmet ballistic protection", true, false)]
+        [TestCase("_woundProtection", "Rupture protection", true, true)]
+        [TestCase("_strikeProtection", "Impact protection", true, true)]
+        [TestCase("_explosionProtection", "Explosion protection", true, true)]
+        [TestCase("_radiationProtection", "Radiation protection", true, true)]
+        [TestCase("_telepaticProtection", "Psy protection", true, true)]
+        [TestCase("_burnProtection", "Burn protection", true, true)]
+        [TestCase("_shockProtection", "Shock protection", true, true)]
+        [TestCase("_chemicalBurnProtection", "Chemical protection", true, true)]
+        [TestCase("_physicalDurability", "Physical durability", false, false)]
+        [TestCase("_anomalyDurability", "Anomaly durability", false, false)]
+        public void StoredPercentUsesSharedAnomalyCurveAndPreservesOtherStats(string field, string label, bool affectedByCondition, bool anomalyProtection)
         {
             ItemDefinition definition = CreateDefinition(EquipmentStatsFormatter.OUTFIT_CATEGORY, false);
             SetValue(definition, field, 23.75f);
             var item = new ItemInstance(definition, 1);
-            item.SetState(EquipmentStatsFormatter.CONDITION_STATE, "0.13");
-            var formatter = new EquipmentStatsFormatter(_window);
+            item.SetState(EquipmentStatsFormatter.CONDITION_STATE, anomalyProtection ? "0.5" : "0.13");
+            var formatter = new EquipmentStatsFormatter(_window, _anomalyConfig);
             var rows = new List<InventoryItemStat>();
             formatter.Collect(item, rows);
-            Assert.That(Find(rows, label).Value, Is.EqualTo(affectedByCondition ? "3.09%" : "23.75%"));
+            Assert.That(Find(rows, label).Value, Is.EqualTo(anomalyProtection ? "8.31%" : affectedByCondition ? "3.09%" : "23.75%"));
             formatter.FullCondition = true;
             rows.Clear();
             formatter.Collect(item, rows);
@@ -117,7 +126,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
         }
 
         [Test]
-        public void StatusBarsCombineEachItemsConditionWithoutOriginalScale()
+        public void StatusBarsUseSequentialAnomalyProtectionAndPreserveBallisticValues()
         {
             InventoryModel model = BindEquipment();
             ItemDefinition outfitDefinition = CreateDefinition(EquipmentStatsFormatter.OUTFIT_CATEGORY, true);
@@ -137,13 +146,97 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             Assert.That(model.TryAdd(helmet, "Equipment", Vector2Int.right, false).Success, Is.True);
             InventoryStatusPanel panel = _root.AddComponent<InventoryStatusPanel>();
             panel.Configure(new[] { new InventoryStatusBar(EquipmentStatusPresenter.STATUS_RADIATION, null, null, null), new InventoryStatusBar(EquipmentStatusPresenter.STATUS_SHOCK, null, null, null), new InventoryStatusBar(EquipmentStatusPresenter.STATUS_FIRE_WOUND, null, null, null) });
-            var presenter = new EquipmentStatusPresenter(_window, panel);
+            var presenter = new EquipmentStatusPresenter(_window, panel, _anomalyConfig);
             presenter.Refresh(null, false);
-            Assert.That(panel.GetValue(EquipmentStatusPresenter.STATUS_RADIATION), Is.EqualTo(0.07f).Within(0.000001f));
-            Assert.That(panel.GetValue(EquipmentStatusPresenter.STATUS_SHOCK), Is.EqualTo(0.09f).Within(0.000001f));
+            Assert.That(panel.GetValue(EquipmentStatusPresenter.STATUS_RADIATION), Is.EqualTo(0.048412f).Within(0.000001f));
+            Assert.That(panel.GetValue(EquipmentStatusPresenter.STATUS_SHOCK), Is.EqualTo(0.062608f).Within(0.000001f));
             Assert.That(panel.GetValue(EquipmentStatusPresenter.STATUS_FIRE_WOUND), Is.EqualTo(0.055f).Within(0.000001f));
             presenter.Refresh(null, true);
-            Assert.That(panel.GetValue(EquipmentStatusPresenter.STATUS_RADIATION), Is.EqualTo(0.5f).Within(0.000001f));
+            Assert.That(panel.GetValue(EquipmentStatusPresenter.STATUS_RADIATION), Is.EqualTo(0.44f).Within(0.000001f));
+        }
+
+        [Test]
+        public void StatusTextUsesMeanProtectionAndRestoresCurrentValueAfterPreview()
+        {
+            InventoryModel model = BindEquipment();
+            model.AddContainer(new GridContainer("Backpack", 2, 1));
+            ItemDefinition definition = CreateDefinition(EquipmentStatsFormatter.OUTFIT_CATEGORY, true);
+            using (var serialized = new SerializedObject(definition))
+            {
+                SerializedProperty protections = serialized.FindProperty("_components").GetArrayElementAtIndex(0).FindPropertyRelative("_anomalyProtections");
+                protections.arraySize = 1;
+                protections.GetArrayElementAtIndex(0).boxedValue = new AnomalyEquipmentProtectionEntry(AnomalyDamageType.Shock, new AnomalyProtectionValues(90f, 60f, 12f));
+                serialized.ApplyModifiedPropertiesWithoutUndo();
+            }
+            ItemInstance outfit = model.CreateItem(definition);
+            Assert.That(model.TryAdd(outfit, "Equipment", Vector2Int.zero, false).Success, Is.True);
+            var textObject = new GameObject("Stat Text", typeof(RectTransform));
+            textObject.transform.SetParent(_root.transform, false);
+            TMP_Text text = textObject.AddComponent<TextMeshProUGUI>();
+            Color originalColor = new(0.7f, 0.6f, 0.5f, 1f);
+            text.color = originalColor;
+            InventoryStatusPanel panel = _root.AddComponent<InventoryStatusPanel>();
+            panel.Configure(new[] { new InventoryStatusBar(EquipmentStatusPresenter.STATUS_SHOCK, null, null, null, text) });
+            var presenter = new EquipmentStatusPresenter(_window, panel, _anomalyConfig);
+            presenter.Refresh(null, false);
+            Assert.That(text.text, Is.EqualTo("54 / 100 %"));
+            outfit.SetState(EquipmentStatsFormatter.CONDITION_STATE, "0.5");
+            presenter.Refresh(null, false);
+            Assert.That(text.text, Is.EqualTo("19 / 100 %"));
+            Assert.That(panel.GetValue(EquipmentStatusPresenter.STATUS_SHOCK), Is.EqualTo(0.189f).Within(0.000001f));
+            ItemDefinition candidateDefinition = CreateDefinition(EquipmentStatsFormatter.OUTFIT_CATEGORY, true);
+            SetValue(candidateDefinition, "_shockProtection", 24f);
+            ItemInstance candidate = model.CreateItem(candidateDefinition);
+            Assert.That(model.TryAdd(candidate, "Backpack", Vector2Int.zero, false).Success, Is.True);
+            presenter.Refresh(candidate, false);
+            Assert.That(text.text, Is.EqualTo("<color=#00FF00FF>24</color> / 100 %"));
+            Assert.That(text.color, Is.EqualTo(originalColor));
+            presenter.Refresh(null, false);
+            Assert.That(text.text, Is.EqualTo("19 / 100 %"));
+            Assert.That(text.color, Is.EqualTo(originalColor));
+            presenter.Refresh(null, true);
+            Assert.That(text.text, Is.EqualTo("54 / 100 %"));
+            Assert.That(outfit.State[EquipmentStatsFormatter.CONDITION_STATE], Is.EqualTo("0.5"));
+        }
+
+        [TestCase(0.543f, 1f, "54 / 100 %")]
+        [TestCase(0.375f, 0.8f, "38 / 80 %")]
+        [TestCase(-1f, 2f, "0 / 100 %")]
+        public void StatusTextDisplaysRoundedPercentagesAndCurrentMaximum(float value, float maximum, string expected)
+        {
+            var textObject = new GameObject("Stat Text", typeof(RectTransform));
+            textObject.transform.SetParent(_root.transform, false);
+            TMP_Text text = textObject.AddComponent<TextMeshProUGUI>();
+            var bar = new InventoryStatusBar("power", null, null, null, text);
+            bar.Apply(value, maximum);
+            Assert.That(text.text, Is.EqualTo(expected));
+        }
+
+        [Test]
+        public void StatusHoverForwardsPointerAndIgnoresExitFromPreviousRow()
+        {
+            InventoryStatusPanel panel = _root.AddComponent<InventoryStatusPanel>();
+            InventoryStatusHoverTarget target = _root.AddComponent<InventoryStatusHoverTarget>();
+            target.Configure(panel, EquipmentStatusPresenter.STATUS_SHOCK);
+            string hovered = null;
+            Vector2 position = Vector2.zero;
+            int exits = 0;
+            panel.PointerEntered += (id, point, eventCamera) => hovered = id;
+            panel.PointerMoved += (point, eventCamera) => position = point;
+            panel.PointerExited += () => exits++;
+            var pointer = new PointerEventData(null) { position = new Vector2(123f, 456f) };
+            target.OnPointerEnter(pointer);
+            Assert.That(hovered, Is.EqualTo(EquipmentStatusPresenter.STATUS_SHOCK));
+            target.OnPointerMove(pointer);
+            Assert.That(position, Is.EqualTo(pointer.position));
+            panel.HandlePointerEnter(EquipmentStatusPresenter.STATUS_FIRE, Vector2.zero, null);
+            target.OnPointerExit(pointer);
+            Assert.That(exits, Is.Zero);
+            panel.HandlePointerExit(EquipmentStatusPresenter.STATUS_FIRE);
+            Assert.That(exits, Is.EqualTo(1));
+            pointer.position = Vector2.one;
+            target.OnPointerMove(pointer);
+            Assert.That(position, Is.EqualTo(new Vector2(123f, 456f)));
         }
 
         [Test]
@@ -161,17 +254,41 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
         public void HelmetTooltipUsesItsOwnCondition()
         {
             ItemDefinition definition = CreateDefinition(EquipmentStatsFormatter.HELMET_CATEGORY, true);
-            SetValue(definition, "_shockProtection", 47.5f);
+            SetValue(definition, "_shockProtection", 47f);
             var item = new ItemInstance(definition, 1);
             item.SetState(EquipmentStatsFormatter.CONDITION_STATE, "0.5");
             var rows = new List<InventoryItemStat>();
-            var formatter = new EquipmentStatsFormatter(_window);
+            var formatter = new EquipmentStatsFormatter(_window, _anomalyConfig);
             formatter.Collect(item, rows);
-            Assert.That(Find(rows, "Shock protection").Value, Is.EqualTo("23.75%"));
+            Assert.That(Find(rows, "Shock protection").Value, Is.EqualTo("16.45%"));
             rows.Clear();
             formatter.FullCondition = true;
             formatter.Collect(item, rows);
-            Assert.That(Find(rows, "Shock protection").Value, Is.EqualTo("47.5%"));
+            Assert.That(Find(rows, "Shock protection").Value, Is.EqualTo("47%"));
+        }
+
+        [TestCase("0.999", "99.9%", "#33FF66")]
+        [TestCase("1", "100%", "#33FF66")]
+        [TestCase("0.91", "91%", "#33FF66")]
+        [TestCase("0.599", "59.9%", "#CC0033")]
+        [TestCase("0.6", "60%", "#FFFF00")]
+        [TestCase("0.849", "84.9%", "#FFFF00")]
+        [TestCase("0.85", "85%", "#33FF66")]
+        [TestCase("0", "0%", "#CC0033")]
+        public void ItemTooltipsUseOneOptionalConditionDecimalWithoutRoundingUpToAnInteger(string condition, string expectedPercent, string expectedColor)
+        {
+            foreach (string category in new[] { EquipmentStatsFormatter.OUTFIT_CATEGORY, EquipmentStatsFormatter.HELMET_CATEGORY, EquipmentStatsFormatter.BACKPACK_CATEGORY })
+            {
+                ItemDefinition definition = CreateDefinition(category, true);
+                var item = new ItemInstance(definition, 1);
+                item.SetState(EquipmentStatsFormatter.CONDITION_STATE, condition);
+                var formatter = new EquipmentStatsFormatter(_window, _anomalyConfig);
+                string expected = "Condition: <color=" + expectedColor + ">" + expectedPercent;
+                Assert.That(formatter.Describe(item), Does.Contain(expected), category);
+                formatter.FullCondition = true;
+                Assert.That(formatter.Describe(item), Does.Contain(expected), category);
+                Assert.That(item.GetState(EquipmentStatsFormatter.CONDITION_STATE), Is.EqualTo(condition), category);
+            }
         }
 
         private InventoryModel BindEquipment()

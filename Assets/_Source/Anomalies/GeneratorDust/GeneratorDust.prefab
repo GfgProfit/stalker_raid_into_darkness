@@ -22954,6 +22954,7 @@ GameObject:
   - component: {fileID: 4468000783191033005}
   - component: {fileID: 7434058245482913623}
   - component: {fileID: 8293794023843080922}
+  - component: {fileID: 6708132269025464157}
   m_Layer: 0
   m_Name: GeneratorDust
   m_TagString: Untagged
@@ -23101,6 +23102,20 @@ MonoBehaviour:
   _randomizeRadius: 0
   _randomRadiusMin: 2
   _randomRadiusMax: 3
+--- !u!114 &6708132269025464157
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6803863700715777244}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 06e2e3b853eeca64ea97774cd24d1f89, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: RaidIntoDarkness.Player::RaidIntoDarkness.Player.AnomalyDamageSource
+  _variant: {fileID: 11400000, guid: 78dd955883dcc1546907ef849ed793ec, type: 2}
+  _sourceSection: generator_dust_static
 --- !u!1 &7519897798714905146
 GameObject:
   m_ObjectHideFlags: 0

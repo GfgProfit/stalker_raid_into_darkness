@@ -8,6 +8,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 5465464842102847460, guid: 57fe2d45e2d10c546ba3c7b47b5b06f8, type: 3}
+      propertyPath: _variant
+      value: 
+      objectReference: {fileID: 11400000, guid: 0dc66f6d6e42c1342800b106649293bc, type: 2}
+    - target: {fileID: 5465464842102847460, guid: 57fe2d45e2d10c546ba3c7b47b5b06f8, type: 3}
+      propertyPath: _sourceSection
+      value: zone_mine_gravitational_average
+      objectReference: {fileID: 0}
     - target: {fileID: 7296845186965445704, guid: 57fe2d45e2d10c546ba3c7b47b5b06f8, type: 3}
       propertyPath: m_Name
       value: VortexAverage

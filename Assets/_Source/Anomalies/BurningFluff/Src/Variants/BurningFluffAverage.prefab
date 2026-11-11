@@ -114,6 +114,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: BurningFluffAverage
       objectReference: {fileID: 0}
+    - target: {fileID: 6812319926763774545, guid: ceb9b97044f535a43ad1b4d909fd5dac, type: 3}
+      propertyPath: _variant
+      value: 
+      objectReference: {fileID: 11400000, guid: 98c39918e0890694e852cbb2175f8ec6, type: 2}
+    - target: {fileID: 6812319926763774545, guid: ceb9b97044f535a43ad1b4d909fd5dac, type: 3}
+      propertyPath: _sourceSection
+      value: zone_burning_fuzz_average
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects:
     - {fileID: 1553239026229368783, guid: ceb9b97044f535a43ad1b4d909fd5dac, type: 3}

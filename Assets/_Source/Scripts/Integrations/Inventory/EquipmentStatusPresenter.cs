@@ -1,6 +1,7 @@
 using Inventory;
 using Inventory.UI;
 using UnityEngine;
+using XRay.Importer.Levels;
 
 namespace RaidIntoDarkness.Integrations.Inventory
 {
@@ -31,11 +32,19 @@ namespace RaidIntoDarkness.Integrations.Inventory
 
         private readonly InventoryWindow _window;
         private readonly InventoryStatusPanel _status;
+        private readonly AnomalyBalanceConfig _anomalyConfig;
 
-        public EquipmentStatusPresenter(InventoryWindow window, InventoryStatusPanel status)
+        public EquipmentStatusPresenter(InventoryWindow window, InventoryStatusPanel status, AnomalyBalanceConfig anomalyConfig = null)
         {
             _window = window;
             _status = status;
+            _anomalyConfig = anomalyConfig != null ? anomalyConfig : GameConfig.Load()?.AnomalyBalance;
+        }
+
+        public AnomalyProtectionValues GetAnomalyProtectionValues(AnomalyDamageType type, bool fullCondition = false, ItemInstance replacement = null)
+        {
+            InventoryContainer equipment = _window != null && _window.Model != null ? _window.Model.GetContainer(_window.EquipmentContainerId) : null;
+            return AnomalyEquipmentProtection.GetCombinedValues(equipment, type, _anomalyConfig, replacement: replacement, fullCondition: fullCondition);
         }
 
         public void Refresh(ItemInstance hovered, bool fullCondition)
@@ -57,9 +66,20 @@ namespace RaidIntoDarkness.Integrations.Inventory
             for (int i = 0; i < BARS.Length; i++)
             {
                 StatusBar bar = BARS[i];
+                if (AnomalyEquipmentProtection.TryGetDamageType(bar.Stat, out AnomalyDamageType anomalyType))
+                {
+                    float protection = Normalize(GetMeanProtection(GetAnomalyProtectionValues(anomalyType, fullCondition)));
+                    _status.SetValue(bar.Id, protection);
+                    if (hoveredOutfit || hoveredHelmet)
+                    {
+                        float preview = Normalize(GetMeanProtection(GetAnomalyProtectionValues(anomalyType, fullCondition, hovered)));
+                        _status.SetBonus(bar.Id, preview, preview > protection ? POSITIVE_COLOR : preview < protection ? NEGATIVE_COLOR : NEUTRAL_COLOR);
+                    }
+                    continue;
+                }
                 float outfitValue = GetProtection(outfit, bar, fullCondition);
                 float helmetValue = GetProtection(helmet, bar, fullCondition);
-                float current = Normalize(outfitValue + helmetValue);
+                float current = Normalize(outfitValue + (outfitStats == null || outfitStats.HelmetAvailable ? helmetValue : 0f));
                 _status.SetValue(bar.Id, current);
 
                 if (hoveredOutfit == false && hoveredHelmet == false)
@@ -87,6 +107,8 @@ namespace RaidIntoDarkness.Integrations.Inventory
         private static EquipmentStatsComponent GetStats(ItemInstance item) => item != null ? item.Definition.GetComponent<EquipmentStatsComponent>() : null;
 
         private static float Normalize(float value) => Mathf.Clamp01(value / 100f);
+
+        private static float GetMeanProtection(AnomalyProtectionValues values) => (values.Get(AnomalyStrength.Weak) + values.Get(AnomalyStrength.Average) + values.Get(AnomalyStrength.Strong)) / 3f;
 
         private static float GetProtection(ItemInstance item, StatusBar bar, bool fullCondition)
         {

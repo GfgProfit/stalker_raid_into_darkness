@@ -52,6 +52,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: ZharkaWeak
       objectReference: {fileID: 0}
+    - target: {fileID: 8519971585301508410, guid: bb71a7a9124edab409ed0f17d98e4634, type: 3}
+      propertyPath: _variant
+      value: 
+      objectReference: {fileID: 11400000, guid: 7f3fadbfeaaa57949b9029d858adf8e5, type: 2}
+    - target: {fileID: 8519971585301508410, guid: bb71a7a9124edab409ed0f17d98e4634, type: 3}
+      propertyPath: _sourceSection
+      value: zone_mine_thermal_weak
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

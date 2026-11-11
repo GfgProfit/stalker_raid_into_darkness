@@ -3940,6 +3940,7 @@ GameObject:
   - component: {fileID: 243591159740784769}
   - component: {fileID: 3551637154218846241}
   - component: {fileID: 3198826694053411979}
+  - component: {fileID: 4388864092803264596}
   m_Layer: 0
   m_Name: ThermalField
   m_TagString: Untagged
@@ -4071,6 +4072,20 @@ MonoBehaviour:
   _randomizeRadius: 0
   _randomRadiusMin: 2
   _randomRadiusMax: 3
+--- !u!114 &4388864092803264596
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3728985411100880731}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 06e2e3b853eeca64ea97774cd24d1f89, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: RaidIntoDarkness.Player::RaidIntoDarkness.Player.AnomalyDamageSource
+  _variant: {fileID: 11400000, guid: bc519b299b75d614d86e4ea801fd1e31, type: 2}
+  _sourceSection: zone_field_thermal_average
 --- !u!1 &4193776302987787983
 GameObject:
   m_ObjectHideFlags: 0

@@ -77,6 +77,7 @@ namespace Inventory.UI
         private float _statusUntil;
         private string _hint = string.Empty;
         private bool _initialized;
+        private bool _externalTooltip;
         private AudioSource _audio;
         private float _lastSoundTime = float.MinValue;
 
@@ -106,6 +107,7 @@ namespace Inventory.UI
         public Action<ItemInstance, List<InventoryItemStat>> ItemStatsProvider { get; set; }
         public Func<ItemInstance, string> ItemDescriptionProvider { get; set; }
         public Func<ItemInstance, string> ItemShortNameProvider { get; set; }
+        public Func<ItemInstance, float?> ItemConditionProvider { get; set; }
         public Func<InventoryActionContext, IInventoryItemAction, InventoryActionStyle> ActionStyleProvider { get; set; }
         public IInventoryEquipmentGate EquipmentGate { get; set; }
         public IInventoryItemDropHandler ItemDropHandler { get; set; }
@@ -314,6 +316,7 @@ namespace Inventory.UI
         public void HideTransientWidgets()
         {
             _hovered = null;
+            _externalTooltip = false;
             _tooltip?.Hide();
             _contextMenu?.Hide();
             _splitDialog?.Hide();
@@ -363,6 +366,7 @@ namespace Inventory.UI
                 _tooltip?.Hide();
             }
 
+            _externalTooltip = false;
             _hovered = view;
             _hoverStart = Time.unscaledTime;
             _hoverPosition = eventData.position;
@@ -963,6 +967,30 @@ namespace Inventory.UI
 
         public string CollectDescription(ItemInstance item) => item != null && ItemDescriptionProvider != null ? ItemDescriptionProvider(item) : null;
 
+        public bool ShowTooltip(string title, string description, Vector2 screenPosition, Camera eventCamera)
+        {
+            if (IsOpen == false || _tooltip == null || IsDragging || HasModalWidget)
+            {
+                return false;
+            }
+            _hovered = null;
+            _externalTooltip = true;
+            _hoverPosition = screenPosition;
+            _hoverCamera = eventCamera;
+            _tooltip.Show(title, description, screenPosition, eventCamera);
+            ApplyThemeTo(_tooltip);
+            return true;
+        }
+
+        public void HideTooltip()
+        {
+            if (_externalTooltip)
+            {
+                _externalTooltip = false;
+                _tooltip?.Hide();
+            }
+        }
+
         public void RefreshTooltip()
         {
             if (_tooltip == null || _tooltip.IsVisible == false || _hovered == null || _hovered.Item == null)
@@ -1021,7 +1049,7 @@ namespace Inventory.UI
         {
             if (_theme != null && widget != null)
             {
-                _theme.ApplyTo(widget.transform, true);
+                _theme.ApplyTo(widget.transform, widget is InventoryTooltip == false);
             }
         }
 
@@ -1116,13 +1144,25 @@ namespace Inventory.UI
 
         private void LateUpdate()
         {
-            if (IsOpen == false || _drag != null || HasModalWidget || _hovered == null || _tooltip == null)
+            if (IsOpen == false || _drag != null || HasModalWidget || _tooltip == null)
             {
+                _externalTooltip = false;
                 _tooltip?.Hide();
                 return;
             }
 
             Vector2 pointer = UnityEngine.InputSystem.Pointer.current != null ? UnityEngine.InputSystem.Pointer.current.position.ReadValue() : _hoverPosition;
+
+            if (_externalTooltip)
+            {
+                _tooltip.Follow(pointer, _hoverCamera);
+                return;
+            }
+            if (_hovered == null)
+            {
+                _tooltip.Hide();
+                return;
+            }
 
             if (IsHoveredItemAt(pointer) == false)
             {

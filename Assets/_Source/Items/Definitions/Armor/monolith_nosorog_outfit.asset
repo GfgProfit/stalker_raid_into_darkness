@@ -92,6 +92,47 @@ MonoBehaviour:
         _speed: 1
         _physicalDurability: 98
         _anomalyDurability: 72
+        _anomalyProtections:
+        - _type: 1
+          _values:
+            _weak: 36
+            _average: 30
+            _strong: 26
+        - _type: 2
+          _values:
+            _weak: 30
+            _average: 24
+            _strong: 20
+        - _type: 3
+          _values:
+            _weak: 73
+            _average: 58
+            _strong: 48
+        - _type: 4
+          _values:
+            _weak: 69
+            _average: 62
+            _strong: 52
+        - _type: 5
+          _values:
+            _weak: 28
+            _average: 16
+            _strong: 13
+        - _type: 6
+          _values:
+            _weak: 78
+            _average: 64
+            _strong: 50
+        - _type: 7
+          _values:
+            _weak: 73
+            _average: 67
+            _strong: 58
+        - _type: 8
+          _values:
+            _weak: 57
+            _average: 50
+            _strong: 40
     - rid: 3479885472039698546
       type: {class: WorldItemComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
       data:

@@ -27,3 +27,5 @@ MonoBehaviour:
   _adaptLensFlareToWeather: 1
   _expressiveFlareIntensity: 1
   _fxLightingAdaptation: 1
+  _defaultPlayerStatCapacity: 100
+  _anomalyBalance: {fileID: 11400000, guid: 9d988dbce831bf7479069388c8ac460f, type: 2}

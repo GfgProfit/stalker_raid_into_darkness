@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 6900053619303508921}
   - component: {fileID: 1954715554957267370}
   - component: {fileID: 5884421759954241517}
+  - component: {fileID: 8570015646355542708}
   m_Layer: 0
   m_Name: Electra
   m_TagString: Untagged
@@ -66,6 +67,8 @@ MonoBehaviour:
   _idleLightRangeJitter: 0
   _audio: {fileID: 1954715554957267370}
   _contactEffects: {fileID: 0}
+  _smallContactEffects: {fileID: 0}
+  _useSourceContactEffects: 0
   _entranceContactEffects: {fileID: 0}
   _idleContactEffects: {fileID: 0}
   _smallEntranceContactEffects: {fileID: 0}
@@ -177,6 +180,9 @@ MonoBehaviour:
   _blowoutTime: 0.1
   _accumulateTime: 1.5
   _ignoreSmallObjects: 0
+  _actorOnly: 0
+  _ignoreNonlivingObjects: 0
+  _minimumPlayerSpeed: 0
   _smallObjectIgnoreDelay: 0.5
   _nonlivingIdleStopDelay: 0.1
   _repeatNonlivingIdleStop: 0
@@ -202,6 +208,7 @@ MonoBehaviour:
   _awaking: {fileID: 0}
   _accumulate: {fileID: 0}
   _blowoutDelay: 0
+  _followZone: 0
 --- !u!114 &5884421759954241517
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -218,6 +225,20 @@ MonoBehaviour:
   - _system: {fileID: 3114857361002102683}
     _rate: 2
     _timeLimit: 0
+--- !u!114 &8570015646355542708
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 122456809518884124}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 06e2e3b853eeca64ea97774cd24d1f89, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: RaidIntoDarkness.Player::RaidIntoDarkness.Player.AnomalyDamageSource
+  _variant: {fileID: 11400000, guid: b3ac3d6f1f44f094ea20ed7d8ab56b60, type: 2}
+  _sourceSection: zone_witches_galantine
 --- !u!1 &212758882120912016
 GameObject:
   m_ObjectHideFlags: 0

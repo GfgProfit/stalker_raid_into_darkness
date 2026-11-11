@@ -5,15 +5,16 @@ using System.Text;
 using Inventory;
 using Inventory.UI;
 using UnityEngine;
+using XRay.Importer.Levels;
 
 namespace RaidIntoDarkness.Integrations.Inventory
 {
     public sealed class EquipmentStatsFormatter
     {
-        public const string OUTFIT_CATEGORY = "Armor";
-        public const string HELMET_CATEGORY = "Head";
-        public const string BACKPACK_CATEGORY = "Backpack";
-        public const string CONDITION_STATE = "condition";
+        public const string OUTFIT_CATEGORY = AnomalyEquipmentProtection.OUTFIT_CATEGORY;
+        public const string HELMET_CATEGORY = AnomalyEquipmentProtection.HELMET_CATEGORY;
+        public const string BACKPACK_CATEGORY = AnomalyEquipmentProtection.BACKPACK_CATEGORY;
+        public const string CONDITION_STATE = AnomalyEquipmentProtection.CONDITION_STATE;
         public const char NUMBER_SEPARATOR = '.';
 
         private const double PERCENT = 100.0;
@@ -72,25 +73,20 @@ namespace RaidIntoDarkness.Integrations.Inventory
         };
 
         private readonly InventoryWindow _window;
+        private readonly AnomalyBalanceConfig _anomalyConfig;
         private readonly StringBuilder _builder = new(1024);
 
-        public EquipmentStatsFormatter(InventoryWindow window)
+        public EquipmentStatsFormatter(InventoryWindow window, AnomalyBalanceConfig anomalyConfig = null)
         {
             _window = window;
+            _anomalyConfig = anomalyConfig != null ? anomalyConfig : GameConfig.Load()?.AnomalyBalance;
         }
 
         public bool FullCondition { get; set; }
 
         public static float GetCondition(ItemInstance item)
         {
-            string value = item != null ? item.GetState(CONDITION_STATE) : null;
-
-            if (string.IsNullOrEmpty(value) == false && float.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out float condition))
-            {
-                return Mathf.Clamp01(condition);
-            }
-
-            return 1f;
+            return AnomalyEquipmentProtection.GetCondition(item);
         }
 
         public static string GetEquipmentCategory(ItemDefinition definition)
@@ -161,6 +157,11 @@ namespace RaidIntoDarkness.Integrations.Inventory
             for (int i = 0; i < rows.Length; i++)
             {
                 StatRow row = rows[i];
+                if (AnomalyEquipmentProtection.TryGetDamageType(row.Stat, out AnomalyDamageType anomalyType))
+                {
+                    AddAnomalyProtection(stats, row, item, anomalyType);
+                    continue;
+                }
                 float value = component.GetValue(row.Stat);
                 float otherValue = other != null ? other.GetValue(row.Stat) : 0f;
 
@@ -185,7 +186,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
 
             float condition = GetCondition(item);
             long cost = (long)Math.Ceiling(component.Cost * (double)(decimal)condition);
-            int percent = (int)Math.Ceiling((double)(decimal)condition * PERCENT);
+            double percent = (double)(decimal)condition * PERCENT;
             Color conditionColor = percent < CONDITION_RED_THRESHOLD ? RED_COLOR : percent < CONDITION_YELLOW_THRESHOLD ? YELLOW_COLOR : GREEN_COLOR;
             _builder.Clear();
             AppendColor(GRAY_1_COLOR).Append(_window.Label("tooltip_cost", "Cost:")).Append(' ');
@@ -193,7 +194,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
             AppendColor(GRAY_1_COLOR).Append(_window.Label("unit_currency", "RU")).Append("\n\n");
             AppendColor(conditionColor).Append(BULLET);
             AppendColor(GRAY_1_COLOR).Append(_window.Label("tooltip_condition", "Condition")).Append(": ");
-            AppendColor(conditionColor).Append(Utils.FormatNumber(percent, NUMBER_SEPARATOR)).Append('%');
+            AppendColor(conditionColor).Append(percent.ToString("0.#", CultureInfo.InvariantCulture)).Append('%');
 
             if (definition.Description.Length > 0)
             {
@@ -260,6 +261,32 @@ namespace RaidIntoDarkness.Integrations.Inventory
             string iconId = value < 0f && row.NegativeIcon != null ? row.NegativeIcon : row.Icon;
             stats.Add(new InventoryItemStat(_window.Label(row.Key, row.Fallback), text, _window.Theme != null ? _window.Theme.Icon(iconId) : null, tone, comparison));
         }
+
+        private void AddAnomalyProtection(List<InventoryItemStat> stats, StatRow row, ItemInstance item, AnomalyDamageType type)
+        {
+            float value = AnomalyEquipmentProtection.GetItemValues(item, type, _anomalyConfig, FullCondition).Get(AnomalyStrength.Weak);
+            if (value == 0f)
+            {
+                return;
+            }
+            InventoryContainer equipment = _window.Model != null ? _window.Model.GetContainer(_window.EquipmentContainerId) : null;
+            AnomalyProtectionValues current = AnomalyEquipmentProtection.GetCombinedValues(equipment, type, _anomalyConfig, fullCondition: FullCondition);
+            AnomalyProtectionValues preview = AnomalyEquipmentProtection.GetCombinedValues(equipment, type, _anomalyConfig, replacement: item, fullCondition: FullCondition);
+            float difference = preview.Get(AnomalyStrength.Weak) - current.Get(AnomalyStrength.Weak);
+            string comparison = null;
+            InventoryStatTone tone = InventoryStatTone.Normal;
+            if (difference != 0f)
+            {
+                comparison = "(" + FormatProtectionDifference(difference) + ")";
+                tone = difference > 0f ? InventoryStatTone.Better : InventoryStatTone.Worse;
+            }
+            string text = FormatProtection(value);
+            stats.Add(new InventoryItemStat(_window.Label(row.Key, row.Fallback), text, _window.Theme != null ? _window.Theme.Icon(row.Icon) : null, tone, comparison));
+        }
+
+        private static string FormatProtection(float value) => value.ToString("0.##", CultureInfo.InvariantCulture) + PERCENT_UNIT;
+
+        private static string FormatProtectionDifference(float value) => (value > 0f ? "+" : string.Empty) + value.ToString("0.##", CultureInfo.InvariantCulture);
 
         private void AddPercentage(List<InventoryItemStat> stats, StatRow row, float value, float otherValue)
         {

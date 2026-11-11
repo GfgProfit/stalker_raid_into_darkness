@@ -33760,6 +33760,7 @@ GameObject:
   - component: {fileID: 8529198695854003933}
   - component: {fileID: 3346489936955519742}
   - component: {fileID: 1768500758908627811}
+  - component: {fileID: 6487743454641806829}
   m_Layer: 0
   m_Name: Teleport
   m_TagString: Untagged
@@ -33952,6 +33953,20 @@ MonoBehaviour:
   _activationVolume: {fileID: 8529198695854003933}
   _teleportPostProcess: {fileID: 11400000, guid: 06b6f75f655322e42b7df2d52717d3f7, type: 2}
   _teleportAudio: {fileID: 7802566894181093320}
+--- !u!114 &6487743454641806829
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3435257070114805463}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 06e2e3b853eeca64ea97774cd24d1f89, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: RaidIntoDarkness.Player::RaidIntoDarkness.Player.AnomalyDamageSource
+  _variant: {fileID: 11400000, guid: cc046714c0158df48b0a67c3cc5a0495, type: 2}
+  _sourceSection: zone_teleport
 --- !u!1 &3488247320038094190
 GameObject:
   m_ObjectHideFlags: 0

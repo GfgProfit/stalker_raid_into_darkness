@@ -28,6 +28,7 @@ namespace Inventory.UI
         private TextMeshProUGUI _conditionShadow;
         private Image[] _infoBackgrounds;
         private Image[] _nameBackgrounds;
+        private Image[] _conditionBackgrounds;
         private InventoryTheme _appliedTheme;
         private Image _indicator;
         private Image _badge;
@@ -280,12 +281,18 @@ namespace Inventory.UI
             string info = count.Length > 0 && weight.Length > 0 ? count + "\n" + weight : count + weight;
             SetLabel(_infoText, _infoShadow, info);
             SetLabel(_nameText, _nameShadow, customName ?? (theme.ShowsShortName(definition) ? definition.ShortName : string.Empty));
+            float? conditionValue = _grid != null && _grid.Window != null && _grid.Window.ItemConditionProvider != null ? _grid.Window.ItemConditionProvider(Item) : null;
             string condition = Item.GetState("condition");
             string conditionText = string.Empty;
 
-            if (string.IsNullOrEmpty(condition) == false && float.TryParse(condition, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out float value))
+            if (conditionValue.HasValue == false && string.IsNullOrEmpty(condition) == false && float.TryParse(condition, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out float value))
             {
-                conditionText = Mathf.RoundToInt(Mathf.Clamp01(value) * 100f) + "%";
+                conditionValue = value;
+            }
+
+            if (conditionValue.HasValue && float.IsFinite(conditionValue.Value))
+            {
+                conditionText = (Mathf.Clamp01(conditionValue.Value) * 100f).ToString("0.#", System.Globalization.CultureInfo.InvariantCulture) + "%";
             }
 
             SetLabel(_conditionText, _conditionShadow, conditionText);
@@ -305,7 +312,7 @@ namespace Inventory.UI
             _conditionText.gameObject.SetActive(themed);
             _infoShadow.gameObject.SetActive(themed && theme.ItemTextShadow && theme.ItemInfoBackground.a <= 0f);
             _nameShadow.gameObject.SetActive(themed && theme.ItemTextShadow && theme.ItemInfoBackground.a <= 0f);
-            _conditionShadow.gameObject.SetActive(themed && theme.ItemTextShadow);
+            _conditionShadow.gameObject.SetActive(themed && theme.ItemTextShadow && theme.ItemInfoBackground.a <= 0f);
 
             if (themed == false)
             {
@@ -349,6 +356,7 @@ namespace Inventory.UI
         {
             LayoutTextBackgrounds(_infoText, _infoBackgrounds, _appliedTheme);
             LayoutTextBackgrounds(_nameText, _nameBackgrounds, _appliedTheme);
+            LayoutTextBackgrounds(_conditionText, _conditionBackgrounds, _appliedTheme);
 
             if (_communityIcon.enabled)
             {
@@ -406,6 +414,11 @@ namespace Inventory.UI
             for (int i = 0; i < _nameBackgrounds.Length; i++)
             {
                 _nameBackgrounds[i].enabled = false;
+            }
+
+            for (int i = 0; i < _conditionBackgrounds.Length; i++)
+            {
+                _conditionBackgrounds[i].enabled = false;
             }
         }
 
@@ -601,6 +614,7 @@ namespace Inventory.UI
             _overlay = overlay;
             _infoBackgrounds = new Image[2];
             _nameBackgrounds = new Image[1];
+            _conditionBackgrounds = new Image[1];
 
             for (int i = 0; i < _infoBackgrounds.Length; i++)
             {
@@ -612,6 +626,9 @@ namespace Inventory.UI
             _nameBackgrounds[0] = CreateChild("NameBackground", hideFlags, overlay, true).gameObject.AddComponent<Image>();
             _nameBackgrounds[0].raycastTarget = false;
             _nameBackgrounds[0].enabled = false;
+            _conditionBackgrounds[0] = CreateChild("ConditionBackground", hideFlags, overlay, true).gameObject.AddComponent<Image>();
+            _conditionBackgrounds[0].raycastTarget = false;
+            _conditionBackgrounds[0].enabled = false;
             _communityIcon = CreateChild("CommunityIcon", hideFlags, overlay, true).gameObject.AddComponent<Image>();
             _communityIcon.rectTransform.anchorMin = new Vector2(1f, 0f);
             _communityIcon.rectTransform.anchorMax = new Vector2(1f, 0f);

@@ -47,6 +47,8 @@ namespace RaidIntoDarkness.Integrations.Inventory
         private InventorySortingPlus _sorting;
         private EquipmentStatsFormatter _statsFormatter;
         private EquipmentStatusPresenter _statusPresenter;
+        private EquipmentStatusDetailsFormatter _statusDetails;
+        private InventoryStatusPanel _hoverStatusPanel;
         private FirstPersonOutfitBinder _outfitBinder;
         private FirstPersonWeaponBinder _weaponBinder;
         private InventoryWeaponAttachments _weaponAttachments;
@@ -60,6 +62,12 @@ namespace RaidIntoDarkness.Integrations.Inventory
         private bool _bound;
         private bool _fullCondition;
         private bool _statsDirty = true;
+        private string _statusHovered;
+        private Vector2 _statusHoverPosition;
+        private Camera _statusHoverCamera;
+        private float _statusTooltipValue;
+        private float _statusTooltipMaximum;
+        private bool _statusTooltipDirty;
 
         public InventoryWindow Window => _window;
         public PlayerInventoryRuntime Inventory => _inventory;
@@ -74,11 +82,16 @@ namespace RaidIntoDarkness.Integrations.Inventory
 
         public void Configure(InventoryWindow window, PlayerInventoryRuntime inventory, StalkerPlayerController player, InputActionReference toggleInventory, InputActionReference closeInventory)
         {
+            if (_inventory != null && _inventory != inventory)
+            {
+                _inventory.BindDamageReceiver(null);
+            }
             _window = window;
             _inventory = inventory;
             _player = player;
             _toggleInventory = toggleInventory;
             _closeInventory = closeInventory;
+            BindDamageReceiver();
         }
 
         public void ConfigurePresentation(InputActionReference toggleStash, InventoryCharacterHeader header, InventoryStatusPanel status, string characterName, string community, long money, Sprite portrait, Sprite rank)
@@ -91,6 +104,10 @@ namespace RaidIntoDarkness.Integrations.Inventory
             _money = money;
             _portrait = portrait;
             _rank = rank;
+            if (isActiveAndEnabled)
+            {
+                BindStatusHover();
+            }
         }
 
         public void ConfigureSorting(InputActionReference toggleFavorite, InputActionReference toggleJunk, Sprite favoriteBadge, Sprite junkBadge)
@@ -159,6 +176,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
 
         private void OnEnable()
         {
+            BindStatusHover();
             Enable(_toggleInventory);
             Enable(_closeInventory);
             Enable(_toggleStash);
@@ -169,6 +187,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
 
         private void Start()
         {
+            BindDamageReceiver();
             EnsureBound();
 
             if (_window != null)
@@ -224,7 +243,9 @@ namespace RaidIntoDarkness.Integrations.Inventory
 
             if (IsOpen)
             {
+                RefreshConditionStatus();
                 UpdateStats();
+                RefreshStatusTooltip();
             }
 
             if (IsOpen && _gameplayBlocked && Cursor.lockState != CursorLockMode.None)
@@ -260,11 +281,33 @@ namespace RaidIntoDarkness.Integrations.Inventory
                 return;
             }
 
-            _status.SetValue(STATUS_HEALTH, 1f);
-            _status.SetValue(STATUS_POWER, 1f);
-            _status.SetValue(STATUS_HUNGER, 1f);
-            _status.SetValue(STATUS_THIRST, 1f);
-            _status.SetValue(STATUS_SLEEP, 1f);
+            RefreshConditionStatus();
+        }
+
+        private void RefreshConditionStatus()
+        {
+            if (_status == null)
+            {
+                return;
+            }
+            StalkerActorCondition condition = _player != null && _player.Motor != null ? _player.Motor.Condition : null;
+            if (condition == null)
+            {
+                return;
+            }
+            SetConditionStatus(STATUS_HEALTH, condition.Health, condition.MaxHealth, condition.HealthCapacity);
+            SetConditionStatus(STATUS_POWER, condition.Power, condition.MaxPower, condition.PowerCapacity);
+            SetConditionStatus(STATUS_HUNGER, condition.Hunger, condition.MaxHunger, condition.HungerCapacity);
+            SetConditionStatus(STATUS_THIRST, condition.Thirst, condition.MaxThirst, condition.ThirstCapacity);
+            SetConditionStatus(STATUS_SLEEP, condition.Sleep, condition.MaxSleep, condition.SleepCapacity);
+        }
+
+        private void SetConditionStatus(string id, float value, float maximum, float capacity)
+        {
+            if (float.IsFinite(capacity) && capacity > 0f)
+            {
+                _status.SetValue(id, value / capacity, maximum / capacity);
+            }
         }
 
         private void OnApplicationFocus(bool hasFocus)
@@ -277,6 +320,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
 
         private void OnDisable()
         {
+            UnbindStatusHover();
             if (_gameplayBlocked)
             {
                 if (_window != null)
@@ -290,6 +334,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
 
         private void OnDestroy()
         {
+            UnbindStatusHover();
             if (_gameplayBlocked)
             {
                 RestoreGameplay();
@@ -339,6 +384,14 @@ namespace RaidIntoDarkness.Integrations.Inventory
             }
         }
 
+        private void BindDamageReceiver()
+        {
+            if (_inventory != null)
+            {
+                _inventory.BindDamageReceiver(_player != null ? _player.GetComponent<AnomalyDamageReceiver>() : null);
+            }
+        }
+
         private void EnsureBound()
         {
             if (_bound || _window == null || _inventory == null)
@@ -347,6 +400,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
             }
 
             _bound = true;
+            _window.ItemConditionProvider = GetItemCondition;
             _window.Bind(_inventory.Model, new ItemIconCacheProvider());
             _inventory.SeedOnce();
             BindSorting();
@@ -355,6 +409,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
             _window.ItemDescriptionProvider = _statsFormatter.Describe;
             _window.ItemShortNameProvider = FormatItemShortName;
             _statusPresenter = _status != null ? new EquipmentStatusPresenter(_window, _status) : null;
+            _statusDetails = new EquipmentStatusDetailsFormatter(_window);
             _inventory.Model.Changed += OnModelChanged;
 
             _itemSounds = new InventoryItemSounds(_window);
@@ -462,6 +517,11 @@ namespace RaidIntoDarkness.Integrations.Inventory
 
         private static string FormatShortNameLabel(string label) => "<size=16><color=#FFFFFF>" + label + "</color></size>";
 
+        private static float? GetItemCondition(ItemInstance item)
+        {
+            return item != null && (item.Definition.GetComponent<EquipmentStatsComponent>() != null || item.Definition.GetComponent<WeaponStatsComponent>() != null) ? EquipmentStatsFormatter.GetCondition(item) : null;
+        }
+
         private InventoryItemDecoration DecorateItem(ItemInstance item)
         {
             InventoryItemDecoration decoration = _sorting != null ? _sorting.Decorate(item) : InventoryItemDecoration.None;
@@ -525,6 +585,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
             _fullCondition = fullCondition;
             _statsHovered = hovered;
             _statsDirty = false;
+            _statusTooltipDirty = true;
 
             if (_statsFormatter != null)
             {
@@ -540,6 +601,91 @@ namespace RaidIntoDarkness.Integrations.Inventory
             {
                 _window.RefreshTooltip();
             }
+        }
+
+        private void BindStatusHover()
+        {
+            if (_hoverStatusPanel == _status)
+            {
+                return;
+            }
+            UnbindStatusHover();
+            _hoverStatusPanel = _status;
+            if (_hoverStatusPanel != null)
+            {
+                _hoverStatusPanel.PointerEntered += OnStatusPointerEnter;
+                _hoverStatusPanel.PointerMoved += OnStatusPointerMove;
+                _hoverStatusPanel.PointerExited += OnStatusPointerExit;
+            }
+        }
+
+        private void UnbindStatusHover()
+        {
+            if (_hoverStatusPanel != null)
+            {
+                _hoverStatusPanel.PointerEntered -= OnStatusPointerEnter;
+                _hoverStatusPanel.PointerMoved -= OnStatusPointerMove;
+                _hoverStatusPanel.PointerExited -= OnStatusPointerExit;
+            }
+            _hoverStatusPanel = null;
+            OnStatusPointerExit();
+        }
+
+        private void OnStatusPointerEnter(string id, Vector2 position, Camera eventCamera)
+        {
+            _statusHovered = id;
+            _statusHoverPosition = position;
+            _statusHoverCamera = eventCamera;
+            _statusTooltipDirty = true;
+            RefreshStatusTooltip();
+        }
+
+        private void OnStatusPointerMove(Vector2 position, Camera eventCamera)
+        {
+            _statusHoverPosition = position;
+            _statusHoverCamera = eventCamera;
+            if (string.IsNullOrEmpty(_statusHovered) == false && _window != null && _window.Tooltip != null)
+            {
+                _window.Tooltip.Follow(position, eventCamera);
+            }
+        }
+
+        private void OnStatusPointerExit()
+        {
+            _statusHovered = null;
+            _statusTooltipDirty = false;
+            if (_window != null)
+            {
+                _window.HideTooltip();
+            }
+        }
+
+        private void RefreshStatusTooltip()
+        {
+            if (string.IsNullOrEmpty(_statusHovered) || _window == null || _status == null)
+            {
+                return;
+            }
+            if (IsOpen == false || _window.IsDragging || _window.HasModalWidget)
+            {
+                OnStatusPointerExit();
+                return;
+            }
+            float value = _status.GetValue(_statusHovered);
+            float maximum = _status.GetMaximum(_statusHovered);
+            if (_statusTooltipDirty == false && value == _statusTooltipValue && maximum == _statusTooltipMaximum)
+            {
+                return;
+            }
+            _statusDetails ??= new EquipmentStatusDetailsFormatter(_window);
+            StalkerActorCondition condition = _player != null && _player.Motor != null ? _player.Motor.Condition : null;
+            if (_statusDetails.TryDescribe(_statusHovered, _fullCondition, out string title, out string description) || _statusDetails.TryDescribeCondition(_statusHovered, condition, out title, out description))
+            {
+                _window.ShowTooltip(title, description, _statusHoverPosition, _statusHoverCamera);
+            }
+            _statusTooltipValue = value;
+            _statusTooltipMaximum = maximum;
+            _statusTooltipDirty = false;
         }
 
         private void OnModelChanged(InventoryChange change)

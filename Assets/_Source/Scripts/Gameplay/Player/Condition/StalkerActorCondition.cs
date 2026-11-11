@@ -38,6 +38,7 @@ namespace RaidIntoDarkness.Player
         private bool _cantWalk;
         private bool _cantSprint;
         private bool _limping;
+        private bool _warnedReadOnlyHealthSource;
         private float _modTimer;
         private float _lastPositionY;
         private bool _hasLastPosition;
@@ -131,6 +132,41 @@ namespace RaidIntoDarkness.Player
         public void SetHealth(float health)
         {
             GetStat(StalkerStatKind.Health).SetValue(health);
+        }
+
+        public bool TryApplyHealthDamage(float absoluteHp)
+        {
+            if (!float.IsFinite(absoluteHp) || absoluteHp < 0f || !float.IsFinite(Health))
+            {
+                return false;
+            }
+            if (absoluteHp == 0f)
+            {
+                return true;
+            }
+            float remaining = Mathf.Max(0f, Health - absoluteHp);
+            if (_healthSource != null && _healthSource is IStalkerHealthSource)
+            {
+                if (_healthSource is IStalkerMutableHealthSource mutable)
+                {
+                    mutable.SetHealth(remaining / HealthCapacity);
+                    return true;
+                }
+                if (!_warnedReadOnlyHealthSource)
+                {
+                    Debug.LogWarning("Anomaly damage requires the assigned health source to implement IStalkerMutableHealthSource. The authoritative health was not changed.", this);
+                    _warnedReadOnlyHealthSource = true;
+                }
+                return false;
+            }
+            GetStat(StalkerStatKind.Health).SetValue(remaining);
+            return true;
+        }
+
+        public void SetHealthSource(MonoBehaviour source)
+        {
+            _healthSource = source;
+            _warnedReadOnlyHealthSource = false;
         }
 
         public void SetMaxHealth(float maximum)

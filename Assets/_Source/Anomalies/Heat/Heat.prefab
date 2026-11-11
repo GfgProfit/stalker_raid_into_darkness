@@ -13924,6 +13924,7 @@ GameObject:
   - component: {fileID: 6528957201135071553}
   - component: {fileID: 8496897073798247746}
   - component: {fileID: 5102071485010455322}
+  - component: {fileID: 4699666516224111792}
   m_Layer: 0
   m_Name: Heat
   m_TagString: Untagged
@@ -14115,6 +14116,20 @@ MonoBehaviour:
   _randomizeRadius: 0
   _randomRadiusMin: 2
   _randomRadiusMax: 3
+--- !u!114 &4699666516224111792
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 199375251455078767}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 06e2e3b853eeca64ea97774cd24d1f89, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: RaidIntoDarkness.Player::RaidIntoDarkness.Player.AnomalyDamageSource
+  _variant: {fileID: 11400000, guid: a28fe4e9c1d43174f89b2a5e1bc01132, type: 2}
+  _sourceSection: zone_zhar
 --- !u!1 &210824195123649035
 GameObject:
   m_ObjectHideFlags: 0

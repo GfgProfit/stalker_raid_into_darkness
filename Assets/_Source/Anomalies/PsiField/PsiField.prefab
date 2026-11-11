@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 5202046464932537402}
   - component: {fileID: 1220746360434330467}
   - component: {fileID: 1582413772289555137}
+  - component: {fileID: 2372678492988223069}
   m_Layer: 0
   m_Name: PsiField
   m_TagString: Untagged
@@ -144,6 +145,20 @@ MonoBehaviour:
   _randomizeRadius: 0
   _randomRadiusMin: 2
   _randomRadiusMax: 3
+--- !u!114 &2372678492988223069
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 171784854351601855}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 06e2e3b853eeca64ea97774cd24d1f89, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: RaidIntoDarkness.Player::RaidIntoDarkness.Player.AnomalyDamageSource
+  _variant: {fileID: 11400000, guid: 67f5a72db5ac1594a9d3e4c0dd05e37b, type: 2}
+  _sourceSection: zone_field_psychic_average
 --- !u!1 &3914835957085605429
 GameObject:
   m_ObjectHideFlags: 0

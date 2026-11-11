@@ -25,6 +25,7 @@ namespace XRay.Importer.Levels
         [SerializeField, Min(0.0f)] private float _expressiveFlareIntensity = 1.0f;
         [SerializeField, Range(0.0f, MAX_FX_LIGHTING_ADAPTATION)] private float _fxLightingAdaptation = 1.0f;
         [SerializeField, Min(0.0001f)] private float _defaultPlayerStatCapacity = DEFAULT_PLAYER_STAT_CAPACITY;
+        [SerializeField] private AnomalyBalanceConfig _anomalyBalance;
 
         public float DefaultTimeScale => _defaultTimeScale;
         public float DefaultTimeOfDay => _defaultTimeOfDay;
@@ -42,6 +43,7 @@ namespace XRay.Importer.Levels
         public float ExpressiveFlareIntensity => _expressiveFlareIntensity;
         public float FxLightingAdaptation => _fxLightingAdaptation;
         public float DefaultPlayerStatCapacity => _defaultPlayerStatCapacity;
+        public AnomalyBalanceConfig AnomalyBalance => _anomalyBalance;
         public int Revision { get; private set; }
 
         public static GameConfig Load()
@@ -65,6 +67,7 @@ namespace XRay.Importer.Levels
             else if (!float.IsFinite(_expressiveFlareIntensity) || _expressiveFlareIntensity < 0.0f) diagnostic = "GameConfig ExpressiveFlareIntensity must be finite and non-negative.";
             else if (!float.IsFinite(_fxLightingAdaptation) || _fxLightingAdaptation < 0.0f || _fxLightingAdaptation > MAX_FX_LIGHTING_ADAPTATION) diagnostic = "GameConfig FxLightingAdaptation must be within its supported range.";
             else if (!float.IsFinite(_defaultPlayerStatCapacity) || _defaultPlayerStatCapacity <= 0.0f) diagnostic = "GameConfig DefaultPlayerStatCapacity must be finite and positive.";
+            else if (_anomalyBalance != null && !_anomalyBalance.TryValidate(out string anomalyDiagnostic)) diagnostic = anomalyDiagnostic;
             return diagnostic == null;
         }
 

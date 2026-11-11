@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 49b3ce2a24595ed40b9482dba5620194, type: 3}
+  m_Name: zone_mosquito_bald_strong
+  m_EditorClassIdentifier: XRay.Importer.Runtime::XRay.Importer.Levels.AnomalyVariantConfig
+  _sourceSection: zone_mosquito_bald_strong
+  _archetype: {fileID: 11400000, guid: 9b2a049202a977246812ce3ec4a0a3f6, type: 2}
+  _strength: 2
+  _damageMultiplier: 1.75
+  _continuous: 0
+  _hitInterval: 0.1

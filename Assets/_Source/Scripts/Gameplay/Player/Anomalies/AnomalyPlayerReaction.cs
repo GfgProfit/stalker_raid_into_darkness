@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using RaidIntoDarkness.Effects;
 using UnityEngine;
@@ -35,6 +36,11 @@ namespace RaidIntoDarkness.Player
         private bool _pulsePending;
         private bool _sourceActive = true;
         private XRayAnomalyActivationVolume _activationVolume;
+        private ulong _dischargeSequence;
+        private bool _confirmedPulse;
+        private bool _presentingDischarge;
+
+        public event Action<StalkerPlayerController, ulong> HitConfirmed;
 
         public AnomalyPhase Phase => _cycle != null ? _cycle.Phase : AnomalyPhase.Idle;
         public float CooldownRemaining => _cycle != null ? _cycle.GetCooldownRemaining(Time.time) : 0f;
@@ -42,6 +48,22 @@ namespace RaidIntoDarkness.Player
         public AnomalyInfluenceProfile InfluenceProfile => _influenceProfile;
         public bool IsInfluencing => CanDetect;
         public bool CanDeactivate => Phase == AnomalyPhase.Idle;
+
+        public void CollectActivePlayers(List<StalkerPlayerController> players)
+        {
+            players.Clear();
+            if (CanDetect == false)
+            {
+                return;
+            }
+            foreach (KeyValuePair<Collider, StalkerPlayerController> contact in _contacts)
+            {
+                if (IsContactActive(contact.Key, contact.Value) && players.Contains(contact.Value) == false && (_minimumPlayerSpeed <= 0f || contact.Value.Motor != null && contact.Value.Motor.ActualVelocity > _minimumPlayerSpeed))
+                {
+                    players.Add(contact.Value);
+                }
+            }
+        }
 
         public void SetSourceActive(bool active)
         {
@@ -92,7 +114,7 @@ namespace RaidIntoDarkness.Player
                 {
                     int minimum = Mathf.Max(0, _randomRadiusMin);
                     int maximum = Mathf.Max(minimum, _randomRadiusMax);
-                    volume.radius = Random.Range(minimum, maximum + 1);
+                    volume.radius = UnityEngine.Random.Range(minimum, maximum + 1);
                 }
             }
         }
@@ -120,6 +142,7 @@ namespace RaidIntoDarkness.Player
         private void ResetCycle()
         {
             _pulsePending = false;
+            _confirmedPulse = false;
             foreach (StalkerPlayerController player in _contacts.Values)
             {
                 if (player != null && _visual != null)
@@ -157,7 +180,18 @@ namespace RaidIntoDarkness.Player
             AnomalyPhase previous = _cycle.Phase;
             if (_cycle.Tick(Time.time, HasActivePlayer() || HasActiveProbe()))
             {
-                _visual.PlayDischarge();
+                _dischargeSequence++;
+                _confirmedPulse = true;
+                SchedulePulse();
+                _presentingDischarge = true;
+                try
+                {
+                    _visual.PlayDischarge();
+                }
+                finally
+                {
+                    _presentingDischarge = false;
+                }
             }
             if (_cycle.Phase != previous)
             {
@@ -333,6 +367,16 @@ namespace RaidIntoDarkness.Player
 
         private void OnDischargeStarted()
         {
+            if (_presentingDischarge || _confirmedPulse && _pulsePending)
+            {
+                return;
+            }
+            _confirmedPulse = false;
+            SchedulePulse();
+        }
+
+        private void SchedulePulse()
+        {
             if (CanDetect == false)
             {
                 return;
@@ -350,6 +394,8 @@ namespace RaidIntoDarkness.Player
         private void ApplyPulse()
         {
             _pulsePending = false;
+            bool confirmed = _confirmedPulse;
+            _confirmedPulse = false;
             _affectedPlayers.Clear();
             _affectedProbes.Clear();
             foreach (KeyValuePair<Collider, StalkerPlayerController> contact in _contacts)
@@ -369,6 +415,10 @@ namespace RaidIntoDarkness.Player
                         }
                     }
                     _visual.PlayHit(contact.Value.transform);
+                    if (confirmed)
+                    {
+                        HitConfirmed?.Invoke(contact.Value, _dischargeSequence);
+                    }
                     if (contact.Value.TryGetComponent(out StalkerAnomalyResponse response))
                     {
                         response.ApplyPulse(_influenceProfile);

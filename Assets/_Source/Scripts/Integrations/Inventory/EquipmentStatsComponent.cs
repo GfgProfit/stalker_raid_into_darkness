@@ -1,6 +1,7 @@
 using System;
 using Inventory;
 using UnityEngine;
+using XRay.Importer.Levels;
 
 namespace RaidIntoDarkness.Integrations.Inventory
 {
@@ -21,6 +22,22 @@ namespace RaidIntoDarkness.Integrations.Inventory
         Speed = 12,
         PhysicalDurability = 13,
         AnomalyDurability = 14
+    }
+
+    [Serializable]
+    public struct AnomalyEquipmentProtectionEntry
+    {
+        [SerializeField] private AnomalyDamageType _type;
+        [SerializeField] private AnomalyProtectionValues _values;
+
+        public AnomalyDamageType Type => _type;
+        public AnomalyProtectionValues Values => _values;
+
+        public AnomalyEquipmentProtectionEntry(AnomalyDamageType type, AnomalyProtectionValues values)
+        {
+            _type = type;
+            _values = values;
+        }
     }
 
     [Serializable]
@@ -53,6 +70,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
         [SerializeField] private float _speed = 1f;
         [SerializeField] [Range(0f, 100f)] private float _physicalDurability;
         [SerializeField] [Range(0f, 100f)] private float _anomalyDurability;
+        [SerializeField] private AnomalyEquipmentProtectionEntry[] _anomalyProtections = Array.Empty<AnomalyEquipmentProtectionEntry>();
 
         public string Section => _section ?? string.Empty;
         public int Cost => _cost;
@@ -94,6 +112,33 @@ namespace RaidIntoDarkness.Integrations.Inventory
         public float Speed => _speed;
         public float PhysicalDurability => _physicalDurability;
         public float AnomalyDurability => _anomalyDurability;
+
+        public float GetAnomalyProtection(AnomalyDamageType type, AnomalyStrength strength)
+        {
+            if (_anomalyProtections != null)
+            {
+                for (int i = 0; i < _anomalyProtections.Length; i++)
+                {
+                    if (_anomalyProtections[i].Type == type)
+                    {
+                        return _anomalyProtections[i].Values.Get(strength);
+                    }
+                }
+            }
+
+            return type switch
+            {
+                AnomalyDamageType.Burn => _burnProtection,
+                AnomalyDamageType.Shock => _shockProtection,
+                AnomalyDamageType.ChemicalBurn => _chemicalBurnProtection,
+                AnomalyDamageType.Radiation => _radiationProtection,
+                AnomalyDamageType.Telepatic => _telepaticProtection,
+                AnomalyDamageType.Strike => _strikeProtection,
+                AnomalyDamageType.Wound => _woundProtection,
+                AnomalyDamageType.Explosion => _explosionProtection,
+                _ => 0f
+            };
+        }
 
         public float GetValue(EquipmentStat stat) => stat switch
         {

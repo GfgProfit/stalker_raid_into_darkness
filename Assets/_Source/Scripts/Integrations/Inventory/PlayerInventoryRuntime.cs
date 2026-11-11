@@ -2,11 +2,12 @@ using System.Collections.Generic;
 using Inventory;
 using RaidIntoDarkness.Player;
 using UnityEngine;
+using XRay.Importer.Levels;
 
 namespace RaidIntoDarkness.Integrations.Inventory
 {
     [DisallowMultipleComponent]
-    public sealed class PlayerInventoryRuntime : MonoBehaviour, IStalkerCarryWeightSource, IStalkerSprintSource
+    public sealed class PlayerInventoryRuntime : MonoBehaviour, IStalkerCarryWeightSource, IStalkerSprintSource, IAnomalyProtectionSource, IAnomalyEquipmentWearSource
     {
         [SerializeField] private ItemDatabase _database;
         [SerializeField] private InventorySeed _seed;
@@ -14,6 +15,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
         [SerializeField] private string _equipmentContainerId = "Equipment";
 
         private InventoryModel _model;
+        private AnomalyDamageReceiver _damageReceiver;
         private bool _seeded;
 
         public ItemDatabase Database => _database;
@@ -38,7 +40,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
                     ItemDefinition definition = equipment.Items[i].Definition;
                     EquipmentStatsComponent stats = definition.GetComponent<EquipmentStatsComponent>();
 
-                    if (stats != null && (definition.IsCategory(EquipmentStatsFormatter.OUTFIT_CATEGORY) || definition.IsCategory(EquipmentStatsFormatter.BACKPACK_CATEGORY)))
+                    if (stats != null && (definition.IsCategory(AnomalyEquipmentProtection.OUTFIT_CATEGORY) || definition.IsCategory(AnomalyEquipmentProtection.BACKPACK_CATEGORY)))
                     {
                         weight += stats.AdditionalWeight;
                     }
@@ -64,7 +66,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
                     ItemDefinition definition = equipment.Items[i].Definition;
                     EquipmentStatsComponent stats = definition.GetComponent<EquipmentStatsComponent>();
 
-                    if (stats != null && stats.SprintAllowed == false && definition.IsCategory(EquipmentStatsFormatter.OUTFIT_CATEGORY))
+                    if (stats != null && stats.SprintAllowed == false && definition.IsCategory(AnomalyEquipmentProtection.OUTFIT_CATEGORY))
                     {
                         return false;
                     }
@@ -85,6 +87,39 @@ namespace RaidIntoDarkness.Integrations.Inventory
 
                 return _model;
             }
+        }
+
+        public float GetAnomalyProtection(AnomalyDamageType type, AnomalyStrength strength, AnomalyBalanceConfig config)
+        {
+            return AnomalyEquipmentProtection.GetCombinedProtection(Model.GetContainer(_equipmentContainerId), type, strength, config);
+        }
+
+        public void CaptureEquipmentWear(AnomalyDamageType type, AnomalyBalanceConfig config, List<AnomalyEquipmentWearTarget> targets)
+        {
+            AnomalyEquipmentWear.Capture(this, Model, Model.GetContainer(_equipmentContainerId), type, config, targets);
+        }
+
+        public void ApplyEquipmentWear(AnomalyEquipmentWearTarget target, float remainingCondition)
+        {
+            AnomalyEquipmentWear.Apply(this, Model, Model.GetContainer(_equipmentContainerId), target, remainingCondition);
+        }
+
+        public void BindDamageReceiver(AnomalyDamageReceiver receiver)
+        {
+            if (_damageReceiver != null && _damageReceiver != receiver)
+            {
+                _damageReceiver.UnregisterProtectionSource(this);
+            }
+            _damageReceiver = receiver;
+            if (_damageReceiver != null)
+            {
+                _damageReceiver.RegisterProtectionSource(this);
+            }
+        }
+
+        private void OnDestroy()
+        {
+            BindDamageReceiver(null);
         }
 
         public void SeedOnce()

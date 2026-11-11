@@ -12,6 +12,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: PsiFieldWeak
       objectReference: {fileID: 0}
+    - target: {fileID: 2372678492988223069, guid: bca8d2a43cb61e94ca33142036557a19, type: 3}
+      propertyPath: _variant
+      value: 
+      objectReference: {fileID: 11400000, guid: dc43c1a208a9cac4a8dc542ed4adc5da, type: 2}
+    - target: {fileID: 2372678492988223069, guid: bca8d2a43cb61e94ca33142036557a19, type: 3}
+      propertyPath: _sourceSection
+      value: zone_field_psychic_weak
+      objectReference: {fileID: 0}
     - target: {fileID: 3635810550341604277, guid: bca8d2a43cb61e94ca33142036557a19, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0

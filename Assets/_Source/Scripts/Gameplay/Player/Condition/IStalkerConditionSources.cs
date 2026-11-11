@@ -23,6 +23,11 @@ namespace RaidIntoDarkness.Player
         float Health { get; }
     }
 
+    public interface IStalkerMutableHealthSource : IStalkerHealthSource
+    {
+        void SetHealth(float normalizedHealth);
+    }
+
     public interface IStalkerSatietySource
     {
         float Satiety { get; }

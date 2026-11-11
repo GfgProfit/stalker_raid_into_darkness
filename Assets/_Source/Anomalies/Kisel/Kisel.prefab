@@ -288287,6 +288287,7 @@ GameObject:
   - component: {fileID: 200121122979251600}
   - component: {fileID: 8981716252550549330}
   - component: {fileID: 5797485465731992496}
+  - component: {fileID: 347444286950510043}
   m_Layer: 0
   m_Name: Kisel
   m_TagString: Untagged
@@ -288335,6 +288336,7 @@ MonoBehaviour:
   _awaking: {fileID: 0}
   _accumulate: {fileID: 0}
   _blowoutDelay: 0
+  _followZone: 0
 --- !u!114 &2871489131987383309
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -288371,6 +288373,8 @@ MonoBehaviour:
   _idleLightRangeJitter: 0.25
   _audio: {fileID: 3200691815896099394}
   _contactEffects: {fileID: 4321617439939865341}
+  _smallContactEffects: {fileID: 0}
+  _useSourceContactEffects: 0
   _entranceContactEffects: {fileID: 0}
   _idleContactEffects: {fileID: 4321617439939865341}
   _smallEntranceContactEffects: {fileID: 0}
@@ -288379,6 +288383,7 @@ MonoBehaviour:
   _playIdleChildren: 1
   _keepIdleDuringDischarge: 1
   _dischargeTemplate: {fileID: 3549879301152537307}
+  _freezeDischargeAtStart: 0
   _dischargeRootIndex: 0
   _stopEffectIndices: 0100000002000000030000000400000005000000070000000a0000000b0000000c0000000e0000000f000000i
   _stopTimes:
@@ -288439,6 +288444,9 @@ MonoBehaviour:
   _blowoutTime: 1.4
   _accumulateTime: 0.3
   _ignoreSmallObjects: 0
+  _actorOnly: 0
+  _ignoreNonlivingObjects: 0
+  _minimumPlayerSpeed: 0
   _smallObjectIgnoreDelay: -1
   _nonlivingIdleStopDelay: 50
   _repeatNonlivingIdleStop: 1
@@ -288514,6 +288522,20 @@ MonoBehaviour:
   - _system: {fileID: 8929890892879207314}
     _rate: 8
     _timeLimit: 0
+--- !u!114 &347444286950510043
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6341456586046015985}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 06e2e3b853eeca64ea97774cd24d1f89, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: RaidIntoDarkness.Player::RaidIntoDarkness.Player.AnomalyDamageSource
+  _variant: {fileID: 11400000, guid: 0fc656c8f0b6dbd4c82c8469e475363e, type: 2}
+  _sourceSection: zone_buzz
 --- !u!1 &6347543408621899151
 GameObject:
   m_ObjectHideFlags: 0

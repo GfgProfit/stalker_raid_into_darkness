@@ -1,4 +1,5 @@
 using System;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -13,33 +14,48 @@ namespace Inventory.UI
         [SerializeField] private Image _fill;
         [SerializeField] private Image _icon;
         [SerializeField] private Gradient _colorByValue;
+        [SerializeField] private TMP_Text _text;
 
         private Image _bonus;
+        private float _value;
+        private float _maximum = 1f;
+        private bool _hasBonus;
+        private int _displayedValue = -1;
+        private int _displayedMaximum = -1;
+        private Color? _displayedColor;
 
         public InventoryStatusBar()
         {
         }
 
-        public InventoryStatusBar(string id, Image fill, Image icon, Gradient colorByValue)
+        public InventoryStatusBar(string id, Image fill, Image icon, Gradient colorByValue, TMP_Text text = null)
         {
             _id = id;
             _fill = fill;
             _icon = icon;
             _colorByValue = colorByValue;
+            _text = text;
         }
 
         public string Id => _id ?? string.Empty;
         public Image Fill => _fill;
         public Image Icon => _icon;
+        public TMP_Text Text => _text;
 
-        public void Apply(float value)
+        public void Apply(float value, float maximum = 1f)
         {
+            _value = Mathf.Clamp01(value);
+            _maximum = Mathf.Clamp01(maximum);
+            if (_hasBonus == false)
+            {
+                ApplyText(_value, _maximum);
+            }
             if (_fill == null)
             {
                 return;
             }
 
-            float clamped = Mathf.Clamp01(value);
+            float clamped = _value;
             _fill.fillAmount = clamped;
 
             if (_colorByValue != null)
@@ -50,6 +66,12 @@ namespace Inventory.UI
 
         public void ApplyBonus(float value, Color color)
         {
+            if (_text != null)
+            {
+                ApplyText(Mathf.Clamp01(value), _maximum, color);
+                _hasBonus = true;
+                return;
+            }
             Image bonus = EnsureBonus();
 
             if (bonus == null)
@@ -64,10 +86,34 @@ namespace Inventory.UI
 
         public void ClearBonus()
         {
+            if (_hasBonus)
+            {
+                _hasBonus = false;
+                ApplyText(_value, _maximum);
+            }
             if (_bonus != null)
             {
                 _bonus.enabled = false;
             }
+        }
+
+        private void ApplyText(float value, float maximum, Color? color = null)
+        {
+            if (_text == null)
+            {
+                return;
+            }
+            int currentPercent = Mathf.RoundToInt(value * 100f);
+            int maximumPercent = Mathf.RoundToInt(maximum * 100f);
+            if (_displayedValue == currentPercent && _displayedMaximum == maximumPercent && _displayedColor == color)
+            {
+                return;
+            }
+            _displayedValue = currentPercent;
+            _displayedMaximum = maximumPercent;
+            _displayedColor = color;
+            string format = color.HasValue ? "<color=#" + ColorUtility.ToHtmlStringRGBA(color.Value) + ">{0}</color> / {1} %" : "{0} / {1} %";
+            _text.SetText(format, (float)currentPercent, maximumPercent);
         }
 
         private Image EnsureBonus()

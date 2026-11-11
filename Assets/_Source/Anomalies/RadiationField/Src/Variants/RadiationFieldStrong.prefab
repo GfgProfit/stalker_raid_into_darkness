@@ -52,6 +52,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: RadiationFieldStrong
       objectReference: {fileID: 0}
+    - target: {fileID: 6970433929531398948, guid: ec58e181ecf926a4bb2ed3a93c674e2e, type: 3}
+      propertyPath: _variant
+      value: 
+      objectReference: {fileID: 11400000, guid: 51de3b1112bc7de49a65b9628da460a3, type: 2}
+    - target: {fileID: 6970433929531398948, guid: ec58e181ecf926a4bb2ed3a93c674e2e, type: 3}
+      propertyPath: _sourceSection
+      value: zone_field_radioactive_strong
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

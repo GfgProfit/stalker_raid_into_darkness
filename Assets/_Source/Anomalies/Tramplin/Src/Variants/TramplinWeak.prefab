@@ -8,6 +8,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1686304417374297379, guid: bc6367c4932433a4eaa67d191519601b, type: 3}
+      propertyPath: _variant
+      value: 
+      objectReference: {fileID: 11400000, guid: 614494ae908916f46994a62a00929ccf, type: 2}
+    - target: {fileID: 1686304417374297379, guid: bc6367c4932433a4eaa67d191519601b, type: 3}
+      propertyPath: _sourceSection
+      value: zone_mosquito_bald_weak
+      objectReference: {fileID: 0}
     - target: {fileID: 1877172421583510763, guid: bc6367c4932433a4eaa67d191519601b, type: 3}
       propertyPath: m_Name
       value: TramplinWeak

@@ -33310,6 +33310,7 @@ GameObject:
   - component: {fileID: 2288742537585696478}
   - component: {fileID: 3877836665617917960}
   - component: {fileID: 5879598114933213782}
+  - component: {fileID: 6279778668134633739}
   m_Layer: 0
   m_Name: GeneratorHeat
   m_TagString: Untagged
@@ -33499,6 +33500,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: RaidIntoDarkness.Player::RaidIntoDarkness.Player.AnomalyMotion
   _motion: {fileID: 4908183818744415850, guid: a5b5d6f6e5083e5409761f6d416b2ab1, type: 3}
   _relativeToFirstFrame: 1
+--- !u!114 &6279778668134633739
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4393034817434973559}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 06e2e3b853eeca64ea97774cd24d1f89, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: RaidIntoDarkness.Player::RaidIntoDarkness.Player.AnomalyDamageSource
+  _variant: {fileID: 11400000, guid: e6ecbf7be094db14882f0507bab5756c, type: 2}
+  _sourceSection: generator_torrid
 --- !u!1 &4572902955108361663
 GameObject:
   m_ObjectHideFlags: 0

@@ -17559,6 +17559,7 @@ GameObject:
   - component: {fileID: 6844276828462332383}
   - component: {fileID: 4798299675626964077}
   - component: {fileID: 1877689978028440653}
+  - component: {fileID: 1686304417374297379}
   m_Layer: 0
   m_Name: Tramplin
   m_TagString: Untagged
@@ -17630,6 +17631,7 @@ MonoBehaviour:
   _awaking: {fileID: 0}
   _accumulate: {fileID: 0}
   _blowoutDelay: 0
+  _followZone: 0
 --- !u!114 &3522951698426389749
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -17654,6 +17656,8 @@ MonoBehaviour:
   _idleLightRangeJitter: 0
   _audio: {fileID: 3386189348370233706}
   _contactEffects: {fileID: 3958856286014058144}
+  _smallContactEffects: {fileID: 0}
+  _useSourceContactEffects: 0
   _entranceContactEffects: {fileID: 0}
   _idleContactEffects: {fileID: 0}
   _smallEntranceContactEffects: {fileID: 0}
@@ -17663,6 +17667,7 @@ MonoBehaviour:
   _playIdleChildren: 1
   _keepIdleDuringDischarge: 1
   _dischargeTemplate: {fileID: 9182995532552591288}
+  _freezeDischargeAtStart: 0
   _dischargeRootIndex: 0
   _stopEffectIndices: 0200000003000000040000000500000006000000070000000800000009000000i
   _stopTimes:
@@ -17720,6 +17725,9 @@ MonoBehaviour:
   _blowoutTime: 0.1
   _accumulateTime: 1
   _ignoreSmallObjects: 0
+  _actorOnly: 0
+  _ignoreNonlivingObjects: 0
+  _minimumPlayerSpeed: 0
   _smallObjectIgnoreDelay: 0.5
   _nonlivingIdleStopDelay: 0.1
   _repeatNonlivingIdleStop: 0
@@ -17757,6 +17765,20 @@ MonoBehaviour:
   - _system: {fileID: 930588075196532107}
     _rate: 22
     _timeLimit: 0
+--- !u!114 &1686304417374297379
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1877172421583510763}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 06e2e3b853eeca64ea97774cd24d1f89, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: RaidIntoDarkness.Player::RaidIntoDarkness.Player.AnomalyDamageSource
+  _variant: {fileID: 11400000, guid: a68921cd570d98e4d9ba41554b739948, type: 2}
+  _sourceSection: zone_mosquito_bald
 --- !u!1 &3030963088386547082
 GameObject:
   m_ObjectHideFlags: 0

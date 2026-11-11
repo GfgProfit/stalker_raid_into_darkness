@@ -34,6 +34,7 @@ namespace Inventory.UI
         private readonly StringBuilder _builder = new(256);
         private readonly List<StatRow> _statRows = new();
         private RectTransform _rectTransform;
+        private Image _background;
         private TextMeshProUGUI _title;
         private TextMeshProUGUI _weight;
         private TextMeshProUGUI _body;
@@ -53,14 +54,7 @@ namespace Inventory.UI
         public void Show(ItemInstance item, Vector2 screenPosition, Camera eventCamera, IReadOnlyList<InventoryItemStat> stats, string description)
         {
             EnsureBuilt();
-
-            if (Theme != null)
-            {
-                Theme.ApplyTo(transform, false);
-            }
-
             ItemDefinition definition = item.Definition;
-            _title.text = definition.DisplayName;
             _builder.Clear();
             _builder.Append(InventoryUIFactory.FormatWeight(item.TotalWeight)).Append(InventoryTheme.Resolve(Theme, "unit_kg", " kg"));
 
@@ -70,14 +64,39 @@ namespace Inventory.UI
             }
 
             _weight.text = _builder.ToString();
-            string body = description ?? definition.Description;
-            bool hasDescription = string.IsNullOrEmpty(body) == false;
-            _body.text = hasDescription ? body : string.Empty;
+            ShowContent(definition.DisplayName, description ?? definition.Description, stats, true, screenPosition, eventCamera);
+        }
+
+        public void Show(string title, string description, Vector2 screenPosition, Camera eventCamera)
+        {
+            EnsureBuilt();
+            ShowContent(title, description, null, false, screenPosition, eventCamera);
+        }
+
+        private void ShowContent(string title, string description, IReadOnlyList<InventoryItemStat> stats, bool showWeight, Vector2 screenPosition, Camera eventCamera)
+        {
+            if (Theme != null)
+            {
+                Theme.ApplyTo(transform, false);
+            }
+
+            _background.sprite = null;
+            _background.type = Image.Type.Simple;
+            _background.color = Theme != null ? Theme.TooltipBackgroundColor : InventoryUIFactory.TooltipBackgroundColor;
+            _title.text = title ?? string.Empty;
+            _weight.gameObject.SetActive(showWeight);
+            bool hasDescription = string.IsNullOrEmpty(description) == false;
+            _body.text = hasDescription ? description : string.Empty;
             _body.gameObject.SetActive(hasDescription);
             gameObject.SetActive(true);
             transform.SetAsLastSibling();
             float statsHeight = ApplyStats(stats);
-            float contentHeight = MeasureHeight(_title) + SECTION_GAP + MeasureHeight(_weight);
+            float contentHeight = MeasureHeight(_title);
+
+            if (showWeight)
+            {
+                contentHeight += SECTION_GAP + MeasureHeight(_weight);
+            }
 
             if (hasDescription)
             {
@@ -259,7 +278,7 @@ namespace Inventory.UI
             }
 
             _rectTransform = (RectTransform)transform;
-            InventoryUIFactory.AddPanel(gameObject, InventoryUIFactory.PanelColor, false);
+            _background = InventoryUIFactory.AddPanel(gameObject, InventoryUIFactory.TooltipBackgroundColor, false);
             CanvasGroup group = InventoryUIFactory.GetOrAdd<CanvasGroup>(gameObject);
             group.blocksRaycasts = false;
             group.interactable = false;

@@ -114,6 +114,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: BurningFluffStrong
       objectReference: {fileID: 0}
+    - target: {fileID: 6812319926763774545, guid: ceb9b97044f535a43ad1b4d909fd5dac, type: 3}
+      propertyPath: _variant
+      value: 
+      objectReference: {fileID: 11400000, guid: e5916d6cb74ba5546af079890a2ad5cc, type: 2}
+    - target: {fileID: 6812319926763774545, guid: ceb9b97044f535a43ad1b4d909fd5dac, type: 3}
+      propertyPath: _sourceSection
+      value: zone_burning_fuzz_strong
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects:
     - {fileID: 1553239026229368783, guid: ceb9b97044f535a43ad1b4d909fd5dac, type: 3}

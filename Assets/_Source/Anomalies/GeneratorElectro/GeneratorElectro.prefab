@@ -246211,6 +246211,7 @@ GameObject:
   - component: {fileID: 5574282705950692224}
   - component: {fileID: 3484812634724706854}
   - component: {fileID: 5936775538528728954}
+  - component: {fileID: 7343427511793939246}
   m_Layer: 0
   m_Name: GeneratorElectro
   m_TagString: Untagged
@@ -246376,6 +246377,20 @@ MonoBehaviour:
   _randomizeRadius: 0
   _randomRadiusMin: 2
   _randomRadiusMax: 3
+--- !u!114 &7343427511793939246
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6049450527168691728}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 06e2e3b853eeca64ea97774cd24d1f89, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: RaidIntoDarkness.Player::RaidIntoDarkness.Player.AnomalyDamageSource
+  _variant: {fileID: 11400000, guid: 8b3c428187d2e3a47a9053e224fd5067, type: 2}
+  _sourceSection: generator_electra
 --- !u!1 &6061323705516069365
 GameObject:
   m_ObjectHideFlags: 0

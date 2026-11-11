@@ -5,8 +5,12 @@
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
         "RaidIntoDarkness.Integrations.Inventory",
+        "RaidIntoDarkness.Player",
+        "XRay.Importer.Runtime",
+        "Unity.InputSystem",
         "Inventory",
         "Inventory.UI",
+        "Unity.TextMeshPro",
         "UnityEngine.UI"
     ],
     "includePlatforms": [

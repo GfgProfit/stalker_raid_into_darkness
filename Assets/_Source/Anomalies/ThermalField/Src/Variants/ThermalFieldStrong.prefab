@@ -52,6 +52,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: ThermalFieldStrong
       objectReference: {fileID: 0}
+    - target: {fileID: 4388864092803264596, guid: 4e106ea0509100c41938071e6c72ea0b, type: 3}
+      propertyPath: _variant
+      value: 
+      objectReference: {fileID: 11400000, guid: 5f55adb5248303e4c8d0c2e4d4f2c599, type: 2}
+    - target: {fileID: 4388864092803264596, guid: 4e106ea0509100c41938071e6c72ea0b, type: 3}
+      propertyPath: _sourceSection
+      value: zone_field_thermal_strong
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

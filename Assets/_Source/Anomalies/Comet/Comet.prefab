@@ -43211,6 +43211,7 @@ GameObject:
   - component: {fileID: 7509800182060621136}
   - component: {fileID: 6406800426820103145}
   - component: {fileID: 730839903086895756}
+  - component: {fileID: 3512505538323500819}
   m_Layer: 0
   m_Name: Comet
   m_TagString: Untagged
@@ -43440,6 +43441,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: RaidIntoDarkness.Player::RaidIntoDarkness.Player.AnomalyMotion
   _motion: {fileID: 4908183818744415850, guid: d8442165eae2b9e4c84b2ae6d7246345, type: 3}
   _relativeToFirstFrame: 1
+--- !u!114 &3512505538323500819
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 248714951878494221}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 06e2e3b853eeca64ea97774cd24d1f89, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: RaidIntoDarkness.Player::RaidIntoDarkness.Player.AnomalyDamageSource
+  _variant: {fileID: 11400000, guid: 4c30b13b35529884f9b251b0a4c08e8e, type: 2}
+  _sourceSection: fireball_zone
 --- !u!1 &339374461556458867
 GameObject:
   m_ObjectHideFlags: 0

@@ -108,6 +108,7 @@ namespace XRay.Importer.Editor.Levels
                     DisableRandomRadius(instance);
                     ConfigureMotion(instance, motionAsset);
                     ConfigureSchedule(instance, anomaly);
+                    ConfigureDamage(instance, anomaly.Section, result.Warnings);
                     PrefabUtility.RecordPrefabInstancePropertyModifications(instance.transform);
                     result.ImportedCount++;
                 }
@@ -255,6 +256,24 @@ namespace XRay.Importer.Editor.Levels
             }
             schedule.Configure(anomaly.EnabledTime, anomaly.DisabledTime, anomaly.StartTimeShift);
             PrefabUtility.RecordPrefabInstancePropertyModifications(schedule);
+        }
+
+        private static void ConfigureDamage(GameObject instance, string section, List<string> warnings)
+        {
+            GameConfig config = GameConfig.Load();
+            AnomalyVariantConfig variant = config != null && config.AnomalyBalance != null ? config.AnomalyBalance.FindVariant(section) : null;
+            foreach (MonoBehaviour component in instance.GetComponents<MonoBehaviour>())
+            {
+                if (component is IXRayAnomalyDamageSource source)
+                {
+                    source.ConfigureDamage(variant);
+                    if (variant == null && config != null && config.AnomalyBalance != null)
+                    {
+                        warnings.Add("Не назначен профиль повреждений аномалии [" + section + "]; урон этого экземпляра отключён.");
+                    }
+                    PrefabUtility.RecordPrefabInstancePropertyModifications(component);
+                }
+            }
         }
 
         private static void ConfigureVolume(GameObject instance, XRaySpawnShape shape, string description)

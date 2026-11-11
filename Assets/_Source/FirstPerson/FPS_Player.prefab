@@ -2168,6 +2168,7 @@ GameObject:
   - component: {fileID: 5825434680647000719}
   - component: {fileID: 1402223458717569375}
   - component: {fileID: 9082889536266957315}
+  - component: {fileID: 6816063066189536554}
   m_Layer: 0
   m_Name: FPS_Player
   m_TagString: Untagged
@@ -3165,3 +3166,17 @@ MonoBehaviour:
   _weapons: {fileID: 6641122454229867537}
   _definition: {fileID: 11400000, guid: 04484d70f12e92d448a1a95529c574a8, type: 2}
   _audio: {fileID: 6201717040936305001}
+--- !u!114 &6816063066189536554
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9095947929063771272}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4497183886643e5418ae9d39db5e1df0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: RaidIntoDarkness.Player::RaidIntoDarkness.Player.AnomalyDamageReceiver
+  _condition: {fileID: 5917588425433027955}
+  _protectionSources: []

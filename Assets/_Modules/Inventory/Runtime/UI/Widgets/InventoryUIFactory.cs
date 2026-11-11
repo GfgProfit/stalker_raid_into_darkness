@@ -9,6 +9,7 @@ namespace Inventory.UI
     public static class InventoryUIFactory
     {
         public static readonly Color PanelColor = new(0.07f, 0.075f, 0.08f, 0.97f);
+        public static readonly Color TooltipBackgroundColor = new Color32(40, 40, 40, 250);
         public static readonly Color PanelBorderColor = new(1f, 1f, 1f, 0.12f);
         public static readonly Color TextColor = new(0.9f, 0.9f, 0.86f, 1f);
         public static readonly Color MutedTextColor = new(0.65f, 0.66f, 0.62f, 1f);

@@ -52,6 +52,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8570015646355542708, guid: e4fcbbdd51e69a94fa41cacdf195f1b6, type: 3}
+      propertyPath: _variant
+      value: 
+      objectReference: {fileID: 11400000, guid: 40a68dd421ab723409ff87cdfd9b28ae, type: 2}
+    - target: {fileID: 8570015646355542708, guid: e4fcbbdd51e69a94fa41cacdf195f1b6, type: 3}
+      propertyPath: _sourceSection
+      value: zone_mine_electric_strong
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

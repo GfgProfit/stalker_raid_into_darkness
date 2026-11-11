@@ -25,6 +25,7 @@ namespace Inventory.UI
         [SerializeField] private Sprite _contextMenuHighlight;
         [SerializeField] private Sprite _contextMenuDivider;
         [SerializeField] private Color _panelColor = Color.white;
+        [SerializeField] private Color _tooltipBackgroundColor = InventoryUIFactory.TooltipBackgroundColor;
         [SerializeField] private Vector4 _panelPadding = new(18f, 18f, 18f, 18f);
         [SerializeField] private bool _showItemBackground = true;
         [SerializeField] private bool _showItemWeight;
@@ -58,6 +59,7 @@ namespace Inventory.UI
         public Sprite ContextMenuHighlight => _contextMenuHighlight;
         public Sprite ContextMenuDivider => _contextMenuDivider;
         public Color PanelColor => _panelColor;
+        public Color TooltipBackgroundColor => _tooltipBackgroundColor;
         public Vector4 PanelPadding => _panelPadding;
         public bool ShowItemBackground => _showItemBackground;
         public bool ShowItemWeight => _showItemWeight;

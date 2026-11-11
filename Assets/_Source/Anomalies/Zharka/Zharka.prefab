@@ -85060,6 +85060,7 @@ GameObject:
   - component: {fileID: 5290107305091968687}
   - component: {fileID: 2374858350447174257}
   - component: {fileID: 2209004526330796241}
+  - component: {fileID: 8519971585301508410}
   m_Layer: 0
   m_Name: Zharka
   m_TagString: Untagged
@@ -85106,6 +85107,7 @@ MonoBehaviour:
   _awaking: {fileID: 0}
   _accumulate: {fileID: 0}
   _blowoutDelay: 0
+  _followZone: 0
 --- !u!114 &2127572662569318147
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -85130,6 +85132,8 @@ MonoBehaviour:
   _idleLightRangeJitter: 0
   _audio: {fileID: 1568900054068925385}
   _contactEffects: {fileID: 0}
+  _smallContactEffects: {fileID: 0}
+  _useSourceContactEffects: 0
   _entranceContactEffects: {fileID: 0}
   _idleContactEffects: {fileID: 0}
   _smallEntranceContactEffects: {fileID: 0}
@@ -85138,6 +85142,7 @@ MonoBehaviour:
   _playIdleChildren: 1
   _keepIdleDuringDischarge: 1
   _dischargeTemplate: {fileID: 4190896433051880499}
+  _freezeDischargeAtStart: 0
   _dischargeRootIndex: 0
   _stopEffectIndices: 010000000500000006000000070000000800000016000000090000001000000011000000i
   _stopTimes:
@@ -85196,6 +85201,9 @@ MonoBehaviour:
   _blowoutTime: 7
   _accumulateTime: 0.25
   _ignoreSmallObjects: 0
+  _actorOnly: 0
+  _ignoreNonlivingObjects: 0
+  _minimumPlayerSpeed: 0
   _smallObjectIgnoreDelay: -1
   _nonlivingIdleStopDelay: 0.1
   _repeatNonlivingIdleStop: 0
@@ -85224,6 +85232,20 @@ MonoBehaviour:
   - _system: {fileID: 7179701069155205701}
     _rate: 5
     _timeLimit: 0
+--- !u!114 &8519971585301508410
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6036523816419366679}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 06e2e3b853eeca64ea97774cd24d1f89, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: RaidIntoDarkness.Player::RaidIntoDarkness.Player.AnomalyDamageSource
+  _variant: {fileID: 11400000, guid: d7317dc2a5631b94ba73a5554472eca9, type: 2}
+  _sourceSection: zone_mine_thermal_average
 --- !u!1 &6071270127157639024
 GameObject:
   m_ObjectHideFlags: 0

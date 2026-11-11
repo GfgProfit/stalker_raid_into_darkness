@@ -52,6 +52,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: GazirovkaStrong
       objectReference: {fileID: 0}
+    - target: {fileID: 8338606880030080481, guid: edd76411fe76bcb4f9128d7dcf32e3b8, type: 3}
+      propertyPath: _variant
+      value: 
+      objectReference: {fileID: 11400000, guid: 130873a8c3c6da946aff914ae93dda23, type: 2}
+    - target: {fileID: 8338606880030080481, guid: edd76411fe76bcb4f9128d7dcf32e3b8, type: 3}
+      propertyPath: _sourceSection
+      value: zone_mine_acidic_strong
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

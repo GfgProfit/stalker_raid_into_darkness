@@ -82509,6 +82509,7 @@ GameObject:
   - component: {fileID: 2735621062191532760}
   - component: {fileID: 6287719300525330722}
   - component: {fileID: 6690152705040302541}
+  - component: {fileID: 3009322854843770694}
   m_Layer: 0
   m_Name: Carousel
   m_TagString: Untagged
@@ -82560,6 +82561,7 @@ MonoBehaviour:
   _awaking: {fileID: 6824676651917646721}
   _accumulate: {fileID: 5374250165870869109}
   _blowoutDelay: 0.1
+  _followZone: 0
 --- !u!114 &8254771797567263219
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -82584,6 +82586,8 @@ MonoBehaviour:
   _idleLightRangeJitter: 0
   _audio: {fileID: 4271085620115097055}
   _contactEffects: {fileID: 6539677125276850910}
+  _smallContactEffects: {fileID: 0}
+  _useSourceContactEffects: 0
   _entranceContactEffects: {fileID: 6360984844325854678}
   _idleContactEffects: {fileID: 6539677125276850910}
   _smallEntranceContactEffects: {fileID: 926029105211867883}
@@ -82593,6 +82597,7 @@ MonoBehaviour:
   _playIdleChildren: 1
   _keepIdleDuringDischarge: 1
   _dischargeTemplate: {fileID: 3665627229291757167}
+  _freezeDischargeAtStart: 0
   _dischargeRootIndex: 0
   _stopEffectIndices: 01000000020000000600000014000000i
   _stopTimes:
@@ -82673,6 +82678,9 @@ MonoBehaviour:
   _blowoutTime: 10
   _accumulateTime: 4
   _ignoreSmallObjects: 1
+  _actorOnly: 0
+  _ignoreNonlivingObjects: 0
+  _minimumPlayerSpeed: 0
   _smallObjectIgnoreDelay: -1
   _nonlivingIdleStopDelay: 0.1
   _repeatNonlivingIdleStop: 0
@@ -82728,6 +82736,20 @@ MonoBehaviour:
   - _system: {fileID: 8185229297021397157}
     _rate: 50
     _timeLimit: 0
+--- !u!114 &3009322854843770694
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3525461912719225073}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 06e2e3b853eeca64ea97774cd24d1f89, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: RaidIntoDarkness.Player::RaidIntoDarkness.Player.AnomalyDamageSource
+  _variant: {fileID: 11400000, guid: b8b7c1d29200beb46a0870cb0ab7ee2b, type: 2}
+  _sourceSection: zone_mine_gravitational_strong
 --- !u!1 &3638876285036928150
 GameObject:
   m_ObjectHideFlags: 0

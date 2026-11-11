@@ -1,0 +1,6 @@
+{
+    "name": "Rvm.Benchmark.Runtime",
+    "rootNamespace": "Rvm.Benchmark",
+    "references": [],
+    "autoReferenced": true
+}

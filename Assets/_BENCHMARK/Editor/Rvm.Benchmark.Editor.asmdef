@@ -1,0 +1,7 @@
+{
+    "name": "Rvm.Benchmark.Editor",
+    "rootNamespace": "Rvm.Benchmark.Editor",
+    "references": ["Rvm.Benchmark.Runtime"],
+    "includePlatforms": ["Editor"],
+    "autoReferenced": true
+}

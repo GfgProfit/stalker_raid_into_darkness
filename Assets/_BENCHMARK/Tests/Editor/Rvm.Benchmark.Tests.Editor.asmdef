@@ -1,0 +1,8 @@
+{
+    "name": "Rvm.Benchmark.Tests.Editor",
+    "rootNamespace": "Rvm.Benchmark.Tests",
+    "references": ["Rvm.Benchmark.Runtime", "Rvm.Benchmark.Editor"],
+    "includePlatforms": ["Editor"],
+    "optionalUnityReferences": ["TestAssemblies"],
+    "autoReferenced": false
+}

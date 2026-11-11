@@ -40,6 +40,7 @@ Shader "RaidIntoDarkness/Anomalies/ElectraDistortion"
             #pragma target 4.5
             #pragma vertex Vert
             #pragma fragment Frag
+            #pragma shader_feature _SURFACE_TYPE_TRANSPARENT
 
             #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Common.hlsl"
             #include "Packages/com.unity.render-pipelines.high-definition/Runtime/ShaderLibrary/ShaderVariables.hlsl"

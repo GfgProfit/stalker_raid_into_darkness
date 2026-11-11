@@ -544,6 +544,7 @@ Shader "RaidIntoDarkness/Anomalies/SpatialBubbleMesh"
             #pragma target 4.5
             #pragma vertex Vert
             #pragma fragment FragDistortion
+            #pragma shader_feature _SURFACE_TYPE_TRANSPARENT
             #pragma multi_compile_instancing
             ENDHLSL
         }

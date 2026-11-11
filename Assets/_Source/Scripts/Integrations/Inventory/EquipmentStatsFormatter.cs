@@ -264,7 +264,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
 
         private void AddAnomalyProtection(List<InventoryItemStat> stats, StatRow row, ItemInstance item, AnomalyDamageType type)
         {
-            float value = AnomalyEquipmentProtection.GetItemValues(item, type, _anomalyConfig, FullCondition).Get(AnomalyStrength.Weak);
+            float value = GetMeanProtection(AnomalyEquipmentProtection.GetItemValues(item, type, _anomalyConfig, FullCondition));
             if (value == 0f)
             {
                 return;
@@ -272,7 +272,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
             InventoryContainer equipment = _window.Model != null ? _window.Model.GetContainer(_window.EquipmentContainerId) : null;
             AnomalyProtectionValues current = AnomalyEquipmentProtection.GetCombinedValues(equipment, type, _anomalyConfig, fullCondition: FullCondition);
             AnomalyProtectionValues preview = AnomalyEquipmentProtection.GetCombinedValues(equipment, type, _anomalyConfig, replacement: item, fullCondition: FullCondition);
-            float difference = preview.Get(AnomalyStrength.Weak) - current.Get(AnomalyStrength.Weak);
+            float difference = GetMeanProtection(preview) - GetMeanProtection(current);
             string comparison = null;
             InventoryStatTone tone = InventoryStatTone.Normal;
             if (difference != 0f)
@@ -283,6 +283,8 @@ namespace RaidIntoDarkness.Integrations.Inventory
             string text = FormatProtection(value);
             stats.Add(new InventoryItemStat(_window.Label(row.Key, row.Fallback), text, _window.Theme != null ? _window.Theme.Icon(row.Icon) : null, tone, comparison));
         }
+
+        private static float GetMeanProtection(AnomalyProtectionValues values) => (values.Get(AnomalyStrength.Weak) + values.Get(AnomalyStrength.Average) + values.Get(AnomalyStrength.Strong)) / 3f;
 
         private static string FormatProtection(float value) => value.ToString("0.##", CultureInfo.InvariantCulture) + PERCENT_UNIT;
 

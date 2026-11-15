@@ -43,7 +43,7 @@ namespace Rvm.Benchmark.Editor
                     throw new InvalidOperationException("Duplicate benchmark identity Resources name: " + path);
                 }
             }
-            HashFile(code, "Assets/_BENCHMARK/Editor/HdrpShadowPatch.json");
+            HashFile(code, "Assets/_Tools/X-Ray OGF OMG Importer/Editor/Rendering/HdrpShadowBindingPatch.json");
             foreach (string path in AssetDatabase.GetDependencies(scene, true))
             {
                 if (!IsGeneratedPath(path))

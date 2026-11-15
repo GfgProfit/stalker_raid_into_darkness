@@ -1,0 +1,71 @@
+{
+  "historicalBuildId": "e088c0ca5d8c4c3599834341feb1819d",
+  "historicalApplicationBuildGuid": "0eb5eda1ff77486f860381952739ac24",
+  "scene": "Assets/_Source/Levels/Anomaly/1v2_DX11_v_12gb_2.5_168_662acc8d/l07_military/Scenes/l07_military.unity",
+  "positions": [
+    {
+      "key": "Pos 1",
+      "position": {
+        "x": 125.68307495117188,
+        "y": 47.63573455810547,
+        "z": 158.39654541015625
+      },
+      "rotation": {
+        "x": -0.1965065896511078,
+        "y": 0.7831632494926453,
+        "z": -0.304460734128952,
+        "w": -0.5053159594535828
+      }
+    },
+    {
+      "key": "Pos 2",
+      "position": {
+        "x": 26.3380126953125,
+        "y": 42.196529388427734,
+        "z": 380.252685546875
+      },
+      "rotation": {
+        "x": -0.10509398579597473,
+        "y": 0.894839882850647,
+        "z": -0.31431591510772705,
+        "w": -0.29903584718704224
+      }
+    },
+    {
+      "key": "Pos 3",
+      "position": {
+        "x": -280.1938781738281,
+        "y": 67.71609497070312,
+        "z": 371.8193664550781
+      },
+      "rotation": {
+        "x": 0.1539696753025055,
+        "y": 0.8454510569572449,
+        "z": -0.3778775930404663,
+        "w": 0.3445497155189514
+      }
+    },
+    {
+      "key": "Pos 4",
+      "position": {
+        "x": -317.63446044921875,
+        "y": 60.07313919067383,
+        "z": 16.360685348510742
+      },
+      "rotation": {
+        "x": 0.3390536308288574,
+        "y": 0.40801456570625305,
+        "z": -0.1664273738861084,
+        "w": 0.8311851024627686
+      }
+    }
+  ],
+  "cameraSettings": "name=Level Camera;fov=90;near=0.1;far=10000;ortho=False;size=5;aspect=1.77777779;rect=(x:0.00, y:0.00, width:1.00, height:1.00);mask=-1;HDR=False;MSAA=False;dynamic=False;physical=False;lens=50;sensor=(36.00, 24.00);shift=(0.00, 0.00);target=screen",
+  "warmupSeconds": 8,
+  "positionSeconds": 5,
+  "stableExclusionSeconds": 0.5,
+  "warmupPolicy": "Fixed initial POS1; no previsit of other poses, as explicitly requested for RC07",
+  "weather": "w_foggy3",
+  "weatherTimeSeconds": 43200,
+  "weatherPaused": true
+}

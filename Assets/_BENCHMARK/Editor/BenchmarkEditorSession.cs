@@ -77,6 +77,10 @@ namespace Rvm.Benchmark.Editor
                 throw new InvalidOperationException("Scenario, camera and four positions are required.");
             }
             var scene = camera.gameObject.scene;
+            if (!scene.path.StartsWith("Assets/_BENCHMARK/", StringComparison.Ordinal))
+            {
+                throw new InvalidOperationException("Persistent benchmark runners belong in module-owned scenes. Use the build-only Release route for ordinary locations.");
+            }
             if (scene.path != scenario.ScenePath)
             {
                 throw new InvalidOperationException("Open the scene specified by the scenario.");

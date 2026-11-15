@@ -15,6 +15,8 @@ namespace Rvm.CleanReleaseRoute07.Editor
 {
     public sealed class CleanReleaseBuild : IProcessSceneWithReport
     {
+        private const string ROUTE_REFERENCE_PATH = "Assets/_BENCHMARK/Scenarios/l07_military.route.json";
+
         private static bool _building;
         private static string _task;
         private static RouteReference _reference;
@@ -46,7 +48,13 @@ namespace Rvm.CleanReleaseRoute07.Editor
                 throw new InvalidOperationException("Exact Unity6000.6.7f1, Windows64 and Mono backend are required.");
             }
             HdrpShadowPackagePatch.RequireApplied();
-            _reference = JsonUtility.FromJson<RouteReference>(File.ReadAllText(Path.Combine(_task, "ROUTE_REFERENCE.json")));
+            string referencePath = Path.Combine(_task, "ROUTE_REFERENCE.json");
+            if (!File.Exists(referencePath))
+            {
+                Directory.CreateDirectory(_task);
+                File.Copy(ROUTE_REFERENCE_PATH, referencePath);
+            }
+            _reference = JsonUtility.FromJson<RouteReference>(File.ReadAllText(referencePath));
             var scenario = AssetDatabase.LoadAssetAtPath<BenchmarkScenario>("Assets/_BENCHMARK/Scenarios/l07_military.asset");
             if (scenario == null || scenario.ScenePath != _reference.scene || scenario.WarmupSeconds != 8 || scenario.PositionSeconds != 5 || scenario.StabilizationSeconds != 0.5)
             {
@@ -209,7 +217,11 @@ namespace Rvm.CleanReleaseRoute07.Editor
         private static void ValidateSourceScene(Scene scene)
         {
             Camera camera = null;
-            var positions = new Transform[4];
+            var recipe = JsonUtility.FromJson<RouteReference>(File.ReadAllText(ROUTE_REFERENCE_PATH));
+            if (recipe.scene != scene.path || recipe.positions == null || recipe.positions.Length != 4)
+            {
+                throw new InvalidOperationException("Module-owned route recipe does not match the location.");
+            }
             foreach (var root in scene.GetRootGameObjects())
             {
                 foreach (var candidate in root.GetComponentsInChildren<Camera>(true))
@@ -223,20 +235,6 @@ namespace Rvm.CleanReleaseRoute07.Editor
                         camera = candidate;
                     }
                 }
-                foreach (var transform in root.GetComponentsInChildren<Transform>(true))
-                {
-                    for (int i = 0; i < positions.Length; i++)
-                    {
-                        if (transform.name == _reference.positions[i].key)
-                        {
-                            if (positions[i] != null)
-                            {
-                                throw new InvalidOperationException("Duplicate source pose: " + transform.name);
-                            }
-                            positions[i] = transform;
-                        }
-                    }
-                }
             }
             if (camera == null)
             {
@@ -246,12 +244,12 @@ namespace Rvm.CleanReleaseRoute07.Editor
             var rotationDeltas = new float[4];
             for (int i = 0; i < 4; i++)
             {
-                if (positions[i] == null)
+                if (recipe.positions[i].key != _reference.positions[i].key)
                 {
-                    throw new InvalidOperationException("Original source pose is unavailable: " + i);
+                    throw new InvalidOperationException("Route pose key differs from the module recipe: " + i);
                 }
-                positionDeltas[i] = Vector3.Distance(positions[i].position, _reference.positions[i].position);
-                rotationDeltas[i] = Quaternion.Angle(positions[i].rotation, _reference.positions[i].rotation);
+                positionDeltas[i] = Vector3.Distance(recipe.positions[i].position, _reference.positions[i].position);
+                rotationDeltas[i] = Quaternion.Angle(recipe.positions[i].rotation, _reference.positions[i].rotation);
                 if (positionDeltas[i] > 0.0001f || rotationDeltas[i] > 0.0001f)
                 {
                     throw new InvalidOperationException("Original source pose differs from full R30 metadata: " + i);

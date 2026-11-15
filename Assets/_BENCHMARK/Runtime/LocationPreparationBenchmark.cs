@@ -134,7 +134,7 @@ namespace Rvm.Benchmark
             enabled = false;
             try
             {
-                var results = new WorkEvidence();
+                var results = new WorkEvidence { allocationCounter = AllocationCounterControl.Measure() };
                 foreach (var renderer in _renderers)
                 {
                     if (renderer.BatchSet == null || !renderer.isActiveAndEnabled)
@@ -218,7 +218,8 @@ namespace Rvm.Benchmark
         [Serializable]
         private sealed class WorkEvidence
         {
-            public string scope = "Separate Release Player CPU microbenchmark of real production History with compiled delegates. No culling, submissions, GPU or elapsed frame time claim. Warmed buffers; fixed Unity frame; A1 B1 B2 A2; expression compilation excluded.";
+            public string scope = "Warmed local History pass microbenchmark on location data at a fixed Unity frame number. Compiled delegates included; expression compilation excluded. Not inclusive MatrixHistory CPU time in a real frame; excludes culling, submissions and GPU. Allocation deltas are evidence only if the same-thread positive control is valid.";
+            public AllocationCounterControl.Result allocationCounter;
             public List<WorkSample> samples = new List<WorkSample>();
             public List<RouteOverheadBenchmark.Sample> routeOverhead = new List<RouteOverheadBenchmark.Sample>();
         }

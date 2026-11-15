@@ -393,18 +393,19 @@ namespace XRay.Importer.Levels
                 group.Active = true;
                 group.UseResolved = false;
                 XRayInstanceBatch first = _batchSet.Batches[group.Plan.BatchIndices[0]];
+                if (first.Mesh == null) group.Active = false;
                 int count = 0;
                 for (int member = 0; member < group.Plan.BatchIndices.Count; member++)
                 {
                     XRayInstanceBatch batch = _batchSet.Batches[group.Plan.BatchIndices[member]];
-                    if (!ReferenceEquals(group.Sources[member], batch) || batch.Mesh != first.Mesh || batch.Mesh == null || batch.MatricesExposed || batch.Count != group.Counts[member] || batch.CastShadows != first.CastShadows || batch.Materials == null || batch.Materials.Length != group.Resolved[member].Length || batch.Materials.Length != first.Materials.Length)
+                    if (!ReferenceEquals(group.Sources[member], batch) || !ReferenceEquals(batch.Mesh, first.Mesh) || batch.MatricesExposed || batch.Count != group.Counts[member] || batch.CastShadows != first.CastShadows || batch.Materials == null || batch.Materials.Length != group.Resolved[member].Length || batch.Materials.Length != first.Materials.Length)
                     {
                         group.Active = false;
                         break;
                     }
                     for (int material = 0; material < batch.Materials.Length; material++)
                     {
-                        if (batch.Materials[material] != first.Materials[material]) group.Active = false;
+                        if (!ReferenceEquals(batch.Materials[material], first.Materials[material])) group.Active = false;
                     }
                     if (group.OrientationRevisions[member] != batch.MatrixRevision)
                     {
@@ -421,12 +422,32 @@ namespace XRay.Importer.Levels
 
         private bool RenderGroup(Camera camera, GroupScratch group, XRayFloraWindState wind, ref int visibleBatches, ref int visibleInstances, ref int shadowOnlyBatches)
         {
+            XRayInstanceBatch first = group.Sources[0];
+            bool usesWind = XRayFloraWindBounds.Uses(first.Materials, wind);
+            Bounds bounds = usesWind ? XRayFloraWindBounds.Expand(group.Plan.Bounds, wind, group.MaximumSourceHeight) : group.Plan.Bounds;
+            bool visible = false;
+            for (int member = 0; member < group.Sources.Length; member++)
+            {
+                Bounds sourceBounds = usesWind ? XRayFloraWindBounds.Expand(group.Sources[member].Bounds, wind) : group.Sources[member].Bounds;
+                bool sourceVisible = GeometryUtility.TestPlanesAABB(_planes, sourceBounds);
+                if (member == 0) visible = sourceVisible;
+                else if (sourceVisible != visible)
+                {
+                    group.Active = false;
+                    return false;
+                }
+            }
+            bool shadows = _castShadows && first.CastShadows;
             bool refresh = !group.Ready || group.Moving;
             group.Moving = false;
+            int frame = Time.frameCount;
+            int revision = _batchSet.MatrixRevision;
             for (int member = 0; member < group.Sources.Length; member++)
             {
                 int index = group.Plan.BatchIndices[member];
-                InstanceHistory history = History(index, group.Sources[member]);
+                InstanceHistory history = group.Histories[member];
+                if (history != null && !history.Moving && history.Revision == revision && history.BatchRevision == group.Sources[member].MatrixRevision) history.Frame = frame;
+                else history = History(index, group.Sources[member]);
                 group.Histories[member] = history;
                 refresh |= group.Revisions[member] != group.Sources[member].MatrixRevision || history.Moving;
                 group.Moving |= history.Moving;
@@ -450,22 +471,6 @@ namespace XRay.Importer.Levels
                 if (!group.Ready) group.Properties.SetVectorArray(_propertyId, group.Data);
                 group.Ready = true;
             }
-            XRayInstanceBatch first = group.Sources[0];
-            bool usesWind = XRayFloraWindBounds.Uses(first.Materials, wind);
-            Bounds bounds = usesWind ? XRayFloraWindBounds.Expand(group.Plan.Bounds, wind, group.MaximumSourceHeight) : group.Plan.Bounds;
-            bool visible = false;
-            for (int member = 0; member < group.Sources.Length; member++)
-            {
-                Bounds sourceBounds = usesWind ? XRayFloraWindBounds.Expand(group.Sources[member].Bounds, wind) : group.Sources[member].Bounds;
-                bool sourceVisible = GeometryUtility.TestPlanesAABB(_planes, sourceBounds);
-                if (member == 0) visible = sourceVisible;
-                else if (sourceVisible != visible)
-                {
-                    group.Active = false;
-                    return false;
-                }
-            }
-            bool shadows = _castShadows && first.CastShadows;
             if (!visible && !shadows) return true;
             bool compatible = true;
             for (int member = 0; member < group.Sources.Length; member++)
@@ -475,9 +480,12 @@ namespace XRay.Importer.Levels
                     Material source = group.Sources[member].Materials[slot];
                     Material resolved = source != null && MaterialResolver != null ? MaterialResolver(source) : source;
                     group.Resolved[member][slot] = resolved;
-                    if (!XRayInstanceBatchSet.SupportsSubmissionMaterial(resolved)) compatible = false;
-                    if (member > 0 && resolved != group.Resolved[0][slot]) compatible = false;
+                    if (member > 0 && !ReferenceEquals(resolved, group.Resolved[0][slot])) compatible = false;
                 }
+            }
+            for (int slot = 0; slot < group.Resolved[0].Length; slot++)
+            {
+                if (!XRayInstanceBatchSet.SupportsSubmissionMaterial(group.Resolved[0][slot])) compatible = false;
             }
             if (!compatible)
             {

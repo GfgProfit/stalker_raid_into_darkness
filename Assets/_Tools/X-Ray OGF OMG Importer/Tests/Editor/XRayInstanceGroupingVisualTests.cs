@@ -69,7 +69,7 @@ namespace XRay.Importer.Tests
                 light.type = LightType.Directional;
                 light.shadows = LightShadows.Hard;
                 light.transform.rotation = Quaternion.LookRotation(new Vector3(-1f, -1f, 0f));
-                light.gameObject.AddComponent<HDAdditionalLightData>().SetIntensity(3f, LightUnit.Lux);
+                light.gameObject.AddComponent<HDAdditionalLightData>().SetIntensity(3000f, LightUnit.Lux);
                 var material = new Material(Shader.Find("HDRP/Lit")) { enableInstancing = true };
                 owned.Add(material);
                 material.SetColor("_BaseColor", Color.gray);
@@ -104,6 +104,8 @@ namespace XRay.Importer.Tests
                 camera.targetTexture = target;
                 var pixels = new Texture2D(SIZE, SIZE, TextureFormat.RGBAFloat, false, true);
                 owned.Add(pixels);
+                float previewScale = 0f;
+                float previewMinimum = 0f;
                 for (int view = 0; view < 2; view++)
                 {
                     camera.transform.position = new Vector3(view * 0.25f, 8f, -8f);
@@ -111,16 +113,33 @@ namespace XRay.Importer.Tests
                     Plane[] planes = GeometryUtility.CalculateFrustumPlanes(camera);
                     foreach (var batch in batches) Assert.That(GeometryUtility.TestPlanesAABB(planes, batch.Bounds), Is.False);
                     renderer.BatchSet = legacy;
-                    Color[] before = Capture(camera, target, pixels, Path.Combine(output, "view" + view + "_A.png"));
+                    Color[] before = Capture(camera, target, pixels);
+                    if (view == 0)
+                    {
+                        float previewMaximum = 0f;
+                        previewMinimum = float.MaxValue;
+                        foreach (Color color in before)
+                        {
+                            previewMaximum = Mathf.Max(previewMaximum, Luminance(color));
+                            previewMinimum = Mathf.Min(previewMinimum, Luminance(color));
+                        }
+                        Assert.That(previewMaximum, Is.GreaterThan(previewMinimum));
+                        previewScale = 0.8f / (previewMaximum - previewMinimum);
+                        File.WriteAllText(Path.Combine(output, "preview-transform.json"), "{\"reference\":\"view0_A\",\"minimumLuminance\":" + previewMinimum.ToString("R", System.Globalization.CultureInfo.InvariantCulture) + ",\"linearScale\":" + previewScale.ToString("R", System.Globalization.CultureInfo.InvariantCulture) + ",\"mapping\":\"LinearToGammaSpace(Clamp01((Rec709Luminance - minimumLuminance) * linearScale + 0.1)); fixed grayscale contrast for all six previews; original RGB retained in EXR\",\"rawFormat\":\"RGBA float32 OpenEXR\"}");
+                    }
+                    SaveEvidence(Path.Combine(output, "view" + view + "_A"), pixels, before, previewMinimum, previewScale);
                     Assert.That(renderer.LastSubmittedCalls, Is.EqualTo(2));
                     renderer.BatchSet = prepared;
-                    Color[] after = Capture(camera, target, pixels, Path.Combine(output, "view" + view + "_B.png"));
+                    Color[] after = Capture(camera, target, pixels);
+                    SaveEvidence(Path.Combine(output, "view" + view + "_B"), pixels, after, previewMinimum, previewScale);
                     Assert.That(renderer.LastSubmittedCalls, Is.EqualTo(1));
                     renderer.enabled = false;
-                    Color[] clear = Capture(camera, target, pixels, null);
+                    Color[] clear = Capture(camera, target, pixels);
+                    SaveEvidence(Path.Combine(output, "view" + view + "_no-caster"), pixels, clear, previewMinimum, previewScale);
                     renderer.enabled = true;
                     int changed = 0;
                     int shadowPixels = 0;
+                    int previewShadowPixels = 0;
                     float maximum = 0f;
                     for (int index = 0; index < before.Length; index++)
                     {
@@ -128,9 +147,13 @@ namespace XRay.Importer.Tests
                         maximum = Mathf.Max(maximum, error);
                         if (error > 0.001f) changed++;
                         if (Error(before[index], clear[index]) > 0.01f) shadowPixels++;
+                        float previewBefore = PreviewValue(before[index], previewMinimum, previewScale);
+                        float previewClear = PreviewValue(clear[index], previewMinimum, previewScale);
+                        if (Mathf.Abs(previewBefore - previewClear) > 0.05f) previewShadowPixels++;
                     }
                     File.WriteAllText(Path.Combine(output, "view" + view + ".json"), "{\"changedPixels\":" + changed + ",\"shadowPixels\":" + shadowPixels + ",\"maximumError\":" + maximum.ToString("R", System.Globalization.CultureInfo.InvariantCulture) + ",\"pixels\":" + before.Length + "}");
                     Assert.That(shadowPixels, Is.GreaterThan(100));
+                    Assert.That(previewShadowPixels, Is.GreaterThan(100));
                     Assert.That(changed, Is.LessThan(before.Length * 0.005f));
                     Assert.That(maximum, Is.LessThan(0.02f));
                 }
@@ -143,7 +166,7 @@ namespace XRay.Importer.Tests
             }
         }
 
-        private static Color[] Capture(Camera camera, RenderTexture target, Texture2D pixels, string path)
+        private static Color[] Capture(Camera camera, RenderTexture target, Texture2D pixels)
         {
             var renderCamera = UnityEngine.Object.Instantiate(camera.gameObject, camera.transform.parent).GetComponent<Camera>();
             renderCamera.scene = camera.scene;
@@ -157,27 +180,63 @@ namespace XRay.Importer.Tests
                 pixels.ReadPixels(new Rect(0, 0, SIZE, SIZE), 0, 0);
                 pixels.Apply();
                 RenderTexture.active = previous;
-                Color[] result = pixels.GetPixels();
-                if (path != null)
-                {
-                    var preview = new Texture2D(SIZE, SIZE, TextureFormat.RGBA32, false, true);
-                    try
-                    {
-                        preview.SetPixels(result);
-                        preview.Apply();
-                        File.WriteAllBytes(path, preview.EncodeToPNG());
-                    }
-                    finally
-                    {
-                        UnityEngine.Object.DestroyImmediate(preview);
-                    }
-                }
-                return result;
+                return pixels.GetPixels();
             }
             finally
             {
                 UnityEngine.Object.DestroyImmediate(renderCamera.gameObject);
             }
+        }
+
+        private static void SaveEvidence(string prefix, Texture2D raw, Color[] colors, float minimum, float scale)
+        {
+            var range = new CaptureRange { minimum = new Color(float.MaxValue, float.MaxValue, float.MaxValue, float.MaxValue), maximum = new Color(float.MinValue, float.MinValue, float.MinValue, float.MinValue), pixelCount = colors.Length };
+            var display = new Color[colors.Length];
+            for (int index = 0; index < colors.Length; index++)
+            {
+                Color color = colors[index];
+                for (int channel = 0; channel < 4; channel++)
+                {
+                    Assert.That(float.IsFinite(color[channel]), Is.True, prefix + " non-finite pixel " + index + " channel " + channel);
+                    range.minimum[channel] = Mathf.Min(range.minimum[channel], color[channel]);
+                    range.maximum[channel] = Mathf.Max(range.maximum[channel], color[channel]);
+                }
+                float value = PreviewValue(color, minimum, scale);
+                display[index] = new Color(value, value, value, 1f);
+            }
+            File.WriteAllText(prefix + "-range.json", JsonUtility.ToJson(range, true));
+            raw.SetPixels(colors);
+            raw.Apply();
+            File.WriteAllBytes(prefix + ".exr", raw.EncodeToEXR(Texture2D.EXRFlags.OutputAsFloat));
+            var preview = new Texture2D(SIZE, SIZE, TextureFormat.RGBA32, false, true);
+            try
+            {
+                preview.SetPixels(display);
+                preview.Apply();
+                File.WriteAllBytes(prefix + ".png", preview.EncodeToPNG());
+            }
+            finally
+            {
+                UnityEngine.Object.DestroyImmediate(preview);
+            }
+        }
+
+        private static float Luminance(Color color)
+        {
+            return color.r * 0.2126f + color.g * 0.7152f + color.b * 0.0722f;
+        }
+
+        private static float PreviewValue(Color color, float minimum, float scale)
+        {
+            return Mathf.LinearToGammaSpace(Mathf.Clamp01((Luminance(color) - minimum) * scale + 0.1f));
+        }
+
+        [Serializable]
+        private sealed class CaptureRange
+        {
+            public Color minimum;
+            public Color maximum;
+            public int pixelCount;
         }
 
         private static float Error(Color first, Color second)

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Unity.Profiling;
 using UnityEngine;
 
 namespace RaidIntoDarkness.Effects
@@ -13,6 +14,12 @@ namespace RaidIntoDarkness.Effects
 
         private static readonly int FRAME_SIZE_ID = Shader.PropertyToID("_FrameSize");
         private static readonly int FRAME_COLUMNS_ID = Shader.PropertyToID("_FrameColumns");
+        private static readonly ProfilerMarker GET_PARTICLES_MARKER = new ProfilerMarker("RVM.Particles.GetParticles");
+        private static readonly ProfilerMarker SEEDS_MARKER = new ProfilerMarker("RVM.Particles.Seeds");
+        private static readonly ProfilerMarker LOOP_MARKER = new ProfilerMarker("RVM.Particles.Loop");
+        private static readonly ProfilerMarker FINITE_MARKER = new ProfilerMarker("RVM.Particles.FiniteHistory");
+        private static readonly ProfilerMarker INFINITE_MARKER = new ProfilerMarker("RVM.Particles.InfiniteState");
+        private static readonly ProfilerMarker CUSTOM_MARKER = new ProfilerMarker("RVM.Particles.SetCustom1");
 
         [SerializeField] private ParticleSystem _system;
         [SerializeField] private int _frameCount = 1;
@@ -46,6 +53,10 @@ namespace RaidIntoDarkness.Effects
             public double Remainder { get; set; }
             public bool Backward { get; }
         }
+
+        public static bool DiagnosticScopesEnabled { get; set; }
+
+        public static event Action<AnomalyParticleFrames, ParticleSystem.Particle[], int> ParticlesObserved;
 
         public void Configure(ParticleSystem system, int frameCount, int frameColumns, Vector2 frameSize, float framesPerSecond, bool animated, bool randomStart, bool randomPlayback)
         {
@@ -137,26 +148,49 @@ namespace RaidIntoDarkness.Effects
                 return;
             }
             EnsureStorage();
-            int count = _system.GetParticles(_particles);
-            UpdatePersistentSeeds(count);
+            int count;
+            using (DiagnosticScopesEnabled ? GET_PARTICLES_MARKER.Auto() : default)
+            {
+                count = _system.GetParticles(_particles);
+            }
+            using (DiagnosticScopesEnabled ? SEEDS_MARKER.Auto() : default)
+            {
+                UpdatePersistentSeeds(count);
+            }
             double elapsed = _system.isPlaying && !float.IsNaN(deltaTime) && !float.IsInfinity(deltaTime) ? Math.Max(0.0, deltaTime) * _system.main.simulationSpeed : 0.0;
             _frames.Clear();
-            for (int index = 0; index < count; index++)
+            using (DiagnosticScopesEnabled ? LOOP_MARKER.Auto() : default)
             {
-                ParticleSystem.Particle particle = _particles[index];
-                float frame;
-                if (float.IsPositiveInfinity(particle.startLifetime))
+                for (int index = 0; index < count; index++)
                 {
-                    frame = PersistentFrameValue(particle.randomSeed, elapsed);
+                    ParticleSystem.Particle particle = _particles[index];
+                    float frame;
+                    if (float.IsPositiveInfinity(particle.startLifetime))
+                    {
+                        using (DiagnosticScopesEnabled ? INFINITE_MARKER.Auto() : default)
+                        {
+                            frame = PersistentFrameValue(particle.randomSeed, elapsed);
+                        }
+                    }
+                    else
+                    {
+                        float age = particle.startLifetime - particle.remainingLifetime;
+                        using (DiagnosticScopesEnabled ? FINITE_MARKER.Auto() : default)
+                        {
+                            frame = FiniteParticleFrameCache.Evaluate(age, particle.randomSeed, _frameCount, _framesPerSecond, _animated, _randomStart, _randomPlayback);
+                        }
+                    }
+                    _frames.Add(new Vector4(Mathf.Floor(frame), 0f, 0f, 0f));
                 }
-                else
-                {
-                    float age = particle.startLifetime - particle.remainingLifetime;
-                    frame = SpatialBubbleParticleFrames.EvaluateFrame(age, particle.randomSeed, _frameCount, _framesPerSecond, _animated, _randomStart, _randomPlayback);
-                }
-                _frames.Add(new Vector4(Mathf.Floor(frame), 0f, 0f, 0f));
             }
-            _system.SetCustomParticleData(_frames, ParticleSystemCustomData.Custom1);
+            using (DiagnosticScopesEnabled ? CUSTOM_MARKER.Auto() : default)
+            {
+                _system.SetCustomParticleData(_frames, ParticleSystemCustomData.Custom1);
+            }
+            if (DiagnosticScopesEnabled)
+            {
+                ParticlesObserved?.Invoke(this, _particles, count);
+            }
         }
 
         private float PersistentFrameValue(uint seed, double elapsed)

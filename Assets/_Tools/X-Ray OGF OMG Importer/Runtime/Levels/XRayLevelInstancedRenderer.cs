@@ -16,6 +16,11 @@ namespace XRay.Importer.Levels
         private static readonly ProfilerMarker CAMERA_MARKER = new ProfilerMarker("RVM.XRay.InstancedRenderer");
         private static readonly ProfilerMarker HISTORY_MARKER = new ProfilerMarker("RVM.XRay.MatrixHistory");
         private static readonly ProfilerMarker SUBMISSION_MARKER = new ProfilerMarker("RVM.XRay.Submission");
+        private static readonly ProfilerMarker HISTORY_LOOP_MARKER = new ProfilerMarker("RVM.XRay.HistoryLoop");
+        private static readonly ProfilerMarker MATERIAL_MARKER = new ProfilerMarker("RVM.XRay.MaterialResolve");
+        private static readonly ProfilerMarker DATA_MARKER = new ProfilerMarker("RVM.XRay.InstanceDataMPB");
+        private static readonly ProfilerMarker PARAMS_MARKER = new ProfilerMarker("RVM.XRay.RenderParams");
+        private static readonly ProfilerMarker DRAW_MARKER = new ProfilerMarker("RVM.XRay.UnitySubmit");
         private static readonly ProfilerMarker LOD_MARKER = new ProfilerMarker("RVM.XRay.Lod");
         private static readonly ProfilerMarker REFLECTION_MARKER = new ProfilerMarker("RVM.XRay.Reflection");
 
@@ -224,7 +229,11 @@ namespace XRay.Importer.Levels
                 for (int submesh = 0; submesh < submeshes; submesh++)
                 {
                     Material source = batch.Materials[submesh];
-                    Material material = source != null && MaterialResolver != null ? MaterialResolver(source) : source;
+                    Material material;
+                using (new DiagnosticScope(MATERIAL_MARKER))
+                {
+                    material = source != null && MaterialResolver != null ? MaterialResolver(source) : source;
+                }
                     if (material == null) continue;
                     for (int start = 0; start < batch.Count; start += MAX_MOTION_INSTANCES)
                     {
@@ -329,7 +338,11 @@ namespace XRay.Importer.Levels
             for (int submesh = 0; submesh < submeshes; submesh++)
             {
                 Material source = batch.Materials[submesh];
-                Material material = source != null && MaterialResolver != null ? MaterialResolver(source) : source;
+                Material material;
+                using (new DiagnosticScope(MATERIAL_MARKER))
+                {
+                    material = source != null && MaterialResolver != null ? MaterialResolver(source) : source;
+                }
                 if (material == null)
                 {
                     continue;
@@ -339,14 +352,24 @@ namespace XRay.Importer.Levels
                 {
                     int length = Mathf.Min(MAX_MOTION_INSTANCES, count - start);
                     MaterialPropertyBlock properties = block;
-                    if (count > MAX_MOTION_INSTANCES)
+                    using (new DiagnosticScope(DATA_MARKER))
                     {
-                        for (int i = 0; i < length; i++) _submissionData[i] = data != null && start + i < data.Length ? data[start + i] : new Vector4(1.0f, 0.0f, 0.0f, 0.0f);
-                        _submissionBlock.SetVectorArray(_propertyId, _submissionData);
-                        properties = _submissionBlock;
+                        if (count > MAX_MOTION_INSTANCES)
+                        {
+                            for (int i = 0; i < length; i++) _submissionData[i] = data != null && start + i < data.Length ? data[start + i] : new Vector4(1.0f, 0.0f, 0.0f, 0.0f);
+                            _submissionBlock.SetVectorArray(_propertyId, _submissionData);
+                            properties = _submissionBlock;
+                        }
                     }
-                    var parameters = new RenderParams(material) { camera = camera, worldBounds = bounds, motionVectorMode = moving || XRayFloraWindBounds.Uses(material, wind) ? MotionVectorGenerationMode.Object : MotionVectorGenerationMode.Camera, layer = gameObject.layer, shadowCastingMode = mode, receiveShadows = true, matProps = properties };
-                    Graphics.RenderMeshInstanced(parameters, batch.Mesh, submesh, matrices, length, start);
+                    RenderParams parameters;
+                    using (new DiagnosticScope(PARAMS_MARKER))
+                    {
+                        parameters = new RenderParams(material) { camera = camera, worldBounds = bounds, motionVectorMode = moving || XRayFloraWindBounds.Uses(material, wind) ? MotionVectorGenerationMode.Object : MotionVectorGenerationMode.Camera, layer = gameObject.layer, shadowCastingMode = mode, receiveShadows = true, matProps = properties };
+                    }
+                    using (new DiagnosticScope(DRAW_MARKER))
+                    {
+                        Graphics.RenderMeshInstanced(parameters, batch.Mesh, submesh, matrices, length, start);
+                    }
                     if (DiagnosticMarkersEnabled)
                     {
                         DiagnosticCpuSubmissions++;
@@ -372,17 +395,23 @@ namespace XRay.Importer.Levels
                 history = new InstanceHistory(batch);
                 _histories[index] = history;
             }
+            using var loopScope = new DiagnosticScope(HISTORY_LOOP_MARKER);
             bool advance = history.Frame != Time.frameCount;
             history.Moving = false;
             for (int i = 0; i < batch.Count; i++)
             {
-                Matrix4x4 current = batch.Matrices[i];
-                Matrix4x4 previous = advance ? history.Instances[i].objectToWorld : history.Instances[i].prevObjectToWorld;
-                history.Instances[i] = new InstanceData(current, previous);
-                history.Moving |= !current.Equals(previous);
+                ref InstanceData instance = ref history.Instances[i];
+                if (advance) instance.prevObjectToWorld = instance.objectToWorld;
+                instance.objectToWorld = batch.Matrices[i];
+                history.Moving |= !Same(in instance.objectToWorld, in instance.prevObjectToWorld);
             }
             history.Frame = Time.frameCount;
             return history;
+        }
+
+        private static bool Same(in Matrix4x4 current, in Matrix4x4 previous)
+        {
+            return current.m00 == previous.m00 && current.m10 == previous.m10 && current.m20 == previous.m20 && current.m30 == previous.m30 && current.m01 == previous.m01 && current.m11 == previous.m11 && current.m21 == previous.m21 && current.m31 == previous.m31 && current.m02 == previous.m02 && current.m12 == previous.m12 && current.m22 == previous.m22 && current.m32 == previous.m32 && current.m03 == previous.m03 && current.m13 == previous.m13 && current.m23 == previous.m23 && current.m33 == previous.m33;
         }
 
         private readonly struct DiagnosticScope : IDisposable
@@ -411,8 +440,8 @@ namespace XRay.Importer.Levels
 
         private struct InstanceData
         {
-            public readonly Matrix4x4 objectToWorld;
-            public readonly Matrix4x4 prevObjectToWorld;
+            public Matrix4x4 objectToWorld;
+            public Matrix4x4 prevObjectToWorld;
 
             public InstanceData(Matrix4x4 current, Matrix4x4 previous)
             {

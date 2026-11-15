@@ -28,6 +28,10 @@ namespace RaidIntoDarkness.Effects
             string[] args = Environment.GetCommandLineArgs();
             int index = Array.IndexOf(args, "-anomaly-visual");
             Active = index >= 0;
+            if (Active)
+            {
+                throw new NotSupportedException("Legacy Visual08, Light10 and Shadow11 modes depended on retired gameplay hooks. Historical results remain in Archive. Use the location preparation route for this campaign.");
+            }
             if (Active && (index + 1 >= args.Length || Array.IndexOf(new[] { "A", "N", "P", "L", "B", "Light10_A", "Light10_B", "Shadow11_A", "Shadow11_B" }, args[index + 1]) < 0))
             {
                 throw new ArgumentException("-anomaly-visual requires N, P, L or B.");

@@ -74,8 +74,8 @@ namespace Rvm.Benchmark.Tests
             Assert.That(memory.Read(Time.frameCount).Value, Is.Zero);
             Type rendererType = AppDomain.CurrentDomain.GetAssemblies().Select(value => value.GetType("XRay.Importer.Levels.XRayLevelInstancedRenderer")).First(value => value != null);
             _rendererSwitch = rendererType.GetProperty("DiagnosticMarkersEnabled", BindingFlags.Public | BindingFlags.Static);
-            _rendererFlag = (bool)_rendererSwitch.GetValue(null);
-            _rendererSwitch.SetValue(null, true);
+            _rendererFlag = _rendererSwitch != null && (bool)_rendererSwitch.GetValue(null);
+            _rendererSwitch?.SetValue(null, true);
             var root = new GameObject("Recorder ownership fixture");
             root.AddComponent(rendererType);
             var camera = new GameObject("Fixture camera").AddComponent<Camera>();
@@ -126,7 +126,10 @@ namespace Rvm.Benchmark.Tests
                 Assert.That(UnityEngine.Profiling.Profiler.GetAreaEnabled(UnityEngine.Profiling.ProfilerArea.CPU), Is.True);
                 Assert.That(UnityEngine.Profiling.Profiler.enableBinaryLog, Is.EqualTo(_binary));
                 Assert.That(UnityEngine.Profiling.Profiler.logFile, Is.EqualTo(_profilerFile));
-                Assert.That((bool)_rendererSwitch.GetValue(null), Is.True);
+                if (_rendererSwitch != null)
+                {
+                    Assert.That((bool)_rendererSwitch.GetValue(null), Is.True);
+                }
             }
             timing.Dispose();
             using (marker.Auto())

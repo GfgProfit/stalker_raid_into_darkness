@@ -110,12 +110,12 @@ namespace XRay.Importer.Tests
             Assert.AreEqual(0, Invoke(fixture.Details, "Flush", fixture.Camera, 0));
             Assert.AreEqual(2, calls);
             Set(fixture.Details, "_counts", new[] { 1, 0, 0 });
-            Assert.IsNull(Invoke(fixture.Details, "FlushSource", fixture.Camera, 0, false));
+            Assert.IsNull(Invoke(fixture.Details, "FlushSource", fixture.Camera, 0, false, null, 0f));
             Assert.AreEqual(3, calls);
             Set(fixture.Details, "_counts", new[] { 0, 0, 1 });
             Assert.AreEqual(0, Invoke(fixture.Details, "Flush", fixture.Camera, 2));
             Set(fixture.Details, "_counts", new[] { 0, 0, 1 });
-            Assert.IsNull(Invoke(fixture.Details, "FlushSource", fixture.Camera, 2, false));
+            Assert.IsNull(Invoke(fixture.Details, "FlushSource", fixture.Camera, 2, false, null, 0f));
             Assert.AreEqual(3, calls);
             fixture.AssertReadOnly();
         }

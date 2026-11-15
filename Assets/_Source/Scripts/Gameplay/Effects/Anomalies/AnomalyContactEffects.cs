@@ -191,11 +191,13 @@ namespace RaidIntoDarkness.Effects
             }
             Vector3 position = anchor.position;
             GameObject root = Instantiate(_template, position, rotation);
+            AnomalyVisual08Target.ApplySpawned(this, root);
             root.name = "AnomalyContactEffect";
             if (gameObject.scene.IsValid() && root.scene != gameObject.scene)
             {
                 SceneManager.MoveGameObjectToScene(root, gameObject.scene);
             }
+            AnomalyVisual09Events.Record(this, 11, 0, 0.0, root.transform);
             AnomalyParticlePlayback playback = new AnomalyParticlePlayback(root, _rootIndex, _stopEffectIndices, _stopTimes, _groupDuration);
             if (playback.IsValid == false || playback.Play() == false)
             {

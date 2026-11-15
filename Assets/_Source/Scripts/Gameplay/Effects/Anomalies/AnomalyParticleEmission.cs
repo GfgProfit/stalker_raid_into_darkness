@@ -122,6 +122,7 @@ namespace RaidIntoDarkness.Effects
                 if (state.System != system || !state.Playing || currentTime + CLOCK_EPSILON < state.LastTime && !loopWrapped)
                 {
                     state = new SourceState { System = system, Playing = true };
+                    AnomalyVisual09Events.Record(this, 9, index, currentTime, system);
                 }
 
                 state.LastTime = currentTime;
@@ -145,7 +146,9 @@ namespace RaidIntoDarkness.Effects
                     int capacity = Mathf.Max(0, main.maxParticles - system.particleCount);
                     if (count > 0 && capacity > 0)
                     {
-                        system.Emit(Mathf.Min(count, capacity));
+                        int actual = Mathf.Min(count, capacity);
+                        AnomalyVisual09Events.Record(this, 3, actual, state.Elapsed, system);
+                        system.Emit(actual);
                     }
                 }
             }

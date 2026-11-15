@@ -1,0 +1,12 @@
+{
+    "name": "Rvm.CleanReleaseRoute07",
+    "rootNamespace": "Rvm.CleanReleaseRoute07",
+    "references": [
+        "XRay.Importer.Runtime",
+        "RaidIntoDarkness.Effects",
+        "RaidIntoDarkness.Player",
+        "Unity.RenderPipelines.HighDefinition.Runtime",
+        "Unity.RenderPipelines.Core.Runtime"
+    ],
+    "autoReferenced": true
+}

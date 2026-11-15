@@ -1,0 +1,15 @@
+{
+    "name": "Rvm.CleanReleaseRoute07.Editor",
+    "rootNamespace": "Rvm.CleanReleaseRoute07.Editor",
+    "references": [
+        "Rvm.CleanReleaseRoute07",
+        "Rvm.Benchmark.Runtime",
+        "Rvm.Benchmark.Editor",
+        "XRay.Importer.Runtime",
+        "RaidIntoDarkness.Effects"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "autoReferenced": true
+}

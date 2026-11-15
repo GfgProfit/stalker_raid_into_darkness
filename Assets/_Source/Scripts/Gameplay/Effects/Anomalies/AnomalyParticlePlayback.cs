@@ -54,9 +54,11 @@ namespace RaidIntoDarkness.Effects
             _delayRemaining = Mathf.Max(0f, delay);
             _playing = true;
             _started = _delayRemaining <= 0f;
+            AnomalyVisual09Events.Record(_systems[_rootIndex], 7, _started ? 1 : 0, _delayRemaining);
             Root.SetActive(_started);
             if (_started)
             {
+                AnomalyVisual09Events.Record(_systems[_rootIndex], 2);
                 _systems[_rootIndex].Play(true);
             }
             return true;
@@ -80,6 +82,7 @@ namespace RaidIntoDarkness.Effects
                 }
                 _started = true;
                 Root.SetActive(true);
+                AnomalyVisual09Events.Record(_systems[_rootIndex], 2);
                 _systems[_rootIndex].Play(true);
             }
             float previous = _elapsed;

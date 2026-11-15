@@ -17,6 +17,7 @@ namespace XRay.Importer.Levels
         [SerializeField] private int[] _lodIndices;
 
         [NonSerialized] private bool _matricesExposed;
+        [NonSerialized] private int _matrixRevision;
 
         public XRayInstanceBatch(string name, Mesh mesh, Material[] materials, Bounds bounds, Matrix4x4[] matrices, Vector4[] data, bool castShadows, int[] lodIndices = null)
         {
@@ -46,6 +47,7 @@ namespace XRay.Importer.Levels
 
         internal Matrix4x4[] RenderMatrices => _matrices;
         internal bool MatricesExposed => _matricesExposed;
+        internal int MatrixRevision => _matrixRevision;
         public Vector4[] Data => _data;
         public bool CastShadows => _castShadows;
         public int[] LodIndices => _lodIndices;
@@ -60,6 +62,7 @@ namespace XRay.Importer.Levels
         internal void CaptureOwnedMatrices()
         {
             _matrices = _matrices != null ? (Matrix4x4[])_matrices.Clone() : null;
+            _matrixRevision++;
             _matricesExposed = false;
         }
     }

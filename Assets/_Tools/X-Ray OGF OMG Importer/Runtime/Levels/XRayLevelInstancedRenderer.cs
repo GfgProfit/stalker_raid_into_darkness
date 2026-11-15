@@ -337,7 +337,7 @@ namespace XRay.Importer.Levels
                 history = new InstanceHistory(batch, revision);
                 _histories[index] = history;
             }
-            if (_batchSet != null && _batchSet.HasPreparedMatrices && !batch.MatricesExposed)
+            if (_batchSet != null && _batchSet.HasPreparedMatrices && !batch.MatricesExposed && history.BatchRevision == batch.MatrixRevision && !history.Moving)
             {
                 history.Frame = Time.frameCount;
                 history.Moving = false;
@@ -353,6 +353,7 @@ namespace XRay.Importer.Levels
                 history.Moving |= !Same(in instance.objectToWorld, in instance.prevObjectToWorld);
             }
             history.Frame = Time.frameCount;
+            history.BatchRevision = batch.MatrixRevision;
             return history;
         }
 
@@ -379,6 +380,7 @@ namespace XRay.Importer.Levels
             {
                 Source = source;
                 Revision = revision;
+                BatchRevision = source.MatrixRevision;
                 Instances = new InstanceData[source.Count];
                 for (int i = 0; i < source.Count; i++) Instances[i] = new InstanceData(source.GetMatrix(i), source.GetMatrix(i));
             }
@@ -387,6 +389,7 @@ namespace XRay.Importer.Levels
             public int Revision { get; }
             public InstanceData[] Instances { get; }
             public int Frame { get; set; } = -1;
+            public int BatchRevision { get; set; }
             public bool Moving { get; set; }
         }
 

@@ -94,6 +94,59 @@ namespace XRay.Importer.Tests
         }
 
         [Test]
+        public void SharedBatchRepreparationKeepsBothConsumersCurrent()
+        {
+            _set.PrepareMatrices("first");
+            object first = Observe();
+            Matrix4x4 original = _batch.GetMatrix(0);
+            var secondSet = ScriptableObject.CreateInstance<XRayInstanceBatchSet>();
+            var secondRoot = new GameObject("Shared matrix consumer");
+            try
+            {
+                secondSet.Initialize("second", 128f, new List<XRayInstanceBatch> { _batch });
+                secondSet.PrepareMatrices("second");
+                var secondRenderer = secondRoot.AddComponent<XRayLevelInstancedRenderer>();
+                secondRenderer.BatchSet = secondSet;
+                HISTORY.Invoke(secondRenderer, new object[] { 0, _batch });
+                Matrix4x4 changed = Matrix4x4.Translate(Vector3.right * 70f);
+                _batch.Matrices[0] = changed;
+                secondSet.PrepareMatrices("changed");
+                first = Observe();
+                object second = HISTORY.Invoke(secondRenderer, new object[] { 0, _batch });
+                Assert.That(Matrix(first, 0, "objectToWorld"), Is.EqualTo(changed));
+                Assert.That(Matrix(second, 0, "objectToWorld"), Is.EqualTo(changed));
+                Assert.That(Matrix(first, 0, "prevObjectToWorld"), Is.EqualTo(original));
+                Observe();
+                Assert.That(Matrix(first, 0, "prevObjectToWorld"), Is.EqualTo(original));
+                Advance(first);
+                Observe();
+                Assert.That(Matrix(first, 0, "prevObjectToWorld"), Is.EqualTo(changed));
+                Assert.That(Moving(first), Is.False);
+                Matrix4x4[] retained = _batch.Matrices;
+                retained[0] = Matrix4x4.Translate(Vector3.up * 90f);
+                Observe();
+                second = HISTORY.Invoke(secondRenderer, new object[] { 0, _batch });
+                Assert.That(Matrix(first, 0, "objectToWorld"), Is.EqualTo(retained[0]));
+                Assert.That(Matrix(second, 0, "objectToWorld"), Is.EqualTo(retained[0]));
+                Matrix4x4 previous = retained[0];
+                Advance(first);
+                Advance(second);
+                retained[0] = Matrix4x4.Translate(Vector3.forward * 110f);
+                Observe();
+                HISTORY.Invoke(secondRenderer, new object[] { 0, _batch });
+                Assert.That(Matrix(first, 0, "prevObjectToWorld"), Is.EqualTo(previous));
+                Assert.That(Matrix(second, 0, "prevObjectToWorld"), Is.EqualTo(previous));
+                Assert.That(Matrix(first, 0, "objectToWorld"), Is.EqualTo(retained[0]));
+                Assert.That(Matrix(second, 0, "objectToWorld"), Is.EqualTo(retained[0]));
+            }
+            finally
+            {
+                UnityEngine.Object.DestroyImmediate(secondRoot);
+                UnityEngine.Object.DestroyImmediate(secondSet);
+            }
+        }
+
+        [Test]
         public void UnpreparedConstructorRetainsMutableInputCompatibility()
         {
             object history = Observe();

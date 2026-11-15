@@ -1,0 +1,4 @@
+interface:
+  display_name: "RVM Performance"
+  short_description: "Performance rules for rendering, runtime and import"
+  default_prompt: "Apply project performance rules to this change."

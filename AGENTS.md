@@ -115,6 +115,8 @@ If validation was not run because it is forbidden or unsafe, say so in `Risks or
 
 ## Skill Integration
 
+Apply [rvm-performance](.agents/skills/rvm-performance/SKILL.md) whenever changing runtime code, rendering, import, resource loading, effects, memory, or performance. Its correctness, automatic application, networking boundaries, and removable diagnostics rules are mandatory within the task scope.
+
 Project skills:
 - `.claude/skills/...`
 

@@ -41,6 +41,7 @@ namespace XRay.Importer.Levels
         private byte[] _sourceVisibility;
         private Func<Material, Material> _materialResolver;
         private bool _orderIndependentResolver;
+        private GameConfig _configuration;
 
         public XRayInstanceBatchSet BatchSet
         {
@@ -73,6 +74,7 @@ namespace XRay.Importer.Levels
                 _orderIndependentResolver = false;
             }
         }
+        public GameConfig Configuration => _configuration;
         public int LastVisibleBatches { get; private set; }
         public int LastVisibleInstances { get; private set; }
         public int LastShadowOnlyBatches { get; private set; }
@@ -89,6 +91,7 @@ namespace XRay.Importer.Levels
 
         private void OnEnable()
         {
+            if (_configuration == null) _configuration = GameConfig.Load();
             _propertyId = Shader.PropertyToID(INSTANCE_DATA_PROPERTY);
             _submissionBlock = new MaterialPropertyBlock();
             _properties.Clear();
@@ -394,8 +397,28 @@ namespace XRay.Importer.Levels
             _orderIndependentResolver = resolver != null;
         }
 
+        public void ApplyConfiguration(GameConfig configuration)
+        {
+            _configuration = configuration;
+            ReleaseGroups();
+        }
+
+        private void ReleaseGroups()
+        {
+            _groupOwner = null;
+            _groups = null;
+            _groupByBatch = null;
+            _sourceBounds = null;
+            _sourceVisibility = null;
+        }
+
         private bool PrepareGroups(Camera camera, byte[] states)
         {
+            if (_configuration == null || !_configuration.InstanceSubmissionGroupingEnabled)
+            {
+                if (_groups != null) ReleaseGroups();
+                return false;
+            }
             if (MaterialResolver != null && !_orderIndependentResolver) return false;
             if (_groupOwner != null && (_groupOwner != _batchSet || _groupRevision != _batchSet.GroupingRevision))
             {

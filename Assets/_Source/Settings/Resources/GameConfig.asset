@@ -19,6 +19,7 @@ MonoBehaviour:
   _weatherFxCatalog: {fileID: 11400000, guid: e41ce4b841757b64b9bedc08e3f0c593, type: 2}
   _celestialSettings: {fileID: 11400000, guid: daf0ba08ecb8f9e4cbfd2ef8f9a13bfd, type: 2}
   _precipitation: {fileID: 11400000, guid: d9e7cde7bfb412b44af0248e8943ce6e, type: 2}
+  _instanceSubmissionGroupingEnabled: 0
   _fogEnabled: 1
   _sunShaftsEnabled: 1
   _lensFlareEnabled: 1

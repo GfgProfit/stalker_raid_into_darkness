@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using NUnit.Framework;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
 using XRay.Importer.Editor.Levels;
@@ -28,6 +29,11 @@ namespace XRay.Importer.Tests
             _material = Own(new Material(Shader.Find("HDRP/Unlit")) { enableInstancing = true });
             _set = Own(ScriptableObject.CreateInstance<XRayInstanceBatchSet>());
             _renderer = Own(new GameObject("Grouping renderer")).AddComponent<XRayLevelInstancedRenderer>();
+            var config = Own(ScriptableObject.CreateInstance<GameConfig>());
+            var serialized = new SerializedObject(config);
+            serialized.FindProperty("_instanceSubmissionGroupingEnabled").boolValue = true;
+            serialized.ApplyModifiedPropertiesWithoutUndo();
+            _renderer.ApplyConfiguration(config);
             _camera = Own(new GameObject("Grouping camera")).AddComponent<Camera>();
             _camera.enabled = false;
             _camera.farClipPlane = 2000f;
@@ -257,6 +263,38 @@ namespace XRay.Importer.Tests
             Assert.That(visited, Is.EqualTo(new[] { _material, middleMaterial, _material }));
             Assert.That(_renderer.LastSubmittedCalls, Is.EqualTo(2));
             Assert.That(_renderer.LastSubmittedInstances, Is.EqualTo(7));
+        }
+
+        [Test]
+        public void GlobalConfigurationDefaultsToOriginalSubmissionAndOptInReleasesGroupsWhenDisabled()
+        {
+            Prepare(Batch(1f), Batch(2f));
+            var config = Own(ScriptableObject.CreateInstance<GameConfig>());
+            Assert.That(config.InstanceSubmissionGroupingEnabled, Is.False);
+            _renderer.ApplyConfiguration(config);
+            Draw();
+            Assert.That(_renderer.LastSubmittedCalls, Is.EqualTo(2));
+            Assert.That(Field(_renderer, "_groups"), Is.Null);
+            var serialized = new SerializedObject(config);
+            serialized.FindProperty("_instanceSubmissionGroupingEnabled").boolValue = true;
+            serialized.ApplyModifiedPropertiesWithoutUndo();
+            Draw();
+            Assert.That(_renderer.LastSubmittedCalls, Is.EqualTo(1));
+            _renderer.enabled = false;
+            _renderer.enabled = true;
+            Draw();
+            Assert.That(_renderer.LastSubmittedCalls, Is.EqualTo(1));
+            serialized.Update();
+            serialized.FindProperty("_instanceSubmissionGroupingEnabled").boolValue = false;
+            serialized.ApplyModifiedPropertiesWithoutUndo();
+            Draw();
+            Assert.That(_renderer.LastSubmittedCalls, Is.EqualTo(2));
+            Assert.That(_renderer.LastSubmittedInstances, Is.EqualTo(2));
+            Assert.That(Field(_renderer, "_groups"), Is.Null);
+            Assert.That(Field(_renderer, "_sourceBounds"), Is.Null);
+            _renderer.ApplyConfiguration(null);
+            Draw();
+            Assert.That(_renderer.LastSubmittedCalls, Is.EqualTo(2));
         }
 
         [Test]

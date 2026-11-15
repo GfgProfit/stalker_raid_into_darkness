@@ -59,6 +59,20 @@ namespace XRay.Importer.Levels
             return _matrices[index];
         }
 
+        public int GetMatrixOrientation()
+        {
+            int result = 0;
+            for (int index = 0; index < Count; index++)
+            {
+                float determinant = _matrices[index].determinant;
+                if (!float.IsFinite(determinant) || determinant == 0f) return 0;
+                int sign = determinant > 0f ? 1 : -1;
+                if (index == 0) result = sign;
+                else if (result != sign) return 0;
+            }
+            return result;
+        }
+
         internal void CaptureOwnedMatrices()
         {
             _matrices = _matrices != null ? (Matrix4x4[])_matrices.Clone() : null;
@@ -67,10 +81,28 @@ namespace XRay.Importer.Levels
         }
     }
 
+    [Serializable]
+    public sealed class XRayInstanceBatchGroup
+    {
+        [SerializeField] private int[] _batchIndices;
+        [SerializeField] private Bounds _bounds;
+
+        public IReadOnlyList<int> BatchIndices => _batchIndices;
+        public Bounds Bounds => _bounds;
+
+        public XRayInstanceBatchGroup(int[] batchIndices, Bounds bounds)
+        {
+            _batchIndices = (int[])batchIndices.Clone();
+            _bounds = bounds;
+        }
+    }
+
     public sealed class XRayInstanceBatchSet : ScriptableObject
     {
         public const int MAX_INSTANCES_PER_BATCH = 1023;
         public const int MATRIX_PREPARATION_VERSION = 1;
+        public const int GROUPING_VERSION = 2;
+        public const int MAX_GROUP_INSTANCES = 511;
 
         [SerializeField] private string _levelName;
         [SerializeField] private float _cellSize;
@@ -78,8 +110,12 @@ namespace XRay.Importer.Levels
         [SerializeField] private XRayLevelLodSet _lods;
         [SerializeField] private int _matrixPreparationVersion;
         [SerializeField] private string _matrixInputSignature;
+        [SerializeField] private int _groupingVersion;
+        [SerializeField] private string _groupingSignature;
+        [SerializeField] private List<XRayInstanceBatchGroup> _submissionGroups = new List<XRayInstanceBatchGroup>();
 
         [NonSerialized] private int _matrixRevision;
+        [NonSerialized] private int _groupingRevision;
 
         public string LevelName => _levelName;
         public float CellSize => _cellSize;
@@ -87,7 +123,11 @@ namespace XRay.Importer.Levels
         public XRayLevelLodSet Lods => _lods;
         public int MatrixPreparationVersion => _matrixPreparationVersion;
         public string MatrixInputSignature => _matrixInputSignature;
+        public int GroupingVersion => _groupingVersion;
+        public string GroupingSignature => _groupingSignature;
+        public IReadOnlyList<XRayInstanceBatchGroup> SubmissionGroups => _submissionGroups;
         internal int MatrixRevision => _matrixRevision;
+        internal int GroupingRevision => _groupingRevision;
         internal bool HasPreparedMatrices => _matrixPreparationVersion == MATRIX_PREPARATION_VERSION && !string.IsNullOrEmpty(_matrixInputSignature);
 
         public int InstanceCount
@@ -104,11 +144,24 @@ namespace XRay.Importer.Levels
             }
         }
 
+        public static bool SupportsSubmissionMaterial(Material material)
+        {
+            if (material == null) return true;
+            if (!material.enableInstancing || material.renderQueue >= 3000) return false;
+            if (material.HasProperty("_SurfaceType")) return material.GetFloat("_SurfaceType") == 0f;
+            string renderType = material.GetTag("RenderType", false, string.Empty);
+            return renderType == "Opaque" || renderType == "TransparentCutout";
+        }
+
         public void Initialize(string levelName, float cellSize, List<XRayInstanceBatch> batches, XRayLevelLodSet lods = null)
         {
             _matrixPreparationVersion = 0;
             _matrixInputSignature = null;
             _matrixRevision++;
+            _groupingVersion = 0;
+            _groupingSignature = null;
+            _submissionGroups.Clear();
+            _groupingRevision++;
             _lods = lods;
             _levelName = levelName;
             _cellSize = cellSize;
@@ -133,6 +186,34 @@ namespace XRay.Importer.Levels
             _matrixRevision++;
             _matrixInputSignature = inputSignature;
             _matrixPreparationVersion = MATRIX_PREPARATION_VERSION;
+        }
+
+        public void PrepareSubmissionGroups(List<XRayInstanceBatchGroup> groups, string signature)
+        {
+            if (groups == null || string.IsNullOrEmpty(signature)) throw new ArgumentException("Submission groups and their input signature are required.");
+            var used = new HashSet<int>();
+            foreach (var group in groups)
+            {
+                if (group == null || group.BatchIndices.Count < 2) throw new ArgumentException("A submission group needs at least two source batches.");
+                int count = 0;
+                foreach (int index in group.BatchIndices)
+                {
+                    if (index < 0 || index >= _batches.Count || !used.Add(index)) throw new ArgumentException("Invalid or repeated source batch index.");
+                    count += _batches[index].Count;
+                }
+                if (count > MAX_GROUP_INSTANCES) throw new ArgumentException("Submission group exceeds its instance limit.");
+            }
+            _groupingVersion = 0;
+            _submissionGroups = new List<XRayInstanceBatchGroup>(groups);
+            _groupingSignature = signature;
+            _groupingRevision++;
+            _groupingVersion = GROUPING_VERSION;
+        }
+
+        public void InvalidateSubmissionGroups()
+        {
+            _groupingVersion = 0;
+            _groupingRevision++;
         }
     }
 }

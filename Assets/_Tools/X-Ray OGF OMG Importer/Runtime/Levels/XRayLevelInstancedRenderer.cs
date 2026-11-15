@@ -10,7 +10,7 @@ namespace XRay.Importer.Levels
     {
         public const string INSTANCE_DATA_PROPERTY = "_MonolithInstanceData";
 
-        private const int MAX_MOTION_INSTANCES = 511;
+        private const int MAX_MOTION_INSTANCES = XRayInstanceBatchSet.MAX_GROUP_INSTANCES;
 
         [SerializeField] private XRayInstanceBatchSet _batchSet;
         [SerializeField] private float _maxDistance;
@@ -25,6 +25,13 @@ namespace XRay.Importer.Levels
         private MaterialPropertyBlock _submissionBlock;
         private XRayLevelLodRenderer _lodRenderer;
         private int _propertyId;
+        private XRayInstanceBatchSet _groupOwner;
+        private int _groupRevision = -1;
+        private int[] _groupByBatch;
+        private GroupScratch[] _groups;
+        private XRayInstanceBatchSet _propertiesOwner;
+        private int _propertiesMatrixRevision = -1;
+        private int _propertiesGroupingRevision = -1;
 
         public XRayInstanceBatchSet BatchSet
         {
@@ -35,6 +42,9 @@ namespace XRay.Importer.Levels
                 _properties.Clear();
                 _lodScratch.Clear();
                 _histories.Clear();
+                _groups = null;
+                _groupByBatch = null;
+                _groupOwner = null;
             }
         }
 
@@ -49,6 +59,8 @@ namespace XRay.Importer.Levels
         public int LastVisibleInstances { get; private set; }
         public int LastShadowOnlyBatches { get; private set; }
         public int LastRejectedShadowBatches { get; private set; }
+        public int LastSubmittedCalls { get; private set; }
+        public int LastSubmittedInstances { get; private set; }
         public int LastImpostors { get; private set; }
         public int LastLodShadowOnlyInstances { get; private set; }
         public int LastLodDiscardedInstances { get; private set; }
@@ -64,6 +76,7 @@ namespace XRay.Importer.Levels
             _properties.Clear();
             _histories.Clear();
             RenderPipelineManager.beginCameraRendering += OnBeginCameraRendering;
+            _groupOwner = null;
         }
 
         private void OnDisable()
@@ -75,6 +88,9 @@ namespace XRay.Importer.Levels
             _lodRenderer?.Dispose();
             _lodRenderer = null;
             _submissionBlock = null;
+            _groups = null;
+            _groupByBatch = null;
+            _groupOwner = null;
         }
 
         private void OnBeginCameraRendering(ScriptableRenderContext context, Camera camera)
@@ -115,8 +131,16 @@ namespace XRay.Importer.Levels
 
             IReadOnlyList<XRayInstanceBatch> batches = _batchSet.Batches;
             XRayFloraWindState wind = XRayFloraWindBounds.ActiveState();
+            LastSubmittedCalls = 0;
+            LastSubmittedInstances = 0;
+            bool grouped = PrepareGroups(camera, states);
             for (int i = 0; i < batches.Count; i++)
             {
+                if (grouped && _groupByBatch[i] >= 0 && _groups[_groupByBatch[i]].Active)
+                {
+                    GroupScratch group = _groups[_groupByBatch[i]];
+                    if (group.Plan.BatchIndices[0] != i || RenderGroup(camera, group, wind, ref visibleBatches, ref visibleInstances, ref shadowOnlyBatches)) continue;
+                }
                 XRayInstanceBatch batch = batches[i];
                 InstanceHistory history = History(i, batch);
                 if (batch.Mesh == null || batch.Count == 0)
@@ -158,7 +182,16 @@ namespace XRay.Importer.Levels
                     continue;
                 }
 
-                Submit(camera, batch, bounds, wind, _properties[i], history.Instances, batch.Data, batch.Count, castShadows ? visible ? ShadowCastingMode.On : ShadowCastingMode.ShadowsOnly : ShadowCastingMode.Off, history.Moving);
+                Material[] resolved = null;
+                if (grouped && _groupByBatch[i] >= 0 && _groups[_groupByBatch[i]].UseResolved)
+                {
+                    GroupScratch group = _groups[_groupByBatch[i]];
+                    for (int member = 0; member < group.Plan.BatchIndices.Count; member++)
+                    {
+                        if (group.Plan.BatchIndices[member] == i) resolved = group.Resolved[member];
+                    }
+                }
+                Submit(camera, batch, bounds, wind, _properties[i], history.Instances, batch.Data, batch.Count, castShadows ? visible ? ShadowCastingMode.On : ShadowCastingMode.ShadowsOnly : ShadowCastingMode.Off, history.Moving, resolved);
             }
 
             if (states != null)
@@ -292,14 +325,14 @@ namespace XRay.Importer.Levels
             return true;
         }
 
-        private void Submit(Camera camera, XRayInstanceBatch batch, Bounds bounds, XRayFloraWindState wind, MaterialPropertyBlock block, InstanceData[] matrices, Vector4[] data, int count, ShadowCastingMode mode, bool moving)
+        private void Submit(Camera camera, XRayInstanceBatch batch, Bounds bounds, XRayFloraWindState wind, MaterialPropertyBlock block, InstanceData[] matrices, Vector4[] data, int count, ShadowCastingMode mode, bool moving, Material[] resolvedMaterials = null)
         {
             int submeshes = Mathf.Min(batch.Mesh.subMeshCount, batch.Materials.Length);
             for (int submesh = 0; submesh < submeshes; submesh++)
             {
                 Material source = batch.Materials[submesh];
                 Material material;
-                material = source != null && MaterialResolver != null ? MaterialResolver(source) : source;
+                material = resolvedMaterials != null ? resolvedMaterials[submesh] : source != null && MaterialResolver != null ? MaterialResolver(source) : source;
                 if (material == null)
                 {
                     continue;
@@ -318,6 +351,8 @@ namespace XRay.Importer.Levels
                     RenderParams parameters;
                     parameters = new RenderParams(material) { camera = camera, worldBounds = bounds, motionVectorMode = moving || XRayFloraWindBounds.Uses(material, wind) ? MotionVectorGenerationMode.Object : MotionVectorGenerationMode.Camera, layer = gameObject.layer, shadowCastingMode = mode, receiveShadows = true, matProps = properties };
                     Graphics.RenderMeshInstanced(parameters, batch.Mesh, submesh, matrices, length, start);
+                    LastSubmittedCalls++;
+                    LastSubmittedInstances += length;
                 }
             }
         }
@@ -325,6 +360,185 @@ namespace XRay.Importer.Levels
         public void ResetMotionHistory()
         {
             _histories.Clear();
+            _groupOwner = null;
+            _groups = null;
+            _groupByBatch = null;
+        }
+
+        private bool PrepareGroups(Camera camera, byte[] states)
+        {
+            if (_groupOwner != null && (_groupOwner != _batchSet || _groupRevision != _batchSet.GroupingRevision))
+            {
+                _groupOwner = null;
+                _groups = null;
+                _groupByBatch = null;
+            }
+            if (_batchSet.GroupingVersion != XRayInstanceBatchSet.GROUPING_VERSION || !_batchSet.HasPreparedMatrices || _batchSet.SubmissionGroups == null || _batchSet.SubmissionGroups.Count == 0 || _maxDistance > 0f || _lodImpostors || states != null || ExperimentalShadowInfluence != null || camera.stereoEnabled || camera.cameraType != CameraType.Game && camera.cameraType != CameraType.SceneView) return false;
+            if (_groupOwner != _batchSet || _groupRevision != _batchSet.GroupingRevision)
+            {
+                _groupOwner = _batchSet;
+                _groupRevision = _batchSet.GroupingRevision;
+                _groupByBatch = new int[_batchSet.Batches.Count];
+                Array.Fill(_groupByBatch, -1);
+                _groups = new GroupScratch[_batchSet.SubmissionGroups.Count];
+                for (int index = 0; index < _groups.Length; index++)
+                {
+                    var plan = _batchSet.SubmissionGroups[index];
+                    _groups[index] = new GroupScratch(plan, _batchSet.Batches);
+                    for (int member = 0; member < plan.BatchIndices.Count; member++) _groupByBatch[plan.BatchIndices[member]] = index;
+                }
+            }
+            foreach (GroupScratch group in _groups)
+            {
+                group.Active = true;
+                group.UseResolved = false;
+                XRayInstanceBatch first = _batchSet.Batches[group.Plan.BatchIndices[0]];
+                int count = 0;
+                for (int member = 0; member < group.Plan.BatchIndices.Count; member++)
+                {
+                    XRayInstanceBatch batch = _batchSet.Batches[group.Plan.BatchIndices[member]];
+                    if (!ReferenceEquals(group.Sources[member], batch) || batch.Mesh != first.Mesh || batch.Mesh == null || batch.MatricesExposed || batch.Count != group.Counts[member] || batch.CastShadows != first.CastShadows || batch.Materials == null || batch.Materials.Length != group.Resolved[member].Length || batch.Materials.Length != first.Materials.Length)
+                    {
+                        group.Active = false;
+                        break;
+                    }
+                    for (int material = 0; material < batch.Materials.Length; material++)
+                    {
+                        if (batch.Materials[material] != first.Materials[material]) group.Active = false;
+                    }
+                    if (group.OrientationRevisions[member] != batch.MatrixRevision)
+                    {
+                        group.Orientations[member] = batch.GetMatrixOrientation();
+                        group.OrientationRevisions[member] = batch.MatrixRevision;
+                    }
+                    if (group.Orientations[member] == 0 || group.Orientations[member] != group.Orientations[0]) group.Active = false;
+                    count += batch.Count;
+                }
+                if (count != group.Instances.Length) group.Active = false;
+            }
+            return true;
+        }
+
+        private bool RenderGroup(Camera camera, GroupScratch group, XRayFloraWindState wind, ref int visibleBatches, ref int visibleInstances, ref int shadowOnlyBatches)
+        {
+            bool refresh = !group.Ready || group.Moving;
+            group.Moving = false;
+            for (int member = 0; member < group.Sources.Length; member++)
+            {
+                int index = group.Plan.BatchIndices[member];
+                InstanceHistory history = History(index, group.Sources[member]);
+                group.Histories[member] = history;
+                refresh |= group.Revisions[member] != group.Sources[member].MatrixRevision || history.Moving;
+                group.Moving |= history.Moving;
+            }
+            if (refresh)
+            {
+                int offset = 0;
+                var payload = !group.Ready ? new List<Vector4>() : null;
+                for (int member = 0; member < group.Sources.Length; member++)
+                {
+                    int count = group.Sources[member].Count;
+                    Array.Copy(group.Histories[member].Instances, 0, group.Instances, offset, count);
+                    if (!group.Ready)
+                    {
+                        _properties[group.Plan.BatchIndices[member]].GetVectorArray(_propertyId, payload);
+                        for (int item = 0; item < count; item++) group.Data[offset + item] = payload[item];
+                    }
+                    group.Revisions[member] = group.Sources[member].MatrixRevision;
+                    offset += count;
+                }
+                if (!group.Ready) group.Properties.SetVectorArray(_propertyId, group.Data);
+                group.Ready = true;
+            }
+            XRayInstanceBatch first = group.Sources[0];
+            bool usesWind = XRayFloraWindBounds.Uses(first.Materials, wind);
+            Bounds bounds = usesWind ? XRayFloraWindBounds.Expand(group.Plan.Bounds, wind, group.MaximumSourceHeight) : group.Plan.Bounds;
+            bool visible = false;
+            for (int member = 0; member < group.Sources.Length; member++)
+            {
+                Bounds sourceBounds = usesWind ? XRayFloraWindBounds.Expand(group.Sources[member].Bounds, wind) : group.Sources[member].Bounds;
+                bool sourceVisible = GeometryUtility.TestPlanesAABB(_planes, sourceBounds);
+                if (member == 0) visible = sourceVisible;
+                else if (sourceVisible != visible)
+                {
+                    group.Active = false;
+                    return false;
+                }
+            }
+            bool shadows = _castShadows && first.CastShadows;
+            if (!visible && !shadows) return true;
+            bool compatible = true;
+            for (int member = 0; member < group.Sources.Length; member++)
+            {
+                for (int slot = 0; slot < group.Resolved[member].Length; slot++)
+                {
+                    Material source = group.Sources[member].Materials[slot];
+                    Material resolved = source != null && MaterialResolver != null ? MaterialResolver(source) : source;
+                    group.Resolved[member][slot] = resolved;
+                    if (!XRayInstanceBatchSet.SupportsSubmissionMaterial(resolved)) compatible = false;
+                    if (member > 0 && resolved != group.Resolved[0][slot]) compatible = false;
+                }
+            }
+            if (!compatible)
+            {
+                group.Active = false;
+                group.UseResolved = true;
+                return false;
+            }
+            if (visible)
+            {
+                visibleBatches++;
+                visibleInstances += group.Instances.Length;
+            }
+            else shadowOnlyBatches++;
+            Submit(camera, first, bounds, wind, group.Properties, group.Instances, group.Data, group.Instances.Length, shadows ? visible ? ShadowCastingMode.On : ShadowCastingMode.ShadowsOnly : ShadowCastingMode.Off, group.Moving, group.Resolved[0]);
+            return true;
+        }
+
+        private sealed class GroupScratch
+        {
+            public XRayInstanceBatchGroup Plan { get; }
+            public XRayInstanceBatch[] Sources { get; }
+            public int[] Counts { get; }
+            public int[] Revisions { get; }
+            public int[] Orientations { get; }
+            public int[] OrientationRevisions { get; }
+            public InstanceHistory[] Histories { get; }
+            public InstanceData[] Instances { get; }
+            public Vector4[] Data { get; }
+            public Material[][] Resolved { get; }
+            public MaterialPropertyBlock Properties { get; } = new MaterialPropertyBlock();
+            public float MaximumSourceHeight { get; }
+            public bool Ready { get; set; }
+            public bool Moving { get; set; }
+            public bool Active { get; set; }
+            public bool UseResolved { get; set; }
+
+            public GroupScratch(XRayInstanceBatchGroup plan, IReadOnlyList<XRayInstanceBatch> batches)
+            {
+                Plan = plan;
+                Sources = new XRayInstanceBatch[plan.BatchIndices.Count];
+                Counts = new int[Sources.Length];
+                Revisions = new int[Sources.Length];
+                Orientations = new int[Sources.Length];
+                OrientationRevisions = new int[Sources.Length];
+                Histories = new InstanceHistory[Sources.Length];
+                Resolved = new Material[Sources.Length][];
+                int count = 0;
+                for (int member = 0; member < Sources.Length; member++)
+                {
+                    XRayInstanceBatch batch = batches[plan.BatchIndices[member]];
+                    Sources[member] = batch;
+                    Counts[member] = batch.Count;
+                    Orientations[member] = batch.GetMatrixOrientation();
+                    OrientationRevisions[member] = batch.MatrixRevision;
+                    Resolved[member] = new Material[batch.Materials.Length];
+                    count += batch.Count;
+                    MaximumSourceHeight = Mathf.Max(MaximumSourceHeight, batch.Bounds.size.y);
+                }
+                Instances = new InstanceData[count];
+                Data = new Vector4[count];
+            }
         }
 
         private InstanceHistory History(int index, XRayInstanceBatch batch)
@@ -396,12 +610,15 @@ namespace XRay.Importer.Levels
         private void EnsureProperties()
         {
             IReadOnlyList<XRayInstanceBatch> batches = _batchSet.Batches;
-            if (_properties.Count == batches.Count)
+            if (_properties.Count == batches.Count && _propertiesOwner == _batchSet && _propertiesMatrixRevision == _batchSet.MatrixRevision && _propertiesGroupingRevision == _batchSet.GroupingRevision)
             {
                 return;
             }
 
             _properties.Clear();
+            _propertiesOwner = _batchSet;
+            _propertiesMatrixRevision = _batchSet.MatrixRevision;
+            _propertiesGroupingRevision = _batchSet.GroupingRevision;
             foreach (XRayInstanceBatch batch in batches)
             {
                 var block = new MaterialPropertyBlock();

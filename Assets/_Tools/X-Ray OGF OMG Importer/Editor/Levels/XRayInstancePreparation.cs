@@ -41,11 +41,10 @@ namespace XRay.Importer.Editor.Levels
                 throw new ArgumentNullException(nameof(set));
             }
             string signature = InputSignature(set);
-            if (set.MatrixPreparationVersion == XRayInstanceBatchSet.MATRIX_PREPARATION_VERSION && set.MatrixInputSignature == signature)
-            {
-                return false;
-            }
-            set.PrepareMatrices(signature);
+            bool changed = set.MatrixPreparationVersion != XRayInstanceBatchSet.MATRIX_PREPARATION_VERSION || set.MatrixInputSignature != signature;
+            if (changed) set.PrepareMatrices(signature);
+            changed |= XRayInstanceGrouping.Ensure(set);
+            if (!changed) return false;
             EditorUtility.SetDirty(set);
             if (!string.IsNullOrEmpty(AssetDatabase.GetAssetPath(set)))
             {
@@ -128,6 +127,7 @@ namespace XRay.Importer.Editor.Levels
             }
             foreach (string path in importedAssets)
             {
+                if (path.EndsWith(".asset", StringComparison.OrdinalIgnoreCase) || path.EndsWith(".mat", StringComparison.OrdinalIgnoreCase) || path.EndsWith(".shader", StringComparison.OrdinalIgnoreCase) || path.EndsWith(".hlsl", StringComparison.OrdinalIgnoreCase)) _scanAll = true;
                 if (path.EndsWith(".asset", StringComparison.OrdinalIgnoreCase))
                 {
                     PENDING.Add(path);
@@ -135,12 +135,13 @@ namespace XRay.Importer.Editor.Levels
             }
             foreach (string path in movedAssets)
             {
+                if (path.EndsWith(".asset", StringComparison.OrdinalIgnoreCase) || path.EndsWith(".mat", StringComparison.OrdinalIgnoreCase) || path.EndsWith(".shader", StringComparison.OrdinalIgnoreCase) || path.EndsWith(".hlsl", StringComparison.OrdinalIgnoreCase)) _scanAll = true;
                 if (path.EndsWith(".asset", StringComparison.OrdinalIgnoreCase))
                 {
                     PENDING.Add(path);
                 }
             }
-            if (PENDING.Count > 0)
+            if (PENDING.Count > 0 || _scanAll)
             {
                 Queue();
             }

@@ -104,7 +104,7 @@ namespace XRay.Importer.Tests
             Type instanceData = typeof(XRayLevelInstancedRenderer).GetNestedType("InstanceData", BindingFlags.NonPublic);
             Assert.IsNotNull(instanceData);
             Array matrices = Array.CreateInstance(instanceData, 2);
-            Invoke(fixture.Instances, "Submit", fixture.Camera, fixture.Batch, fixture.Batch.Bounds, default(XRayFloraWindState), new MaterialPropertyBlock(), matrices, fixture.Batch.Data, 2, ShadowCastingMode.Off, false);
+            Invoke(fixture.Instances, "Submit", fixture.Camera, fixture.Batch, fixture.Batch.Bounds, default(XRayFloraWindState), new MaterialPropertyBlock(), matrices, fixture.Batch.Data, 2, ShadowCastingMode.Off, false, null);
             Assert.AreEqual(1, calls);
             Set(fixture.Details, "_counts", new[] { 1, 0, 0 });
             Assert.AreEqual(0, Invoke(fixture.Details, "Flush", fixture.Camera, 0));

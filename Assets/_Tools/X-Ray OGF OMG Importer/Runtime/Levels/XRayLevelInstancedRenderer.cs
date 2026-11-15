@@ -26,6 +26,7 @@ namespace XRay.Importer.Levels
         private readonly Dictionary<Mesh, int> _meshSubmeshes = new Dictionary<Mesh, int>(new ReferenceComparer<Mesh>());
         private readonly Dictionary<Material, bool> _materialSupport = new Dictionary<Material, bool>(new ReferenceComparer<Material>());
         private readonly Dictionary<Material, bool> _windMaterials = new Dictionary<Material, bool>(new ReferenceComparer<Material>());
+        private readonly Dictionary<Material, Material> _resolvedMaterials = new Dictionary<Material, Material>(new ReferenceComparer<Material>());
         private MaterialPropertyBlock _submissionBlock;
         private XRayLevelLodRenderer _lodRenderer;
         private int _propertyId;
@@ -38,6 +39,8 @@ namespace XRay.Importer.Levels
         private int _propertiesGroupingRevision = -1;
         private Bounds[] _sourceBounds;
         private byte[] _sourceVisibility;
+        private Func<Material, Material> _materialResolver;
+        private bool _orderIndependentResolver;
 
         public XRayInstanceBatchSet BatchSet
         {
@@ -61,7 +64,15 @@ namespace XRay.Importer.Levels
             set => _lodImpostors = value;
         }
 
-        public Func<Material, Material> MaterialResolver { get; set; }
+        public Func<Material, Material> MaterialResolver
+        {
+            get => _materialResolver;
+            set
+            {
+                _materialResolver = value;
+                _orderIndependentResolver = false;
+            }
+        }
         public int LastVisibleBatches { get; private set; }
         public int LastVisibleInstances { get; private set; }
         public int LastShadowOnlyBatches { get; private set; }
@@ -111,6 +122,7 @@ namespace XRay.Importer.Levels
             _meshSubmeshes.Clear();
             _materialSupport.Clear();
             _windMaterials.Clear();
+            _resolvedMaterials.Clear();
             if (camera.cameraType == CameraType.Reflection)
             {
                 RenderReflection(camera);
@@ -335,14 +347,14 @@ namespace XRay.Importer.Levels
             return true;
         }
 
-        private void Submit(Camera camera, XRayInstanceBatch batch, Bounds bounds, XRayFloraWindState wind, MaterialPropertyBlock block, InstanceData[] matrices, Vector4[] data, int count, ShadowCastingMode mode, bool moving)
+        private void Submit(Camera camera, XRayInstanceBatch batch, Bounds bounds, XRayFloraWindState wind, MaterialPropertyBlock block, InstanceData[] matrices, Vector4[] data, int count, ShadowCastingMode mode, bool moving, Material[] resolvedMaterials = null)
         {
             int submeshes = Mathf.Min(MeshSubmeshes(batch.Mesh), batch.Materials.Length);
             for (int submesh = 0; submesh < submeshes; submesh++)
             {
                 Material source = batch.Materials[submesh];
                 Material material;
-                material = source != null && MaterialResolver != null ? MaterialResolver(source) : source;
+                material = resolvedMaterials != null ? resolvedMaterials[submesh] : _orderIndependentResolver ? ResolveGroupingMaterial(source) : source != null && MaterialResolver != null ? MaterialResolver(source) : source;
                 if (material == null)
                 {
                     continue;
@@ -376,9 +388,15 @@ namespace XRay.Importer.Levels
             ReleaseCallbackCaches();
         }
 
+        internal void SetOrderIndependentMaterialResolver(Func<Material, Material> resolver)
+        {
+            _materialResolver = resolver;
+            _orderIndependentResolver = resolver != null;
+        }
+
         private bool PrepareGroups(Camera camera, byte[] states)
         {
-            if (MaterialResolver != null) return false;
+            if (MaterialResolver != null && !_orderIndependentResolver) return false;
             if (_groupOwner != null && (_groupOwner != _batchSet || _groupRevision != _batchSet.GroupingRevision))
             {
                 _groupOwner = null;
@@ -408,9 +426,10 @@ namespace XRay.Importer.Levels
                 XRayInstanceBatch first = group.Sources[0];
                 group.Active = group.Compatible && MeshSubmeshes(first.Mesh) >= 0;
                 if (!group.Active) continue;
-                foreach (Material material in first.Materials)
+                for (int slot = 0; slot < first.Materials.Length; slot++)
                 {
-                    if (!SupportsMaterial(material)) group.Active = false;
+                    group.Resolved[slot] = ResolveGroupingMaterial(first.Materials[slot]);
+                    if (!SupportsMaterial(group.Resolved[slot])) group.Active = false;
                 }
                 if (!group.Active) continue;
                 for (int member = 0; member < group.Sources.Length; member++)
@@ -493,7 +512,7 @@ namespace XRay.Importer.Levels
                 visibleInstances += group.Instances.Length;
             }
             else shadowOnlyBatches++;
-            Submit(camera, first, bounds, wind, group.Properties, group.Instances, group.Data, group.Instances.Length, shadows ? visible ? ShadowCastingMode.On : ShadowCastingMode.ShadowsOnly : ShadowCastingMode.Off, group.Moving);
+            Submit(camera, first, bounds, wind, group.Properties, group.Instances, group.Data, group.Instances.Length, shadows ? visible ? ShadowCastingMode.On : ShadowCastingMode.ShadowsOnly : ShadowCastingMode.Off, group.Moving, group.Resolved);
             return true;
         }
 
@@ -512,7 +531,7 @@ namespace XRay.Importer.Levels
         private int MeshSubmeshes(Mesh mesh)
         {
             if (ReferenceEquals(mesh, null)) return -1;
-            if (MaterialResolver != null) return mesh != null ? mesh.subMeshCount : -1;
+            if (MaterialResolver != null && !_orderIndependentResolver) return mesh != null ? mesh.subMeshCount : -1;
             if (_meshSubmeshes.TryGetValue(mesh, out int count)) return count;
             count = mesh != null ? mesh.subMeshCount : -1;
             _meshSubmeshes.Add(mesh, count);
@@ -541,7 +560,7 @@ namespace XRay.Importer.Levels
         private bool UsesWind(Material material, XRayFloraWindState wind)
         {
             if (wind == null || ReferenceEquals(material, null)) return false;
-            if (MaterialResolver != null) return XRayFloraWindBounds.Uses(material, wind);
+            if (MaterialResolver != null && !_orderIndependentResolver) return XRayFloraWindBounds.Uses(material, wind);
             if (_windMaterials.TryGetValue(material, out bool uses)) return uses;
             uses = XRayFloraWindBounds.Uses(material, wind);
             _windMaterials.Add(material, uses);
@@ -558,6 +577,17 @@ namespace XRay.Importer.Levels
             _materialSupport.TrimExcess();
             _windMaterials.Clear();
             _windMaterials.TrimExcess();
+            _resolvedMaterials.Clear();
+            _resolvedMaterials.TrimExcess();
+        }
+
+        private Material ResolveGroupingMaterial(Material source)
+        {
+            if (!_orderIndependentResolver || source == null) return source;
+            if (_resolvedMaterials.TryGetValue(source, out Material resolved)) return resolved;
+            resolved = _materialResolver(source);
+            _resolvedMaterials.Add(source, resolved);
+            return resolved;
         }
 
         private sealed class ReferenceComparer<T> : IEqualityComparer<T> where T : class
@@ -586,6 +616,7 @@ namespace XRay.Importer.Levels
             public InstanceData[] Instances { get; }
             public Vector4[] Data { get; }
             public bool Compatible { get; }
+            public Material[] Resolved { get; }
             public MaterialPropertyBlock Properties { get; } = new MaterialPropertyBlock();
             public float MaximumSourceHeight { get; }
             public bool Ready { get; set; }
@@ -603,6 +634,7 @@ namespace XRay.Importer.Levels
                 Histories = new InstanceHistory[Sources.Length];
                 XRayInstanceBatch first = batches[plan.BatchIndices[0]];
                 Compatible = first.Materials != null;
+                Resolved = new Material[first.Materials != null ? first.Materials.Length : 0];
                 int count = 0;
                 LeaderIndex = int.MaxValue;
                 for (int member = 0; member < Sources.Length; member++)

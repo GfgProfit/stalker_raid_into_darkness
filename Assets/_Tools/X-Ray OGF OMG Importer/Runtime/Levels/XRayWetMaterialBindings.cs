@@ -370,7 +370,11 @@ namespace XRay.Importer.Levels
 
             private void Assign(Func<Material, Material> resolver)
             {
-                if (_instances != null) _instances.MaterialResolver = resolver;
+                if (_instances != null)
+                {
+                    if (_previous == null && ReferenceEquals(resolver, _assigned)) _instances.SetOrderIndependentMaterialResolver(resolver);
+                    else _instances.MaterialResolver = resolver;
+                }
                 else if (_details != null) _details.MaterialResolver = resolver;
             }
         }

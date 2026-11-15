@@ -97,7 +97,7 @@ namespace XRay.Importer.Levels
         }
     }
 
-    public sealed class XRayInstanceBatchSet : ScriptableObject
+    public sealed class XRayInstanceBatchSet : ScriptableObject, ISerializationCallbackReceiver
     {
         public const int MAX_INSTANCES_PER_BATCH = 1023;
         public const int MATRIX_PREPARATION_VERSION = 1;
@@ -216,6 +216,17 @@ namespace XRay.Importer.Levels
         public void InvalidateSubmissionGroups()
         {
             _groupingVersion = 0;
+            _groupingRevision++;
+        }
+
+        public void OnBeforeSerialize()
+        {
+        }
+
+        public void OnAfterDeserialize()
+        {
+            _batchView = null;
+            _matrixRevision++;
             _groupingRevision++;
         }
     }

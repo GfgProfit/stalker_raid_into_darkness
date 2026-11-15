@@ -283,6 +283,23 @@ namespace XRay.Importer.Tests
         }
 
         [Test]
+        public void DeserializationInvalidatesReadOnlyViewAndRendererCaches()
+        {
+            Prepare(Batch(1f), Batch(2f));
+            Draw();
+            var replacement = Own(ScriptableObject.CreateInstance<XRayInstanceBatchSet>());
+            replacement.Initialize("replacement", 128f, new List<XRayInstanceBatch> { Batch(1f, 2), Batch(2f, 3), Batch(3f, 4) });
+            XRayInstancePreparation.Ensure(replacement);
+            JsonUtility.FromJsonOverwrite(JsonUtility.ToJson(replacement), _set);
+            Assert.That(_set.Batches.Count, Is.EqualTo(3));
+            Draw();
+            Assert.That(_renderer.LastSubmittedCalls, Is.EqualTo(1));
+            Assert.That(_renderer.LastSubmittedInstances, Is.EqualTo(9));
+            Assert.That(((Array)Field(_renderer, "_groupByBatch")).Length, Is.EqualTo(3));
+            Assert.That(((IList)Field(_renderer, "_properties")).Count, Is.EqualTo(3));
+        }
+
+        [Test]
         public void ReinitializeRebuildsHistoryPropertiesAndGroupMaps()
         {
             Prepare(Batch(1f), Batch(2f));
@@ -295,6 +312,42 @@ namespace XRay.Importer.Tests
             Assert.That(((IList)Field(_renderer, "_properties")).Count, Is.EqualTo(3));
             var histories = (IList)Field(_renderer, "_histories");
             Assert.That(((Array)Property(histories[2], "Instances")).Length, Is.EqualTo(4));
+        }
+
+        [Test]
+        public void OwnedWetResolverKeepsGroupingAndPublicReplacementReturnsToOrderedFallback()
+        {
+            Prepare(Batch(1f), Batch(2f));
+            var config = Own(ScriptableObject.CreateInstance<PrecipitationConfig>());
+            using var bindings = new XRayWetMaterialBindings();
+            typeof(XRayWetMaterialBindings).GetMethod("BindDrawer", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(bindings, new object[] { _renderer, config });
+            Draw();
+            Assert.That(_renderer.LastSubmittedCalls, Is.EqualTo(1));
+            _renderer.MaterialResolver = _renderer.MaterialResolver;
+            Draw();
+            Assert.That(_renderer.LastSubmittedCalls, Is.EqualTo(2));
+        }
+
+        [Test]
+        public void OwnedWetResolverWrappingCustomResolverKeepsOriginalSourceOrder()
+        {
+            XRayInstanceBatch middle = Batch(2f, 3);
+            Material other = Own(new Material(_material));
+            middle.Materials[0] = other;
+            Prepare(Batch(1f, 2), middle, Batch(3f, 5));
+            var visited = new List<Material>();
+            _renderer.MaterialResolver = material =>
+            {
+                visited.Add(material);
+                return visited.Count == 2 ? null : material;
+            };
+            var config = Own(ScriptableObject.CreateInstance<PrecipitationConfig>());
+            using var bindings = new XRayWetMaterialBindings();
+            typeof(XRayWetMaterialBindings).GetMethod("BindDrawer", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(bindings, new object[] { _renderer, config });
+            visited.Clear();
+            Draw();
+            Assert.That(visited, Is.EqualTo(new[] { _material, other, _material }));
+            Assert.That(_renderer.LastSubmittedInstances, Is.EqualTo(7));
         }
 
         [Test]

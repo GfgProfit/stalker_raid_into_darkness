@@ -139,7 +139,7 @@ namespace XRay.Importer.Levels
                 if (grouped && _groupByBatch[i] >= 0 && _groups[_groupByBatch[i]].Active)
                 {
                     GroupScratch group = _groups[_groupByBatch[i]];
-                    if (group.Plan.BatchIndices[0] != i || RenderGroup(camera, group, wind, ref visibleBatches, ref visibleInstances, ref shadowOnlyBatches)) continue;
+                    if (group.LeaderIndex != i || RenderGroup(camera, group, wind, ref visibleBatches, ref visibleInstances, ref shadowOnlyBatches)) continue;
                 }
                 XRayInstanceBatch batch = batches[i];
                 InstanceHistory history = History(i, batch);
@@ -367,6 +367,7 @@ namespace XRay.Importer.Levels
 
         private bool PrepareGroups(Camera camera, byte[] states)
         {
+            if (MaterialResolver != null) return false;
             if (_groupOwner != null && (_groupOwner != _batchSet || _groupRevision != _batchSet.GroupingRevision))
             {
                 _groupOwner = null;
@@ -506,6 +507,7 @@ namespace XRay.Importer.Levels
         private sealed class GroupScratch
         {
             public XRayInstanceBatchGroup Plan { get; }
+            public int LeaderIndex { get; }
             public XRayInstanceBatch[] Sources { get; }
             public int[] Counts { get; }
             public int[] Revisions { get; }
@@ -533,8 +535,10 @@ namespace XRay.Importer.Levels
                 Histories = new InstanceHistory[Sources.Length];
                 Resolved = new Material[Sources.Length][];
                 int count = 0;
+                LeaderIndex = int.MaxValue;
                 for (int member = 0; member < Sources.Length; member++)
                 {
+                    LeaderIndex = Mathf.Min(LeaderIndex, plan.BatchIndices[member]);
                     XRayInstanceBatch batch = batches[plan.BatchIndices[member]];
                     Sources[member] = batch;
                     Counts[member] = batch.Count;

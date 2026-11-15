@@ -195,6 +195,71 @@ namespace XRay.Importer.Tests
         }
 
         [Test]
+        public void ReversedPlanIndicesKeepBothSourcesWithMixedVisibility()
+        {
+            Prepare(Batch(1f, 2), Batch(129f, 3));
+            Bounds bounds = _set.Batches[0].Bounds;
+            bounds.Encapsulate(_set.Batches[1].Bounds);
+            _set.PrepareSubmissionGroups(new List<XRayInstanceBatchGroup> { new XRayInstanceBatchGroup(new[] { 1, 0 }, bounds) }, "reversed");
+            Draw();
+            Assert.That(_renderer.LastSubmittedCalls, Is.EqualTo(2));
+            Assert.That(_renderer.LastSubmittedInstances, Is.EqualTo(5));
+            Assert.That(_renderer.LastVisibleInstances, Is.EqualTo(2));
+        }
+
+        [TestCase("add")]
+        [TestCase("remove")]
+        [TestCase("replace")]
+        [TestCase("reorder")]
+        public void InitializeOwnsStructureWhileRetainingBatchAndMatrixReferences(string mutation)
+        {
+            XRayInstanceBatch first = Batch(1f, 2);
+            XRayInstanceBatch second = Batch(2f, 3);
+            var input = new List<XRayInstanceBatch> { first, second };
+            _set.Initialize("snapshot", 128f, input);
+            XRayInstancePreparation.Ensure(_set);
+            Draw();
+            if (mutation == "add") input.Add(Batch(3f, 7));
+            if (mutation == "remove") input.RemoveAt(0);
+            if (mutation == "replace") input[0] = Batch(4f, 11);
+            if (mutation == "reorder") input.Reverse();
+            Assert.That(_set.Batches.Count, Is.EqualTo(2));
+            Assert.That(_set.Batches[0], Is.SameAs(first));
+            Assert.That(_set.Batches[1], Is.SameAs(second));
+            Assert.That(_set.Batches, Is.Not.InstanceOf<List<XRayInstanceBatch>>());
+            Draw();
+            Assert.That(_renderer.LastSubmittedInstances, Is.EqualTo(5));
+            Matrix4x4[] retained = first.Matrices;
+            retained[0] = Matrix4x4.Translate(new Vector3(5f, 0f, 20f));
+            Draw();
+            Assert.That(_renderer.LastSubmittedCalls, Is.EqualTo(2));
+            object history = ((IList)Field(_renderer, "_histories"))[0];
+            object instance = ((Array)Property(history, "Instances")).GetValue(0);
+            Assert.That((Matrix4x4)instance.GetType().GetField("objectToWorld").GetValue(instance), Is.EqualTo(retained[0]));
+        }
+
+        [Test]
+        public void NonAdjacentGroupKeepsStatefulResolverSourceOrderAndResults()
+        {
+            XRayInstanceBatch first = Batch(1f, 2);
+            XRayInstanceBatch middle = Batch(2f, 3);
+            Material middleMaterial = Own(new Material(_material));
+            middle.Materials[0] = middleMaterial;
+            Prepare(first, middle, Batch(3f, 5));
+            Assert.That(_set.SubmissionGroups[0].BatchIndices, Is.EqualTo(new[] { 0, 2 }));
+            var visited = new List<Material>();
+            _renderer.MaterialResolver = material =>
+            {
+                visited.Add(material);
+                return visited.Count == 2 ? null : material;
+            };
+            Draw();
+            Assert.That(visited, Is.EqualTo(new[] { _material, middleMaterial, _material }));
+            Assert.That(_renderer.LastSubmittedCalls, Is.EqualTo(2));
+            Assert.That(_renderer.LastSubmittedInstances, Is.EqualTo(7));
+        }
+
+        [Test]
         public void ResolverResultsAreCheckedPerSourceAndFallbackAvoidsDoubleResolution()
         {
             Prepare(Batch(1f), Batch(2f));
@@ -206,7 +271,7 @@ namespace XRay.Importer.Tests
             Assert.That(_renderer.LastSubmittedCalls, Is.EqualTo(2));
             _renderer.MaterialResolver = material => other;
             Draw();
-            Assert.That(_renderer.LastSubmittedCalls, Is.EqualTo(1));
+            Assert.That(_renderer.LastSubmittedCalls, Is.EqualTo(2));
             _renderer.LodImpostors = true;
             Draw();
             Assert.That(_renderer.LastSubmittedCalls, Is.EqualTo(2));

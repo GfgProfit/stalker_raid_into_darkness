@@ -116,10 +116,11 @@ namespace XRay.Importer.Levels
 
         [NonSerialized] private int _matrixRevision;
         [NonSerialized] private int _groupingRevision;
+        [NonSerialized] private IReadOnlyList<XRayInstanceBatch> _batchView;
 
         public string LevelName => _levelName;
         public float CellSize => _cellSize;
-        public IReadOnlyList<XRayInstanceBatch> Batches => _batches;
+        public IReadOnlyList<XRayInstanceBatch> Batches => _batchView ??= _batches.AsReadOnly();
         public XRayLevelLodSet Lods => _lods;
         public int MatrixPreparationVersion => _matrixPreparationVersion;
         public string MatrixInputSignature => _matrixInputSignature;
@@ -155,6 +156,7 @@ namespace XRay.Importer.Levels
 
         public void Initialize(string levelName, float cellSize, List<XRayInstanceBatch> batches, XRayLevelLodSet lods = null)
         {
+            if (batches == null) throw new ArgumentNullException(nameof(batches));
             _matrixPreparationVersion = 0;
             _matrixInputSignature = null;
             _matrixRevision++;
@@ -165,7 +167,8 @@ namespace XRay.Importer.Levels
             _lods = lods;
             _levelName = levelName;
             _cellSize = cellSize;
-            _batches = batches;
+            _batches = new List<XRayInstanceBatch>(batches);
+            _batchView = null;
         }
 
         public void PrepareMatrices(string inputSignature)

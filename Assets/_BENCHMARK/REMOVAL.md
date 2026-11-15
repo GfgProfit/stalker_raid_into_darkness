@@ -21,3 +21,5 @@ The functional HDRP 17.6 shadow binding fix lives in `Assets/_Tools/X-Ray OGF OM
 5. Restore the directory and sibling `.meta` together while the Editor is closed when measurements are still needed. For final removal leave them excluded, delete no Git history or Archive evidence, and rebuild the delivered Player.
 
 The current task exercised physical removal and built a normal Release Player successfully. Evidence is under `E:\Projects\stalker_raid_into_darkness_Archive\LocationOptimization_20261115\WithoutBenchmark`. A source inventory and the scene-detachment evidence are stored in the same task directory. Recheck the inventory after adding benchmark files or registrations.
+
+`LocationBatchingBenchmark` owns A/B initialization, the optional CPU callback wrapper and technical captures. Production submission plans and their regression/visual tests remain outside this module. Removing the module leaves normal imports, migration, culling, shadows and runtime submission grouping operational.

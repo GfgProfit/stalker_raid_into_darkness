@@ -2,6 +2,8 @@
 
 All campaign runtime, Editor tooling, scenarios, experimental routes, assets and registrations are owned by `Assets/_BENCHMARK` and its sibling `.meta`. Dependencies point from these assemblies to game assemblies. Ordinary scenes contain no benchmark components.
 
+`AllocationCounterControl` validates the managed allocation counter used by the local History harness. `ShadowOnlyFeasibilityBenchmark` owns the rejected shadow-only prototype, source observations, local costs and fallback evidence. Both are removed with this module; neither adds production hooks. Measurement scope and invalid-counter handling are defined in `MEASUREMENTS.md`.
+
 The four historical poses are stored in `Scenarios/l07_military.route.json`; the verified Transform-only `BENCHMARK_POSITION` hierarchy was removed from the ordinary scene after checking external references. The route builder injects its controller only into build copies. Legacy persistent runner integration is restricted to scenes inside this module, so it cannot reintroduce mandatory components into ordinary locations. `Rvm.Benchmark.Last` is an optional EditorPrefs report pointer; pending route/session keys use the `Rvm.Benchmark` prefix and can be erased when permanently removing the module.
 
 `CleanReleaseRoute07` and Visual08/09/Light10/Shadow11 now reside here. Gameplay hooks have been retired. Requesting historical visual modes or the low-level event journal fails explicitly rather than producing an incomplete old-format experiment. Historical results and the original package diagnostics payload remain available in Git and Archive. Particle inspection is a module-owned, separately enabled observer; it does not instrument the particle loop.

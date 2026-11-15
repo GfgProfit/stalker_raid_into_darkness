@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -22,6 +23,9 @@ namespace XRay.Importer.Levels
         private readonly List<LodScratch> _lodScratch = new List<LodScratch>();
         private readonly List<InstanceHistory> _histories = new List<InstanceHistory>();
         private readonly Vector4[] _submissionData = new Vector4[MAX_MOTION_INSTANCES];
+        private readonly Dictionary<Mesh, int> _meshSubmeshes = new Dictionary<Mesh, int>(new ReferenceComparer<Mesh>());
+        private readonly Dictionary<Material, bool> _materialSupport = new Dictionary<Material, bool>(new ReferenceComparer<Material>());
+        private readonly Dictionary<Material, bool> _windMaterials = new Dictionary<Material, bool>(new ReferenceComparer<Material>());
         private MaterialPropertyBlock _submissionBlock;
         private XRayLevelLodRenderer _lodRenderer;
         private int _propertyId;
@@ -32,6 +36,8 @@ namespace XRay.Importer.Levels
         private XRayInstanceBatchSet _propertiesOwner;
         private int _propertiesMatrixRevision = -1;
         private int _propertiesGroupingRevision = -1;
+        private Bounds[] _sourceBounds;
+        private byte[] _sourceVisibility;
 
         public XRayInstanceBatchSet BatchSet
         {
@@ -45,6 +51,7 @@ namespace XRay.Importer.Levels
                 _groups = null;
                 _groupByBatch = null;
                 _groupOwner = null;
+                ReleaseCallbackCaches();
             }
         }
 
@@ -77,6 +84,7 @@ namespace XRay.Importer.Levels
             _histories.Clear();
             RenderPipelineManager.beginCameraRendering += OnBeginCameraRendering;
             _groupOwner = null;
+            ReleaseCallbackCaches();
         }
 
         private void OnDisable()
@@ -91,6 +99,7 @@ namespace XRay.Importer.Levels
             _groups = null;
             _groupByBatch = null;
             _groupOwner = null;
+            ReleaseCallbackCaches();
         }
 
         private void OnBeginCameraRendering(ScriptableRenderContext context, Camera camera)
@@ -99,6 +108,9 @@ namespace XRay.Importer.Levels
             {
                 return;
             }
+            _meshSubmeshes.Clear();
+            _materialSupport.Clear();
+            _windMaterials.Clear();
             if (camera.cameraType == CameraType.Reflection)
             {
                 RenderReflection(camera);
@@ -143,18 +155,25 @@ namespace XRay.Importer.Levels
                 }
                 XRayInstanceBatch batch = batches[i];
                 InstanceHistory history = History(i, batch);
-                if (batch.Mesh == null || batch.Count == 0)
+                if (MeshSubmeshes(batch.Mesh) < 0 || batch.Count == 0)
                 {
                     continue;
                 }
 
-                Bounds bounds = XRayFloraWindBounds.Uses(batch.Materials, wind) ? XRayFloraWindBounds.Expand(batch.Bounds, wind) : batch.Bounds;
+                Bounds bounds;
+                bool visible;
+                if (grouped) visible = SourceVisible(i, batch, wind, out bounds);
+                else
+                {
+                    bounds = UsesWind(batch.Materials, wind) ? XRayFloraWindBounds.Expand(batch.Bounds, wind) : batch.Bounds;
+                    visible = false;
+                }
                 if (bounds.SqrDistance(eye) > maxDistanceSqr)
                 {
                     continue;
                 }
+                if (!grouped) visible = GeometryUtility.TestPlanesAABB(_planes, bounds);
 
-                bool visible = GeometryUtility.TestPlanesAABB(_planes, bounds);
                 bool castShadows = _castShadows && batch.CastShadows;
                 if (!visible && !castShadows)
                 {
@@ -182,16 +201,7 @@ namespace XRay.Importer.Levels
                     continue;
                 }
 
-                Material[] resolved = null;
-                if (grouped && _groupByBatch[i] >= 0 && _groups[_groupByBatch[i]].UseResolved)
-                {
-                    GroupScratch group = _groups[_groupByBatch[i]];
-                    for (int member = 0; member < group.Plan.BatchIndices.Count; member++)
-                    {
-                        if (group.Plan.BatchIndices[member] == i) resolved = group.Resolved[member];
-                    }
-                }
-                Submit(camera, batch, bounds, wind, _properties[i], history.Instances, batch.Data, batch.Count, castShadows ? visible ? ShadowCastingMode.On : ShadowCastingMode.ShadowsOnly : ShadowCastingMode.Off, history.Moving, resolved);
+                Submit(camera, batch, bounds, wind, _properties[i], history.Instances, batch.Data, batch.Count, castShadows ? visible ? ShadowCastingMode.On : ShadowCastingMode.ShadowsOnly : ShadowCastingMode.Off, history.Moving);
             }
 
             if (states != null)
@@ -325,14 +335,14 @@ namespace XRay.Importer.Levels
             return true;
         }
 
-        private void Submit(Camera camera, XRayInstanceBatch batch, Bounds bounds, XRayFloraWindState wind, MaterialPropertyBlock block, InstanceData[] matrices, Vector4[] data, int count, ShadowCastingMode mode, bool moving, Material[] resolvedMaterials = null)
+        private void Submit(Camera camera, XRayInstanceBatch batch, Bounds bounds, XRayFloraWindState wind, MaterialPropertyBlock block, InstanceData[] matrices, Vector4[] data, int count, ShadowCastingMode mode, bool moving)
         {
-            int submeshes = Mathf.Min(batch.Mesh.subMeshCount, batch.Materials.Length);
+            int submeshes = Mathf.Min(MeshSubmeshes(batch.Mesh), batch.Materials.Length);
             for (int submesh = 0; submesh < submeshes; submesh++)
             {
                 Material source = batch.Materials[submesh];
                 Material material;
-                material = resolvedMaterials != null ? resolvedMaterials[submesh] : source != null && MaterialResolver != null ? MaterialResolver(source) : source;
+                material = source != null && MaterialResolver != null ? MaterialResolver(source) : source;
                 if (material == null)
                 {
                     continue;
@@ -349,7 +359,7 @@ namespace XRay.Importer.Levels
                         properties = _submissionBlock;
                     }
                     RenderParams parameters;
-                    parameters = new RenderParams(material) { camera = camera, worldBounds = bounds, motionVectorMode = moving || XRayFloraWindBounds.Uses(material, wind) ? MotionVectorGenerationMode.Object : MotionVectorGenerationMode.Camera, layer = gameObject.layer, shadowCastingMode = mode, receiveShadows = true, matProps = properties };
+                    parameters = new RenderParams(material) { camera = camera, worldBounds = bounds, motionVectorMode = moving || UsesWind(material, wind) ? MotionVectorGenerationMode.Object : MotionVectorGenerationMode.Camera, layer = gameObject.layer, shadowCastingMode = mode, receiveShadows = true, matProps = properties };
                     Graphics.RenderMeshInstanced(parameters, batch.Mesh, submesh, matrices, length, start);
                     LastSubmittedCalls++;
                     LastSubmittedInstances += length;
@@ -363,6 +373,7 @@ namespace XRay.Importer.Levels
             _groupOwner = null;
             _groups = null;
             _groupByBatch = null;
+            ReleaseCallbackCaches();
         }
 
         private bool PrepareGroups(Camera camera, byte[] states)
@@ -380,6 +391,8 @@ namespace XRay.Importer.Levels
                 _groupOwner = _batchSet;
                 _groupRevision = _batchSet.GroupingRevision;
                 _groupByBatch = new int[_batchSet.Batches.Count];
+                _sourceBounds = new Bounds[_batchSet.Batches.Count];
+                _sourceVisibility = new byte[_batchSet.Batches.Count];
                 Array.Fill(_groupByBatch, -1);
                 _groups = new GroupScratch[_batchSet.SubmissionGroups.Count];
                 for (int index = 0; index < _groups.Length; index++)
@@ -389,22 +402,26 @@ namespace XRay.Importer.Levels
                     for (int member = 0; member < plan.BatchIndices.Count; member++) _groupByBatch[plan.BatchIndices[member]] = index;
                 }
             }
+            Array.Clear(_sourceVisibility, 0, _sourceVisibility.Length);
             foreach (GroupScratch group in _groups)
             {
-                group.Active = true;
-                group.UseResolved = false;
-                XRayInstanceBatch first = _batchSet.Batches[group.Plan.BatchIndices[0]];
-                if (first.Mesh == null) group.Active = false;
-                int count = 0;
-                for (int member = 0; member < group.Plan.BatchIndices.Count; member++)
+                XRayInstanceBatch first = group.Sources[0];
+                group.Active = group.Compatible && MeshSubmeshes(first.Mesh) >= 0;
+                if (!group.Active) continue;
+                foreach (Material material in first.Materials)
                 {
-                    XRayInstanceBatch batch = _batchSet.Batches[group.Plan.BatchIndices[member]];
-                    if (!ReferenceEquals(group.Sources[member], batch) || !ReferenceEquals(batch.Mesh, first.Mesh) || batch.MatricesExposed || batch.Count != group.Counts[member] || batch.CastShadows != first.CastShadows || batch.Materials == null || batch.Materials.Length != group.Resolved[member].Length || batch.Materials.Length != first.Materials.Length)
+                    if (!SupportsMaterial(material)) group.Active = false;
+                }
+                if (!group.Active) continue;
+                for (int member = 0; member < group.Sources.Length; member++)
+                {
+                    XRayInstanceBatch batch = group.Sources[member];
+                    if (batch.MatricesExposed || batch.Count != group.Counts[member])
                     {
                         group.Active = false;
                         break;
                     }
-                    for (int material = 0; material < batch.Materials.Length; material++)
+                    for (int material = 0; member > 0 && material < batch.Materials.Length; material++)
                     {
                         if (!ReferenceEquals(batch.Materials[material], first.Materials[material])) group.Active = false;
                     }
@@ -414,9 +431,7 @@ namespace XRay.Importer.Levels
                         group.OrientationRevisions[member] = batch.MatrixRevision;
                     }
                     if (group.Orientations[member] == 0 || group.Orientations[member] != group.Orientations[0]) group.Active = false;
-                    count += batch.Count;
                 }
-                if (count != group.Instances.Length) group.Active = false;
             }
             return true;
         }
@@ -424,13 +439,12 @@ namespace XRay.Importer.Levels
         private bool RenderGroup(Camera camera, GroupScratch group, XRayFloraWindState wind, ref int visibleBatches, ref int visibleInstances, ref int shadowOnlyBatches)
         {
             XRayInstanceBatch first = group.Sources[0];
-            bool usesWind = XRayFloraWindBounds.Uses(first.Materials, wind);
+            bool usesWind = UsesWind(first.Materials, wind);
             Bounds bounds = usesWind ? XRayFloraWindBounds.Expand(group.Plan.Bounds, wind, group.MaximumSourceHeight) : group.Plan.Bounds;
             bool visible = false;
             for (int member = 0; member < group.Sources.Length; member++)
             {
-                Bounds sourceBounds = usesWind ? XRayFloraWindBounds.Expand(group.Sources[member].Bounds, wind) : group.Sources[member].Bounds;
-                bool sourceVisible = GeometryUtility.TestPlanesAABB(_planes, sourceBounds);
+                bool sourceVisible = SourceVisible(group.Plan.BatchIndices[member], group.Sources[member], wind, out _);
                 if (member == 0) visible = sourceVisible;
                 else if (sourceVisible != visible)
                 {
@@ -473,35 +487,90 @@ namespace XRay.Importer.Levels
                 group.Ready = true;
             }
             if (!visible && !shadows) return true;
-            bool compatible = true;
-            for (int member = 0; member < group.Sources.Length; member++)
-            {
-                for (int slot = 0; slot < group.Resolved[member].Length; slot++)
-                {
-                    Material source = group.Sources[member].Materials[slot];
-                    Material resolved = source != null && MaterialResolver != null ? MaterialResolver(source) : source;
-                    group.Resolved[member][slot] = resolved;
-                    if (member > 0 && !ReferenceEquals(resolved, group.Resolved[0][slot])) compatible = false;
-                }
-            }
-            for (int slot = 0; slot < group.Resolved[0].Length; slot++)
-            {
-                if (!XRayInstanceBatchSet.SupportsSubmissionMaterial(group.Resolved[0][slot])) compatible = false;
-            }
-            if (!compatible)
-            {
-                group.Active = false;
-                group.UseResolved = true;
-                return false;
-            }
             if (visible)
             {
                 visibleBatches++;
                 visibleInstances += group.Instances.Length;
             }
             else shadowOnlyBatches++;
-            Submit(camera, first, bounds, wind, group.Properties, group.Instances, group.Data, group.Instances.Length, shadows ? visible ? ShadowCastingMode.On : ShadowCastingMode.ShadowsOnly : ShadowCastingMode.Off, group.Moving, group.Resolved[0]);
+            Submit(camera, first, bounds, wind, group.Properties, group.Instances, group.Data, group.Instances.Length, shadows ? visible ? ShadowCastingMode.On : ShadowCastingMode.ShadowsOnly : ShadowCastingMode.Off, group.Moving);
             return true;
+        }
+
+        private bool SourceVisible(int index, XRayInstanceBatch batch, XRayFloraWindState wind, out Bounds bounds)
+        {
+            if (_sourceVisibility[index] == 0)
+            {
+                bounds = UsesWind(batch.Materials, wind) ? XRayFloraWindBounds.Expand(batch.Bounds, wind) : batch.Bounds;
+                _sourceBounds[index] = bounds;
+                _sourceVisibility[index] = GeometryUtility.TestPlanesAABB(_planes, bounds) ? (byte)2 : (byte)1;
+            }
+            bounds = _sourceBounds[index];
+            return _sourceVisibility[index] == 2;
+        }
+
+        private int MeshSubmeshes(Mesh mesh)
+        {
+            if (ReferenceEquals(mesh, null)) return -1;
+            if (MaterialResolver != null) return mesh != null ? mesh.subMeshCount : -1;
+            if (_meshSubmeshes.TryGetValue(mesh, out int count)) return count;
+            count = mesh != null ? mesh.subMeshCount : -1;
+            _meshSubmeshes.Add(mesh, count);
+            return count;
+        }
+
+        private bool SupportsMaterial(Material material)
+        {
+            if (ReferenceEquals(material, null)) return true;
+            if (_materialSupport.TryGetValue(material, out bool supported)) return supported;
+            supported = XRayInstanceBatchSet.SupportsSubmissionMaterial(material);
+            _materialSupport.Add(material, supported);
+            return supported;
+        }
+
+        private bool UsesWind(Material[] materials, XRayFloraWindState wind)
+        {
+            if (wind == null || materials == null) return false;
+            foreach (Material material in materials)
+            {
+                if (UsesWind(material, wind)) return true;
+            }
+            return false;
+        }
+
+        private bool UsesWind(Material material, XRayFloraWindState wind)
+        {
+            if (wind == null || ReferenceEquals(material, null)) return false;
+            if (MaterialResolver != null) return XRayFloraWindBounds.Uses(material, wind);
+            if (_windMaterials.TryGetValue(material, out bool uses)) return uses;
+            uses = XRayFloraWindBounds.Uses(material, wind);
+            _windMaterials.Add(material, uses);
+            return uses;
+        }
+
+        private void ReleaseCallbackCaches()
+        {
+            _sourceBounds = null;
+            _sourceVisibility = null;
+            _meshSubmeshes.Clear();
+            _meshSubmeshes.TrimExcess();
+            _materialSupport.Clear();
+            _materialSupport.TrimExcess();
+            _windMaterials.Clear();
+            _windMaterials.TrimExcess();
+        }
+
+        private sealed class ReferenceComparer<T> : IEqualityComparer<T> where T : class
+        {
+            public bool Equals(T first, T second)
+            {
+                return ReferenceEquals(first, second);
+            }
+
+            public int GetHashCode(T value)
+            {
+                return RuntimeHelpers.GetHashCode(value);
+            }
         }
 
         private sealed class GroupScratch
@@ -516,13 +585,12 @@ namespace XRay.Importer.Levels
             public InstanceHistory[] Histories { get; }
             public InstanceData[] Instances { get; }
             public Vector4[] Data { get; }
-            public Material[][] Resolved { get; }
+            public bool Compatible { get; }
             public MaterialPropertyBlock Properties { get; } = new MaterialPropertyBlock();
             public float MaximumSourceHeight { get; }
             public bool Ready { get; set; }
             public bool Moving { get; set; }
             public bool Active { get; set; }
-            public bool UseResolved { get; set; }
 
             public GroupScratch(XRayInstanceBatchGroup plan, IReadOnlyList<XRayInstanceBatch> batches)
             {
@@ -533,7 +601,8 @@ namespace XRay.Importer.Levels
                 Orientations = new int[Sources.Length];
                 OrientationRevisions = new int[Sources.Length];
                 Histories = new InstanceHistory[Sources.Length];
-                Resolved = new Material[Sources.Length][];
+                XRayInstanceBatch first = batches[plan.BatchIndices[0]];
+                Compatible = first.Materials != null;
                 int count = 0;
                 LeaderIndex = int.MaxValue;
                 for (int member = 0; member < Sources.Length; member++)
@@ -544,7 +613,7 @@ namespace XRay.Importer.Levels
                     Counts[member] = batch.Count;
                     Orientations[member] = batch.GetMatrixOrientation();
                     OrientationRevisions[member] = batch.MatrixRevision;
-                    Resolved[member] = new Material[batch.Materials.Length];
+                    Compatible &= ReferenceEquals(batch.Mesh, first.Mesh) && batch.CastShadows == first.CastShadows && batch.Materials != null && first.Materials != null && batch.Materials.Length == first.Materials.Length;
                     count += batch.Count;
                     MaximumSourceHeight = Mathf.Max(MaximumSourceHeight, batch.Bounds.size.y);
                 }

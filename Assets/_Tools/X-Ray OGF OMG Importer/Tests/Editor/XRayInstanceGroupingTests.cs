@@ -260,6 +260,44 @@ namespace XRay.Importer.Tests
         }
 
         [Test]
+        public void CallbackCachesSharedNativeQueriesAndRefreshesMaterialAndMeshChanges()
+        {
+            Prepare(Batch(1f), Batch(2f), Batch(300f), Batch(301f));
+            Draw();
+            Assert.That(_renderer.LastSubmittedCalls, Is.EqualTo(2));
+            Assert.That(((IDictionary)Field(_renderer, "_meshSubmeshes")).Count, Is.EqualTo(1));
+            Assert.That(((IDictionary)Field(_renderer, "_materialSupport")).Count, Is.EqualTo(1));
+            _material.renderQueue = 3000;
+            _mesh.subMeshCount = 2;
+            _mesh.SetTriangles(new[] { 0, 1, 2 }, 1);
+            Draw();
+            Assert.That(_renderer.LastSubmittedCalls, Is.EqualTo(4));
+            Assert.That(((IDictionary)Field(_renderer, "_meshSubmeshes"))[_mesh], Is.EqualTo(2));
+            Assert.That(((IDictionary)Field(_renderer, "_materialSupport"))[_material], Is.False);
+            _material.renderQueue = 2450;
+            Draw();
+            Assert.That(_renderer.LastSubmittedCalls, Is.EqualTo(2));
+            _renderer.BatchSet = null;
+            Assert.That(Field(_renderer, "_sourceBounds"), Is.Null);
+            Assert.That(((IDictionary)Field(_renderer, "_meshSubmeshes")).Count, Is.Zero);
+        }
+
+        [Test]
+        public void ReinitializeRebuildsHistoryPropertiesAndGroupMaps()
+        {
+            Prepare(Batch(1f), Batch(2f));
+            Draw();
+            Prepare(Batch(1f, 2), Batch(2f, 3), Batch(3f, 4));
+            Draw();
+            Assert.That(_renderer.LastSubmittedInstances, Is.EqualTo(9));
+            Assert.That(_renderer.LastSubmittedCalls, Is.EqualTo(1));
+            Assert.That(((Array)Field(_renderer, "_groupByBatch")).Length, Is.EqualTo(3));
+            Assert.That(((IList)Field(_renderer, "_properties")).Count, Is.EqualTo(3));
+            var histories = (IList)Field(_renderer, "_histories");
+            Assert.That(((Array)Property(histories[2], "Instances")).Length, Is.EqualTo(4));
+        }
+
+        [Test]
         public void ResolverResultsAreCheckedPerSourceAndFallbackAvoidsDoubleResolution()
         {
             Prepare(Batch(1f), Batch(2f));

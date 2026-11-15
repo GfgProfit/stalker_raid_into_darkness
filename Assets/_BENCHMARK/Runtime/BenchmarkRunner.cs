@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Profiling;
+using UnityEngine.Rendering;
 using Debug = UnityEngine.Debug;
 
 namespace Rvm.Benchmark
@@ -39,6 +40,7 @@ namespace Rvm.Benchmark
         private int _gc1;
         private int _gc2;
         private int _runtimeErrors;
+        private int _lastRenderedUnityFrame;
         private bool _running;
         private bool _finishing;
         private bool _hasFrame;
@@ -46,12 +48,19 @@ namespace Rvm.Benchmark
         private bool _transition;
         private bool _cameraSaved;
         private bool _ownsCapture;
+        private bool _captureStarted;
+        private double _captureStartedAt;
         private bool _savedProfilerEnabled;
         private bool _savedBinaryLog;
         private string _savedProfilerFile;
         private string _cameraSignature;
         private string _error;
         private string _firstRuntimeError;
+        private string _conditionEvidence;
+        private BenchmarkShadowTrace _shadowTrace;
+        private bool _shadowTraceEnabled;
+        [SerializeField] [HideInInspector] private string _buildSourceDigest = "unavailable";
+        [SerializeField] [HideInInspector] private string _renderSettingsDigest = "unavailable";
 
         public static event Action<BenchmarkRunner> Completed;
 
@@ -59,9 +68,24 @@ namespace Rvm.Benchmark
         public Camera WorkingCamera => _camera;
         public Transform[] Positions => (Transform[])_positions.Clone();
         public bool Running => _running;
+        public string BuildSourceDigest => _buildSourceDigest;
+        public string RenderSettingsDigest => _renderSettingsDigest;
+        public string BuildGitSha => _buildGitSha;
+        public string BuildGitDirty => _buildGitDirty;
         public bool Saved { get; private set; }
         public string LastDirectory { get; private set; }
         public BenchmarkSummary LastSummary { get; private set; }
+        public BenchmarkMetadata LastMetadata => _metadata;
+        public BenchmarkTraceContext TraceContext => new BenchmarkTraceContext { runId = _metadata?.runId, phase = !_running ? "Idle" : _sequence == null || !_sequenceStarted ? "Preparation" : _sequence.Complete ? "Drain" : _sequence.Measuring ? "Measurement" : "Warmup", position = _sequence == null ? -1 : _sequence.Measuring ? _sequence.Position : _warmupPosition, transition = _transition };
+
+        public void EnableShadowTrace(bool enabled)
+        {
+            if (_running)
+            {
+                throw new InvalidOperationException("Cannot change tracing during a run.");
+            }
+            _shadowTraceEnabled = enabled;
+        }
 
         public void Configure(BenchmarkScenario scenario, Camera camera, Transform[] positions)
         {
@@ -79,6 +103,16 @@ namespace Rvm.Benchmark
             _buildGitSha = sha;
             _buildGitDirty = dirty;
             _buildHdrp = hdrp;
+        }
+
+        public void SetValidationContext(string sourceDigest, string evidence, string renderSettingsDigest = null)
+        {
+            _buildSourceDigest = sourceDigest;
+            _conditionEvidence = evidence;
+            if (renderSettingsDigest != null)
+            {
+                _renderSettingsDigest = renderSettingsDigest;
+            }
         }
 
         public string Validate()
@@ -137,21 +171,45 @@ namespace Rvm.Benchmark
             _warmupPosition = -1;
             _error = null;
             _runtimeErrors = 0;
+            _lastRenderedUnityFrame = -1;
             _firstRuntimeError = null;
             _hasFrame = false;
             _sequenceStarted = false;
             _finishing = false;
+            _captureStarted = false;
             Saved = false;
             LastSummary = null;
             LastDirectory = null;
             try
             {
+                var identity = BenchmarkBuildIdentity.Capture();
                 _worldState = BenchmarkWorldState.Acquire(_camera, _scenario);
                 _metadata = BenchmarkEnvironment.Capture(_scenario, _camera, _positions, seriesId, repetition);
                 _metadata.gitSha = _buildGitSha;
                 _metadata.gitDirty = _buildGitDirty;
                 _metadata.hdrp = _buildHdrp;
+                _metadata.buildSourceDigest = _buildSourceDigest;
+                _metadata.conditionEvidence = _conditionEvidence;
+                _metadata.renderSettingsDigest = _renderSettingsDigest;
+                _metadata.buildIdentity = identity;
+                _metadata.shadowTrace = _shadowTraceEnabled;
+                if (!Application.isEditor && identity.stamp != null)
+                {
+                    _metadata.buildSourceDigest = identity.stamp.sourceDigest;
+                    _metadata.renderSettingsDigest = identity.stamp.renderSettingsDigest;
+                    _metadata.gitSha = identity.stamp.gitSha;
+                    _metadata.gitDirty = identity.stamp.gitDirty;
+                    _metadata.hdrp = identity.stamp.hdrp;
+                }
+                if (!string.IsNullOrEmpty(_conditionEvidence))
+                {
+                    _metadata.conditionProtocol = JsonUtility.FromJson<BenchmarkConditionEvidence>(_conditionEvidence)?.protocolId;
+                }
                 LastDirectory = BenchmarkOutput.Prepare(outputRoot, _metadata);
+                if (_shadowTraceEnabled)
+                {
+                    _shadowTrace = new BenchmarkShadowTrace(_camera, () => TraceContext);
+                }
             }
             catch
             {
@@ -166,12 +224,12 @@ namespace Rvm.Benchmark
             BenchmarkEnvironment.Add(_metadata.environment, "application.runInBackground", Application.runInBackground.ToString());
             _running = true;
             Application.logMessageReceived += OnLogMessage;
+            RenderPipelineManager.endCameraRendering += OnEndCameraRendering;
             try
             {
                 _frames = new BenchmarkFrame[_scenario.FrameCapacity];
                 _collector = new BenchmarkCollector(_frames.Length, _scenario.Mode);
                 _sequence = new BenchmarkSequence(_scenario.PositionSeconds, _scenario.WarmupSeconds);
-                StartCapture();
                 _diagnostics = _scenario.Mode == BenchmarkMode.Diagnostic ? new BenchmarkDiagnostics(_scenario, _camera, _metadata) : null;
                 MoveCamera(0);
                 _gc0 = GC.CollectionCount(0);
@@ -249,10 +307,25 @@ namespace Rvm.Benchmark
                     }
                     if (_count == 0)
                     {
+                        _collector.StartMeasuredInterval();
+                        _diagnostics?.StartMeasuredInterval();
                         _diagnostics?.Position(0);
                         _gc0 = GC.CollectionCount(0);
                         _gc1 = GC.CollectionCount(1);
                         _gc2 = GC.CollectionCount(2);
+                    }
+                    if (_scenario.ProfilerCapture && !_captureStarted && _sequence.Position == 0 && now - _sequence.PhaseStart >= _scenario.StabilizationSeconds)
+                    {
+                        _captureStarted = true;
+                        StartCapture();
+                        _diagnostics?.Position(0);
+                        _captureStartedAt = now;
+                        _metadata.captureStartUnityFrame = Time.frameCount;
+                    }
+                    if (_ownsCapture && now - _captureStartedAt >= _scenario.CaptureSeconds)
+                    {
+                        _metadata.captureEndUnityFrame = Time.frameCount;
+                        StopCapture();
                     }
                     _framePosition = _sequence.Position;
                     _transition = now - _sequence.PhaseStart < _scenario.StabilizationSeconds;
@@ -286,6 +359,15 @@ namespace Rvm.Benchmark
             if ((_camera.transform.position - _expectedPosition).sqrMagnitude > 0.00000001f || Quaternion.Angle(_camera.transform.rotation, _expectedRotation) > 0.001f)
             {
                 Abort("Another system moved the benchmark camera. No gameplay components were disabled.");
+            }
+        }
+
+        private void OnEndCameraRendering(ScriptableRenderContext context, Camera camera)
+        {
+            if (_running && !_finishing && camera == _camera && _hasFrame && _sequence != null && _sequence.Measuring && _frameUnityIndex == Time.frameCount && _lastRenderedUnityFrame != Time.frameCount)
+            {
+                _lastRenderedUnityFrame = Time.frameCount;
+                _metadata.renderedMeasurementFrames++;
             }
         }
 
@@ -353,12 +435,13 @@ namespace Rvm.Benchmark
             _finishing = true;
             _running = false;
             Application.logMessageReceived -= OnLogMessage;
+            RenderPipelineManager.endCameraRendering -= OnEndCameraRendering;
             _hasFrame = false;
             long endTicks = BenchmarkClock.GetTimestamp();
             try
             {
-                _diagnostics?.Dispose();
                 StopCapture();
+                _diagnostics?.Dispose();
                 _metadata.finalFramePacing = QualitySettings.vSyncCount + "/" + Application.targetFrameRate + "/" + UnityEngine.Rendering.OnDemandRendering.renderFrameInterval;
                 _metadata.finalQuality = QualitySettings.names[QualitySettings.GetQualityLevel()];
                 if (_metadata.finalQuality != _metadata.quality)
@@ -409,6 +492,15 @@ namespace Rvm.Benchmark
                         }
                     }
                     _metadata.timerSignature = timers.ToString();
+                    var sourceSignature = new System.Text.StringBuilder(_metadata.instrumentationSignature);
+                    foreach (var metric in _collector.Metrics)
+                    {
+                        if (metric.identity != null)
+                        {
+                            sourceSignature.Append("|Standard/").Append(metric.identity.key).Append('/').Append(metric.identity.kind).Append("/physical=").Append(metric.identity.physicalSources);
+                        }
+                    }
+                    _metadata.instrumentationSignature = sourceSignature.ToString();
                     bool diagnosticsSaved = true;
                     try
                     {
@@ -421,6 +513,7 @@ namespace Rvm.Benchmark
                         _metadata.warnings.Add(warning);
                         LastSummary.warnings.Add(warning);
                     }
+                    _collector.SaveEvidence(LastDirectory);
                     Saved = BenchmarkOutput.Save(LastDirectory, _metadata, LastSummary, _frames, _count, _collector) && diagnosticsSaved;
                 }
             }
@@ -431,7 +524,25 @@ namespace Rvm.Benchmark
             }
             finally
             {
+                if (_shadowTrace != null)
+                {
+                    try
+                    {
+                        _shadowTrace.Save(System.IO.Path.Combine(LastDirectory, "shadow-trace.json"));
+                    }
+                    catch (Exception exception)
+                    {
+                        Saved = false;
+                        Debug.LogError("Shadow trace save failed: " + exception);
+                    }
+                    finally
+                    {
+                        _shadowTrace.Dispose();
+                        _shadowTrace = null;
+                    }
+                }
                 _collector?.Dispose();
+                StopCapture();
                 _diagnostics?.Dispose();
                 _diagnostics = null;
                 StopCapture();
@@ -484,6 +595,10 @@ namespace Rvm.Benchmark
                 return;
             }
             _ownsCapture = false;
+            if (_metadata != null && _metadata.captureEndUnityFrame < 0)
+            {
+                _metadata.captureEndUnityFrame = Time.frameCount;
+            }
             Profiler.enableBinaryLog = _savedBinaryLog;
             Profiler.logFile = _savedProfilerFile;
             Profiler.enabled = _savedProfilerEnabled;

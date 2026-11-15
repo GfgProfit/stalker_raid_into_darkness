@@ -18,11 +18,15 @@ namespace Rvm.Benchmark.Editor
             {
                 return;
             }
+            BenchmarkBuildProvenance.RecordSceneCallback();
             foreach (var root in scene.GetRootGameObjects())
             {
                 foreach (var runner in root.GetComponentsInChildren<BenchmarkRunner>(true))
                 {
+                    string before = runner.BuildSourceDigest;
                     BenchmarkEditorSession.FillEnvironment(runner);
+                    runner.SetValidationContext(BenchmarkBuildProvenance.SourceDigest, null, BenchmarkBuildProvenance.SettingsDigest);
+                    BenchmarkBuildProvenance.RecordScene(scene.path, runner.name, before, runner.BuildSourceDigest);
                 }
             }
         }
@@ -39,7 +43,7 @@ namespace Rvm.Benchmark.Editor
                 throw new InvalidOperationException("Select Windows x86_64 before building; benchmark does not change the active build target.");
             }
             var scene = SceneManager.GetActiveScene();
-            var runners = UnityEngine.Object.FindObjectsByType<BenchmarkRunner>(FindObjectsSortMode.None);
+            var runners = UnityEngine.Object.FindObjectsByType<BenchmarkRunner>();
             if (runners.Length != 1 || runners[0].Validate() != null || runners[0].gameObject.scene != scene)
             {
                 throw new InvalidOperationException("Exactly one valid runner must be configured in the active scene.");
@@ -67,10 +71,12 @@ namespace Rvm.Benchmark.Editor
             try
             {
                 BenchmarkEditorSession.RequireCleanScenes();
+                BenchmarkBuildProvenance.Capture(folder, scenePath);
                 var options = new BuildPlayerOptions { scenes = new[] { scenePath }, locationPathName = Path.Combine(folder, "RvmBenchmark.exe"), target = BuildTarget.StandaloneWindows64, options = BuildOptions.Development };
                 File.WriteAllText(Path.Combine(folder, "build-status.json"), "{\"status\":\"building\"}");
                 var report = BuildPipeline.BuildPlayer(options);
-                var status = new BuildStatus { status = report.summary.result.ToString(), scene = scenePath, executable = options.locationPathName, totalBytes = report.summary.totalSize, durationSeconds = report.summary.totalTime.TotalSeconds, errors = report.summary.totalErrors, warnings = report.summary.totalWarnings };
+                string artifactManifest = report.summary.result == BuildResult.Succeeded ? BenchmarkBuildProvenance.Finish(folder, options.locationPathName, report.summary.guid.ToString()) : null;
+                var status = new BuildStatus { status = report.summary.result.ToString(), scene = scenePath, executable = options.locationPathName, totalBytes = report.summary.totalSize, durationSeconds = report.summary.totalTime.TotalSeconds, errors = report.summary.totalErrors, warnings = report.summary.totalWarnings, applicationBuildGuid = report.summary.guid.ToString(), artifactManifest = artifactManifest, identityStatus = "Awaiting real Player embedded identity verification" };
                 BenchmarkOutput.WriteJson(Path.Combine(folder, "build-status.json"), status);
                 File.WriteAllText(Path.Combine(folder, "RunBenchmark.cmd"), "@echo off\r\ncd /d \"%~dp0\"\r\n\"%~dp0RvmBenchmark.exe\" -benchmark -benchmark-scenario " + scenarioId + " -benchmark-repeat 1 -benchmark-output \"" + BenchmarkOutput.DEFAULT_ROOT.Replace('/', '\\') + "\" -logFile \"%~dp0player_%RANDOM%_%RANDOM%.log\"\r\n", System.Text.Encoding.ASCII);
                 File.WriteAllText(Path.Combine(folder, "RunBenchmarkSeries.cmd"), "@echo off\r\ncd /d \"%~dp0\"\r\n\"%~dp0RvmBenchmark.exe\" -benchmark -benchmark-scenario " + scenarioId + " -benchmark-repeat 3 -benchmark-output \"" + BenchmarkOutput.DEFAULT_ROOT.Replace('/', '\\') + "\" -logFile \"%~dp0player_series_%RANDOM%_%RANDOM%.log\"\r\n", System.Text.Encoding.ASCII);
@@ -94,6 +100,9 @@ namespace Rvm.Benchmark.Editor
             public double durationSeconds;
             public int errors;
             public int warnings;
+            public string applicationBuildGuid;
+            public string artifactManifest;
+            public string identityStatus;
         }
     }
 }

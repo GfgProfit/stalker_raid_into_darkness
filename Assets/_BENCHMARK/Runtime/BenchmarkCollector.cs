@@ -16,7 +16,7 @@ namespace Rvm.Benchmark
         public const int PRESENT_WAIT = 3;
         public const int GPU = 4;
 
-        private readonly ProfilerRecorder[] _recorders = new ProfilerRecorder[METRIC_COUNT];
+        private readonly BenchmarkRecorderSource[] _recorders = new BenchmarkRecorderSource[METRIC_COUNT];
         private readonly FrameTiming[] _latest = new FrameTiming[16];
         private readonly bool _frameTimingEnabled;
         private readonly ulong _frequency;
@@ -70,6 +70,14 @@ namespace Rvm.Benchmark
             _frequency = FrameTimingManager.GetCpuTimerFrequency();
             var handles = new List<ProfilerRecorderHandle>();
             ProfilerRecorderHandle.GetAvailable(handles);
+            handles = BenchmarkRecorderSource.UniqueHandles(handles);
+            var physicalCounts = new Dictionary<string, int>();
+            foreach (var handle in handles)
+            {
+                string key = BenchmarkRecorderSource.Key(ProfilerRecorderHandle.GetDescription(handle));
+                physicalCounts.TryGetValue(key, out int count);
+                physicalCounts[key] = count + 1;
+            }
             try
             {
                 for (int i = 0; i < Metrics.Length; i++)
@@ -97,9 +105,18 @@ namespace Rvm.Benchmark
                             continue;
                         }
                         found = true;
-                        _recorders[i] = ProfilerRecorder.StartNew(description.Category, description.Name, 1);
-                        metric.source = category + "/" + description.Name + " (previous completed frame)";
-                        metric.reason = _recorders[i].Valid ? "No completed samples yet." : "Recorder is invalid in this execution mode.";
+                        try
+                        {
+                            _recorders[i] = new BenchmarkRecorderSource(handles[j], description, physicalCounts[BenchmarkRecorderSource.Key(description)], 32768);
+                            metric.identity = _recorders[i].Identity;
+                            metric.sourceFound = _recorders[i].Valid;
+                            metric.source = category + "/" + description.Name + " (new native publications; source Unity frame unknown)";
+                            metric.reason = _recorders[i].Valid ? "No completed samples yet." : "Recorder is invalid in this execution mode.";
+                        }
+                        catch (Exception exception)
+                        {
+                            metric.reason = "Native source cannot be opened with the required semantics: " + exception.Message;
+                        }
                         break;
                     }
                     if (!found)
@@ -120,19 +137,52 @@ namespace Rvm.Benchmark
             int offset = row * METRIC_COUNT;
             for (int i = 0; i < METRIC_COUNT; i++)
             {
-                if (!_recorders[i].Valid || _recorders[i].Count == 0)
+                if (_recorders[i] == null || !_recorders[i].Valid)
                 {
                     continue;
                 }
-                long value = _recorders[i].LastValue;
-                if (value < 0 || (i < 2 && value == 0))
+                var sample = _recorders[i].Read(Time.frameCount);
+                sample.contextRow = row;
+                sample.intervalStartUnityFrame = Time.frameCount - 1;
+                _recorders[i].RecordEvidence(sample);
+                Metrics[i].samplesSeen += sample.publications;
+                if (sample.status != BenchmarkSampleStatus.Valid)
                 {
+                    if (sample.status != BenchmarkSampleStatus.NoPublication)
+                    {
+                        Metrics[i].invalidSamples++;
+                    }
+                    if (!Metrics[i].available)
+                    {
+                        Metrics[i].reason = BenchmarkRecorderSource.Reason(sample.status);
+                    }
                     continue;
                 }
-                Values[offset + i] = Metrics[i].unit == "ms" ? value * 0.000001 : value;
+                Values[offset + i] = sample.Value;
                 Metrics[i].available = true;
                 Metrics[i].reason = null;
             }
+        }
+
+        public void StartMeasuredInterval()
+        {
+            foreach (var source in _recorders)
+            {
+                source?.Arm();
+            }
+        }
+
+        public void SaveEvidence(string directory)
+        {
+            var document = new BenchmarkCollectorEvidence();
+            for (int i = 0; i < _recorders.Length; i++)
+            {
+                if (_recorders[i] != null)
+                {
+                    document.sources.Add(new BenchmarkCollectorEvidenceSource { id = Metrics[i].id, identity = _recorders[i].Identity, rawEvidence = _recorders[i].Evidence });
+                }
+            }
+            BenchmarkOutput.WriteJson(System.IO.Path.Combine(directory, "recorder-evidence.json"), document);
         }
 
         public void PollTimings()
@@ -243,7 +293,7 @@ namespace Rvm.Benchmark
             _disposed = true;
             for (int i = 0; i < _recorders.Length; i++)
             {
-                _recorders[i].Dispose();
+                _recorders[i]?.Dispose();
             }
         }
 

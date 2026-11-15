@@ -16,7 +16,7 @@ namespace Rvm.Benchmark
         private const int MAX_CPU_TIMERS = 96;
         private const int MAX_GPU_MARKERS = 64;
         private const int MAX_SNAPSHOTS = 256;
-        private const ProfilerRecorderOptions FLUSH_AT_FRAME_END = (ProfilerRecorderOptions)(1 << 7);
+        private const int RAW_EVIDENCE_LIMIT = 128;
 
         private static readonly ProfilerMarker[] POSITION_MARKERS = { new ProfilerMarker("RVM.Benchmark.POS1"), new ProfilerMarker("RVM.Benchmark.POS2"), new ProfilerMarker("RVM.Benchmark.POS3"), new ProfilerMarker("RVM.Benchmark.POS4") };
 
@@ -25,6 +25,9 @@ namespace Rvm.Benchmark
         private readonly BenchmarkSceneDiagnostics _scene;
         private readonly List<Counter> _cpu = new List<Counter>();
         private readonly List<Counter> _gpu = new List<Counter>();
+        private readonly List<BenchmarkRecorderSource> _aliases = new List<BenchmarkRecorderSource>();
+        private readonly List<BenchmarkPhysicalSourceEvidence> _aliasEvidence = new List<BenchmarkPhysicalSourceEvidence>();
+        private List<ProfilerRecorderHandle> _catalog;
         private readonly bool _profilerEnabled;
         private readonly bool _cpuAreaEnabled;
         private readonly bool _rendererEnabled;
@@ -37,6 +40,8 @@ namespace Rvm.Benchmark
         private int _lastUnityFrame = -1;
         private int _cpuTimers;
         private int _frameGaps;
+        private int _discoveredSources;
+        private readonly Dictionary<string, int> _physicalCounts = new Dictionary<string, int>();
         private bool _disposed;
 
         public bool Sampling { get; private set; }
@@ -47,11 +52,15 @@ namespace Rvm.Benchmark
                 int count = 0;
                 foreach (var counter in _cpu)
                 {
-                    count += counter.Recorder.Valid ? 1 : 0;
+                    count += counter.Source.Valid ? 1 : 0;
                 }
                 foreach (var counter in _gpu)
                 {
-                    count += counter.Recorder.Valid ? 1 : 0;
+                    count += counter.Source.Valid ? 1 : 0;
+                }
+                foreach (var source in _aliases)
+                {
+                    count += source.Valid ? 1 : 0;
                 }
                 return count;
             }
@@ -61,7 +70,7 @@ namespace Rvm.Benchmark
         {
             _scenario = scenario;
             _metadata = metadata;
-            _capacity = scenario.FrameCapacity;
+            _capacity = Math.Min(scenario.FrameCapacity, 8192);
             _profilerEnabled = Profiler.enabled;
             _cpuAreaEnabled = Profiler.GetAreaEnabled(ProfilerArea.CPU);
             _scene = new BenchmarkSceneDiagnostics(camera, scenario.DiagnosticRendering);
@@ -95,6 +104,16 @@ namespace Rvm.Benchmark
             Sampling = true;
             var handles = new List<ProfilerRecorderHandle>();
             ProfilerRecorderHandle.GetAvailable(handles);
+            handles = BenchmarkRecorderSource.UniqueHandles(handles);
+            _discoveredSources = handles.Count;
+            _catalog = new List<ProfilerRecorderHandle>(handles);
+            foreach (var handle in handles)
+            {
+                string key = BenchmarkRecorderSource.Key(ProfilerRecorderHandle.GetDescription(handle));
+                _physicalCounts.TryGetValue(key, out int count);
+                _physicalCounts[key] = count + 1;
+            }
+            var selected = new HashSet<string>();
             handles.Sort((a, b) =>
             {
                 string first = ProfilerRecorderHandle.GetDescription(a).Name;
@@ -111,7 +130,11 @@ namespace Rvm.Benchmark
                 bool render = description.Category.Name == "Render" && description.UnitType == ProfilerMarkerDataUnit.Count;
                 if (_cpu.Count < MAX_CPU_MARKERS && ((_scenario.DiagnosticCpu && timing && _cpuTimers < MAX_CPU_TIMERS && CpuCandidate(description.Name)) || (_scenario.DiagnosticMemory && memory && MemoryCandidate(description.Name)) || (_scenario.DiagnosticRendering && render && RenderCandidate(description.Name))))
                 {
-                    Bind(_cpu, description, false);
+                    if (!selected.Add("CPU/" + BenchmarkRecorderSource.Key(description)))
+                    {
+                        continue;
+                    }
+                    Bind(_cpu, handle, description, false);
                     if (timing)
                     {
                         _cpuTimers++;
@@ -130,17 +153,20 @@ namespace Rvm.Benchmark
                 var description = ProfilerRecorderHandle.GetDescription(handle);
                 if (_scenario.DiagnosticGpu && SystemInfo.supportsGpuRecorder && description.Category.Name == "Render" && description.UnitType == ProfilerMarkerDataUnit.TimeNanoseconds && (description.Flags & MarkerFlags.SampleGPU) != 0 && _gpu.Count < MAX_GPU_MARKERS && GpuCandidate(description.Name))
                 {
-                    Bind(_gpu, description, true);
+                    if (selected.Add("GPU/" + BenchmarkRecorderSource.Key(description)))
+                    {
+                        Bind(_gpu, handle, description, true);
+                    }
                 }
             }
             var signature = new StringBuilder(_metadata.instrumentationSignature);
             foreach (var counter in _cpu)
             {
-                signature.Append('|').Append(counter.Data.category).Append('/').Append(counter.Data.name).Append('/').Append(counter.Data.unit);
+                signature.Append('|').Append(counter.Data.identity.key).Append('/').Append(counter.Data.identity.kind).Append("/physical=").Append(counter.Data.identity.physicalSources);
             }
             foreach (var counter in _gpu)
             {
-                signature.Append("|GPU/").Append(counter.Data.name);
+                signature.Append("|GPU/").Append(counter.Data.identity.key).Append("/physical=").Append(counter.Data.identity.physicalSources);
             }
             _metadata.instrumentationSignature = signature.ToString();
         }
@@ -159,18 +185,47 @@ namespace Rvm.Benchmark
             }
             foreach (var counter in _cpu)
             {
-                if (!consecutive || !counter.Recorder.Valid || counter.Recorder.Count == 0)
+                var sample = counter.Source.Read(Time.frameCount);
+                sample.contextRow = row;
+                sample.contextPosition = frame.position;
+                sample.intervalStartUnityFrame = frame.unityFrame;
+                if (!consecutive && sample.status == BenchmarkSampleStatus.Valid)
+                {
+                    sample.status = BenchmarkSampleStatus.AmbiguousInterval;
+                    sample.Value = double.NaN;
+                }
+                if (counter.Data.rawEvidence.Count < RAW_EVIDENCE_LIMIT && (row % 8 == 0 || counter.Data.rawEvidence.Count < 4))
+                {
+                    sample.observedQpcTicks = BenchmarkClock.GetTimestamp();
+                    counter.Data.rawEvidence.Add(sample);
+                }
+                counter.Data.samplesSeen += sample.publications;
+                if (sample.status != BenchmarkSampleStatus.Valid)
+                {
+                    if (sample.status != BenchmarkSampleStatus.NoPublication)
+                    {
+                        counter.Data.invalidSamples++;
+                        counter.Data.validityStatus = sample.status.ToString();
+                        counter.Data.reason = BenchmarkRecorderSource.Reason(sample.status);
+                    }
+                    continue;
+                }
+                if (row >= _capacity)
                 {
                     continue;
                 }
-                var sample = counter.Recorder.GetSample(counter.Recorder.Count - 1);
-                if (sample.Value < 0)
-                {
-                    continue;
-                }
-                counter.Values[row] = sample.Value * (counter.Data.unit == "ms" ? 0.000001 : 1);
-                counter.Calls[row] = sample.Count;
-                counter.ObservedCalls += sample.Count;
+                counter.Values[row] = sample.Value;
+                counter.Calls[row] = sample.calls;
+                counter.Data.validSamples++;
+                counter.ObservedCalls += sample.calls;
+            }
+            foreach (var source in _aliases)
+            {
+                var sample = source.Read(Time.frameCount);
+                sample.contextRow = row;
+                sample.contextPosition = frame.position;
+                sample.intervalStartUnityFrame = frame.unityFrame;
+                source.RecordEvidence(sample);
             }
             if (_world.Count >= MAX_SNAPSHOTS || (frame.timestamp < _nextSnapshot && frame.position == _snapshotPosition))
             {
@@ -186,15 +241,26 @@ namespace Rvm.Benchmark
             }
             foreach (var counter in _gpu)
             {
-                if (!counter.Recorder.Valid || counter.Recorder.Count == 0)
+                var sample = counter.Source.Read(Time.frameCount);
+                counter.Data.samplesSeen += sample.publications;
+                sample.contextRow = row;
+                sample.contextPosition = frame.position;
+                sample.intervalStartUnityFrame = frame.unityFrame;
+                if (counter.Data.rawEvidence.Count < RAW_EVIDENCE_LIMIT)
                 {
-                    continue;
+                    sample.observedQpcTicks = BenchmarkClock.GetTimestamp();
+                    counter.Data.rawEvidence.Add(sample);
                 }
-                var sample = counter.Recorder.GetSample(counter.Recorder.Count - 1);
-                if (sample.Value > 0 && sample.Count > 0)
+                if (sample.status == BenchmarkSampleStatus.Valid && sample.Value > 0 && sample.calls > 0)
                 {
-                    counter.Data.observations.Add(new BenchmarkGpuObservation { observedUnityFrame = Time.frameCount, observedPosition = frame.position, milliseconds = sample.Value * 0.000001, calls = sample.Count });
+                    counter.Data.observations.Add(new BenchmarkGpuObservation { observedUnityFrame = Time.frameCount, observedPosition = frame.position, milliseconds = sample.Value, calls = sample.calls });
                     counter.Data.available = true;
+                    counter.Data.validSamples++;
+                }
+                else if (sample.status != BenchmarkSampleStatus.NoPublication)
+                {
+                    counter.Data.invalidSamples++;
+                    counter.Data.reason = BenchmarkRecorderSource.Reason(sample.status);
                 }
             }
             double cost = (BenchmarkClock.GetTimestamp() - start) * 1000000.0 / BenchmarkClock.Frequency;
@@ -202,6 +268,22 @@ namespace Rvm.Benchmark
             if (_rendering.Count > 0)
             {
                 _rendering[_rendering.Count - 1].collectionMicroseconds = cost;
+            }
+        }
+
+        public void StartMeasuredInterval()
+        {
+            foreach (var source in _aliases)
+            {
+                source.Arm();
+            }
+            foreach (var counter in _cpu)
+            {
+                counter.Source.Arm();
+            }
+            foreach (var counter in _gpu)
+            {
+                counter.Source.Arm();
             }
         }
 
@@ -224,10 +306,10 @@ namespace Rvm.Benchmark
             var rendering = Document(summary.status);
             var gpu = Document(summary.status);
             var world = Document(summary.status);
-            cpu.limitations.Add("All-thread inclusive frame sums; nested/parallel markers overlap and MUST NOT be added. Exclusive/self time and thread attribution are unavailable: use the Timeline/Hierarchy capture workflow.");
+            cpu.limitations.Add("Means/P95 use valid published intervals only; missing updates are not zero. Windows record contextRows and actual sample count. Source frame/POS association is not native-verified. Raw evidence status enum is decoded by rawStatusLegend. All-thread inclusive frame sums; nested/parallel markers overlap and MUST NOT be added. Exclusive/self time and thread attribution are unavailable: use the Timeline/Hierarchy capture workflow.");
             cpu.limitations.Add("Previous completed profiler frame is associated by consecutive Unity Update cadence, not a native sample frame ID. Skipped ambiguous frame gaps: " + _frameGaps + ". Editor and other camera work may contribute. One Diagnostic preparation frame after binding is excluded from the measured interval.");
-            cpu.limitations.Add("Frame-end flush option bit 7 matches installed HDRP 17.6 ProfilingSampler; zero-call frames are retained only after the marker has actually been observed. Recorders bind after warmup, before measured time.");
-            gpu.limitations.Add("Delayed GPU observations have NO source-frame or source-POS identity. ObservedPosition is observation context only. Samples may repeat across polls; no per-POS aggregate, sum, percentile, or bottleneck verdict is derived from them.");
+            cpu.limitations.Add("Bit 7 is the HDRP shared-recorder option, not frame-end flush. Benchmark uses private handle-bound recorders without sharing/wrapping. Monotonic publication cursors prevent replay of missing updates; source frame remains unknown.");
+            gpu.limitations.Add("Delayed GPU observations have NO source-frame or source-POS identity. ObservedPosition is observation context only. Only new native publications are read; GPU source frames remain unknown; no per-POS aggregate, sum, percentile, or bottleneck verdict is derived from them.");
             gpu.limitations.Add("Absent/zero samples do not prove a pass disabled. Actual HDRP effect enablement and custom shader costs require a capture. Frame Debugger is ordering evidence, not a GPU timer.");
             if (!_scenario.DiagnosticGpu || !SystemInfo.supportsGpuRecorder || _gpu.Count == 0)
             {
@@ -244,12 +326,21 @@ namespace Rvm.Benchmark
             }
             foreach (var counter in _cpu)
             {
-                counter.Data.available = counter.ObservedCalls > 0;
-                counter.Data.reason = counter.Data.available ? "" : "No validated positive call count; zero is not proof of absence.";
+                counter.Data.available = counter.Data.validSamples > 0 && (counter.Data.unit != "ms" || counter.ObservedCalls > 0);
+                if (counter.Data.available)
+                {
+                    counter.Data.validityStatus = counter.Data.invalidSamples > 0 ? "ValidSubset" : "Valid";
+                    counter.Data.reason = counter.Data.invalidSamples > 0 ? "Invalid publications excluded; see rawEvidence and sample statuses." : "";
+                }
+                else if (counter.Data.samplesSeen == 0)
+                {
+                    counter.Data.validityStatus = "NoSamples";
+                    counter.Data.reason = "Source found but no new native publications observed.";
+                }
                 for (int position = -1; position < 4; position++)
                 {
-                    counter.Data.windows.Add(Aggregate(counter.Values, counter.Calls, frames, count, position, false, counter.Data.available));
-                    counter.Data.windows.Add(Aggregate(counter.Values, counter.Calls, frames, count, position, true, counter.Data.available));
+                    counter.Data.windows.Add(Aggregate(counter.Values, counter.Calls, frames, Math.Min(count, _capacity), position, false, counter.Data.available));
+                    counter.Data.windows.Add(Aggregate(counter.Values, counter.Calls, frames, Math.Min(count, _capacity), position, true, counter.Data.available));
                 }
                 if (counter.Data.category == "Memory" || counter.Data.unit == "bytes")
                 {
@@ -276,6 +367,7 @@ namespace Rvm.Benchmark
             {
                 BenchmarkOutput.WriteJson(Path.Combine(folder, pair.Item1 + ".json"), pair.Item2);
             }
+            BenchmarkOutput.WriteJson(Path.Combine(folder, "physical-source-evidence.json"), new BenchmarkDiagnosticDocument { runId = _metadata.runId, physicalAliases = _aliasEvidence });
             WriteReport(folder, summary, cpu, gpu, rendering, memory, world);
         }
 
@@ -283,10 +375,15 @@ namespace Rvm.Benchmark
         {
             var selected = new List<double>();
             long total = 0;
+            int contextRows = 0;
             if (observed)
             {
                 for (int i = 0; i < count; i++)
                 {
+                    if ((position < 0 || frames[i].position == position) && (!stable || !frames[i].transition))
+                    {
+                        contextRows++;
+                    }
                     if ((position < 0 || frames[i].position == position) && (!stable || !frames[i].transition) && !double.IsNaN(values[i]))
                     {
                         selected.Add(values[i]);
@@ -294,7 +391,7 @@ namespace Rvm.Benchmark
                     }
                 }
             }
-            return new BenchmarkDiagnosticWindow { position = position, window = stable ? "Stable" : "Full", callCount = total, inclusive = BenchmarkStatistics.Distribution(selected.ToArray()) };
+            return new BenchmarkDiagnosticWindow { position = position, window = stable ? "Stable" : "Full", callCount = total, contextRows = contextRows, inclusive = BenchmarkStatistics.Distribution(selected.ToArray()) };
         }
 
         public void Dispose()
@@ -306,46 +403,65 @@ namespace Rvm.Benchmark
             _disposed = true;
             foreach (var counter in _cpu)
             {
-                var recorder = counter.Recorder;
-                recorder.Dispose();
-                counter.Recorder = recorder;
+                counter.Source.Dispose();
             }
             foreach (var counter in _gpu)
             {
-                var recorder = counter.Recorder;
-                recorder.Dispose();
-                counter.Recorder = recorder;
+                counter.Source.Dispose();
+            }
+            foreach (var source in _aliases)
+            {
+                source.Dispose();
             }
             _rendererSwitch?.SetValue(null, _rendererEnabled);
-            Profiler.SetAreaEnabled(ProfilerArea.CPU, _cpuAreaEnabled);
             Profiler.enabled = _profilerEnabled;
+            Profiler.SetAreaEnabled(ProfilerArea.CPU, _cpuAreaEnabled);
         }
 
-        private void Bind(List<Counter> list, ProfilerRecorderDescription description, bool gpu)
+        private void Bind(List<Counter> list, ProfilerRecorderHandle handle, ProfilerRecorderDescription description, bool gpu)
         {
-            var data = new BenchmarkDiagnosticMarker { name = description.Name, category = description.Category.Name, unit = description.UnitType == ProfilerMarkerDataUnit.TimeNanoseconds ? "ms" : description.UnitType == ProfilerMarkerDataUnit.Bytes ? "bytes" : "count", scope = gpu ? "delayed GPU marker; source frame unavailable" : "all threads; inclusive frame sum; previous completed Unity frame", reason = "No samples yet; self time unavailable." };
-            var recorder = default(ProfilerRecorder);
+            BenchmarkRecorderSource source = null;
             try
             {
-                var options = ProfilerRecorderOptions.Default | FLUSH_AT_FRAME_END;
-                recorder = ProfilerRecorder.StartNew(description.Category, description.Name, 1, gpu ? options | ProfilerRecorderOptions.GpuRecorder : options);
-                var counter = new Counter { Data = data, Recorder = recorder, Values = gpu ? null : new double[_capacity], Calls = gpu ? null : new long[_capacity] };
+                source = new BenchmarkRecorderSource(handle, description, _physicalCounts[BenchmarkRecorderSource.Key(description)], gpu ? 8192 : 32768, gpu);
+                var data = new BenchmarkDiagnosticMarker { name = description.Name, category = description.Category.Name, unit = description.UnitType == ProfilerMarkerDataUnit.TimeNanoseconds ? "ms" : description.UnitType == ProfilerMarkerDataUnit.Bytes ? "bytes" : "count", identity = source.Identity, rawEvidence = source.Evidence, sourceFound = source.Valid, validityStatus = "NoSamples", scope = gpu ? "delayed GPU observation; source frame unknown" : source.Identity.aggregation + "; interval-associated, source Unity frame unknown", reason = "Source discovered; no interpreted samples yet; self time unavailable." };
+                var counter = new Counter { Data = data, Source = source, Values = gpu ? null : new double[_capacity], Calls = gpu ? null : new long[_capacity] };
                 if (!gpu)
                 {
                     Array.Fill(counter.Values, double.NaN);
                 }
                 list.Add(counter);
+                if (source.Identity.physicalSources > 1)
+                {
+                    int ordinal = 0;
+                    foreach (var aliasHandle in _catalog)
+                    {
+                        var aliasDescription = ProfilerRecorderHandle.GetDescription(aliasHandle);
+                        if (BenchmarkRecorderSource.Key(aliasDescription) != source.Identity.key)
+                        {
+                            continue;
+                        }
+                        if (aliasHandle.Equals(handle))
+                        {
+                            _aliasEvidence.Add(new BenchmarkPhysicalSourceEvidence { role = gpu ? "GPU" : "CPU", logicalKey = source.Identity.key, physicalOrdinal = ordinal++, identity = source.Identity, rawEvidence = source.Evidence });
+                            continue;
+                        }
+                        var alias = new BenchmarkRecorderSource(aliasHandle, aliasDescription, source.Identity.physicalSources, 32768, gpu);
+                        _aliases.Add(alias);
+                        _aliasEvidence.Add(new BenchmarkPhysicalSourceEvidence { role = gpu ? "GPU" : "CPU", logicalKey = source.Identity.key, physicalOrdinal = ordinal++, identity = alias.Identity, rawEvidence = alias.Evidence });
+                    }
+                }
             }
             catch (Exception exception)
             {
-                recorder.Dispose();
+                source?.Dispose();
                 _metadata.warnings.Add("Diagnostic recorder unavailable: " + description.Name + ": " + exception.Message);
             }
         }
 
         private BenchmarkDiagnosticDocument Document(string status)
         {
-            return new BenchmarkDiagnosticDocument { runId = _metadata.runId, signature = _metadata.instrumentationSignature, status = status };
+            return new BenchmarkDiagnosticDocument { runId = _metadata.runId, signature = _metadata.instrumentationSignature, status = status, discoveredPhysicalSources = _discoveredSources, selectedUniqueSources = _cpu.Count + _gpu.Count };
         }
 
         private void WriteReport(string folder, BenchmarkSummary summary, params BenchmarkDiagnosticDocument[] documents)
@@ -526,7 +642,7 @@ namespace Rvm.Benchmark
 
         private sealed class Counter
         {
-            public ProfilerRecorder Recorder { get; set; }
+            public BenchmarkRecorderSource Source { get; set; }
             public BenchmarkDiagnosticMarker Data { get; set; }
             public double[] Values { get; set; }
             public long[] Calls { get; set; }

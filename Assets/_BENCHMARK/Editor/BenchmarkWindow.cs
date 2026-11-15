@@ -59,6 +59,10 @@ namespace Rvm.Benchmark.Editor
                     EditorGUILayout.PropertyField(serialized.FindProperty("_diagnosticMemory"), new GUIContent("Memory counters"));
                     EditorGUILayout.PropertyField(serialized.FindProperty("_snapshotSeconds"), new GUIContent("Snapshot interval, seconds"));
                     EditorGUILayout.PropertyField(serialized.FindProperty("_profilerCapture"), new GUIContent("Binary CPU capture"));
+                    if (serialized.FindProperty("_profilerCapture").boolValue)
+                    {
+                        EditorGUILayout.PropertyField(serialized.FindProperty("_captureSeconds"), new GUIContent("Capture budget, seconds (<=4)"));
+                    }
                     EditorGUILayout.HelpBox("Inclusive CPU markers нельзя складывать. GPU observations запаздывают и не привязаны к исходному POS. Процедура GPU capture и анализ CPU Timeline описаны в diagnostic-report.md каждого запуска.", MessageType.Info);
                 }
                 else

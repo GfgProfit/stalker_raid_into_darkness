@@ -1,0 +1,11 @@
+{
+    "formatVersion": 1,
+    "buildId": "e088c0ca5d8c4c3599834341feb1819d",
+    "sourceDigest": "2f1b198cf0090b526d56aa4663a9c20de00eb0bdabadc0e0f1f4f198f1605a05",
+    "renderSettingsDigest": "13d83bb0acefc97179e9f6e8cb728a23f0ff7e8a1930b547d8893b659728e92d",
+    "inputManifestSha256": "776eb6d8a0e9dddd345bcb3978857c6076ee5fa4ce769e7d8d89b6e9c7ec7c87",
+    "gitSha": "1fa11c6f1267adfe8613d9084aa95538a5d71121",
+    "gitDirty": "True",
+    "unity": "6000.6.7f1",
+    "hdrp": "17.6.0"
+}

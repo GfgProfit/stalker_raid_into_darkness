@@ -20,6 +20,7 @@ namespace Rvm.Benchmark
         [SerializeField] private double _stabilizationSeconds = 0.5;
         [SerializeField] private BenchmarkMode _mode;
         [SerializeField] private bool _profilerCapture;
+        [SerializeField] private double _captureSeconds = 2;
         [SerializeField] private int _frameCapacity = 65536;
         [SerializeField] private string[] _tags = { "Baseline" };
         [SerializeField] private bool _diagnosticCpu = true;
@@ -39,6 +40,7 @@ namespace Rvm.Benchmark
         public double StabilizationSeconds => _stabilizationSeconds;
         public BenchmarkMode Mode => _mode;
         public bool ProfilerCapture => _profilerCapture;
+        public double CaptureSeconds => _captureSeconds;
         public int FrameCapacity => _frameCapacity;
         public string[] Tags => (string[])_tags.Clone();
         public bool DiagnosticCpu => _diagnosticCpu;
@@ -49,6 +51,16 @@ namespace Rvm.Benchmark
         public bool FixedWeatherTime => _fixedWeatherTime;
         public double FixedTimeHours => _fixedTimeHours;
         public string ExpectedWeatherProfile => _expectedWeatherProfile;
+
+        public void ConfigureSession(BenchmarkMode mode, bool fixedWeatherTime, double fixedTimeHours, string expectedProfile, bool capture, double captureSeconds)
+        {
+            _mode = mode;
+            _fixedWeatherTime = fixedWeatherTime;
+            _fixedTimeHours = fixedTimeHours;
+            _expectedWeatherProfile = expectedProfile;
+            _profilerCapture = capture;
+            _captureSeconds = captureSeconds;
+        }
 
         public string Validate()
         {
@@ -89,6 +101,10 @@ namespace Rvm.Benchmark
             if (_frameCapacity < 1024 || _frameCapacity > 262144)
             {
                 return "Frame capacity must be between 1024 and 262144.";
+            }
+            if (!IsFinite(_captureSeconds) || _captureSeconds <= 0 || _captureSeconds > 4)
+            {
+                return "Capture duration must be in (0, 4] seconds.";
             }
             if (_profilerCapture && _mode != BenchmarkMode.Diagnostic)
             {

@@ -1,6 +1,9 @@
 {
     "name": "Rvm.Benchmark.Runtime",
     "rootNamespace": "Rvm.Benchmark",
-    "references": [],
+    "references": [
+        "RaidIntoDarkness.Effects",
+        "XRay.Importer.Runtime"
+    ],
     "autoReferenced": true
 }

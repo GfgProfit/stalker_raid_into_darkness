@@ -151,7 +151,7 @@ namespace Rvm.Benchmark.Tests
                 summary.windows.Add(new BenchmarkWindow { position = i, window = "Full", frames = new BenchmarkFrameStats() });
                 summary.windows.Add(new BenchmarkWindow { position = i, window = "Stable", frames = new BenchmarkFrameStats() });
             }
-            Assert.That(BenchmarkComparison.Compare(a, summary, b, summary).comparable, Is.True);
+            Assert.That(BenchmarkComparison.Compare(a, summary, b, summary).comparabilityStatus, Is.EqualTo("UnverifiedOrigin"));
             b.environment[1].value = "45000";
             Assert.That(BenchmarkComparison.Compare(a, summary, b, summary).comparable, Is.False);
             b.environment[1].value = "43200";

@@ -367,12 +367,14 @@ namespace Rvm.Benchmark.Editor
                 var start = new ProcessStartInfo("git", arguments) { WorkingDirectory = root, UseShellExecute = false, RedirectStandardOutput = true, RedirectStandardError = true, CreateNoWindow = true };
                 using (var process = Process.Start(start))
                 {
+                    var output = process.StandardOutput.ReadToEndAsync();
+                    var error = process.StandardError.ReadToEndAsync();
                     if (!process.WaitForExit(3000))
                     {
                         process.Kill();
                         return "unavailable";
                     }
-                    return process.ExitCode == 0 ? process.StandardOutput.ReadToEnd().Trim() : "unavailable";
+                    return process.ExitCode == 0 ? output.GetAwaiter().GetResult().Trim() : "unavailable";
                 }
             }
             catch

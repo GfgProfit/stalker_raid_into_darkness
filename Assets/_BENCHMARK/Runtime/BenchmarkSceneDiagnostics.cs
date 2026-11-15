@@ -18,6 +18,7 @@ namespace Rvm.Benchmark
         private readonly List<MonoBehaviour> _visuals = new List<MonoBehaviour>();
         private readonly List<MonoBehaviour> _instances = new List<MonoBehaviour>();
         private readonly List<Behaviour> _navigation = new List<Behaviour>();
+        private readonly SortedSet<string> _behaviourTypes = new SortedSet<string>(StringComparer.Ordinal);
         private readonly Plane[] _planes = new Plane[6];
         private readonly Dictionary<Type, Dictionary<string, MemberInfo>> _members = new Dictionary<Type, Dictionary<string, MemberInfo>>();
 
@@ -55,6 +56,7 @@ namespace Rvm.Benchmark
                     {
                         continue;
                     }
+                    _behaviourTypes.Add(name);
                     if (name == "XRay.Importer.Levels.XRayWeatherController")
                     {
                         _weather.Add(behaviour);
@@ -85,6 +87,7 @@ namespace Rvm.Benchmark
 
         public void CollectWorld(List<BenchmarkEntry> entries)
         {
+            Add(entries, "inventory.behaviourTypes", string.Join("\n", _behaviourTypes));
             Add(entries, "location.scene", _camera.gameObject.scene.path);
             Add(entries, "observation.unityFrame", Time.frameCount);
             for (int i = 0; i < _weather.Count; i++)

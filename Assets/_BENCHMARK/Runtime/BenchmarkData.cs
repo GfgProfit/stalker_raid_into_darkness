@@ -5,6 +5,22 @@ using UnityEngine;
 namespace Rvm.Benchmark
 {
     [Serializable]
+    public sealed class BenchmarkCollectorEvidence
+    {
+        public int measurementVersion = 3;
+        public string sampling = "Bounded stratified raw publications; at most 128 evidence rows per source, every eighth context row plus initial rows. Native source frame unknown; no hold-last.";
+        public List<BenchmarkCollectorEvidenceSource> sources = new List<BenchmarkCollectorEvidenceSource>();
+    }
+
+    [Serializable]
+    public sealed class BenchmarkCollectorEvidenceSource
+    {
+        public string id;
+        public BenchmarkSourceIdentity identity;
+        public List<BenchmarkSampleRead> rawEvidence;
+    }
+
+    [Serializable]
     public sealed class BenchmarkEntry
     {
         public string key;
@@ -69,6 +85,17 @@ namespace Rvm.Benchmark
         public int runtimeErrors;
         public string frameTimingAlignment;
         public int metadataVersion;
+        public int measurementVersion;
+        public string conditionProtocol;
+        public string conditionEvidence;
+        public string buildSourceDigest;
+        public string renderSettingsDigest;
+        public BenchmarkBuildIdentityEvidence buildIdentity;
+        public bool shadowTrace;
+        public int renderedMeasurementFrames;
+        public double captureSeconds;
+        public int captureStartUnityFrame = -1;
+        public int captureEndUnityFrame = -1;
         public int vSyncCount;
         public double refreshRateHz;
         public int renderFrameInterval;
@@ -90,6 +117,10 @@ namespace Rvm.Benchmark
         public string source;
         public string reason;
         public bool available;
+        public BenchmarkSourceIdentity identity;
+        public bool sourceFound;
+        public int samplesSeen;
+        public int invalidSamples;
     }
 
     public struct BenchmarkFrame

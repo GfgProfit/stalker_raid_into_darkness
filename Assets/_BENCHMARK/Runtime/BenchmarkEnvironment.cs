@@ -13,11 +13,13 @@ namespace Rvm.Benchmark
         {
             var result = new BenchmarkMetadata
             {
-                metadataVersion = 2,
+                metadataVersion = 5,
+                measurementVersion = 3,
+                captureSeconds = scenario.CaptureSeconds,
                 vSyncCount = QualitySettings.vSyncCount,
                 refreshRateHz = Screen.currentResolution.refreshRateRatio.value,
                 renderFrameInterval = OnDemandRendering.renderFrameInterval,
-                instrumentationSignature = scenario.Mode == BenchmarkMode.Standard ? "V2/Standard/legacy23" : "V2/Diagnostic/rev2/ownedCpuArea/preparationFrame/capacity=" + scenario.FrameCapacity + "/cpu=" + scenario.DiagnosticCpu + "/gpu=" + scenario.DiagnosticGpu + "/render=" + scenario.DiagnosticRendering + "/memory=" + scenario.DiagnosticMemory + "/snapshot=" + scenario.SnapshotSeconds.ToString("R", CultureInfo.InvariantCulture) + "/binary=" + scenario.ProfilerCapture,
+                instrumentationSignature = scenario.Mode == BenchmarkMode.Standard ? "V21/Standard/measurement3/private-monotonic/latest-counters" : "V21/Diagnostic/measurement3/private-monotonic/ownedCpuArea/preparationFrame/capacity=" + scenario.FrameCapacity + "/cpu=" + scenario.DiagnosticCpu + "/gpu=" + scenario.DiagnosticGpu + "/render=" + scenario.DiagnosticRendering + "/memory=" + scenario.DiagnosticMemory + "/snapshot=" + scenario.SnapshotSeconds.ToString("R", CultureInfo.InvariantCulture) + "/binary=" + scenario.ProfilerCapture,
                 fixedWorldState = scenario.FixedWeatherTime ? "Existing stable profile; paused at " + scenario.FixedTimeHours.ToString("R", CultureInfo.InvariantCulture) + " hours; expected=" + scenario.ExpectedWeatherProfile : "Uncontrolled evolving world",
                 runId = DateTime.UtcNow.ToString("yyyyMMdd_HHmmss_fffffff", CultureInfo.InvariantCulture) + "_" + Guid.NewGuid().ToString("N"),
                 seriesId = seriesId,

@@ -1,0 +1,9 @@
+{
+    "name": "Rvm.Benchmark.Tests.PlayMode",
+    "rootNamespace": "Rvm.Benchmark.Tests",
+    "references": ["Rvm.Benchmark.Runtime", "Unity.Profiling.Core", "RaidIntoDarkness.Effects"],
+    "includePlatforms": [],
+    "optionalUnityReferences": ["TestAssemblies"],
+    "defineConstraints": ["UNITY_EDITOR"],
+    "autoReferenced": false
+}

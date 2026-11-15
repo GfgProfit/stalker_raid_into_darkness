@@ -13,6 +13,13 @@ namespace Rvm.Benchmark
         public string reason;
         public bool available;
         public bool selfTimeAvailable;
+        public BenchmarkSourceIdentity identity;
+        public bool sourceFound;
+        public int samplesSeen;
+        public int validSamples;
+        public int invalidSamples;
+        public string validityStatus;
+        public List<BenchmarkSampleRead> rawEvidence = new List<BenchmarkSampleRead>();
         public List<BenchmarkDiagnosticWindow> windows = new List<BenchmarkDiagnosticWindow>();
         public List<BenchmarkGpuObservation> observations = new List<BenchmarkGpuObservation>();
     }
@@ -23,6 +30,7 @@ namespace Rvm.Benchmark
         public int position;
         public string window;
         public long callCount;
+        public int contextRows;
         public BenchmarkDistribution inclusive;
     }
 
@@ -49,9 +57,25 @@ namespace Rvm.Benchmark
     }
 
     [Serializable]
+    public sealed class BenchmarkPhysicalSourceEvidence
+    {
+        public string role;
+        public string logicalKey;
+        public int physicalOrdinal;
+        public BenchmarkSourceIdentity identity;
+        public List<BenchmarkSampleRead> rawEvidence;
+    }
+
+    [Serializable]
     public sealed class BenchmarkDiagnosticDocument
     {
-        public int schemaVersion = 2;
+        public int schemaVersion = 3;
+        public int measurementVersion = 3;
+        public long qpcFrequency = BenchmarkClock.Frequency;
+        public List<BenchmarkPhysicalSourceEvidence> physicalAliases = new List<BenchmarkPhysicalSourceEvidence>();
+        public int discoveredPhysicalSources;
+        public int selectedUniqueSources;
+        public string[] rawStatusLegend = Enum.GetNames(typeof(BenchmarkSampleStatus));
         public string runId;
         public string signature;
         public string status;

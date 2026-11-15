@@ -93,7 +93,7 @@ namespace Rvm.CleanReleaseRoute07.Editor
                 {
                     throw new BuildFailedException("Clean Release build did not succeed.");
                 }
-                var payload = JsonUtility.FromJson<PatchPayload>(File.ReadAllText("Assets/_BENCHMARK/Editor/HdrpShadowPatch.json"));
+                var payload = JsonUtility.FromJson<PatchPayload>(File.ReadAllText("Assets/_Tools/X-Ray OGF OMG Importer/Editor/Rendering/HdrpShadowBindingPatch.json"));
                 string package = UnityEditor.PackageManager.PackageInfo.FindForAssetPath("Packages/com.unity.render-pipelines.high-definition").resolvedPath;
                 var files = new List<PatchEvidence>();
                 foreach (var file in payload.files)

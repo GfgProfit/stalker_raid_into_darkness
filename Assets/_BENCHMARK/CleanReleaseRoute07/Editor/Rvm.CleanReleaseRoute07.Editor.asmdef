@@ -6,7 +6,8 @@
         "Rvm.Benchmark.Runtime",
         "Rvm.Benchmark.Editor",
         "XRay.Importer.Runtime",
-        "RaidIntoDarkness.Effects"
+        "RaidIntoDarkness.Effects",
+        "XRay.Importer.Editor"
     ],
     "includePlatforms": [
         "Editor"

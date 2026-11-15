@@ -244,7 +244,6 @@ namespace RaidIntoDarkness.Effects
             var main = child.main;
             main.emitterVelocity = parent.Velocity;
             child.gameObject.SetActive(true);
-            AnomalyVisual09Events.Record(this, 4, linkIndex, 0.0, child);
             child.Play(true);
             _children.Add(state);
         }
@@ -256,10 +255,6 @@ namespace RaidIntoDarkness.Effects
                 ParticleSystem cached = _pools[linkIndex].Pop();
                 if (cached != null)
                 {
-                    if (AnomalyVisual09Events.Enabled)
-                    {
-                        AnomalyVisual09Events.Record(this, 5, linkIndex, cached.time, cached);
-                    }
                     return cached;
                 }
             }
@@ -271,8 +266,6 @@ namespace RaidIntoDarkness.Effects
                 _poolRoot.SetParent(parent, false);
             }
             ParticleSystem child = Instantiate(template, _poolRoot);
-            AnomalyVisual08Target.ApplySpawned(this, child.gameObject);
-            AnomalyVisual09Events.Record(this, 6, linkIndex, 0.0, child);
             child.name = template.name + " Instance";
             child.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
             return child;
@@ -309,10 +302,6 @@ namespace RaidIntoDarkness.Effects
                 }
                 if (child.Following && _links[child.Link].Rewind)
                 {
-                    if (AnomalyVisual09Events.Enabled)
-                    {
-                        AnomalyVisual09Events.Record(this, 10, child.Link, child.System.time, child.System);
-                    }
                     child.System.Play(true);
                     continue;
                 }

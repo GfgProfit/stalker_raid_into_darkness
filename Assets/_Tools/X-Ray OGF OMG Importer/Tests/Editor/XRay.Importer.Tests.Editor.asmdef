@@ -9,7 +9,8 @@
         "XRay.Importer.Sources",
         "XRay.Importer.Editor",
         "Unity.RenderPipelines.HighDefinition.Runtime",
-        "Unity.RenderPipelines.Core.Runtime"
+        "Unity.RenderPipelines.Core.Runtime",
+        "Unity.Collections"
     ],
     "includePlatforms": [
         "Editor"

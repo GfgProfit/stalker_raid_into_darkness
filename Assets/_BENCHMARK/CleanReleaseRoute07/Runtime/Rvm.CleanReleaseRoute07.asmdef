@@ -6,7 +6,8 @@
         "RaidIntoDarkness.Effects",
         "RaidIntoDarkness.Player",
         "Unity.RenderPipelines.HighDefinition.Runtime",
-        "Unity.RenderPipelines.Core.Runtime"
+        "Unity.RenderPipelines.Core.Runtime",
+        "Rvm.Benchmark.Runtime"
     ],
     "autoReferenced": true
 }

@@ -4,9 +4,9 @@ using NUnit.Framework;
 using RaidIntoDarkness.Effects;
 using UnityEngine;
 
-namespace Rvm.Benchmark.Tests
+namespace RaidIntoDarkness.Player.Tests
 {
-    public sealed class ParticleFrameEquivalenceTests
+    public sealed class FiniteParticleFrameTests
     {
         private static Func<float, uint, int, float, bool, bool, bool, float> Optimized()
         {
@@ -16,7 +16,7 @@ namespace Rvm.Benchmark.Tests
 
         private static void Check(Func<float, uint, int, float, bool, bool, bool, float> optimized, float age, uint seed, int count, float fps, bool animated, bool start, bool playback)
         {
-            float expected = ParticleFrameReference.EvaluateFrame(age, seed, count, fps, animated, start, playback);
+            float expected = FiniteParticleFrameOracle.EvaluateFrame(age, seed, count, fps, animated, start, playback);
             float actual = optimized(age, seed, count, fps, animated, start, playback);
             Assert.That(BitConverter.SingleToInt32Bits(actual), Is.EqualTo(BitConverter.SingleToInt32Bits(expected)), age + "/" + seed + "/" + count + "/" + fps + "/" + animated + "/" + start + "/" + playback);
             Assert.That(Mathf.Floor(actual), Is.EqualTo(Mathf.Floor(expected)));

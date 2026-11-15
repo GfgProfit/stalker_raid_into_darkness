@@ -33,9 +33,7 @@ namespace RaidIntoDarkness.Effects
 
         protected override bool StartDischarge()
         {
-            AnomalyVisual09Events.Record(this, 1, 0, _dischargeEffectDelay);
             GameObject instance = Instantiate(_dischargeTemplate, transform);
-            AnomalyVisual08Target.ApplySpawned(this, instance);
             instance.name = "Discharge";
             if (_freezeDischargeAtStart)
             {
@@ -91,7 +89,6 @@ namespace RaidIntoDarkness.Effects
             float strength = active ? Mathf.Pow(Mathf.Clamp01(_lightRemaining / _dischargeLightDuration) + LIGHT_EPSILON, LIGHT_EXPONENT) : 0f;
             _dischargeLight.intensity = _dischargeLightIntensity * strength;
             _dischargeLight.range = Mathf.Max(0.001f, _dischargeLightRange * strength);
-            AnomalyVisual09Events.LightAssignment(_dischargeLight, active);
             _dischargeLight.enabled = active;
         }
 

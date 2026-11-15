@@ -3,9 +3,9 @@ using System.Reflection;
 using NUnit.Framework;
 using Unity.Collections;
 
-namespace Rvm.Benchmark.Tests
+namespace XRay.Importer.Tests
 {
-    public sealed class BenchmarkShadowLightIndexTests
+    public sealed class HdrpShadowBindingTests
     {
         private const string RESOLVER_TYPE = "UnityEngine.Rendering.HighDefinition.HDShadowLightIndexResolver, Unity.RenderPipelines.HighDefinition.Runtime";
 

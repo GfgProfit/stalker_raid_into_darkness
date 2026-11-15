@@ -1,7 +1,12 @@
 {
     "name": "Rvm.Benchmark.Editor",
     "rootNamespace": "Rvm.Benchmark.Editor",
-    "references": ["Rvm.Benchmark.Runtime"],
-    "includePlatforms": ["Editor"],
+    "references": [
+        "Rvm.Benchmark.Runtime",
+        "XRay.Importer.Editor"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
     "autoReferenced": true
 }

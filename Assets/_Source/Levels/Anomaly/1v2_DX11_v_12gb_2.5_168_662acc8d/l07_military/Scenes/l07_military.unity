@@ -278,7 +278,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 900609162}
-  - component: {fileID: 900609163}
   m_Layer: 0
   m_Name: BENCHMARK_POSITION
   m_TagString: Untagged
@@ -305,28 +304,6 @@ Transform:
   - {fileID: 458401275}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &900609163
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 900609161}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 239241b26fce31249abd29189baab708, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Rvm.Benchmark.Runtime::Rvm.Benchmark.BenchmarkRunner
-  _scenario: {fileID: 11400000, guid: 2a847a8df51cdb8439abc73b8a0e389b, type: 2}
-  _camera: {fileID: 950751326}
-  _positions:
-  - {fileID: 463081178}
-  - {fileID: 684281612}
-  - {fileID: 1911312592}
-  - {fileID: 458401275}
-  _buildGitSha: unavailable
-  _buildGitDirty: unavailable
-  _buildHdrp: unavailable
 --- !u!1 &950751324
 GameObject:
   m_ObjectHideFlags: 0

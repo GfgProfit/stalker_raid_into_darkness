@@ -1,0 +1,17 @@
+# Independent benchmark module
+
+All campaign runtime, Editor tooling, scenarios, experimental routes, assets and registrations are owned by `Assets/_BENCHMARK` and its sibling `.meta`. Dependencies point from these assemblies to game assemblies. Ordinary scenes contain no benchmark components.
+
+`CleanReleaseRoute07` and Visual08/09/Light10/Shadow11 now reside here. Low-level Visual09 event hooks have been retired from gameplay. Requesting the historical event journal fails explicitly rather than producing an incomplete old-format trace. Historical journals and the original package diagnostics payload remain available in Git and Archive. Particle inspection is a module-owned, separately enabled observer; it does not instrument the particle loop.
+
+The functional HDRP 17.6 shadow binding fix lives in `Assets/_Tools/X-Ray OGF OMG Importer/Editor/Rendering`. Its payload contains only the resolver and functional call-site changes. It installs no request observer, event journal or diagnostic callback. Runtime frame pacing lives in `Assets/_Source/Scripts/Utils/RuntimeFramePacing.cs`. Finite particle frame caching and MatrixHistory remain production code, with regression tests outside the module.
+
+## Reversible removal
+
+1. Preserve unsaved scenes and close every Editor for Production. Do not remove the module while Unity is importing it.
+2. Move `Assets/_BENCHMARK` and `Assets/_BENCHMARK.meta` together outside Assets into a task-owned Archive directory. Keep every `.meta` and GUID. No project-wide compile symbol or package registration is required by this module; `CLEAN_RELEASE_ROUTE07` is scoped to the route build's extra defines.
+3. Open Production, wait for Runtime and Editor compilation, and check ordinary scenes/prefabs for missing scripts and dependencies. Inspect assembly references and the actual loaded assemblies, not names alone. Run production regression tests.
+4. Build and run an ordinary non-Development Player without route-specific defines or build processors. Verify the functional HDRP resolver is present and the request diagnostics type is absent. Inspect build output and runtime errors.
+5. Restore the directory and sibling `.meta` together while the Editor is closed when measurements are still needed. For final removal leave them excluded, delete no Git history or Archive evidence, and rebuild the delivered Player.
+
+The current task exercised physical removal and built a normal Release Player successfully. Evidence is under `E:\Projects\stalker_raid_into_darkness_Archive\LocationOptimization_20261115\WithoutBenchmark`. A source inventory and the scene-detachment evidence are stored in the same task directory. Recheck the inventory after adding benchmark files or registrations.

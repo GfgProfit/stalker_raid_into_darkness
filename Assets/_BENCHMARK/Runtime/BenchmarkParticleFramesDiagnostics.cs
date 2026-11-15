@@ -23,10 +23,9 @@ namespace Rvm.Benchmark
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         private static void Reset()
         {
-            AnomalyParticleFrames.ParticlesObserved -= Observe;
+            ParticleFrameDiagnosticObserver.ParticlesObserved -= Observe;
             BenchmarkRunner.Completed -= Save;
             RenderPipelineManager.endCameraRendering -= CaptureVisual;
-            AnomalyParticleFrames.DiagnosticScopesEnabled = false;
             COMPONENTS.Clear();
             GROUPS.Clear();
             _sampleFrame = -1;
@@ -46,10 +45,10 @@ namespace Rvm.Benchmark
             {
                 return;
             }
-            AnomalyParticleFrames.DiagnosticScopesEnabled = diagnostics;
+            ParticleFrameDiagnosticObserver.Active = diagnostics;
             if (diagnostics)
             {
-                AnomalyParticleFrames.ParticlesObserved += Observe;
+                ParticleFrameDiagnosticObserver.ParticlesObserved += Observe;
             }
             if (_visual)
             {

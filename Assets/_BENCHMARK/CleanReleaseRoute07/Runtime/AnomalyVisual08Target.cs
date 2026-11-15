@@ -1,4 +1,5 @@
 using System;
+using System.Reflection;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -37,7 +38,10 @@ namespace RaidIntoDarkness.Effects
             {
                 throw new ArgumentException("AnomalyLight10 forbids the event journal.");
             }
-            AnomalyVisual09Events.Initialize(args);
+            if (Array.IndexOf(args, "-anomaly-events") >= 0)
+            {
+                throw new NotSupportedException("Visual09 low-level event hooks were retired from production. Historical journals remain in Archive.");
+            }
         }
 
         public void Configure(string family, string prefab)
@@ -56,12 +60,17 @@ namespace RaidIntoDarkness.Effects
             TARGETS.Add(this);
             if (Mode.StartsWith("Shadow11_", StringComparison.Ordinal) && TryGetComponent<AnomalyVisual>(out var shadowVisual))
             {
-                shadowVisual.ConfigureDiagnosticIdleRange(false);
-                shadowVisual.ConfigureDiagnosticIdleShadows(Mode == "Shadow11_B");
+                if (Mode == "Shadow11_B")
+                {
+                    ((Light)typeof(AnomalyVisual).GetField("_idleIllumination", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(shadowVisual)).shadows = LightShadows.None;
+                }
             }
             if (Mode.StartsWith("Light10_", StringComparison.Ordinal) && TryGetComponent<AnomalyVisual>(out var visual))
             {
-                visual.ConfigureDiagnosticIdleRange(Mode == "Light10_B");
+                if (Mode == "Light10_B")
+                {
+                    typeof(AnomalyVisual).GetField("_idleLightRangeJitter", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(visual, 0f);
+                }
             }
             AnomalyVisual09Events.RegisterTarget(this);
             foreach (var system in GetComponentsInChildren<ParticleSystem>(true))

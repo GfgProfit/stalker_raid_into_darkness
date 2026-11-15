@@ -25,7 +25,6 @@ namespace RaidIntoDarkness.Effects
 
         private bool _isVisible;
         private bool _sourceActive = true;
-        private bool _diagnosticFixedIdleRange;
 
         public bool IsVisible => _isVisible;
         public AnomalyAudio Audio => _audio;
@@ -35,19 +34,6 @@ namespace RaidIntoDarkness.Effects
 
         public event Action DischargeStarted;
         public event Action Hidden;
-
-        public void ConfigureDiagnosticIdleRange(bool fixedRange)
-        {
-            _diagnosticFixedIdleRange = fixedRange;
-        }
-
-        public void ConfigureDiagnosticIdleShadows(bool disabled)
-        {
-            if (disabled && _idleIllumination != null)
-            {
-                _idleIllumination.shadows = LightShadows.None;
-            }
-        }
 
         [ContextMenu("Visual/Show Idle")]
         public void ShowIdle()
@@ -276,7 +262,6 @@ namespace RaidIntoDarkness.Effects
         {
             if (_idleIllumination != null)
             {
-                AnomalyVisual09Events.LightAssignment(_idleIllumination, false);
                 _idleIllumination.enabled = false;
             }
             Clear(_idle);
@@ -294,13 +279,11 @@ namespace RaidIntoDarkness.Effects
         {
             if (_idleIllumination != null)
             {
-                AnomalyVisual09Events.LightAssignment(_idleIllumination, _isVisible && isActiveAndEnabled);
                 _idleIllumination.enabled = _isVisible && isActiveAndEnabled;
                 UpdateIdleLight(Time.time);
             }
             if (_idle != null && _isVisible && isActiveAndEnabled && _idle.isPlaying == false)
             {
-                AnomalyVisual09Events.Record(this, 2, 0, 0.0, _idle);
                 _idle.Play(_playIdleChildren);
             }
         }
@@ -318,7 +301,7 @@ namespace RaidIntoDarkness.Effects
             if (_idleLightRange > 0f)
             {
                 float range = Mathf.Max(0.001f, _idleLightRange + _idleLightRangeJitter * UnityEngine.Random.Range(-1f, 1f));
-                _idleIllumination.range = _diagnosticFixedIdleRange ? Mathf.Max(0.001f, _idleLightRange) : range;
+                _idleIllumination.range = range;
             }
         }
     }

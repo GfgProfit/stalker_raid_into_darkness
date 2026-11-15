@@ -15,20 +15,17 @@ namespace RaidIntoDarkness.Effects
 
         private static long _clock;
 
-        internal static bool UseReference { get; set; }
-
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         private static void Reset()
         {
             CACHE.Clear();
             _clock = 0;
-            UseReference = false;
         }
 
         internal static float Evaluate(float age, uint randomSeed, int frameCount, float framesPerSecond, bool animated, bool randomStart, bool randomPlayback)
         {
             int count = Mathf.Max(1, frameCount);
-            if (UseReference || !animated || count > MAX_FRAME_COUNT || float.IsNaN(framesPerSecond) || float.IsInfinity(framesPerSecond) || framesPerSecond < 0)
+            if (!animated || count > MAX_FRAME_COUNT || float.IsNaN(framesPerSecond) || float.IsInfinity(framesPerSecond) || framesPerSecond < 0)
             {
                 return SpatialBubbleParticleFrames.EvaluateFrame(age, randomSeed, frameCount, framesPerSecond, animated, randomStart, randomPlayback);
             }

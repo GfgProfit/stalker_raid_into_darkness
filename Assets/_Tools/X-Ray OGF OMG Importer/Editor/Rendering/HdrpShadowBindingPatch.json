@@ -1,0 +1,71 @@
+{
+  "version": 1,
+  "packageName": "com.unity.render-pipelines.high-definition",
+  "packageVersion": "17.6.0",
+  "files": [
+    {
+      "path": "Runtime/Lighting/Shadow/HDShadowAtlas.cs",
+      "create": false,
+      "originalSha256": "5b3e4bfa3111778c2d1f2f8e5fb3d36ed7a435ee22084ea182a8675185600e2c",
+      "patchedSha256": "83de3241b7b051f554a0438b7080d814c977bcd0ea907ea3446779e30abd5dcb",
+      "edits": [
+        {
+          "find": "            public bool debugClearAtlas;\n            public ScriptableRenderContext renderContext;\n\n            // Read-only reference to the per-frame dataIndex -> lightIndex map built by HDShadowManager.\n            // Do NOT dispose here. Lifetime is managed by HDShadowManager.\n            public NativeHashMap<int, int> dataIndexToLightIndex;\n        }\n\n",
+          "replace": "            public bool debugClearAtlas;\n            public ScriptableRenderContext renderContext;\n\n            // Read-only reference to the per-frame dataIndex -> lightIndex map built by HDShadowManager.\n            // Do NOT dispose here. Lifetime is managed by HDShadowManager.\n            public NativeHashMap<int, int> dataIndexToLightIndex;\n            public NativeArray<int> VisibleLightEntityIndices { get; set; }\n        }\n\n"
+        },
+        {
+          "find": "        }\n#endif\n        internal unsafe TextureHandle RenderShadowMaps(\n            RenderGraph renderGraph, ScriptableRenderContext renderContext,\n            CullingResults cullResults, NativeHashMap<int, int> dataIndexToLightIndex,\n            in ShaderVariablesGlobal globalCBData, FrameSettings frameSettings, string shadowPassName)\n        {\n            TextureHandle atlasTexture;\n",
+          "replace": "        }\n#endif\n        internal unsafe TextureHandle RenderShadowMaps(RenderGraph renderGraph, ScriptableRenderContext renderContext, CullingResults cullResults, NativeHashMap<int, int> dataIndexToLightIndex, NativeArray<int> visibleLightEntityIndices, in ShaderVariablesGlobal globalCBData, FrameSettings frameSettings, string shadowPassName)\n        {\n            TextureHandle atlasTexture;\n"
+        },
+        {
+          "find": "                passData.shadowDrawSettings.useRenderingLayerMaskTest = frameSettings.IsEnabled(FrameSettingsField.LightLayers);\n                passData.renderContext = renderContext;\n                passData.dataIndexToLightIndex = dataIndexToLightIndex;\n\n                builder.SetRenderFunc(\n",
+          "replace": "                passData.shadowDrawSettings.useRenderingLayerMaskTest = frameSettings.IsEnabled(FrameSettingsField.LightLayers);\n                passData.renderContext = renderContext;\n                passData.dataIndexToLightIndex = dataIndexToLightIndex;\n                passData.VisibleLightEntityIndices = visibleLightEntityIndices;\n\n                builder.SetRenderFunc(\n"
+        },
+        {
+          "find": "                            ref var shadowRequest = ref requestStorageUnsafe.ElementAt(shadowRequestHandle.storageIndexForShadowRequest);\n\n                            if (!data.dataIndexToLightIndex.TryGetValue(shadowRequest.dataIndex, out int currentCorrectIndex))\n                                continue;\n\n                            var commonState = CommonPerShadowRequestUpdate(natCmd, data, shadowRequest, shadowRequestHandle, ref planesScratchpad, ref frustumPlanesStorageUnsafe);\n",
+          "replace": "                            ref var shadowRequest = ref requestStorageUnsafe.ElementAt(shadowRequestHandle.storageIndexForShadowRequest);\n\n                            if (!data.dataIndexToLightIndex.TryGetValue(shadowRequest.dataIndex, out int currentCorrectIndex))\n                                continue;\n\n                            currentCorrectIndex = HDShadowLightIndexResolver.Resolve(shadowRequest.dataIndex, shadowRequest.lightIndex, currentCorrectIndex, data.VisibleLightEntityIndices, data.shadowDrawSettings.cullingResults.visibleLights.Length);\n\n                            var commonState = CommonPerShadowRequestUpdate(natCmd, data, shadowRequest, shadowRequestHandle, ref planesScratchpad, ref frustumPlanesStorageUnsafe);\n"
+        },
+        {
+          "find": "            }\n        }\n        internal TextureHandle RenderShadows(\n            RenderGraph renderGraph, ScriptableRenderContext renderContext,\n            CullingResults cullResults, NativeHashMap<int, int> dataIndexToLightIndex,\n            in ShaderVariablesGlobal globalCB, FrameSettings frameSettings, string shadowPassName)\n        {\n            if (m_ShadowRequests.Length == 0)\n",
+          "replace": "            }\n        }\n        internal TextureHandle RenderShadows(RenderGraph renderGraph, ScriptableRenderContext renderContext, CullingResults cullResults, NativeHashMap<int, int> dataIndexToLightIndex, NativeArray<int> visibleLightEntityIndices, in ShaderVariablesGlobal globalCB, FrameSettings frameSettings, string shadowPassName)\n        {\n            if (m_ShadowRequests.Length == 0)\n"
+        },
+        {
+          "find": "            }\n\n            RenderShadowMaps(renderGraph, renderContext, cullResults, dataIndexToLightIndex, globalCB, frameSettings, shadowPassName);\n\n            if (m_BlurAlgorithm == BlurAlgorithm.EVSM)\n",
+          "replace": "            }\n\n            RenderShadowMaps(renderGraph, renderContext, cullResults, dataIndexToLightIndex, visibleLightEntityIndices, globalCB, frameSettings, shadowPassName);\n\n            if (m_BlurAlgorithm == BlurAlgorithm.EVSM)\n"
+        }
+      ]
+    },
+    {
+      "path": "Runtime/Lighting/Shadow/HDShadowManager.cs",
+      "create": false,
+      "originalSha256": "fcda43605bf62669408c568a7b54967fde40de4768980f003b57e2e63985ea28",
+      "patchedSha256": "7a3a763f1f829ba1c5985a9fad13c7bbc662b074cc620fa2984e14d1cc0f1979",
+      "edits": [
+        {
+          "find": "        private void BuildDataIndexToLightIndexMap(NativeArray<int> visibleLightEntityIndices, int visibleLightCount)\n        {\n            m_DataIndexToLightIndexMap.Clear();\n\n            if (m_DataIndexToLightIndexMap.Capacity < visibleLightCount)\n            {\n                m_DataIndexToLightIndexMap.Capacity = visibleLightCount;\n            }\n\n            for (var i = 0; i < visibleLightCount; i++)\n            {\n                var dataIndex = visibleLightEntityIndices[i];\n                if (dataIndex >= 0)\n                    m_DataIndexToLightIndexMap[dataIndex] = i;\n            }\n        }\n\n",
+          "replace": "        private void BuildDataIndexToLightIndexMap(NativeArray<int> visibleLightEntityIndices, int visibleLightCount)\n        {\n            HDShadowLightIndexResolver.BuildMap(visibleLightEntityIndices, visibleLightCount, ref m_DataIndexToLightIndexMap);\n        }\n\n"
+        },
+        {
+          "find": "\n                // Punctual\n                result.cachedPunctualShadowResult = cachedShadowManager.punctualShadowAtlas.RenderShadows(renderGraph, renderContext, cullResults, m_DataIndexToLightIndexMap, globalCB, hdCamera.frameSettings, \"Render Cached Punctual Lights Shadow Maps\");\n                BlitCachedShadows(renderGraph, ShadowMapType.PunctualAtlas);\n                result.punctualShadowResult = m_Atlas.RenderShadows(renderGraph, renderContext, cullResults, m_DataIndexToLightIndexMap, globalCB, hdCamera.frameSettings, \"Render Punctual Lights Shadow Maps\");\n\n                if (ShaderConfig.s_AreaLights == 1)\n                {\n                    cachedShadowManager.areaShadowAtlas.RenderShadowMaps(renderGraph, renderContext, cullResults, m_DataIndexToLightIndexMap, globalCB, hdCamera.frameSettings, \"Render Cached Area Lights Shadow Maps\");\n                    BlitCachedShadows(renderGraph, ShadowMapType.AreaLightAtlas);\n                    m_AreaLightShadowAtlas.RenderShadowMaps(renderGraph, renderContext, cullResults, m_DataIndexToLightIndexMap, globalCB, hdCamera.frameSettings, \"Render Area Light Shadow Maps\");\n                    result.areaShadowResult = m_AreaLightShadowAtlas.BlurShadows(renderGraph);\n                    result.cachedAreaShadowResult = cachedShadowManager.areaShadowAtlas.BlurShadows(renderGraph);\n",
+          "replace": "\n                // Punctual\n                result.cachedPunctualShadowResult = cachedShadowManager.punctualShadowAtlas.RenderShadows(renderGraph, renderContext, cullResults, m_DataIndexToLightIndexMap, visibleLightEntityIndices, globalCB, hdCamera.frameSettings, \"Render Cached Punctual Lights Shadow Maps\");\n                BlitCachedShadows(renderGraph, ShadowMapType.PunctualAtlas);\n                result.punctualShadowResult = m_Atlas.RenderShadows(renderGraph, renderContext, cullResults, m_DataIndexToLightIndexMap, visibleLightEntityIndices, globalCB, hdCamera.frameSettings, \"Render Punctual Lights Shadow Maps\");\n\n                if (ShaderConfig.s_AreaLights == 1)\n                {\n                    cachedShadowManager.areaShadowAtlas.RenderShadowMaps(renderGraph, renderContext, cullResults, m_DataIndexToLightIndexMap, visibleLightEntityIndices, globalCB, hdCamera.frameSettings, \"Render Cached Area Lights Shadow Maps\");\n                    BlitCachedShadows(renderGraph, ShadowMapType.AreaLightAtlas);\n                    m_AreaLightShadowAtlas.RenderShadowMaps(renderGraph, renderContext, cullResults, m_DataIndexToLightIndexMap, visibleLightEntityIndices, globalCB, hdCamera.frameSettings, \"Render Area Light Shadow Maps\");\n                    result.areaShadowResult = m_AreaLightShadowAtlas.BlurShadows(renderGraph);\n                    result.cachedAreaShadowResult = cachedShadowManager.areaShadowAtlas.BlurShadows(renderGraph);\n"
+        },
+        {
+          "find": "                    {\n                        cachedShadowManager.UpdateDirectionalCacheTexture(renderGraph);\n                        cachedShadowManager.directionalLightAtlas.RenderShadows(renderGraph, renderContext, cullResults, m_DataIndexToLightIndexMap, globalCB, hdCamera.frameSettings, \"Render Cached Directional Lights Shadow Maps\");\n                    }\n                    BlitCachedShadows(renderGraph, ShadowMapType.CascadedDirectional);\n                }\n                result.directionalShadowResult = m_CascadeAtlas.RenderShadows(renderGraph, renderContext, cullResults, m_DataIndexToLightIndexMap, globalCB, hdCamera.frameSettings, \"Render Directional Light Shadow Maps\");\n            }\n\n",
+          "replace": "                    {\n                        cachedShadowManager.UpdateDirectionalCacheTexture(renderGraph);\n                        cachedShadowManager.directionalLightAtlas.RenderShadows(renderGraph, renderContext, cullResults, m_DataIndexToLightIndexMap, visibleLightEntityIndices, globalCB, hdCamera.frameSettings, \"Render Cached Directional Lights Shadow Maps\");\n                    }\n                    BlitCachedShadows(renderGraph, ShadowMapType.CascadedDirectional);\n                }\n                result.directionalShadowResult = m_CascadeAtlas.RenderShadows(renderGraph, renderContext, cullResults, m_DataIndexToLightIndexMap, visibleLightEntityIndices, globalCB, hdCamera.frameSettings, \"Render Directional Light Shadow Maps\");\n            }\n\n"
+        }
+      ]
+    },
+    {
+      "path": "Runtime/Lighting/Shadow/HDShadowLightIndexResolver.cs",
+      "create": true,
+      "patchedSha256": "1ae5641c915a7da004d3b124a47900d97f18a0f013897faa074f3a2127e50e4b",
+      "content": "using System;\nusing Unity.Collections;\n\nnamespace UnityEngine.Rendering.HighDefinition\n{\n    internal static class HDShadowLightIndexResolver\n    {\n        private const int AMBIGUOUS_LIGHT_INDEX = -1;\n\n        internal static void BuildMap(NativeArray<int> visibleLightEntityIndices, int visibleLightCount, ref NativeHashMap<int, int> map)\n        {\n            map.Clear();\n            if (map.Capacity < visibleLightCount)\n            {\n                map.Capacity = visibleLightCount;\n            }\n            for (int index = 0; index < visibleLightCount; index++)\n            {\n                int dataIndex = visibleLightEntityIndices[index];\n                if (dataIndex >= 0 && !map.TryAdd(dataIndex, index))\n                {\n                    map[dataIndex] = AMBIGUOUS_LIGHT_INDEX;\n                }\n            }\n        }\n\n        internal static int Resolve(int dataIndex, int requestLightIndex, int mappedLightIndex, NativeArray<int> visibleLightEntityIndices, int visibleLightCount)\n        {\n            if (mappedLightIndex >= 0)\n            {\n                return mappedLightIndex;\n            }\n            if (mappedLightIndex != AMBIGUOUS_LIGHT_INDEX || requestLightIndex < 0 || requestLightIndex >= visibleLightCount || requestLightIndex >= visibleLightEntityIndices.Length || visibleLightEntityIndices[requestLightIndex] != dataIndex)\n            {\n                throw new InvalidOperationException(\"Ambiguous shadow light mapping has no matching original native light index. Entity data index: \" + dataIndex + \"; request light index: \" + requestLightIndex + \".\");\n            }\n            return requestLightIndex;\n        }\n    }\n\n}\n"
+    },
+    {
+      "path": "Runtime/Lighting/Shadow/HDShadowLightIndexResolver.cs.meta",
+      "create": true,
+      "patchedSha256": "27a72c270b6346dfa2dbe8f7a1a1dfdbdb343ae4866a67996bad7aa2e5f95b74",
+      "content": "fileFormatVersion: 2\nguid: e03ae1948b4d4cce95a6a5b6af3c103b\n"
+    }
+  ]
+}

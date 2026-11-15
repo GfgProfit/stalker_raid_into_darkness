@@ -31,7 +31,7 @@ namespace Rvm.Benchmark
                 return;
             }
             _next = Time.realtimeSinceStartupAsDouble + 1;
-            foreach (var component in FindObjectsByType<AnomalyParticleFrames>(FindObjectsSortMode.None))
+            foreach (var component in FindObjectsByType<AnomalyParticleFrames>())
             {
                 var particles = (ParticleSystem.Particle[])PARTICLES.GetValue(component);
                 var system = component.GetComponent<ParticleSystem>();

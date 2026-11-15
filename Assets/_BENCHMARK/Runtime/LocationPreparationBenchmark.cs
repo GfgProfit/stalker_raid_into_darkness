@@ -28,6 +28,8 @@ namespace Rvm.Benchmark
         private Vector3 _lastPosition;
         private Quaternion _lastRotation;
         private int _pose;
+        private double _poseChangedAt;
+        private bool _posePending;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void Install()
@@ -44,7 +46,7 @@ namespace Rvm.Benchmark
             }
             string output = BenchmarkOutput.ValidateDirectory(Argument(args, "-preparation-output", Argument(args, "-clean-route-output", null)));
             Directory.CreateDirectory(output);
-            var renderers = FindObjectsByType<XRayLevelInstancedRenderer>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+            var renderers = FindObjectsByType<XRayLevelInstancedRenderer>(FindObjectsInactive.Include);
             var sets = new HashSet<XRayInstanceBatchSet>();
             var evidence = new ModeEvidence { mode = mode, unity = Application.unityVersion, debugBuild = UnityEngine.Debug.isDebugBuild, renderers = renderers.Length, cameraCountAtStartup = Camera.allCamerasCount };
             foreach (var renderer in renderers)
@@ -90,14 +92,24 @@ namespace Rvm.Benchmark
 
         private void Capture(ScriptableRenderContext context, Camera camera)
         {
-            if (camera.cameraType != CameraType.Game || _hasPose && camera.transform.position == _lastPosition && camera.transform.rotation == _lastRotation)
+            if (camera.cameraType != CameraType.Game)
             {
                 return;
             }
-            _lastPosition = camera.transform.position;
-            _lastRotation = camera.transform.rotation;
-            _hasPose = true;
-            var report = new PoseEvidence { position = _lastPosition, rotation = _lastRotation, camera = camera.name, managedBytes = GC.GetTotalMemory(false), allocatedBytes = Profiler.GetTotalAllocatedMemoryLong(), reservedBytes = Profiler.GetTotalReservedMemoryLong() };
+            if (!_hasPose || camera.transform.position != _lastPosition || camera.transform.rotation != _lastRotation)
+            {
+                _lastPosition = camera.transform.position;
+                _lastRotation = camera.transform.rotation;
+                _hasPose = true;
+                _poseChangedAt = Time.realtimeSinceStartupAsDouble;
+                _posePending = true;
+            }
+            if (!_posePending || Time.realtimeSinceStartupAsDouble - _poseChangedAt < 1)
+            {
+                return;
+            }
+            _posePending = false;
+            var report = new PoseEvidence { position = _lastPosition, rotation = _lastRotation, camera = camera.name, unityFrame = Time.frameCount, secondsAfterPoseChange = Time.realtimeSinceStartupAsDouble - _poseChangedAt, managedBytes = GC.GetTotalMemory(false), allocatedBytes = Profiler.GetTotalAllocatedMemoryLong(), reservedBytes = Profiler.GetTotalReservedMemoryLong() };
             foreach (var renderer in _renderers)
             {
                 report.visibleBatches += renderer.LastVisibleBatches;
@@ -139,6 +151,7 @@ namespace Rvm.Benchmark
                     results.samples.Add(Measure(renderer, observe, "A2", false));
                     VERSION.SetValue(renderer.BatchSet, XRayInstanceBatchSet.MATRIX_PREPARATION_VERSION);
                 }
+                results.routeOverhead = RouteOverheadBenchmark.Measure();
                 BenchmarkOutput.WriteJson(Path.Combine(_output, "history-work.json"), results);
                 Application.Quit(0);
             }
@@ -207,6 +220,7 @@ namespace Rvm.Benchmark
         {
             public string scope = "Separate Release Player CPU microbenchmark of real production History with compiled delegates. No culling, submissions, GPU or elapsed frame time claim. Warmed buffers; fixed Unity frame; A1 B1 B2 A2; expression compilation excluded.";
             public List<WorkSample> samples = new List<WorkSample>();
+            public List<RouteOverheadBenchmark.Sample> routeOverhead = new List<RouteOverheadBenchmark.Sample>();
         }
 
         [Serializable]
@@ -215,6 +229,8 @@ namespace Rvm.Benchmark
             public Vector3 position;
             public Quaternion rotation;
             public string camera;
+            public int unityFrame;
+            public double secondsAfterPoseChange;
             public int visibleBatches;
             public int visibleInstances;
             public int shadowOnlyBatches;

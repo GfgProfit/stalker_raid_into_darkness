@@ -222,6 +222,20 @@ namespace XRay.Importer.Editor.Levels
                 Debug.LogError($"[X-Ray Level] Import of '{LevelName}' failed at '{Stage}': {exception}");
             }
 
+            if (state == XRayLevelJobState.Completed)
+            {
+                try
+                {
+                    _record.SetMetric("MatrixPreparationUpdatedSets", XRayInstancePreparation.UpdateDependencies(_record.PrefabPath, _record.ScenePath));
+                }
+                catch (Exception preparationException)
+                {
+                    state = XRayLevelJobState.Failed;
+                    _record.Errors.Add("Matrix preparation: " + preparationException.Message);
+                    Debug.LogError("[X-Ray Level] Matrix preparation failed for '" + LevelName + "': " + preparationException);
+                }
+            }
+
             _record.Completed = state == XRayLevelJobState.Completed;
             _record.Cancelled = state == XRayLevelJobState.Cancelled;
             _record.SetMetric("ImportSeconds", _total.Elapsed.TotalSeconds);
@@ -1379,6 +1393,7 @@ namespace XRay.Importer.Editor.Levels
             }
 
             set.Initialize(_entry.Name, cellSize, batches, lodSet);
+            XRayInstancePreparation.Ensure(set);
             if (created)
             {
                 AssetDatabase.CreateAsset(set, setPath);

@@ -208,7 +208,7 @@ namespace XRay.Importer.Levels
                             properties = _submissionBlock;
                         }
                         var parameters = new RenderParams(material) { camera = camera, worldBounds = bounds, motionVectorMode = MotionVectorGenerationMode.ForceNoMotion, layer = gameObject.layer, shadowCastingMode = ShadowCastingMode.Off, receiveShadows = true, matProps = properties };
-                        Graphics.RenderMeshInstanced(parameters, batch.Mesh, submesh, batch.Matrices, count, start);
+                        Graphics.RenderMeshInstanced(parameters, batch.Mesh, submesh, batch.RenderMatrices, count, start);
                         submitted = true;
                     }
                 }
@@ -331,10 +331,17 @@ namespace XRay.Importer.Levels
         {
             while (_histories.Count <= index) _histories.Add(null);
             InstanceHistory history = _histories[index];
-            if (history == null || !ReferenceEquals(history.Source, batch) || history.Instances.Length != batch.Count)
+            int revision = _batchSet != null ? _batchSet.MatrixRevision : 0;
+            if (history == null || !ReferenceEquals(history.Source, batch) || history.Instances.Length != batch.Count || history.Revision != revision)
             {
-                history = new InstanceHistory(batch);
+                history = new InstanceHistory(batch, revision);
                 _histories[index] = history;
+            }
+            if (_batchSet != null && _batchSet.HasPreparedMatrices && !batch.MatricesExposed)
+            {
+                history.Frame = Time.frameCount;
+                history.Moving = false;
+                return history;
             }
             bool advance = history.Frame != Time.frameCount;
             history.Moving = false;
@@ -342,7 +349,7 @@ namespace XRay.Importer.Levels
             {
                 ref InstanceData instance = ref history.Instances[i];
                 if (advance) instance.prevObjectToWorld = instance.objectToWorld;
-                instance.objectToWorld = batch.Matrices[i];
+                instance.objectToWorld = batch.RenderMatrices[i];
                 history.Moving |= !Same(in instance.objectToWorld, in instance.prevObjectToWorld);
             }
             history.Frame = Time.frameCount;
@@ -368,14 +375,16 @@ namespace XRay.Importer.Levels
 
         private sealed class InstanceHistory
         {
-            public InstanceHistory(XRayInstanceBatch source)
+            public InstanceHistory(XRayInstanceBatch source, int revision)
             {
                 Source = source;
+                Revision = revision;
                 Instances = new InstanceData[source.Count];
-                for (int i = 0; i < source.Count; i++) Instances[i] = new InstanceData(source.Matrices[i], source.Matrices[i]);
+                for (int i = 0; i < source.Count; i++) Instances[i] = new InstanceData(source.GetMatrix(i), source.GetMatrix(i));
             }
 
             public XRayInstanceBatch Source { get; }
+            public int Revision { get; }
             public InstanceData[] Instances { get; }
             public int Frame { get; set; } = -1;
             public bool Moving { get; set; }

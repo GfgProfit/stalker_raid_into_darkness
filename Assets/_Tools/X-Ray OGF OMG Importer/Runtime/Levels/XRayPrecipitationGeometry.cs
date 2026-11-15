@@ -105,7 +105,7 @@ namespace XRay.Importer.Levels
                             signature = signature * 31 + batch.Bounds.GetHashCode();
                             signature = signature * 31 + batch.Count;
                             foreach (Material material in batch.Materials) signature = MaterialSignature(signature, ResolveMaterial(renderer, material));
-                            foreach (Matrix4x4 matrix in batch.Matrices) signature = signature * 31 + matrix.GetHashCode();
+                            foreach (Matrix4x4 matrix in batch.RenderMatrices) signature = signature * 31 + matrix.GetHashCode();
                         }
                     }
                 }
@@ -212,7 +212,7 @@ namespace XRay.Importer.Levels
                             {
                                 int count = Mathf.Min(XRayInstanceBatchSet.MAX_INSTANCES_PER_BATCH, batch.Count - start);
                                 var matrices = new Matrix4x4[count];
-                                Array.Copy(batch.Matrices, start, matrices, 0, count);
+                                Array.Copy(batch.RenderMatrices, start, matrices, 0, count);
                                 _instancedDraws.Add(new InstancedDraw(batch.Mesh, submesh, properties, matrices));
                                 InstancedInstanceCount += count;
                             }

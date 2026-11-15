@@ -15,7 +15,13 @@ namespace XRay.Importer.Editor.Levels
         public static bool Ensure(XRayInstanceBatchSet set)
         {
             if (Application.isPlaying) return false;
-            string signature = InputSignature(set);
+            return Ensure(set, XRayInstancePreparation.InputSignature(set));
+        }
+
+        internal static bool Ensure(XRayInstanceBatchSet set, string matrixSignature)
+        {
+            if (Application.isPlaying) return false;
+            string signature = InputSignature(set, matrixSignature);
             if (set.GroupingVersion == XRayInstanceBatchSet.GROUPING_VERSION && set.GroupingSignature == signature) return false;
             set.InvalidateSubmissionGroups();
             List<XRayInstanceBatchGroup> groups = Build(set);
@@ -72,13 +78,18 @@ namespace XRay.Importer.Editor.Levels
 
         public static string InputSignature(XRayInstanceBatchSet set)
         {
+            return InputSignature(set, XRayInstancePreparation.InputSignature(set));
+        }
+
+        internal static string InputSignature(XRayInstanceBatchSet set, string matrixSignature)
+        {
             using var buffer = new MemoryStream();
             using (var writer = new BinaryWriter(buffer, System.Text.Encoding.UTF8, true))
             {
                 writer.Write(XRayInstanceBatchSet.GROUPING_VERSION);
                 writer.Write(CELL_SPAN);
                 writer.Write(XRayInstanceBatchSet.MAX_GROUP_INSTANCES);
-                writer.Write(XRayInstancePreparation.InputSignature(set));
+                writer.Write(matrixSignature);
                 var references = new Dictionary<UnityEngine.Object, string>();
                 WriteReference(writer, set.Lods, references);
                 foreach (var batch in set.Batches)

@@ -873,6 +873,7 @@ MonoBehaviour:
   - {fileID: 6078549365028983878}
   - {fileID: 3712310903681097917}
   - {fileID: -527319517275055244}
+  - {fileID: 5858158323802429317}
 --- !u!114 &262110150527044806
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -1535,6 +1536,92 @@ MonoBehaviour:
   proceduralSoftness:
     m_OverrideState: 1
     m_Value: 0.5
+--- !u!114 &5858158323802429317
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 222cdaae67a94b3f95a5ef526d34dcc9, type: 3}
+  m_Name: XRayWeatherSkySettings
+  m_EditorClassIdentifier: XRay.Importer.Runtime::XRay.Importer.Levels.XRayWeatherSkySettings
+  active: 1
+  rotation:
+    m_OverrideState: 1
+    m_Value: 0
+  skyIntensityMode:
+    m_OverrideState: 1
+    m_Value: 0
+  exposure:
+    m_OverrideState: 1
+    m_Value: 0
+  multiplier:
+    m_OverrideState: 1
+    m_Value: 1
+  upperHemisphereLuxValue:
+    m_OverrideState: 1
+    m_Value: 1
+  upperHemisphereLuxColor:
+    m_OverrideState: 1
+    m_Value: {x: 0, y: 0, z: 0}
+  desiredLuxValue:
+    m_OverrideState: 1
+    m_Value: 20000
+  updateMode:
+    m_OverrideState: 1
+    m_Value: 0
+  updatePeriod:
+    m_OverrideState: 1
+    m_Value: 0
+  includeSunInBaking:
+    m_OverrideState: 1
+    m_Value: 0
+  _useHdrpIntensity:
+    m_OverrideState: 1
+    m_Value: 0
+  _nightAmbient:
+    m_OverrideState: 1
+    m_Value: {r: 0, g: 0, b: 0, a: 1}
+  _nightWeight:
+    m_OverrideState: 1
+    m_Value: 0
+  _nightDiffuseMultiplier:
+    m_OverrideState: 1
+    m_Value: 1
+  _nightTransitionHours:
+    m_OverrideState: 1
+    m_Value: {x: 4, y: 7, z: 19, w: 22}
+  _sky0:
+    m_OverrideState: 1
+    m_Value: {fileID: 0}
+    dimension: 1
+  _sky1:
+    m_OverrideState: 1
+    m_Value: {fileID: 0}
+    dimension: 1
+  _sky2:
+    m_OverrideState: 1
+    m_Value: {fileID: 0}
+    dimension: 1
+  _sky3:
+    m_OverrideState: 1
+    m_Value: {fileID: 0}
+    dimension: 1
+  _weights:
+    m_OverrideState: 1
+    m_Value: {x: 0, y: 0, z: 0, w: 0}
+  _sourceTint:
+    m_OverrideState: 1
+    m_Value: {x: 0, y: 0, z: 0, w: 0}
+  _sourceRotation:
+    m_OverrideState: 1
+    m_Value: 0
+  _shader:
+    m_OverrideState: 1
+    m_Value: {fileID: 0}
 --- !u!114 &5950477899034056289
 MonoBehaviour:
   m_ObjectHideFlags: 3

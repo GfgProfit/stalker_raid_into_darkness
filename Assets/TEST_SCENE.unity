@@ -6842,6 +6842,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3597613614727896259, guid: 0c8cbe402baa4ee47a196114d953d7e3, type: 3}
+      propertyPath: _destination
+      value: 
+      objectReference: {fileID: 1147281852}
     - target: {fileID: 5375876459936235655, guid: 0c8cbe402baa4ee47a196114d953d7e3, type: 3}
       propertyPath: m_Name
       value: SpatialBubbleMesh

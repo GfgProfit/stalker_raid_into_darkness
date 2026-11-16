@@ -35,6 +35,8 @@ namespace Rvm.CleanReleaseRoute07
         private XRayWeatherController _weather;
         private string _output;
         private bool _timing;
+        private bool _pixDiagnostic;
+        private PixDiagnosticSession _pixSession;
         private bool _configCheck;
         private bool _running;
         private bool _started;
@@ -156,6 +158,7 @@ namespace Rvm.CleanReleaseRoute07
                 return;
             }
             controller._timing = route && !noTiming && !check;
+            controller._pixDiagnostic = PixDiagnosticPolicy.Requested(args);
             controller._configCheck = check;
             controller.enabled = true;
         }
@@ -225,6 +228,10 @@ namespace Rvm.CleanReleaseRoute07
                 _before = CaptureConditions();
                 File.WriteAllText(Path.Combine(_output, "conditions-before.json"), JsonUtility.ToJson(_before, true));
                 RequireConditions(_before);
+                if (_pixDiagnostic)
+                {
+                    _pixSession = new PixDiagnosticSession(_output, _scenario != null ? _scenario.ScenarioId : _sceneGuid, _camera, Environment.GetCommandLineArgs());
+                }
                 if (AnomalyVisual08Target.Active)
                 {
                     File.WriteAllText(Path.Combine(_output, "visual-state-before.json"), AnomalyVisual08Target.Snapshot());
@@ -274,6 +281,7 @@ namespace Rvm.CleanReleaseRoute07
             }
             if (_configCheck)
             {
+                _pixSession?.Frame(timestamp, _position, _phaseStart);
                 if (_configurationRenderFrames >= 3 && (_visualCheck == null || _visualCheck.Completed) && (_lightCheck == null || _lightCheck.Completed) && (_shadowCheck == null || _shadowCheck.Completed))
                 {
                     _endTimestamp = timestamp;
@@ -314,6 +322,14 @@ namespace Rvm.CleanReleaseRoute07
                 flags = BOUNDARY_FLAG;
             }
             Store(timestamp, flags);
+            try
+            {
+                _pixSession?.Frame(timestamp, _position, _phaseStart);
+            }
+            catch (Exception exception)
+            {
+                Fail(exception);
+            }
         }
 
         private void Store(long timestamp, int flags)
@@ -388,7 +404,7 @@ namespace Rvm.CleanReleaseRoute07
                     modules[i] = process.Modules[i].FileName;
                     string name = Path.GetFileName(modules[i]);
                     nvidiaCaptureModuleLoaded |= name.IndexOf("nvspcap", StringComparison.OrdinalIgnoreCase) >= 0;
-                    externalDiagnostics |= name.IndexOf("RTSSHooks", StringComparison.OrdinalIgnoreCase) >= 0 || name.IndexOf("FramePacingNative", StringComparison.OrdinalIgnoreCase) >= 0 || name.IndexOf("renderdoc", StringComparison.OrdinalIgnoreCase) >= 0 || name.IndexOf("WinPixGpuCapturer", StringComparison.OrdinalIgnoreCase) >= 0;
+                    externalDiagnostics |= PixDiagnosticPolicy.IsForbiddenModule(name) || PixDiagnosticPolicy.IsPixModule(name);
                 }
             }
             return new Conditions { unity = Application.unityVersion, buildGuid = Application.buildGUID, debugBuild = UnityEngine.Debug.isDebugBuild, frameTimingEnabled = FrameTimingManager.IsFeatureEnabled(), profilerEnabled = UnityEngine.Profiling.Profiler.enabled, eventJournalConfigured = AnomalyVisual09Events.Configured, oldBenchmarkAssemblyLoaded = oldBenchmark, nativeModules = modules, externalDiagnostics = externalDiagnostics, nvidiaCaptureModuleLoaded = nvidiaCaptureModuleLoaded, graphicsApi = SystemInfo.graphicsDeviceType.ToString(), quality = QualitySettings.names[QualitySettings.GetQualityLevel()], width = Screen.width, height = Screen.height, fullScreenMode = Screen.fullScreenMode.ToString(), vSyncCount = QualitySettings.vSyncCount, targetFrameRate = Application.targetFrameRate, renderFrameInterval = OnDemandRendering.renderFrameInterval, runInBackground = Application.runInBackground, focused = Application.isFocused, camera = _camera.name, cameraEnabled = _camera.isActiveAndEnabled, fieldOfView = _camera.fieldOfView, nearClip = _camera.nearClipPlane, farClip = _camera.farClipPlane, cameraAspect = _camera.aspect, cameraRect = _camera.rect, cameraPixelWidth = _camera.pixelWidth, cameraPixelHeight = _camera.pixelHeight, renderWidthScale = ScalableBufferManager.widthScaleFactor, renderHeightScale = ScalableBufferManager.heightScaleFactor, orthographic = _camera.orthographic, orthographicSize = _camera.orthographicSize, focalLength = _camera.focalLength, sensorSize = _camera.sensorSize, lensShift = _camera.lensShift, cullingMask = _camera.cullingMask, allowHdr = _camera.allowHDR, allowMsaa = _camera.allowMSAA, dynamicResolution = _camera.allowDynamicResolution, physicalCamera = _camera.usePhysicalProperties, cameraTargetIsScreen = _camera.targetTexture == null, referenceCameraSettings = _referenceCameraSettings, timeScale = Time.timeScale, fixedDeltaTime = Time.fixedDeltaTime, weather = _weather.ActiveProfile.name, weatherSeconds = _weather.GameTimeSeconds, weatherPaused = _weather.Paused, particleDiagnostics = false, rendererDiagnostics = false };
@@ -397,10 +413,8 @@ namespace Rvm.CleanReleaseRoute07
         private void RequireConditions(Conditions value)
         {
             if (_scenario != null && (value.fieldOfView != _scenario.CameraSettings.FieldOfView || value.nearClip != _scenario.CameraSettings.Near || value.farClip != _scenario.CameraSettings.Far)) throw new InvalidOperationException("Actual camera lens differs from the selected route profile.");
-            if (value.debugBuild || value.frameTimingEnabled || value.profilerEnabled || value.externalDiagnostics || value.graphicsApi != "Direct3D12" || value.quality != "High Fidelity" || value.width != 1920 || value.height != 1080 || value.cameraPixelWidth != 1920 || value.cameraPixelHeight != 1080 || value.renderWidthScale != 1.0f || value.renderHeightScale != 1.0f || value.fullScreenMode != "FullScreenWindow" || value.vSyncCount != 0 || value.targetFrameRate != -1 || value.renderFrameInterval != 1 || !value.runInBackground || !value.cameraEnabled || !value.cameraTargetIsScreen || value.particleDiagnostics || value.rendererDiagnostics || value.weather != _weatherProfile.name || !value.weatherPaused || value.weatherSeconds != (_scenario != null ? _scenario.FixedTimeHours * 3600 : 43200.0))
-            {
-                throw new InvalidOperationException("Clean Release route conditions do not match the required configuration.");
-            }
+            bool configurationValid = !value.debugBuild && !value.frameTimingEnabled && !value.profilerEnabled && !value.eventJournalConfigured && (!_pixDiagnostic || !PixDiagnosticPolicy.HasObserverArguments(Environment.GetCommandLineArgs())) && value.graphicsApi == "Direct3D12" && value.quality == "High Fidelity" && value.width == 1920 && value.height == 1080 && value.cameraPixelWidth == 1920 && value.cameraPixelHeight == 1080 && value.renderWidthScale == 1.0f && value.renderHeightScale == 1.0f && value.fullScreenMode == "FullScreenWindow" && value.vSyncCount == 0 && value.targetFrameRate == -1 && value.renderFrameInterval == 1 && value.runInBackground && value.cameraEnabled && value.cameraTargetIsScreen && !value.particleDiagnostics && !value.rendererDiagnostics && value.weather == _weatherProfile.name && value.weatherPaused && value.weatherSeconds == (_scenario != null ? _scenario.FixedTimeHours * 3600 : 43200.0);
+            PixDiagnosticPolicy.Require(_pixDiagnostic, value.externalDiagnostics, value.nativeModules, configurationValid);
         }
 
         private void Complete()
@@ -446,8 +460,12 @@ namespace Rvm.CleanReleaseRoute07
                 }
             }
             bool rendered = _configCheck ? _configurationRenderFrames >= 3 : _renderedFrames[1] > 0 && _renderedFrames[2] > 0 && _renderedFrames[3] > 0 && _renderedFrames[4] > 0;
-            bool valid = !_overflow && !_focusViolation && _runtimeErrors == 0 && rendered;
+            bool valid = !_overflow && !_focusViolation && _runtimeErrors == 0 && rendered && (_pixSession == null || !_pixSession.Overflow);
             var result = new Result { status = valid ? "completed" : "conditions-violated", configurationCheckOnly = _configCheck, timing = _timing, stopwatchFrequency = Stopwatch.Frequency, capacity = CAPACITY, samples = _count, overflow = _overflow, foregroundViolation = _focusViolation, firstFocusLostUnityFrame = _focusLostFrame, runtimeErrors = _runtimeErrors, phaseStarts = _phaseStarts, endTimestamp = _endTimestamp, renderedFrames = _renderedFrames, configurationRenderFrames = _configurationRenderFrames, positions = _positions, rotations = _rotations, warmupSeconds = WARMUP_SECONDS, positionSeconds = POSITION_SECONDS, updateExecutionOrder = -9000 };
+            result.instrumented = _pixDiagnostic;
+            result.eligibleForFpsComparison = !_pixDiagnostic;
+            result.measurementClass = _pixDiagnostic ? "pix-diagnostic" : "clean";
+            if (valid && _pixDiagnostic) result.status = "diagnostic-completed";
             File.WriteAllText(Path.Combine(_output, "result.json"), JsonUtility.ToJson(result, true));
             RestoreState();
             Application.Quit(valid ? 0 : 2);
@@ -493,14 +511,22 @@ namespace Rvm.CleanReleaseRoute07
             if (_stateRestored) return;
             try
             {
-                _cameraState?.Dispose();
-                _cameraState = null;
-                if (_weatherCaptured && _weather != null)
+                try
                 {
-                    _weatherCaptured = false;
-                    if (_weather.ActiveProfile != _savedWeather) _weather.SetProfile(_savedWeather);
-                    _weather.Seek(_savedWeatherSeconds);
-                    _weather.SetPaused(_savedWeatherPaused);
+                    _pixSession?.Dispose();
+                }
+                finally
+                {
+                    _pixSession = null;
+                    _cameraState?.Dispose();
+                    _cameraState = null;
+                    if (_weatherCaptured && _weather != null)
+                    {
+                        _weatherCaptured = false;
+                        if (_weather.ActiveProfile != _savedWeather) _weather.SetProfile(_savedWeather);
+                        _weather.Seek(_savedWeatherSeconds);
+                        _weather.SetPaused(_savedWeatherPaused);
+                    }
                 }
             }
             finally
@@ -537,6 +563,9 @@ namespace Rvm.CleanReleaseRoute07
         [Serializable]
         private sealed class Result
         {
+            public bool instrumented;
+            public bool eligibleForFpsComparison;
+            public string measurementClass;
             public string status;
             public bool configurationCheckOnly;
             public bool timing;

@@ -15,9 +15,12 @@ def main():
     parser.add_argument('--player-folder')
     parser.add_argument('--capture-position', type=int, choices=range(1, 5))
     parser.add_argument('--timing', action='store_true')
+    parser.add_argument('--no-gpu-timings', action='store_true')
     args = parser.parse_args()
     if args.timing and args.capture_position:
         raise ValueError('Use separate live timing and structural captures.')
+    if args.no_gpu_timings and not args.timing:
+        raise ValueError('CPU-only capture requires --timing.')
     spec = importlib.util.spec_from_file_location('route_driver', Path(__file__).with_name('run_benchmark.py'))
     driver = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(driver)
@@ -36,9 +39,13 @@ def main():
     command = '"' + str(pix) + '" --log-file="' + str(output / 'pixtool.log') + '" launch "' + str(executable) + '" --command-line="' + subprocess.list2cmdline(app_args) + '"'
     if args.timing:
         command += ' --timing take-new-timing-capture "' + str(output / 'timing.wpix') + '" --until-exit --sample-rate=1000 --no-gpu-memory'
+        if args.no_gpu_timings:
+            command += ' --no-gpu-timings'
     else:
         command += ' programmatic-capture --until-exit save-all-captures "' + str(output / 'Captures') + '"'
     launch = dict(arguments=command, mainSeries=False, instrumented=True, eligibleForFpsComparison=False, measurementClass='pix-diagnostic', startupActivationOnly=True, startedUtc=datetime.datetime.now(datetime.timezone.utc).isoformat())
+    launch['requestedInstrumentationProfile'] = 'cpu-only' if args.no_gpu_timings else 'full-timing' if args.timing else 'structural'
+    launch['providerReturnVerified'] = False
     log = (output / 'capture-console.txt').open('w', encoding='utf-8')
     process = subprocess.Popen(command, cwd=pix.parent, stdout=log, stderr=subprocess.STDOUT, creationflags=0x08000000)
     pid = None

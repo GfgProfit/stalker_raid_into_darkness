@@ -37,6 +37,27 @@ namespace Rvm.Benchmark.Tests
             Assert.That(PixDiagnosticPolicy.HasObserverArguments(new[] { "-batching-counters" }), Is.True);
         }
 
+        [TestCase("-batching-counters")]
+        [TestCase("-batching-capture")]
+        [TestCase("-preparation-counters")]
+        [TestCase("-preparation-capture")]
+        [TestCase("-particle-counters")]
+        [TestCase("-location-preparation")]
+        [TestCase("-location-preparation-work")]
+        [TestCase("-shadow-only-mode")]
+        [TestCase("-shadow-only-technical")]
+        [TestCase("-renderer-local")]
+        [TestCase("-particle-frames-local")]
+        [TestCase("-particle-frames-diagnostics")]
+        [TestCase("-particle-frames-visual")]
+        [TestCase("-anomaly-visual")]
+        [TestCase("-anomaly-events")]
+        public void DiagnosticRejectsOtherBenchmarkModes(string argument)
+        {
+            Assert.That(PixDiagnosticPolicy.HasObserverArguments(new[] { "-clean-route", "-benchmark-pix-diagnostic", argument }), Is.True);
+            Assert.That(PixDiagnosticPolicy.HasObserverArguments(new[] { "-clean-route", "-benchmark-pix-diagnostic", "-location-batching", "U" }), Is.False);
+        }
+
         [TestCase("debugBuild", true)]
         [TestCase("frameTimingEnabled", true)]
         [TestCase("profilerEnabled", true)]

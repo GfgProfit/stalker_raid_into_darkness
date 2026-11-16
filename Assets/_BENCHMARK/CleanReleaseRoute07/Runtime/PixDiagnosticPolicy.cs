@@ -44,7 +44,7 @@ namespace Rvm.CleanReleaseRoute07
 
         public static bool HasObserverArguments(string[] args)
         {
-            return Array.IndexOf(args, "-batching-counters") >= 0 || Array.IndexOf(args, "-batching-capture") >= 0 || Array.IndexOf(args, "-preparation-counters") >= 0 || Array.IndexOf(args, "-preparation-capture") >= 0 || Array.IndexOf(args, "-particle-counters") >= 0;
+            return Array.IndexOf(args, "-batching-counters") >= 0 || Array.IndexOf(args, "-batching-capture") >= 0 || Array.IndexOf(args, "-preparation-counters") >= 0 || Array.IndexOf(args, "-preparation-capture") >= 0 || Array.IndexOf(args, "-particle-counters") >= 0 || Array.IndexOf(args, "-location-preparation") >= 0 || Array.IndexOf(args, "-location-preparation-work") >= 0 || Array.IndexOf(args, "-shadow-only-mode") >= 0 || Array.IndexOf(args, "-shadow-only-technical") >= 0 || Array.IndexOf(args, "-renderer-local") >= 0 || Array.IndexOf(args, "-particle-frames-local") >= 0 || Array.IndexOf(args, "-particle-frames-diagnostics") >= 0 || Array.IndexOf(args, "-particle-frames-visual") >= 0 || Array.IndexOf(args, "-anomaly-visual") >= 0 || Array.IndexOf(args, "-anomaly-events") >= 0;
         }
     }
 }

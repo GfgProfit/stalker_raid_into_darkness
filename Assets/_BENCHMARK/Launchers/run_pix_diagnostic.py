@@ -25,6 +25,8 @@ def main():
     if not output.resolve().is_relative_to(driver.task):
         raise ValueError('Run output must remain in its Archive task directory.')
     output.mkdir(parents=True, exist_ok=False)
+    if args.capture_position:
+        (output / 'Captures').mkdir()
     driver.save(output / 'precheck.json', driver.precheck())
     executable = (Path(args.player_folder) if args.player_folder else driver.task / 'Player') / 'CleanRelease.exe'
     pix = Path(args.pix).resolve(strict=True)
@@ -35,7 +37,7 @@ def main():
     if args.timing:
         command += ' --timing take-new-timing-capture "' + str(output / 'timing.wpix') + '" --until-exit --sample-rate=1000 --no-gpu-memory'
     else:
-        command += ' programmatic-capture --until-exit'
+        command += ' programmatic-capture --until-exit save-all-captures "' + str(output / 'Captures') + '"'
     launch = dict(arguments=command, mainSeries=False, instrumented=True, eligibleForFpsComparison=False, measurementClass='pix-diagnostic', startupActivationOnly=True, startedUtc=datetime.datetime.now(datetime.timezone.utc).isoformat())
     log = (output / 'capture-console.txt').open('w', encoding='utf-8')
     process = subprocess.Popen(command, cwd=pix.parent, stdout=log, stderr=subprocess.STDOUT, creationflags=0x08000000)
@@ -88,8 +90,11 @@ def main():
     driver.save(output / 'exit.json', dict(toolCode=result, endedUtc=datetime.datetime.now(datetime.timezone.utc).isoformat()))
     state = json.loads((output / 'result.json').read_text(encoding='utf-8-sig')) if (output / 'result.json').exists() else {}
     valid = state.get('status') == 'diagnostic-completed' and state.get('instrumented') and state.get('eligibleForFpsComparison') is False
-    print(json.dumps(dict(run=args.label, pid=pid, toolExit=result, diagnosticCompleted=valid, structuralExists=(output/'structural.wpix').exists())))
-    return 0 if valid and result == 0 else 2
+    captures = list(output.rglob('*.wpix'))
+    capture_saved = not (args.capture_position or args.timing) or bool(captures)
+    driver.save(output / 'capture-export.json', dict(files=[str(x) for x in captures], structuralRequested=bool(args.capture_position), timingRequested=args.timing, fileSaved=capture_saved, suitabilityVerified=False))
+    print(json.dumps(dict(run=args.label, pid=pid, toolExit=result, diagnosticCompleted=valid, captureFiles=len(captures))))
+    return 0 if valid and result == 0 and capture_saved else 2
 
 if __name__ == '__main__':
     raise SystemExit(main())

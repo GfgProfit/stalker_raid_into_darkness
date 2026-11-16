@@ -4,6 +4,7 @@
     "references": [
         "Rvm.Benchmark.Runtime",
         "Rvm.Benchmark.Editor",
+        "Rvm.CleanReleaseRoute07",
         "Unity.Profiling.Core",
         "Unity.Collections",
         "RaidIntoDarkness.Effects",

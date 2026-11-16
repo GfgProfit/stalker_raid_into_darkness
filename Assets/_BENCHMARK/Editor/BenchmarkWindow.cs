@@ -209,7 +209,24 @@ namespace Rvm.Benchmark.Editor
             {
                 Execute(() => { _positions = BenchmarkRouteAuthoring.OrderedChildren(_scenario, Selection.activeTransform); BenchmarkRouteAuthoring.UpdateRoute(_scenario, _positions); });
             }
-            if (GUILayout.Button("Собрать Release с маршрутами текущей сцены")) EditorApplication.ExecuteMenuItem("Tools/RVM/Build Benchmark Release");
+            if (GUILayout.Button("Собрать Release с маршрутами текущей сцены"))
+            {
+                Execute(() =>
+                {
+                    if (stage != null && stage.scene.isDirty) throw new InvalidOperationException("Сначала сохраните authoring-prefab.");
+                    UnityEditor.SceneManagement.StageUtility.GoToMainStage();
+                    string previous = Environment.GetEnvironmentVariable("BENCHMARK_SCENE_GUID");
+                    try
+                    {
+                        Environment.SetEnvironmentVariable("BENCHMARK_SCENE_GUID", _scenario.SceneGuid);
+                        if (!EditorApplication.ExecuteMenuItem("Tools/RVM/Build Benchmark Release")) throw new InvalidOperationException("Release builder is unavailable.");
+                    }
+                    finally
+                    {
+                        Environment.SetEnvironmentVariable("BENCHMARK_SCENE_GUID", previous);
+                    }
+                });
+            }
             string release = EditorPrefs.GetString("Rvm.Benchmark.ReleaseDirectory", "");
             if (GUILayout.Button("Открыть U / G1 / обычный запуск / фиксированную серию") && Directory.Exists(release)) EditorUtility.RevealInFinder(Path.Combine(release, "Launchers"));
             EditorGUILayout.HelpBox("Release использует сохранённый профиль без объектов в игровой сцене. Перед launcher закройте Editors; launcher проверяет их отсутствие. Обновление поз требует пересборки Player.", MessageType.Info);

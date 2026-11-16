@@ -20,6 +20,8 @@ namespace Rvm.CleanReleaseRoute07.Editor
         private static bool _building;
         private static string _task;
         private static RouteReference _reference;
+        private static BenchmarkScenario[] _profiles;
+        private static string _sceneGuid;
 
         public int callbackOrder => -20000;
 
@@ -54,12 +56,23 @@ namespace Rvm.CleanReleaseRoute07.Editor
                 Directory.CreateDirectory(_task);
                 File.Copy(ROUTE_REFERENCE_PATH, referencePath);
             }
-            _reference = JsonUtility.FromJson<RouteReference>(File.ReadAllText(referencePath));
-            var scenario = AssetDatabase.LoadAssetAtPath<BenchmarkScenario>("Assets/_BENCHMARK/Scenarios/l07_military.asset");
-            if (scenario == null || scenario.ScenePath != _reference.scene || scenario.WarmupSeconds != 8 || scenario.PositionSeconds != 5 || scenario.StabilizationSeconds != 0.5)
+            _sceneGuid = Environment.GetEnvironmentVariable("BENCHMARK_SCENE_GUID");
+            if (string.IsNullOrEmpty(_sceneGuid)) _sceneGuid = AssetDatabase.AssetPathToGUID(SceneManager.GetActiveScene().path);
+            string scenePath = AssetDatabase.GUIDToAssetPath(_sceneGuid);
+            var profiles = new List<BenchmarkScenario>();
+            foreach (string guid in AssetDatabase.FindAssets("t:BenchmarkScenario", new[] { "Assets/_BENCHMARK" }))
             {
-                throw new InvalidOperationException("Original scenario differs from required route.");
+                var candidate = AssetDatabase.LoadAssetAtPath<BenchmarkScenario>(AssetDatabase.GUIDToAssetPath(guid));
+                if (candidate.SceneGuid != _sceneGuid) continue;
+                string error = candidate.ValidateRoute(_sceneGuid);
+                if (error != null || candidate.WarmupSeconds != 8 || candidate.PositionSeconds != 5 || candidate.StabilizationSeconds != 0.5 || !candidate.FixedWeatherTime) throw new InvalidOperationException(error ?? "Route does not match the fixed Release protocol.");
+                profiles.Add(candidate);
             }
+            if (profiles.Count == 0) throw new InvalidOperationException("No verified benchmark route is available for the selected scene GUID: " + _sceneGuid);
+            profiles.Sort((a, b) => string.CompareOrdinal(a.ScenarioId, b.ScenarioId));
+            _profiles = profiles.ToArray();
+            foreach (var profile in _profiles) BenchmarkScenario.SelectRoute(_profiles, profile.ScenarioId, _sceneGuid);
+            _reference = new RouteReference { scene = scenePath };
             var loadedScene = EditorSceneManager.OpenScene(_reference.scene, OpenSceneMode.Single);
             ValidateSourceScene(loadedScene);
             if (Environment.GetEnvironmentVariable("ANOMALY_VISUAL08") == "1")
@@ -101,6 +114,8 @@ namespace Rvm.CleanReleaseRoute07.Editor
                 {
                     throw new BuildFailedException("Clean Release build did not succeed.");
                 }
+                BenchmarkReleaseLaunchers.Write(_task, _profiles);
+                EditorPrefs.SetString("Rvm.Benchmark.ReleaseDirectory", _task);
                 var payload = JsonUtility.FromJson<PatchPayload>(File.ReadAllText("Assets/_Tools/X-Ray OGF OMG Importer/Editor/Rendering/HdrpShadowBindingPatch.json"));
                 string package = UnityEditor.PackageManager.PackageInfo.FindForAssetPath("Packages/com.unity.render-pipelines.high-definition").resolvedPath;
                 var files = new List<PatchEvidence>();
@@ -154,7 +169,7 @@ namespace Rvm.CleanReleaseRoute07.Editor
                 }
                 foreach (var candidate in root.GetComponentsInChildren<Camera>(true))
                 {
-                    if (candidate.name == "Level Camera")
+                    if (candidate.isActiveAndEnabled && candidate.cameraType == CameraType.Game)
                     {
                         if (camera != null)
                         {
@@ -197,15 +212,26 @@ namespace Rvm.CleanReleaseRoute07.Editor
             var rotations = new Quaternion[4];
             for (int i = 0; i < 4; i++)
             {
-                positions[i] = _reference.positions[i].position;
-                rotations[i] = _reference.positions[i].rotation;
+                positions[i] = _profiles[0].Position(i);
+                rotations[i] = _profiles[0].Rotation(i);
             }
-            var profile = AssetDatabase.LoadAssetAtPath<XRay.Importer.Levels.XRayWeatherProfile>("Assets/_Source/Levels/Anomaly/1v2_DX11_v_12gb_2.5_168_662acc8d/WeatherProfiles/2e431903b176_01232f8a/w_foggy3.asset");
+            XRay.Importer.Levels.XRayWeatherProfile profile = null;
+            foreach (string guid in AssetDatabase.FindAssets("t:XRayWeatherProfile"))
+            {
+                var candidate = AssetDatabase.LoadAssetAtPath<XRay.Importer.Levels.XRayWeatherProfile>(AssetDatabase.GUIDToAssetPath(guid));
+                if (candidate.name != _profiles[0].ExpectedWeatherProfile) continue;
+                if (profile != null) throw new BuildFailedException("Ambiguous benchmark weather profile.");
+                profile = candidate;
+            }
             if (profile == null)
             {
                 throw new BuildFailedException("Exact historical w_foggy3 asset is unavailable.");
             }
-            camera.gameObject.AddComponent<CleanReleaseRouteController>().Configure(camera, positions, rotations, _reference.cameraSettings, profile);
+            foreach (var route in _profiles)
+            {
+                if (route.ExpectedWeatherProfile != profile.name) throw new BuildFailedException("Routes in one Player must use the same weather profile.");
+            }
+            camera.gameObject.AddComponent<CleanReleaseRouteController>().ConfigureProfiles(camera, _profiles, _sceneGuid, profile);
             if (Environment.GetEnvironmentVariable("ANOMALY_VISUAL08") == "1")
             {
                 AnomalyVisual08Build.Prepare(scene, _task);
@@ -218,7 +244,7 @@ namespace Rvm.CleanReleaseRoute07.Editor
         {
             Camera camera = null;
             var recipe = JsonUtility.FromJson<RouteReference>(File.ReadAllText(ROUTE_REFERENCE_PATH));
-            if (recipe.scene != scene.path || recipe.positions == null || recipe.positions.Length != 4)
+            if (_profiles == null || _profiles.Length == 0 || AssetDatabase.AssetPathToGUID(scene.path) != _sceneGuid)
             {
                 throw new InvalidOperationException("Module-owned route recipe does not match the location.");
             }
@@ -226,7 +252,7 @@ namespace Rvm.CleanReleaseRoute07.Editor
             {
                 foreach (var candidate in root.GetComponentsInChildren<Camera>(true))
                 {
-                    if (candidate.name == "Level Camera")
+                    if (candidate.isActiveAndEnabled && candidate.cameraType == CameraType.Game)
                     {
                         if (camera != null)
                         {
@@ -242,20 +268,23 @@ namespace Rvm.CleanReleaseRoute07.Editor
             }
             var positionDeltas = new float[4];
             var rotationDeltas = new float[4];
+            BenchmarkScenario overview = Array.Find(_profiles, value => value.ScenarioId == "military-overview");
+            if (overview == null) return;
+            if (recipe.scene != scene.path || recipe.positions == null || recipe.positions.Length != 4) throw new InvalidOperationException("Historical Overview reference belongs to a different scene.");
             for (int i = 0; i < 4; i++)
             {
-                if (recipe.positions[i].key != _reference.positions[i].key)
+                if (recipe.positions[i].key != overview.PositionKeys[i])
                 {
                     throw new InvalidOperationException("Route pose key differs from the module recipe: " + i);
                 }
-                positionDeltas[i] = Vector3.Distance(recipe.positions[i].position, _reference.positions[i].position);
-                rotationDeltas[i] = Quaternion.Angle(recipe.positions[i].rotation, _reference.positions[i].rotation);
+                positionDeltas[i] = Vector3.Distance(recipe.positions[i].position, overview.Position(i));
+                rotationDeltas[i] = Quaternion.Angle(recipe.positions[i].rotation, overview.Rotation(i));
                 if (positionDeltas[i] > 0.0001f || rotationDeltas[i] > 0.0001f)
                 {
                     throw new InvalidOperationException("Original source pose differs from full R30 metadata: " + i);
                 }
             }
-            if (camera.name != "Level Camera" || camera.fieldOfView != 90 || camera.nearClipPlane != 0.1f || camera.farClipPlane != 10000 || camera.cullingMask != -1 || camera.allowHDR || camera.allowMSAA || camera.allowDynamicResolution || camera.usePhysicalProperties || camera.targetTexture != null)
+            if (overview.CameraSettings.FieldOfView != 90 || overview.CameraSettings.Near != 0.1f || overview.CameraSettings.Far != 10000)
             {
                 throw new InvalidOperationException("Source camera settings differ from R30.");
             }

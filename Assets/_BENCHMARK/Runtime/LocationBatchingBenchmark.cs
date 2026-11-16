@@ -12,6 +12,7 @@ namespace Rvm.Benchmark
     public sealed class LocationBatchingBenchmark : MonoBehaviour
     {
         private static readonly MethodInfo DRAW = typeof(XRayLevelInstancedRenderer).GetMethod("OnBeginCameraRendering", BindingFlags.Instance | BindingFlags.NonPublic);
+        private static BenchmarkGroupingState _modeState;
 
         private readonly List<MeasuredCallback> _callbacks = new List<MeasuredCallback>();
         private XRayLevelInstancedRenderer[] _renderers;
@@ -31,11 +32,13 @@ namespace Rvm.Benchmark
             string[] args = Environment.GetCommandLineArgs();
             if (Application.isEditor || Array.IndexOf(args, "-location-batching") < 0) return;
             string mode = Argument(args, "-location-batching");
-            if (mode != "A" && mode != "B") throw new ArgumentException("Location batching mode must be A or B.");
+            if (Array.IndexOf(args, "-clean-route") < 0 && Array.IndexOf(args, "-clean-route-no-timing") < 0 && Array.IndexOf(args, "-clean-route-config-check") < 0) throw new ArgumentException("A grouping override requires an explicit benchmark route session.");
+            bool grouping = BenchmarkGroupingState.Enabled(mode);
             string output = BenchmarkOutput.ValidateDirectory(Argument(args, "-clean-route-output"));
             var renderers = FindObjectsByType<XRayLevelInstancedRenderer>(FindObjectsInactive.Include);
-            var copies = new Dictionary<XRayInstanceBatchSet, XRayInstanceBatchSet>();
-            var evidence = new Mode { mode = mode, buildGuid = Application.buildGUID };
+            _modeState = new BenchmarkGroupingState(renderers, mode);
+            Application.quitting += RestoreMode;
+            var evidence = new Mode { mode = mode, buildGuid = Application.buildGUID, groupingEnabled = grouping, renderers = renderers.Length };
             foreach (var renderer in renderers)
             {
                 var source = renderer.BatchSet;
@@ -44,15 +47,7 @@ namespace Rvm.Benchmark
                 evidence.sourceBatches += source.Batches.Count;
                 evidence.sourceInstances += source.InstanceCount;
                 evidence.preparedGroups += source.SubmissionGroups.Count;
-                if (mode != "A") continue;
-                if (!copies.TryGetValue(source, out XRayInstanceBatchSet legacy))
-                {
-                    legacy = Instantiate(source);
-                    legacy.Initialize(source.LevelName, source.CellSize, new List<XRayInstanceBatch>(source.Batches), source.Lods);
-                    legacy.PrepareMatrices(source.MatrixInputSignature);
-                    copies.Add(source, legacy);
-                }
-                renderer.BatchSet = legacy;
+                if (renderer.Configuration.InstanceSubmissionGroupingEnabled != grouping) throw new InvalidOperationException("Actual grouping configuration differs from the requested mode.");
             }
             BenchmarkOutput.WriteJson(Path.Combine(output, "batching-mode.json"), evidence);
             if (Array.IndexOf(args, "-batching-counters") < 0) return;
@@ -83,6 +78,13 @@ namespace Rvm.Benchmark
             }
         }
 
+        public static void RestoreMode()
+        {
+            Application.quitting -= RestoreMode;
+            _modeState?.Dispose();
+            _modeState = null;
+        }
+
         private void Record(ScriptableRenderContext context, Camera camera)
         {
             if (camera.cameraType != CameraType.Game || Time.realtimeSinceStartupAsDouble - _start < 8) return;
@@ -107,12 +109,25 @@ namespace Rvm.Benchmark
                 report.visibleGroups += renderer.LastVisibleBatches;
                 report.shadowOnlyGroups += renderer.LastShadowOnlyBatches;
                 report.sourceInstances += renderer.BatchSet.InstanceCount;
+                RecordVisibility(renderer, camera, report);
                 var groups = (Array)typeof(XRayLevelInstancedRenderer).GetField("_groups", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(renderer);
                 if (groups == null) continue;
                 foreach (object group in groups)
                 {
                     report.groupMatrixPayloadBytes += ((Array)group.GetType().GetProperty("Instances").GetValue(group)).Length * 128L;
                     report.groupDataPayloadBytes += ((Array)group.GetType().GetProperty("Data").GetValue(group)).Length * 16L;
+                    bool active = (bool)group.GetType().GetProperty("Active").GetValue(group);
+                    if (active) report.mergedGroups++;
+                    var plan = (XRayInstanceBatchGroup)group.GetType().GetProperty("Plan").GetValue(group);
+                    var visibility = (byte[])typeof(XRayLevelInstancedRenderer).GetField("_sourceVisibility", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(renderer);
+                    bool color = false;
+                    bool offscreen = false;
+                    foreach (int index in plan.BatchIndices)
+                    {
+                        color |= visibility[index] == 2;
+                        offscreen |= visibility[index] == 1;
+                    }
+                    if (!active && color && offscreen) report.mixedVisibilityFallbacks++;
                 }
             }
             foreach (var callback in _callbacks)
@@ -132,6 +147,29 @@ namespace Rvm.Benchmark
             int index = Array.IndexOf(args, key);
             if (index < 0 || index + 1 >= args.Length) throw new ArgumentException("Missing argument: " + key);
             return args[index + 1];
+        }
+
+        private static void RecordVisibility(XRayLevelInstancedRenderer renderer, Camera camera, Pose report)
+        {
+            var planes = GeometryUtility.CalculateFrustumPlanes(camera);
+            var wind = XRayFloraWindBounds.ActiveState();
+            bool shadows = (bool)typeof(XRayLevelInstancedRenderer).GetField("_castShadows", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(renderer);
+            float distance = (float)typeof(XRayLevelInstancedRenderer).GetField("_maxDistance", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(renderer);
+            float maximum = distance > 0 ? distance * distance : float.MaxValue;
+            foreach (var batch in renderer.BatchSet.Batches)
+            {
+                report.sourceBatches++;
+                Bounds bounds = XRayFloraWindBounds.Uses(batch.Materials, wind) ? XRayFloraWindBounds.Expand(batch.Bounds, wind) : batch.Bounds;
+                bool eligible = batch.Mesh != null && batch.Count > 0 && bounds.SqrDistance(camera.transform.position) <= maximum;
+                bool color = eligible && GeometryUtility.TestPlanesAABB(planes, bounds);
+                if (color)
+                {
+                    report.colorSourceBatches++;
+                    report.colorCandidateInstances += batch.Count;
+                }
+                else if (eligible && shadows && batch.CastShadows) report.shadowOnlySourceBatches++;
+                else report.excludedSourceBatches++;
+            }
         }
 
         private sealed class MeasuredCallback
@@ -177,7 +215,9 @@ namespace Rvm.Benchmark
             public int sourceBatches;
             public int sourceInstances;
             public int preparedGroups;
-            public string scope = "A initializes a private runtime set from unchanged source batches, retaining matrix preparation and shared-batch fixes. B uses production prepared groups. Counters and callback timing are installed only with batching-counters; main series has no observer.";
+            public bool groupingEnabled;
+            public int renderers;
+            public string scope = "U/G1 apply false/true to a private in-memory GameConfig clone before warmup. The same source sets and prepared plans remain intact. Production assets are never written. Counters and elapsed callback timing exist only with batching-counters; main series has no observer.";
         }
 
         [Serializable]
@@ -190,6 +230,13 @@ namespace Rvm.Benchmark
             public int submittedInstances;
             public int colorInstances;
             public int sourceInstances;
+            public int sourceBatches;
+            public int colorSourceBatches;
+            public int colorCandidateInstances;
+            public int shadowOnlySourceBatches;
+            public int excludedSourceBatches;
+            public int mergedGroups;
+            public int mixedVisibilityFallbacks;
             public int visibleGroups;
             public int shadowOnlyGroups;
             public int cpuSamples;
@@ -199,7 +246,7 @@ namespace Rvm.Benchmark
             public long memoryBytes;
             public long groupMatrixPayloadBytes;
             public long groupDataPayloadBytes;
-            public string scope = "Technical run only: actual RenderMeshInstanced invocations and instance arguments, CPU duration of the real renderer callback over the observed one-second window after route warmup. Callback timing excludes subsequent HDRP/native culling and GPU work. Color instances count the instances passed to color-capable groups, not visible pixels or GPU draws. No allocation-counter zero claim; screenshots are overview evidence, not a pixel-equivalence test.";
+            public string scope = "Technical run only: actual RenderMeshInstanced invocations and instance arguments, elapsed wall duration of the real renderer callback over the observed one-second window after route warmup. Timing includes native calls and is not exclusive CPU execution time; it excludes subsequent HDRP/native culling and GPU work. Source color candidates use wind-expanded source bounds and the camera frustum, not occlusion. Merged-group and mixed-fallback counts inspect the existing runtime scratch once per pose. Color instances are submission candidates, not visible pixels or GPU draws. Screenshots are route evidence, not pixel equivalence.";
         }
     }
 }

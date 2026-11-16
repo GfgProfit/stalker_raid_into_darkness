@@ -31,6 +31,13 @@ namespace Rvm.Benchmark
         [SerializeField] private bool _fixedWeatherTime;
         [SerializeField] private double _fixedTimeHours = 12;
         [SerializeField] private string _expectedWeatherProfile;
+        [SerializeField] private string _displayName;
+        [SerializeField] private string _sceneGuid;
+        [SerializeField] private string _authoringGuid;
+        [SerializeField] private Vector3[] _worldPositions;
+        [SerializeField] private Quaternion[] _worldRotations;
+        [SerializeField] private BenchmarkCameraSettings _cameraSettings;
+        [SerializeField] private string _cameraProvenance;
 
         public string ScenarioId => _scenarioId;
         public string ScenePath => _scenePath;
@@ -51,6 +58,73 @@ namespace Rvm.Benchmark
         public bool FixedWeatherTime => _fixedWeatherTime;
         public double FixedTimeHours => _fixedTimeHours;
         public string ExpectedWeatherProfile => _expectedWeatherProfile;
+        public string DisplayName => string.IsNullOrEmpty(_displayName) ? _scenarioId : _displayName;
+        public string SceneGuid => _sceneGuid;
+        public string AuthoringGuid => _authoringGuid;
+        public bool HasRoute => !string.IsNullOrEmpty(_sceneGuid);
+        public BenchmarkCameraSettings CameraSettings => _cameraSettings;
+        public string CameraProvenance => _cameraProvenance;
+
+        public void ConfigureRoute(string id, string displayName, string scenePath, string sceneGuid, string authoringGuid, Vector3[] positions, Quaternion[] rotations, BenchmarkCameraSettings cameraSettings, string cameraProvenance)
+        {
+            string error = ValidatePoses(positions, rotations);
+            if (error != null || string.IsNullOrEmpty(sceneGuid) || cameraSettings == null || cameraSettings.Validate() != null)
+            {
+                throw new ArgumentException(error ?? "A stable scene GUID and valid camera settings are required.");
+            }
+            _scenarioId = id;
+            _displayName = displayName;
+            _scenePath = scenePath;
+            _sceneGuid = sceneGuid;
+            _authoringGuid = authoringGuid;
+            _worldPositions = (Vector3[])positions.Clone();
+            _worldRotations = (Quaternion[])rotations.Clone();
+            _cameraSettings = cameraSettings;
+            _cameraProvenance = cameraProvenance;
+        }
+
+        public Vector3 Position(int index) => _worldPositions[index];
+        public Quaternion Rotation(int index) => _worldRotations[index];
+
+        public string ValidateRoute(string sceneGuid)
+        {
+            string error = Validate();
+            if (error != null) return error;
+            if (string.IsNullOrEmpty(_sceneGuid) || _sceneGuid != sceneGuid) return "Route belongs to a different scene, or its stable scene GUID is missing.";
+            if (_cameraSettings == null) return "Route camera settings are missing.";
+            return ValidatePoses(_worldPositions, _worldRotations) ?? _cameraSettings.Validate();
+        }
+
+        public static BenchmarkScenario SelectRoute(BenchmarkScenario[] profiles, string id, string sceneGuid)
+        {
+            BenchmarkScenario found = null;
+            foreach (var profile in profiles)
+            {
+                if (profile == null || profile.ScenarioId != id) continue;
+                if (found != null) throw new InvalidOperationException("Duplicate route ID: " + id);
+                found = profile;
+            }
+            if (found == null) throw new InvalidOperationException("No benchmark route is available: " + id);
+            string error = found.ValidateRoute(sceneGuid);
+            if (error != null) throw new InvalidOperationException(error);
+            return found;
+        }
+
+        private static string ValidatePoses(Vector3[] positions, Quaternion[] rotations)
+        {
+            if (positions == null || rotations == null || positions.Length != 4 || rotations.Length != 4) return "Exactly four world poses are required.";
+            for (int i = 0; i < 4; i++)
+            {
+                Vector3 p = positions[i];
+                Quaternion q = rotations[i];
+                if (!IsFinite(p.x) || !IsFinite(p.y) || !IsFinite(p.z) || !IsFinite(q.x) || !IsFinite(q.y) || !IsFinite(q.z) || !IsFinite(q.w) || Math.Abs(Quaternion.Dot(q, q) - 1) > 0.001) return "World pose must be finite with a unit quaternion: " + i;
+                for (int j = 0; j < i; j++)
+                {
+                    if (positions[j] == p && Quaternion.Angle(rotations[j], q) < 0.0001f) return "Duplicate world pose: " + i;
+                }
+            }
+            return null;
+        }
 
         public void ConfigureSession(BenchmarkMode mode, bool fixedWeatherTime, double fixedTimeHours, string expectedProfile, bool capture, double captureSeconds)
         {

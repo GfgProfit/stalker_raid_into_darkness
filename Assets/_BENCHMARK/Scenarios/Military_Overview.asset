@@ -1,0 +1,74 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 784f155aa32d61241bb221c5db5ee62c, type: 3}
+  m_Name: Military_Overview
+  m_EditorClassIdentifier: Rvm.Benchmark.Runtime::Rvm.Benchmark.BenchmarkScenario
+  _scenarioId: military-overview
+  _scenePath: Assets/_Source/Levels/Anomaly/1v2_DX11_v_12gb_2.5_168_662acc8d/l07_military/Scenes/l07_military.unity
+  _positionKeys:
+  - Pos 1
+  - Pos 2
+  - Pos 3
+  - Pos 4
+  _positionSeconds: 5
+  _warmupSeconds: 8
+  _stabilizationSeconds: 0.5
+  _mode: 0
+  _profilerCapture: 0
+  _captureSeconds: 2
+  _frameCapacity: 65536
+  _tags:
+  - Baseline
+  _diagnosticCpu: 1
+  _diagnosticGpu: 1
+  _diagnosticRendering: 1
+  _diagnosticMemory: 1
+  _snapshotSeconds: 1
+  _fixedWeatherTime: 1
+  _fixedTimeHours: 12
+  _expectedWeatherProfile: w_foggy3
+  _displayName: "Military \u2014 Overview"
+  _sceneGuid: 09c15a29336ef984e969e4d88c38922f
+  _authoringGuid: 
+  _worldPositions:
+  - {x: 125.683075, y: 47.635735, z: 158.39655}
+  - {x: 26.338013, y: 42.19653, z: 380.2527}
+  - {x: -280.19388, y: 67.716095, z: 371.81937}
+  - {x: -317.63446, y: 60.07314, z: 16.360685}
+  _worldRotations:
+  - {x: -0.19650659, y: 0.78316325, z: -0.30446073, w: -0.50531596}
+  - {x: -0.105093986, y: 0.8948399, z: -0.31431592, w: -0.29903585}
+  - {x: 0.15396968, y: 0.84545106, z: -0.3778776, w: 0.34454972}
+  - {x: 0.33905363, y: 0.40801457, z: -0.16642737, w: 0.8311851}
+  _cameraSettings:
+    _fieldOfView: 90
+    _near: 0.1
+    _far: 10000
+    _aspect: 1.7777778
+    _rect:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 1
+      height: 1
+    _orthographic: 0
+    _size: 5
+    _mask: -1
+    _hdr: 0
+    _msaa: 0
+    _dynamic: 0
+    _physical: 0
+    _focalLength: 50
+    _sensor: {x: 36, y: 24}
+    _shift: {x: 0, y: 0}
+    _occlusion: 1
+  _cameraProvenance: Historical l07_military.route.json / R30 Level Camera; unchanged 90 degree FOV, near 0.1, far 10000

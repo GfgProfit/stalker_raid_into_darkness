@@ -27,6 +27,7 @@ namespace Rvm.Benchmark.Editor
         {
             _scroll = EditorGUILayout.BeginScrollView(_scroll);
             EditorGUILayout.LabelField("Бенчмарк локации", EditorStyles.boldLabel);
+            DrawRoutes();
             EditorGUILayout.LabelField("Frame pacing", "VSync=" + QualitySettings.vSyncCount + "; targetFrameRate=" + Application.targetFrameRate + "; refresh=" + Screen.currentResolution.refreshRateRatio.value.ToString("F2") + " Hz; interval=" + UnityEngine.Rendering.OnDemandRendering.renderFrameInterval);
             if (QualitySettings.vSyncCount != 0 || Application.targetFrameRate > 0 || UnityEngine.Rendering.OnDemandRendering.renderFrameInterval != 1)
             {
@@ -41,6 +42,11 @@ namespace Rvm.Benchmark.Editor
             if (GUILayout.Button("Создать и подключить сценарий текущей сцены"))
             {
                 Execute(() => { _scenario = BenchmarkEditorSession.PrepareCurrentScene(); TryAutoReferences(); });
+            }
+            _camera = (Camera)EditorGUILayout.ObjectField("Камера для нового профиля", _camera, typeof(Camera), true);
+            if (GUILayout.Button("Создать маршрут из выбранного module-prefab для текущей сцены"))
+            {
+                Execute(() => { string path = EditorUtility.SaveFilePanelInProject("Route profile", "new-route", "asset", "Save inside Assets/_BENCHMARK", "Assets/_BENCHMARK/Scenarios"); if (!string.IsNullOrEmpty(path)) _scenario = BenchmarkRouteAuthoring.CreateRoute(path, UnityEditor.SceneManagement.EditorSceneManager.GetActiveScene().path, _camera, Selection.activeTransform); });
             }
             if (_scenario != null)
             {
@@ -94,9 +100,9 @@ namespace Rvm.Benchmark.Editor
                 }
                 if (GUILayout.Button("Подключить выбранные ссылки (с Undo)"))
                 {
-                    Execute(() => BenchmarkEditorSession.Connect(_scenario, _camera, _positions, false));
+                    Execute(() => { if (_scenario.HasRoute) BenchmarkRouteAuthoring.UpdateRoute(_scenario, _positions); else BenchmarkEditorSession.Connect(_scenario, _camera, _positions, false); });
                 }
-                using (new EditorGUI.DisabledScope(EditorApplication.isPlayingOrWillChangePlaymode || EditorApplication.isCompiling))
+                using (new EditorGUI.DisabledScope(EditorApplication.isPlayingOrWillChangePlaymode || EditorApplication.isCompiling || _scenario.HasRoute))
                 {
                     if (GUILayout.Button("Запустить один прогон"))
                     {
@@ -159,8 +165,52 @@ namespace Rvm.Benchmark.Editor
         {
             if (_scenario != null)
             {
-                Execute(() => BenchmarkEditorSession.AutoReferences(_scenario, out _camera, out _positions));
+                if (_scenario.HasRoute)
+                {
+                    if (!string.IsNullOrEmpty(_scenario.AuthoringGuid)) Execute(() => _positions = BenchmarkRouteAuthoring.AuthoringPoses(_scenario));
+                    else _positions = new Transform[4];
+                }
+                else Execute(() => BenchmarkEditorSession.AutoReferences(_scenario, out _camera, out _positions));
             }
+        }
+
+        private void DrawRoutes()
+        {
+            string guid = AssetDatabase.AssetPathToGUID(UnityEditor.SceneManagement.EditorSceneManager.GetActiveScene().path);
+            var profiles = new System.Collections.Generic.List<BenchmarkScenario>();
+            foreach (string asset in AssetDatabase.FindAssets("t:BenchmarkScenario", new[] { "Assets/_BENCHMARK" }))
+            {
+                var profile = AssetDatabase.LoadAssetAtPath<BenchmarkScenario>(AssetDatabase.GUIDToAssetPath(asset));
+                if (profile.HasRoute && profile.SceneGuid == guid) profiles.Add(profile);
+            }
+            profiles.Sort((a, b) => string.CompareOrdinal(a.ScenarioId, b.ScenarioId));
+            if (profiles.Count == 0)
+            {
+                EditorGUILayout.HelpBox("Для текущей сцены нет проверенного маршрута. Координаты другой карты не подставляются.", MessageType.Info);
+                return;
+            }
+            var names = new string[profiles.Count];
+            for (int i = 0; i < names.Length; i++) names[i] = profiles[i].DisplayName;
+            int current = profiles.IndexOf(_scenario);
+            int selected = EditorGUILayout.Popup("Release route", Mathf.Max(0, current), names);
+            if (current < 0 || selected != current)
+            {
+                _scenario = profiles[selected];
+                TryAutoReferences();
+            }
+            EditorGUILayout.LabelField("Camera", _scenario.CameraSettings.FieldOfView + "°; near=" + _scenario.CameraSettings.Near + "; far=" + _scenario.CameraSettings.Far);
+            if (GUILayout.Button("Открыть authoring-prefab") && !string.IsNullOrEmpty(_scenario.AuthoringGuid))
+            {
+                AssetDatabase.OpenAsset(AssetDatabase.LoadAssetAtPath<GameObject>(AssetDatabase.GUIDToAssetPath(_scenario.AuthoringGuid)));
+            }
+            if (GUILayout.Button("Обновить маршрут из выбранного корня Pos 1–4"))
+            {
+                Execute(() => { _positions = BenchmarkRouteAuthoring.OrderedChildren(_scenario, Selection.activeTransform); BenchmarkRouteAuthoring.UpdateRoute(_scenario, _positions); });
+            }
+            if (GUILayout.Button("Собрать Release с маршрутами текущей сцены")) EditorApplication.ExecuteMenuItem("Tools/RVM/Build Benchmark Release");
+            string release = EditorPrefs.GetString("Rvm.Benchmark.ReleaseDirectory", "");
+            if (GUILayout.Button("Открыть U / G1 / обычный запуск / фиксированную серию") && Directory.Exists(release)) EditorUtility.RevealInFinder(Path.Combine(release, "Launchers"));
+            EditorGUILayout.HelpBox("Release использует сохранённый профиль без объектов в игровой сцене. Перед launcher закройте Editors; launcher проверяет их отсутствие. Обновление поз требует пересборки Player.", MessageType.Info);
         }
 
         private void Execute(Action action)

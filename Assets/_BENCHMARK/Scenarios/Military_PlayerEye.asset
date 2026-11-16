@@ -1,0 +1,74 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 784f155aa32d61241bb221c5db5ee62c, type: 3}
+  m_Name: Military_PlayerEye
+  m_EditorClassIdentifier: Rvm.Benchmark.Runtime::Rvm.Benchmark.BenchmarkScenario
+  _scenarioId: military-player-eye
+  _scenePath: Assets/_Source/Levels/Anomaly/1v2_DX11_v_12gb_2.5_168_662acc8d/l07_military/Scenes/l07_military.unity
+  _positionKeys:
+  - Pos 1
+  - Pos 2
+  - Pos 3
+  - Pos 4
+  _positionSeconds: 5
+  _warmupSeconds: 8
+  _stabilizationSeconds: 0.5
+  _mode: 0
+  _profilerCapture: 0
+  _captureSeconds: 2
+  _frameCapacity: 65536
+  _tags:
+  - Baseline
+  _diagnosticCpu: 1
+  _diagnosticGpu: 1
+  _diagnosticRendering: 1
+  _diagnosticMemory: 1
+  _snapshotSeconds: 1
+  _fixedWeatherTime: 1
+  _fixedTimeHours: 12
+  _expectedWeatherProfile: w_foggy3
+  _displayName: "Military \u2014 Player Eye"
+  _sceneGuid: 09c15a29336ef984e969e4d88c38922f
+  _authoringGuid: 8162aedb0fa5b404b917d5df7bd1ac9d
+  _worldPositions:
+  - {x: -6.75, y: -4.41458, z: 91.81416}
+  - {x: 63.8, y: -11.61, z: 333}
+  - {x: -329.28, y: -11.61, z: 378.1}
+  - {x: -327.33, y: -22.85, z: 50.97}
+  _worldRotations:
+  - {x: -0, y: 0.5002051, z: -0, w: 0.86590695}
+  - {x: -0, y: -0.9120289, z: -0, w: 0.41012606}
+  - {x: -0, y: -0.93575996, z: -0, w: -0.35263768}
+  - {x: -0, y: -0.5251721, z: -0, w: -0.8509961}
+  _cameraSettings:
+    _fieldOfView: 95
+    _near: 0.05
+    _far: 1000
+    _aspect: 1.7777778
+    _rect:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 1
+      height: 1
+    _orthographic: 0
+    _size: 5
+    _mask: -1
+    _hdr: 0
+    _msaa: 0
+    _dynamic: 0
+    _physical: 0
+    _focalLength: 50
+    _sensor: {x: 36, y: 24}
+    _shift: {x: 0, y: 0}
+    _occlusion: 1
+  _cameraProvenance: 'FPS_Player.prefab Camera; StalkerPlayerController.Profile -> StalkerCameraController.Initialize: StalkerMovementProfile.asset Camera.FieldOfView=95, NearClip=0.05; prefab far=1000. No zoom, recoil or authoring scale.'

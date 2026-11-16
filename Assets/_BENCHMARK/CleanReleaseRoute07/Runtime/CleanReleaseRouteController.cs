@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using XRay.Importer.Levels;
 using RaidIntoDarkness.Effects;
+using Rvm.Benchmark;
 using Stopwatch = System.Diagnostics.Stopwatch;
 
 namespace Rvm.CleanReleaseRoute07
@@ -25,6 +26,8 @@ namespace Rvm.CleanReleaseRoute07
         [SerializeField] private string _referenceCameraSettings;
         [SerializeField] private XRayWeatherProfile _weatherProfile;
         [SerializeField] private GameObject _technicalKiselPrefab;
+        [SerializeField] private BenchmarkScenario[] _profiles;
+        [SerializeField] private string _sceneGuid;
 
         private Sample[] _samples;
         private readonly long[] _phaseStarts = new long[5];
@@ -50,6 +53,25 @@ namespace Rvm.CleanReleaseRoute07
         private AnomalyVisual08Check _visualCheck;
         private AnomalyLight10Check _lightCheck;
         private AnomalyShadow11Check _shadowCheck;
+        private BenchmarkScenario _scenario;
+        private BenchmarkCameraState _cameraState;
+        private XRayWeatherProfile _savedWeather;
+        private double _savedWeatherSeconds;
+        private bool _savedWeatherPaused;
+        private bool _weatherCaptured;
+        private string _originalCameraSettings;
+        private Vector3 _originalCameraPosition;
+        private Quaternion _originalCameraRotation;
+        private static BenchmarkPacingState _pacing;
+
+        public void ConfigureProfiles(Camera camera, BenchmarkScenario[] profiles, string sceneGuid, XRayWeatherProfile weatherProfile)
+        {
+            _camera = camera;
+            _profiles = profiles;
+            _sceneGuid = sceneGuid;
+            _weatherProfile = weatherProfile;
+            enabled = false;
+        }
 
         public void Configure(Camera camera, Vector3[] positions, Quaternion[] rotations, string referenceCameraSettings, XRayWeatherProfile weatherProfile)
         {
@@ -78,6 +100,7 @@ namespace Rvm.CleanReleaseRoute07
             {
                 throw new InvalidOperationException("High Fidelity quality is unavailable.");
             }
+            _pacing = new BenchmarkPacingState();
             QualitySettings.SetQualityLevel(quality, true);
             QualitySettings.vSyncCount = 0;
             Application.targetFrameRate = -1;
@@ -107,9 +130,32 @@ namespace Rvm.CleanReleaseRoute07
                 throw new InvalidOperationException("Exactly one clean route controller is required.");
             }
             var controller = controllers[0];
+            controller._output = GetArgument(args, "-clean-route-output");
+            try
+            {
+                if (controller._profiles != null && controller._profiles.Length > 0)
+                {
+                    int index = Array.IndexOf(args, "-benchmark-route");
+                    if (index < 0 || index + 1 >= args.Length) throw new ArgumentException("Select an explicit -benchmark-route profile ID.");
+                    controller._scenario = BenchmarkScenario.SelectRoute(controller._profiles, args[index + 1], controller._sceneGuid);
+                    if (controller._scenario.WarmupSeconds != WARMUP_SECONDS || controller._scenario.PositionSeconds != POSITION_SECONDS || controller._scenario.StabilizationSeconds != 0.5) throw new InvalidOperationException("Release route requires the established 8 / 5 / 0.5 protocol.");
+                    controller._positions = new Vector3[4];
+                    controller._rotations = new Quaternion[4];
+                    for (int i = 0; i < 4; i++)
+                    {
+                        controller._positions[i] = controller._scenario.Position(i);
+                        controller._rotations[i] = controller._scenario.Rotation(i);
+                    }
+                    controller._referenceCameraSettings = controller._scenario.CameraProvenance;
+                }
+            }
+            catch (Exception exception)
+            {
+                controller.Fail(exception);
+                return;
+            }
             controller._timing = route && !noTiming && !check;
             controller._configCheck = check;
-            controller._output = GetArgument(args, "-clean-route-output");
             controller.enabled = true;
         }
 
@@ -137,12 +183,21 @@ namespace Rvm.CleanReleaseRoute07
                     throw new InvalidOperationException("Route output must be inside Archive.");
                 }
                 Directory.CreateDirectory(_output);
+                _cameraState = new BenchmarkCameraState(_camera);
+                _originalCameraSettings = JsonUtility.ToJson(BenchmarkCameraSettings.Capture(_camera));
+                _originalCameraPosition = _camera.transform.position;
+                _originalCameraRotation = _camera.transform.rotation;
+                if (_scenario != null)
+                {
+                    _scenario.CameraSettings.Apply(_camera);
+                    File.WriteAllText(Path.Combine(_output, "route-profile.json"), JsonUtility.ToJson(_scenario, true));
+                }
                 if (_timing)
                 {
                     _samples = new Sample[CAPACITY];
                 }
                 var weatherControllers = UnityEngine.Object.FindObjectsByType<XRayWeatherController>();
-                if (weatherControllers.Length != 1 || _weatherProfile == null || _weatherProfile.name != "w_foggy3")
+                if (weatherControllers.Length != 1 || _weatherProfile == null)
                 {
                     throw new InvalidOperationException("Exactly one weather controller and the exact w_foggy3 profile are required.");
                 }
@@ -151,12 +206,16 @@ namespace Rvm.CleanReleaseRoute07
                 {
                     throw new InvalidOperationException("Weather transition or FX is active before the route.");
                 }
+                _savedWeather = _weather.ActiveProfile;
+                _savedWeatherSeconds = _weather.GameTimeSeconds;
+                _savedWeatherPaused = _weather.Paused;
+                _weatherCaptured = true;
                 if (_weather.ActiveProfile != _weatherProfile)
                 {
                     _weather.SetProfile(_weatherProfile);
                 }
                 _weather.SetPaused(true);
-                _weather.Seek(43200.0);
+                _weather.Seek(_scenario != null ? _scenario.FixedTimeHours * 3600 : 43200.0);
                 if (XRayWeatherController.Active != _weather)
                 {
                     throw new InvalidOperationException("Weather ownership is unavailable: " + _weather.Diagnostic);
@@ -334,9 +393,10 @@ namespace Rvm.CleanReleaseRoute07
             return new Conditions { unity = Application.unityVersion, buildGuid = Application.buildGUID, debugBuild = UnityEngine.Debug.isDebugBuild, frameTimingEnabled = FrameTimingManager.IsFeatureEnabled(), profilerEnabled = UnityEngine.Profiling.Profiler.enabled, eventJournalConfigured = AnomalyVisual09Events.Configured, oldBenchmarkAssemblyLoaded = oldBenchmark, nativeModules = modules, externalDiagnostics = externalDiagnostics, nvidiaCaptureModuleLoaded = nvidiaCaptureModuleLoaded, graphicsApi = SystemInfo.graphicsDeviceType.ToString(), quality = QualitySettings.names[QualitySettings.GetQualityLevel()], width = Screen.width, height = Screen.height, fullScreenMode = Screen.fullScreenMode.ToString(), vSyncCount = QualitySettings.vSyncCount, targetFrameRate = Application.targetFrameRate, renderFrameInterval = OnDemandRendering.renderFrameInterval, runInBackground = Application.runInBackground, focused = Application.isFocused, camera = _camera.name, cameraEnabled = _camera.isActiveAndEnabled, fieldOfView = _camera.fieldOfView, nearClip = _camera.nearClipPlane, farClip = _camera.farClipPlane, cameraAspect = _camera.aspect, cameraRect = _camera.rect, cameraPixelWidth = _camera.pixelWidth, cameraPixelHeight = _camera.pixelHeight, renderWidthScale = ScalableBufferManager.widthScaleFactor, renderHeightScale = ScalableBufferManager.heightScaleFactor, orthographic = _camera.orthographic, orthographicSize = _camera.orthographicSize, focalLength = _camera.focalLength, sensorSize = _camera.sensorSize, lensShift = _camera.lensShift, cullingMask = _camera.cullingMask, allowHdr = _camera.allowHDR, allowMsaa = _camera.allowMSAA, dynamicResolution = _camera.allowDynamicResolution, physicalCamera = _camera.usePhysicalProperties, cameraTargetIsScreen = _camera.targetTexture == null, referenceCameraSettings = _referenceCameraSettings, timeScale = Time.timeScale, fixedDeltaTime = Time.fixedDeltaTime, weather = _weather.ActiveProfile.name, weatherSeconds = _weather.GameTimeSeconds, weatherPaused = _weather.Paused, particleDiagnostics = false, rendererDiagnostics = false };
         }
 
-        private static void RequireConditions(Conditions value)
+        private void RequireConditions(Conditions value)
         {
-            if (value.debugBuild || value.frameTimingEnabled || value.profilerEnabled || value.externalDiagnostics || value.graphicsApi != "Direct3D12" || value.quality != "High Fidelity" || value.width != 1920 || value.height != 1080 || value.cameraPixelWidth != 1920 || value.cameraPixelHeight != 1080 || value.renderWidthScale != 1.0f || value.renderHeightScale != 1.0f || value.fullScreenMode != "FullScreenWindow" || value.vSyncCount != 0 || value.targetFrameRate != -1 || value.renderFrameInterval != 1 || !value.runInBackground || !value.cameraEnabled || !value.cameraTargetIsScreen || value.particleDiagnostics || value.rendererDiagnostics || value.weather != "w_foggy3" || !value.weatherPaused || value.weatherSeconds != 43200.0)
+            if (_scenario != null && (value.fieldOfView != _scenario.CameraSettings.FieldOfView || value.nearClip != _scenario.CameraSettings.Near || value.farClip != _scenario.CameraSettings.Far)) throw new InvalidOperationException("Actual camera lens differs from the selected route profile.");
+            if (value.debugBuild || value.frameTimingEnabled || value.profilerEnabled || value.externalDiagnostics || value.graphicsApi != "Direct3D12" || value.quality != "High Fidelity" || value.width != 1920 || value.height != 1080 || value.cameraPixelWidth != 1920 || value.cameraPixelHeight != 1080 || value.renderWidthScale != 1.0f || value.renderHeightScale != 1.0f || value.fullScreenMode != "FullScreenWindow" || value.vSyncCount != 0 || value.targetFrameRate != -1 || value.renderFrameInterval != 1 || !value.runInBackground || !value.cameraEnabled || !value.cameraTargetIsScreen || value.particleDiagnostics || value.rendererDiagnostics || value.weather != _weatherProfile.name || !value.weatherPaused || value.weatherSeconds != (_scenario != null ? _scenario.FixedTimeHours * 3600 : 43200.0))
             {
                 throw new InvalidOperationException("Clean Release route conditions do not match the required configuration.");
             }
@@ -388,12 +448,14 @@ namespace Rvm.CleanReleaseRoute07
             bool valid = !_overflow && !_focusViolation && _runtimeErrors == 0 && rendered;
             var result = new Result { status = valid ? "completed" : "conditions-violated", configurationCheckOnly = _configCheck, timing = _timing, stopwatchFrequency = Stopwatch.Frequency, capacity = CAPACITY, samples = _count, overflow = _overflow, foregroundViolation = _focusViolation, firstFocusLostUnityFrame = _focusLostFrame, runtimeErrors = _runtimeErrors, phaseStarts = _phaseStarts, endTimestamp = _endTimestamp, renderedFrames = _renderedFrames, configurationRenderFrames = _configurationRenderFrames, positions = _positions, rotations = _rotations, warmupSeconds = WARMUP_SECONDS, positionSeconds = POSITION_SECONDS, updateExecutionOrder = -9000 };
             File.WriteAllText(Path.Combine(_output, "result.json"), JsonUtility.ToJson(result, true));
+            RestoreState();
             Application.Quit(valid ? 0 : 2);
         }
 
         private void Fail(Exception exception)
         {
             _running = false;
+            RestoreState();
             Application.logMessageReceived -= OnLog;
             RenderPipelineManager.endCameraRendering -= OnCameraRendered;
             if (!string.IsNullOrEmpty(_output))
@@ -413,6 +475,52 @@ namespace Rvm.CleanReleaseRoute07
             {
                 _running = false;
             }
+            RestoreState();
+        }
+
+        public void Abort()
+        {
+            _running = false;
+            Application.logMessageReceived -= OnLog;
+            RenderPipelineManager.endCameraRendering -= OnCameraRendered;
+            RestoreState();
+            enabled = false;
+        }
+
+        private void RestoreState()
+        {
+            try
+            {
+                _cameraState?.Dispose();
+                _cameraState = null;
+                if (_weatherCaptured && _weather != null)
+                {
+                    _weatherCaptured = false;
+                    if (_weather.ActiveProfile != _savedWeather) _weather.SetProfile(_savedWeather);
+                    _weather.Seek(_savedWeatherSeconds);
+                    _weather.SetPaused(_savedWeatherPaused);
+                }
+            }
+            finally
+            {
+                LocationBatchingBenchmark.RestoreMode();
+                _pacing?.Dispose();
+                _pacing = null;
+            }
+            if (_camera != null && !string.IsNullOrEmpty(_originalCameraSettings) && !string.IsNullOrEmpty(_output))
+            {
+                bool cameraRestored = JsonUtility.ToJson(BenchmarkCameraSettings.Capture(_camera)) == _originalCameraSettings && _camera.transform.position == _originalCameraPosition && Quaternion.Angle(_camera.transform.rotation, _originalCameraRotation) < 0.001f;
+                bool weatherRestored = _weather == null || _weather.ActiveProfile == _savedWeather && Math.Abs(_weather.GameTimeSeconds - _savedWeatherSeconds) < 0.001 && _weather.Paused == _savedWeatherPaused;
+                File.WriteAllText(Path.Combine(_output, "restoration.json"), JsonUtility.ToJson(new Restoration { cameraRestored = cameraRestored, weatherRestored = weatherRestored }, true));
+                if (!cameraRestored || !weatherRestored) throw new InvalidOperationException("Route state restoration did not match the original state.");
+            }
+        }
+
+        [Serializable]
+        private sealed class Restoration
+        {
+            public bool cameraRestored;
+            public bool weatherRestored;
         }
 
         private struct Sample

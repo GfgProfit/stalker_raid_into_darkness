@@ -8,6 +8,9 @@ import time
 from pathlib import Path
 
 task = Path(__file__).resolve().parent.parent
+archive = Path(r'E:\Projects\stalker_raid_into_darkness_Archive').resolve()
+if not task.is_relative_to(archive):
+    raise RuntimeError('Use the generated launchers under Archive, not the source helper inside Assets.')
 user = ctypes.WinDLL('user32', use_last_error=True)
 user.GetForegroundWindow.restype = w.HWND
 user.GetWindowThreadProcessId.argtypes = [w.HWND, ctypes.POINTER(w.DWORD)]
@@ -56,6 +59,8 @@ def precheck():
 
 def run(route, label, mode, kind, player_folder=None):
     output = task / 'Runs' / label
+    if not output.resolve().is_relative_to(task):
+        raise ValueError('Run label must stay inside the build output directory.')
     output.mkdir(parents=True, exist_ok=False)
     try:
         save(output / 'precheck.json', precheck())
@@ -98,6 +103,12 @@ def run(route, label, mode, kind, player_folder=None):
         save(output / 'driver-failure.json', dict(reason='Player did not finish within the fixed timeout; retained as rejected attempt'))
         raise
     save(output / 'exit.json', dict(code=result, endedUtc=datetime.datetime.now(datetime.timezone.utc).isoformat()))
+    state_path = output / 'restoration.json'
+    if state_path.exists():
+        state = json.loads(state_path.read_text(encoding='utf-8-sig'))
+        if not state.get('cameraRestored') or not state.get('weatherRestored'):
+            save(output / 'driver-failure.json', dict(reason='Session state was not restored; retained as rejected attempt'))
+            result = 2
     print(json.dumps(dict(run=label, mode=mode, kind=kind, exitCode=result)), flush=True)
     return result
 

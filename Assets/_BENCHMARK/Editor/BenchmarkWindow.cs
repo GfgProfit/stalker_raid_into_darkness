@@ -177,6 +177,8 @@ namespace Rvm.Benchmark.Editor
         private void DrawRoutes()
         {
             string guid = AssetDatabase.AssetPathToGUID(UnityEditor.SceneManagement.EditorSceneManager.GetActiveScene().path);
+            var stage = UnityEditor.SceneManagement.PrefabStageUtility.GetCurrentPrefabStage();
+            if (stage != null && _scenario != null && _scenario.AuthoringGuid == AssetDatabase.AssetPathToGUID(stage.assetPath)) guid = _scenario.SceneGuid;
             var profiles = new System.Collections.Generic.List<BenchmarkScenario>();
             foreach (string asset in AssetDatabase.FindAssets("t:BenchmarkScenario", new[] { "Assets/_BENCHMARK" }))
             {

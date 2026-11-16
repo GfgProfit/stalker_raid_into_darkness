@@ -59,6 +59,7 @@ namespace Rvm.CleanReleaseRoute07
         private double _savedWeatherSeconds;
         private bool _savedWeatherPaused;
         private bool _weatherCaptured;
+        private bool _stateRestored;
         private string _originalCameraSettings;
         private Vector3 _originalCameraPosition;
         private Quaternion _originalCameraRotation;
@@ -489,6 +490,7 @@ namespace Rvm.CleanReleaseRoute07
 
         private void RestoreState()
         {
+            if (_stateRestored) return;
             try
             {
                 _cameraState?.Dispose();
@@ -514,6 +516,7 @@ namespace Rvm.CleanReleaseRoute07
                 File.WriteAllText(Path.Combine(_output, "restoration.json"), JsonUtility.ToJson(new Restoration { cameraRestored = cameraRestored, weatherRestored = weatherRestored }, true));
                 if (!cameraRestored || !weatherRestored) throw new InvalidOperationException("Route state restoration did not match the original state.");
             }
+            _stateRestored = true;
         }
 
         [Serializable]

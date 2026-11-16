@@ -1,5 +1,17 @@
 # Measurement contract
 
+## PIX diagnostics in non-Development Release
+
+`-benchmark-pix-diagnostic` is an explicit opt-in only in a requested CleanReleaseRoute07 session. Clean startup still rejects PIX capturer modules. Diagnostic admission permits the exact PIX GPU/timing capturer names while preserving their real `externalDiagnostics` value and native module paths. Known RTSS, FramePacingNative, RenderDoc and Nsight injection modules remain forbidden. Camera, weather, resolution, API, quality and pacing checks remain active. Additional benchmark observers are rejected in this mode.
+
+Diagnostic results use `status=diagnostic-completed`, `measurementClass=pix-diagnostic`, `instrumented=true` and `eligibleForFpsComparison=false`. They are not a clean FPS series, even when no capture was ultimately obtained. A clean comparison must reject these records rather than silently pooling their timestamps. The launcher always writes `mainSeries=false`.
+
+`-benchmark-pix-capture-position 1..4` requests one present-to-present structural capture after 1.5 seconds of that position. It requires external PIX launch before D3D12 device creation. No position is skipped, and no route settings change. `pix-diagnostic.json` distinguishes requested, attached-reported and capture-file state; actual suitability requires opening and inspecting the capture.
+
+`clock-sync.csv` records original route Stopwatch ticks and native QPC brackets, PID/TID, frame, position and marker sequence. Additional Stopwatch reads bracket the native call, bounding clock conversion rather than assuming equal clock epochs. `gpu-frame-markers.csv` records submitted camera identity markers and their native recording-thread QPC. Verify corresponding `RC06CPU`/`RC06GPU` events in the saved capture at multiple times, check monotonic order and bound residual error before using route windows. A CPU Update timestamp is not Present; a GPU camera marker is not an HDRP pass or a guarantee that a simultaneously running CPU frame matches it.
+
+The optional native bridge and its official PIX runtime live entirely under this module. See `CleanReleaseRoute07/Native/README.md` for API contracts and reproducible builds. Instrumentation is bounded, opt-in, and writes CSV only during teardown. Overflow makes the record unsuitable. Live timestamps and structural replay counters must remain separate; export pagination, queue ownership, overlap levels and truncation must be validated before population claims.
+
 The location History work test is a warmed local microbenchmark of a History pass on location data at a fixed Unity frame number. Its compiled delegate calls the production implementation repeatedly. It does not measure inclusive MatrixHistory CPU time in real frames, camera culling, submissions or GPU work. Do not combine it with recorder/native timings.
 
 The previous 212.68 to 52.50 microseconds describe this local fixed-frame pass. Preserve the original evidence and use this scope when quoting it.

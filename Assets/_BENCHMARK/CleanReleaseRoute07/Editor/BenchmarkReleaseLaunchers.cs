@@ -29,6 +29,7 @@ namespace Rvm.CleanReleaseRoute07.Editor
             string directory = Path.Combine(root, "Launchers");
             Directory.CreateDirectory(directory);
             File.Copy("Assets/_BENCHMARK/Launchers/run_benchmark.py", Path.Combine(directory, "run_benchmark.py"));
+            File.Copy("Assets/_BENCHMARK/Launchers/run_pix_diagnostic.py", Path.Combine(directory, "run_pix_diagnostic.py"));
             File.Copy("Assets/_BENCHMARK/Launchers/Run-Series.ps1", Path.Combine(directory, "Run-Series.ps1"));
             foreach (var profile in profiles)
             {

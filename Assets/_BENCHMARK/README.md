@@ -2,6 +2,12 @@
 
 Система измеряет существующую сцену и сохраняет исходные кадры для сравнения будущих оптимизаций. Игровые настройки, симуляция, погода, качество рендера и ограничение FPS остаются под управлением проекта.
 
+## PIX-диагностика Release
+
+Сгенерированный `Launchers/run_pix_diagnostic.py` запускает отдельный инструментированный сеанс через внешний `pixtool.exe`. Например: `python Launchers/run_pix_diagnostic.py military-player-eye --pix "<PIX>/pixtool.exe" --label Eye_Pos1 --capture-position 1`. Для live timing используйте отдельный запуск с `--timing` вместо `--capture-position`. Вывод остаётся в Archive рядом с соответствующей сборкой. Ordinary_Game и обычные U/G1 launcher не включают этот режим и не требуют PIX.
+
+Допуск задаётся только сочетанием benchmark-сеанса и `-benchmark-pix-diagnostic`. Результат имеет статус `diagnostic-completed`, `instrumented=true` и не допускается в clean FPS-сравнения. Успешный guard или наличие DLL не подтверждают пригодность capture: необходимо открыть запись, проверить команды/ресурсы и маркеры временной привязки. Контракт и ограничения описаны в [MEASUREMENTS.md](MEASUREMENTS.md), исходники и сборка необязательного native-моста — в [Native/README.md](CleanReleaseRoute07/Native/README.md).
+
 ## Запуск в Editor
 
 Постоянные `BenchmarkRunner` разрешены только в отдельных сценах внутри `Assets/_BENCHMARK`. Для такого сценария откройте окно **Tools → RVM → Benchmark** и выберите его ScriptableObject. Компонент хранит прямые ссылки на камеру и четыре Transform; ScriptableObject хранит идентификатор сцены и ключи позиций.

@@ -18,6 +18,8 @@ The functional HDRP 17.6 shadow binding fix lives in `Assets/_Tools/X-Ray OGF OM
 
 ## Reversible removal
 
+PIX diagnostics add only module-owned `PixDiagnosticPolicy`, `PixDiagnosticSession`, `Native/RenderCostPixBridge.cpp`, its build script/documentation, `Plugins/x86_64/RenderCostPixBridge.dll`, the official MIT `WinPixEventRuntime.dll`, plugin import settings, regression tests and `Launchers/run_pix_diagnostic.py`. Neither plugin is preloaded. Ordinary startup never calls the bridge; no game assembly, production scene, package registration or global scripting define refers to it. Remove these with `_BENCHMARK` and its metas. Archive captures, the separately retained diagnostic Player and external PIX installation/portable tooling are independent evidence/tools, not production requirements. Removing the module requires rebuilding a delivered Player; deleting source assets does not remove DLLs from an already built diagnostic Player.
+
 1. Preserve unsaved scenes and close every Editor for Production. Do not remove the module while Unity is importing it.
 2. Move `Assets/_BENCHMARK` and `Assets/_BENCHMARK.meta` together outside Assets into a task-owned Archive directory. Keep every `.meta` and GUID. No project-wide compile symbol or package registration is required by this module; `CLEAN_RELEASE_ROUTE07` is scoped to the route build's extra defines.
 3. Open Production, wait for Runtime and Editor compilation, and check ordinary scenes/prefabs for missing scripts and dependencies. Inspect assembly references and the actual loaded assemblies, not names alone. Run production regression tests.

@@ -30,6 +30,8 @@ namespace RaidIntoDarkness.Player
         private float _savedHudFieldOfView = -1.0f;
         private CharacterController _characterController;
         private StalkerVegetationAudio _vegetationAudio;
+        private bool _gameplayInputBlocked;
+        private int _resumeFrame = -1;
 
         public StalkerMovementProfile Profile => _profile;
         public StalkerMovementMotor Motor => _motor;
@@ -49,7 +51,13 @@ namespace RaidIntoDarkness.Player
         public string OutfitSection => _appliedSection;
 
         public StalkerMoveFlags ScriptedWish { get; set; }
-        public bool GameplayInputBlocked { get; set; }
+        public bool SimulationPaused { get; private set; }
+
+        public bool GameplayInputBlocked
+        {
+            get => _gameplayInputBlocked || SimulationPaused || _resumeFrame == Time.frameCount;
+            set => _gameplayInputBlocked = value;
+        }
 
         public bool Combat
         {
@@ -151,8 +159,25 @@ namespace RaidIntoDarkness.Player
             return applied;
         }
 
+        public void SetSimulationPaused(bool paused)
+        {
+            if (SimulationPaused == paused)
+            {
+                return;
+            }
+            SimulationPaused = paused;
+            if (!paused)
+            {
+                _resumeFrame = Time.frameCount;
+            }
+        }
+
         private void Update()
         {
+            if (SimulationPaused)
+            {
+                return;
+            }
             float deltaTime = Mathf.Min(Time.deltaTime, MAX_FRAME_DELTA);
             if (!GameplayInputBlocked)
             {

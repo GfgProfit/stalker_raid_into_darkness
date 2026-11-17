@@ -127,7 +127,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
 
         public void Open(bool showStash)
         {
-            if (_window == null)
+            if (_window == null || _player != null && _player.SimulationPaused)
             {
                 return;
             }
@@ -203,6 +203,10 @@ namespace RaidIntoDarkness.Integrations.Inventory
 
         private void Update()
         {
+            if (_player != null && _player.SimulationPaused)
+            {
+                return;
+            }
             if (_restoreFrame >= 0 && Time.frameCount > _restoreFrame)
             {
                 RestoreGameplay();

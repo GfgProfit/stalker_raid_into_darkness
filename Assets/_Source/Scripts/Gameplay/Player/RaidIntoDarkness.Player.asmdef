@@ -8,6 +8,8 @@
         "XRay.Importer.Core",
         "Unity.InputSystem",
         "Unity.ugui",
+        "Unity.TextMeshPro",
+        "DOTween.Modules",
         "Unity.RenderPipelines.Core.Runtime",
         "Unity.RenderPipelines.HighDefinition.Runtime"
     ],

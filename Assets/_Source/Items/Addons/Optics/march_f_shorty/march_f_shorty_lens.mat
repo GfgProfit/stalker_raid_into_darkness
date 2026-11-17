@@ -61,7 +61,7 @@ Material:
     - _ColorKeyUnpremultiply: 1
     - _CullMode: 2
     - _EyeTransmission: 0
-    - _IlluminationIntensity: 1
+    - _IlluminationIntensity: 10
     - _LensEnvironmentIntensity: 2
     - _LensReflectionStrength: 1
     - _LensRoughness: 0.2

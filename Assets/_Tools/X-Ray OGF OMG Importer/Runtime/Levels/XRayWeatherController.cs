@@ -137,7 +137,7 @@ namespace XRay.Importer.Levels
         public float FxLightingAdaptationGain => FxLightingAdaptationOverride ?? (Inherits(XRayWeatherLevelOverrides.FxLightingAdaptation) ? _configuration.FxLightingAdaptation : IsFinite(_fxLightingAdaptation) ? Mathf.Clamp(_fxLightingAdaptation, 0.0f, GameConfig.MAX_FX_LIGHTING_ADAPTATION) : 1.0f);
         public bool FogEnabled => FogOverride ?? (Inherits(XRayWeatherLevelOverrides.Fog) ? _configuration.FogEnabled : _fogEnabled);
         public bool SunShaftsEnabled => SunShaftsOverride ?? (Inherits(XRayWeatherLevelOverrides.SunShafts) ? _configuration.SunShaftsEnabled : _sunShaftsEnabled);
-        public bool LensFlareEnabled => LensFlareOverride ?? (Inherits(XRayWeatherLevelOverrides.LensFlare) ? _configuration.LensFlareEnabled : _lensFlareEnabled);
+        public bool LensFlareEnabled => LensFlareOverride ?? XRayVideoOverrides.LensFlare ?? (Inherits(XRayWeatherLevelOverrides.LensFlare) ? _configuration.LensFlareEnabled : _lensFlareEnabled);
         public bool ExpressiveDaylight => Inherits(XRayWeatherLevelOverrides.ExpressiveDaylight) ? _configuration.ExpressiveDaylight : _expressiveDaylight;
         public float LensFlareIntensity => LensFlareIntensityOverride ?? (Inherits(XRayWeatherLevelOverrides.LensFlareIntensity) ? _configuration.LensFlareIntensity : _lensFlareIntensity);
         public bool AdaptLensFlareToWeather => FlareAdaptationOverride ?? (Inherits(XRayWeatherLevelOverrides.FlareAdaptation) ? _configuration.AdaptLensFlareToWeather : _adaptLensFlareToWeather);
@@ -565,7 +565,7 @@ namespace XRay.Importer.Levels
 
         private void Update()
         {
-            if (!Application.IsPlaying(gameObject) || Time.frameCount == _lastFrame) return;
+            if (!Application.IsPlaying(gameObject) || Time.timeScale == 0.0f || Time.frameCount == _lastFrame) return;
             _lastFrame = Time.frameCount;
             TickSimulation(Time.unscaledDeltaTime);
         }

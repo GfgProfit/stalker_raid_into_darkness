@@ -1,0 +1,10 @@
+{
+    "name": "RaidIntoDarkness.Graphics",
+    "rootNamespace": "RaidIntoDarkness.GraphicsOptions",
+    "references": [
+        "XRay.Importer.Runtime",
+        "Unity.RenderPipelines.Core.Runtime",
+        "Unity.RenderPipelines.HighDefinition.Runtime"
+    ],
+    "autoReferenced": true
+}

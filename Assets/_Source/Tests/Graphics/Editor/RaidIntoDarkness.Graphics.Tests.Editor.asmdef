@@ -1,0 +1,21 @@
+{
+    "name": "RaidIntoDarkness.Graphics.Tests.Editor",
+    "rootNamespace": "RaidIntoDarkness.GraphicsOptions.Tests",
+    "references": [
+        "UnityEngine.TestRunner",
+        "UnityEditor.TestRunner",
+        "XRay.Importer.Runtime",
+        "RaidIntoDarkness.Graphics"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "nunit.framework.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS"
+    ]
+}

@@ -104,6 +104,8 @@ namespace XRay.Importer.Levels
                 _shaftsSkyDistance = Mathf.Lerp(SHAFTS_NIGHT_SKY_DISTANCE, SHAFTS_DAY_SKY_DISTANCE, daylight);
                 _fog.maxFogDistance.Override(_shaftsSkyDistance);
                 _fog.anisotropy.Override(Mathf.Lerp(SHAFTS_NIGHT_ANISOTROPY, SHAFTS_DAY_ANISOTROPY, daylight));
+                int quality = XRayVideoOverrides.FogQuality ?? (int)ScalableSettingLevelParameter.Level.High;
+                if (!_fog.quality.overrideState || _fog.quality.value != quality) _fog.quality.Override(quality);
             }
             if (_nativeShafts == active) return;
             _nativeShafts = active;
@@ -114,7 +116,6 @@ namespace XRay.Importer.Levels
                 _fog.globalLightProbeDimmer.Override(SHAFTS_AMBIENT);
                 _fog.directionalLightsOnly.Override(true);
                 _fog.denoisingMode.Override(FogDenoisingMode.Gaussian);
-                _fog.quality.Override((int)ScalableSettingLevelParameter.Level.High);
             }
             else if (_authoredFog != null)
             {

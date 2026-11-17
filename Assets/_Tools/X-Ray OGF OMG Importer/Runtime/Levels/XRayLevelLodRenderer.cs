@@ -75,6 +75,11 @@ namespace XRay.Importer.Levels
 
             float fov = Mathf.Max(1.0f, camera.fieldOfView);
             float screen = camera.pixelWidth * camera.pixelHeight * (90.0f / fov) * (90.0f / fov) * (EPS_S + set.GeometryLod);
+            if (camera.cameraType == CameraType.Game && camera.targetTexture == null)
+            {
+                float bias = XRayVideoOverrides.LodBias;
+                screen *= bias * bias;
+            }
             float lodA = (set.SsaLodA / 3.0f) * (set.SsaLodA / 3.0f) / screen;
             float lodB = (set.SsaLodB / 3.0f) * (set.SsaLodB / 3.0f) / screen;
             float discard = set.SsaDiscard * set.SsaDiscard / screen;

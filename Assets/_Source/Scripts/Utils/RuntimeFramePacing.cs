@@ -12,8 +12,6 @@ namespace RaidIntoDarkness
             {
                 return;
             }
-            QualitySettings.vSyncCount = 0;
-            Application.targetFrameRate = -1;
             Application.runInBackground = true;
             OnDemandRendering.renderFrameInterval = 1;
         }

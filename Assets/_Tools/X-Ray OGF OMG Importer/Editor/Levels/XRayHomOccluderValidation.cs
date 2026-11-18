@@ -10,13 +10,16 @@ namespace XRay.Importer.Editor.Levels
     {
         private const int MAX_PATCHES_PER_MESH = 40;
         private const int MAX_POLYGON_VERTICES = 8;
+        private const int MAX_FACES_PER_LEAF = 8;
         private const float MAX_PLANE_OFFSET = 0.2f;
         private const float MIN_NORMAL_AGREEMENT = 0.985f;
         private const float MIN_DOUBLE_AREA_SQUARED = 0.04f;
         private const float INSET_FRACTION = 0.00025f;
 
         private readonly List<HomFace> _source = new List<HomFace>();
-        private readonly List<HomFace> _candidates = new List<HomFace>();
+        private readonly List<Node> _nodes = new List<Node>();
+        private readonly int[] _sourceOrder;
+        private readonly List<int> _candidates = new List<int>();
         private readonly XRayVegetationOccluderData.Triangle[] _patches = new XRayVegetationOccluderData.Triangle[MAX_PATCHES_PER_MESH];
         private readonly float[] _priorities = new float[MAX_PATCHES_PER_MESH];
         private readonly PolygonPoint[] _input = new PolygonPoint[MAX_POLYGON_VERTICES];
@@ -36,8 +39,14 @@ namespace XRay.Importer.Editor.Levels
                 Vector3 c = XRayUnitySpace.Position(triangle.C, 1f);
                 Vector3 cross = Vector3.Cross(b - a, c - a);
                 float area = cross.sqrMagnitude;
-                if (float.IsFinite(area) && area >= MIN_DOUBLE_AREA_SQUARED) _source.Add(new HomFace(a, b, c, cross / Mathf.Sqrt(area), triangle.DoubleSided));
+                if (!float.IsFinite(area) || area < MIN_DOUBLE_AREA_SQUARED) continue;
+                var face = new HomFace(a, b, c, cross / Mathf.Sqrt(area), triangle.DoubleSided);
+                if (face.Bounds.Intersects(face.Bounds)) _source.Add(face);
             }
+
+            _sourceOrder = new int[_source.Count];
+            for (int index = 0; index < _sourceOrder.Length; index++) _sourceOrder[index] = index;
+            if (_sourceOrder.Length != 0) BuildIndex(0, _sourceOrder.Length, new SourceComparer(_source));
         }
 
         public bool BeginMesh(Bounds bounds)
@@ -61,9 +70,17 @@ namespace XRay.Importer.Editor.Levels
                 bounds = new Bounds(meshToLevel.MultiplyPoint3x4(bounds.center), 2f * new Vector3(Vector3.Dot(x, e), Vector3.Dot(y, e), Vector3.Dot(z, e)));
             }
 
-            foreach (HomFace face in _source)
+            if (_nodes.Count == 0) return false;
+            Vector3 minimum = bounds.min;
+            Vector3 maximum = bounds.max;
+            if (_nodes[0].IsWithin(minimum, maximum))
             {
-                if (face.Bounds.Intersects(bounds)) _candidates.Add(face);
+                for (int index = 0; index < _source.Count; index++) _candidates.Add(index);
+            }
+            else
+            {
+                CollectCandidates(0, bounds, minimum, maximum);
+                _candidates.Sort();
             }
 
             return _candidates.Count != 0;
@@ -92,8 +109,9 @@ namespace XRay.Importer.Editor.Levels
             int bestCount = 0;
             float bestArea = 0f;
             bool doubleSided = false;
-            foreach (HomFace face in _candidates)
+            foreach (int index in _candidates)
             {
+                HomFace face = _source[index];
                 if (!face.Bounds.Intersects(bounds) || !face.Supports(levelA, levelB, levelC, normal)) continue;
                 if (face.Contains(levelA) && face.Contains(levelB) && face.Contains(levelC))
                 {
@@ -143,6 +161,54 @@ namespace XRay.Importer.Editor.Levels
             return result;
         }
 
+        private int BuildIndex(int start, int count, SourceComparer comparer)
+        {
+            int index = _nodes.Count;
+            _nodes.Add(default);
+
+            Bounds first = _source[_sourceOrder[start]].Bounds;
+            Vector3 minimum = first.min;
+            Vector3 maximum = first.max;
+            for (int offset = start + 1; offset < start + count; offset++)
+            {
+                Bounds bounds = _source[_sourceOrder[offset]].Bounds;
+                minimum = Vector3.Min(minimum, bounds.min);
+                maximum = Vector3.Max(maximum, bounds.max);
+            }
+
+            int left = -1;
+            int right = -1;
+            if (count > MAX_FACES_PER_LEAF)
+            {
+                Vector3 size = maximum - minimum;
+                comparer.Axis = size.x >= size.y && size.x >= size.z ? 0 : size.y >= size.z ? 1 : 2;
+                Array.Sort(_sourceOrder, start, count, comparer);
+                int leftCount = count / 2;
+                left = BuildIndex(start, leftCount, comparer);
+                right = BuildIndex(start + leftCount, count - leftCount, comparer);
+            }
+            _nodes[index] = new Node(minimum, maximum, start, count, left, right);
+            return index;
+        }
+
+        private void CollectCandidates(int index, Bounds bounds, Vector3 minimum, Vector3 maximum)
+        {
+            Node node = _nodes[index];
+            if (!node.Intersects(minimum, maximum)) return;
+            if (node.Left >= 0)
+            {
+                CollectCandidates(node.Left, bounds, minimum, maximum);
+                CollectCandidates(node.Right, bounds, minimum, maximum);
+                return;
+            }
+
+            for (int offset = node.Start; offset < node.Start + node.Count; offset++)
+            {
+                int sourceIndex = _sourceOrder[offset];
+                if (_source[sourceIndex].Bounds.Intersects(bounds)) _candidates.Add(sourceIndex);
+            }
+        }
+
         private void Insert(XRayVegetationOccluderData.Triangle triangle, float priority)
         {
             int index = Mathf.Min(_count, MAX_PATCHES_PER_MESH - 1);
@@ -182,6 +248,55 @@ namespace XRay.Importer.Editor.Levels
             var bounds = new Bounds();
             bounds.SetMinMax(Vector3.Min(a, Vector3.Min(b, c)), Vector3.Max(a, Vector3.Max(b, c)));
             return bounds;
+        }
+
+        private readonly struct Node
+        {
+            private readonly Vector3 _minimum;
+            private readonly Vector3 _maximum;
+
+            public int Start { get; }
+            public int Count { get; }
+            public int Left { get; }
+            public int Right { get; }
+
+            public Node(Vector3 minimum, Vector3 maximum, int start, int count, int left, int right)
+            {
+                _minimum = minimum;
+                _maximum = maximum;
+                Start = start;
+                Count = count;
+                Left = left;
+                Right = right;
+            }
+
+            public bool IsWithin(Vector3 minimum, Vector3 maximum)
+            {
+                return _minimum.x >= minimum.x && _maximum.x <= maximum.x && _minimum.y >= minimum.y && _maximum.y <= maximum.y && _minimum.z >= minimum.z && _maximum.z <= maximum.z;
+            }
+
+            public bool Intersects(Vector3 minimum, Vector3 maximum)
+            {
+                return _minimum.x <= maximum.x && _maximum.x >= minimum.x && _minimum.y <= maximum.y && _maximum.y >= minimum.y && _minimum.z <= maximum.z && _maximum.z >= minimum.z;
+            }
+        }
+
+        private sealed class SourceComparer : IComparer<int>
+        {
+            private readonly List<HomFace> _source;
+
+            public int Axis { get; set; }
+
+            public SourceComparer(List<HomFace> source)
+            {
+                _source = source;
+            }
+
+            public int Compare(int first, int second)
+            {
+                int result = _source[first].Bounds.center[Axis].CompareTo(_source[second].Bounds.center[Axis]);
+                return result != 0 ? result : first.CompareTo(second);
+            }
         }
 
         private readonly struct HomFace

@@ -73,9 +73,45 @@ namespace XRay.Importer.Tests
             Assert.That(patches[0].C.z, Is.Zero);
         }
 
-        private static XRayHomTriangle Hom(float height, uint flags)
+        [Test]
+        public void IndexedMeshesKeepSourceOrderAcrossBranches()
         {
-            return new XRayHomTriangle(new XVector3(-5, -3, height), new XVector3(5, -3, height), new XVector3(0, 8, height), flags);
+            var source = new XRayHomTriangle[20];
+            source[0] = Hom(0f, 0u, 3f);
+            source[1] = Hom(0f, 1u, -3f);
+            for (int index = 0; index < 9; index++)
+            {
+                float offset = 20f * (index + 1);
+                source[2 + index * 2] = Hom(0f, 1u, -offset);
+                source[3 + index * 2] = Hom(0f, 1u, offset);
+            }
+
+            var validator = new XRayHomOccluderValidation(source);
+            Assert.That(validator.BeginMesh(new Bounds(Vector3.zero, new Vector3(2f, 4f, 0f))), Is.True);
+            validator.AddBackingTriangle(0, new Vector3(-0.5f, -2f, 0f), new Vector3(0.5f, -2f, 0f), Vector3.up);
+            XRayVegetationOccluderData.Triangle[] patches = validator.FinishMesh();
+            Assert.That(patches, Has.Length.EqualTo(1));
+            Assert.That(patches[0].DoubleSided, Is.False);
+
+            Assert.That(validator.BeginMesh(new Bounds(Vector3.forward, Vector3.zero)), Is.False);
+            Assert.That(validator.FinishMesh(), Is.Empty);
+        }
+
+        [Test]
+        public void IndexedBoundsPreserveEdgeContactAndRejectGaps()
+        {
+            var source = new XRayHomTriangle[17];
+            for (int index = 0; index < source.Length; index++) source[index] = Hom(0f, 0u, index * 20f);
+
+            var validator = new XRayHomOccluderValidation(source);
+            Assert.That(validator.BeginMesh(new Bounds(new Vector3(40f, 0f, 0.2f), Vector3.zero)), Is.True);
+            Assert.That(validator.BeginMesh(new Bounds(new Vector3(40f, 0f, 0.201f), Vector3.zero)), Is.False);
+            Assert.That(validator.BeginMesh(new Bounds(new Vector3(50f, 0f, 0f), Vector3.zero)), Is.False);
+        }
+
+        private static XRayHomTriangle Hom(float height, uint flags, float offset = 0f)
+        {
+            return new XRayHomTriangle(new XVector3(offset - 5f, -3, height), new XVector3(offset + 5f, -3, height), new XVector3(offset, 8, height), flags);
         }
     }
 }

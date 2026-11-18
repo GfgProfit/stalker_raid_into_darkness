@@ -10,6 +10,8 @@ namespace XRay.Importer.Tests
         private static readonly MethodInfo _reset = typeof(XRayVegetationOcclusion).GetMethod("Reset", BindingFlags.Instance | BindingFlags.NonPublic);
         private static readonly MethodInfo _addTriangle = typeof(XRayVegetationOcclusion).GetMethod("AddTriangle", BindingFlags.Instance | BindingFlags.NonPublic);
         private static readonly MethodInfo _addHomTriangle = typeof(XRayVegetationOcclusion).GetMethod("AddHomTriangle", BindingFlags.Instance | BindingFlags.NonPublic);
+        private static readonly FieldInfo _rasterTestsRemaining = typeof(XRayVegetationOcclusion).GetField("_rasterTestsRemaining", BindingFlags.Instance | BindingFlags.NonPublic);
+        private static readonly FieldInfo _depths = typeof(XRayVegetationOcclusion).GetField("_depths", BindingFlags.Instance | BindingFlags.NonPublic);
 
         [TestCase(false)]
         [TestCase(true)]
@@ -39,6 +41,30 @@ namespace XRay.Importer.Tests
 
             AddTriangle(query, right, top, left, true);
             Assert.That(query.IsOccluded(hidden), Is.True);
+        }
+
+        [Test]
+        public void NearestCornerInFrontOfTheOccluderKeepsBoundsVisible()
+        {
+            XRayVegetationOcclusion query = Create(false);
+            AddTriangle(query, new Vector3(-4f, -4f, -5f), new Vector3(0f, 4f, -5f), new Vector3(4f, -4f, -5f));
+
+            Assert.That(query.IsOccluded(new Bounds(new Vector3(0f, 0f, -6f), new Vector3(0.2f, 0.2f, 1f))), Is.True);
+            Assert.That(query.IsOccluded(new Bounds(new Vector3(0f, 0f, -6f), new Vector3(0.2f, 0.2f, 2.5f))), Is.False);
+        }
+
+        [TestCase(150, false)]
+        [TestCase(151, true)]
+        public void WideTriangleDoesNotRasterizePastTheBudgetedRowPrefix(int budget, bool expectedCovered)
+        {
+            XRayVegetationOcclusion query = Create(true);
+            _rasterTestsRemaining.SetValue(query, budget);
+            AddTriangle(query, new Vector3(-4f, 4f, -5f), new Vector3(4f, 4f, -5f), new Vector3(4f, -4f, -5f));
+
+            float[] depths = (float[])_depths.GetValue(query);
+            Assert.That(float.IsFinite(depths[7 * 96 + 84]), Is.EqualTo(expectedCovered));
+            Assert.That(float.IsPositiveInfinity(depths[7 * 96 + 85]), Is.True);
+            Assert.That(_rasterTestsRemaining.GetValue(query), Is.EqualTo(0));
         }
 
         [Test]

@@ -23,11 +23,14 @@ namespace XRay.Importer.Levels
         private readonly Dictionary<Mesh, XRayVegetationOccluderData.Entry> _entries = new Dictionary<Mesh, XRayVegetationOccluderData.Entry>();
         private readonly Dictionary<Material, int> _materialModes = new Dictionary<Material, int>();
         private readonly Plane[] _planes = new Plane[6];
+        private readonly int[] _selectedRenderers = new int[MAX_RENDERERS_INSPECTED_PER_VIEW];
         private readonly Candidate[] _candidates = new Candidate[MAX_RENDERERS_PER_VIEW];
         private readonly Candidate[] _homCandidates = new Candidate[MAX_HOM_RENDERERS_PER_VIEW];
         private readonly Occluder[] _occluders = new Occluder[MAX_RENDERERS_PER_VIEW];
         private readonly List<Material> _subMeshMaterials = new List<Material>();
         private readonly bool[] _defaultLayerDistances = new bool[32];
+        private XRayVegetationOccluderIndex _index;
+        private Matrix4x4 _indexTransform;
         private ResourceRequest _request;
         private bool _initialized;
         private bool _loadedFallback;
@@ -53,10 +56,10 @@ namespace XRay.Importer.Levels
             Vector3 eye = camera.transform.position;
             int candidateCount = 0;
             int homCandidateCount = 0;
-            int stride = (_renderers.Count + MAX_RENDERERS_INSPECTED_PER_VIEW - 1) / MAX_RENDERERS_INSPECTED_PER_VIEW;
-            if (stride == 0) return;
-            for (int i = Time.frameCount % stride; i < _renderers.Count; i += stride)
+            int selectedCount = SelectRenderers(eye);
+            for (int selected = 0; selected < selectedCount; selected++)
             {
+                int i = _selectedRenderers[selected];
                 MeshRenderer renderer = _renderers[i];
                 MeshFilter filter = _filters[i];
                 if (renderer == null || filter == null || !renderer.enabled || !renderer.gameObject.activeInHierarchy || renderer.forceRenderingOff || renderer.isPartOfStaticBatch || renderer.shadowCastingMode == ShadowCastingMode.ShadowsOnly) continue;
@@ -79,11 +82,33 @@ namespace XRay.Importer.Levels
             RasterizeTriangles(query, occluderCount, MAX_TRIANGLES_PER_VIEW - MAX_HOM_TRIANGLES_PER_VIEW + homRemaining, false);
         }
 
+        private int SelectRenderers(Vector3 eye)
+        {
+            Matrix4x4 transform = _geometry.localToWorldMatrix;
+            if (_index == null || !_indexTransform.Equals(transform))
+            {
+                var bounds = new Bounds[_renderers.Count];
+                for (int i = 0; i < _renderers.Count; i++)
+                {
+                    MeshRenderer renderer = _renderers[i];
+                    MeshFilter filter = _filters[i];
+                    if (renderer == null || filter == null) continue;
+                    Mesh mesh = filter.sharedMesh;
+                    if (mesh != null && !mesh.isReadable && _entries.ContainsKey(mesh)) bounds[i] = renderer.bounds;
+                }
+
+                _index = new XRayVegetationOccluderIndex(bounds);
+                _indexTransform = transform;
+            }
+
+            return _index.Select(_planes, eye, MAX_OCCLUDER_DISTANCE_SQUARED, _selectedRenderers);
+        }
+
         private static int RankCandidate(Candidate[] candidates, int count, Candidate candidate)
         {
             int index = Mathf.Min(count, candidates.Length - 1);
-            if (count == candidates.Length && candidate.Size <= candidates[index].Size) return count;
-            while (index > 0 && candidate.Size > candidates[index - 1].Size)
+            if (count == candidates.Length && !RanksBefore(candidate, candidates[index])) return count;
+            while (index > 0 && RanksBefore(candidate, candidates[index - 1]))
             {
                 candidates[index] = candidates[index - 1];
                 index--;
@@ -91,6 +116,11 @@ namespace XRay.Importer.Levels
 
             candidates[index] = candidate;
             return Mathf.Min(count + 1, candidates.Length);
+        }
+
+        private static bool RanksBefore(Candidate candidate, Candidate other)
+        {
+            return candidate.Size > other.Size || candidate.Size == other.Size && candidate.Index < other.Index;
         }
 
         private void PreferHomCandidates(int count, int homCount)

@@ -12,6 +12,7 @@ namespace XRay.Importer.Levels
         private const int MAX_LEVELS = 4;
         private const int MAX_RASTER_TILE_TESTS = 180000;
         private const int MESH_RASTER_TILE_RESERVE = MAX_RASTER_TILE_TESTS / 2;
+        private const int RASTER_TILE_BLOCK = 8;
         private const int MAX_QUERY_TILES = 48;
         private const float TILE_MARGIN = 0.005f;
         private const float DEPTH_MARGIN = 0.05f;
@@ -31,6 +32,7 @@ namespace XRay.Importer.Levels
         private float _near;
         private float _far;
         private bool _perspective;
+        private int _nearestCorner;
         private int _rasterTestsRemaining;
         private int _coveredTiles;
 
@@ -109,18 +111,21 @@ namespace XRay.Importer.Levels
             if (_coveredTiles == 0) return false;
             if (!Project(bounds.center, out Vector3 center)) return false;
             if (center.x < 0.0f || center.x >= WIDTH || center.y < 0.0f || center.y >= HEIGHT) return false;
-            if (_depths[(int)center.y * WIDTH + (int)center.x] + DEPTH_MARGIN >= center.z) return false;
+            float centerTileDepth = _depths[(int)center.y * WIDTH + (int)center.x] + DEPTH_MARGIN;
+            if (centerTileDepth >= center.z) return false;
 
             Vector3 lower = bounds.min;
             Vector3 upper = bounds.max;
-            Vector3 min = center;
-            Vector3 max = center;
-            for (int corner = 0; corner < 8; corner++)
+            if (!Project(GetCorner(lower, upper, _nearestCorner), out Vector3 nearest) || centerTileDepth >= nearest.z) return false;
+            Vector2 min = Vector2.Min(center, nearest);
+            Vector2 max = Vector2.Max(center, nearest);
+            float nearestDepth = Mathf.Min(center.z, nearest.z);
+            for (int offset = 1; offset < 8; offset++)
             {
-                var point = new Vector3((corner & 1) == 0 ? lower.x : upper.x, (corner & 2) == 0 ? lower.y : upper.y, (corner & 4) == 0 ? lower.z : upper.z);
-                if (!Project(point, out Vector3 projected)) return false;
-                min = Vector3.Min(min, projected);
-                max = Vector3.Max(max, projected);
+                if (!Project(GetCorner(lower, upper, _nearestCorner ^ offset), out Vector3 projected)) return false;
+                min = Vector2.Min(min, projected);
+                max = Vector2.Max(max, projected);
+                nearestDepth = Mathf.Min(nearestDepth, projected.z);
             }
 
             int startX = Mathf.FloorToInt(min.x - TILE_MARGIN);
@@ -133,7 +138,7 @@ namespace XRay.Importer.Levels
                 int row = y * WIDTH;
                 for (int x = startX; x <= endX; x++)
                 {
-                    if (_depths[row + x] + DEPTH_MARGIN >= min.z) return false;
+                    if (_depths[row + x] + DEPTH_MARGIN >= nearestDepth) return false;
                 }
             }
 
@@ -147,6 +152,7 @@ namespace XRay.Importer.Levels
             _near = near + DEPTH_MARGIN;
             _far = far;
             _perspective = projection.m32 != 0.0f;
+            _nearestCorner = (view.m20 > 0.0f ? 1 : 0) | (view.m21 > 0.0f ? 2 : 0) | (view.m22 > 0.0f ? 4 : 0);
             _rasterTestsRemaining = MAX_RASTER_TILE_TESTS;
             _coveredTiles = 0;
             Array.Fill(_depths, float.PositiveInfinity);
@@ -160,6 +166,11 @@ namespace XRay.Importer.Levels
         internal void AddHomTriangle(Vector3 a, Vector3 b, Vector3 c, bool doubleSided)
         {
             RasterizeTriangle(a, b, c, doubleSided, MESH_RASTER_TILE_RESERVE);
+        }
+
+        private static Vector3 GetCorner(Vector3 lower, Vector3 upper, int corner)
+        {
+            return new Vector3((corner & 1) == 0 ? lower.x : upper.x, (corner & 2) == 0 ? lower.y : upper.y, (corner & 4) == 0 ? lower.z : upper.z);
         }
 
         private void RasterizeTriangle(Vector3 a, Vector3 b, Vector3 c, bool doubleSided, int reserve)
@@ -176,17 +187,35 @@ namespace XRay.Importer.Levels
             int startY = Mathf.CeilToInt(Mathf.Max(0.0f, min.y));
             int endX = Mathf.FloorToInt(Mathf.Min(WIDTH, max.x)) - 1;
             int endY = Mathf.FloorToInt(Mathf.Min(HEIGHT, max.y)) - 1;
+            int width = endX - startX + 1;
+            if (width <= 0 || endY < startY) return;
             var first = new Edge(p, q);
             var second = new Edge(q, r);
             var third = new Edge(r, p);
             var depthPlane = new DepthPlane(p, q, r, Mathf.Abs(signedArea), _perspective);
             for (int y = startY; y <= endY; y++)
             {
-                int row = y * WIDTH;
-                for (int x = startX; x <= endX; x++)
+                int rowTiles = Math.Min(width, _rasterTestsRemaining - reserve);
+                if (rowTiles <= 0) return;
+                _rasterTestsRemaining -= rowTiles;
+                int rowStart = startX;
+                int rowEnd = startX + rowTiles - 1;
+                if (rowTiles >= RASTER_TILE_BLOCK * 2)
                 {
-                    if (_rasterTestsRemaining <= reserve) return;
-                    _rasterTestsRemaining--;
+                    while (rowStart + RASTER_TILE_BLOCK - 1 <= rowEnd && !MayCover(first, second, third, rowStart, rowStart + RASTER_TILE_BLOCK - 1, y))
+                    {
+                        rowStart += RASTER_TILE_BLOCK;
+                    }
+
+                    while (rowEnd - RASTER_TILE_BLOCK + 1 >= rowStart && !MayCover(first, second, third, rowEnd - RASTER_TILE_BLOCK + 1, rowEnd, y))
+                    {
+                        rowEnd -= RASTER_TILE_BLOCK;
+                    }
+                }
+
+                int row = y * WIDTH;
+                for (int x = rowStart; x <= rowEnd; x++)
+                {
                     int index = row + x;
                     if (min.z >= _depths[index] || !first.Covers(x, y) || !second.Covers(x, y) || !third.Covers(x, y)) continue;
                     float depth = depthPlane.Farthest(x, y, min.z, max.z, _perspective);
@@ -197,15 +226,22 @@ namespace XRay.Importer.Levels
             }
         }
 
+        private static bool MayCover(in Edge first, in Edge second, in Edge third, int startX, int endX, int y)
+        {
+            return first.MayCover(startX, endX, y) && second.MayCover(startX, endX, y) && third.MayCover(startX, endX, y);
+        }
+
         private bool Project(Vector3 point, out Vector3 projected)
         {
             projected = default;
             float depth = -(_view.m20 * point.x + _view.m21 * point.y + _view.m22 * point.z + _view.m23);
             if (!(depth > _near && depth < _far)) return false;
-            Vector4 clip = _viewProjection * new Vector4(point.x, point.y, point.z, 1.0f);
-            if (!(clip.w > 0.0f)) return false;
-            float x = (clip.x / clip.w + 1.0f) * (WIDTH * 0.5f);
-            float y = (clip.y / clip.w + 1.0f) * (HEIGHT * 0.5f);
+            float w = _viewProjection.m30 * point.x + _viewProjection.m31 * point.y + _viewProjection.m32 * point.z + _viewProjection.m33;
+            if (!(w > 0.0f)) return false;
+            float clipX = _viewProjection.m00 * point.x + _viewProjection.m01 * point.y + _viewProjection.m02 * point.z + _viewProjection.m03;
+            float clipY = _viewProjection.m10 * point.x + _viewProjection.m11 * point.y + _viewProjection.m12 * point.z + _viewProjection.m13;
+            float x = (clipX / w + 1.0f) * (WIDTH * 0.5f);
+            float y = (clipY / w + 1.0f) * (HEIGHT * 0.5f);
             projected = new Vector3(x, y, depth);
             return float.IsFinite(x) && float.IsFinite(y) && Mathf.Abs(x) < 1e6f && Mathf.Abs(y) < 1e6f;
         }
@@ -246,6 +282,8 @@ namespace XRay.Importer.Levels
             }
 
             public bool Covers(int x, int y) => _x * x + _y * y + _offset > 0.0f;
+
+            public bool MayCover(int startX, int endX, int y) => Covers(_x < 0.0f ? startX : endX, y);
         }
 
         private readonly struct DepthPlane

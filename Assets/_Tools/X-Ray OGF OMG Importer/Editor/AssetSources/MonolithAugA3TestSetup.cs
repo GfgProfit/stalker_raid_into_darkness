@@ -21,7 +21,7 @@ namespace XRay.Importer.Editor
     {
         public const string FOLDER = "Assets/_Source/Items/Weapons/Tests/MonolithHDRP";
         public const string MODEL_PATH = "Assets/_Source/Items/Weapons/Models/wpn_aug_a3.ogf";
-        public const string ALBEDO_PATH = "Assets/_Source/Items/Weapons/Models/Textures/aug_a3.dds";
+        public const string ALBEDO_PATH = "Assets/_Source/Items/Weapons/Models/Textures/aug_a3.png";
         public const string MATERIAL_PATH = FOLDER + "/AUG_A3_Monolith_Test.mat";
         public const string SCENE_PATH = FOLDER + "/AUG_A3_Monolith_Comparison.unity";
         public const string PREFAB_PATH = FOLDER + "/AUG_A3_Monolith_Test.prefab";
@@ -75,9 +75,8 @@ namespace XRay.Importer.Editor
             }
 
             var albedo = AssetDatabase.LoadAssetAtPath<Texture2D>(ALBEDO_PATH);
-            DdsHeader header = DdsHeader.Parse(File.ReadAllBytes(ALBEDO_PATH));
-            lines.Add($"Albedo={albedo.width}x{albedo.height}, {albedo.format}, sRGB={albedo.isDataSRGB}, mips={albedo.mipmapCount}, header={header.Description}");
-            var packed = AssetDatabase.LoadAssetAtPath<Texture2D>(FOLDER + "/aug_a3_bump_packed.dds");
+            lines.Add($"Albedo={albedo.width}x{albedo.height}, {albedo.format}, sRGB={albedo.isDataSRGB}, mips={albedo.mipmapCount}");
+            var packed = AssetDatabase.LoadAssetAtPath<Texture2D>(FOLDER + "/aug_a3_bump_packed.png");
             if (packed != null)
             {
                 lines.Add($"Packed={packed.width}x{packed.height}, {packed.format}, sRGB={packed.isDataSRGB}, graphics={packed.graphicsFormat}, mips={packed.mipmapCount}");

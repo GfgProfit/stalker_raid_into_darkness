@@ -122,6 +122,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
             }
 
             var paths = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            var retainedPngPaths = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
             foreach (string name in names)
             {
@@ -145,6 +146,14 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
                     byte[] data = File.ReadAllBytes(file);
                     DdsHeader header = DdsHeader.Parse(data);
                     bool native = XRayTextureImporter.IsUnityNative(header);
+                    string png = TexturePath(name, ".png");
+                    if (native && File.Exists(png) && !File.Exists(TexturePath(name, ".dds")))
+                    {
+                        retainedPngPaths.Add(png);
+                        paths[name] = png;
+                        continue;
+                    }
+
                     string target = TexturePath(name, native ? ".dds" : ".png");
                     string full = Path.GetFullPath(target);
                     byte[] converted = native ? ToSrgb(data, header) : EncodePng(DdsDecoder.DecodeTopLevel(data, header), header.Width, header.Height);
@@ -173,7 +182,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
 
             foreach (KeyValuePair<string, string> pair in paths)
             {
-                if (AssetImporter.GetAtPath(pair.Value) is TextureImporter importer && (importer.sRGBTexture == false || importer.alphaIsTransparency == false || importer.textureCompression != TextureImporterCompression.CompressedHQ))
+                if (!retainedPngPaths.Contains(pair.Value) && AssetImporter.GetAtPath(pair.Value) is TextureImporter importer && (importer.sRGBTexture == false || importer.alphaIsTransparency == false || importer.textureCompression != TextureImporterCompression.CompressedHQ))
                 {
                     importer.sRGBTexture = true;
                     importer.alphaIsTransparency = true;

@@ -64,7 +64,8 @@ namespace XRay.Importer.Editor
             var marker = new XRayAssetMarker(file.VirtualPath + ALBEDO_KEY_SUFFIX + ContentQualifier(source), XRayTextureRole.Albedo.ToString(), file.Winner.SourceName, file.Winner.Location, stamp);
             if (IsUnityNative(header) && HasExactPayload(source, header))
             {
-                return Store(marker, file.Winner.RelativePath, string.Empty, ".dds", folder, XRayTextureRole.Albedo, header.Description, () => ToSrgbDds(source, header), null);
+                Func<byte[]> producePng = DdsDecoder.CanDecode(header) ? () => EncodePng(DdsDecoder.DecodeTopLevel(source, header), header.Width, header.Height, false) : null;
+                return Store(marker, file.Winner.RelativePath, string.Empty, ".dds", folder, XRayTextureRole.Albedo, header.Description, () => ToSrgbDds(source, header), null, producePng);
             }
 
             if (!DdsDecoder.CanDecode(header))
@@ -184,7 +185,8 @@ namespace XRay.Importer.Editor
             var marker = new XRayAssetMarker(file.VirtualPath + "#packed" + ContentQualifier(source), XRayTextureRole.Packed.ToString(), file.Winner.SourceName, file.Winner.Location, file.Winner.Stamp);
             if (IsUnityNative(header) && HasExactPayload(source, header))
             {
-                return EnsurePackedLinear(Store(marker, file.Winner.RelativePath, "_packed", ".dds", folder, XRayTextureRole.Packed, header.Description, () => DdsColorSpace.TryGetDxgiFormat(header.Format, false, out uint dxgi) ? DdsColorSpace.WithDx10Header(source, header, dxgi) : source, "Packed linear X-Ray channels; no normal conversion."));
+                Func<byte[]> producePng = DdsDecoder.CanDecode(header) ? () => EncodePng(DdsDecoder.DecodeTopLevel(source, header), header.Width, header.Height, true) : null;
+                return EnsurePackedLinear(Store(marker, file.Winner.RelativePath, "_packed", ".dds", folder, XRayTextureRole.Packed, header.Description, () => DdsColorSpace.TryGetDxgiFormat(header.Format, false, out uint dxgi) ? DdsColorSpace.WithDx10Header(source, header, dxgi) : source, "Packed linear X-Ray channels; no normal conversion.", producePng));
             }
 
             if (!DdsDecoder.CanDecode(header))
@@ -572,10 +574,21 @@ namespace XRay.Importer.Editor
             return count;
         }
 
-        private XRayTextureAssetResult Store(XRayAssetMarker marker, string relativePath, string nameSuffix, string extension, string folder, XRayTextureRole role, string format, Func<byte[]> produce, string note)
+        private XRayTextureAssetResult Store(XRayAssetMarker marker, string relativePath, string nameSuffix, string extension, string folder, XRayTextureRole role, string format, Func<byte[]> produce, string note, Func<byte[]> producePng = null)
         {
             List<string> candidates = XRayAssetNaming.CreateCandidates(relativePath, nameSuffix);
-            string assetPath = XRayAssetNaming.Place(folder, candidates, extension, marker.Key, XRayAssetMarker.ReadKey, _claimed);
+            string retainedPng = role == XRayTextureRole.Normal ? null : FindOwnedPng(folder, candidates, marker.Key);
+            if (retainedPng != null)
+            {
+                _claimed?.Add(retainedPng);
+                if (extension == ".dds")
+                {
+                    extension = ".png";
+                    produce = producePng;
+                }
+            }
+
+            string assetPath = retainedPng ?? XRayAssetNaming.Place(folder, candidates, extension, marker.Key, XRayAssetMarker.ReadKey, _claimed);
             string previousPath = null;
             if (!ContentKeys && _options.OverwriteExistingTextures && !File.Exists(assetPath))
             {
@@ -608,6 +621,13 @@ namespace XRay.Importer.Editor
 
                     return result;
                 }
+            }
+
+            if (produce == null)
+            {
+                result.Status = XRayResourceStatus.Reused;
+                result.Note = $"Kept the existing PNG because DDS format {format} cannot be decoded by the importer.";
+                return result;
             }
 
             byte[] bytes;
@@ -654,6 +674,32 @@ namespace XRay.Importer.Editor
 
             result.Status = exists ? XRayResourceStatus.Updated : extension == ".png" ? XRayResourceStatus.Converted : XRayResourceStatus.Imported;
             return result;
+        }
+
+        private string FindOwnedPng(string folder, List<string> candidates, string key)
+        {
+            string existingPath = null;
+            foreach (string candidate in candidates)
+            {
+                string path = folder + "/" + candidate + ".png";
+                if (XRayAssetMarker.ReadKey(path) != key)
+                {
+                    path = folder + "/" + candidate + "_dds_source.png";
+                    if (XRayAssetMarker.ReadKey(path) != key)
+                    {
+                        continue;
+                    }
+                }
+
+                if (_claimed == null || !_claimed.Contains(path))
+                {
+                    return path;
+                }
+
+                existingPath ??= path;
+            }
+
+            return existingPath;
         }
 
         internal static byte[] ToSrgbDds(byte[] source, DdsHeader header)

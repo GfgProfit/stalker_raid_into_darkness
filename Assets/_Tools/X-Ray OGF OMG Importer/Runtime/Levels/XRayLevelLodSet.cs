@@ -33,6 +33,7 @@ namespace XRay.Importer.Levels
         public float SsaLodA => _ssaLodA;
         public float SsaLodB => _ssaLodB;
         public float SsaDiscard => _ssaDiscard;
+        internal bool HasImpostorData => _material != null && Count > 0 && Count <= int.MaxValue / VERTICES && _lodFactors?.Length == Count && _positions?.Length == Count * VERTICES && _uvs?.Length == Count * VERTICES && _hemi?.Length == Count * VERTICES && _sun?.Length == Count * VERTICES && _normals?.Length == Count * FACES;
 
         public void Initialize(Material material, Vector4[] spheres, float[] lodFactors, Vector3[] positions, Vector2[] uvs, float[] hemi, float[] sun, Vector3[] normals, float geometryLod, float ssaLodA, float ssaLodB, float ssaDiscard)
         {

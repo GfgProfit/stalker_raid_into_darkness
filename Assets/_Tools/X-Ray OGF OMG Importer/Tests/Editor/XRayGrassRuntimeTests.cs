@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using NUnit.Framework;
 using UnityEditor;
@@ -404,6 +405,48 @@ namespace XRay.Importer.Tests
             finally
             {
                 UnityEngine.Object.DestroyImmediate(material);
+            }
+        }
+
+        [Test]
+        public void GrassThinningAndShadowFadeUseIndependentDistances()
+        {
+            const BindingFlags FLAGS = BindingFlags.NonPublic | BindingFlags.Static;
+            Type type = typeof(XRayDetailVegetation);
+            var retention = (Func<float, float, float, float>)type.GetMethod("DistanceRetention", FLAGS).CreateDelegate(typeof(Func<float, float, float, float>));
+            var shadow = (Func<float, float, float, float>)type.GetMethod("ShadowFade", FLAGS).CreateDelegate(typeof(Func<float, float, float, float>));
+            var thinning = (Func<float, float, float>)type.GetMethod("ThinningScale", FLAGS).CreateDelegate(typeof(Func<float, float, float>));
+            Assert.AreEqual(1.0f, retention(40.0f * 40.0f, 40.0f, 140.0f));
+            Assert.AreEqual(0.5f, retention(90.0f * 90.0f, 40.0f, 140.0f), 0.00001f);
+            Assert.AreEqual(0.0f, retention(140.0f * 140.0f, 40.0f, 140.0f));
+            Assert.AreEqual(1.0f, thinning(0.99f, 1.0f));
+            Assert.AreEqual(0.0f, thinning(0.50f, 0.50f));
+            Assert.Greater(thinning(0.48f, 0.50f), 0.0f);
+            Assert.Less(thinning(0.48f, 0.50f), 1.0f);
+            Assert.AreEqual(1.0f, thinning(0.2f, 0.50f));
+            Assert.AreEqual(1.0f, shadow(18.0f * 18.0f, 25.0f, 7.0f));
+            Assert.AreEqual(0.5f, shadow(21.5f * 21.5f, 25.0f, 7.0f), 0.00001f);
+            Assert.AreEqual(0.0f, shadow(25.0f * 25.0f, 25.0f, 7.0f));
+            Assert.AreEqual(1.0f, shadow(24.0f * 24.0f, 25.0f, 0.0f));
+        }
+
+        [TestCase(false)]
+        [TestCase(true)]
+        public void PreparedGrassMatrixMatchesPlacementOnSlope(bool aligned)
+        {
+            Vector3 normal = new Vector3(-0.2f, 1.0f, 0.35f).normalized;
+            var instance = new XRayDetailInstance(3, -12.0f, 3.0f, 7.5f, 1.923f, 2.0f, 1.0f, 1.0f, 1, normal.x, normal.y, normal.z);
+            Type type = typeof(XRayDetailPopulation).Assembly.GetType("XRay.Importer.Levels.XRayPreparedDetail", true);
+            object prepared = Activator.CreateInstance(type, XRayDetailPopulation.MatrixFor(instance, 1.0f, aligned), 0.5f);
+            MethodInfo matrix = type.GetMethod("Matrix");
+            foreach (float scale in new[] { 0.02f, 0.87f, 2.0f })
+            {
+                var actual = (Matrix4x4)matrix.Invoke(prepared, new object[] { instance, scale, aligned });
+                Matrix4x4 expected = XRayDetailPopulation.MatrixFor(instance, scale, aligned);
+                for (int element = 0; element < 16; element++)
+                {
+                    Assert.AreEqual(expected[element], actual[element], 0.00001f);
+                }
             }
         }
 

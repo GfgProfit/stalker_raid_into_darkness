@@ -7,6 +7,9 @@ namespace XRay.Importer.Levels
     {
         public const float MAX_FX_LIGHTING_ADAPTATION = 4.0f;
         public const float DEFAULT_PLAYER_STAT_CAPACITY = 100.0f;
+        public const float DEFAULT_GRASS_SHADOW_DISTANCE = 25.0f;
+        public const float DEFAULT_GRASS_SHADOW_FADE_DISTANCE = 7.0f;
+        public const float DEFAULT_GRASS_THINNING_START_DISTANCE = 36.0f;
 
         private const string RESOURCE_PATH = "GameConfig";
 
@@ -19,6 +22,11 @@ namespace XRay.Importer.Levels
         [SerializeField] private PrecipitationConfig _precipitation;
         [SerializeField] private bool _instanceSubmissionGroupingEnabled;
         [SerializeField] private bool _instanceNativeSubmissionEnabled;
+        [SerializeField] private bool _vegetationOcclusionEnabled = true;
+        [SerializeField] private bool _vegetationTreeImpostorsEnabled = true;
+        [SerializeField, Min(0.0f)] private float _grassShadowDistance = DEFAULT_GRASS_SHADOW_DISTANCE;
+        [SerializeField, Min(0.0f)] private float _grassShadowFadeDistance = DEFAULT_GRASS_SHADOW_FADE_DISTANCE;
+        [SerializeField, Min(0.0f)] private float _grassThinningStartDistance = DEFAULT_GRASS_THINNING_START_DISTANCE;
         [SerializeField] private bool _punctualShadowDistanceEnabled = true;
         [SerializeField, Min(0.01f)] private float _punctualShadowDistance = 75.0f;
         [SerializeField] private bool _fogEnabled = true;
@@ -42,6 +50,11 @@ namespace XRay.Importer.Levels
         public PrecipitationConfig Precipitation => _precipitation;
         public bool InstanceSubmissionGroupingEnabled => _instanceSubmissionGroupingEnabled;
         public bool InstanceNativeSubmissionEnabled => _instanceNativeSubmissionEnabled;
+        public bool VegetationOcclusionEnabled => _vegetationOcclusionEnabled;
+        public bool VegetationTreeImpostorsEnabled => _vegetationTreeImpostorsEnabled;
+        public float GrassShadowDistance => _grassShadowDistance;
+        public float GrassShadowFadeDistance => _grassShadowFadeDistance;
+        public float GrassThinningStartDistance => _grassThinningStartDistance;
         public bool PunctualShadowDistanceEnabled => _punctualShadowDistanceEnabled;
         public float PunctualShadowDistance => _punctualShadowDistance;
         public bool FogEnabled => _fogEnabled;
@@ -76,6 +89,9 @@ namespace XRay.Importer.Levels
             else if (_weatherFxCatalog.OrdinaryCatalog != _ordinaryWeatherCatalog) diagnostic = "GameConfig WeatherFX and ordinary weather catalogs must reference the same ordinary catalog.";
             else if (_celestialSettings == null || _celestialSettings.Shader == null) diagnostic = "GameConfig requires celestial settings with a shader.";
             else if (_precipitation != null && !_precipitation.TryValidate(out string precipitationDiagnostic)) diagnostic = precipitationDiagnostic;
+            else if (!float.IsFinite(_grassShadowDistance) || _grassShadowDistance < 0.0f) diagnostic = "GameConfig GrassShadowDistance must be finite and non-negative.";
+            else if (!float.IsFinite(_grassShadowFadeDistance) || _grassShadowFadeDistance < 0.0f) diagnostic = "GameConfig GrassShadowFadeDistance must be finite and non-negative.";
+            else if (!float.IsFinite(_grassThinningStartDistance) || _grassThinningStartDistance < 0.0f) diagnostic = "GameConfig GrassThinningStartDistance must be finite and non-negative.";
             else if (!float.IsFinite(_punctualShadowDistance) || _punctualShadowDistance <= 0.0f) diagnostic = "GameConfig PunctualShadowDistance must be finite and positive.";
             else if (!float.IsFinite(_lensFlareIntensity) || _lensFlareIntensity < 0.0f) diagnostic = "GameConfig LensFlareIntensity must be finite and non-negative.";
             else if (!float.IsFinite(_expressiveFlareIntensity) || _expressiveFlareIntensity < 0.0f) diagnostic = "GameConfig ExpressiveFlareIntensity must be finite and non-negative.";

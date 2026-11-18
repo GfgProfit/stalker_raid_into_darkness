@@ -8,13 +8,45 @@ namespace XRay.Importer.Levels
 {
     public sealed class XRayDetailCell
     {
+        private readonly List<XRayDetailInstance> _instances = new List<XRayDetailInstance>();
+
         public int X { get; internal set; }
         public int Z { get; internal set; }
         public Bounds Bounds { get; internal set; }
         public Vector3 FadeCenter { get; internal set; }
         public float Alpha { get; internal set; }
         public int Generation { get; internal set; }
-        public List<XRayDetailInstance> Instances { get; } = new List<XRayDetailInstance>();
+        public IReadOnlyList<XRayDetailInstance> Instances { get; }
+
+        internal List<XRayDetailInstance> MutableInstances => _instances;
+        internal XRayPreparedDetail[] Prepared { get; set; }
+
+        public XRayDetailCell()
+        {
+            Instances = _instances.AsReadOnly();
+        }
+    }
+
+    internal readonly struct XRayPreparedDetail
+    {
+        public Vector3 Right { get; }
+        public Vector3 Forward { get; }
+        public float Rank { get; }
+
+        public XRayPreparedDetail(Matrix4x4 matrix, float rank)
+        {
+            Right = new Vector3(matrix.m00, matrix.m10, matrix.m20);
+            Forward = new Vector3(matrix.m02, matrix.m12, matrix.m22);
+            Rank = rank;
+        }
+
+        public Matrix4x4 Matrix(XRayDetailInstance instance, float scale, bool alignment)
+        {
+            Vector3 right = Right * scale;
+            Vector3 up = alignment ? new Vector3(instance.NormalX, instance.NormalY, instance.NormalZ) * scale : Vector3.up * scale;
+            Vector3 forward = Forward * scale;
+            return new Matrix4x4(new Vector4(right.x, right.y, right.z, 0.0f), new Vector4(up.x, up.y, up.z, 0.0f), new Vector4(forward.x, forward.y, forward.z, 0.0f), new Vector4(instance.X, instance.Y, instance.Z, 1.0f));
+        }
     }
 
     public sealed class XRayDetailPopulation
@@ -22,6 +54,9 @@ namespace XRay.Importer.Levels
         public const int MAX_SLOT_BUILDS_PER_FRAME = 4;
         public const int MAX_SLOT_PROBES_PER_FRAME = 512;
         public const double BUILD_BUDGET_MILLISECONDS = 2.0;
+
+        private const int MAX_PREPARED_CAPACITY = 262144;
+        private const float MAX_GRASS_HEIGHT = 2.0f;
 
         private readonly XRayDetails _details;
         private readonly XRayDetailPlacement _placement;
@@ -33,10 +68,11 @@ namespace XRay.Importer.Levels
         private readonly Stopwatch _timer = new Stopwatch();
         private readonly bool _alignment;
         private readonly float _modelExtent;
-        private readonly Vector3 _windExtent;
+        private readonly Bounds[] _modelBounds;
         private Vector2Int _eyeSlot = new Vector2Int(int.MinValue, int.MinValue);
         private int _cursor;
         private int _generation;
+        private int _preparedCapacity;
         private XRayGrassValues _values;
 
         public XRayDetailPopulation(XRayDetailDatabase database, XRayGrassDefaults defaults)
@@ -44,15 +80,21 @@ namespace XRay.Importer.Levels
             _details = XRayDetails.Read(database.SourceDetails.bytes, database.LevelName + " level.details");
             XRayCollisionModel collision = XRayRuntimeCollisionSource.Load(database.SourceCollision);
             _alignment = database.SourceProfile == 1 && defaults.TerrainAlignment;
-            float horizontal = Mathf.Abs(defaults.WindGrass.y) + Mathf.Abs(defaults.WindGrass.z);
-            _windExtent = new Vector3(horizontal, Mathf.Abs(defaults.WindGrass.w), horizontal);
             _placementSettings = new XRayDetailPlacementSettings { MonolithRelease = database.SourceProfile == 1, TerrainSlope = defaults.TerrainSlope, HeightScale = 1.0f };
             _placement = new XRayDetailPlacement(_details, collision, database.Passable, _placementSettings);
-            foreach (XRayDetailModel model in _details.Models)
+            _modelBounds = new Bounds[_details.Models.Count];
+            for (int index = 0; index < _modelBounds.Length; index++)
             {
+                XRayDetailModel model = _details.Models[index];
                 var min = new Vector3(model.BoundsMin[0], model.BoundsMin[1], model.BoundsMin[2]);
                 var max = new Vector3(model.BoundsMax[0], model.BoundsMax[1], model.BoundsMax[2]);
-                _modelExtent = Mathf.Max(_modelExtent, Mathf.Max(min.magnitude, max.magnitude) * model.MaxScale * 2.0f);
+                _modelBounds[index].SetMinMax(min, max);
+                Mesh mesh = index < database.Models.Count ? database.Models[index].Mesh : null;
+                if (mesh != null)
+                {
+                    _modelBounds[index].Encapsulate(mesh.bounds);
+                }
+                _modelExtent = Mathf.Max(_modelExtent, Vector3.Max(-_modelBounds[index].min, _modelBounds[index].max).magnitude * model.MaxScale * MAX_GRASS_HEIGHT);
             }
 
             _offsets.Add(Vector2Int.zero);
@@ -77,7 +119,7 @@ namespace XRay.Importer.Levels
         public int ResidentCells => _cells.Count;
         public int ResidentInstances { get; private set; }
         public double LastBuildMilliseconds { get; private set; }
-        public float BoundsPadding => _modelExtent * 1.5f + _windExtent.magnitude;
+        public float BoundsPadding => XRayDetails.SLOT_SIZE * 2.0f + _modelExtent * 1.5f;
         public float MaximumModelHeight => _modelExtent;
         public bool NeedsStreaming => _cursor < _offsets.Count;
         public bool HasFadingCells { get; private set; }
@@ -145,33 +187,43 @@ namespace XRay.Importer.Levels
                 if (bounds.SqrDistance(eye) > radius * radius) continue;
                 XRayDetailCell cell = cached ?? (_pool.Count > 0 ? _pool.Pop() : new XRayDetailCell());
                 if (cached != null) ResidentInstances -= cached.Instances.Count;
-                cell.Instances.Clear();
+                List<XRayDetailInstance> instances = cell.MutableInstances;
+                instances.Clear();
                 int maximum = (_placement.DitherSize + 1) * (_placement.DitherSize + 1);
-                if (cell.Instances.Capacity > Mathf.Max(64, maximum * 2)) cell.Instances.Capacity = maximum;
+                if (instances.Capacity > Mathf.Max(64, maximum * 2)) instances.Capacity = maximum;
                 cell.X = x;
                 cell.Z = z;
                 cell.Generation = _generation;
                 cell.Alpha = 0.0f;
                 HasFadingCells = true;
-                _placement.PlaceSlot(x, z, cell.Instances);
+                _placement.PlaceSlot(x, z, instances);
+                ReservePrepared(cell, instances.Count);
+                Bounds renderBounds = bounds;
                 bool first = true;
-                foreach (XRayDetailInstance instance in cell.Instances)
+                for (int index = 0; index < instances.Count; index++)
                 {
-                    XRayDetailModel model = _details.Models[instance.Model];
-                    var min = new Vector3(model.BoundsMin[0], model.BoundsMin[1], model.BoundsMin[2]);
-                    var max = new Vector3(model.BoundsMax[0], model.BoundsMax[1], model.BoundsMax[2]);
-                    Matrix4x4 matrix = Matrix(instance, instance.Scale);
-                    Vector3 extent = (max - min) * 0.5f;
+                    XRayDetailInstance instance = instances[index];
+                    Matrix4x4 matrix = Matrix(instance, 1.0f);
+                    XRayPreparedDetail prepared = new XRayPreparedDetail(matrix, StableRank(instance.X, instance.Y, instance.Z));
+                    if (cell.Prepared != null)
+                    {
+                        cell.Prepared[index] = prepared;
+                    }
+                    matrix = PreparedMatrix(instance, prepared, instance.Scale);
+                    Bounds modelBounds = _modelBounds[instance.Model];
+                    Vector3 extent = modelBounds.extents;
                     Vector3 worldExtent = new Vector3(Mathf.Abs(matrix.m00) * extent.x + Mathf.Abs(matrix.m01) * extent.y + Mathf.Abs(matrix.m02) * extent.z, Mathf.Abs(matrix.m10) * extent.x + Mathf.Abs(matrix.m11) * extent.y + Mathf.Abs(matrix.m12) * extent.z, Mathf.Abs(matrix.m20) * extent.x + Mathf.Abs(matrix.m21) * extent.y + Mathf.Abs(matrix.m22) * extent.z);
-                    var itemBounds = new Bounds(matrix.MultiplyPoint3x4((min + max) * 0.5f), worldExtent * 2.0f);
+                    var itemBounds = new Bounds(matrix.MultiplyPoint3x4(modelBounds.center), worldExtent * 2.0f);
+                    Bounds grownBounds = DeformationBounds(instance, itemBounds);
                     if (first) bounds = itemBounds;
                     else bounds.Encapsulate(itemBounds);
+                    if (first) renderBounds = grownBounds;
+                    else renderBounds.Encapsulate(grownBounds);
                     first = false;
                 }
 
                 cell.FadeCenter = bounds.center;
-                bounds.Expand(Vector3.one * (_modelExtent * 3.0f) + _windExtent * 2.0f);
-                cell.Bounds = bounds;
+                cell.Bounds = renderBounds;
                 _cells[key] = cell;
                 ResidentInstances += cell.Instances.Count;
                 if (++builds >= MAX_SLOT_BUILDS_PER_FRAME || _timer.Elapsed.TotalMilliseconds >= BUILD_BUDGET_MILLISECONDS) break;
@@ -184,6 +236,25 @@ namespace XRay.Importer.Levels
         public Matrix4x4 Matrix(XRayDetailInstance instance, float scale)
         {
             return MatrixFor(instance, scale, _alignment);
+        }
+
+        internal Matrix4x4 PreparedMatrix(XRayDetailInstance instance, XRayPreparedDetail prepared, float scale)
+        {
+            return prepared.Matrix(instance, scale, _alignment);
+        }
+
+        internal static float StableRank(float x, float y, float z)
+        {
+            unchecked
+            {
+                uint value = (uint)BitConverter.SingleToInt32Bits(x) * 73856093u ^ (uint)BitConverter.SingleToInt32Bits(y) * 19349663u ^ (uint)BitConverter.SingleToInt32Bits(z) * 83492791u;
+                value ^= value >> 16;
+                value *= 0x7feb352du;
+                value ^= value >> 15;
+                value *= 0x846ca68bu;
+                value ^= value >> 16;
+                return (value >> 8) * (1.0f / 16777216.0f);
+            }
         }
 
         public static Matrix4x4 MatrixFor(XRayDetailInstance instance, float scale, bool alignment)
@@ -211,8 +282,41 @@ namespace XRay.Importer.Levels
         private void Recycle(XRayDetailCell cell)
         {
             ResidentInstances -= cell.Instances.Count;
-            cell.Instances.Clear();
-            if (_pool.Count < 256 && cell.Instances.Capacity <= 4096) _pool.Push(cell);
+            cell.MutableInstances.Clear();
+            if (_pool.Count < 256 && cell.MutableInstances.Capacity <= 4096)
+            {
+                _pool.Push(cell);
+                return;
+            }
+
+            _preparedCapacity -= cell.Prepared?.Length ?? 0;
+        }
+
+        private void ReservePrepared(XRayDetailCell cell, int count)
+        {
+            int capacity = cell.Prepared?.Length ?? 0;
+            if (capacity >= count && capacity <= Mathf.Max(32, count * 4)) return;
+            _preparedCapacity -= capacity;
+            int requested = Mathf.NextPowerOfTwo(count);
+            cell.Prepared = requested > 0 && _preparedCapacity + requested <= MAX_PREPARED_CAPACITY ? new XRayPreparedDetail[requested] : null;
+            _preparedCapacity += cell.Prepared?.Length ?? 0;
+        }
+
+        private Bounds DeformationBounds(XRayDetailInstance instance, Bounds bounds)
+        {
+            Vector3 origin = new Vector3(instance.X, instance.Y, instance.Z);
+            Vector3 min = Vector3.Min(Vector3.zero, (bounds.min - origin) * MAX_GRASS_HEIGHT);
+            Vector3 max = Vector3.Max(Vector3.zero, (bounds.max - origin) * MAX_GRASS_HEIGHT);
+            if (_alignment)
+            {
+                float height = Mathf.Max(-min.y, max.y) * 0.5f;
+                var shear = new Vector3(Mathf.Abs(instance.NormalX) * height, 0.0f, Mathf.Abs(instance.NormalZ) * height);
+                min -= shear;
+                max += shear;
+            }
+
+            bounds.SetMinMax(origin + min, origin + max);
+            return bounds;
         }
     }
 }

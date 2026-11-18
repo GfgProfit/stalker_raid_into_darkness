@@ -340,6 +340,22 @@ namespace XRay.Importer.Tests
         }
 
         [Test]
+        public void ShadowSplitFiltersIndividualInstancesWithinOneSource()
+        {
+            Vector3[] centers = { new Vector3(-4f, 0f, 4f), new Vector3(-0.5f, 0f, 4f), new Vector3(3f, 0f, 4f) };
+            var matrices = new[] { Matrix4x4.Translate(centers[0]), Matrix4x4.Translate(centers[1]), Matrix4x4.Translate(centers[2]) };
+            var batch = new XRayInstanceBatch("Shared shadow source", _mesh, new[] { _firstMaterial }, new Bounds(new Vector3(-0.5f, 0f, 4f), new Vector3(8f, 1f, 1f)), matrices, new[] { Vector4.one, Vector4.one, Vector4.one }, true);
+            _renderer.BatchSet = PreparedSet(new List<XRayInstanceBatch> { batch });
+            XRayInstanceNativeRenderer backend = ActivateNative();
+            var splits = new[] { new CullingSplit { cullingPlaneOffset = 0, cullingPlaneCount = 1 } };
+            Assert.That(SelectShadowSources(backend, new[] { new Plane(Vector3.right, 0f) }, splits), Is.EqualTo(new ushort[] { 1 }));
+            Assert.That(BackendField<ushort[]>(backend, "_instanceMasks"), Is.EqualTo(new ushort[] { 0, 1, 1 }));
+            Assert.That(BackendField<int[]>(backend, "_sourceShadowCounts"), Is.EqualTo(new[] { 2 }));
+            Assert.That(SelectShadowSources(backend, null, splits), Is.EqualTo(new[] { ushort.MaxValue }));
+            Assert.That(BackendField<ushort[]>(backend, "_instanceMasks"), Is.EqualTo(new ushort[] { 1, 1, 1 }));
+        }
+
+        [Test]
         public void ValidShadowSplitsPreserveTheSixteenthBit()
         {
             XRayInstanceNativeRenderer backend = ActivateNative();

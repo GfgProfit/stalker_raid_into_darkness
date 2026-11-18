@@ -54,6 +54,12 @@ namespace XRay.Importer.Levels
 
         public void Evaluate(Camera camera, XRayLevelLodSet set)
         {
+            Evaluate(camera, set, null, null);
+        }
+
+        internal void Evaluate(Camera camera, XRayLevelLodSet set, bool[] owners, XRayVegetationOcclusion occlusion)
+        {
+            bool preserveGeometryWithoutImpostor = owners != null;
             int count = set.Count;
             if (_states == null || _states.Length != count)
             {
@@ -83,6 +89,7 @@ namespace XRay.Importer.Levels
             float lodA = (set.SsaLodA / 3.0f) * (set.SsaLodA / 3.0f) / screen;
             float lodB = (set.SsaLodB / 3.0f) * (set.SsaLodB / 3.0f) / screen;
             float discard = set.SsaDiscard * set.SsaDiscard / screen;
+            bool validThresholds = float.IsFinite(lodA) && float.IsFinite(lodB) && lodA > lodB && lodB > 0.0f;
             float range = Mathf.Max(EPS_S, lodA - lodB);
             Vector3 eye = camera.transform.position;
             GeometryUtility.CalculateFrustumPlanes(camera, _planes);
@@ -91,17 +98,22 @@ namespace XRay.Importer.Levels
             Vector4[] spheres = set.Spheres;
             for (int lod = 0; lod < count; lod++)
             {
+                if (owners != null && !owners[lod])
+                {
+                    _states[lod] = STATE_FULL;
+                    continue;
+                }
                 Vector4 sphere = spheres[lod];
                 var center = new Vector3(sphere.x, sphere.y, sphere.z);
                 float distanceSqr = (center - eye).sqrMagnitude + EPS;
                 float ssa = sphere.w / distanceSqr * set.LodFactors[lod];
-                if (ssa >= lodA)
+                if (ssa >= lodA || preserveGeometryWithoutImpostor && (!validThresholds || !float.IsFinite(ssa) || sphere.w <= 0.0f || set.LodFactors[lod] <= 0.0f))
                 {
                     _states[lod] = STATE_FULL;
                     continue;
                 }
 
-                if (ssa < discard)
+                if (!preserveGeometryWithoutImpostor && ssa < discard)
                 {
                     _states[lod] = STATE_DISCARD;
                     discarded++;
@@ -111,15 +123,32 @@ namespace XRay.Importer.Levels
                 _states[lod] = ssa > lodB ? STATE_BOTH : STATE_IMPOSTOR;
                 if (!InFrustum(center, sphere.w))
                 {
+                    if (preserveGeometryWithoutImpostor) _states[lod] = STATE_FULL;
                     continue;
                 }
 
                 float alpha = Mathf.Clamp(Mathf.Floor((1.0f - (ssa - lodB) / range) * 255.0f), 0.0f, 255.0f) / 255.0f;
-                AppendImpostor(set, lod, center, sphere.w, eye, alpha, impostors++);
+                AppendImpostor(set, lod, center, sphere.w, eye, alpha, impostors);
+                if (preserveGeometryWithoutImpostor)
+                {
+                    var impostorBounds = new Bounds(_vertices[impostors * 4].Position, Vector3.zero);
+                    for (int corner = 1; corner < 4; corner++) impostorBounds.Encapsulate(_vertices[impostors * 4 + corner].Position);
+                    if (!Finite(impostorBounds.center) || !Finite(impostorBounds.extents) || !GeometryUtility.TestPlanesAABB(_planes, impostorBounds))
+                    {
+                        _states[lod] = STATE_FULL;
+                        continue;
+                    }
+
+                    var bounds = new Bounds(center, Vector3.one * (2.0f * sphere.w));
+                    bounds.Encapsulate(impostorBounds);
+                    if (occlusion != null && XRayVegetationOcclusion.IsSmallFlora(bounds) && occlusion.IsOccluded(bounds)) continue;
+                }
+                impostors++;
             }
 
             LastImpostors = impostors;
             LastDiscarded = discarded;
+            if (owners != null && impostors == 0 && !_meshes.ContainsKey(camera)) return;
             Mesh mesh = GetMesh(camera);
             UploadMesh(mesh, impostors);
         }
@@ -166,6 +195,11 @@ namespace XRay.Importer.Levels
             }
 
             return true;
+        }
+
+        private static bool Finite(Vector3 point)
+        {
+            return float.IsFinite(point.x) && float.IsFinite(point.y) && float.IsFinite(point.z);
         }
 
         private void AppendImpostor(XRayLevelLodSet set, int lod, Vector3 center, float radius, Vector3 eye, float alpha, int slot)

@@ -21,6 +21,11 @@ MonoBehaviour:
   _precipitation: {fileID: 11400000, guid: d9e7cde7bfb412b44af0248e8943ce6e, type: 2}
   _instanceSubmissionGroupingEnabled: 0
   _instanceNativeSubmissionEnabled: 1
+  _vegetationOcclusionEnabled: 1
+  _vegetationTreeImpostorsEnabled: 1
+  _grassShadowDistance: 25
+  _grassShadowFadeDistance: 7
+  _grassThinningStartDistance: 36
   _punctualShadowDistanceEnabled: 1
   _punctualShadowDistance: 75
   _fogEnabled: 1

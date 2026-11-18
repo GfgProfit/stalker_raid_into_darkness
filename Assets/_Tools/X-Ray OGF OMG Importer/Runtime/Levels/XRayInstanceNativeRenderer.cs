@@ -54,10 +54,13 @@ namespace XRay.Importer.Levels
         private Bounds[] _sourceBounds;
         private Bounds[] _physicalSourceBounds;
         private ushort[] _sourceSplitMasks;
+        private int[] _sourceShadowCounts;
         private ushort[] _instanceMasks;
         private int[] _sourceStamps;
         private int[] _selectedSources;
         private Vector4[] _payload;
+        private byte[] _cameraLodStates;
+        private XRayVegetationOcclusion _cameraOcclusion;
         private Plane[] _planes = new Plane[0];
         private XRayFloraWindState _wind;
         private XRayFloraWindBounds.SnapshotKey _windBoundsKey;
@@ -78,7 +81,7 @@ namespace XRay.Importer.Levels
         public static IReadOnlyList<string> UnsupportedShaderKeywords => UNSUPPORTED_SHADER_KEYWORDS;
 
         public bool Active => _active;
-        public long MemoryBytes => (_buffer != null ? (long)_buffer.count * _buffer.stride : 0L) + (_instanceBounds != null ? _instanceBounds.LongLength * 24L : 0L) + (_windBounds != null ? _windBounds.LongLength * 24L : 0L) + (_windBoundsStamps != null ? _windBoundsStamps.LongLength * sizeof(int) : 0L) + (_sourceWind != null ? _sourceWind.LongLength : 0L) + (_sourceBounds != null ? _sourceBounds.LongLength * 24L : 0L) + (_physicalSourceBounds != null ? _physicalSourceBounds.LongLength * 24L : 0L) + (_sourceSplitMasks != null ? _sourceSplitMasks.LongLength * 2L : 0L) + (_payload != null ? _payload.LongLength * VECTOR_BYTES : 0L) + (_instanceMasks != null ? _instanceMasks.LongLength * 2L : 0L) + (_sources != null ? _sources.LongLength * 120L : 0L) + (_draws != null ? _draws.LongLength * 32L : 0L) + _planes.LongLength * VECTOR_BYTES + _index.MemoryBytes + (long)_reflectionViews.Capacity * UnsafeUtility.SizeOf<ReflectionView>();
+        public long MemoryBytes => (_buffer != null ? (long)_buffer.count * _buffer.stride : 0L) + (_instanceBounds != null ? _instanceBounds.LongLength * 24L : 0L) + (_windBounds != null ? _windBounds.LongLength * 24L : 0L) + (_windBoundsStamps != null ? _windBoundsStamps.LongLength * sizeof(int) : 0L) + (_sourceWind != null ? _sourceWind.LongLength : 0L) + (_sourceBounds != null ? _sourceBounds.LongLength * 24L : 0L) + (_physicalSourceBounds != null ? _physicalSourceBounds.LongLength * 24L : 0L) + (_sourceSplitMasks != null ? _sourceSplitMasks.LongLength * 2L : 0L) + (_sourceShadowCounts != null ? _sourceShadowCounts.LongLength * sizeof(int) : 0L) + (_payload != null ? _payload.LongLength * VECTOR_BYTES : 0L) + (_instanceMasks != null ? _instanceMasks.LongLength * 2L : 0L) + (_sources != null ? _sources.LongLength * 120L : 0L) + (_draws != null ? _draws.LongLength * 32L : 0L) + _planes.LongLength * VECTOR_BYTES + _index.MemoryBytes + (long)_reflectionViews.Capacity * UnsafeUtility.SizeOf<ReflectionView>();
         public int LastCameraCommands { get; private set; }
         public int LastCameraInstances { get; private set; }
         public int LastCameraBatches { get; private set; }
@@ -98,6 +101,11 @@ namespace XRay.Importer.Levels
         public string FallbackReason { get; private set; }
 
         public bool Prepare(XRayInstanceBatchSet set, Camera camera, int layer, bool castShadows, XRayFloraWindState wind, Func<Material, Material> resolver = null)
+        {
+            return Prepare(set, camera, layer, castShadows, wind, resolver, null, null);
+        }
+
+        internal bool Prepare(XRayInstanceBatchSet set, Camera camera, int layer, bool castShadows, XRayFloraWindState wind, Func<Material, Material> resolver, XRayVegetationOcclusion occlusion, byte[] lodStates)
         {
             Disable();
             _reflectionViews.Clear();
@@ -156,7 +164,7 @@ namespace XRay.Importer.Levels
                     MaterialState state;
                     if (!_materials.TryGetValue(material, out state))
                     {
-                        state = ReadMaterialState(material, wind);
+                        state = ReadMaterialState(material, wind, occlusion != null);
                         _materials.Add(material, state);
                     }
                     if (!state.Supported) return Unsupported("A material does not support the native instance shader contract.");
@@ -181,6 +189,7 @@ namespace XRay.Importer.Levels
                 Source source = _sources[index];
                 source.CastShadows = castShadows && source.Batch.CastShadows;
                 source.Wind = false;
+                source.Flora = occlusion != null && source.DrawCount > 0;
                 source.ReflectionWind = UsesReflectionWind(source.Batch.Materials, wind);
                 source.ReflectionBounds = source.ReflectionWind ? XRayFloraWindBounds.Expand(source.Batch.Bounds, wind) : source.Batch.Bounds;
                 _sources[index] = source;
@@ -192,6 +201,7 @@ namespace XRay.Importer.Levels
                 _draws[index] = draw;
                 Source source = _sources[draw.SourceIndex];
                 source.Wind |= draw.Wind;
+                if (source.Flora) source.Flora = _materials[draw.Material].Flora;
                 _sources[draw.SourceIndex] = source;
             }
             bool payloadChanged = false;
@@ -226,6 +236,8 @@ namespace XRay.Importer.Levels
             _preparedGlobalBounds = globalBounds;
             ClearStatistics();
             FallbackReason = null;
+            _cameraLodStates = lodStates;
+            _cameraOcclusion = occlusion;
             _group.SetEnabledViewTypes(ENABLED_VIEWS);
             _active = true;
             return true;
@@ -235,6 +247,8 @@ namespace XRay.Importer.Levels
         {
             if (_active) _group?.SetEnabledViewTypes(DISABLED_VIEWS);
             _active = false;
+            _cameraLodStates = null;
+            _cameraOcclusion = null;
         }
 
         public bool TryGetResolvedMaterial(Material source, out Material material)
@@ -340,12 +354,12 @@ namespace XRay.Importer.Levels
             return true;
         }
 
-        private MaterialState ReadMaterialState(Material material, XRayFloraWindState wind)
+        private MaterialState ReadMaterialState(Material material, XRayFloraWindState wind, bool classifyFlora = false)
         {
             float materialWind = material.HasProperty(WIND_ID) ? material.GetFloat(WIND_ID) : 0f;
             bool supportedWind = materialWind <= 0.5f || wind != null && wind.Initialized && Mathf.Abs(materialWind - (float)wind.Profile) < 0.5f;
             bool supportedContract = !HasUnsupportedShaderKeyword(material) && (!material.HasProperty(DETAIL_ID) || material.GetFloat(DETAIL_ID) <= 0.5f);
-            return new MaterialState { Supported = _shader != null && material.shader == _shader && material.renderQueue <= (int)RenderQueue.GeometryLast && XRayInstanceBatchSet.SupportsSubmissionMaterial(material) && supportedWind && supportedContract, Wind = XRayFloraWindBounds.Uses(material, wind) };
+            return new MaterialState { Supported = _shader != null && material.shader == _shader && material.renderQueue <= (int)RenderQueue.GeometryLast && XRayInstanceBatchSet.SupportsSubmissionMaterial(material) && supportedWind && supportedContract, Wind = XRayFloraWindBounds.Uses(material, wind), Flora = classifyFlora && XRayVegetationOcclusion.IsFlora(material) };
         }
 
         private bool UsesReflectionWind(Material[] materials, XRayFloraWindState wind)
@@ -458,6 +472,7 @@ namespace XRay.Importer.Levels
             _sourceBounds = null;
             _physicalSourceBounds = null;
             _sourceSplitMasks = null;
+            _sourceShadowCounts = null;
             _instanceMasks = null;
             _sourceStamps = null;
             _selectedSources = null;
@@ -496,6 +511,7 @@ namespace XRay.Importer.Levels
             _sourceBounds = new Bounds[set.Batches.Count];
             _physicalSourceBounds = new Bounds[set.Batches.Count];
             _sourceSplitMasks = new ushort[set.Batches.Count];
+            _sourceShadowCounts = new int[set.Batches.Count];
             _instanceMasks = new ushort[instanceCount];
             _payload = new Vector4[instanceCount];
             int start = 0;
@@ -638,7 +654,8 @@ namespace XRay.Importer.Levels
                 else _cullingStamp++;
                 _selectedCount = 0;
                 Select(context.cullingPlanes, 0, context.cullingPlanes.Length, reflectionIndex);
-                int capacity = 0;
+                int commandCapacity = 0;
+                int instanceCapacity = 0;
                 int survivingInstances = 0;
                 for (int selected = 0; selected < _selectedCount; selected++)
                 {
@@ -647,7 +664,8 @@ namespace XRay.Importer.Levels
                     int count = 0;
                     for (int index = source.Start; index < source.Start + source.Count; index++) if (_instanceMasks[index] != 0) count++;
                     survivingInstances += count;
-                    capacity += count * source.DrawCount;
+                    commandCapacity += source.DrawCount;
+                    instanceCapacity += count * source.DrawCount;
                 }
                 if (reflection)
                 {
@@ -662,11 +680,11 @@ namespace XRay.Importer.Levels
                     LastCameraCommands = 0;
                     LastCameraInstances = 0;
                 }
-                if (capacity == 0) return default;
+                if (instanceCapacity == 0) return default;
                 var commands = (BatchCullingOutputDrawCommands*)output.drawCommands.GetUnsafePtr();
-                commands->drawCommands = (BatchDrawCommand*)UnsafeUtility.Malloc((long)UnsafeUtility.SizeOf<BatchDrawCommand>() * capacity, UnsafeUtility.AlignOf<BatchDrawCommand>(), Allocator.TempJob);
-                commands->visibleInstances = (int*)UnsafeUtility.Malloc((long)sizeof(int) * capacity, UnsafeUtility.AlignOf<int>(), Allocator.TempJob);
-                commands->drawRanges = (BatchDrawRange*)UnsafeUtility.Malloc((long)UnsafeUtility.SizeOf<BatchDrawRange>() * capacity, UnsafeUtility.AlignOf<BatchDrawRange>(), Allocator.TempJob);
+                commands->drawCommands = (BatchDrawCommand*)UnsafeUtility.Malloc((long)UnsafeUtility.SizeOf<BatchDrawCommand>() * commandCapacity, UnsafeUtility.AlignOf<BatchDrawCommand>(), Allocator.TempJob);
+                commands->visibleInstances = (int*)UnsafeUtility.Malloc((long)sizeof(int) * instanceCapacity, UnsafeUtility.AlignOf<int>(), Allocator.TempJob);
+                commands->drawRanges = (BatchDrawRange*)UnsafeUtility.Malloc((long)UnsafeUtility.SizeOf<BatchDrawRange>() * commandCapacity, UnsafeUtility.AlignOf<BatchDrawRange>(), Allocator.TempJob);
                 int commandCount = 0;
                 int visibleCount = 0;
                 for (int selected = 0; selected < _selectedCount; selected++)
@@ -689,7 +707,7 @@ namespace XRay.Importer.Levels
                 commands->drawCommandCount = commandCount;
                 commands->visibleInstanceCount = visibleCount;
                 commands->drawRangeCount = commandCount;
-                LastCullingOutputBytes += (long)capacity * (UnsafeUtility.SizeOf<BatchDrawCommand>() + sizeof(int) + UnsafeUtility.SizeOf<BatchDrawRange>());
+                LastCullingOutputBytes += (long)commandCapacity * (UnsafeUtility.SizeOf<BatchDrawCommand>() + UnsafeUtility.SizeOf<BatchDrawRange>()) + (long)instanceCapacity * sizeof(int);
                 if (reflection)
                 {
                     ReflectionCommands += commandCount;
@@ -715,9 +733,10 @@ namespace XRay.Importer.Levels
             int instanceCapacity = 0;
             for (int selected = 0; selected < _selectedCount; selected++)
             {
-                Source source = _sources[_selectedSources[selected]];
+                int sourceIndex = _selectedSources[selected];
+                Source source = _sources[sourceIndex];
                 commandCapacity = checked(commandCapacity + source.DrawCount);
-                instanceCapacity = checked(instanceCapacity + source.Count * source.DrawCount);
+                instanceCapacity = checked(instanceCapacity + _sourceShadowCounts[sourceIndex] * source.DrawCount);
             }
             if (commandCapacity == 0) return default;
             var commands = (BatchCullingOutputDrawCommands*)output.drawCommands.GetUnsafePtr();
@@ -734,8 +753,8 @@ namespace XRay.Importer.Levels
                 {
                     Draw draw = _draws[drawIndex];
                     int first = instanceCount;
-                    for (int index = source.Start; index < source.Start + source.Count; index++) commands->visibleInstances[instanceCount++] = index;
-                    commands->drawCommands[commandCount] = new BatchDrawCommand { batchID = _batchId, materialID = draw.MaterialId, meshID = draw.MeshId, submeshIndex = (ushort)draw.Submesh, visibleOffset = (uint)first, visibleCount = (uint)source.Count, splitVisibilityMask = _sourceSplitMasks[sourceIndex], flags = BatchDrawCommandFlags.None, sortingPosition = 0 };
+                    for (int index = source.Start; index < source.Start + source.Count; index++) if (_instanceMasks[index] != 0) commands->visibleInstances[instanceCount++] = index;
+                    commands->drawCommands[commandCount] = new BatchDrawCommand { batchID = _batchId, materialID = draw.MaterialId, meshID = draw.MeshId, submeshIndex = (ushort)draw.Submesh, visibleOffset = (uint)first, visibleCount = (uint)(instanceCount - first), splitVisibilityMask = _sourceSplitMasks[sourceIndex], flags = BatchDrawCommandFlags.None, sortingPosition = 0 };
                     commands->drawRanges[commandCount] = new BatchDrawRange { drawCommandsBegin = (uint)commandCount, drawCommandsCount = 1, filterSettings = new BatchFilterSettings { renderingLayerMask = _renderingLayerMask, layer = (byte)_layer, receiveShadows = true, shadowCastingMode = ShadowCastingMode.ShadowsOnly, motionMode = MotionVectorGenerationMode.Camera, staticShadowCaster = false, allDepthSorted = false, sceneCullingMask = ulong.MaxValue } };
                     commandCount++;
                 }
@@ -753,6 +772,7 @@ namespace XRay.Importer.Levels
         {
             _selectedCount = 0;
             Array.Clear(_sourceSplitMasks, 0, _sourceSplitMasks.Length);
+            Array.Clear(_instanceMasks, 0, _instanceMasks.Length);
             bool valid = context.cullingSplits.IsCreated && context.cullingSplits.Length > 0 && context.cullingSplits.Length <= 16 && context.cullingPlanes.IsCreated && Finite(XRayFloraWindBounds.Expand(_globalBounds, _wind, _maximumHeight));
             for (int splitIndex = 0; valid && splitIndex < context.cullingSplits.Length; splitIndex++)
             {
@@ -778,15 +798,43 @@ namespace XRay.Importer.Levels
                     for (int candidate = 0; candidate < _index.SelectedCount; candidate++)
                     {
                         int sourceIndex = _index.SelectedSource(candidate);
-                        if (_sources[sourceIndex].CastShadows) _sourceSplitMasks[sourceIndex] |= mask;
+                        Source source = _sources[sourceIndex];
+                        if (!source.CastShadows) continue;
+                        int count = _sourceSplitMasks[sourceIndex] != 0 ? _sourceShadowCounts[sourceIndex] : 0;
+                        _sourceSplitMasks[sourceIndex] |= mask;
+                        if (count == source.Count) continue;
+                        if (source.Count == 1)
+                        {
+                            _instanceMasks[source.Start] = 1;
+                            _sourceShadowCounts[sourceIndex] = 1;
+                            continue;
+                        }
+
+                        for (int index = source.Start; index < source.Start + source.Count; index++)
+                        {
+                            if (_instanceMasks[index] != 0) continue;
+                            Bounds bounds = _instanceBounds[index];
+                            if (source.Wind) bounds = XRayFloraWindBounds.Expand(bounds, _wind, _sourceBounds[sourceIndex].size.y);
+                            if (!Intersects(_planes, split.cullingPlaneCount, bounds)) continue;
+                            _instanceMasks[index] = 1;
+                            count++;
+                        }
+                        _sourceShadowCounts[sourceIndex] = count;
                     }
                 }
             }
             for (int sourceIndex = 0; sourceIndex < _sources.Length; sourceIndex++)
             {
-                if (!_sources[sourceIndex].CastShadows) continue;
-                if (!valid) _sourceSplitMasks[sourceIndex] = ushort.MaxValue;
-                if (_sourceSplitMasks[sourceIndex] != 0) _selectedSources[_selectedCount++] = sourceIndex;
+                Source source = _sources[sourceIndex];
+                if (!source.CastShadows) continue;
+                if (!valid)
+                {
+                    _sourceSplitMasks[sourceIndex] = ushort.MaxValue;
+                    _sourceShadowCounts[sourceIndex] = source.Count;
+                    for (int index = source.Start; index < source.Start + source.Count; index++) _instanceMasks[index] = 1;
+                }
+                if (_sourceSplitMasks[sourceIndex] == 0 || _sourceShadowCounts[sourceIndex] == 0) continue;
+                _selectedSources[_selectedCount++] = sourceIndex;
             }
         }
 
@@ -890,8 +938,15 @@ namespace XRay.Importer.Levels
                     if (source.ReflectionBounds.SqrDistance(view.Position) > view.DistanceSquared) continue;
                 }
                 Bounds sourceBounds = _sourceBounds[sourceIndex];
+                bool primary = reflectionIndex < 0;
+                int[] lodIndices = primary && _cameraLodStates != null && source.Batch.HasLods ? source.Batch.LodIndices : null;
                 for (int index = source.Start; index < source.Start + source.Count; index++)
                 {
+                    if (lodIndices != null)
+                    {
+                        int lod = lodIndices[index - source.Start];
+                        if (lod >= 0 && lod < _cameraLodStates.Length && _cameraLodStates[lod] > XRayLevelLodRenderer.STATE_BOTH) continue;
+                    }
                     Bounds bounds = _instanceBounds[index];
                     if (source.Wind)
                     {
@@ -903,6 +958,7 @@ namespace XRay.Importer.Levels
                         bounds = _windBounds[index];
                     }
                     if (valid && !Intersects(_planes, count, bounds)) continue;
+                    if (primary && source.Flora && _cameraOcclusion != null && XRayVegetationOcclusion.IsSmallFlora(bounds) && _cameraOcclusion.IsOccluded(bounds)) continue;
                     _instanceMasks[index] = 1;
                     if (_sourceStamps[sourceIndex] == _cullingStamp) continue;
                     _sourceStamps[sourceIndex] = _cullingStamp;
@@ -969,6 +1025,7 @@ namespace XRay.Importer.Levels
         {
             public bool Supported { get; set; }
             public bool Wind { get; set; }
+            public bool Flora { get; set; }
         }
 
         private struct Source
@@ -984,6 +1041,7 @@ namespace XRay.Importer.Levels
             public int MatrixRevision { get; set; }
             public bool Wind { get; set; }
             public bool ReflectionWind { get; set; }
+            public bool Flora { get; set; }
             public bool CastShadows { get; set; }
             public int DrawStart { get; set; }
             public int DrawCount { get; set; }

@@ -18,6 +18,7 @@ namespace XRay.Importer.Levels
 
         private const float TWO_PI = Mathf.PI * 2.0f;
         private const int MAX_SOURCE_INSTANCES_PER_BATCH = 511;
+        private const float THINNING_TRANSITION = 0.08f;
 
         [SerializeField] private XRayDetailDatabase _database;
         [SerializeField, HideInInspector] private float _drawDistance = ENGINE_FADE_DISTANCE;
@@ -31,6 +32,7 @@ namespace XRay.Importer.Levels
         private readonly Dictionary<int, DecodedChunk> _cache = new Dictionary<int, DecodedChunk>();
         private readonly LinkedList<int> _usage = new LinkedList<int>();
         private readonly Plane[] _planes = new Plane[6];
+        private readonly List<XRayDetailCell> _shadowCells = new List<XRayDetailCell>();
         private Matrix4x4[][] _matrixBuffers;
         private SourceInstance[][] _sourceBuffers;
         private Vector4[][] _dataBuffers;
@@ -43,6 +45,8 @@ namespace XRay.Importer.Levels
         private float _timeRot2;
         private float _timePos;
         private XRayGrassSettings _settings;
+        private GameConfig _configuration;
+        private Vector3 _bakedBoundsPadding;
         private XRayDetailPopulation _population;
         private Vector4[][] _extraBuffers;
         private int _streamFrame = -1;
@@ -106,6 +110,7 @@ namespace XRay.Importer.Levels
             _dataId = Shader.PropertyToID(XRayLevelInstancedRenderer.INSTANCE_DATA_PROPERTY);
             _block = new MaterialPropertyBlock();
             _lastTime = Time.realtimeSinceStartupAsDouble;
+            _configuration = GameConfig.Load();
             ResetCache();
             RenderPipelineManager.beginContextRendering += OnBeginContextRendering;
             RenderPipelineManager.beginCameraRendering += OnBeginCameraRendering;
@@ -126,6 +131,7 @@ namespace XRay.Importer.Levels
         {
             _cache.Clear();
             _usage.Clear();
+            _shadowCells.Clear();
             _instanceBytes = null;
             _matrixBuffers = null;
             _sourceBuffers = null;
@@ -199,11 +205,31 @@ namespace XRay.Importer.Levels
                 RenderSource(camera);
                 return;
             }
+
+            RenderBaked(camera);
+        }
+
+        private void RenderBaked(Camera camera)
+        {
             GeometryUtility.CalculateFrustumPlanes(camera, _planes);
             Vector3 eye = camera.transform.position;
-            float fade = Mathf.Max(1.0f, _drawDistance);
-            float fadeLimit = fade * fade;
-            float fadeRange = fadeLimit - 1.0f;
+            float drawDistance = Mathf.Max(0.0f, _drawDistance);
+            float shadowDistance = ResolveShadowDistance();
+            float thinningStart = _configuration != null ? _configuration.GrassThinningStartDistance : GameConfig.DEFAULT_GRASS_THINNING_START_DISTANCE;
+            XRayVegetationOcclusion occlusion = XRayVegetationOcclusion.Begin(camera, transform.parent);
+            LastVisibleInstances = 0;
+            LastShadowVisibleInstances = 0;
+            LastDrawCalls = 0;
+            RenderBakedPass(camera, eye, drawDistance, thinningStart, 0.0f, false, occlusion);
+            if (shadowDistance > 0.0f)
+            {
+                RenderBakedPass(camera, eye, shadowDistance, thinningStart, ResolveShadowFade(), true, null);
+            }
+        }
+
+        private void RenderBakedPass(Camera camera, Vector3 eye, float distanceLimit, float thinningStart, float shadowFade, bool shadow, XRayVegetationOcclusion occlusion)
+        {
+            float distanceLimitSquared = distanceLimit * distanceLimit;
             Array.Clear(_counts, 0, _counts.Length);
             int visible = 0;
             int draws = 0;
@@ -211,7 +237,13 @@ namespace XRay.Importer.Levels
             for (int c = 0; c < chunks.Count; c++)
             {
                 XRayDetailChunk chunk = chunks[c];
-                if (chunk.InstanceCount == 0 || chunk.Bounds.SqrDistance(eye) > fadeLimit || !GeometryUtility.TestPlanesAABB(_planes, chunk.Bounds))
+                if (chunk.InstanceCount == 0)
+                {
+                    continue;
+                }
+                Bounds bounds = chunk.Bounds;
+                bounds.Expand(_bakedBoundsPadding * 2.0f);
+                if (bounds.SqrDistance(eye) >= distanceLimitSquared || !shadow && (!GeometryUtility.TestPlanesAABB(_planes, bounds) || occlusion != null && occlusion.IsOccluded(bounds)))
                 {
                     continue;
                 }
@@ -223,13 +255,15 @@ namespace XRay.Importer.Levels
                     float dy = decoded.Y[i] - eye.y;
                     float dz = decoded.Z[i] - eye.z;
                     float distance = dx * dx + dy * dy + dz * dz;
-                    if (distance > fadeLimit)
+                    if (distance >= distanceLimitSquared)
                     {
                         continue;
                     }
 
-                    float alpha = distance < 1.0f ? 0.0f : (distance - 1.0f) / fadeRange;
-                    float scale = decoded.Scale[i] * (1.0f - alpha);
+                    float fade = SourceFade(distance, _drawDistance);
+                    fade *= ThinningScale(decoded.Rank[i], DistanceRetention(distance, thinningStart, _drawDistance));
+                    if (shadow) fade *= ShadowFade(distance, distanceLimit, shadowFade);
+                    float scale = decoded.Scale[i] * fade;
                     int model = decoded.Model[i];
                     if (model >= _counts.Length || scale <= 0.0f)
                     {
@@ -249,25 +283,26 @@ namespace XRay.Importer.Levels
                     matrix.m13 = decoded.Y[i];
                     matrix.m23 = decoded.Z[i];
                     _matrixBuffers[model][slot] = matrix;
-                    _dataBuffers[model][slot] = new Vector4(decoded.Hemi[i], _database.Models[model].InverseHeight, decoded.Wave[i], decoded.Sun[i]);
+                    _dataBuffers[model][slot] = new Vector4(decoded.Hemi[i], _database.Models[model].InverseHeight, _wind ? decoded.Wave[i] : 0.0f, decoded.Sun[i]);
                     visible++;
                     if (++_counts[model] == XRayInstanceBatchSet.MAX_INSTANCES_PER_BATCH)
                     {
-                        draws += Flush(camera, model);
+                        draws += Flush(camera, model, shadow, distanceLimit);
                     }
                 }
             }
 
             for (int model = 0; model < _counts.Length; model++)
             {
-                draws += Flush(camera, model);
+                draws += Flush(camera, model, shadow, distanceLimit);
             }
 
-            LastVisibleInstances = visible;
-            LastDrawCalls = draws;
+            if (shadow) LastShadowVisibleInstances = visible;
+            else LastVisibleInstances = visible;
+            LastDrawCalls += draws;
         }
 
-        private int Flush(Camera camera, int model)
+        private int Flush(Camera camera, int model, bool shadow, float distanceLimit)
         {
             int count = _counts[model];
             _counts[model] = 0;
@@ -284,9 +319,9 @@ namespace XRay.Importer.Levels
             var parameters = new RenderParams(material)
             {
                 camera = camera,
-                worldBounds = new Bounds(camera.transform.position, Vector3.one * (_drawDistance * 2.0f + 10.0f)),
+                worldBounds = new Bounds(camera.transform.position, (Vector3.one * distanceLimit + _bakedBoundsPadding) * 2.0f),
                 layer = gameObject.layer,
-                shadowCastingMode = _castShadows ? ShadowCastingMode.On : ShadowCastingMode.Off,
+                shadowCastingMode = shadow ? ShadowCastingMode.ShadowsOnly : ShadowCastingMode.Off,
                 receiveShadows = true,
                 matProps = _block
             };
@@ -308,6 +343,10 @@ namespace XRay.Importer.Levels
             _extraBuffers = new Vector4[models][];
             _counts = new int[models];
             int capacity = _sourceBuffers != null ? MAX_SOURCE_INSTANCES_PER_BATCH : XRayInstanceBatchSet.MAX_INSTANCES_PER_BATCH;
+            if (_sourceBuffers == null)
+            {
+                _bakedBoundsPadding = CalculateBakedBoundsPadding();
+            }
             for (int i = 0; i < models; i++)
             {
                 _extraBuffers[i] = new Vector4[capacity];
@@ -315,6 +354,24 @@ namespace XRay.Importer.Levels
                 else _sourceBuffers[i] = new SourceInstance[capacity];
                 _dataBuffers[i] = new Vector4[capacity];
             }
+        }
+
+        private Vector3 CalculateBakedBoundsPadding()
+        {
+            float radius = 0.0f;
+            XRayDetailSwing normal = _database.SwingNormal;
+            XRayDetailSwing fast = _database.SwingFast;
+            float amplitude = Mathf.Max(Mathf.Max(Mathf.Abs(normal.Amplitude1), Mathf.Abs(normal.Amplitude2)), Mathf.Max(Mathf.Abs(fast.Amplitude1), Mathf.Abs(fast.Amplitude2)));
+            foreach (XRayDetailModelEntry model in _database.Models)
+            {
+                if (model.Mesh == null) continue;
+                Bounds bounds = model.Mesh.bounds;
+                Vector3 extent = Vector3.Max(-bounds.min, bounds.max);
+                float windReach = extent.y * extent.y * Mathf.Abs(model.InverseHeight) * amplitude;
+                radius = Mathf.Max(radius, (extent.magnitude + windReach) * Mathf.Max(0.0f, model.MaxScale));
+            }
+
+            return Vector3.one * (radius + 0.1f);
         }
 
         private DecodedChunk GetChunk(int index, XRayDetailChunk chunk)
@@ -363,6 +420,7 @@ namespace XRay.Importer.Levels
                 decoded.Hemi[i] = _instanceBytes[p + 13] / 15.0f;
                 decoded.Sun[i] = _instanceBytes[p + 14] / 15.0f;
                 decoded.Wave[i] = _instanceBytes[p + 15];
+                decoded.Rank[i] = XRayDetailPopulation.StableRank(decoded.X[i], decoded.Y[i], decoded.Z[i]);
             }
 
             decoded.Count = chunk.InstanceCount;
@@ -451,50 +509,135 @@ namespace XRay.Importer.Levels
 
             if (_population == null) return;
             XRayFloraWindProvider provider = XRayFloraWindProvider.Active;
-            XRayGrassBenderState benders = _database.SourceProfile == 1 && provider != null && provider.isActiveAndEnabled ? provider.GrassBenders : null;
+            bool sourceWind = _database.SourceProfile == 1 && provider != null && provider.isActiveAndEnabled;
+            XRayGrassBenderState benders = sourceWind ? provider.GrassBenders : null;
+            Vector3 windExtent = sourceWind && _wind ? ResolveWindExtent(provider.State) : Vector3.zero;
             float maximumHeight = _population.MaximumModelHeight * Mathf.Max(_settings.Values.Height, _heightPrevious);
             GeometryUtility.CalculateFrustumPlanes(camera, _planes);
+            XRayVegetationOcclusion occlusion = XRayVegetationOcclusion.Begin(camera, transform.parent);
             LastVisibleInstances = 0;
             LastShadowVisibleInstances = 0;
             LastDrawCalls = 0;
-            for (int pass = 0; pass < (_castShadows && _settings.Defaults.GrassShadows.x > 0.0f ? 2 : 1); pass++)
+            float shadowDistance = _settings.Defaults.GrassShadows.x > 0.0f ? ResolveShadowDistance() : 0.0f;
+            float shadowLimit = shadowDistance * shadowDistance;
+            float thinningStart = _configuration != null ? _configuration.GrassThinningStartDistance : GameConfig.DEFAULT_GRASS_THINNING_START_DISTANCE;
+            Vector3 boundsPadding = Vector3.one * _population.BoundsPadding + windExtent;
+            if (benders != null) boundsPadding += benders.MaximumDisplacement(maximumHeight);
+            Bounds colorBatchBounds = new Bounds(eye, (Vector3.one * Mathf.Max(0.0f, _drawDistance) + boundsPadding) * 2.0f);
+            _shadowCells.Clear();
+            Array.Clear(_counts, 0, _counts.Length);
+            foreach (XRayDetailCell cell in _population.Cells)
             {
-                Array.Clear(_counts, 0, _counts.Length);
-                foreach (XRayDetailCell cell in _population.Cells)
+                if (!_population.IsCurrent(cell) || cell.Instances.Count == 0) continue;
+                float distance = (cell.FadeCenter - eye).sqrMagnitude;
+                if (distance < shadowLimit)
                 {
-                    if (!_population.IsCurrent(cell)) continue;
-                    bool shadow = pass == 1;
-                    float distance = (cell.FadeCenter - eye).sqrMagnitude;
-                    float fade = SourceFade(distance, _drawDistance);
-                    if (shadow)
-                    {
-                        float start = _drawDistance * _drawDistance * _settings.Defaults.GrassShadows.y;
-                        if (distance > start) fade *= Mathf.Max(0.0f, 1.0f - Mathf.Abs(distance - start) * 0.005f);
-                    }
-                    Bounds bounds = benders != null ? benders.ExpandBounds(cell.Bounds, maximumHeight) : cell.Bounds;
-                    if (fade <= 0.0f || !shadow && !GeometryUtility.TestPlanesAABB(_planes, bounds)) continue;
-                    foreach (XRayDetailInstance instance in cell.Instances)
-                    {
-                        int model = instance.Model;
-                        int index = _counts[model];
-                        Matrix4x4 matrix = _population.Matrix(instance, instance.Scale * fade);
-                        _sourceBuffers[model][index] = new SourceInstance(matrix, matrix);
-                        _dataBuffers[model][index] = new Vector4(instance.Hemi, _database.Models[model].InverseHeight, _wind ? instance.Wave : 0.0f, instance.Sun);
-                        _extraBuffers[model][index] = new Vector4(instance.NormalX, instance.NormalY, instance.NormalZ, cell.Alpha);
-                        if (shadow) LastShadowVisibleInstances++;
-                        else LastVisibleInstances++;
-                        if (++_counts[model] == MAX_SOURCE_INSTANCES_PER_BATCH) FlushSource(camera, model, shadow, benders, maximumHeight);
-                    }
+                    _shadowCells.Add(cell);
                 }
 
-                for (int model = 0; model < _counts.Length; model++) FlushSource(camera, model, pass == 1, benders, maximumHeight);
+                float fade = SourceFade(distance, _drawDistance);
+                if (fade <= 0.0f) continue;
+                Bounds bounds = cell.Bounds;
+                bounds.Expand(windExtent * 2.0f);
+                if (benders != null) bounds = benders.ExpandBounds(bounds, maximumHeight);
+                if (!GeometryUtility.TestPlanesAABB(_planes, bounds) || occlusion != null && occlusion.IsOccluded(bounds)) continue;
+                float retention = DistanceRetention(distance, thinningStart, _drawDistance);
+                RenderSourceCell(cell, fade, retention, camera, false, colorBatchBounds);
             }
+
+            for (int model = 0; model < _counts.Length; model++) FlushSource(camera, model, false, colorBatchBounds);
+
+            if (_shadowCells.Count > 0)
+            {
+                float shadowFade = ResolveShadowFade();
+                Bounds shadowBatchBounds = new Bounds(eye, (Vector3.one * shadowDistance + boundsPadding) * 2.0f);
+                foreach (XRayDetailCell cell in _shadowCells)
+                {
+                    float distance = (cell.FadeCenter - eye).sqrMagnitude;
+                    float fade = SourceFade(distance, _drawDistance) * ShadowFade(distance, shadowDistance, shadowFade);
+                    if (fade > 0.0f) RenderSourceCell(cell, fade, DistanceRetention(distance, thinningStart, _drawDistance), camera, true, shadowBatchBounds);
+                }
+                for (int model = 0; model < _counts.Length; model++) FlushSource(camera, model, true, shadowBatchBounds);
+                _shadowCells.Clear();
+            }
+        }
+
+        private void RenderSourceCell(XRayDetailCell cell, float fade, float retention, Camera camera, bool shadow, Bounds batchBounds)
+        {
+            List<XRayDetailInstance> instances = cell.MutableInstances;
+            XRayPreparedDetail[] prepared = cell.Prepared;
+            int visible = 0;
+            for (int instanceIndex = 0; instanceIndex < instances.Count; instanceIndex++)
+            {
+                XRayDetailInstance instance = instances[instanceIndex];
+                int model = instance.Model;
+                if (model >= _counts.Length) continue;
+                float scale = instance.Scale * fade;
+                if (retention < 1.0f)
+                {
+                    float rank = prepared != null ? prepared[instanceIndex].Rank : XRayDetailPopulation.StableRank(instance.X, instance.Y, instance.Z);
+                    scale *= ThinningScale(rank, retention);
+                }
+                if (scale <= 0.0f) continue;
+                int index = _counts[model];
+                Matrix4x4 matrix = prepared != null ? _population.PreparedMatrix(instance, prepared[instanceIndex], scale) : _population.Matrix(instance, scale);
+                _sourceBuffers[model][index] = new SourceInstance(matrix, matrix);
+                _dataBuffers[model][index] = new Vector4(instance.Hemi, _database.Models[model].InverseHeight, _wind ? instance.Wave : 0.0f, instance.Sun);
+                _extraBuffers[model][index] = new Vector4(instance.NormalX, instance.NormalY, instance.NormalZ, cell.Alpha);
+                visible++;
+                if (++_counts[model] == MAX_SOURCE_INSTANCES_PER_BATCH) FlushSource(camera, model, shadow, batchBounds);
+            }
+
+            if (shadow) LastShadowVisibleInstances += visible;
+            else LastVisibleInstances += visible;
         }
 
         public static float SourceFade(float distanceSquared, float fadeDistance)
         {
             if (fadeDistance <= 1.0f || distanceSquared >= fadeDistance * fadeDistance) return 0.0f;
             return distanceSquared <= 1.0f ? 1.0f : 1.0f - (distanceSquared - 1.0f) / (fadeDistance * fadeDistance - 1.0f);
+        }
+
+        private float ResolveShadowDistance()
+        {
+            if (!_castShadows) return 0.0f;
+            float settingsDistance = _configuration != null ? _configuration.GrassShadowDistance : GameConfig.DEFAULT_GRASS_SHADOW_DISTANCE;
+            return Mathf.Max(0.0f, Mathf.Min(settingsDistance, _drawDistance));
+        }
+
+        private float ResolveShadowFade()
+        {
+            return _configuration != null ? _configuration.GrassShadowFadeDistance : GameConfig.DEFAULT_GRASS_SHADOW_FADE_DISTANCE;
+        }
+
+        private Vector3 ResolveWindExtent(XRayFloraWindState wind)
+        {
+            if (!wind.Initialized || wind.Profile != XRayFloraWindProfile.AnomalySsfx) return Vector3.zero;
+            Vector4 settings = _settings.Defaults.WindGrass;
+            float speed = Mathf.Max(wind.TreesSetup.w, Mathf.Clamp01(wind.Weather.Velocity * 0.001f));
+            float horizontal = Mathf.Abs(settings.y) + Mathf.Abs(settings.z);
+            return new Vector3(horizontal, Mathf.Abs(settings.w), horizontal) * speed;
+        }
+
+        internal static float ShadowFade(float distanceSquared, float shadowDistance, float fadeLength)
+        {
+            if (distanceSquared >= shadowDistance * shadowDistance) return 0.0f;
+            float start = Mathf.Max(0.0f, shadowDistance - fadeLength);
+            if (distanceSquared <= start * start) return 1.0f;
+            return Mathf.SmoothStep(0.0f, 1.0f, (shadowDistance - Mathf.Sqrt(distanceSquared)) / (shadowDistance - start));
+        }
+
+        internal static float DistanceRetention(float distanceSquared, float thinningStart, float distanceLimit)
+        {
+            if (distanceSquared <= thinningStart * thinningStart || distanceLimit <= thinningStart) return 1.0f;
+            return Mathf.Clamp01((distanceLimit - Mathf.Sqrt(distanceSquared)) / (distanceLimit - thinningStart));
+        }
+
+        internal static float ThinningScale(float rank, float retention)
+        {
+            if (retention >= 1.0f) return 1.0f;
+            if (retention <= rank) return 0.0f;
+            return Mathf.SmoothStep(0.0f, 1.0f, (retention - rank) / Mathf.Min(THINNING_TRANSITION, 1.0f - rank));
         }
 
         public bool CanStreamFrom(Camera camera)
@@ -512,7 +655,7 @@ namespace XRay.Importer.Levels
             return owner == null || camera == owner;
         }
 
-        private void FlushSource(Camera camera, int model, bool shadow, XRayGrassBenderState benders, float maximumHeight)
+        private void FlushSource(Camera camera, int model, bool shadow, Bounds batchBounds)
         {
             int count = _counts[model];
             _counts[model] = 0;
@@ -528,15 +671,10 @@ namespace XRay.Importer.Levels
             _block.SetFloat("_MonolithGrassHeight", _settings.Values.Height);
             _block.SetFloat("_MonolithGrassHeightPrevious", _heightPrevious > 0.0f ? _heightPrevious : _settings.Values.Height);
             _block.SetVector("_MonolithWindGrassSetup", _settings.Defaults.WindGrass);
-            Bounds bounds = new Bounds(camera.transform.position, Vector3.one * ((Mathf.Max(0.0f, _drawDistance) + _population.BoundsPadding) * 2.0f));
-            if (benders != null)
-            {
-                bounds.Expand(benders.MaximumDisplacement(maximumHeight) * 2f);
-            }
             var parameters = new RenderParams(material)
             {
                 camera = camera,
-                worldBounds = bounds,
+                worldBounds = batchBounds,
                 layer = gameObject.layer,
                 shadowCastingMode = shadow ? ShadowCastingMode.ShadowsOnly : ShadowCastingMode.Off,
                 motionVectorMode = shadow ? MotionVectorGenerationMode.Camera : MotionVectorGenerationMode.Object,
@@ -610,6 +748,7 @@ namespace XRay.Importer.Levels
                 Hemi = new float[count];
                 Sun = new float[count];
                 Wave = new float[count];
+                Rank = new float[count];
             }
 
             public int Count { get; set; }
@@ -624,6 +763,7 @@ namespace XRay.Importer.Levels
             public float[] Hemi { get; }
             public float[] Sun { get; }
             public float[] Wave { get; }
+            public float[] Rank { get; }
         }
     }
 }

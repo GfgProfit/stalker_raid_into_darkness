@@ -31,6 +31,7 @@ namespace XRay.Importer.Levels
         private readonly XRayInstanceNativeContext _nativeContext = new XRayInstanceNativeContext();
         private MaterialPropertyBlock _submissionBlock;
         private XRayLevelLodRenderer _lodRenderer;
+        private bool[] _lodOwners;
         private int _propertyId;
         private XRayInstanceBatchSet _groupOwner;
         private int _groupRevision = -1;
@@ -47,6 +48,7 @@ namespace XRay.Importer.Levels
         private GameConfig _configuration;
         private XRayInstanceNativeRenderer _nativeRenderer;
         private bool? _nativeSubmissionOverride;
+        private bool? _lodImpostorsOverride;
         private Camera _nativeContextCamera;
         private bool _nativeContextActive;
         private bool _nativeContextAllowed;
@@ -64,6 +66,7 @@ namespace XRay.Importer.Levels
                 _batchSet = value;
                 _properties.Clear();
                 _lodScratch.Clear();
+                _lodOwners = null;
                 _histories.Clear();
                 _groups = null;
                 _groupByBatch = null;
@@ -74,8 +77,8 @@ namespace XRay.Importer.Levels
 
         public bool LodImpostors
         {
-            get => _lodImpostors;
-            set => _lodImpostors = value;
+            get => _lodImpostorsOverride ?? _lodImpostors;
+            set => _lodImpostorsOverride = value;
         }
 
         public Func<Material, Material> MaterialResolver
@@ -155,6 +158,7 @@ namespace XRay.Importer.Levels
             _histories.Clear();
             _lodRenderer?.Dispose();
             _lodRenderer = null;
+            _lodOwners = null;
             _submissionBlock = null;
             _groups = null;
             _groupByBatch = null;
@@ -182,11 +186,26 @@ namespace XRay.Importer.Levels
                 return;
             }
             XRayFloraWindState wind = XRayFloraWindBounds.ActiveState();
-            bool historyPrepared;
-            bool native = TryNativeSubmission(camera, wind, out historyPrepared);
-            EnsureProperties();
+            XRayVegetationOcclusion occlusion = XRayVegetationOcclusion.Begin(camera, transform.parent);
+            bool authoredLod = LodImpostors;
+            bool automaticLod = _lodImpostorsOverride == null && !authoredLod && (_configuration?.VegetationTreeImpostorsEnabled ?? true) && _maxDistance <= 0f && camera.cameraType == CameraType.Game && camera.targetTexture == null && !camera.orthographic && !camera.stereoEnabled;
+            XRayLevelLodSet lods = automaticLod || authoredLod ? _batchSet.Lods : null;
+            byte[] states = null;
+            if (lods != null && lods.HasImpostorData && (!automaticLod || PrepareAutomaticLodOwners(lods)))
+            {
+                _lodRenderer ??= new XRayLevelLodRenderer();
+                _lodRenderer.Evaluate(camera, lods, automaticLod ? _lodOwners : null, automaticLod ? occlusion : null);
+                states = _lodRenderer.States;
+            }
+            else if (_lodRenderer != null)
+            {
+                _lodRenderer.Dispose();
+                _lodRenderer = null;
+            }
+            bool native = TryNativeSubmission(camera, wind, occlusion, states, out bool historyPrepared);
             if (!native)
             {
+                EnsureProperties();
                 GeometryUtility.CalculateFrustumPlanes(camera, _planes);
                 ExperimentalShadowInfluence?.Prepare(camera);
             }
@@ -198,19 +217,6 @@ namespace XRay.Importer.Levels
             int rejectedShadowBatches = 0;
             int lodShadowOnly = 0;
             int lodDiscarded = 0;
-            XRayLevelLodSet lods = !native && _lodImpostors ? _batchSet.Lods : null;
-            byte[] states = null;
-            if (lods != null && lods.Count > 0)
-            {
-                _lodRenderer ??= new XRayLevelLodRenderer();
-                _lodRenderer.Evaluate(camera, lods);
-                states = _lodRenderer.States;
-            }
-            else if (_lodRenderer != null)
-            {
-                _lodRenderer.Dispose();
-                _lodRenderer = null;
-            }
 
             IReadOnlyList<XRayInstanceBatch> batches = _batchSet.Batches;
             LastSubmittedCalls = 0;
@@ -221,7 +227,7 @@ namespace XRay.Importer.Levels
                 if (grouped && _groupByBatch[i] >= 0 && _groups[_groupByBatch[i]].Active)
                 {
                     GroupScratch group = _groups[_groupByBatch[i]];
-                    if (group.LeaderIndex != i || RenderGroup(camera, group, wind, ref visibleBatches, ref visibleInstances, ref shadowOnlyBatches)) continue;
+                    if (group.LeaderIndex != i || RenderGroup(camera, group, wind, occlusion, ref visibleBatches, ref visibleInstances, ref shadowOnlyBatches)) continue;
                 }
                 XRayInstanceBatch batch = batches[i];
                 bool castShadows = _castShadows && batch.CastShadows;
@@ -234,7 +240,7 @@ namespace XRay.Importer.Levels
 
                 Bounds bounds;
                 bool visible;
-                if (grouped) visible = SourceVisible(i, batch, wind, out bounds);
+                if (grouped) visible = SourceVisible(i, batch, wind, occlusion, out bounds);
                 else
                 {
                     bounds = UsesWind(batch.Materials, wind) ? XRayFloraWindBounds.Expand(batch.Bounds, wind) : batch.Bounds;
@@ -244,7 +250,7 @@ namespace XRay.Importer.Levels
                 {
                     continue;
                 }
-                if (!native && !grouped) visible = GeometryUtility.TestPlanesAABB(_planes, bounds);
+                if (!grouped) visible = IsColorVisible(batch, bounds, occlusion);
 
                 if (!visible && !castShadows)
                 {
@@ -287,6 +293,25 @@ namespace XRay.Importer.Levels
             LastVisibleInstances = visibleInstances;
             LastShadowOnlyBatches = shadowOnlyBatches;
             LastRejectedShadowBatches = rejectedShadowBatches;
+        }
+
+        private bool PrepareAutomaticLodOwners(XRayLevelLodSet lods)
+        {
+            if (_lodOwners == null || _lodOwners.Length != lods.Count) _lodOwners = new bool[lods.Count];
+            Array.Clear(_lodOwners, 0, _lodOwners.Length);
+            bool hasOwners = false;
+            foreach (XRayInstanceBatch batch in _batchSet.Batches)
+            {
+                if (!batch.HasLods) continue;
+                if (batch.MatricesExposed) return false;
+                foreach (int lod in batch.LodIndices)
+                {
+                    if (lod < 0 || lod >= _lodOwners.Length) continue;
+                    _lodOwners[lod] = true;
+                    hasOwners = true;
+                }
+            }
+            return hasOwners;
         }
 
         private void RenderReflection(Camera camera)
@@ -466,7 +491,7 @@ namespace XRay.Importer.Levels
             ReleaseGroups();
         }
 
-        private bool TryNativeSubmission(Camera camera, XRayFloraWindState wind, out bool historyPrepared)
+        private bool TryNativeSubmission(Camera camera, XRayFloraWindState wind, XRayVegetationOcclusion occlusion, byte[] lodStates, out bool historyPrepared)
         {
             historyPrepared = false;
             bool enabled = _nativeSubmissionOverride ?? (_configuration != null && _configuration.InstanceNativeSubmissionEnabled);
@@ -481,7 +506,7 @@ namespace XRay.Importer.Levels
                 _nativeSubmissionFallbackReason = "The render context does not contain a single supported camera.";
                 return false;
             }
-            if (camera.cameraType != CameraType.Game || camera.stereoEnabled || _maxDistance > 0f || _lodImpostors || ExperimentalShadowInfluence != null || _configuration != null && _configuration.InstanceSubmissionGroupingEnabled || MaterialResolver != null && !_orderIndependentResolver || !_batchSet.HasPreparedMatrices)
+            if (camera.cameraType != CameraType.Game || camera.stereoEnabled || _maxDistance > 0f || LodImpostors || ExperimentalShadowInfluence != null || _configuration != null && _configuration.InstanceSubmissionGroupingEnabled || MaterialResolver != null && !_orderIndependentResolver || !_batchSet.HasPreparedMatrices)
             {
                 _nativeSubmissionFallbackReason = "The renderer requires the original submission contract.";
                 return false;
@@ -512,7 +537,7 @@ namespace XRay.Importer.Levels
             Func<Material, Material> resolver = MaterialResolver;
             int layer = gameObject.layer;
             bool castShadows = _castShadows;
-            bool prepared = _nativeRenderer.Prepare(_batchSet, camera, layer, castShadows, wind, resolver);
+            bool prepared = _nativeRenderer.Prepare(_batchSet, camera, layer, castShadows, wind, resolver, occlusion, lodStates);
             if (prepared)
             {
                 _nativePreparedResolver = resolver;
@@ -576,7 +601,7 @@ namespace XRay.Importer.Levels
                 _groups = null;
                 _groupByBatch = null;
             }
-            if (_batchSet.GroupingVersion != XRayInstanceBatchSet.GROUPING_VERSION || !_batchSet.HasPreparedMatrices || _batchSet.SubmissionGroups == null || _batchSet.SubmissionGroups.Count == 0 || _maxDistance > 0f || _lodImpostors || states != null || ExperimentalShadowInfluence != null || camera.stereoEnabled || camera.cameraType != CameraType.Game && camera.cameraType != CameraType.SceneView) return false;
+            if (_batchSet.GroupingVersion != XRayInstanceBatchSet.GROUPING_VERSION || !_batchSet.HasPreparedMatrices || _batchSet.SubmissionGroups == null || _batchSet.SubmissionGroups.Count == 0 || _maxDistance > 0f || LodImpostors || states != null || ExperimentalShadowInfluence != null || camera.stereoEnabled || camera.cameraType != CameraType.Game && camera.cameraType != CameraType.SceneView) return false;
             if (_groupOwner != _batchSet || _groupRevision != _batchSet.GroupingRevision)
             {
                 _groupOwner = _batchSet;
@@ -628,7 +653,7 @@ namespace XRay.Importer.Levels
             return true;
         }
 
-        private bool RenderGroup(Camera camera, GroupScratch group, XRayFloraWindState wind, ref int visibleBatches, ref int visibleInstances, ref int shadowOnlyBatches)
+        private bool RenderGroup(Camera camera, GroupScratch group, XRayFloraWindState wind, XRayVegetationOcclusion occlusion, ref int visibleBatches, ref int visibleInstances, ref int shadowOnlyBatches)
         {
             XRayInstanceBatch first = group.Sources[0];
             bool usesWind = UsesWind(first.Materials, wind);
@@ -636,7 +661,7 @@ namespace XRay.Importer.Levels
             bool visible = false;
             for (int member = 0; member < group.Sources.Length; member++)
             {
-                bool sourceVisible = SourceVisible(group.Plan.BatchIndices[member], group.Sources[member], wind, out _);
+                bool sourceVisible = SourceVisible(group.Plan.BatchIndices[member], group.Sources[member], wind, occlusion, out _);
                 if (member == 0) visible = sourceVisible;
                 else if (sourceVisible != visible)
                 {
@@ -689,16 +714,23 @@ namespace XRay.Importer.Levels
             return true;
         }
 
-        private bool SourceVisible(int index, XRayInstanceBatch batch, XRayFloraWindState wind, out Bounds bounds)
+        private bool SourceVisible(int index, XRayInstanceBatch batch, XRayFloraWindState wind, XRayVegetationOcclusion occlusion, out Bounds bounds)
         {
             if (_sourceVisibility[index] == 0)
             {
                 bounds = UsesWind(batch.Materials, wind) ? XRayFloraWindBounds.Expand(batch.Bounds, wind) : batch.Bounds;
                 _sourceBounds[index] = bounds;
-                _sourceVisibility[index] = GeometryUtility.TestPlanesAABB(_planes, bounds) ? (byte)2 : (byte)1;
+                _sourceVisibility[index] = IsColorVisible(batch, bounds, occlusion) ? (byte)2 : (byte)1;
             }
             bounds = _sourceBounds[index];
             return _sourceVisibility[index] == 2;
+        }
+
+        private bool IsColorVisible(XRayInstanceBatch batch, Bounds bounds, XRayVegetationOcclusion occlusion)
+        {
+            if (!GeometryUtility.TestPlanesAABB(_planes, bounds)) return false;
+            if (occlusion == null || batch.MatricesExposed || MaterialResolver != null && !_orderIndependentResolver || !XRayVegetationOcclusion.IsSmallFlora(bounds) || !XRayVegetationOcclusion.IsFlora(batch.Materials)) return true;
+            return !occlusion.IsOccluded(bounds);
         }
 
         private int MeshSubmeshes(Mesh mesh)

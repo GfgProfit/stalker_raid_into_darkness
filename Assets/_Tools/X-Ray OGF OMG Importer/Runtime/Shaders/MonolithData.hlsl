@@ -180,6 +180,15 @@ void MonolithSourceBasis(FragInputs input, out float3 tangent, out float3 bitang
 
 void GetSurfaceAndBuiltinData(FragInputs input, float3 V, inout PositionInputs posInput, out SurfaceData surfaceData, out BuiltinData builtinData)
 {
+    #ifdef _MONOLITH_LEVEL_DETAIL
+    float grassSource = _MonolithGrassSource;
+    if (grassSource > 0.5 && grassSource < 1.5)
+    {
+        float cellAlpha = MonolithInstanceExtra().w;
+        [branch]
+        if (cellAlpha < 16.0 / 17.0) clip(cellAlpha - MonolithAnomalyGrassDither(posInput.positionSS));
+    }
+    #endif
     if (_MonolithDebug > 62.5 && _MonolithDebug < 63.5)
     {
         _MonolithDiagnosticValue = 1.0;
@@ -268,10 +277,8 @@ void GetSurfaceAndBuiltinData(FragInputs input, float3 V, inout PositionInputs p
     #endif
     encodedAlbedo = saturate(encodedAlbedo * _BaseColor.rgb);
     #ifdef _MONOLITH_LEVEL_DETAIL
-    float grassSource = _MonolithGrassSource;
     if (grassSource > 0.5 && grassSource < 1.5)
     {
-        clip(MonolithInstanceExtra().w - MonolithAnomalyGrassDither(posInput.positionSS));
         float variation = input.texCoord1.x;
         encodedAlbedo = MonolithFloraUnorm8(MonolithFloraOptionalColorVariation(encodedAlbedo, variation, _MonolithFloraVariation.x, _MonolithFloraVariationEnabled));
     }

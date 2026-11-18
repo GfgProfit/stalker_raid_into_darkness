@@ -1259,9 +1259,9 @@ namespace XRay.Importer.Editor.Levels
             _record.SetMetric("LodOwnedTrees", lodOwners.Count);
             _record.SetMetric("HierarchyVisuals", hierarchy);
             _record.SetMetric("UnsupportedVisuals", unsupported);
-            if (lods > 0)
+            if (lods > 0 && lodSet == null)
             {
-                _record.AddLimitation(lodSet != null ? $"{lods} MT_LOD visuals: original 8-face impostors (level_lods.dds) are imported as an experimental path (XRayLevelInstancedRenderer.LodImpostors, off by default); by default child MU/tree geometry is rendered at every distance." : $"{lods} MT_LOD visuals: their child MU/tree geometry is rendered at every distance; the LOD impostor atlas is unavailable.");
+                _record.AddLimitation($"{lods} MT_LOD visuals: their child MU/tree geometry is rendered at every distance; the LOD impostor atlas is unavailable.");
             }
 
             var submeshShaders = new List<int>();

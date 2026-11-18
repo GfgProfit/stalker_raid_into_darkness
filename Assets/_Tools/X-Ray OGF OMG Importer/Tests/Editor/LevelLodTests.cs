@@ -42,6 +42,15 @@ namespace XRay.Importer.Tests
                 CollectionAssert.AreEqual(new[] { XRayLevelLodRenderer.STATE_FULL, XRayLevelLodRenderer.STATE_BOTH, XRayLevelLodRenderer.STATE_IMPOSTOR, XRayLevelLodRenderer.STATE_DISCARD }, renderer.States);
                 Assert.AreEqual(2, renderer.LastImpostors);
                 Assert.AreEqual(1, renderer.LastDiscarded);
+
+                set.Spheres[2].x = 1000.0f;
+                for (int vertex = 3 * XRayLevelLodSet.VERTICES; vertex < vertices; vertex++) set.Positions[vertex] = new Vector3((vertex & 1) == 0 ? -1.0f : 1.0f, (vertex & 2) == 0 ? -1.0f : 1.0f, distances[3]);
+                var owners = new[] { true, false, true, true };
+                MethodInfo automatic = typeof(XRayLevelLodRenderer).GetMethod(nameof(XRayLevelLodRenderer.Evaluate), BindingFlags.Instance | BindingFlags.NonPublic);
+                automatic.Invoke(renderer, new object[] { camera, set, owners, null });
+                CollectionAssert.AreEqual(new[] { XRayLevelLodRenderer.STATE_FULL, XRayLevelLodRenderer.STATE_FULL, XRayLevelLodRenderer.STATE_FULL, XRayLevelLodRenderer.STATE_IMPOSTOR }, renderer.States);
+                Assert.AreEqual(1, renderer.LastImpostors);
+                Assert.AreEqual(0, renderer.LastDiscarded);
             }
             finally
             {

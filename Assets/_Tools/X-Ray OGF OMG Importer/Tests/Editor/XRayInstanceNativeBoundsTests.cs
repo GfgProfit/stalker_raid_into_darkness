@@ -298,9 +298,9 @@ namespace XRay.Importer.Tests
                 Assert.That(configuration.InstanceNativeSubmissionEnabled, Is.True);
                 Assert.That(renderer.NativeSubmissionOverride, Is.Null);
                 begin.Invoke(renderer, new object[] { default(ScriptableRenderContext), new List<Camera> { camera } });
-                object[] arguments = { camera, wind, false };
+                object[] arguments = { camera, wind, null, null, false };
                 Assert.That((bool)prepare.Invoke(renderer, arguments), Is.True, renderer.NativeSubmissionFallbackReason);
-                Assert.That((bool)arguments[2], Is.True);
+                Assert.That((bool)arguments[4], Is.True);
                 Assert.That(renderer.NativeSubmissionActive, Is.True);
                 Assert.That(renderer.NativeSubmissionFallbackReason, Is.Null.Or.Empty);
                 Assert.That(renderer.NativeSubmissionMemoryBytes, Is.GreaterThan(0));

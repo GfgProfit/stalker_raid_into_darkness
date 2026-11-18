@@ -44,40 +44,10 @@ namespace XRay.Importer.Editor.Rendering
             {
                 string path = ResolveFile(root, file.path);
                 byte[] original = File.Exists(path) ? File.ReadAllBytes(path) : null;
-                if (original != null && Hash(original) == file.patchedSha256)
+                byte[] replacement = PrepareReplacement(file, original, path);
+                if (replacement == null)
                 {
                     continue;
-                }
-                byte[] replacement;
-                if (file.create)
-                {
-                    if (original != null)
-                    {
-                        throw new InvalidOperationException("Refusing to replace an unknown HDRP patch file: " + path);
-                    }
-                    replacement = new UTF8Encoding(false).GetBytes(file.content);
-                }
-                else
-                {
-                    if (original == null || Hash(original) != file.originalSha256)
-                    {
-                        throw new InvalidOperationException("HDRP original/patched SHA256 guard failed: " + path);
-                    }
-                    string text = new UTF8Encoding(false, true).GetString(original);
-                    foreach (var edit in file.edits)
-                    {
-                        int first = text.IndexOf(edit.find, StringComparison.Ordinal);
-                        if (first < 0 || text.IndexOf(edit.find, first + edit.find.Length, StringComparison.Ordinal) >= 0)
-                        {
-                            throw new InvalidOperationException("HDRP patch anchor must occur exactly once: " + file.path);
-                        }
-                        text = text.Substring(0, first) + edit.replace + text.Substring(first + edit.find.Length);
-                    }
-                    replacement = new UTF8Encoding(false).GetBytes(text);
-                }
-                if (Hash(replacement) != file.patchedSha256)
-                {
-                    throw new InvalidOperationException("HDRP patch output SHA256 guard failed: " + file.path);
                 }
                 writes.Add(new PendingWrite { Path = path, Original = original, Replacement = replacement, Attributes = original == null ? FileAttributes.Normal : File.GetAttributes(path) });
             }
@@ -86,6 +56,62 @@ namespace XRay.Importer.Editor.Rendering
                 return "HDRP 17.6.0 shadow binding patch already applied and SHA256 verified.";
             }
             AssetDatabase.StartAssetEditing();
+            try
+            {
+                ApplyWrites(writes);
+            }
+            finally
+            {
+                AssetDatabase.StopAssetEditing();
+            }
+            AssetDatabase.Refresh();
+            RequireApplied();
+            return "Applied and SHA256 verified HDRP 17.6.0 shadow binding patch to " + root + ". Wait for Unity script compilation before building.";
+        }
+
+        private static byte[] PrepareReplacement(PatchFile file, byte[] original, string path)
+        {
+            string originalHash = original != null ? Hash(original) : null;
+            if (originalHash != null && originalHash == file.patchedSha256)
+            {
+                return null;
+            }
+            byte[] replacement;
+            if (file.create)
+            {
+                if (original != null && (string.IsNullOrEmpty(file.previousPatchedSha256) || originalHash != file.previousPatchedSha256))
+                {
+                    throw new InvalidOperationException("Refusing to replace an unknown HDRP patch file: " + path);
+                }
+                replacement = new UTF8Encoding(false).GetBytes(file.content);
+            }
+            else
+            {
+                if (original == null || originalHash != file.originalSha256)
+                {
+                    throw new InvalidOperationException("HDRP original/patched SHA256 guard failed: " + path);
+                }
+                string text = new UTF8Encoding(false, true).GetString(original);
+                foreach (var edit in file.edits)
+                {
+                    int first = text.IndexOf(edit.find, StringComparison.Ordinal);
+                    if (first < 0 || text.IndexOf(edit.find, first + edit.find.Length, StringComparison.Ordinal) >= 0)
+                    {
+                        throw new InvalidOperationException("HDRP patch anchor must occur exactly once: " + file.path);
+                    }
+                    text = text.Substring(0, first) + edit.replace + text.Substring(first + edit.find.Length);
+                }
+                replacement = new UTF8Encoding(false).GetBytes(text);
+            }
+            if (Hash(replacement) != file.patchedSha256)
+            {
+                throw new InvalidOperationException("HDRP patch output SHA256 guard failed: " + file.path);
+            }
+            return replacement;
+        }
+
+        private static void ApplyWrites(List<PendingWrite> writes)
+        {
             try
             {
                 foreach (var write in writes)
@@ -127,13 +153,6 @@ namespace XRay.Importer.Editor.Rendering
                 }
                 throw;
             }
-            finally
-            {
-                AssetDatabase.StopAssetEditing();
-            }
-            AssetDatabase.Refresh();
-            RequireApplied();
-            return "Applied and SHA256 verified HDRP 17.6.0 shadow binding patch to " + root + ". Wait for Unity script compilation before building.";
         }
 
         public static bool IsApplied(out string reason)
@@ -291,6 +310,7 @@ namespace XRay.Importer.Editor.Rendering
             public string path;
             public bool create;
             public string originalSha256;
+            public string previousPatchedSha256;
             public string patchedSha256;
             public string content;
             public PatchEdit[] edits;

@@ -52,6 +52,8 @@ namespace Rvm.Benchmark.Tests
         [TestCase("-particle-frames-visual")]
         [TestCase("-anomaly-visual")]
         [TestCase("-anomaly-events")]
+        [TestCase("-instance-native-submission")]
+        [TestCase("-benchmark-frame-timing-diagnostic")]
         public void DiagnosticRejectsOtherBenchmarkModes(string argument)
         {
             Assert.That(PixDiagnosticPolicy.HasObserverArguments(new[] { "-clean-route", "-benchmark-pix-diagnostic", argument }), Is.True);

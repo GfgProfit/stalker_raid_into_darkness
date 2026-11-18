@@ -17,6 +17,7 @@ namespace Rvm.CleanReleaseRoute07
         private const int CAPACITY = 262144;
         private const double WARMUP_SECONDS = 8.0;
         private const double POSITION_SECONDS = 5.0;
+        private const double STARTUP_FOCUS_SETTLE_SECONDS = 0.5;
         private const int BOUNDARY_FLAG = 1;
         private const int END_FLAG = 2;
 
@@ -37,6 +38,18 @@ namespace Rvm.CleanReleaseRoute07
         private bool _timing;
         private bool _pixDiagnostic;
         private PixDiagnosticSession _pixSession;
+        private bool _frameTimingDiagnostic;
+        private FrameTimingDiagnosticSession _frameTimingSession;
+        private bool _cpuDiagnostic;
+        private ReleaseCpuDiagnosticSession _cpuSession;
+        private string _cpuMarkerConfig;
+        private PunctualShadowDistanceTrial _punctualShadowTrial;
+        private string _punctualShadowMode;
+        private bool _punctualShadowTechnical;
+        private bool _punctualShadowCapture;
+        private bool _punctualShadowRestored = true;
+        private readonly bool[] _punctualShadowPosesCaptured = new bool[4];
+        private bool _punctualShadowConfigCaptured;
         private bool _configCheck;
         private bool _running;
         private bool _started;
@@ -51,6 +64,7 @@ namespace Rvm.CleanReleaseRoute07
         private int _configurationRenderFrames;
         private long _phaseStart;
         private long _endTimestamp;
+        private long _startupFocusSince = -1;
         private Conditions _before;
         private AnomalyVisual08Check _visualCheck;
         private AnomalyLight10Check _lightCheck;
@@ -123,7 +137,7 @@ namespace Rvm.CleanReleaseRoute07
             bool route = Array.IndexOf(args, "-clean-route") >= 0;
             bool noTiming = Array.IndexOf(args, "-clean-route-no-timing") >= 0;
             bool check = Array.IndexOf(args, "-clean-route-config-check") >= 0;
-            if (!route && !noTiming && !check)
+            if (!route && !noTiming && !check && Array.IndexOf(args, "-benchmark-cpu-diagnostic") < 0 && Array.IndexOf(args, "-benchmark-cpu-marker-config") < 0)
             {
                 return;
             }
@@ -136,6 +150,12 @@ namespace Rvm.CleanReleaseRoute07
             controller._output = GetArgument(args, "-clean-route-output");
             try
             {
+                controller._cpuDiagnostic = ReleaseCpuDiagnosticSession.Requested(args);
+                controller._cpuMarkerConfig = Option(args, "-benchmark-cpu-marker-config");
+                controller._frameTimingDiagnostic = FrameTimingDiagnosticSession.Requested(args);
+                controller._punctualShadowMode = ParsePunctualShadowMode(args);
+                controller._punctualShadowTechnical = Array.IndexOf(args, "-punctual-shadow-technical") >= 0;
+                controller._punctualShadowCapture = Array.IndexOf(args, "-punctual-shadow-capture") >= 0;
                 if (controller._profiles != null && controller._profiles.Length > 0)
                 {
                     int index = Array.IndexOf(args, "-benchmark-route");
@@ -171,6 +191,34 @@ namespace Rvm.CleanReleaseRoute07
                 throw new ArgumentException("Missing " + key);
             }
             return Path.GetFullPath(args[index + 1]);
+        }
+
+        private static string ParsePunctualShadowMode(string[] args)
+        {
+            string mode = Option(args, "-punctual-shadow-mode");
+            bool technical = Array.IndexOf(args, "-punctual-shadow-technical") >= 0;
+            bool capture = Array.IndexOf(args, "-punctual-shadow-capture") >= 0;
+            if (mode == null)
+            {
+                if (technical || capture) throw new ArgumentException("Punctual shadow diagnostics require an explicit shadow mode.");
+                return null;
+            }
+            if (mode != "A" && mode != "B") throw new ArgumentException("Punctual shadow mode must be A or B. The retired coded-distance mode C is not supported.");
+            if (Option(args, "-location-batching") != "U" || Option(args, "-instance-native-submission") != "A") throw new ArgumentException("Punctual shadow comparison requires grouping U and native submission A.");
+            if (capture && !technical) throw new ArgumentException("Punctual shadow captures require the separate technical mode.");
+            foreach (string forbidden in new[] { "-anomaly-visual", "-anomaly-events", "-benchmark-pix-diagnostic", "-shadow-only-mode", "-shadow-only-technical", "-location-preparation", "-location-preparation-work", "-renderer-local", "-particle-frames-diagnostics", "-particle-frames-visual", "-particle-frames-local", "-particle-counters", "-batching-counters", "-batching-capture", "-preparation-counters", "-preparation-capture" })
+            {
+                if (Array.IndexOf(args, forbidden) >= 0) throw new ArgumentException("Punctual shadow comparison forbids " + forbidden + ".");
+            }
+            return mode;
+        }
+
+        private static string Option(string[] args, string key)
+        {
+            int index = Array.IndexOf(args, key);
+            if (index < 0) return null;
+            if (Array.LastIndexOf(args, key) != index || index + 1 >= args.Length || args[index + 1].StartsWith("-", StringComparison.Ordinal)) throw new ArgumentException("Expected one value for " + key + ".");
+            return args[index + 1];
         }
 
         private void Start()
@@ -225,9 +273,23 @@ namespace Rvm.CleanReleaseRoute07
                     throw new InvalidOperationException("Weather ownership is unavailable: " + _weather.Diagnostic);
                 }
                 MoveCamera(0);
+                if (_punctualShadowMode != null)
+                {
+                    _punctualShadowTrial = PunctualShadowDistanceTrial.Attach(_camera, _punctualShadowMode);
+                    _punctualShadowRestored = false;
+                    _punctualShadowTrial.RecordEvidence(_output, "before", _punctualShadowTechnical);
+                }
                 _before = CaptureConditions();
                 File.WriteAllText(Path.Combine(_output, "conditions-before.json"), JsonUtility.ToJson(_before, true));
                 RequireConditions(_before);
+                if (_frameTimingDiagnostic)
+                {
+                    _frameTimingSession = new FrameTimingDiagnosticSession();
+                }
+                if (_cpuDiagnostic)
+                {
+                    _cpuSession = new ReleaseCpuDiagnosticSession(_cpuMarkerConfig);
+                }
                 if (_pixDiagnostic)
                 {
                     _pixSession = new PixDiagnosticSession(_output, _scenario != null ? _scenario.ScenarioId : _sceneGuid, _camera, Environment.GetCommandLineArgs());
@@ -279,6 +341,7 @@ namespace Rvm.CleanReleaseRoute07
             {
                 return;
             }
+            _frameTimingSession?.Poll(timestamp, Time.frameCount);
             if (_configCheck)
             {
                 _pixSession?.Frame(timestamp, _position, _phaseStart);
@@ -292,7 +355,7 @@ namespace Rvm.CleanReleaseRoute07
             int flags = 0;
             if (!_started)
             {
-                if (!Application.isFocused)
+                if (!StartupFocusSettled(Application.isFocused, timestamp, Stopwatch.Frequency, ref _startupFocusSince))
                 {
                     return;
                 }
@@ -311,6 +374,7 @@ namespace Rvm.CleanReleaseRoute07
                 _position++;
                 if (_position == 4)
                 {
+                    _cpuSession?.Poll(timestamp, Time.frameCount, _position);
                     Store(timestamp, BOUNDARY_FLAG | END_FLAG);
                     _endTimestamp = timestamp;
                     Complete();
@@ -320,7 +384,9 @@ namespace Rvm.CleanReleaseRoute07
                 _phaseStart = timestamp;
                 _phaseStarts[_position + 1] = timestamp;
                 flags = BOUNDARY_FLAG;
+                if (_position == 0) _cpuSession?.RefreshInventory();
             }
+            _cpuSession?.Poll(timestamp, Time.frameCount, _position);
             Store(timestamp, flags);
             try
             {
@@ -330,6 +396,21 @@ namespace Rvm.CleanReleaseRoute07
             {
                 Fail(exception);
             }
+        }
+
+        private static bool StartupFocusSettled(bool focused, long timestamp, long frequency, ref long focusedSince)
+        {
+            if (!focused || timestamp < 0 || frequency <= 0)
+            {
+                focusedSince = -1;
+                return false;
+            }
+            if (focusedSince < 0 || timestamp < focusedSince)
+            {
+                focusedSince = timestamp;
+                return false;
+            }
+            return (timestamp - focusedSince) / (double)frequency >= STARTUP_FOCUS_SETTLE_SECONDS;
         }
 
         private void Store(long timestamp, int flags)
@@ -349,6 +430,7 @@ namespace Rvm.CleanReleaseRoute07
         private void MoveCamera(int position)
         {
             _camera.transform.SetPositionAndRotation(_positions[position], _rotations[position]);
+            _punctualShadowTrial?.RefreshTargetsAtPose();
         }
 
         private void OnCameraRendered(ScriptableRenderContext context, Camera camera)
@@ -363,10 +445,31 @@ namespace Rvm.CleanReleaseRoute07
             {
                 _renderedFrames[_position + 1]++;
             }
+            if (_punctualShadowTrial != null && _punctualShadowTechnical)
+            {
+                if (_configCheck && !_punctualShadowConfigCaptured && _configurationRenderFrames >= 2)
+                {
+                    _punctualShadowConfigCaptured = true;
+                    CapturePunctualShadowPose("config", camera);
+                }
+                else if (_started && _position >= 0 && _position < 4 && !_punctualShadowPosesCaptured[_position] && (Stopwatch.GetTimestamp() - _phaseStart) / (double)Stopwatch.Frequency >= 1.0)
+                {
+                    _punctualShadowPosesCaptured[_position] = true;
+                    CapturePunctualShadowPose("pose" + _position, camera);
+                }
+            }
+        }
+
+        private void CapturePunctualShadowPose(string label, Camera camera)
+        {
+            _punctualShadowTrial.RecordEvidence(_output, label, true);
+            File.WriteAllText(Path.Combine(_output, "punctual-shadow-rendered-" + label + ".json"), PunctualShadowDistanceInventory.Capture(camera, _punctualShadowTrial));
+            if (_punctualShadowCapture) ScreenCapture.CaptureScreenshot(Path.Combine(_output, "punctual-shadow-" + label + ".png"));
         }
 
         private void OnApplicationFocus(bool focused)
         {
+            if (!_started && !focused) _startupFocusSince = -1;
             if (_running && _started && !focused)
             {
                 _focusViolation = true;
@@ -413,7 +516,7 @@ namespace Rvm.CleanReleaseRoute07
         private void RequireConditions(Conditions value)
         {
             if (_scenario != null && (value.fieldOfView != _scenario.CameraSettings.FieldOfView || value.nearClip != _scenario.CameraSettings.Near || value.farClip != _scenario.CameraSettings.Far)) throw new InvalidOperationException("Actual camera lens differs from the selected route profile.");
-            bool configurationValid = !value.debugBuild && !value.frameTimingEnabled && !value.profilerEnabled && !value.eventJournalConfigured && (!_pixDiagnostic || !PixDiagnosticPolicy.HasObserverArguments(Environment.GetCommandLineArgs())) && value.graphicsApi == "Direct3D12" && value.quality == "High Fidelity" && value.width == 1920 && value.height == 1080 && value.cameraPixelWidth == 1920 && value.cameraPixelHeight == 1080 && value.renderWidthScale == 1.0f && value.renderHeightScale == 1.0f && value.fullScreenMode == "FullScreenWindow" && value.vSyncCount == 0 && value.targetFrameRate == -1 && value.renderFrameInterval == 1 && value.runInBackground && value.cameraEnabled && value.cameraTargetIsScreen && !value.particleDiagnostics && !value.rendererDiagnostics && value.weather == _weatherProfile.name && value.weatherPaused && value.weatherSeconds == (_scenario != null ? _scenario.FixedTimeHours * 3600 : 43200.0);
+            bool configurationValid = !value.debugBuild && value.frameTimingEnabled == _frameTimingDiagnostic && !(_frameTimingDiagnostic && (_pixDiagnostic || _punctualShadowMode != null || _configCheck)) && !(_cpuDiagnostic && (_pixDiagnostic || _frameTimingDiagnostic || _punctualShadowMode != null || _configCheck)) && !value.profilerEnabled && !value.eventJournalConfigured && (!_pixDiagnostic || !PixDiagnosticPolicy.HasObserverArguments(Environment.GetCommandLineArgs())) && value.graphicsApi == "Direct3D12" && value.quality == "High Fidelity" && value.width == 1920 && value.height == 1080 && value.cameraPixelWidth == 1920 && value.cameraPixelHeight == 1080 && value.renderWidthScale == 1.0f && value.renderHeightScale == 1.0f && value.fullScreenMode == "FullScreenWindow" && value.vSyncCount == 0 && value.targetFrameRate == -1 && value.renderFrameInterval == 1 && value.runInBackground && value.cameraEnabled && value.cameraTargetIsScreen && !value.particleDiagnostics && !value.rendererDiagnostics && value.weather == _weatherProfile.name && value.weatherPaused && value.weatherSeconds == (_scenario != null ? _scenario.FixedTimeHours * 3600 : 43200.0);
             PixDiagnosticPolicy.Require(_pixDiagnostic, value.externalDiagnostics, value.nativeModules, configurationValid);
         }
 
@@ -433,6 +536,9 @@ namespace Rvm.CleanReleaseRoute07
         {
             _running = false;
             _saved = true;
+            _frameTimingSession?.Save(_output);
+            _cpuSession?.Save(_output);
+            _punctualShadowTrial?.RecordEvidence(_output, "after", _punctualShadowTechnical);
             AnomalyVisual09Events.Save(_output);
             if (AnomalyVisual08Target.Active)
             {
@@ -460,15 +566,30 @@ namespace Rvm.CleanReleaseRoute07
                 }
             }
             bool rendered = _configCheck ? _configurationRenderFrames >= 3 : _renderedFrames[1] > 0 && _renderedFrames[2] > 0 && _renderedFrames[3] > 0 && _renderedFrames[4] > 0;
-            bool valid = !_overflow && !_focusViolation && _runtimeErrors == 0 && rendered && (_pixSession == null || !_pixSession.Overflow);
-            var result = new Result { status = valid ? "completed" : "conditions-violated", configurationCheckOnly = _configCheck, timing = _timing, stopwatchFrequency = Stopwatch.Frequency, capacity = CAPACITY, samples = _count, overflow = _overflow, foregroundViolation = _focusViolation, firstFocusLostUnityFrame = _focusLostFrame, runtimeErrors = _runtimeErrors, phaseStarts = _phaseStarts, endTimestamp = _endTimestamp, renderedFrames = _renderedFrames, configurationRenderFrames = _configurationRenderFrames, positions = _positions, rotations = _rotations, warmupSeconds = WARMUP_SECONDS, positionSeconds = POSITION_SECONDS, updateExecutionOrder = -9000 };
-            result.instrumented = _pixDiagnostic;
-            result.eligibleForFpsComparison = !_pixDiagnostic;
-            result.measurementClass = _pixDiagnostic ? "pix-diagnostic" : "clean";
-            if (valid && _pixDiagnostic) result.status = "diagnostic-completed";
+            bool valid = !_overflow && !_focusViolation && _runtimeErrors == 0 && rendered && (_pixSession == null || !_pixSession.Overflow) && (_frameTimingSession == null || !_frameTimingSession.Overflow) && (_cpuSession == null || _cpuSession.Valid);
+            var result = new Result { status = valid ? "completed" : "conditions-violated", configurationCheckOnly = _configCheck, timing = _timing, stopwatchFrequency = Stopwatch.Frequency, capacity = CAPACITY, samples = _count, overflow = _overflow, foregroundViolation = _focusViolation, firstFocusLostUnityFrame = _focusLostFrame, runtimeErrors = _runtimeErrors, phaseStarts = _phaseStarts, endTimestamp = _endTimestamp, renderedFrames = _renderedFrames, configurationRenderFrames = _configurationRenderFrames, positions = _positions, rotations = _rotations, warmupSeconds = WARMUP_SECONDS, positionSeconds = POSITION_SECONDS, startupFocusSettleSeconds = STARTUP_FOCUS_SETTLE_SECONDS, updateExecutionOrder = -9000 };
+            ClassifyMeasurement(result, _pixDiagnostic, _punctualShadowTechnical, _frameTimingDiagnostic, Environment.GetCommandLineArgs());
+            result.frameTimingDiagnostic = _frameTimingDiagnostic;
+            result.frameTimingSamples = _frameTimingSession != null ? _frameTimingSession.Count : 0;
+            result.frameTimingOverflow = _frameTimingSession != null && _frameTimingSession.Overflow;
+            result.cpuDiagnostic = _cpuDiagnostic;
+            result.cpuSamples = _cpuSession != null ? _cpuSession.Count : 0;
+            result.cpuOverflow = _cpuSession != null && _cpuSession.Overflow;
+            result.punctualShadowMode = _punctualShadowMode;
+            result.punctualShadowTechnical = _punctualShadowTechnical;
+            if (valid && (_pixDiagnostic || _frameTimingDiagnostic || _cpuDiagnostic)) result.status = "diagnostic-completed";
             File.WriteAllText(Path.Combine(_output, "result.json"), JsonUtility.ToJson(result, true));
             RestoreState();
             Application.Quit(valid ? 0 : 2);
+        }
+
+        private static void ClassifyMeasurement(Result result, bool pixDiagnostic, bool punctualShadowTechnical, bool frameTimingDiagnostic, string[] args)
+        {
+            bool rendererTechnical = Array.IndexOf(args, "-batching-counters") >= 0 || Array.IndexOf(args, "-batching-capture") >= 0;
+            bool cpuDiagnostic = Array.IndexOf(args, "-benchmark-cpu-diagnostic") >= 0;
+            result.instrumented = pixDiagnostic || punctualShadowTechnical || frameTimingDiagnostic || cpuDiagnostic || rendererTechnical;
+            result.eligibleForFpsComparison = !result.instrumented;
+            result.measurementClass = pixDiagnostic ? "pix-diagnostic" : punctualShadowTechnical ? "punctual-shadow-technical" : frameTimingDiagnostic ? "frame-timing-diagnostic" : cpuDiagnostic ? "release-cpu-diagnostic" : rendererTechnical ? "renderer-technical" : "clean";
         }
 
         private void Fail(Exception exception)
@@ -509,6 +630,9 @@ namespace Rvm.CleanReleaseRoute07
         private void RestoreState()
         {
             if (_stateRestored) return;
+            _frameTimingSession = null;
+            _cpuSession?.Dispose();
+            _cpuSession = null;
             try
             {
                 try
@@ -518,14 +642,28 @@ namespace Rvm.CleanReleaseRoute07
                 finally
                 {
                     _pixSession = null;
-                    _cameraState?.Dispose();
-                    _cameraState = null;
-                    if (_weatherCaptured && _weather != null)
+                    try
                     {
-                        _weatherCaptured = false;
-                        if (_weather.ActiveProfile != _savedWeather) _weather.SetProfile(_savedWeather);
-                        _weather.Seek(_savedWeatherSeconds);
-                        _weather.SetPaused(_savedWeatherPaused);
+                        var trial = _punctualShadowTrial;
+                        _punctualShadowTrial = null;
+                        if (trial != null)
+                        {
+                            trial.Dispose();
+                            _punctualShadowRestored = true;
+                            if (!string.IsNullOrEmpty(_output)) trial.RecordEvidence(_output, "restored", _punctualShadowTechnical);
+                        }
+                    }
+                    finally
+                    {
+                        _cameraState?.Dispose();
+                        _cameraState = null;
+                        if (_weatherCaptured && _weather != null)
+                        {
+                            _weatherCaptured = false;
+                            if (_weather.ActiveProfile != _savedWeather) _weather.SetProfile(_savedWeather);
+                            _weather.Seek(_savedWeatherSeconds);
+                            _weather.SetPaused(_savedWeatherPaused);
+                        }
                     }
                 }
             }
@@ -539,8 +677,8 @@ namespace Rvm.CleanReleaseRoute07
             {
                 bool cameraRestored = JsonUtility.ToJson(BenchmarkCameraSettings.Capture(_camera)) == _originalCameraSettings && _camera.transform.position == _originalCameraPosition && Quaternion.Angle(_camera.transform.rotation, _originalCameraRotation) < 0.001f;
                 bool weatherRestored = _weather == null || _weather.ActiveProfile == _savedWeather && Math.Abs(_weather.GameTimeSeconds - _savedWeatherSeconds) < 0.001 && _weather.Paused == _savedWeatherPaused;
-                File.WriteAllText(Path.Combine(_output, "restoration.json"), JsonUtility.ToJson(new Restoration { cameraRestored = cameraRestored, weatherRestored = weatherRestored }, true));
-                if (!cameraRestored || !weatherRestored) throw new InvalidOperationException("Route state restoration did not match the original state.");
+                File.WriteAllText(Path.Combine(_output, "restoration.json"), JsonUtility.ToJson(new Restoration { cameraRestored = cameraRestored, weatherRestored = weatherRestored, punctualShadowsRestored = _punctualShadowRestored }, true));
+                if (!cameraRestored || !weatherRestored || !_punctualShadowRestored) throw new InvalidOperationException("Route state restoration did not match the original state.");
             }
             _stateRestored = true;
         }
@@ -550,6 +688,7 @@ namespace Rvm.CleanReleaseRoute07
         {
             public bool cameraRestored;
             public bool weatherRestored;
+            public bool punctualShadowsRestored;
         }
 
         private struct Sample
@@ -564,8 +703,16 @@ namespace Rvm.CleanReleaseRoute07
         private sealed class Result
         {
             public bool instrumented;
+            public bool frameTimingDiagnostic;
+            public int frameTimingSamples;
+            public bool frameTimingOverflow;
+            public bool cpuDiagnostic;
+            public int cpuSamples;
+            public bool cpuOverflow;
             public bool eligibleForFpsComparison;
             public string measurementClass;
+            public string punctualShadowMode;
+            public bool punctualShadowTechnical;
             public string status;
             public bool configurationCheckOnly;
             public bool timing;
@@ -584,6 +731,7 @@ namespace Rvm.CleanReleaseRoute07
             public Quaternion[] rotations;
             public double warmupSeconds;
             public double positionSeconds;
+            public double startupFocusSettleSeconds;
             public int updateExecutionOrder;
         }
 

@@ -2,12 +2,32 @@
 
 Система измеряет существующую сцену и сохраняет исходные кадры для сравнения будущих оптимизаций. Игровые настройки, симуляция, погода, качество рендера и ограничение FPS остаются под управлением проекта.
 
+## FTM-диагностика Release
+
+Отдельная сборка с `BENCHMARK_FRAME_TIMING_DIAGNOSTIC=1` собирает высокоуровневые CPU/GPU timings через Frame Timing Manager. Ей нужен явный `-benchmark-frame-timing-diagnostic` вместе с timing-маршрутом; guard отклоняет этот Player для clean FPS-серии. Результат помечается `instrumented=true`, `eligibleForFpsComparison=false` и `measurementClass=frame-timing-diagnostic`. Основная серия и контроль стоимости инструмента запускаются раздельно.
+
+Файлы `frame-timings.csv`, `frame-timing-clock-sync.csv` и `frame-timing-diagnostic.json` сохраняют delayed publications, исходные timestamp domains и ограничения покрытия. Частота таймера не подтверждает общую эпоху; нулевой GPU sample означает unavailable. Точные команды, путь Archive driver и правила сопоставления приведены в [MEASUREMENTS.md](MEASUREMENTS.md). При удалении `_BENCHMARK` этот режим удаляется вместе с модулем, как описано в [REMOVAL.md](REMOVAL.md).
+
+## CPU-диагностика обычного Release
+
+Явный `-clean-route -benchmark-cpu-diagnostic -location-batching U` включает отдельный режим `release-cpu-diagnostic`. Ему подходит non-Development Player с выключенными Frame Timing Stats; native A/B выбирается отдельно. Результат всегда `instrumented=true`, `eligibleForFpsComparison=false`. PIX, FTM, captures и другие observers одновременно запрещены.
+
+Без дополнительной конфигурации режим сохраняет доступные ProfilerRecorder markers/counters и накопленное Windows CPU-время основного потока. `-benchmark-cpu-marker-config <Archive JSON>` выбирает до 32 точных category/name/unit из фактического inventory. Inventory обновляется один раз после прогрева. Данные, clock brackets и ограничения интерпретации описаны в [MEASUREMENTS.md](MEASUREMENTS.md). Режим целиком удаляется вместе с `_BENCHMARK`.
 ## PIX-диагностика Release
 
 Сгенерированный `Launchers/run_pix_diagnostic.py` запускает отдельный инструментированный сеанс через внешний `pixtool.exe`. Например: `python Launchers/run_pix_diagnostic.py military-player-eye --pix "<PIX>/pixtool.exe" --label Eye_Pos1 --capture-position 1`. Для live timing используйте отдельный запуск с `--timing` вместо `--capture-position`. Вывод остаётся в Archive рядом с соответствующей сборкой. Ordinary_Game и обычные U/G1 launcher не включают этот режим и не требуют PIX.
 
 Допуск задаётся только сочетанием benchmark-сеанса и `-benchmark-pix-diagnostic`. Результат имеет статус `diagnostic-completed`, `instrumented=true` и не допускается в clean FPS-сравнения. Успешный guard или наличие DLL не подтверждают пригодность capture: необходимо открыть запись, проверить команды/ресурсы и маркеры временной привязки. Контракт и ограничения описаны в [MEASUREMENTS.md](MEASUREMENTS.md), исходники и сборка необязательного native-моста — в [Native/README.md](CleanReleaseRoute07/Native/README.md).
 
+## Нативная подача Camera и теней
+
+В текущем Release-эксперименте `-instance-native-submission A` выбирает исходную подачу, B запрашивает BRG для цветных `Camera` и теневых `Light` views. После успешной подготовки B пропускает полный legacy-цикл подачи инстансов. Неподдерживаемые данные, материалы, движение матриц, LOD, дистанционные ограничения и контексты камер используют исходный fallback. Session override не записывает shared GameConfig. Глобальный GameConfig включает native submission по умолчанию; grouping остаётся выключенным. Удаление `_BENCHMARK` сохраняет эти production defaults.
+
+Тени привязаны к подготовленной Game-камере через функциональный HDRP `HDShadowCullingCameraScope` с проверкой API version/signatures. При несовместимом API native-подготовка отклоняется. Покрытие отражений подтверждают фактические view/command counters и отдельные visual fixtures; вызов callback сам по себе не доказывает исполнение геометрии. Камерная видимость и кандидаты для теней проверяются отдельно. Physical global bounds обеспечивают консервативное покрытие геометрии для регистрации BRG; source/index bounds решают отдельную задачу отбора кандидатов.
+
+Ноль legacy `RenderMeshInstanced` calls означает отсутствие вызовов этого API. Геометрия и тени продолжают поступать через BRG. Native shadow commands/instances повторно учитывают source/submesh и ссылки на инстансы по Light views; они не равны GPU draw calls или числу уникальных объектов. Elapsed callback включает ожидания и не является чистым CPU-временем. Сохранённые старые Players с BRG color и legacy `ShadowsOnly` описывают предыдущий hybrid; их evidence не переписывается. Настоящая серия A1 → B1 → B2 → A2 должна отдельно установить выигрыш и сохранение изображения. Описания не подтверждают достижение 100 FPS.
+
+Перед началом timing-маршрута контроллер ждёт 0,5 секунды устойчивого `Application.isFocused`. Потеря фокуса до старта сбрасывает ожидание; только затем начинается полный восьмисекундный прогрев. После старта прежняя строгая проверка потери фокуса остаётся активной. Win32 foreground не подменяет состояние Unity. Config-only проверка этого ожидания не использует.
 ## Запуск в Editor
 
 Постоянные `BenchmarkRunner` разрешены только в отдельных сценах внутри `Assets/_BENCHMARK`. Для такого сценария откройте окно **Tools → RVM → Benchmark** и выберите его ScriptableObject. Компонент хранит прямые ссылки на камеру и четыре Transform; ScriptableObject хранит идентификатор сцены и ключи позиций.

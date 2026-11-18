@@ -89,6 +89,7 @@ namespace Rvm.CleanReleaseRoute07.Editor
             bool autoconnect = EditorUserBuildSettings.connectProfiler;
             bool deep = EditorUserBuildSettings.buildWithDeepProfilingSupport;
             bool timing = PlayerSettings.enableFrameTimingStats;
+            bool frameTimingDiagnostic = Environment.GetEnvironmentVariable("BENCHMARK_FRAME_TIMING_DIAGNOSTIC") == "1";
             int width = PlayerSettings.defaultScreenWidth;
             int height = PlayerSettings.defaultScreenHeight;
             FullScreenMode fullscreen = PlayerSettings.fullScreenMode;
@@ -99,14 +100,14 @@ namespace Rvm.CleanReleaseRoute07.Editor
                 EditorUserBuildSettings.allowDebugging = false;
                 EditorUserBuildSettings.connectProfiler = false;
                 EditorUserBuildSettings.buildWithDeepProfilingSupport = false;
-                PlayerSettings.enableFrameTimingStats = false;
+                PlayerSettings.enableFrameTimingStats = frameTimingDiagnostic;
                 PlayerSettings.defaultScreenWidth = 1920;
                 PlayerSettings.defaultScreenHeight = 1080;
                 PlayerSettings.fullScreenMode = FullScreenMode.FullScreenWindow;
                 PlayerSettings.runInBackground = true;
                 Directory.CreateDirectory(player);
                 _building = true;
-                Write("BUILD_PARAMETERS.json", new Parameters { unity = Application.unityVersion, backend = PlayerSettings.GetScriptingBackend(NamedBuildTarget.Standalone).ToString(), development = EditorUserBuildSettings.development, debugging = EditorUserBuildSettings.allowDebugging, autoconnectProfiler = EditorUserBuildSettings.connectProfiler, deepProfiling = EditorUserBuildSettings.buildWithDeepProfilingSupport, frameTimingStats = PlayerSettings.enableFrameTimingStats, graphicsJobs = PlayerSettings.graphicsJobs, graphicsApis = Array.ConvertAll(PlayerSettings.GetGraphicsAPIs(BuildTarget.StandaloneWindows64), value => value.ToString()), scene = _reference.scene, extraScriptingDefine = "CLEAN_RELEASE_ROUTE07", buildOptions = "StrictMode | CleanBuildCache", executable = Path.Combine(player, "CleanRelease.exe") });
+                Write("BUILD_PARAMETERS.json", new Parameters { unity = Application.unityVersion, backend = PlayerSettings.GetScriptingBackend(NamedBuildTarget.Standalone).ToString(), development = EditorUserBuildSettings.development, debugging = EditorUserBuildSettings.allowDebugging, autoconnectProfiler = EditorUserBuildSettings.connectProfiler, deepProfiling = EditorUserBuildSettings.buildWithDeepProfilingSupport, frameTimingStats = PlayerSettings.enableFrameTimingStats, frameTimingDiagnostic = frameTimingDiagnostic, graphicsJobs = PlayerSettings.graphicsJobs, graphicsApis = Array.ConvertAll(PlayerSettings.GetGraphicsAPIs(BuildTarget.StandaloneWindows64), value => value.ToString()), scene = _reference.scene, extraScriptingDefine = "CLEAN_RELEASE_ROUTE07", buildOptions = "StrictMode | CleanBuildCache", executable = Path.Combine(player, "CleanRelease.exe") });
                 var options = new BuildPlayerOptions { scenes = new[] { _reference.scene }, locationPathName = Path.Combine(player, "CleanRelease.exe"), target = BuildTarget.StandaloneWindows64, subtarget = (int)StandaloneBuildSubtarget.Player, options = BuildOptions.StrictMode | BuildOptions.CleanBuildCache, extraScriptingDefines = new[] { "CLEAN_RELEASE_ROUTE07" } };
                 var report = BuildPipeline.BuildPlayer(options);
                 Write("BUILD_RESULT.json", new BuildResultData { status = report.summary.result.ToString(), buildGuid = report.summary.guid.ToString(), totalBytes = report.summary.totalSize, durationSeconds = report.summary.totalTime.TotalSeconds, errors = report.summary.totalErrors, warnings = report.summary.totalWarnings, development = report.summary.options.HasFlag(BuildOptions.Development), options = report.summary.options.ToString() });
@@ -346,6 +347,7 @@ namespace Rvm.CleanReleaseRoute07.Editor
             public bool autoconnectProfiler;
             public bool deepProfiling;
             public bool frameTimingStats;
+            public bool frameTimingDiagnostic;
             public bool graphicsJobs;
             public string[] graphicsApis;
             public string scene;

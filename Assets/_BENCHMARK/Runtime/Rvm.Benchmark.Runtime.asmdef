@@ -3,7 +3,8 @@
     "rootNamespace": "Rvm.Benchmark",
     "references": [
         "RaidIntoDarkness.Effects",
-        "XRay.Importer.Runtime"
+        "XRay.Importer.Runtime",
+        "Unity.Collections"
     ],
     "autoReferenced": true
 }

@@ -7,6 +7,8 @@
         "Rvm.CleanReleaseRoute07",
         "Unity.Profiling.Core",
         "Unity.Collections",
+        "Unity.RenderPipelines.HighDefinition.Runtime",
+        "Unity.RenderPipelines.Core.Runtime",
         "RaidIntoDarkness.Effects",
         "XRay.Importer.Runtime"
     ],

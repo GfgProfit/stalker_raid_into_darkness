@@ -11,8 +11,13 @@ namespace Rvm.Benchmark
 {
     public sealed class LocationBatchingBenchmark : MonoBehaviour
     {
+        private const string NATIVE_VIEW_SCOPE = "Native B emits BRG Camera commands and Light shadow commands for the prepared owner Game camera; a successful native path skips the complete legacy instance loop, while unsupported contracts use legacy fallback. Shadow commands count emitted source/submesh commands per accepted Light view; shadow instances repeat source instance references across submeshes/views and are not unique casters or GPU draws. Reflection commands/instances/batches/views and registered reflection views are separate. Reflection coverage requires actual view and command evidence; callbacks or registered views alone do not establish emitted geometry. Technical Game and reflection preparation use separate callback populations; native culling elapsed includes observed Camera/Light/reflection callbacks and its mean is per view callback. Normalize elapsed sums only against a declared population; they are not exclusive CPU or a full frame budget. Registered views do not prove executed commands.";
+
         private static readonly MethodInfo DRAW = typeof(XRayLevelInstancedRenderer).GetMethod("OnBeginCameraRendering", BindingFlags.Instance | BindingFlags.NonPublic);
         private static BenchmarkGroupingState _modeState;
+        private static BenchmarkNativeSubmissionState _nativeState;
+        private static string _nativeOutput;
+        private static LocationBatchingBenchmark _technicalObserver;
 
         private readonly List<MeasuredCallback> _callbacks = new List<MeasuredCallback>();
         private XRayLevelInstancedRenderer[] _renderers;
@@ -25,42 +30,58 @@ namespace Rvm.Benchmark
         private double _changed;
         private double _start;
         private int _pose;
+        private BenchmarkNativeCullingObserver _nativeCulling;
+        private bool _nativeCullingRestored;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void Install()
         {
             string[] args = Environment.GetCommandLineArgs();
-            if (Application.isEditor || Array.IndexOf(args, "-location-batching") < 0) return;
-            string mode = Argument(args, "-location-batching");
+            if (Application.isEditor) return;
+            string nativeMode = BenchmarkNativeSubmissionState.RequestedMode(args);
+            bool groupingRequested = Array.IndexOf(args, "-location-batching") >= 0;
+            if (!groupingRequested && nativeMode == null) return;
             if (Array.IndexOf(args, "-clean-route") < 0 && Array.IndexOf(args, "-clean-route-no-timing") < 0 && Array.IndexOf(args, "-clean-route-config-check") < 0) throw new ArgumentException("A grouping override requires an explicit benchmark route session.");
-            bool grouping = BenchmarkGroupingState.Enabled(mode);
+            string mode = groupingRequested ? Argument(args, "-location-batching") : null;
+            bool grouping = groupingRequested && BenchmarkGroupingState.Enabled(mode);
             string output = BenchmarkOutput.ValidateDirectory(Argument(args, "-clean-route-output"));
             var renderers = FindObjectsByType<XRayLevelInstancedRenderer>(FindObjectsInactive.Include);
-            _modeState = new BenchmarkGroupingState(renderers, mode);
             Application.quitting += RestoreMode;
-            var evidence = new Mode { mode = mode, buildGuid = Application.buildGUID, groupingEnabled = grouping, renderers = renderers.Length };
-            foreach (var renderer in renderers)
+            if (nativeMode != null)
             {
-                var source = renderer.BatchSet;
-                if (source == null) continue;
-                if (source.GroupingVersion != XRayInstanceBatchSet.GROUPING_VERSION || source.MatrixPreparationVersion != XRayInstanceBatchSet.MATRIX_PREPARATION_VERSION) throw new InvalidOperationException("Location preparation is stale: " + source.name);
-                evidence.sourceBatches += source.Batches.Count;
-                evidence.sourceInstances += source.InstanceCount;
-                evidence.preparedGroups += source.SubmissionGroups.Count;
-                if (renderer.Configuration.InstanceSubmissionGroupingEnabled != grouping) throw new InvalidOperationException("Actual grouping configuration differs from the requested mode.");
+                _nativeState = new BenchmarkNativeSubmissionState(renderers, nativeMode);
+                _nativeOutput = output;
+                BenchmarkOutput.WriteJson(Path.Combine(output, "native-submission-mode.json"), CaptureNativeMode("startup"));
             }
-            BenchmarkOutput.WriteJson(Path.Combine(output, "batching-mode.json"), evidence);
+            if (groupingRequested)
+            {
+                _modeState = new BenchmarkGroupingState(renderers, mode);
+                var evidence = new Mode { mode = mode, buildGuid = Application.buildGUID, groupingEnabled = grouping, renderers = renderers.Length };
+                foreach (var renderer in renderers)
+                {
+                    var source = renderer.BatchSet;
+                    if (source == null) continue;
+                    if (source.GroupingVersion != XRayInstanceBatchSet.GROUPING_VERSION || source.MatrixPreparationVersion != XRayInstanceBatchSet.MATRIX_PREPARATION_VERSION) throw new InvalidOperationException("Location preparation is stale: " + source.name);
+                    evidence.sourceBatches += source.Batches.Count;
+                    evidence.sourceInstances += source.InstanceCount;
+                    evidence.preparedGroups += source.SubmissionGroups.Count;
+                    if (renderer.Configuration.InstanceSubmissionGroupingEnabled != grouping) throw new InvalidOperationException("Actual grouping configuration differs from the requested mode.");
+                }
+                BenchmarkOutput.WriteJson(Path.Combine(output, "batching-mode.json"), evidence);
+            }
             if (Array.IndexOf(args, "-batching-counters") < 0) return;
             var observer = new GameObject("Benchmark Location Batching").AddComponent<LocationBatchingBenchmark>();
             observer._renderers = renderers;
             observer._output = output;
             observer._start = Time.realtimeSinceStartupAsDouble;
             observer._capture = Array.IndexOf(args, "-batching-capture") >= 0;
+            observer._nativeCulling = new BenchmarkNativeCullingObserver();
+            _technicalObserver = observer;
             foreach (var renderer in renderers)
             {
                 if (!renderer.isActiveAndEnabled || renderer.BatchSet == null) continue;
                 var original = (Action<ScriptableRenderContext, Camera>)Delegate.CreateDelegate(typeof(Action<ScriptableRenderContext, Camera>), renderer, DRAW);
-                var callback = new MeasuredCallback(original);
+                var callback = new MeasuredCallback(original, renderer, observer._nativeCulling);
                 observer._callbacks.Add(callback);
                 RenderPipelineManager.beginCameraRendering -= original;
                 RenderPipelineManager.beginCameraRendering += callback.Invoke;
@@ -70,19 +91,62 @@ namespace Rvm.Benchmark
 
         private void OnDisable()
         {
-            RenderPipelineManager.endCameraRendering -= Record;
-            foreach (var callback in _callbacks)
+            StopObserving();
+        }
+
+        private void StopObserving()
+        {
+            try
             {
-                RenderPipelineManager.beginCameraRendering -= callback.Invoke;
-                if (callback.Original.Target is XRayLevelInstancedRenderer renderer && renderer != null && renderer.isActiveAndEnabled) RenderPipelineManager.beginCameraRendering += callback.Original;
+                ReleaseNativeCulling();
+            }
+            finally
+            {
+                RenderPipelineManager.endCameraRendering -= Record;
+                foreach (var callback in _callbacks)
+                {
+                    RenderPipelineManager.beginCameraRendering -= callback.Invoke;
+                    if (callback.Original.Target is XRayLevelInstancedRenderer renderer && renderer != null && renderer.isActiveAndEnabled) RenderPipelineManager.beginCameraRendering += callback.Original;
+                }
+                _callbacks.Clear();
+                if (ReferenceEquals(_technicalObserver, this)) _technicalObserver = null;
             }
         }
 
         public static void RestoreMode()
         {
             Application.quitting -= RestoreMode;
-            _modeState?.Dispose();
-            _modeState = null;
+            try
+            {
+                if (_technicalObserver != null)
+                {
+                    var observer = _technicalObserver;
+                    try
+                    {
+                        observer.StopObserving();
+                    }
+                    finally
+                    {
+                        observer.enabled = false;
+                    }
+                }
+                if (_nativeState != null && !string.IsNullOrEmpty(_nativeOutput)) BenchmarkOutput.WriteJson(Path.Combine(_nativeOutput, "native-submission-after.json"), CaptureNativeMode("before-restoration"));
+            }
+            finally
+            {
+                try
+                {
+                    _nativeState?.Dispose();
+                }
+                finally
+                {
+                    _nativeState = null;
+                    _nativeOutput = null;
+                    _technicalObserver = null;
+                    _modeState?.Dispose();
+                    _modeState = null;
+                }
+            }
         }
 
         private void Record(ScriptableRenderContext context, Camera camera)
@@ -96,10 +160,18 @@ namespace Rvm.Benchmark
                 _rotation = camera.transform.rotation;
                 _changed = Time.realtimeSinceStartupAsDouble;
                 foreach (var callback in _callbacks) callback.Reset();
+                _nativeCulling?.Reset();
             }
             if (!_pending || Time.realtimeSinceStartupAsDouble - _changed < 1) return;
             _pending = false;
             var report = new Pose { frame = Time.frameCount, position = _position, rotation = _rotation, memoryBytes = UnityEngine.Profiling.Profiler.GetTotalAllocatedMemoryLong() };
+            using (var process = Process.GetCurrentProcess())
+            {
+                process.Refresh();
+                report.privateMemoryBytes = process.PrivateMemorySize64;
+                report.workingSetBytes = process.WorkingSet64;
+            }
+            report.managedHeapBytes = GC.GetTotalMemory(false);
             foreach (var renderer in _renderers)
             {
                 if (!renderer.isActiveAndEnabled || renderer.BatchSet == null) continue;
@@ -108,6 +180,25 @@ namespace Rvm.Benchmark
                 report.colorInstances += renderer.LastVisibleInstances;
                 report.visibleGroups += renderer.LastVisibleBatches;
                 report.shadowOnlyGroups += renderer.LastShadowOnlyBatches;
+                report.rejectedShadowBatches += renderer.LastRejectedShadowBatches;
+                report.nativeActiveRenderers += renderer.NativeSubmissionActive ? 1 : 0;
+                report.nativeMemoryBytes += renderer.NativeSubmissionMemoryBytes;
+                report.nativeCameraCommands += renderer.NativeCameraCommands;
+                report.nativeCameraInstances += renderer.NativeCameraInstances;
+                report.nativeCameraBatches += renderer.NativeCameraBatches;
+                report.nativeShadowCommands += renderer.NativeShadowCommands;
+                report.nativeShadowInstances += renderer.NativeShadowInstances;
+                report.nativeReflectionCommands += renderer.NativeReflectionCommands;
+                report.nativeReflectionInstances += renderer.NativeReflectionInstances;
+                report.nativeReflectionBatches += renderer.NativeReflectionBatches;
+                report.nativeReflectionViews += renderer.NativeReflectionViews;
+                report.nativeRegisteredReflectionViews += renderer.NativeRegisteredReflectionViews;
+                report.nativeCulledBatches += renderer.NativeCulledBatches;
+                report.nativeCulledInstances += renderer.NativeCulledInstances;
+                report.nativeShadowViews += renderer.NativeShadowViews;
+                report.nativeCullingInvocations += renderer.NativeCullingInvocations;
+                report.nativeCullingOutputBytes += renderer.NativeCullingOutputBytes;
+                report.nativeFallbacks.Add(new NativeFallback { renderer = renderer.name, entityId = renderer.GetEntityId().ToString(), reason = renderer.NativeSubmissionFallbackReason });
                 report.sourceInstances += renderer.BatchSet.InstanceCount;
                 RecordVisibility(renderer, camera, report);
                 var groups = (Array)typeof(XRayLevelInstancedRenderer).GetField("_groups", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(renderer);
@@ -135,8 +226,24 @@ namespace Rvm.Benchmark
                 report.cpuSamples += callback.Count;
                 report.cpuMicrosecondsSum += callback.Ticks * 1000000.0 / Stopwatch.Frequency;
                 report.cpuMicrosecondsMax = Math.Max(report.cpuMicrosecondsMax, callback.Maximum * 1000000.0 / Stopwatch.Frequency);
+                report.reflectionCpuSamples += callback.ReflectionCount;
+                report.reflectionCpuMicrosecondsSum += callback.ReflectionTicks * 1000000.0 / Stopwatch.Frequency;
+                report.reflectionCpuMicrosecondsMax = Math.Max(report.reflectionCpuMicrosecondsMax, callback.ReflectionMaximum * 1000000.0 / Stopwatch.Frequency);
             }
             report.cpuMicrosecondsMean = report.cpuSamples > 0 ? report.cpuMicrosecondsSum / report.cpuSamples : 0;
+            report.reflectionCpuMicrosecondsMean = report.reflectionCpuSamples > 0 ? report.reflectionCpuMicrosecondsSum / report.reflectionCpuSamples : 0;
+            if (_nativeCulling != null)
+            {
+                var measurement = _nativeCulling.Capture();
+                report.nativeCullingObserverSupported = measurement.Supported;
+                report.nativeCullingTimingAvailable = measurement.Available;
+                report.nativeCullingElapsedSamples = measurement.Samples;
+                report.nativeCullingElapsedMicrosecondsSum = measurement.Ticks * 1000000.0 / Stopwatch.Frequency;
+                report.nativeCullingElapsedMicrosecondsMean = measurement.Samples > 0 ? report.nativeCullingElapsedMicrosecondsSum / measurement.Samples : 0;
+                report.nativeCullingElapsedMicrosecondsMax = measurement.MaximumTicks * 1000000.0 / Stopwatch.Frequency;
+                report.nativeCullingObservedGroups = measurement.ObservedGroups;
+                report.nativeCullingUnavailableReason = measurement.UnavailableReason;
+            }
             string prefix = Path.Combine(_output, "batching-pose" + _pose++);
             BenchmarkOutput.WriteJson(prefix + ".json", report);
             if (_capture) ScreenCapture.CaptureScreenshot(prefix + ".png");
@@ -147,6 +254,65 @@ namespace Rvm.Benchmark
             int index = Array.IndexOf(args, key);
             if (index < 0 || index + 1 >= args.Length) throw new ArgumentException("Missing argument: " + key);
             return args[index + 1];
+        }
+
+        private void ReleaseNativeCulling()
+        {
+            if (_nativeCulling == null || _nativeCullingRestored) return;
+            _nativeCullingRestored = true;
+            try
+            {
+                _nativeCulling.Dispose();
+            }
+            finally
+            {
+                if (!string.IsNullOrEmpty(_output))
+                {
+                    var native = _nativeCulling.Capture();
+                    var evidence = new NativeCullingRestoration { supported = _nativeCulling.Supported, restored = _nativeCulling.RestorationFailures == 0, failures = _nativeCulling.RestorationFailures, error = _nativeCulling.RestorationError, observedGroups = native.ObservedGroups, nativeCullingTimingAvailable = native.Available, nativeCullingSamples = native.Samples, nativeCullingMicrosecondsSum = native.Ticks * 1000000.0 / Stopwatch.Frequency };
+                    foreach (var callback in _callbacks)
+                    {
+                        evidence.gameCpuSamples += callback.Count;
+                        evidence.gameCpuMicrosecondsSum += callback.Ticks * 1000000.0 / Stopwatch.Frequency;
+                        evidence.reflectionCpuSamples += callback.ReflectionCount;
+                        evidence.reflectionCpuMicrosecondsSum += callback.ReflectionTicks * 1000000.0 / Stopwatch.Frequency;
+                    }
+                    BenchmarkOutput.WriteJson(Path.Combine(_output, "native-culling-observer-restoration.json"), evidence);
+                }
+            }
+        }
+
+        private static NativeMode CaptureNativeMode(string phase)
+        {
+            var evidence = new NativeMode { mode = _nativeState.Mode, buildGuid = Application.buildGUID, requestedEnabled = BenchmarkNativeSubmissionState.Enabled(_nativeState.Mode), phase = phase };
+            foreach (var renderer in _nativeState.Renderers)
+            {
+                if (renderer == null) continue;
+                evidence.renderers++;
+                evidence.overriddenRenderers += renderer.NativeSubmissionOverride == evidence.requestedEnabled ? 1 : 0;
+                evidence.activeRenderers += renderer.NativeSubmissionActive ? 1 : 0;
+                evidence.nativeMemoryBytes += renderer.NativeSubmissionMemoryBytes;
+                evidence.cameraCommands += renderer.NativeCameraCommands;
+                evidence.cameraInstances += renderer.NativeCameraInstances;
+                evidence.cameraBatches += renderer.NativeCameraBatches;
+                evidence.shadowCommands += renderer.NativeShadowCommands;
+                evidence.shadowInstances += renderer.NativeShadowInstances;
+                evidence.reflectionCommands += renderer.NativeReflectionCommands;
+                evidence.reflectionInstances += renderer.NativeReflectionInstances;
+                evidence.reflectionBatches += renderer.NativeReflectionBatches;
+                evidence.reflectionViews += renderer.NativeReflectionViews;
+                evidence.registeredReflectionViews += renderer.NativeRegisteredReflectionViews;
+                evidence.culledBatches += renderer.NativeCulledBatches;
+                evidence.culledInstances += renderer.NativeCulledInstances;
+                evidence.shadowViews += renderer.NativeShadowViews;
+                evidence.cullingInvocations += renderer.NativeCullingInvocations;
+                evidence.cullingOutputBytes += renderer.NativeCullingOutputBytes;
+                evidence.nativeFallbacks.Add(new NativeFallback { renderer = renderer.name, entityId = renderer.GetEntityId().ToString(), reason = renderer.NativeSubmissionFallbackReason });
+                if (renderer.BatchSet == null) continue;
+                evidence.sourceBatches += renderer.BatchSet.Batches.Count;
+                evidence.sourceInstances += renderer.BatchSet.InstanceCount;
+            }
+            return evidence;
         }
 
         private static void RecordVisibility(XRayLevelInstancedRenderer renderer, Camera camera, Pose report)
@@ -174,29 +340,48 @@ namespace Rvm.Benchmark
 
         private sealed class MeasuredCallback
         {
+            private readonly XRayLevelInstancedRenderer _renderer;
+            private readonly BenchmarkNativeCullingObserver _nativeCulling;
+
             public Action<ScriptableRenderContext, Camera> Original { get; }
             public long Ticks { get; private set; }
             public long Maximum { get; private set; }
             public int Count { get; private set; }
+            public long ReflectionTicks { get; private set; }
+            public long ReflectionMaximum { get; private set; }
+            public int ReflectionCount { get; private set; }
 
-            public MeasuredCallback(Action<ScriptableRenderContext, Camera> original)
+            public MeasuredCallback(Action<ScriptableRenderContext, Camera> original, XRayLevelInstancedRenderer renderer, BenchmarkNativeCullingObserver nativeCulling)
             {
                 Original = original;
+                _renderer = renderer;
+                _nativeCulling = nativeCulling;
             }
 
             public void Invoke(ScriptableRenderContext context, Camera camera)
             {
-                if (camera.cameraType != CameraType.Game)
+                if (camera.cameraType != CameraType.Game && camera.cameraType != CameraType.Reflection)
                 {
                     Original(context, camera);
+                    _nativeCulling.Attach(_renderer);
                     return;
                 }
                 long start = Stopwatch.GetTimestamp();
                 Original(context, camera);
                 long elapsed = Stopwatch.GetTimestamp() - start;
-                Ticks += elapsed;
-                Maximum = Math.Max(Maximum, elapsed);
-                Count++;
+                if (camera.cameraType == CameraType.Game)
+                {
+                    Ticks += elapsed;
+                    Maximum = Math.Max(Maximum, elapsed);
+                    Count++;
+                }
+                else
+                {
+                    ReflectionTicks += elapsed;
+                    ReflectionMaximum = Math.Max(ReflectionMaximum, elapsed);
+                    ReflectionCount++;
+                }
+                _nativeCulling.Attach(_renderer);
             }
 
             public void Reset()
@@ -204,6 +389,9 @@ namespace Rvm.Benchmark
                 Ticks = 0;
                 Maximum = 0;
                 Count = 0;
+                ReflectionTicks = 0;
+                ReflectionMaximum = 0;
+                ReflectionCount = 0;
             }
         }
 
@@ -239,14 +427,108 @@ namespace Rvm.Benchmark
             public int mixedVisibilityFallbacks;
             public int visibleGroups;
             public int shadowOnlyGroups;
+            public int rejectedShadowBatches;
+            public int nativeActiveRenderers;
+            public int nativeCameraCommands;
+            public int nativeCameraInstances;
+            public int nativeCameraBatches;
+            public int nativeShadowCommands;
+            public int nativeShadowInstances;
+            public int nativeReflectionCommands;
+            public int nativeReflectionInstances;
+            public int nativeReflectionBatches;
+            public int nativeReflectionViews;
+            public int nativeRegisteredReflectionViews;
+            public int nativeCulledBatches;
+            public int nativeCulledInstances;
+            public int nativeShadowViews;
+            public int nativeCullingInvocations;
+            public int nativeCullingElapsedSamples;
+            public int nativeCullingObservedGroups;
+            public bool nativeCullingObserverSupported;
+            public bool nativeCullingTimingAvailable;
             public int cpuSamples;
+            public int reflectionCpuSamples;
             public double cpuMicrosecondsSum;
             public double cpuMicrosecondsMean;
             public double cpuMicrosecondsMax;
+            public double reflectionCpuMicrosecondsSum;
+            public double reflectionCpuMicrosecondsMean;
+            public double reflectionCpuMicrosecondsMax;
+            public double nativeCullingElapsedMicrosecondsSum;
+            public double nativeCullingElapsedMicrosecondsMean;
+            public double nativeCullingElapsedMicrosecondsMax;
             public long memoryBytes;
+            public long privateMemoryBytes;
+            public long workingSetBytes;
+            public long managedHeapBytes;
             public long groupMatrixPayloadBytes;
             public long groupDataPayloadBytes;
-            public string scope = "Technical run only: actual RenderMeshInstanced invocations and instance arguments, elapsed wall duration of the real renderer callback over the observed one-second window after route warmup. Timing includes native calls and is not exclusive CPU execution time; it excludes subsequent HDRP/native culling and GPU work. Source color candidates use wind-expanded source bounds and the camera frustum, not occlusion. Merged-group and mixed-fallback counts inspect the existing runtime scratch once per pose. Color instances are submission candidates, not visible pixels or GPU draws. Screenshots are route evidence, not pixel equivalence.";
+            public long nativeMemoryBytes;
+            public long nativeCullingOutputBytes;
+            public List<NativeFallback> nativeFallbacks = new List<NativeFallback>();
+            public string nativeCullingUnavailableReason;
+            public string nativeViewScope = NATIVE_VIEW_SCOPE;
+            public string scope = "Technical run only: submissions/submittedInstances count legacy RenderMeshInstanced API invocations/arguments. Zero legacy calls in native B means zero calls to that API, not zero GPU geometry/shadow work. Successful native B submits Camera and owner Game Light shadow views without the complete legacy instance loop; fallback retains the original path. Native camera/shadow commands are emitted BatchRendererGroup source/submesh commands per view, with repeated instance references across submeshes/views; these are not GPU draws or unique objects. Culling invocations include calls before guards; output bytes sum actual native output allocations across views, not resident or managed allocation totals. Source color/shadow candidate counts are independent legacy geometric candidates and do not include native rejection. Native memory is reported payload/storage, not total process memory. Process private bytes, working set and GC.GetTotalMemory(false) managed heap are sampled once at this technical pose; managed heap is an approximate heap snapshot, not allocation flow or zero-allocation evidence. Unity memoryBytes remains Profiler.GetTotalAllocatedMemoryLong. These scopes overlap and are not added. Renderer callback elapsed excludes later native culling. Separate culling elapsed wraps the original synchronous BatchRendererGroup OnPerformCulling delegate across observed camera/light views, weighted by completed callback samples; it excludes subsequently scheduled jobs and GPU work and is not exclusive CPU execution time. Native timing is unavailable unless nativeCullingTimingAvailable is true; unsupported metadata and absent/changed callbacks retain explicit reasons. Screenshots are route evidence, not pixel equivalence.";
+        }
+
+        [Serializable]
+        private sealed class NativeMode
+        {
+            public string mode;
+            public string buildGuid;
+            public string phase;
+            public bool requestedEnabled;
+            public int renderers;
+            public int overriddenRenderers;
+            public int activeRenderers;
+            public int sourceBatches;
+            public int sourceInstances;
+            public int cameraCommands;
+            public int cameraInstances;
+            public int cameraBatches;
+            public int shadowCommands;
+            public int shadowInstances;
+            public int reflectionCommands;
+            public int reflectionInstances;
+            public int reflectionBatches;
+            public int reflectionViews;
+            public int registeredReflectionViews;
+            public int culledBatches;
+            public int culledInstances;
+            public int shadowViews;
+            public int cullingInvocations;
+            public long nativeMemoryBytes;
+            public long cullingOutputBytes;
+            public List<NativeFallback> nativeFallbacks = new List<NativeFallback>();
+            public string nativeViewScope = NATIVE_VIEW_SCOPE;
+            public string scope = "Explicit benchmark-session override only; A selects legacy and B requests native Camera plus owner Game Light shadow submission without writing production GameConfig assets. Production GameConfig defaults are native on and grouping off; this session restores the prior nullable override. Active describes the current render context and can be false after EndContext; completed use requires published camera/shadow commands and declared view coverage. Startup counts do not prove activation. Missing or incompatible HDRP owner-camera scope API and unsupported rendering contracts use legacy fallback before native activation. Before-restoration evidence observes final published state. Culling invocations include calls before guards; output bytes sum native output allocations across views. Main timing runs install no culling recorder or callback observer. View command/instance counts repeat sources and are not GPU draw/unique-object counts.";
+        }
+
+        [Serializable]
+        private sealed class NativeFallback
+        {
+            public string renderer;
+            public string entityId;
+            public string reason;
+        }
+
+        [Serializable]
+        private sealed class NativeCullingRestoration
+        {
+            public bool supported;
+            public bool restored;
+            public int failures;
+            public string error;
+            public int observedGroups;
+            public int gameCpuSamples;
+            public double gameCpuMicrosecondsSum;
+            public int reflectionCpuSamples;
+            public double reflectionCpuMicrosecondsSum;
+            public bool nativeCullingTimingAvailable;
+            public int nativeCullingSamples;
+            public double nativeCullingMicrosecondsSum;
+            public string scope = "Technical teardown snapshot of the final observed window since the most recent pose reset, not whole-route totals. Game/reflection preparation have separate callback populations; native culling includes observed Camera and owner Game Light views plus any registered reflection views. Reflection coverage must be established from the observed views and commands. These synchronous elapsed scopes exclude downstream pipeline work, asynchronous jobs and GPU work; overlapping scopes do not form a full frame or exclusive CPU budget.";
         }
     }
 }

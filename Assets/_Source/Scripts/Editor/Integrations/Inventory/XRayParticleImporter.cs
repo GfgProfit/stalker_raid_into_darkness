@@ -121,12 +121,11 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
                 }
             }
 
-            var paths = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-            var retainedPngPaths = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            var imported = new Dictionary<string, (string Path, int Width, int Height)>(StringComparer.OrdinalIgnoreCase);
 
             foreach (string name in names)
             {
-                StalkerXRaySources.EnsureFolder(Path.GetDirectoryName(TexturePath(name, ".dds")).Replace('\\', '/'));
+                StalkerXRaySources.EnsureFolder(Path.GetDirectoryName(TexturePath(name)).Replace('\\', '/'));
             }
 
             AssetDatabase.StartAssetEditing();
@@ -144,32 +143,21 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
                     }
 
                     byte[] data = File.ReadAllBytes(file);
-                    DdsHeader header = DdsHeader.Parse(data);
-                    bool native = XRayTextureImporter.IsUnityNative(header);
-                    string png = TexturePath(name, ".png");
-                    if (native && File.Exists(png) && !File.Exists(TexturePath(name, ".dds")))
+                    DdsHeader header;
+                    byte[] png;
+                    try
                     {
-                        retainedPngPaths.Add(png);
-                        paths[name] = png;
-                        continue;
+                        header = DdsHeader.Parse(data);
+                        png = XRayTextureImporter.EncodeVerifiedPng(data, header, false);
+                    }
+                    catch (Exception exception) when (exception is FormatException || exception is NotSupportedException || exception is UnityException)
+                    {
+                        throw new InvalidOperationException($"Particle texture '{file}' could not be converted to PNG: {exception.Message}", exception);
                     }
 
-                    string target = TexturePath(name, native ? ".dds" : ".png");
-                    string full = Path.GetFullPath(target);
-                    byte[] converted = native ? ToSrgb(data, header) : EncodePng(DdsDecoder.DecodeTopLevel(data, header), header.Width, header.Height);
-                    string other = Path.GetFullPath(TexturePath(name, native ? ".png" : ".dds"));
-
-                    if (File.Exists(other))
-                    {
-                        AssetDatabase.DeleteAsset(TexturePath(name, native ? ".png" : ".dds"));
-                    }
-
-                    if (File.Exists(full) == false || File.ReadAllBytes(full).AsSpan().SequenceEqual(converted) == false)
-                    {
-                        File.WriteAllBytes(full, converted);
-                    }
-
-                    paths[name] = target;
+                    string target = TexturePath(name);
+                    StorePng(target, png);
+                    imported[name] = (target, header.Width, header.Height);
                 }
             }
             finally
@@ -180,22 +168,32 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
             AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
             var result = new Dictionary<string, Texture2D>(StringComparer.OrdinalIgnoreCase);
 
-            foreach (KeyValuePair<string, string> pair in paths)
+            foreach (KeyValuePair<string, (string Path, int Width, int Height)> pair in imported)
             {
-                if (!retainedPngPaths.Contains(pair.Value) && AssetImporter.GetAtPath(pair.Value) is TextureImporter importer && (importer.sRGBTexture == false || importer.alphaIsTransparency == false || importer.textureCompression != TextureImporterCompression.CompressedHQ))
+                string texturePath = pair.Value.Path;
+                if (AssetImporter.GetAtPath(texturePath) is TextureImporter importer)
                 {
-                    importer.sRGBTexture = true;
-                    importer.alphaIsTransparency = true;
-                    importer.mipmapEnabled = true;
-                    importer.textureCompression = TextureImporterCompression.CompressedHQ;
-                    importer.SaveAndReimport();
+                    bool changed = XRayTextureImportQueue.ApplyPngMipPolicy(importer, pair.Value.Width, pair.Value.Height);
+                    if (!importer.sRGBTexture || importer.alphaSource != TextureImporterAlphaSource.FromInput || importer.alphaIsTransparency || importer.textureCompression != TextureImporterCompression.CompressedHQ)
+                    {
+                        importer.sRGBTexture = true;
+                        importer.alphaSource = TextureImporterAlphaSource.FromInput;
+                        importer.alphaIsTransparency = false;
+                        importer.textureCompression = TextureImporterCompression.CompressedHQ;
+                        changed = true;
+                    }
+
+                    if (changed)
+                    {
+                        importer.SaveAndReimport();
+                    }
                 }
 
-                var texture = AssetDatabase.LoadAssetAtPath<Texture2D>(pair.Value);
+                var texture = AssetDatabase.LoadAssetAtPath<Texture2D>(texturePath);
 
                 if (texture == null)
                 {
-                    log.AppendLine($"Texture '{pair.Value}' failed to import.");
+                    log.AppendLine($"Texture '{texturePath}' failed to import.");
                     continue;
                 }
 
@@ -327,42 +325,69 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
             return PARTICLES_FOLDER + "/" + name.Replace('\\', '/') + extension;
         }
 
-        private static string TexturePath(string name, string extension)
+        private static string TexturePath(string name)
         {
-            return TEXTURES_FOLDER + "/" + name.Replace('\\', '/') + extension;
+            return TEXTURES_FOLDER + "/" + name.Replace('\\', '/') + ".png";
         }
 
-        private static byte[] ToSrgb(byte[] data, DdsHeader header)
+        private static void StorePng(string assetPath, byte[] png)
         {
-            if (header.HasDx10Header && header.IsSrgb)
+            string legacyPath = Path.ChangeExtension(assetPath, ".dds");
+            bool exists = File.Exists(assetPath);
+            if (exists && File.ReadAllBytes(assetPath).AsSpan().SequenceEqual(png))
             {
-                return data;
+                return;
             }
 
-            return DdsColorSpace.TryGetDxgiFormat(header.Format, true, out uint dxgi) ? DdsColorSpace.WithDx10Header(data, header, dxgi) : data;
-        }
-
-        private static byte[] EncodePng(byte[] topDownRgba, int width, int height)
-        {
-            var bottomUp = new byte[topDownRgba.Length];
-            int stride = width * 4;
-
-            for (int y = 0; y < height; y++)
+            bool hasLegacy = File.Exists(legacyPath);
+            if (hasLegacy && exists)
             {
-                Buffer.BlockCopy(topDownRgba, y * stride, bottomUp, (height - 1 - y) * stride, stride);
+                throw new IOException($"Particle texture '{legacyPath}' cannot replace the existing '{assetPath}'.");
             }
 
-            var texture = new Texture2D(width, height, TextureFormat.RGBA32, false, false);
-
+            string pendingPath = assetPath + "." + Guid.NewGuid().ToString("N") + ".tmp";
+            bool moved = false;
             try
             {
-                texture.SetPixelData(bottomUp, 0);
-                texture.Apply(false, false);
-                return texture.EncodeToPNG();
+                File.WriteAllBytes(pendingPath, png);
+                if (hasLegacy)
+                {
+                    string error = AssetDatabase.MoveAsset(legacyPath, assetPath);
+                    if (!string.IsNullOrEmpty(error))
+                    {
+                        throw new IOException($"Could not preserve the particle texture GUID when moving '{legacyPath}' to '{assetPath}': {error}");
+                    }
+
+                    moved = true;
+                    exists = true;
+                }
+
+                if (exists)
+                {
+                    AssetDatabase.ReleaseCachedFileHandles();
+                    File.Replace(pendingPath, assetPath, null);
+                }
+                else
+                {
+                    File.Move(pendingPath, assetPath);
+                }
+            }
+            catch (Exception exception)
+            {
+                if (moved)
+                {
+                    string error = AssetDatabase.MoveAsset(assetPath, legacyPath);
+                    if (!string.IsNullOrEmpty(error))
+                    {
+                        throw new IOException($"Could not restore the particle texture from '{assetPath}' to '{legacyPath}': {error}", exception);
+                    }
+                }
+
+                throw;
             }
             finally
             {
-                UnityEngine.Object.DestroyImmediate(texture);
+                File.Delete(pendingPath);
             }
         }
 

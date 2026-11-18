@@ -152,12 +152,12 @@ namespace XRay.Importer.Editor.Levels
             _authored[authoredKey] = result;
             if (result.Status == XRayResourceStatus.Skipped || result.Status == XRayResourceStatus.Unsupported)
             {
-                _record.AddDependency(XRayLevelDependencyCategory.Materials, "Flora authored albedo mips", diffuse.DisplayPath, diffuse.IsResolved ? diffuse.Winner.Location : null, diffuse.VirtualPath, XRayLevelDependencyStatus.Described, "Legacy albedo keeps the source mip chain or the format has no authored-mip path", null, result.Note);
+                _record.AddDependency(XRayLevelDependencyCategory.Materials, "Flora authored albedo mips", diffuse.DisplayPath, diffuse.IsResolved ? diffuse.Winner.Location : null, diffuse.VirtualPath, XRayLevelDependencyStatus.Described, "No dedicated flora texture was imported; the material keeps its standard albedo", null, result.Note);
                 flora.AuthoredNote = result.Note;
                 return flora;
             }
 
-            Track(XRayLevelDependencyCategory.Materials, "Flora authored albedo mips", diffuse, result, "s_base with the authored DDS mip chain, encoded UNorm sampling, smp_base anisotropy and mip bias");
+            Track(XRayLevelDependencyCategory.Materials, "Flora authored albedo mips", diffuse, result, "s_base with linear sampling, existing native or Unity-generated mips, smp_base anisotropy and mip bias");
             flora.AuthoredAlbedoPath = result.AssetPath;
             flora.AuthoredNote = result.Note;
             return flora;

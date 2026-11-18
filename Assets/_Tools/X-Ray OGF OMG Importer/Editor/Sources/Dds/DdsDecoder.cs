@@ -15,7 +15,6 @@ namespace XRay.Importer.Sources.Dds
             {
                 case DdsFormat.Unknown:
                 case DdsFormat.BC6H:
-                case DdsFormat.BC7:
                 case DdsFormat.RgbaHalf:
                     return false;
                 default:
@@ -25,21 +24,32 @@ namespace XRay.Importer.Sources.Dds
 
         public static byte[] DecodeTopLevel(byte[] data, DdsHeader header)
         {
+            return DecodeTopLevel(data, header, false);
+        }
+
+        public static byte[] DecodePngTopLevel(byte[] data, DdsHeader header)
+        {
+            return DecodeTopLevel(data, header, true);
+        }
+
+        private static byte[] DecodeTopLevel(byte[] data, DdsHeader header, bool preserveChannels)
+        {
             if (!CanDecode(header))
             {
                 throw new NotSupportedException($"DDS format {header.Description} cannot be decoded.");
             }
 
+            int outputSize = checked(header.Width * header.Height * 4);
             int required = DdsHeader.GetLevelSize(header.Format, header.Width, header.Height);
-            if (header.DataOffset + required > data.Length)
+            if (required > data.Length - header.DataOffset)
             {
                 throw new FormatException($"DDS data is truncated: need {required} bytes at offset {header.DataOffset}, file has {data.Length}.");
             }
 
-            var output = new byte[header.Width * header.Height * 4];
+            var output = new byte[outputSize];
             if (header.IsBlockCompressed)
             {
-                DecodeBlocks(data, header, output);
+                DecodeBlocks(data, header, output, preserveChannels);
             }
             else
             {
@@ -49,7 +59,7 @@ namespace XRay.Importer.Sources.Dds
             return output;
         }
 
-        private static void DecodeBlocks(byte[] data, DdsHeader header, byte[] output)
+        private static void DecodeBlocks(byte[] data, DdsHeader header, byte[] output, bool preserveChannels)
         {
             int blocksWide = Math.Max(1, (header.Width + 3) / 4);
             int blocksHigh = Math.Max(1, (header.Height + 3) / 4);
@@ -60,8 +70,10 @@ namespace XRay.Importer.Sources.Dds
             {
                 for (int bx = 0; bx < blocksWide; bx++)
                 {
-                    DecodeBlock(data, offset, header.Format, block);
+                    DecodeBlock(data, offset, header.Format, block, preserveChannels);
                     offset += blockSize;
+                    int x = bx * 4;
+                    int bytesPerRow = Math.Min(4, header.Width - x) * 4;
                     for (int py = 0; py < 4; py++)
                     {
                         int y = by * 4 + py;
@@ -70,30 +82,21 @@ namespace XRay.Importer.Sources.Dds
                             break;
                         }
 
-                        for (int px = 0; px < 4; px++)
-                        {
-                            int x = bx * 4 + px;
-                            if (x >= header.Width)
-                            {
-                                break;
-                            }
-
-                            Buffer.BlockCopy(block, (py * 4 + px) * 4, output, (y * header.Width + x) * 4, 4);
-                        }
+                        Buffer.BlockCopy(block, py * 16, output, (y * header.Width + x) * 4, bytesPerRow);
                     }
                 }
             }
         }
 
-        private static void DecodeBlock(byte[] data, int offset, DdsFormat format, byte[] block)
+        private static void DecodeBlock(byte[] data, int offset, DdsFormat format, byte[] block, bool preserveChannels)
         {
             switch (format)
             {
                 case DdsFormat.BC1:
-                    DecodeColorBlock(data, offset, block, true);
+                    DecodeColorBlock(data, offset, block, true, preserveChannels);
                     break;
                 case DdsFormat.BC2:
-                    DecodeColorBlock(data, offset + 8, block, false);
+                    DecodeColorBlock(data, offset + 8, block, false, preserveChannels);
                     for (int i = 0; i < 16; i++)
                     {
                         int nibble = (data[offset + i / 2] >> ((i % 2) * 4)) & 0xF;
@@ -102,49 +105,59 @@ namespace XRay.Importer.Sources.Dds
 
                     break;
                 case DdsFormat.BC3:
-                    DecodeColorBlock(data, offset + 8, block, false);
-                    DecodeAlphaBlock(data, offset, block, 3);
+                    DecodeColorBlock(data, offset + 8, block, false, preserveChannels);
+                    DecodeAlphaBlock(data, offset, block, 3, preserveChannels);
                     break;
                 case DdsFormat.BC4:
-                    DecodeAlphaBlock(data, offset, block, 0);
+                    DecodeAlphaBlock(data, offset, block, 0, preserveChannels);
                     for (int i = 0; i < 16; i++)
                     {
-                        block[i * 4 + 1] = block[i * 4];
-                        block[i * 4 + 2] = block[i * 4];
+                        byte value = preserveChannels ? (byte)0 : block[i * 4];
+                        block[i * 4 + 1] = value;
+                        block[i * 4 + 2] = value;
                         block[i * 4 + 3] = 255;
                     }
 
                     break;
                 case DdsFormat.BC5:
-                    DecodeAlphaBlock(data, offset, block, 0);
-                    DecodeAlphaBlock(data, offset + 8, block, 1);
+                    DecodeAlphaBlock(data, offset, block, 0, preserveChannels);
+                    DecodeAlphaBlock(data, offset + 8, block, 1, preserveChannels);
                     for (int i = 0; i < 16; i++)
                     {
-                        double nx = block[i * 4] / 127.5 - 1.0;
-                        double ny = block[i * 4 + 1] / 127.5 - 1.0;
-                        double nz = Math.Sqrt(Math.Max(0.0, 1.0 - nx * nx - ny * ny));
-                        block[i * 4 + 2] = (byte)Math.Round((nz * 0.5 + 0.5) * 255.0);
+                        block[i * 4 + 2] = preserveChannels ? (byte)0 : ReconstructNormalZ(block[i * 4], block[i * 4 + 1]);
                         block[i * 4 + 3] = 255;
                     }
 
                     break;
+                case DdsFormat.BC7:
+                    DdsBc7Decoder.DecodeBlock(data, offset, block);
+                    break;
             }
         }
 
-        private static void DecodeColorBlock(byte[] data, int offset, byte[] block, bool allowTransparent)
+        private static byte ReconstructNormalZ(byte x, byte y)
+        {
+            double nx = x / 127.5 - 1.0;
+            double ny = y / 127.5 - 1.0;
+            double nz = Math.Sqrt(Math.Max(0.0, 1.0 - nx * nx - ny * ny));
+            return (byte)Math.Round((nz * 0.5 + 0.5) * 255.0);
+        }
+
+        private static void DecodeColorBlock(byte[] data, int offset, byte[] block, bool allowTransparent, bool preserveChannels)
         {
             int c0 = data[offset] | (data[offset + 1] << 8);
             int c1 = data[offset + 2] | (data[offset + 3] << 8);
             uint indices = DdsHeader.ReadUInt32(data, offset + 4);
-            var palette = new int[16];
+            Span<int> palette = stackalloc int[16];
             Expand565(c0, palette, 0);
             Expand565(c1, palette, 4);
             if (c0 > c1 || !allowTransparent)
             {
+                int rounding = preserveChannels ? 0 : 1;
                 for (int channel = 0; channel < 3; channel++)
                 {
-                    palette[8 + channel] = (2 * palette[channel] + palette[4 + channel] + 1) / 3;
-                    palette[12 + channel] = (palette[channel] + 2 * palette[4 + channel] + 1) / 3;
+                    palette[8 + channel] = (2 * palette[channel] + palette[4 + channel] + rounding) / 3;
+                    palette[12 + channel] = (palette[channel] + 2 * palette[4 + channel] + rounding) / 3;
                 }
 
                 palette[11] = 255;
@@ -172,7 +185,7 @@ namespace XRay.Importer.Sources.Dds
             }
         }
 
-        private static void Expand565(int color, int[] palette, int offset)
+        private static void Expand565(int color, Span<int> palette, int offset)
         {
             int r = (color >> 11) & 0x1F;
             int g = (color >> 5) & 0x3F;
@@ -183,25 +196,27 @@ namespace XRay.Importer.Sources.Dds
             palette[offset + 3] = 255;
         }
 
-        private static void DecodeAlphaBlock(byte[] data, int offset, byte[] block, int channel)
+        private static void DecodeAlphaBlock(byte[] data, int offset, byte[] block, int channel, bool preserveChannels)
         {
             int a0 = data[offset];
             int a1 = data[offset + 1];
-            var values = new int[8];
+            Span<int> values = stackalloc int[8];
             values[0] = a0;
             values[1] = a1;
             if (a0 > a1)
             {
+                int rounding = preserveChannels ? 0 : 3;
                 for (int i = 1; i < 7; i++)
                 {
-                    values[i + 1] = ((7 - i) * a0 + i * a1 + 3) / 7;
+                    values[i + 1] = ((7 - i) * a0 + i * a1 + rounding) / 7;
                 }
             }
             else
             {
+                int rounding = preserveChannels ? 0 : 2;
                 for (int i = 1; i < 5; i++)
                 {
-                    values[i + 1] = ((5 - i) * a0 + i * a1 + 2) / 5;
+                    values[i + 1] = ((5 - i) * a0 + i * a1 + rounding) / 5;
                 }
 
                 values[6] = 0;

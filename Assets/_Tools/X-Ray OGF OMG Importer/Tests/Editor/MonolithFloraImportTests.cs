@@ -113,8 +113,9 @@ namespace XRay.Importer.Tests
                 Assert.IsTrue(file.IsResolved, virtualPath);
                 byte[] bytes = file.Winner.ReadAllBytes();
                 DdsHeader header = DdsHeader.Parse(bytes);
+                CreateLegacyAuthoredFlora(file, bytes, header);
                 XRayTextureAssetResult result = importer.ImportAuthoredMips(file, _temp, 16, -0.5f);
-                Assert.AreEqual(XRayResourceStatus.Imported, result.Status, result.Note);
+                Assert.AreEqual(XRayResourceStatus.Reused, result.Status, result.Note);
                 var authored = AssetDatabase.LoadAssetAtPath<Texture2D>(result.AssetPath);
                 Assert.IsNotNull(authored);
                 Assert.AreEqual(header.MipCount, authored.mipmapCount);
@@ -445,7 +446,10 @@ namespace XRay.Importer.Tests
                 Func<int, float, XRayTextureAssetResult> import = (anisotropy, mipBias) =>
                 {
                     XRayResolvedFile file = new XRayTextureResolver(XRayAssetIndex.Build(Mo2VirtualFileSystem.Plan(fixture.CreateConfiguration("Profile")))).ResolveFile("textures/flora/leaf.dds");
-                    return new XRayTextureImporter(new XRayImportOptions { OverwriteExistingTextures = true }, false, new HashSet<string>()).ImportAuthoredMips(file, _temp, anisotropy, mipBias);
+                    var importer = new XRayTextureImporter(new XRayImportOptions { OverwriteExistingTextures = true }, false, new HashSet<string>());
+                    XRayTextureAssetResult result = importer.ImportAuthoredMips(file, _temp, anisotropy, mipBias);
+                    importer.ImportPendingBatched();
+                    return result;
                 };
                 void Row(string step, XRayTextureAssetResult result)
                 {
@@ -455,7 +459,13 @@ namespace XRay.Importer.Tests
                 }
 
                 XRayTextureAssetResult created = import(16, -0.5f);
-                Assert.AreEqual(XRayResourceStatus.Imported, created.Status, created.Note);
+                Assert.AreEqual(XRayResourceStatus.Converted, created.Status, created.Note);
+                StringAssert.EndsWith("_authored.png", created.AssetPath);
+                var createdImporter = (TextureImporter)AssetImporter.GetAtPath(created.AssetPath);
+                Assert.IsTrue(createdImporter.mipmapEnabled);
+                Assert.IsTrue(createdImporter.mipMapsPreserveCoverage);
+                Assert.AreEqual(XRayFloraSourceBinding.AREF, createdImporter.alphaTestReferenceValue);
+                Assert.IsFalse(createdImporter.sRGBTexture);
                 Row("Created", created);
                 string assetPath = created.AssetPath;
                 string guid = AssetDatabase.AssetPathToGUID(assetPath);
@@ -475,7 +485,7 @@ namespace XRay.Importer.Tests
                 Texture2D texture = AssetDatabase.LoadAssetAtPath<Texture2D>(assetPath);
                 Assert.AreEqual(8, texture.anisoLevel);
                 Assert.AreEqual(0.0f, texture.mipMapBias);
-                Assert.AreEqual(4, texture.mipmapCount);
+                Assert.AreEqual(7, texture.mipmapCount);
                 Assert.AreEqual(guid, AssetDatabase.AssetPathToGUID(assetPath));
                 Assert.AreEqual(payload, Payload(assetPath), "A sampler-only refresh must keep the authored mip payload.");
                 Assert.AreEqual(XRayAuthoredSampler.Record(8, 0.0f), XRayAuthoredSampler.ReadRecord(assetPath));
@@ -485,9 +495,9 @@ namespace XRay.Importer.Tests
                 Assert.AreEqual(XRayResourceStatus.Reused, repeated.Status, repeated.Note);
                 CollectionAssert.AreEquivalent(state, Files(assetPath));
 
-                texture.anisoLevel = 4;
-                EditorUtility.SetDirty(texture);
-                AssetDatabase.SaveAssetIfDirty(texture);
+                var textureImporter = (TextureImporter)AssetImporter.GetAtPath(assetPath);
+                textureImporter.anisoLevel = 4;
+                textureImporter.SaveAndReimport();
                 XRayTextureAssetResult overridden = import(16, -0.5f);
                 Row("UserOverrideAnisotropy", overridden);
                 texture = AssetDatabase.LoadAssetAtPath<Texture2D>(assetPath);
@@ -516,7 +526,7 @@ namespace XRay.Importer.Tests
                 {
                     ("Truncated payload", Truncate(Dds(64, 64, "DXT1", Levels(random, 64, 64, 8, 4)), DdsHeader.HEADER_SIZE + 1000)),
                     ("Excessive MipCount", Patch(Dds(64, 64, "DXT1", Levels(random, 64, 64, 8, 4)), 28, 40)),
-                    ("Unsupported BC5", Dds(64, 64, "ATI2", Levels(random, 64, 64, 16, 4))),
+                    ("Unsupported HDR", Dx10(64, 64, DdsHeader.DXGI_BC6H_UF16, Levels(random, 64, 64, 16, 4))),
                     ("Not a DDS", Levels(random, 64, 64, 8, 1)[0])
                 };
                 foreach ((string name, byte[] data) in corrupt)
@@ -538,7 +548,7 @@ namespace XRay.Importer.Tests
                 Assert.AreEqual(assetPath, updated.AssetPath);
                 Assert.AreEqual(guid, AssetDatabase.AssetPathToGUID(assetPath));
                 texture = AssetDatabase.LoadAssetAtPath<Texture2D>(assetPath);
-                Assert.AreEqual(3, texture.mipmapCount);
+                Assert.AreEqual(7, texture.mipmapCount);
                 Assert.AreEqual(4, texture.anisoLevel, "A payload update must keep the user sampler override.");
                 Assert.AreEqual(-0.5f, texture.mipMapBias);
                 Assert.AreNotEqual(payload, Payload(assetPath));
@@ -569,7 +579,7 @@ namespace XRay.Importer.Tests
                 Dictionary<string, string> before = Snapshot(root);
                 string materialPath = AssetDatabase.GetAssetPath(material);
                 string albedoPath = AssetDatabase.GetAssetPath(material.GetTexture("_BaseColorMap"));
-                StringAssert.EndsWith("_authored.asset", albedoPath);
+                StringAssert.EndsWith("_authored.png", albedoPath);
                 string[] watched = { materialPath, materialPath + ".meta", albedoPath, albedoPath + ".meta" };
                 var hashes = new List<string>();
                 foreach (string file in watched) hashes.Add(XRayLevelSourceRefresh.HashFile(file));
@@ -605,7 +615,7 @@ namespace XRay.Importer.Tests
 
         [UnityTest]
         [Timeout(900000)]
-        public IEnumerator AnomalyFullImportEnablesVerifiedFloraAndAuthoredMips()
+        public IEnumerator AnomalyFullImportEnablesVerifiedFloraAndGeneratedMips()
         {
             string root;
             using (var fixture = new XRayFloraLevelFixture(false))
@@ -622,10 +632,10 @@ namespace XRay.Importer.Tests
                 Assert.AreEqual(XRayFloraSourceBinding.AREF, material.GetFloat("_AlphaCutoff"), 1e-6f);
                 var albedo = material.GetTexture("_BaseColorMap") as Texture2D;
                 Assert.IsNotNull(albedo);
-                StringAssert.EndsWith("_authored.asset", AssetDatabase.GetAssetPath(albedo));
+                StringAssert.EndsWith("_authored.png", AssetDatabase.GetAssetPath(albedo));
                 Assert.IsFalse(albedo.isDataSRGB);
                 Assert.AreEqual(0.0f, material.GetFloat("_MonolithAlbedoSrgb"));
-                Assert.Less(albedo.mipmapCount, Mathf.FloorToInt(Mathf.Log(Mathf.Max(albedo.width, albedo.height), 2)) + 1);
+                Assert.AreEqual(DdsMipChain.FullChainLength(albedo.width, albedo.height), albedo.mipmapCount);
                 Assert.AreEqual(XRayFloraSourceBinding.ANOMALY_CONTRACT_HASH, material.GetTag("XRayFloraContractSHA256", false));
                 Assert.AreEqual(XRayFloraSourceProfile.AnomalySss.ToString(), XRayLevelImportJob.LastRecord.Source.FloraProfile);
                 Assert.IsTrue(XRayLevelImportJob.LastRecord.Dependencies.Exists(dependency => dependency.Role == "Flora authored albedo mips"));
@@ -768,9 +778,10 @@ namespace XRay.Importer.Tests
             configuration.IndexScope.Clear();
             configuration.IndexScope.AddRange(new[] { "textures" });
             var effective = new XRayEffectiveGamedata(XRayAssetIndex.Build(Mo2VirtualFileSystem.Plan(configuration)));
-            XRayTextureAssetResult authoredResult = new XRayTextureImporter(new XRayImportOptions(), false, new HashSet<string>()).ImportAuthoredMips(new XRayTextureResolver(effective.Index).ResolveFile(AUTHORED_TEXTURES[0]), _temp, 16, -0.5f);
-            var authored = AssetDatabase.LoadAssetAtPath<Texture2D>(authoredResult.AssetPath);
-            Assert.IsNotNull(authored, authoredResult.Note);
+            XRayResolvedFile authoredFile = new XRayTextureResolver(effective.Index).ResolveFile(AUTHORED_TEXTURES[0]);
+            byte[] authoredBytes = authoredFile.Winner.ReadAllBytes();
+            var authored = CreateLegacyAuthoredFlora(authoredFile, authoredBytes, DdsHeader.Parse(authoredBytes));
+            Assert.IsNotNull(authored);
             yield return Capture(output, selected, stored, authored, null, false);
             Assert.AreEqual(storedBytes, File.ReadAllText(storedPath));
             Assert.IsFalse(EditorUtility.IsDirty(stored));
@@ -1171,6 +1182,22 @@ namespace XRay.Importer.Tests
             return XRayLevelSurfaceRules.Classify(new XRayLevelShader(1, "flora\\leaf_wave/trees\\leaf"), null, true);
         }
 
+        private Texture2D CreateLegacyAuthoredFlora(XRayResolvedFile file, byte[] bytes, DdsHeader header)
+        {
+            Assert.IsTrue(DdsMipChain.TryReadFlipped(bytes, header, out List<byte[]> levels, out string reason), reason);
+            GraphicsFormat format = header.Format == DdsFormat.BC1 ? GraphicsFormat.RGBA_DXT1_UNorm : header.Format == DdsFormat.BC2 ? GraphicsFormat.RGBA_DXT3_UNorm : GraphicsFormat.RGBA_DXT5_UNorm;
+            var texture = new Texture2D(header.Width, header.Height, format, levels.Count, TextureCreationFlags.None) { filterMode = FilterMode.Trilinear, anisoLevel = 16, mipMapBias = -0.5f };
+            for (int mip = 0; mip < levels.Count; mip++)
+            {
+                texture.SetPixelData(levels[mip], mip);
+            }
+
+            texture = Asset(texture, Path.GetFileNameWithoutExtension(file.Winner.RelativePath) + XRayTextureImporter.AUTHORED_NAME_SUFFIX + ".asset");
+            var marker = new XRayAssetMarker(file.VirtualPath + XRayTextureImporter.AUTHORED_KEY_SUFFIX, XRayTextureRole.Albedo.ToString(), file.Winner.SourceName, file.Winner.Location, file.Winner.Stamp);
+            XRayAuthoredSampler.WriteMarker(AssetDatabase.GetAssetPath(texture), marker, XRayAuthoredSampler.Record(16, -0.5f));
+            return texture;
+        }
+
         private Texture2D Asset(Texture2D texture, string name)
         {
             texture.Apply(false, false);
@@ -1247,6 +1274,11 @@ namespace XRay.Importer.Tests
 
         private static string Payload(string assetPath)
         {
+            if (Path.GetExtension(assetPath) == ".png")
+            {
+                return XRayLevelSourceRefresh.HashFile(assetPath);
+            }
+
             string text = File.ReadAllText(assetPath);
             int start = text.IndexOf("_typelessdata: ", StringComparison.Ordinal);
             Assert.GreaterOrEqual(start, 0, assetPath);

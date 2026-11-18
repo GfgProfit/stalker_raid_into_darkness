@@ -446,30 +446,41 @@ namespace XRay.Importer.Tests
         }
 
         [Test]
-        public void SmallBlockTexturesUsePngAndFormatChangesKeepGuidAndMaterialReference()
+        public void LegacyDdsAndSourceSizeChangesKeepPngGuidAndMaterialReference()
         {
             using (var scope = new XRayImportTestScope(null))
             {
                 Mo2Fixture fixture = CreateProfile(scope.Directory, "+" + MOD_A);
-                string source = fixture.AddModFile(MOD_A, "textures/trees/pine.dds", XRayTestBinaries.Bc1Solid(2, 2, 200, 10, 10));
+                const string virtualPath = "textures/trees/pine.dds";
+                string source = fixture.AddModFile(MOD_A, virtualPath, XRayTestBinaries.Bc1Solid(2, 2, 200, 10, 10));
                 XRayLevelPaths.UseRoot(scope.Folder);
                 try
                 {
+                    string legacyPath = XRayLevelPaths.TextureFolder(virtualPath) + "/pine.dds";
+                    Directory.CreateDirectory(Path.GetDirectoryName(legacyPath));
+                    File.WriteAllBytes(legacyPath, XRayTestBinaries.Bc1Solid(16, 16, 200, 10, 10));
+                    AssetDatabase.ImportAsset(legacyPath, ImportAssetOptions.ForceSynchronousImport);
+                    XRayAssetMarker.Write(legacyPath, new XRayAssetMarker(virtualPath + XRayTextureImporter.ALBEDO_KEY_SUFFIX, XRayTextureRole.Albedo.ToString(), MOD_A, source, string.Empty));
+                    var legacy = AssetDatabase.LoadAssetAtPath<UnityEngine.Texture2D>(legacyPath);
+                    Assert.IsNotNull(legacy);
+                    string guid = AssetDatabase.AssetPathToGUID(legacyPath);
+                    var material = new UnityEngine.Material(UnityEngine.Shader.Find("HDRP/MonolithLit"));
+                    string materialPath = scope.Folder + "/linked.mat";
+                    material.SetTexture("_BaseColorMap", legacy);
+                    AssetDatabase.CreateAsset(material, materialPath);
                     XRayLevelTextureSet first = Import(fixture, scope);
                     StringAssert.EndsWith(".png", first.AlbedoPath);
                     var texture = AssetDatabase.LoadAssetAtPath<UnityEngine.Texture2D>(first.AlbedoPath);
                     Assert.AreEqual(2, texture.width);
-                    string guid = AssetDatabase.AssetPathToGUID(first.AlbedoPath);
-                    var material = new UnityEngine.Material(UnityEngine.Shader.Find("HDRP/MonolithLit"));
-                    string materialPath = scope.Folder + "/linked.mat";
-                    material.SetTexture("_BaseColorMap", texture);
-                    AssetDatabase.CreateAsset(material, materialPath);
+                    Assert.AreEqual(guid, AssetDatabase.AssetPathToGUID(first.AlbedoPath));
+                    Assert.AreEqual(first.AlbedoPath, AssetDatabase.GetAssetPath(material.GetTexture("_BaseColorMap")));
+                    Assert.IsFalse(File.Exists(legacyPath));
                     File.WriteAllBytes(source, XRayTestBinaries.Bc1Solid(16, 16, 10, 200, 10));
                     File.SetLastWriteTimeUtc(source, DateTime.UtcNow.AddMinutes(1));
                     XRayLevelTextureSet second = Import(fixture, scope);
-                    StringAssert.EndsWith(".dds", second.AlbedoPath);
+                    Assert.AreEqual(first.AlbedoPath, second.AlbedoPath);
                     Assert.AreEqual(guid, AssetDatabase.AssetPathToGUID(second.AlbedoPath));
-                    Assert.IsFalse(File.Exists(first.AlbedoPath));
+                    Assert.AreEqual(16, AssetDatabase.LoadAssetAtPath<UnityEngine.Texture2D>(second.AlbedoPath).width);
                     Assert.AreEqual(second.AlbedoPath, AssetDatabase.GetAssetPath(material.GetTexture("_BaseColorMap")));
                     File.WriteAllBytes(source, XRayTestBinaries.Bc1Solid(2, 2, 10, 10, 200));
                     File.SetLastWriteTimeUtc(source, DateTime.UtcNow.AddMinutes(2));

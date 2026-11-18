@@ -288,9 +288,11 @@ namespace XRay.Importer.Editor.Levels
 
                     dependency.AssetPath = result.AssetPath;
                     dependency.CreatesAsset = false;
+                    dependency.FlipV = XRayLevelSourceBindings.PackedFlipV(result.AssetPath);
                     XRayLevelBindingDependency cached = _dependencies[dependency.Source.VirtualPath];
                     cached.AssetPath = result.AssetPath;
                     cached.CreatesAsset = false;
+                    cached.FlipV = dependency.FlipV;
                 }
             }
 
@@ -529,24 +531,24 @@ namespace XRay.Importer.Editor.Levels
                 try
                 {
                     DdsHeader header = DdsHeader.Parse(bytes);
-                    dependency.FlipV = XRayTextureImporter.IsUnityNative(header) && (header.Format == DdsFormat.BC7 || header.Format == DdsFormat.BC6H);
                     dependency.AssetPath = _importer.FindPacked(file, TextureFolder(file.VirtualPath), out bool current);
                     if (dependency.AssetPath != null)
                     {
+                        dependency.FlipV = XRayLevelSourceBindings.PackedFlipV(dependency.AssetPath);
                         dependency.AssetHash = HashFile(dependency.AssetPath);
                         dependency.MetaHash = HashFile(dependency.AssetPath + ".meta");
                         Texture2D texture = AssetDatabase.LoadAssetAtPath<Texture2D>(dependency.AssetPath);
                         dependency.BlocksRefresh = !current || texture == null || texture.isDataSRGB;
                         dependency.Reason = dependency.BlocksRefresh ? "Existing shared packed texture is stale, invalid or sRGB; separate scoped texture update required" : "Reuse current linear packed asset and GUID";
                     }
-                    else if ((!XRayTextureImporter.IsUnityNative(header) || !XRayTextureImporter.HasExactPayload(bytes, header)) && !DdsDecoder.CanDecode(header))
+                    else if (!DdsDecoder.CanDecode(header))
                     {
                         dependency.Reason = "Unsupported packed DDS format; unsupported operation stays disabled";
                     }
                     else
                     {
                         dependency.CreatesAsset = true;
-                        dependency.Reason = "Import effective source through existing packed DDS importer";
+                        dependency.Reason = "Import effective packed texture as PNG";
                     }
                 }
                 catch (FormatException exception)

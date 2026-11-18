@@ -28,11 +28,17 @@ namespace XRay.Importer.Editor.Levels
             _importer = new XRayTextureImporter(new XRayImportOptions(), false, new HashSet<string>()) { ContentKeys = true };
             if (!string.IsNullOrEmpty(reuseRoot) && Directory.Exists(reuseRoot))
             {
-                var paths = new List<string>(Directory.EnumerateFiles(reuseRoot, "*_weather*.asset", SearchOption.AllDirectories));
+                var paths = new List<string>(Directory.EnumerateFiles(reuseRoot, "*_weather*.*", SearchOption.AllDirectories));
                 paths.Sort(StringComparer.Ordinal);
                 foreach (string candidate in paths)
                 {
                     string path = candidate.Replace('\\', '/');
+                    string extension = Path.GetExtension(path);
+                    if (extension != ".asset" && extension != ".png")
+                    {
+                        continue;
+                    }
+
                     string key = XRayAssetMarker.ReadKey(path);
                     if (!string.IsNullOrEmpty(key) && key.Contains("#weather-unorm@")) _reusable.TryAdd(key, path);
                 }
@@ -51,7 +57,7 @@ namespace XRay.Importer.Editor.Levels
             if (_reusable.TryGetValue(_importer.WeatherKey(virtualPath, bytes), out string existingPath))
             {
                 Texture existing = AssetDatabase.LoadAssetAtPath<Texture>(existingPath);
-                if (existing != null && existing.width == header.Width && existing.height == header.Height && existing.mipmapCount == header.MipCount && (existing is Cubemap) == header.IsCubemap)
+                if (MatchesSource(existingPath, existing, header))
                 {
                     _textures.Add(virtualPath, existing);
                     return existing;
@@ -63,6 +69,22 @@ namespace XRay.Importer.Editor.Levels
             if (texture == null) throw new InvalidDataException("INPUT BLOCKED: cannot import effective weather resource " + virtualPath + " from " + file.Winner.Location + ": " + result.Note);
             _textures.Add(virtualPath, texture);
             return texture;
+        }
+
+        private static bool MatchesSource(string path, Texture texture, DdsHeader header)
+        {
+            if (texture == null)
+            {
+                return false;
+            }
+
+            if (!header.IsCubemap && header.Format != DdsFormat.RgbaHalf && texture is Texture2D && AssetImporter.GetAtPath(path) is TextureImporter importer)
+            {
+                importer.GetSourceTextureWidthAndHeight(out int width, out int height);
+                return width == header.Width && height == header.Height && !importer.sRGBTexture && importer.mipmapEnabled;
+            }
+
+            return texture.width == header.Width && texture.height == header.Height && texture.mipmapCount == header.MipCount && (texture is Cubemap) == header.IsCubemap;
         }
 
         private void PrepareFolder()

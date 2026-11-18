@@ -47,8 +47,9 @@ namespace XRay.Importer.Editor
             }
 
             plan.Eligible = true;
-            plan.CurrentAnisotropy = texture.anisoLevel;
-            plan.CurrentMipBias = texture.mipMapBias;
+            var importer = AssetImporter.GetAtPath(assetPath) as TextureImporter;
+            plan.CurrentAnisotropy = importer != null ? importer.anisoLevel : texture.anisoLevel;
+            plan.CurrentMipBias = importer != null ? importer.mipMapBias : texture.mipMapBias;
             plan.Recorded = TryParse(marker.Sampler, out int recordedAnisotropy, out float recordedMipBias);
             bool ownsAnisotropy = !plan.Recorded || recordedAnisotropy == plan.CurrentAnisotropy;
             bool ownsMipBias = !plan.Recorded || Format(recordedMipBias) == Format(plan.CurrentMipBias);
@@ -71,11 +72,20 @@ namespace XRay.Importer.Editor
 
             if (plan.ChangesTexture)
             {
-                var texture = AssetDatabase.LoadAssetAtPath<Texture2D>(plan.AssetPath);
-                texture.anisoLevel = plan.FinalAnisotropy;
-                texture.mipMapBias = plan.FinalMipBias;
-                EditorUtility.SetDirty(texture);
-                AssetDatabase.SaveAssetIfDirty(texture);
+                if (AssetImporter.GetAtPath(plan.AssetPath) is TextureImporter importer)
+                {
+                    importer.anisoLevel = plan.FinalAnisotropy;
+                    importer.mipMapBias = plan.FinalMipBias;
+                    importer.SaveAndReimport();
+                }
+                else
+                {
+                    var texture = AssetDatabase.LoadAssetAtPath<Texture2D>(plan.AssetPath);
+                    texture.anisoLevel = plan.FinalAnisotropy;
+                    texture.mipMapBias = plan.FinalMipBias;
+                    EditorUtility.SetDirty(texture);
+                    AssetDatabase.SaveAssetIfDirty(texture);
+                }
             }
 
             if (plan.ChangesRecord)
@@ -100,7 +110,17 @@ namespace XRay.Importer.Editor
 
         public static string ReadRecord(string assetPath)
         {
-            return ReadMarker(assetPath)?.Sampler;
+            return ReadRecord(AssetImporter.GetAtPath(assetPath));
+        }
+
+        internal static string ReadRecord(AssetImporter importer)
+        {
+            return ReadMarker(importer)?.Sampler;
+        }
+
+        internal static string SerializeMarker(XRayAssetMarker marker, string record)
+        {
+            return SerializeMarker(marker.Key, marker.Role, marker.Source, marker.SourcePath, marker.Stamp, record);
         }
 
         private static void Write(string assetPath, string key, string role, string source, string sourcePath, string stamp, string record)
@@ -111,7 +131,7 @@ namespace XRay.Importer.Editor
                 return;
             }
 
-            string userData = XRayAssetMarker.PREFIX + JsonUtility.ToJson(new AuthoredMarker(key, role, source, sourcePath, stamp, record));
+            string userData = SerializeMarker(key, role, source, sourcePath, stamp, record);
             if (importer.userData != userData)
             {
                 importer.userData = userData;
@@ -120,9 +140,18 @@ namespace XRay.Importer.Editor
             }
         }
 
+        private static string SerializeMarker(string key, string role, string source, string sourcePath, string stamp, string record)
+        {
+            return XRayAssetMarker.PREFIX + JsonUtility.ToJson(new AuthoredMarker(key, role, source, sourcePath, stamp, record));
+        }
+
         private static AuthoredMarker ReadMarker(string assetPath)
         {
-            AssetImporter importer = AssetImporter.GetAtPath(assetPath);
+            return ReadMarker(AssetImporter.GetAtPath(assetPath));
+        }
+
+        private static AuthoredMarker ReadMarker(AssetImporter importer)
+        {
             if (importer == null || string.IsNullOrEmpty(importer.userData) || !importer.userData.StartsWith(XRayAssetMarker.PREFIX, StringComparison.Ordinal))
             {
                 return null;

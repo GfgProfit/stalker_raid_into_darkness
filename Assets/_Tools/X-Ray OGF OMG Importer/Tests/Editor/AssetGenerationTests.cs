@@ -39,7 +39,7 @@ namespace XRay.Importer.Tests
                     Assert.AreEqual("HDRP/Lit", body.shader.name);
                     var albedo = body.GetTexture("_BaseColorMap") as Texture2D;
                     Assert.IsNotNull(albedo);
-                    Assert.AreEqual(scope.TexturesFolder + "/body_diff.dds", AssetDatabase.GetAssetPath(albedo));
+                    Assert.AreEqual(scope.TexturesFolder + "/body_diff.png", AssetDatabase.GetAssetPath(albedo));
                     Assert.IsNotNull(body.GetTexture("_NormalMap"));
                     Assert.AreEqual(0.0f, body.GetFloat("_SurfaceType"));
                     Assert.AreEqual(1.0f, lens.GetFloat("_SurfaceType"));
@@ -58,7 +58,7 @@ namespace XRay.Importer.Tests
         }
 
         [Test]
-        public void ImportedAlbedoDdsIsSrgbAndNormalMapIsLinear()
+        public void ImportedAlbedoPngUsesUnityMipsAndNormalMapIsLinear()
         {
             using (var directory = new TestDirectory())
             {
@@ -68,6 +68,9 @@ namespace XRay.Importer.Tests
                     string model = scope.ImportModel("wpn_test_hud.ogf", CreateModel());
                     Material body = XRayImportTestScope.GetRendererMaterial(model, 0);
                     var albedo = (Texture2D)body.GetTexture("_BaseColorMap");
+                    var albedoImporter = (TextureImporter)AssetImporter.GetAtPath(AssetDatabase.GetAssetPath(albedo));
+                    Assert.IsTrue(albedoImporter.mipmapEnabled);
+                    Assert.Greater(albedo.mipmapCount, 1);
                     Assert.IsTrue(albedo.isDataSRGB, albedo.graphicsFormat.ToString());
                     Assert.AreEqual(GraphicsFormat.RGBA_DXT1_SRGB, albedo.graphicsFormat);
                     var normal = (Texture2D)body.GetTexture("_NormalMap");
@@ -78,13 +81,43 @@ namespace XRay.Importer.Tests
             }
         }
 
+        [TestCase(4100, 4096, 2048, 2048)]
+        [TestCase(1280, 512, 1280, 512)]
+        public void DdsPngKeepsSourceSizeAndCapsOnlyTheImportedTexture(int width, int height, int importedWidth, int importedHeight)
+        {
+            using (var directory = new TestDirectory())
+            {
+                Mo2Fixture fixture = CreateFixture(directory);
+                fixture.AddModFile("HighMod", "textures/wpn/aks74/body_diff.dds", XRayTestBinaries.Bc1Solid(width, height, 0, 0, 255));
+                using (var scope = new XRayImportTestScope(fixture.CreateConfiguration("Main")))
+                {
+                    string model = scope.ImportModel("wpn_test_hud.ogf", CreateModel());
+                    Material material = XRayImportTestScope.GetRendererMaterial(model, 0);
+                    var texture = (Texture2D)material.GetTexture("_BaseColorMap");
+                    string path = AssetDatabase.GetAssetPath(texture);
+                    var importer = (TextureImporter)AssetImporter.GetAtPath(path);
+                    importer.GetSourceTextureWidthAndHeight(out int sourceWidth, out int sourceHeight);
+                    Assert.AreEqual(scope.TexturesFolder + "/body_diff.png", path);
+                    Assert.AreEqual(width, sourceWidth);
+                    Assert.AreEqual(height, sourceHeight);
+                    Assert.AreEqual(importedWidth, texture.width);
+                    Assert.AreEqual(importedHeight, texture.height);
+                    Assert.IsTrue(importer.mipmapEnabled);
+                    Assert.IsFalse(importer.ignoreMipmapLimit);
+                    Assert.That(texture.mipmapCount, Is.GreaterThan(1));
+                }
+            }
+        }
+
+
         [Test]
         public void ImportedDdsAndConvertedPngShareImageOrientation()
         {
             using (var scope = new XRayImportTestScope(null))
             {
                 byte[] dds = XRayTestBinaries.Bc1TopBottom(RED, BLUE);
-                byte[] srgb = XRayTextureImporter.ToSrgbDds(dds, DdsHeader.Parse(dds));
+                DdsHeader header = DdsHeader.Parse(dds);
+                byte[] srgb = DdsColorSpace.WithDx10Header(dds, header, DdsHeader.DXGI_BC1_UNORM_SRGB);
                 string ddsPath = scope.Folder + "/orientation.dds";
                 File.WriteAllBytes(ddsPath, srgb);
                 AssetDatabase.ImportAsset(ddsPath, ImportAssetOptions.ForceSynchronousImport);
@@ -93,9 +126,8 @@ namespace XRay.Importer.Tests
                 ddsImporter.SaveAndReimport();
                 var ddsTexture = AssetDatabase.LoadAssetAtPath<Texture2D>(ddsPath);
                 byte[] raw = ddsTexture.GetRawTextureData();
-                byte[] decoded = DdsDecoder.DecodeTopLevel(dds, DdsHeader.Parse(dds));
                 string pngPath = scope.Folder + "/orientation.png";
-                File.WriteAllBytes(pngPath, XRayTextureImporter.EncodePng(decoded, 4, 8, false));
+                File.WriteAllBytes(pngPath, XRayTextureImporter.EncodeVerifiedPng(dds, header, false));
                 AssetDatabase.ImportAsset(pngPath, ImportAssetOptions.ForceSynchronousImport);
                 var pngImporter = (TextureImporter)AssetImporter.GetAtPath(pngPath);
                 pngImporter.isReadable = true;
@@ -215,8 +247,8 @@ namespace XRay.Importer.Tests
                     var first = (Texture2D)XRayImportTestScope.GetRendererMaterial(model, 0).GetTexture("_BaseColorMap");
                     var second = (Texture2D)XRayImportTestScope.GetRendererMaterial(model, 1).GetTexture("_BaseColorMap");
                     Assert.AreNotEqual(AssetDatabase.GetAssetPath(first), AssetDatabase.GetAssetPath(second));
-                    Assert.AreEqual(scope.TexturesFolder + "/body_diff.dds", AssetDatabase.GetAssetPath(first));
-                    Assert.AreEqual(scope.TexturesFolder + "/ak74m_body_diff.dds", AssetDatabase.GetAssetPath(second));
+                    Assert.AreEqual(scope.TexturesFolder + "/body_diff.png", AssetDatabase.GetAssetPath(first));
+                    Assert.AreEqual(scope.TexturesFolder + "/ak74m_body_diff.png", AssetDatabase.GetAssetPath(second));
                     Assert.AreNotEqual(XRayImportTestScope.GetRendererMaterial(model, 0), XRayImportTestScope.GetRendererMaterial(model, 1));
                 }
             }
@@ -231,7 +263,7 @@ namespace XRay.Importer.Tests
                 using (var scope = new XRayImportTestScope(fixture.CreateConfiguration("Main")))
                 {
                     string model = scope.ImportModel("single.ogf", XRayTestBinaries.StaticOgf(new[] { new OgfTestMesh(BODY, "models\\weapons") }));
-                    string texture = scope.TexturesFolder + "/body_diff.dds";
+                    string texture = scope.TexturesFolder + "/body_diff.png";
                     string guid = AssetDatabase.AssetPathToGUID(texture);
                     Assert.AreEqual("HighMod", XRayAssetMarker.Read(texture).Source);
                     scope.Options.Sources.Mo2Profile = "Reversed";

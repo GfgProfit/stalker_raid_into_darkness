@@ -71,7 +71,7 @@ namespace XRay.Importer.Tests
         }
 
         [Test]
-        public void FlareBgr24AndBgra32PreserveAuthoredMipsAndAlpha()
+        public void FlareBgr24AndBgra32WritePngWithVerifiedMipZeroAndGeneratedMips()
         {
             foreach (DdsFormat format in new[] { DdsFormat.Bgr24, DdsFormat.Bgra32 })
             {
@@ -87,18 +87,27 @@ namespace XRay.Importer.Tests
                 {
                     var importer = new XRayTextureImporter(new XRayImportOptions(), false, new HashSet<string>());
                     XRayTextureAssetResult result = importer.ImportWeather(fixture.File, fixture.AssetsFolder, false);
-                    Assert.AreEqual(XRayResourceStatus.Imported, result.Status, result.Note);
+                    Assert.AreEqual(XRayResourceStatus.Converted, result.Status, result.Note);
+                    StringAssert.EndsWith("_weather.png", result.AssetPath);
                     Texture2D texture = AssetDatabase.LoadAssetAtPath<Texture2D>(result.AssetPath);
                     Assert.IsNotNull(texture);
                     Assert.AreEqual(2, texture.mipmapCount);
                     Assert.IsFalse(GraphicsFormatUtility.IsSRGBFormat(texture.graphicsFormat));
-                    var serialized = new SerializedObject(texture);
-                    serialized.FindProperty("m_IsReadable").boolValue = true;
-                    serialized.ApplyModifiedPropertiesWithoutUndo();
-                    byte[] expectedTop = format == DdsFormat.Bgr24 ? new byte[] { 110, 100, 90, 255, 150, 140, 130, 255, 30, 20, 10, 255, 70, 60, 50, 255 } : new byte[] { 90, 100, 110, 120, 130, 140, 150, 160, 10, 20, 30, 40, 50, 60, 70, 80 };
-                    byte[] expectedMip = format == DdsFormat.Bgr24 ? new byte[] { 190, 180, 170, 255 } : new byte[] { 170, 180, 190, 200 };
-                    CollectionAssert.AreEqual(expectedTop, texture.GetPixelData<byte>(0).ToArray(), format.ToString());
-                    CollectionAssert.AreEqual(expectedMip, texture.GetPixelData<byte>(1).ToArray(), format.ToString());
+                    var settings = (TextureImporter)AssetImporter.GetAtPath(result.AssetPath);
+                    Assert.IsTrue(settings.mipmapEnabled);
+                    Assert.IsFalse(settings.sRGBTexture);
+                    Assert.AreEqual(TextureImporterAlphaSource.FromInput, settings.alphaSource);
+                    var image = new Texture2D(2, 2, TextureFormat.RGBA32, false, true);
+                    try
+                    {
+                        Assert.IsTrue(image.LoadImage(File.ReadAllBytes(result.AssetPath)));
+                        Color32[] expected = format == DdsFormat.Bgr24 ? new Color32[] { new Color32(110, 100, 90, 255), new Color32(150, 140, 130, 255), new Color32(30, 20, 10, 255), new Color32(70, 60, 50, 255) } : new Color32[] { new Color32(110, 100, 90, 120), new Color32(150, 140, 130, 160), new Color32(30, 20, 10, 40), new Color32(70, 60, 50, 80) };
+                        CollectionAssert.AreEqual(expected, image.GetPixels32(), format.ToString());
+                    }
+                    finally
+                    {
+                        UnityEngine.Object.DestroyImmediate(image);
+                    }
                 }
             }
         }

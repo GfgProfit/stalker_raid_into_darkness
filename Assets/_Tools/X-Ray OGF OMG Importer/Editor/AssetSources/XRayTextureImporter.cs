@@ -559,6 +559,13 @@ namespace XRay.Importer.Editor
                 if (!invalidShape && (sameSource || (!_options.OverwriteExistingTextures && !_forceUpdate)))
                 {
                     result.Status = XRayResourceStatus.Reused;
+                    if (XRayTextureImportQueue.RestorePngAlpha(importer))
+                    {
+                        AssetDatabase.WriteImportSettingsIfDirty(assetPath);
+                        SchedulePngImport(assetPath);
+                        result.Status = XRayResourceStatus.Updated;
+                    }
+
                     if (!sameSource)
                     {
                         result.Note = $"Source changed ({existing?.Source ?? "unknown"} -> {marker.Source}); kept the existing texture because 'Overwrite Existing Textures' is off.";
@@ -683,6 +690,11 @@ namespace XRay.Importer.Editor
         private void QueuePng(string path, XRayTextureRole role, XRayAssetMarker marker, DdsHeader header, bool reset, int? anisotropy, float? mipBias)
         {
             XRayTextureImportQueue.Enqueue(path, new XRayTextureImportRequest(role, marker, header) { ResetSettings = reset, Anisotropy = anisotropy, MipBias = mipBias });
+            SchedulePngImport(path);
+        }
+
+        private void SchedulePngImport(string path)
+        {
             if (!_pendingImports.Contains(path))
             {
                 _pendingImports.Add(path);

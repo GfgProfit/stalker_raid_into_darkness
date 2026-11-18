@@ -86,7 +86,7 @@ TextureImporter:
     buildTarget: Standalone
     maxTextureSize: 2048
     resizeAlgorithm: 0
-    textureFormat: 10
+    textureFormat: -1
     textureCompression: 1
     compressionQuality: 100
     crunchedCompression: 0
@@ -114,8 +114,6 @@ TextureImporter:
     nameFileIdTable: {}
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
-  userData: "xray-asset:{\"_key\":\"textures/act/act_morthbag_zombied.dds#albedo\",\"_role\":\"Albedo\",\"_source\":\"[\u0410\u043D\u0438\u043C\u0430\u0446\u0438\u0438]
-    FDDA 0.9b\",\"_sourcePath\":\"D:\\\\GRA2.5\\\\MO2\\\\mods\\\\[\u0410\u043D\u0438\u043C\u0430\u0446\u0438\u0438]
-    FDDA 0.9b\\\\gamedata\\\\textures\\\\act\\\\act_morthbag_zombied.dds\",\"_stamp\":\"11199288:637923889820000000\"}"
+  userData: "xray-asset:{\"_key\":\"textures/act/act_morthbag_zombied.dds#albedo\",\"_role\":\"Albedo\",\"_source\":\"[\u0410\u043D\u0438\u043C\u0430\u0446\u0438\u0438] FDDA 0.9b\",\"_sourcePath\":\"D:\\\\GRA2.5\\\\MO2\\\\mods\\\\[\u0410\u043D\u0438\u043C\u0430\u0446\u0438\u0438] FDDA 0.9b\\\\gamedata\\\\textures\\\\act\\\\act_morthbag_zombied.dds\",\"_stamp\":\"11199288:637923889820000000\"}"
   assetBundleName: 
   assetBundleVariant: 

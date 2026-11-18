@@ -79,8 +79,30 @@ namespace XRay.Importer.Editor
                     textureImporter.alphaTestReferenceValue = Levels.XRayFloraSourceBinding.AREF;
                 }
             }
+            else
+            {
+                RestorePngAlpha(textureImporter, true);
+            }
 
             ApplyPngMipPolicy(textureImporter, request.Header.Width, request.Header.Height);
+        }
+
+        public static bool RestorePngAlpha(TextureImporter importer, bool sourceBeingImported = false)
+        {
+            if (importer == null || importer.alphaSource != TextureImporterAlphaSource.FromInput)
+            {
+                return false;
+            }
+
+            TextureImporterPlatformSettings standalone = importer.GetPlatformTextureSettings("Standalone");
+            if (!standalone.overridden || standalone.format != TextureImporterFormat.DXT1 || (!sourceBeingImported && !importer.DoesSourceTextureHaveAlpha()))
+            {
+                return false;
+            }
+
+            standalone.format = TextureImporterFormat.Automatic;
+            importer.SetPlatformTextureSettings(standalone);
+            return true;
         }
 
         public static bool ApplyPngMipPolicy(TextureImporter importer, int sourceWidth, int sourceHeight)
@@ -141,7 +163,7 @@ namespace XRay.Importer.Editor
             switch (request.Header.Format)
             {
                 case DdsFormat.BC1:
-                    format = TextureImporterFormat.DXT1;
+                    format = TextureImporterFormat.Automatic;
                     break;
                 case DdsFormat.BC3:
                     format = TextureImporterFormat.DXT5;

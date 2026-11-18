@@ -9,6 +9,7 @@ using UnityEngine;
 using XRay.Importer.Editor;
 using XRay.Importer.Editor.Levels;
 using XRay.Importer.Sources;
+using XRay.Importer.Sources.Dds;
 using XRay.Importer.Sources.Levels;
 using XRay.Importer.Sources.Textures;
 using XRay.Importer.Sources.Vfs;
@@ -496,6 +497,52 @@ namespace XRay.Importer.Tests
                     XRayLevelPaths.UseRoot(null);
                 }
             }
+        }
+
+        [TestCase(2, 4)]
+        [TestCase(8, 16)]
+        public void Bc1PngKeepsTransparentPixelsAndRepairsExistingDxt1Override(int size, int transparentPixelCount)
+        {
+            using (var scope = new XRayImportTestScope(null))
+            {
+                Mo2Fixture fixture = CreateProfile(scope.Directory, "+" + MOD_A);
+                byte[] data = XRayTestBinaries.Bc1Solid(size, size, 200, 10, 10);
+                Array.Fill(data, byte.MaxValue, DdsHeader.HEADER_SIZE + sizeof(uint), sizeof(uint));
+                fixture.AddModFile(MOD_A, "textures/trees/pine.dds", data);
+                XRayLevelPaths.UseRoot(scope.Folder);
+                try
+                {
+                    XRayLevelTextureSet first = Import(fixture, scope);
+                    var importer = (TextureImporter)AssetImporter.GetAtPath(first.AlbedoPath);
+                    string guid = AssetDatabase.AssetPathToGUID(first.AlbedoPath);
+                    byte[] png = File.ReadAllBytes(first.AlbedoPath);
+                    importer.isReadable = true;
+                    importer.SaveAndReimport();
+                    Assert.AreEqual(transparentPixelCount, CountTransparentPixels(first.AlbedoPath));
+
+                    TextureImporterPlatformSettings standalone = importer.GetPlatformTextureSettings("Standalone");
+                    standalone.format = TextureImporterFormat.DXT1;
+                    importer.SetPlatformTextureSettings(standalone);
+                    importer.SaveAndReimport();
+                    Assert.AreEqual(0, CountTransparentPixels(first.AlbedoPath));
+
+                    XRayLevelTextureSet repaired = Import(fixture, scope);
+                    Assert.AreEqual(first.AlbedoPath, repaired.AlbedoPath);
+                    Assert.AreEqual(guid, AssetDatabase.AssetPathToGUID(repaired.AlbedoPath));
+                    CollectionAssert.AreEqual(png, File.ReadAllBytes(repaired.AlbedoPath));
+                    Assert.AreEqual(transparentPixelCount, CountTransparentPixels(repaired.AlbedoPath));
+                }
+                finally
+                {
+                    XRayLevelPaths.UseRoot(null);
+                }
+            }
+        }
+
+        private static int CountTransparentPixels(string path)
+        {
+            var texture = AssetDatabase.LoadAssetAtPath<Texture2D>(path);
+            return Array.FindAll(texture.GetPixels32(), pixel => pixel.a == 0).Length;
         }
 
         [Test]

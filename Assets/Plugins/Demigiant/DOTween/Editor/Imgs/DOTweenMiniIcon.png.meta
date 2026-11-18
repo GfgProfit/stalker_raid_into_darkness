@@ -3,6 +3,7 @@ guid: 61521df2e071645488ba3d05e49289ae
 timeCreated: 1602317874
 licenseType: Store
 TextureImporter:
+  ignoreMipmapLimit: 0
   fileIDToRecycleName: {}
   serializedVersion: 4
   mipmaps:

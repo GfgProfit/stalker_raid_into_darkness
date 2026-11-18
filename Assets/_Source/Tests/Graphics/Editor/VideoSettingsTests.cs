@@ -34,6 +34,8 @@ namespace RaidIntoDarkness.GraphicsOptions.Tests
             {
                 settings = _presets.Select(settings, index);
                 Assert.That(settings.Valid, Is.True);
+                Assert.That(settings.quality.textureQuality, Is.EqualTo(index));
+                Assert.That(settings.quality.TextureMipmapLimit, Is.EqualTo(4 - index));
                 Assert.That(_presets.Match(settings.quality), Is.EqualTo(index));
                 Assert.That(_presets.IsCustom(settings), Is.False);
                 Assert.That(settings.display.Matches(_window), Is.True);

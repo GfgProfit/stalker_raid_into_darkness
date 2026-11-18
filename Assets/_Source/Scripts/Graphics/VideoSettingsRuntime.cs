@@ -70,7 +70,7 @@ namespace RaidIntoDarkness.GraphicsOptions
             {
                 Application.targetFrameRate = settings.fpsLimit;
             }
-            int mipmapLimit = 2 - quality.textureQuality;
+            int mipmapLimit = quality.TextureMipmapLimit;
             if (QualitySettings.globalTextureMipmapLimit != mipmapLimit)
             {
                 QualitySettings.globalTextureMipmapLimit = mipmapLimit;

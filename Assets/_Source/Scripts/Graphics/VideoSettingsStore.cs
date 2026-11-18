@@ -10,6 +10,8 @@ namespace RaidIntoDarkness.GraphicsOptions
 
         private const int FIRST_SAVE_VERSION = 1;
         private const int LAST_SAVE_VERSION_WITHOUT_CONTACT_SHADOWS = 2;
+        private const int LAST_SAVE_VERSION_WITH_LEGACY_TEXTURE_QUALITY = 3;
+        private const int LEGACY_MAX_TEXTURE_QUALITY = 2;
 
         private readonly string _path;
 
@@ -37,10 +39,14 @@ namespace RaidIntoDarkness.GraphicsOptions
             try
             {
                 settings = JsonUtility.FromJson<VideoSettings>(File.ReadAllText(_path));
-                bool upgrade = settings.version >= FIRST_SAVE_VERSION && settings.version <= LAST_SAVE_VERSION_WITHOUT_CONTACT_SHADOWS;
+                bool upgrade = settings.version >= FIRST_SAVE_VERSION && settings.version <= LAST_SAVE_VERSION_WITH_LEGACY_TEXTURE_QUALITY && settings.quality.textureQuality >= 0 && settings.quality.textureQuality <= LEGACY_MAX_TEXTURE_QUALITY;
                 if (upgrade)
                 {
-                    VideoPresets.SetPresetContactShadows(ref settings.quality, settings.preset);
+                    if (settings.version <= LAST_SAVE_VERSION_WITHOUT_CONTACT_SHADOWS)
+                    {
+                        VideoPresets.SetPresetContactShadows(ref settings.quality, settings.preset);
+                    }
+                    settings.quality.textureQuality += VideoQuality.MAX_TEXTURE_QUALITY - LEGACY_MAX_TEXTURE_QUALITY;
                     settings.version = VideoPresets.SAVE_VERSION;
                 }
                 if (settings.Valid)

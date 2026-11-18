@@ -439,7 +439,7 @@ namespace RaidIntoDarkness.GraphicsOptions
             RefreshAntialiasing(quality);
             Set(Range.Brightness, draft.brightness, "%", _runtime.SupportsRendering ? null : HDRP_UNAVAILABLE);
             Set(Range.RenderScale, quality.renderScale, "%", _runtime.SupportsRenderScale ? null : "Масштаб HDRP недоступен");
-            Set(Selector.TextureQuality, QUALITY, quality.textureQuality);
+            Set(Selector.TextureQuality, PRESETS, quality.textureQuality);
             Set(Selector.Anisotropy, ANISOTROPY, Array.IndexOf(ANISOTROPY_VALUES, quality.anisotropy));
             Set(Selector.Lod, LOD, quality.lodQuality);
             SetSupported(Selector.ShadowQuality, QUALITY, quality.shadowQuality, _runtime.SupportsRendering, HDRP_UNAVAILABLE);

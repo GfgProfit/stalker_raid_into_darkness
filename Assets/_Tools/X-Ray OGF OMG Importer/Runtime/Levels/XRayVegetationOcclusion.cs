@@ -11,6 +11,7 @@ namespace XRay.Importer.Levels
         private const int HEIGHT = 54;
         private const int MAX_LEVELS = 4;
         private const int MAX_RASTER_TILE_TESTS = 180000;
+        private const int MESH_RASTER_TILE_RESERVE = MAX_RASTER_TILE_TESTS / 2;
         private const int MAX_QUERY_TILES = 48;
         private const float TILE_MARGIN = 0.005f;
         private const float DEPTH_MARGIN = 0.05f;
@@ -153,7 +154,17 @@ namespace XRay.Importer.Levels
 
         internal void AddTriangle(Vector3 a, Vector3 b, Vector3 c, bool doubleSided)
         {
-            if (_rasterTestsRemaining <= 0 || !Project(a, out Vector3 p) || !Project(b, out Vector3 q) || !Project(c, out Vector3 r)) return;
+            RasterizeTriangle(a, b, c, doubleSided, 0);
+        }
+
+        internal void AddHomTriangle(Vector3 a, Vector3 b, Vector3 c, bool doubleSided)
+        {
+            RasterizeTriangle(a, b, c, doubleSided, MESH_RASTER_TILE_RESERVE);
+        }
+
+        private void RasterizeTriangle(Vector3 a, Vector3 b, Vector3 c, bool doubleSided, int reserve)
+        {
+            if (_rasterTestsRemaining <= reserve || !Project(a, out Vector3 p) || !Project(b, out Vector3 q) || !Project(c, out Vector3 r)) return;
             float signedArea = (q.x - p.x) * (r.y - p.y) - (q.y - p.y) * (r.x - p.x);
             if (!float.IsFinite(signedArea) || Mathf.Abs(signedArea) < TILE_MARGIN || !doubleSided && signedArea >= 0.0f) return;
             if (signedArea < 0.0f) (q, r) = (r, q);
@@ -174,7 +185,8 @@ namespace XRay.Importer.Levels
                 int row = y * WIDTH;
                 for (int x = startX; x <= endX; x++)
                 {
-                    if (--_rasterTestsRemaining < 0) return;
+                    if (_rasterTestsRemaining <= reserve) return;
+                    _rasterTestsRemaining--;
                     int index = row + x;
                     if (min.z >= _depths[index] || !first.Covers(x, y) || !second.Covers(x, y) || !third.Covers(x, y)) continue;
                     float depth = depthPlane.Farthest(x, y, min.z, max.z, _perspective);

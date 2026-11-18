@@ -9,6 +9,7 @@ namespace XRay.Importer.Tests
     {
         private static readonly MethodInfo _reset = typeof(XRayVegetationOcclusion).GetMethod("Reset", BindingFlags.Instance | BindingFlags.NonPublic);
         private static readonly MethodInfo _addTriangle = typeof(XRayVegetationOcclusion).GetMethod("AddTriangle", BindingFlags.Instance | BindingFlags.NonPublic);
+        private static readonly MethodInfo _addHomTriangle = typeof(XRayVegetationOcclusion).GetMethod("AddHomTriangle", BindingFlags.Instance | BindingFlags.NonPublic);
 
         [TestCase(false)]
         [TestCase(true)]
@@ -49,6 +50,29 @@ namespace XRay.Importer.Tests
             Assert.That(query.IsOccluded(hidden), Is.True);
 
             _reset.Invoke(query, new object[] { Matrix4x4.identity, Matrix4x4.Perspective(60f, 1f, 0.3f, 100f), 0.3f, 100f });
+            Assert.That(query.IsOccluded(hidden), Is.False);
+        }
+
+        [Test]
+        public void HomAndRenderMeshCanCompleteOneOcclusionQuery()
+        {
+            XRayVegetationOcclusion query = Create(true);
+            var hidden = new Bounds(new Vector3(0f, 0f, -10f), new Vector3(0.9f, 0.2f, 0.2f));
+            _addHomTriangle.Invoke(query, new object[] { new Vector3(-4f, 0f, -5f), new Vector3(0.25f, 4f, -5f), new Vector3(0.25f, -4f, -5f), false });
+            Assert.That(query.IsOccluded(hidden), Is.False);
+
+            AddTriangle(query, new Vector3(4f, 0f, -6f), new Vector3(-0.25f, -4f, -6f), new Vector3(-0.25f, 4f, -6f));
+            Assert.That(query.IsOccluded(hidden), Is.True);
+        }
+
+        [TestCase(0.15f, -6f)]
+        [TestCase(-0.25f, -11f)]
+        public void HomDoesNotRejectBoundsAcrossAnUncoveredOrDeeperTile(float rightEdge, float rightDepth)
+        {
+            XRayVegetationOcclusion query = Create(true);
+            var hidden = new Bounds(new Vector3(0f, 0f, -10f), new Vector3(0.9f, 0.2f, 0.2f));
+            _addHomTriangle.Invoke(query, new object[] { new Vector3(-4f, 0f, -5f), new Vector3(0.03f, 4f, -5f), new Vector3(0.03f, -4f, -5f), false });
+            AddTriangle(query, new Vector3(4f, 0f, rightDepth), new Vector3(rightEdge, -4f, rightDepth), new Vector3(rightEdge, 4f, rightDepth));
             Assert.That(query.IsOccluded(hidden), Is.False);
         }
 

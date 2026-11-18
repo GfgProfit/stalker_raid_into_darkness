@@ -10,10 +10,11 @@ namespace XRay.Importer.Levels
     {
         private const int MAX_RENDERERS_PER_VIEW = 16;
         private const int MAX_TRIANGLES_PER_VIEW = 640;
+        private const int MAX_HOM_RENDERERS_PER_VIEW = 4;
+        private const int MAX_HOM_TRIANGLES_PER_VIEW = 160;
         private const int MAX_RENDERERS_INSPECTED_PER_VIEW = 768;
         private const float MAX_OCCLUDER_DISTANCE_SQUARED = 96f * 96f;
         private const string LEVEL_ROOT = "Assets/_Source/Levels/";
-        private const string MESH_SHADER = "HDRP/MonolithLit";
 
         private readonly Transform _geometry;
         private readonly List<MeshRenderer> _renderers = new List<MeshRenderer>();
@@ -22,8 +23,10 @@ namespace XRay.Importer.Levels
         private readonly Dictionary<Mesh, XRayVegetationOccluderData.Entry> _entries = new Dictionary<Mesh, XRayVegetationOccluderData.Entry>();
         private readonly Dictionary<Material, int> _materialModes = new Dictionary<Material, int>();
         private readonly Plane[] _planes = new Plane[6];
-        private readonly int[] _candidates = new int[MAX_RENDERERS_PER_VIEW];
-        private readonly float[] _candidateSizes = new float[MAX_RENDERERS_PER_VIEW];
+        private readonly Candidate[] _candidates = new Candidate[MAX_RENDERERS_PER_VIEW];
+        private readonly Candidate[] _homCandidates = new Candidate[MAX_HOM_RENDERERS_PER_VIEW];
+        private readonly Occluder[] _occluders = new Occluder[MAX_RENDERERS_PER_VIEW];
+        private readonly List<Material> _subMeshMaterials = new List<Material>();
         private readonly bool[] _defaultLayerDistances = new bool[32];
         private ResourceRequest _request;
         private bool _initialized;
@@ -49,6 +52,7 @@ namespace XRay.Importer.Levels
             for (int i = 0; i < _planes.Length; i++) _planes[i] = parameters.GetCullingPlane(i);
             Vector3 eye = camera.transform.position;
             int candidateCount = 0;
+            int homCandidateCount = 0;
             int stride = (_renderers.Count + MAX_RENDERERS_INSPECTED_PER_VIEW - 1) / MAX_RENDERERS_INSPECTED_PER_VIEW;
             if (stride == 0) return;
             for (int i = Time.frameCount % stride; i < _renderers.Count; i += stride)
@@ -59,30 +63,66 @@ namespace XRay.Importer.Levels
                 int layer = renderer.gameObject.layer;
                 if (!_defaultLayerDistances[layer] || (camera.cullingMask & (1 << layer)) == 0) continue;
                 Mesh mesh = filter.sharedMesh;
-                if (mesh == null || mesh.isReadable || !_entries.ContainsKey(mesh)) continue;
+                if (mesh == null || mesh.isReadable || !_entries.TryGetValue(mesh, out XRayVegetationOccluderData.Entry entry)) continue;
                 Bounds bounds = renderer.bounds;
                 if (bounds.SqrDistance(eye) > MAX_OCCLUDER_DISTANCE_SQUARED || !GeometryUtility.TestPlanesAABB(_planes, bounds)) continue;
                 float size = bounds.extents.sqrMagnitude / Mathf.Max(1f, (bounds.center - eye).sqrMagnitude);
                 if (!(size > 0f)) continue;
-                int j = Mathf.Min(candidateCount, MAX_RENDERERS_PER_VIEW - 1);
-                if (candidateCount == MAX_RENDERERS_PER_VIEW && size <= _candidateSizes[j]) continue;
-                while (j > 0 && size > _candidateSizes[j - 1])
-                {
-                    _candidates[j] = _candidates[j - 1];
-                    _candidateSizes[j] = _candidateSizes[j - 1];
-                    j--;
-                }
-
-                _candidates[j] = i;
-                _candidateSizes[j] = size;
-                candidateCount = Mathf.Min(candidateCount + 1, MAX_RENDERERS_PER_VIEW);
+                var candidate = new Candidate(i, size);
+                candidateCount = RankCandidate(_candidates, candidateCount, candidate);
+                if (entry.HomTriangles is { Count: > 0 }) homCandidateCount = RankCandidate(_homCandidates, homCandidateCount, candidate);
             }
 
-            int remaining = MAX_TRIANGLES_PER_VIEW;
-            _materialModes.Clear();
-            for (int i = 0; i < candidateCount && remaining > 0; i++)
+            PreferHomCandidates(candidateCount, homCandidateCount);
+            int occluderCount = CollectOccluders(candidateCount);
+            int homRemaining = RasterizeTriangles(query, occluderCount, MAX_HOM_TRIANGLES_PER_VIEW, true);
+            RasterizeTriangles(query, occluderCount, MAX_TRIANGLES_PER_VIEW - MAX_HOM_TRIANGLES_PER_VIEW + homRemaining, false);
+        }
+
+        private static int RankCandidate(Candidate[] candidates, int count, Candidate candidate)
+        {
+            int index = Mathf.Min(count, candidates.Length - 1);
+            if (count == candidates.Length && candidate.Size <= candidates[index].Size) return count;
+            while (index > 0 && candidate.Size > candidates[index - 1].Size)
             {
-                int index = _candidates[i];
+                candidates[index] = candidates[index - 1];
+                index--;
+            }
+
+            candidates[index] = candidate;
+            return Mathf.Min(count + 1, candidates.Length);
+        }
+
+        private void PreferHomCandidates(int count, int homCount)
+        {
+            int replacement = count - 1;
+            for (int i = 0; i < homCount; i++)
+            {
+                Candidate hom = _homCandidates[i];
+                if (ContainsCandidate(_candidates, count, hom.Index)) continue;
+                while (replacement >= 0 && ContainsCandidate(_homCandidates, homCount, _candidates[replacement].Index)) replacement--;
+                if (replacement >= 0) _candidates[replacement--] = hom;
+            }
+        }
+
+        private static bool ContainsCandidate(Candidate[] candidates, int count, int index)
+        {
+            for (int i = 0; i < count; i++)
+            {
+                if (candidates[i].Index == index) return true;
+            }
+
+            return false;
+        }
+
+        private int CollectOccluders(int candidateCount)
+        {
+            int count = 0;
+            _subMeshMaterials.Clear();
+            _materialModes.Clear();
+            for (int i = 0; i < candidateCount; i++)
+            {
+                int index = _candidates[i].Index;
                 MeshRenderer renderer = _renderers[index];
                 Mesh mesh = _filters[index].sharedMesh;
                 XRayVegetationOccluderData.Entry entry = _entries[mesh];
@@ -90,24 +130,47 @@ namespace XRay.Importer.Levels
                 Matrix4x4 transform = renderer.localToWorldMatrix;
                 if (!(transform.determinant > 0f)) continue;
                 renderer.GetSharedMaterials(_materials);
-                IReadOnlyList<XRayVegetationOccluderData.Triangle> triangles = entry.Triangles;
+                int start = _subMeshMaterials.Count;
+                int subMeshCount = Mathf.Min(mesh.subMeshCount, _materials.Count);
+                if (subMeshCount == 0) continue;
+                _subMeshMaterials.AddRange(_materials);
+                _occluders[count++] = new Occluder(entry, transform, start, subMeshCount);
+            }
+
+            return count;
+        }
+
+        private int RasterizeTriangles(XRayVegetationOcclusion query, int count, int remaining, bool hom)
+        {
+            for (int i = 0; i < count && remaining > 0; i++)
+            {
+                Occluder occluder = _occluders[i];
+                IReadOnlyList<XRayVegetationOccluderData.Triangle> triangles = hom ? occluder.Entry.HomTriangles : occluder.Entry.Triangles;
+                if (triangles == null) continue;
                 for (int t = 0; t < triangles.Count; t++)
                 {
                     XRayVegetationOccluderData.Triangle triangle = triangles[t];
-                    if (triangle.SubMesh >= _materials.Count) continue;
-                    Material material = _materials[triangle.SubMesh];
+                    if ((uint)triangle.SubMesh >= (uint)occluder.SubMeshCount) continue;
+                    Material material = _subMeshMaterials[occluder.SubMeshStart + triangle.SubMesh];
                     if (material == null) continue;
                     if (!_materialModes.TryGetValue(material, out int mode))
                     {
-                        mode = OccluderCullMode(material);
+                        mode = XRayVegetationOccluderData.OccluderCullMode(material);
                         _materialModes.Add(material, mode);
                     }
 
                     if (mode < 0) continue;
-                    query.AddTriangle(transform.MultiplyPoint3x4(triangle.A), transform.MultiplyPoint3x4(triangle.B), transform.MultiplyPoint3x4(triangle.C), mode == (int)CullMode.Off);
+                    Vector3 a = occluder.Transform.MultiplyPoint3x4(triangle.A);
+                    Vector3 b = occluder.Transform.MultiplyPoint3x4(triangle.B);
+                    Vector3 c = occluder.Transform.MultiplyPoint3x4(triangle.C);
+                    bool doubleSided = mode == (int)CullMode.Off;
+                    if (hom) query.AddHomTriangle(a, b, c, doubleSided && triangle.DoubleSided);
+                    else query.AddTriangle(a, b, c, doubleSided);
                     if (--remaining == 0) break;
                 }
             }
+
+            return remaining;
         }
 
         private bool Prepare()
@@ -163,21 +226,39 @@ namespace XRay.Importer.Levels
 
         private void Add(XRayVegetationOccluderData source)
         {
-            if (source == null || source.Version != XRayVegetationOccluderData.VERSION || source.Entries == null) return;
+            if (source == null || !source.IsReadableVersion || source.Entries == null) return;
             foreach (XRayVegetationOccluderData.Entry entry in source.Entries)
             {
-                if (entry.Mesh != null && entry.Triangles != null) _entries[entry.Mesh] = entry;
+                if (entry != null && entry.Mesh != null && (entry.Triangles is { Count: > 0 } || entry.HomTriangles is { Count: > 0 })) _entries[entry.Mesh] = entry;
             }
         }
 
-        private static int OccluderCullMode(Material material)
+        private readonly struct Candidate
         {
-            if (material == null || material.shader == null || material.shader.name != MESH_SHADER || material.renderQueue < (int)RenderQueue.Geometry || material.renderQueue > (int)RenderQueue.GeometryLast) return -1;
-            if (material.GetFloat("_SurfaceType") != 0f || material.GetFloat("_ZWrite") < 0.5f || material.GetFloat("_AlphaCutoffEnable") > 0.5f || material.GetFloat("_DisplacementMode") != 0f || material.GetFloat("_DepthOffsetEnable") > 0.5f || material.GetFloat("_MonolithFloraWind") > 0f) return -1;
-            if (material.IsKeywordEnabled("_ALPHATEST_ON") || material.IsKeywordEnabled("_MONOLITH_LEVEL_DETAIL") || material.IsKeywordEnabled("_MONOLITH_LEVEL_LOD") || material.IsKeywordEnabled("_MONOLITH_SKINNED_TBN") || material.IsKeywordEnabled("_VERTEX_DISPLACEMENT") || material.IsKeywordEnabled("_DEPTHOFFSET_ON")) return -1;
-            if (!material.GetShaderPassEnabled("DepthForwardOnly") || !material.GetShaderPassEnabled("ForwardOnly")) return -1;
-            int mode = (int)material.GetFloat("_CullMode");
-            return (mode == (int)CullMode.Back || mode == (int)CullMode.Off) && mode == (int)material.GetFloat("_CullModeForward") ? mode : -1;
+            public int Index { get; }
+            public float Size { get; }
+
+            public Candidate(int index, float size)
+            {
+                Index = index;
+                Size = size;
+            }
+        }
+
+        private readonly struct Occluder
+        {
+            public XRayVegetationOccluderData.Entry Entry { get; }
+            public Matrix4x4 Transform { get; }
+            public int SubMeshStart { get; }
+            public int SubMeshCount { get; }
+
+            public Occluder(XRayVegetationOccluderData.Entry entry, Matrix4x4 transform, int subMeshStart, int subMeshCount)
+            {
+                Entry = entry;
+                Transform = transform;
+                SubMeshStart = subMeshStart;
+                SubMeshCount = subMeshCount;
+            }
         }
     }
 }

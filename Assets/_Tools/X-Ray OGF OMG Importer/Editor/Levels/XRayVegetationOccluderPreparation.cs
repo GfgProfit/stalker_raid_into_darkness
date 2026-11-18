@@ -8,6 +8,7 @@ using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
 using UnityEngine;
 using UnityEngine.Rendering;
+using XRay.Importer.Core.Level;
 using XRay.Importer.Levels;
 
 namespace XRay.Importer.Editor.Levels
@@ -57,13 +58,26 @@ namespace XRay.Importer.Editor.Levels
 
         public static bool PrepareLevel(string levelFolder)
         {
+            XRayLevelImportManifest manifest = AssetDatabase.LoadAssetAtPath<XRayLevelImportManifest>(levelFolder + "/" + XRayLevelPaths.MANIFEST_NAME);
+            return PrepareLevel(levelFolder, manifest != null ? manifest.Record : null, false);
+        }
+
+        internal static bool PrepareLevel(string levelFolder, XRayLevelImportRecord record, bool report)
+        {
             string meshFolder = levelFolder + STATIC_MESH_DIRECTORY;
             if (!AssetDatabase.IsValidFolder(meshFolder)) return false;
+            XRayHomTriangle[] hom = XRayLevelHomSource.Read(levelFolder, record, out string homSignature, out string homDiagnostic);
+            bool prepareHom = hom.Length > 0 && !string.IsNullOrEmpty(record.PrefabPath);
             string[] guids = AssetDatabase.FindAssets("t:Mesh", new[] { meshFolder });
             Array.Sort(guids, StringComparer.Ordinal);
             var paths = new List<string>(guids.Length);
             var fingerprint = new StringBuilder();
             fingerprint.Append(XRayVegetationOccluderData.VERSION).Append('\n');
+            if (prepareHom)
+            {
+                fingerprint.Append(homSignature).Append('\n');
+                fingerprint.Append(AssetDatabase.GetAssetDependencyHash(record.PrefabPath)).Append('\n');
+            }
             foreach (string guid in guids)
             {
                 string path = AssetDatabase.GUIDToAssetPath(guid);
@@ -74,17 +88,27 @@ namespace XRay.Importer.Editor.Levels
             string signature = Hash128.Compute(fingerprint.ToString()).ToString();
             string dataPath = DataPath(levelFolder);
             XRayVegetationOccluderData data = AssetDatabase.LoadAssetAtPath<XRayVegetationOccluderData>(dataPath);
-            if (data != null && data.Version == XRayVegetationOccluderData.VERSION && data.Signature == signature) return false;
+            if (data != null && data.Version == XRayVegetationOccluderData.VERSION && data.Signature == signature)
+            {
+                if (report) Report(record, levelFolder, dataPath, data.Entries, hom.Length, homDiagnostic);
+                return false;
+            }
 
             var entries = new List<XRayVegetationOccluderData.Entry>(paths.Count);
             var triangles = new XRayVegetationOccluderData.Triangle[MAX_TRIANGLES_PER_MESH];
             var priorities = new float[MAX_TRIANGLES_PER_MESH];
+            var validator = prepareHom ? new XRayHomOccluderValidation(hom) : null;
+            GameObject prefab = prepareHom ? AssetDatabase.LoadAssetAtPath<GameObject>(record.PrefabPath) : null;
+            Dictionary<Mesh, MeshRenderer> renderers = BackingRenderers(prefab);
             foreach (string path in paths)
             {
                 Mesh mesh = AssetDatabase.LoadAssetAtPath<Mesh>(path);
                 if (mesh == null || mesh.vertexCount < 3) continue;
-                XRayVegetationOccluderData.Triangle[] selected = SelectTriangles(mesh, triangles, priorities);
-                if (selected.Length > 0) entries.Add(new XRayVegetationOccluderData.Entry(mesh, selected));
+                Material[] backing = null;
+                if (validator != null && renderers.TryGetValue(mesh, out MeshRenderer renderer) && validator.BeginMesh(mesh.bounds, prefab.transform.worldToLocalMatrix * renderer.localToWorldMatrix)) backing = renderer.sharedMaterials;
+                XRayVegetationOccluderData.Triangle[] selected = SelectTriangles(mesh, triangles, priorities, backing != null ? validator : null, backing);
+                XRayVegetationOccluderData.Triangle[] validated = backing != null ? validator.FinishMesh() : Array.Empty<XRayVegetationOccluderData.Triangle>();
+                if (selected.Length > 0 || validated.Length > 0) entries.Add(new XRayVegetationOccluderData.Entry(mesh, selected, validated));
             }
 
             if (data == null)
@@ -102,7 +126,36 @@ namespace XRay.Importer.Editor.Levels
                 AssetDatabase.SaveAssetIfDirty(data);
             }
 
+            if (report) Report(record, levelFolder, dataPath, entries, hom.Length, homDiagnostic);
             return true;
+        }
+
+        private static Dictionary<Mesh, MeshRenderer> BackingRenderers(GameObject prefab)
+        {
+            var renderers = new Dictionary<Mesh, MeshRenderer>();
+            Transform geometry = prefab != null ? prefab.transform.Find("Geometry") : null;
+            if (geometry == null) return renderers;
+            foreach (MeshRenderer renderer in geometry.GetComponentsInChildren<MeshRenderer>(true))
+            {
+                if (!renderer.enabled || renderer.forceRenderingOff || renderer.shadowCastingMode == ShadowCastingMode.ShadowsOnly || renderer.GetComponentInParent<LODGroup>(true) != null || renderer.HasPropertyBlock()) continue;
+                MeshFilter filter = renderer.GetComponent<MeshFilter>();
+                if (filter == null || filter.sharedMesh == null || renderers.ContainsKey(filter.sharedMesh)) continue;
+                if (Array.Exists(renderer.sharedMaterials, XRayVegetationOccluderData.SupportsOccluderMaterial)) renderers.Add(filter.sharedMesh, renderer);
+            }
+
+            return renderers;
+        }
+
+        private static void Report(XRayLevelImportRecord record, string levelFolder, string dataPath, IReadOnlyList<XRayVegetationOccluderData.Entry> entries, int sourceTriangles, string diagnostic)
+        {
+            int validated = 0;
+            foreach (XRayVegetationOccluderData.Entry entry in entries) validated += entry.HomTriangles?.Count ?? 0;
+            record.SetMetric("HomSourceTriangles", sourceTriangles);
+            record.SetMetric("HomOccluderTriangles", validated);
+            if (!record.GeneratedAssets.Contains(dataPath)) record.GeneratedAssets.Add(dataPath);
+            string capture = levelFolder + XRayLevelHomSource.CAPTURE_PATH;
+            if (sourceTriangles > 0 && !record.GeneratedAssets.Contains(capture)) record.GeneratedAssets.Add(capture);
+            if (diagnostic != null) record.Warnings.Add(diagnostic);
         }
 
         public static string DataPath(string levelFolder)
@@ -114,15 +167,17 @@ namespace XRay.Importer.Editor.Levels
         {
             foreach (string path in paths)
             {
-                if (!path.StartsWith(XRayLevelPaths.ROOT + "/", StringComparison.Ordinal) || !path.EndsWith(".asset", StringComparison.OrdinalIgnoreCase)) continue;
+                if (!path.StartsWith(XRayLevelPaths.ROOT + "/", StringComparison.Ordinal)) continue;
                 int separator = path.LastIndexOf(STATIC_MESH_DIRECTORY + "/", StringComparison.Ordinal);
-                if (separator > 0) PENDING.Add(path.Substring(0, separator));
+                if (separator > 0 && path.EndsWith(".asset", StringComparison.OrdinalIgnoreCase)) PENDING.Add(path.Substring(0, separator));
+                else if (path.EndsWith("/" + XRayLevelPaths.MANIFEST_NAME, StringComparison.Ordinal)) PENDING.Add(path.Substring(0, path.LastIndexOf('/')));
+                else if (path.EndsWith(".prefab", StringComparison.OrdinalIgnoreCase) && (separator = path.LastIndexOf("/Prefabs/", StringComparison.Ordinal)) > 0) PENDING.Add(path.Substring(0, separator));
             }
 
             if (PENDING.Count > 0) Queue();
         }
 
-        private static XRayVegetationOccluderData.Triangle[] SelectTriangles(Mesh mesh, XRayVegetationOccluderData.Triangle[] triangles, float[] priorities)
+        private static XRayVegetationOccluderData.Triangle[] SelectTriangles(Mesh mesh, XRayVegetationOccluderData.Triangle[] triangles, float[] priorities, XRayHomOccluderValidation validator, Material[] backing)
         {
             using Mesh.MeshDataArray snapshot = MeshUtility.AcquireReadOnlyMeshData(mesh);
             Mesh.MeshData data = snapshot[0];
@@ -136,6 +191,7 @@ namespace XRay.Importer.Editor.Levels
             {
                 SubMeshDescriptor subMesh = data.GetSubMesh(s);
                 if (subMesh.topology != MeshTopology.Triangles) continue;
+                bool useHom = validator != null && s < backing.Length && XRayVegetationOccluderData.SupportsOccluderMaterial(backing[s]);
                 int end = subMesh.indexStart + subMesh.indexCount;
                 for (int i = subMesh.indexStart; i + 2 < end; i += 3)
                 {
@@ -146,6 +202,7 @@ namespace XRay.Importer.Editor.Levels
                     Vector3 a = vertices[aIndex];
                     Vector3 b = vertices[bIndex];
                     Vector3 c = vertices[cIndex];
+                    if (useHom) validator.AddBackingTriangle(s, a, b, c);
                     float priority = Vector3.Cross(b - a, c - a).sqrMagnitude;
                     if (!(priority >= MIN_DOUBLE_AREA_SQUARED) || float.IsInfinity(priority)) continue;
                     int index = Mathf.Min(count, MAX_TRIANGLES_PER_MESH - 1);
@@ -193,7 +250,7 @@ namespace XRay.Importer.Editor.Levels
         {
             _queued = false;
             if (EditorApplication.isPlayingOrWillChangePlaymode) return;
-            if (EditorApplication.isCompiling || EditorApplication.isUpdating)
+            if (EditorApplication.isCompiling || EditorApplication.isUpdating || XRayLevelImportJob.Current != null)
             {
                 Queue();
                 return;

@@ -558,6 +558,12 @@ namespace XRay.Importer.Tests
                 Assert.IsFalse(XRayLevelImportJob.CanReuseGeometry(previous, diff, "new settings"));
                 diff.Changes[0].Category = XRayLevelSourceManifest.CATEGORY_LEVEL;
                 Assert.IsFalse(XRayLevelImportJob.CanReuseGeometry(previous, diff, "settings"));
+                diff.Changes[0].VirtualPath = "levels/y04_pole/level.hom";
+                Assert.IsTrue(XRayLevelImportJob.CanReuseGeometry(previous, diff, "settings"));
+                diff.Changes[0].Kind = XRayLevelSourceChangeKind.Removed;
+                Assert.IsTrue(XRayLevelImportJob.CanReuseGeometry(previous, diff, "settings"));
+                diff.Changes[0].VirtualPath = "levels/y04_pole/level.geom";
+                Assert.IsFalse(XRayLevelImportJob.CanReuseGeometry(previous, diff, "settings"));
                 diff.Changes[0].Category = XRayLevelSourceManifest.CATEGORY_TEXTURE;
                 diff.Changes[0].Kind = XRayLevelSourceChangeKind.Removed;
                 Assert.IsFalse(XRayLevelImportJob.CanReuseGeometry(previous, diff, "settings"));

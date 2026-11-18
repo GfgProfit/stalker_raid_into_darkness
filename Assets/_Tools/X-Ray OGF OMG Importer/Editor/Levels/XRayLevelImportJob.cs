@@ -543,6 +543,7 @@ namespace XRay.Importer.Editor.Levels
 
             foreach (XRayLevelSourceChange change in diff.Changes)
             {
+                if (XRayLevelHomSource.IsHomPath(change.VirtualPath)) continue;
                 if (change.Kind == XRayLevelSourceChangeKind.Removed || (change.Category != XRayLevelSourceManifest.CATEGORY_TEXTURE && change.Category != XRayLevelSourceManifest.CATEGORY_BUMP))
                 {
                     return false;
@@ -598,7 +599,7 @@ namespace XRay.Importer.Editor.Levels
 
             foreach (XRayLevelDependency dependency in _previous.Dependencies)
             {
-                if (dependency.Category != XRayLevelDependencyCategory.Materials.ToString())
+                if (dependency.Category != XRayLevelDependencyCategory.Materials.ToString() && !XRayLevelHomSource.IsHomPath(dependency.Reference?.Replace('\\', '/')))
                 {
                     _record.Dependencies.Add(dependency);
                 }
@@ -659,8 +660,8 @@ namespace XRay.Importer.Editor.Levels
                 case "level.game":
                     _record.AddDependency(XRayLevelDependencyCategory.GameplayData, "Spawn/game data", reference, path, null, XRayLevelDependencyStatus.Described, "ALife spawn, way points and game objects; dynamic objects are not created");
                     break;
-                case "level.hom":
-                    _record.AddDependency(XRayLevelDependencyCategory.Geometry, "Occlusion mesh", reference, path, null, XRayLevelDependencyStatus.Unsupported, "Hierarchical occlusion map geometry; not converted to Unity occlusion data");
+                case XRayLevelHomSource.FILE_NAME:
+                    _record.AddDependency(XRayLevelDependencyCategory.Geometry, "Occlusion mesh", reference, path, null, XRayLevelDependencyStatus.Described, "Optional source for vegetation occlusion backed by opaque level geometry");
                     break;
                 case "level.som":
                     _record.AddDependency(XRayLevelDependencyCategory.GameplayData, "Sound occlusion", reference, path, null, XRayLevelDependencyStatus.Described, "Sound occlusion mesh; not imported");
@@ -1796,7 +1797,20 @@ namespace XRay.Importer.Editor.Levels
 
             XRayLevelSourceManifest.Collect(_record, _info.Effective ?? new XRayEffectiveGamedata(_sourceIndex), _entry);
 
-            bool unchanged = _record.Completed && _resourcesOnly && _anomalyPlan == null && _previous != null && !_materials.Changed && _textures.Imported == 0 && _previous.Settings == _record.Settings && _record.Source.ChangesSincePrevious.Count == 0 && _record.Source.ProfileFingerprint == _previous.Source.ProfileFingerprint && _record.Source.IndexFingerprint == _previous.Source.IndexFingerprint;
+            bool occlusionChanged = false;
+            if (_record.Completed)
+            {
+                try
+                {
+                    occlusionChanged = XRayVegetationOccluderPreparation.PrepareLevel(folder, _record, true);
+                }
+                catch (Exception preparationException)
+                {
+                    _record.Warnings.Add("Vegetation occlusion preparation: " + preparationException.Message);
+                }
+            }
+
+            bool unchanged = _record.Completed && _resourcesOnly && _anomalyPlan == null && _previous != null && !occlusionChanged && !_materials.Changed && _textures.Imported == 0 && _previous.Settings == _record.Settings && _record.Source.ChangesSincePrevious.Count == 0 && _record.Source.ProfileFingerprint == _previous.Source.ProfileFingerprint && _record.Source.IndexFingerprint == _previous.Source.IndexFingerprint && _previous.GetMetric("HomSourceTriangles") == _record.GetMetric("HomSourceTriangles") && _previous.GetMetric("HomOccluderTriangles") == _record.GetMetric("HomOccluderTriangles");
             string reportPath = XRayLevelPaths.AttemptReportPath(_record.LevelName, _record.Source.ProfileId);
             if (unchanged)
             {

@@ -55,6 +55,8 @@ namespace RaidIntoDarkness.GraphicsOptions
     {
         public const int MAX_TEXTURE_QUALITY = 4;
 
+        private const int MAX_SAVED_GRASS_DISTANCE = 250;
+
         public int renderScale;
         public VideoAntialiasing antialiasing;
         public int antialiasingQuality;
@@ -76,7 +78,7 @@ namespace RaidIntoDarkness.GraphicsOptions
         public bool lensFlare;
 
         public int TextureMipmapLimit => MAX_TEXTURE_QUALITY - textureQuality;
-        public bool Valid => renderScale >= 50 && renderScale <= 100 && (int)antialiasing >= 0 && (int)antialiasing <= 3 && IsTier(antialiasingQuality) && textureQuality >= 0 && textureQuality <= MAX_TEXTURE_QUALITY && VideoPresets.IsAnisotropyLevel(anisotropy) && IsTier(lodQuality) && IsTier(shadowQuality) && IsTier(contactShadowQuality) && sunShadowDistance >= 75 && sunShadowDistance <= 500 && localShadowDistance >= 5 && localShadowDistance <= 75 && ambientOcclusion >= 0 && ambientOcclusion <= 3 && float.IsFinite(grassSpacing) && grassSpacing >= 0.04f && grassSpacing <= 1.0f && grassDistance >= 0 && grassDistance <= 250 && IsTier(fogQuality);
+        public bool Valid => renderScale >= 50 && renderScale <= 100 && (int)antialiasing >= 0 && (int)antialiasing <= 3 && IsTier(antialiasingQuality) && textureQuality >= 0 && textureQuality <= MAX_TEXTURE_QUALITY && VideoPresets.IsAnisotropyLevel(anisotropy) && IsTier(lodQuality) && IsTier(shadowQuality) && IsTier(contactShadowQuality) && sunShadowDistance >= 75 && sunShadowDistance <= 500 && localShadowDistance >= 5 && localShadowDistance <= 75 && ambientOcclusion >= 0 && ambientOcclusion <= 3 && float.IsFinite(grassSpacing) && grassSpacing >= 0.04f && grassSpacing <= 1.0f && grassDistance >= 0 && grassDistance <= MAX_SAVED_GRASS_DISTANCE && IsTier(fogQuality);
 
         private static bool IsTier(int value)
         {
@@ -103,28 +105,32 @@ namespace RaidIntoDarkness.GraphicsOptions
         public const int COUNT = 5;
         public const int DEFAULT_PRESET = 3;
         public const int SAVE_VERSION = 4;
+        public const int MAX_GRASS_DENSITY = 115;
+        public const int MAX_GRASS_DISTANCE = 110;
 
         private static readonly int[] ANISOTROPY_LEVELS = { 0, 2, 4, 8, 16 };
         private static readonly int[] FRAME_LIMITS = { 30, 60, 90, 120, 144, 165, 240, -1 };
         private static readonly float[] LOD_BIASES = { 0.65f, 1.0f, 1.5f };
 
         private readonly float _grassReference;
+        private readonly float _minimumGrassSpacing;
         private readonly VideoQuality[] _qualities;
 
         public static int[] AnisotropyLevels => (int[])ANISOTROPY_LEVELS.Clone();
         public static int[] FrameLimits => (int[])FRAME_LIMITS.Clone();
 
-        public VideoPresets(float grassReference, int localShadowDefault, int grassDistanceDefault, bool grassShadowDefault)
+        public VideoPresets(float grassReference, int localShadowDefault, bool grassShadowDefault)
         {
             _grassReference = grassReference;
+            _minimumGrassSpacing = GrassSpacing(MAX_GRASS_DENSITY);
             localShadowDefault = Mathf.Clamp(localShadowDefault, 5, 75);
             _qualities = new[]
             {
                 Quality(60, VideoAntialiasing.Fxaa, 0, 0, 0, 0, 0, 75, Mathf.Min(20, localShadowDefault), 0, 30, 50, false, 0, false, false, false),
                 Quality(75, VideoAntialiasing.Smaa, 0, 1, 2, 1, 1, 100, Mathf.Min(35, localShadowDefault), 1, 50, 80, false, 0, false, true, false),
-                Quality(90, VideoAntialiasing.Taa, 1, 2, 4, 1, 1, 125, Mathf.Min(55, localShadowDefault), 2, 75, 110, false, 1, false, true, true),
-                Quality(100, VideoAntialiasing.Taa, 2, 3, 8, 2, 2, 150, localShadowDefault, 3, 100, grassDistanceDefault, grassShadowDefault, 1, false, true, true),
-                Quality(100, VideoAntialiasing.Taa, 2, 4, 16, 2, 2, 220, localShadowDefault, 3, 140, Mathf.Max(200, grassDistanceDefault), true, 2, true, true, true)
+                Quality(90, VideoAntialiasing.Taa, 1, 2, 4, 1, 1, 125, Mathf.Min(55, localShadowDefault), 2, 75, 90, false, 1, false, true, true),
+                Quality(100, VideoAntialiasing.Taa, 2, 3, 8, 2, 2, 150, localShadowDefault, 3, 100, 100, grassShadowDefault, 1, false, true, true),
+                Quality(100, VideoAntialiasing.Taa, 2, 4, 16, 2, 2, 220, localShadowDefault, 3, MAX_GRASS_DENSITY, MAX_GRASS_DISTANCE, true, 2, true, true, true)
             };
             for (int i = 0; i < _qualities.Length; i++)
             {
@@ -156,13 +162,20 @@ namespace RaidIntoDarkness.GraphicsOptions
 
         public float GrassSpacing(int percent)
         {
-            return Mathf.Clamp(_grassReference / Mathf.Sqrt(percent * 0.01f), 0.04f, 1.0f);
+            return Mathf.Clamp(_grassReference / Mathf.Sqrt(Mathf.Min(percent, MAX_GRASS_DENSITY) * 0.01f), 0.04f, 1.0f);
         }
 
         public int GrassPercent(float spacing)
         {
             float ratio = _grassReference / spacing;
             return Mathf.RoundToInt(100.0f * ratio * ratio);
+        }
+
+        internal VideoQuality LimitGrass(VideoQuality quality)
+        {
+            quality.grassSpacing = Mathf.Max(quality.grassSpacing, _minimumGrassSpacing);
+            quality.grassDistance = Mathf.Min(quality.grassDistance, MAX_GRASS_DISTANCE);
+            return quality;
         }
 
         public static float LodBias(int index)

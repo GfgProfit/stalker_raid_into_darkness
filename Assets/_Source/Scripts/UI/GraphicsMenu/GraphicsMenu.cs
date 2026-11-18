@@ -159,8 +159,8 @@ namespace RaidIntoDarkness.GraphicsOptions
             Bind(Range.RenderScale, 50, 100, (ref VideoSettings settings, int value) => settings.quality.renderScale = value);
             Bind(Range.SunShadows, 75, 500, (ref VideoSettings settings, int value) => settings.quality.sunShadowDistance = value);
             Bind(Range.LocalShadows, 5, 75, (ref VideoSettings settings, int value) => settings.quality.localShadowDistance = value);
-            Bind(Range.GrassDensity, 25, 150, (ref VideoSettings settings, int value) => settings.quality.grassSpacing = _runtime.Presets.GrassSpacing(value));
-            Bind(Range.GrassDistance, 0, 250, (ref VideoSettings settings, int value) => settings.quality.grassDistance = value);
+            Bind(Range.GrassDensity, 25, VideoPresets.MAX_GRASS_DENSITY, (ref VideoSettings settings, int value) => settings.quality.grassSpacing = _runtime.Presets.GrassSpacing(value));
+            Bind(Range.GrassDistance, 0, VideoPresets.MAX_GRASS_DISTANCE, (ref VideoSettings settings, int value) => settings.quality.grassDistance = value);
 
             Bind(Switch.VSync, (ref VideoSettings settings, int value) => settings.vSync = value != 0);
             Bind(Switch.GrassShadows, (ref VideoSettings settings, int value) => settings.quality.grassShadows = value != 0);

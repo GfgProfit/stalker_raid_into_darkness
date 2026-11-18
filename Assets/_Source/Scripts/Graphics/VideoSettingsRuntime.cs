@@ -116,9 +116,9 @@ namespace RaidIntoDarkness.GraphicsOptions
         {
             Display.Refresh();
             _grass = XRayGrassSettingsProvider.Ensure().Settings;
-            XRayGrassValues baseline = _grass != null ? _grass.Defaults.ForLevel(null) : new XRayGrassValues(0.45f, 150, 1.0f, false);
+            XRayGrassValues? baseline = _grass?.Defaults.ForLevel(null);
             int localDistance = Mathf.RoundToInt(XRayVideoOverrides.DefaultPunctualShadowDistance ?? 75.0f);
-            Presets = new VideoPresets(baseline.Density, localDistance, baseline.Radius, baseline.Shadows);
+            Presets = new VideoPresets(baseline?.Density ?? 0.45f, localDistance, baseline?.Shadows ?? false);
             VideoSettings defaults = Presets.Defaults(Display.Read());
             string settingsPath = VideoSettingsStore.ResolvePath(Application.isEditor, Application.dataPath, Application.persistentDataPath, Application.productName);
             _store = new VideoSettingsStore(settingsPath);

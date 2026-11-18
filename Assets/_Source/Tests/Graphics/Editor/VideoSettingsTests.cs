@@ -6,7 +6,7 @@ namespace RaidIntoDarkness.GraphicsOptions.Tests
 {
     public sealed class VideoSettingsTests
     {
-        private readonly VideoPresets _presets = new VideoPresets(0.45f, 75, 150, false);
+        private readonly VideoPresets _presets = new VideoPresets(0.45f, 75, false);
         private readonly VideoDisplay _desktop = new VideoDisplay(FullScreenMode.FullScreenWindow, 1920, 1080);
         private readonly VideoDisplay _window = new VideoDisplay(FullScreenMode.Windowed, 1280, 720);
 
@@ -30,12 +30,16 @@ namespace RaidIntoDarkness.GraphicsOptions.Tests
             settings.vSync = true;
             settings.fpsLimit = 144;
             settings.brightness = 73;
+            int[] grassDensities = { 30, 50, 75, 100, 115 };
+            int[] grassDistances = { 50, 80, 90, 100, 110 };
             for (int index = 0; index < VideoPresets.COUNT; index++)
             {
                 settings = _presets.Select(settings, index);
                 Assert.That(settings.Valid, Is.True);
                 Assert.That(settings.quality.textureQuality, Is.EqualTo(index));
                 Assert.That(settings.quality.TextureMipmapLimit, Is.EqualTo(4 - index));
+                Assert.That(_presets.GrassPercent(settings.quality.grassSpacing), Is.EqualTo(grassDensities[index]));
+                Assert.That(settings.quality.grassDistance, Is.EqualTo(grassDistances[index]));
                 Assert.That(_presets.Match(settings.quality), Is.EqualTo(index));
                 Assert.That(_presets.IsCustom(settings), Is.False);
                 Assert.That(settings.display.Matches(_window), Is.True);
@@ -231,8 +235,39 @@ namespace RaidIntoDarkness.GraphicsOptions.Tests
         {
             Assert.That(_presets.GrassSpacing(30), Is.GreaterThan(_presets.GrassSpacing(100)));
             Assert.That(_presets.GrassSpacing(100), Is.EqualTo(0.45f));
-            Assert.That(_presets.GrassSpacing(125), Is.LessThan(_presets.GrassSpacing(100)));
-            Assert.That(_presets.GrassPercent(_presets.GrassSpacing(137)), Is.EqualTo(137));
+            Assert.That(_presets.GrassSpacing(115), Is.LessThan(_presets.GrassSpacing(100)));
+            Assert.That(_presets.GrassSpacing(150), Is.EqualTo(_presets.GrassSpacing(115)));
+            Assert.That(_presets.GrassPercent(_presets.GrassSpacing(115)), Is.EqualTo(115));
+        }
+
+        [Test]
+        public void GrassAboveTheLimitsIsClampedOnLoadAndApply()
+        {
+            var target = new Target(_desktop, _desktop);
+            VideoSettings defaults = _presets.Defaults(_desktop);
+            VideoSettings saved = defaults;
+            saved.quality.grassSpacing = 0.45f / Mathf.Sqrt(1.5f);
+            saved.quality.grassDistance = 250;
+            saved.brightness = 73;
+            saved.fpsLimit = 144;
+            VideoSettings restored = JsonUtility.FromJson<VideoSettings>(JsonUtility.ToJson(saved));
+            Assert.That(restored.Valid, Is.True);
+
+            var session = new VideoSettingsSession(target, _presets, defaults, restored);
+            session.RestoreAtStartup(0.0);
+            VideoSettings expected = saved;
+            expected.quality.grassSpacing = _presets.GrassSpacing(115);
+            expected.quality.grassDistance = 110;
+            Assert.That(session.Confirmed, Is.EqualTo(expected));
+            Assert.That(target.Active, Is.EqualTo(expected));
+            Assert.That(session.Dirty, Is.False);
+
+            saved.brightness = 74;
+            expected.brightness = 74;
+            session.Edit(saved);
+            session.Apply(1.0);
+            Assert.That(target.Active, Is.EqualTo(expected));
+            Assert.That(target.Saved, Is.EqualTo(expected));
         }
 
         private VideoSettings WithWindow(VideoSettings value)

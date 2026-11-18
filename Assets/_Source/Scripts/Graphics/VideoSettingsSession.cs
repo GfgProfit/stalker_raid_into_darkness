@@ -53,6 +53,7 @@ namespace RaidIntoDarkness.GraphicsOptions
             _target = target;
             _presets = presets;
             _defaults = defaults;
+            initial.quality = _presets.LimitGrass(initial.quality);
             int matchedPreset = _presets.Match(initial.quality);
             if (matchedPreset >= 0)
             {
@@ -91,7 +92,12 @@ namespace RaidIntoDarkness.GraphicsOptions
 
         public void Edit(VideoSettings value)
         {
-            if (State != VideoApplyState.Idle || !value.Valid || value.Equals(Draft))
+            if (State != VideoApplyState.Idle || !value.Valid)
+            {
+                return;
+            }
+            value.quality = _presets.LimitGrass(value.quality);
+            if (value.Equals(Draft))
             {
                 return;
             }

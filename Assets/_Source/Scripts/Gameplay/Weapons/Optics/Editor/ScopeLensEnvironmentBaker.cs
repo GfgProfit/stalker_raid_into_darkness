@@ -141,7 +141,7 @@ namespace RaidIntoDarkness.Weapons.Optics.Editor
 
                 if (existing != null)
                 {
-                    if (existing.width != RESOLUTION || existing.format != TextureFormat.RGBAHalf || existing.mipmapCount != cube.mipmapCount)
+                    if (existing.width != RESOLUTION || existing.format != TextureFormat.RGBAHalf || (existing.mipmapCount != 1 && existing.mipmapCount != cube.mipmapCount))
                     {
                         throw new InvalidOperationException("The existing lens environment has an incompatible format. Move it aside before rebaking.");
                     }
@@ -152,7 +152,7 @@ namespace RaidIntoDarkness.Weapons.Optics.Editor
                         existing.SetPixels(cube.GetPixels((CubemapFace)index), (CubemapFace)index);
                     }
 
-                    existing.Apply(true, false);
+                    existing.Apply(existing.mipmapCount > 1, false);
                     EditorUtility.SetDirty(existing);
                     AssetDatabase.SaveAssetIfDirty(existing);
                 }

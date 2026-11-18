@@ -1,6 +1,4 @@
 # Auto detect text files and perform LF normalization
 * text=auto
-/Assets/_Source/Levels/Anomaly/*_all.spawn filter=lfs diff=lfs merge=lfs -text
-/Assets/_Source/Levels/Anomaly/1v2_DX11_v_12gb_2.5_168_662acc8d/WeatherProfiles/2e431903b176_01232f8a/Textures/*.asset filter=lfs diff=lfs merge=lfs -text
-/Assets/_Source/Levels/Anomaly/1v2_DX11_v_12gb_2.5_168_662acc8d/WeatherProfiles/9975fa377437_4e8c39f2/Textures/*.asset filter=lfs diff=lfs merge=lfs -text
+/Assets/_Source/Settings/WeatherProfiles/**/Textures/*.asset filter=lfs diff=lfs merge=lfs -text
 /Assets/_Source/Settings/Resources/XRayPrecipitation/WetSurfaceTextures.asset filter=lfs diff=lfs merge=lfs -text

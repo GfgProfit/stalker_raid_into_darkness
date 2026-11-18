@@ -20,8 +20,7 @@ namespace XRay.Importer.Editor.Levels
             GetWindow<XRayLevelImporterWindow>("X-Ray Level Importer").Show();
         }
 
-        [MenuItem("Tools/X-Ray/Import Level...")]
-        public static void ImportWithPicker()
+        private static void ImportWithPicker()
         {
             XRayLevelGamedataInfo info = XRayLevelSourceCache.Inspect(false);
             string start = info.Effective == null ? info.LevelsFolder ?? string.Empty : string.Empty;
@@ -29,7 +28,6 @@ namespace XRay.Importer.Editor.Levels
             if (!string.IsNullOrEmpty(path))
             {
                 XRayLevelDropHandler.Handle(path.Replace('/', Path.DirectorySeparatorChar), null, true);
-                Open();
             }
         }
 

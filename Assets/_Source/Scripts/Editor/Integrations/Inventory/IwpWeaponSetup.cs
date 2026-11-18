@@ -40,6 +40,8 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
         internal const string HANDS_MOTIONS = "meshes/dynamics/weapons/wpn_fn2000/wpn_hand_fn2000_hud_animation.omf";
         private const string MENU = "Tools/Inventory/Setup Test Weapon (AUG A3)";
         private const string LOG = "[IwpWeapon] ";
+        private const string HANDS_RIG_PATH = "Assets/_Source/FirstPerson/Hands/Models/wpn_hand_01.ogf";
+        private const string OUTFIT_CATALOG_PATH = "Assets/_Source/FirstPerson/Outfits/OutfitCatalog.asset";
         private const string RIFLE_TAG = InventoryDemoContentBuilder.RIFLE_TAG;
         private const float PLACE_DISTANCE = 2.5f;
         private const float DROP_HEIGHT = 0.3f;
@@ -105,7 +107,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
             }
 
             AssignRig(weaponMotionsPath, hudPath);
-            AssignRig(handsMotionsPath, FirstPersonEquipmentAnimationSetup.HANDS_RIG_PATH);
+            AssignRig(handsMotionsPath, HANDS_RIG_PATH);
             int textureErrors = GenerateIwpMaterials(new[] { worldPath, hudPath });
             var worldModel = AssetDatabase.LoadAssetAtPath<GameObject>(worldPath);
             var hudModel = AssetDatabase.LoadAssetAtPath<GameObject>(hudPath);
@@ -278,7 +280,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
 
         private static int ValidateHandsMotions(XRayMotionLibrary motions, StringBuilder log)
         {
-            var catalog = AssetDatabase.LoadAssetAtPath<FirstPersonOutfitCatalog>(FirstPersonPickupSetup.CATALOG_PATH);
+            var catalog = AssetDatabase.LoadAssetAtPath<FirstPersonOutfitCatalog>(OUTFIT_CATALOG_PATH);
 
             if (catalog == null)
             {

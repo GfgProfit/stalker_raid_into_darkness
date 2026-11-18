@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using NUnit.Framework;
 using RaidIntoDarkness.FirstPerson;
-using RaidIntoDarkness.Player.Editor;
 using UnityEditor;
 using UnityEngine;
 using XRay.Importer;
@@ -11,6 +10,8 @@ namespace RaidIntoDarkness.Player.Tests
     public sealed class FirstPersonPickupAnimatorTests
     {
         private const string BONE = "bone";
+        private const string PICKUP_MOTIONS_PATH = "Assets/_Source/FirstPerson/Animations/Hands/liz_fdda_redone_item_pickup.omf";
+        private const string OUTFIT_CATALOG_PATH = "Assets/_Source/FirstPerson/Outfits/OutfitCatalog.asset";
         private const float CLIP_LENGTH = 1.0f;
         private const int SAMPLES = 2000;
 
@@ -169,13 +170,13 @@ namespace RaidIntoDarkness.Player.Tests
         [Test]
         public void ImportedPickUpMotionsMatchEveryHandsModel()
         {
-            var library = AssetDatabase.LoadAssetAtPath<XRayMotionLibrary>(FirstPersonPickupSetup.MOTIONS_PATH);
+            var library = AssetDatabase.LoadAssetAtPath<XRayMotionLibrary>(PICKUP_MOTIONS_PATH);
             Assert.That(library, Is.Not.Null, "pickup OMF was not imported");
             Assert.That(library.TryGetClip(FirstPersonPickupAnimator.LEFT_HAND_MOTION, out AnimationClip left), Is.True);
             Assert.That(library.TryGetClip(FirstPersonPickupAnimator.RIGHT_HAND_MOTION, out AnimationClip right), Is.True);
             Assert.That(left.length, Is.GreaterThan(0.0f));
             Assert.That(right.length, Is.GreaterThan(0.0f));
-            var catalog = AssetDatabase.LoadAssetAtPath<FirstPersonOutfitCatalog>(FirstPersonPickupSetup.CATALOG_PATH);
+            var catalog = AssetDatabase.LoadAssetAtPath<FirstPersonOutfitCatalog>(OUTFIT_CATALOG_PATH);
             Assert.That(catalog, Is.Not.Null);
             foreach (FirstPersonOutfitEntry entry in catalog.Entries)
             {

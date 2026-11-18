@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using NUnit.Framework;
 using RaidIntoDarkness.FirstPerson;
-using RaidIntoDarkness.Player.Editor;
 using UnityEditor;
 using UnityEngine;
 using XRay.Importer;
@@ -13,6 +12,7 @@ namespace RaidIntoDarkness.Player.Tests
         private const string HANDS_BONE = "bone";
         private const string ITEM_ROOT = "root";
         private const string ITEM_CHILD = "child";
+        private const string EQUIPMENT_LIBRARY_PATH = "Assets/_Source/FirstPerson/Equipment/EquipmentAnimationLibrary.asset";
         private const float CLIP_LENGTH = 1.0f;
 
         private GameObject _root;
@@ -196,7 +196,7 @@ namespace RaidIntoDarkness.Player.Tests
         [Test]
         public void ImportedLibraryCoversEveryProjectHeadgearOutfitAndBackpack()
         {
-            var library = AssetDatabase.LoadAssetAtPath<FirstPersonEquipmentAnimationLibrary>(FirstPersonEquipmentAnimationSetup.LIBRARY_PATH);
+            var library = AssetDatabase.LoadAssetAtPath<FirstPersonEquipmentAnimationLibrary>(EQUIPMENT_LIBRARY_PATH);
             Assert.That(library, Is.Not.Null, "equipment animations were not set up");
             Assert.That(library.Find(FirstPersonEquipmentAnimationLibrary.OUTFIT_SECTION, FirstPersonEquipmentAnimationLibrary.ANM_EQUIP), Is.Not.Null);
             Assert.That(library.Find(FirstPersonEquipmentAnimationLibrary.OUTFIT_FAST_SECTION, FirstPersonEquipmentAnimationLibrary.ANM_EQUIP), Is.Not.Null);

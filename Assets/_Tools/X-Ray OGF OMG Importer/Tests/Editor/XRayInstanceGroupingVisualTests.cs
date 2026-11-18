@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.IO;
 using NUnit.Framework;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -21,11 +19,6 @@ namespace XRay.Importer.Tests
         public void OffscreenCastersKeepVisibleShadowsAcrossCameraChanges()
         {
             HdrpTestWarmup.Ensure();
-            string output = Environment.GetEnvironmentVariable("RVM_BATCHING_VALIDATION_OUTPUT");
-            if (string.IsNullOrEmpty(output)) output = @"E:\Projects\stalker_raid_into_darkness_Archive\InstanceGroupingValidation";
-            output = Path.Combine(Path.GetFullPath(output), DateTime.UtcNow.ToString("yyyyMMdd_HHmmss_fffffff"));
-            Assert.That(output, Does.StartWith("E:\\Projects\\stalker_raid_into_darkness_Archive\\"));
-            Directory.CreateDirectory(output);
             Scene scene = EditorSceneManager.NewPreviewScene();
             var owned = new List<UnityEngine.Object>();
             RenderTexture initial = RenderTexture.active;
@@ -132,17 +125,16 @@ namespace XRay.Importer.Tests
                         }
                         Assert.That(previewMaximum, Is.GreaterThan(previewMinimum));
                         previewScale = 0.8f / (previewMaximum - previewMinimum);
-                        File.WriteAllText(Path.Combine(output, "preview-transform.json"), "{\"reference\":\"view0_A\",\"minimumLuminance\":" + previewMinimum.ToString("R", System.Globalization.CultureInfo.InvariantCulture) + ",\"linearScale\":" + previewScale.ToString("R", System.Globalization.CultureInfo.InvariantCulture) + ",\"mapping\":\"LinearToGammaSpace(Clamp01((Rec709Luminance - minimumLuminance) * linearScale + 0.1)); fixed grayscale contrast for all six previews; original RGB retained in EXR\",\"rawFormat\":\"RGBA float32 OpenEXR\"}");
                     }
-                    SaveEvidence(Path.Combine(output, "view" + view + "_A"), pixels, before, previewMinimum, previewScale);
+                    AssertFinite(before, "Ungrouped view " + view);
                     Assert.That(renderer.LastSubmittedCalls, Is.EqualTo(2));
                     renderer.BatchSet = prepared;
                     Color[] after = Capture(camera, target, pixels);
-                    SaveEvidence(Path.Combine(output, "view" + view + "_B"), pixels, after, previewMinimum, previewScale);
+                    AssertFinite(after, "Grouped view " + view);
                     Assert.That(renderer.LastSubmittedCalls, Is.EqualTo(1));
                     renderer.enabled = false;
                     Color[] clear = Capture(camera, target, pixels);
-                    SaveEvidence(Path.Combine(output, "view" + view + "_no-caster"), pixels, clear, previewMinimum, previewScale);
+                    AssertFinite(clear, "No caster view " + view);
                     renderer.enabled = true;
                     int changed = 0;
                     int shadowPixels = 0;
@@ -158,7 +150,6 @@ namespace XRay.Importer.Tests
                         float previewClear = PreviewValue(clear[index], previewMinimum, previewScale);
                         if (Mathf.Abs(previewBefore - previewClear) > 0.05f) previewShadowPixels++;
                     }
-                    File.WriteAllText(Path.Combine(output, "view" + view + ".json"), "{\"changedPixels\":" + changed + ",\"shadowPixels\":" + shadowPixels + ",\"maximumError\":" + maximum.ToString("R", System.Globalization.CultureInfo.InvariantCulture) + ",\"pixels\":" + before.Length + "}");
                     Assert.That(shadowPixels, Is.GreaterThan(100));
                     Assert.That(previewShadowPixels, Is.GreaterThan(100));
                     Assert.That(changed, Is.LessThan(before.Length * 0.005f));
@@ -195,36 +186,14 @@ namespace XRay.Importer.Tests
             }
         }
 
-        private static void SaveEvidence(string prefix, Texture2D raw, Color[] colors, float minimum, float scale)
+        private static void AssertFinite(Color[] colors, string name)
         {
-            var range = new CaptureRange { minimum = new Color(float.MaxValue, float.MaxValue, float.MaxValue, float.MaxValue), maximum = new Color(float.MinValue, float.MinValue, float.MinValue, float.MinValue), pixelCount = colors.Length };
-            var display = new Color[colors.Length];
             for (int index = 0; index < colors.Length; index++)
             {
-                Color color = colors[index];
                 for (int channel = 0; channel < 4; channel++)
                 {
-                    Assert.That(float.IsFinite(color[channel]), Is.True, prefix + " non-finite pixel " + index + " channel " + channel);
-                    range.minimum[channel] = Mathf.Min(range.minimum[channel], color[channel]);
-                    range.maximum[channel] = Mathf.Max(range.maximum[channel], color[channel]);
+                    Assert.That(float.IsFinite(colors[index][channel]), Is.True, name + " non-finite pixel " + index + " channel " + channel);
                 }
-                float value = PreviewValue(color, minimum, scale);
-                display[index] = new Color(value, value, value, 1f);
-            }
-            File.WriteAllText(prefix + "-range.json", JsonUtility.ToJson(range, true));
-            raw.SetPixels(colors);
-            raw.Apply();
-            File.WriteAllBytes(prefix + ".exr", raw.EncodeToEXR(Texture2D.EXRFlags.OutputAsFloat));
-            var preview = new Texture2D(SIZE, SIZE, TextureFormat.RGBA32, false, true);
-            try
-            {
-                preview.SetPixels(display);
-                preview.Apply();
-                File.WriteAllBytes(prefix + ".png", preview.EncodeToPNG());
-            }
-            finally
-            {
-                UnityEngine.Object.DestroyImmediate(preview);
             }
         }
 
@@ -236,14 +205,6 @@ namespace XRay.Importer.Tests
         private static float PreviewValue(Color color, float minimum, float scale)
         {
             return Mathf.LinearToGammaSpace(Mathf.Clamp01((Luminance(color) - minimum) * scale + 0.1f));
-        }
-
-        [Serializable]
-        private sealed class CaptureRange
-        {
-            public Color minimum;
-            public Color maximum;
-            public int pixelCount;
         }
 
         private static float Error(Color first, Color second)

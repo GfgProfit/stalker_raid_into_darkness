@@ -32,11 +32,6 @@ description: Use when GRA/Anomaly assets must be brought into the Unity project 
 
 ## Шаблон editor-сетапа
 
-Образцы для копирования стиля:
-- `Assets/_Source/Scripts/Editor/Player/FirstPersonEquipmentAnimationSetup.cs`;
-- `Assets/_Source/Scripts/Editor/Player/FirstPersonPickupSetup.cs`;
-- `Assets/_Source/Scripts/Editor/FirstPerson/FirstPersonAssetImporter.cs`.
-
 1. Статический класс в `Assets/_Source/Scripts/Editor/...` с `[MenuItem("Tools/X-Ray/...")]` и `SetupBatch()` → `EditorApplication.Exit(success ? 0 : 1)`. Логи с тегом `[Имя]`.
 2. Источники:
    - `StalkerXRaySources.Open(scope, out error)` или `Mo2VirtualFileSystem.Plan(...)` с узким `IndexScope` (`"configs"`, нужные `meshes/...`, `anims`, `sounds/actor`), затем `XRayAssetIndex.Build(plan)`;

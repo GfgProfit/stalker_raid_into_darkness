@@ -30,12 +30,14 @@ namespace XRay.Importer.Tests
         private readonly Mo2Fixture _mo2;
         private readonly SourceData _source;
         private readonly bool _ownsHost;
+        private readonly bool _exportReports;
         private bool _detailsAttached;
 
-        public XRayFloraLevelFixture(bool trueStalker, string sourceRoot = null)
+        public XRayFloraLevelFixture(bool trueStalker, string sourceRoot = null, bool exportReports = true)
         {
             _directory = new TestDirectory(sourceRoot);
             _trueStalker = trueStalker;
+            _exportReports = exportReports;
             Root = PARENT + "/" + Guid.NewGuid().ToString("N").Substring(0, 8);
             Assert.IsFalse(Directory.Exists(Root) || File.Exists(Root + ".meta"));
             _createdParent = !Directory.Exists(PARENT) && !File.Exists(PARENT + ".meta");
@@ -130,6 +132,11 @@ namespace XRay.Importer.Tests
 
         public string Output()
         {
+            if (!_exportReports)
+            {
+                return null;
+            }
+
             string output = Environment.GetEnvironmentVariable("MONOLITH_PHASE06B1_OUTPUT");
             if (string.IsNullOrEmpty(output)) return null;
             Assert.IsTrue(Path.GetFullPath(output).StartsWith("E:\\Projects\\stalker_raid_into_darkness_Archive\\", StringComparison.OrdinalIgnoreCase));

@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -17,7 +16,7 @@ namespace XRay.Importer.Tests
         public const float FIXED_EXPOSURE_EV100 = 6.0f;
         public const float DIAGNOSTIC_SUN_LUX = 3.0f;
 
-        private const string BATCH_PATH = "Assets/_Source/Levels/Anomaly/1v2_DX11_v_12gb_2.5_168_662acc8d/l01_escape/Meshes/l01_escape_StaticProps.asset";
+        internal const string BATCH_PATH = "Assets/_Source/Levels/Anomaly/1v2_DX11_v_12gb_2.5_168_662acc8d/l01_escape/Meshes/l01_escape_StaticProps.asset";
         private const int SIZE = 640;
 
         private readonly List<UnityEngine.Object> _owned = new List<UnityEngine.Object>();
@@ -106,7 +105,7 @@ namespace XRay.Importer.Tests
             Wind = _root.GetComponentInChildren<XRayFloraWindProvider>();
         }
 
-        public Color[] Capture(string path, float debug = 0.0f)
+        public Color[] Capture(float debug = 0.0f)
         {
             float original = _material.GetFloat("_MonolithDebug");
             RenderTexture active = RenderTexture.active;
@@ -120,24 +119,6 @@ namespace XRay.Importer.Tests
                 _pixels.Apply(false, false);
                 Color[] captured = _pixels.GetPixels();
                 string statistics = ColorImageStatistics(captured, out bool readable);
-                if (path != null)
-                {
-                    File.WriteAllText(path + "_ImageMetrics.txt", statistics + "\nFixedExposureEV100=" + FIXED_EXPOSURE_EV100 + "\nDiagnosticSunLux=" + DIAGNOSTIC_SUN_LUX + "\nPostprocess=true\nExposureControl=true\nTonemapping=None\nCamera=" + _camera.transform.position.ToString("F8") + "\nRotation=" + _camera.transform.rotation.ToString("F8") + "\nProjection=" + _camera.projectionMatrix.ToString("F8"));
-                    File.WriteAllBytes(path + ".exr", _pixels.EncodeToEXR(Texture2D.EXRFlags.OutputAsFloat));
-                    var png = new Texture2D(SIZE, SIZE, TextureFormat.RGBA32, false, false);
-                    try
-                    {
-                        Color[] colors = (Color[])captured.Clone();
-                        for (int i = 0; i < colors.Length; i++) colors[i] = colors[i].gamma;
-                        png.SetPixels(colors);
-                        png.Apply();
-                        File.WriteAllBytes(path + ".png", png.EncodeToPNG());
-                    }
-                    finally
-                    {
-                        UnityEngine.Object.DestroyImmediate(png);
-                    }
-                }
                 if (debug < 0.5f && !readable) throw new InvalidOperationException("Weather color capture requires nonflat visible foliage and fewer than 90% surface pixels at or above the 0.99 display-white threshold: " + statistics);
                 return captured;
             }

@@ -287,7 +287,11 @@ namespace XRay.Importer.Tests
                 readback.Apply();
                 AssertColor(new Color(0.8f, 0.2f, 0.1f), readback.GetPixel(68, 32), 0.035f, "reversing priority must reverse the overlay");
 
-                Assert.IsFalse(ShaderUtil.ShaderHasError(decal.shader), XRayLevelDiagnostics.ShaderMessages(decal.shader.name));
+                foreach (var message in ShaderUtil.GetShaderMessages(decal.shader))
+                {
+                    Assert.AreNotEqual(UnityEditor.Rendering.ShaderCompilerMessageSeverity.Error, message.severity, message.message);
+                }
+                Assert.IsFalse(ShaderUtil.ShaderHasError(decal.shader));
             }
             finally
             {

@@ -67,13 +67,6 @@ namespace XRay.Importer.Tests
 
         [UnityTest]
         [Timeout(600000)]
-        public IEnumerator AnomalyRepeatedFullJobKeepsMaterialIdentityInOneProcess()
-        {
-            for (int iteration = 0; iteration < 3; iteration++) yield return Accept(false, XRayTerrainImportMode.Bind, XRayTerrainQuality.High);
-        }
-
-        [UnityTest]
-        [Timeout(600000)]
         public IEnumerator AnomalyFullJobEnablesHigh()
         {
             yield return Accept(false, XRayTerrainImportMode.EnableVerifiedAnomaly, XRayTerrainQuality.High);

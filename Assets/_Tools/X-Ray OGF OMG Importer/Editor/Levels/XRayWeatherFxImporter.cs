@@ -13,6 +13,7 @@ namespace XRay.Importer.Editor.Levels
     public static partial class XRayWeatherImporter
     {
         private const string WEATHER_FX_ROOT = "configs/environment/weather_effects/";
+        private const string CELESTIAL_SETTINGS_PATH = "Assets/_Tools/X-Ray OGF OMG Importer/Resources/XRayWeatherCelestial.asset";
 
         private static readonly (string Name, XRayWeatherFxKind Kind)[] WEATHER_EFFECTS =
         {
@@ -77,7 +78,7 @@ namespace XRay.Importer.Editor.Levels
             foreach (string dependency in WEATHER_FX_DEPENDENCIES) AddEffective(common, source, dependency);
             string provenance = common.ToString();
             XRayWeatherResourceImporter resources = prepare ? new XRayWeatherResourceImporter(source.Index, weatherFolder + "/Textures", assetRoot + "/WeatherProfiles") : null;
-            XRayWeatherCelestialSettings celestial = AssetDatabase.LoadAssetAtPath<XRayWeatherCelestialSettings>(XRayWeatherCelestialImporter.SETTINGS_ASSET);
+            XRayWeatherCelestialSettings celestial = AssetDatabase.LoadAssetAtPath<XRayWeatherCelestialSettings>(CELESTIAL_SETTINGS_PATH);
             if (celestial == null) throw new InvalidDataException("The prepared celestial weather definitions are missing.");
             var effects = new XRayWeatherFxProfile[WEATHER_EFFECTS.Length];
             for (int i = 0; i < effects.Length; i++)

@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Globalization;
 using NUnit.Framework;
-using RaidIntoDarkness.Player.Editor;
 using UnityEditor;
 using UnityEngine;
 
@@ -138,28 +137,6 @@ namespace RaidIntoDarkness.Player.Tests
             Assert.That(StalkerFootstepSynchronizer.GetStepCycle(0.35f, contacts), Is.EqualTo(0.75f).Within(0.0001f));
             Assert.That(StalkerFootstepSynchronizer.GetStepCycle(0.2f, 0.2f, 0.65f), Is.EqualTo(0.0f).Within(0.0001f));
             Assert.That(StalkerFootstepSynchronizer.GetStepCycle(0.65f, 0.2f, 0.65f), Is.EqualTo(0.5f).Within(0.0001f));
-        }
-
-        [Test]
-        public void ContactDetectionFindsFootPlants()
-        {
-            const int SAMPLES = 120;
-            var left = new float[SAMPLES];
-            var right = new float[SAMPLES];
-            for (int i = 0; i < SAMPLES; i++)
-            {
-                float phase = (float)i / SAMPLES;
-                left[i] = 0.1f + 0.08f * Mathf.Max(0.0f, Mathf.Sin((phase - 0.3f) * Mathf.PI * 2.0f));
-                right[i] = 0.1f + 0.08f * Mathf.Max(0.0f, Mathf.Sin((phase - 0.8f) * Mathf.PI * 2.0f));
-            }
-
-            List<StalkerFootContact> contacts = StalkerFootstepTimingBuilder.FindContacts(left, right);
-            Assert.That(contacts.Count, Is.EqualTo(2));
-            StalkerFootContact l = contacts.Find(contact => contact.Side == StalkerFootSide.Left);
-            StalkerFootContact r = contacts.Find(contact => contact.Side == StalkerFootSide.Right);
-            TestContext.WriteLine($"synthetic contacts: L {F(l.Phase)}, R {F(r.Phase)}");
-            Assert.That(l.Phase, Is.EqualTo(0.8f - 0.032f).Within(0.03f));
-            Assert.That(r.Phase, Is.EqualTo(0.3f - 0.032f).Within(0.03f));
         }
 
         [Test]

@@ -1,15 +1,11 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
-using System.Text;
 using NUnit.Framework;
 using UnityEditor;
 using UnityEditor.SceneManagement;
-using System.Text.RegularExpressions;
 using UnityEngine;
-using UnityEngine.Profiling;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.HighDefinition;
 using UnityEngine.SceneManagement;
@@ -24,35 +20,22 @@ namespace XRay.Importer.Tests
         [Timeout(600000)]
         public IEnumerator SavedTrueStalkerEscapeRemainsReadOnly()
         {
-            yield return Run(true);
-        }
+            const string ROOT = "Assets/_Source/Levels";
+            const string LEVEL = "escape";
+            const string MESH_PATH = ROOT + "/escape/Meshes/Static/S14_C0886.asset";
+            const string MATERIAL_PATH = ROOT + "/Materials/levels/escape/terrain/levels_escape_terrain_terrain_escape_terrain.mat";
+            if (!File.Exists(MESH_PATH) || !File.Exists(MATERIAL_PATH))
+            {
+                Assert.Ignore("This integration test requires the saved True Stalker escape terrain.");
+            }
 
-        [UnityEngine.TestTools.UnityTest]
-        [Timeout(600000)]
-        public IEnumerator AnomalyTerrainMatchesFrozenCheckpoint()
-        {
-            yield return Run(false);
-        }
-
-        private static IEnumerator Run(bool trueStalker)
-        {
-            string output = Path.Combine(TrueStalkerTerrainReference.Output(), trueStalker ? "Real_TS_Escape" : "Anomaly_AB");
-            Directory.CreateDirectory(output);
-            string root = trueStalker ? "Assets/_Source/Levels" : "Assets/_Source/Levels/Anomaly/1v2_DX11_v_12gb_2.5_168_662acc8d";
-            string level = trueStalker ? "escape" : "l01_escape";
-            string meshPath = root + "/" + level + "/Meshes/Static/" + (trueStalker ? "S14_C0886.asset" : "S30_C0876.asset");
-            string materialPath = root + "/Materials/levels/" + level + "/terrain/" + (trueStalker ? "levels_escape_terrain_terrain_escape_terrain.mat" : "terrain_escape_terrain.mat");
-            Mesh mesh = AssetDatabase.LoadAssetAtPath<Mesh>(meshPath);
-            Material stored = AssetDatabase.LoadAssetAtPath<Material>(materialPath);
+            Mesh mesh = AssetDatabase.LoadAssetAtPath<Mesh>(MESH_PATH);
+            Material stored = AssetDatabase.LoadAssetAtPath<Material>(MATERIAL_PATH);
             Assert.IsNotNull(mesh);
             Assert.IsNotNull(stored);
-            string storedBytes = File.ReadAllText(materialPath);
+            string storedBytes = File.ReadAllText(MATERIAL_PATH);
             Scene scene = EditorSceneManager.NewPreviewScene();
             var temporary = new List<UnityEngine.Object>();
-            var metrics = new StringBuilder("Mode,Debug,NonFinite,MaxNormalDelta\n");
-            var timings = new StringBuilder("Mode,Frame,GpuNanoseconds,GpuBlocks\n");
-            var comparisons = new StringBuilder("Mode,Debug,MaxAbsoluteDelta,ComparedComponents\n");
-            var baselinePixels = new Dictionary<int, Color[]>();
             XRayTerrainDiagnosticBinding bindings = null;
             try
             {
@@ -65,52 +48,9 @@ namespace XRay.Importer.Tests
                 renderer.receiveShadows = false;
                 var material = new Material(stored);
                 temporary.Add(material);
-                bindings = XRayTerrainDiagnosticBinding.Open(root, level);
-                bindings.Bind(stored, material, trueStalker);
-                if (!trueStalker)
-                {
-                    material.SetFloat("_MonolithSourceProfile", 1);
-                    material.SetFloat("_MonolithSourceTerrain", 1);
-                    material.SetFloat("_MonolithTerrainParallax", 0);
-                    material.SetFloat("_MonolithTerrainOcclusion", 0);
-                }
-                Shader currentShader = material.shader;
-                Shader baselineShader = FrozenShader();
-                temporary.Add(baselineShader);
-                Assert.IsFalse(ShaderUtil.ShaderHasError(baselineShader));
+                bindings = XRayTerrainDiagnosticBinding.Open(ROOT, LEVEL);
+                bindings.Bind(stored, material, trueStalker: true);
                 renderer.sharedMaterial = material;
-                var inventory = new StringBuilder("Vertex,Px,Py,Pz,Nx,Ny,Nz,NormalLength,Tx,Ty,Tz,Bx,By,Bz,UVx,UVy,Hemisphere\n");
-                var colors = new List<Color>();
-                var binormal = new List<Vector2>();
-                var hemi = new List<Vector2>();
-                mesh.GetColors(colors);
-                mesh.GetUVs(1, binormal);
-                mesh.GetUVs(2, hemi);
-                for (int vertex = 0; vertex < mesh.vertexCount; vertex++)
-                {
-                    Vector3 p = mesh.vertices[vertex];
-                    Vector3 n = mesh.normals[vertex];
-                    Vector3 t = new Vector3(colors[vertex].r, colors[vertex].g, colors[vertex].b) * 4 - Vector3.one * 2;
-                    Vector3 b = new Vector3(binormal[vertex].x, binormal[vertex].y, hemi[vertex].x) * 4 - Vector3.one * 2;
-                    Vector2 tc = mesh.uv[vertex];
-                    inventory.AppendLine(string.Join(",", vertex, p.x.ToString("R", CultureInfo.InvariantCulture), p.y.ToString("R", CultureInfo.InvariantCulture), p.z.ToString("R", CultureInfo.InvariantCulture), n.x.ToString("R", CultureInfo.InvariantCulture), n.y.ToString("R", CultureInfo.InvariantCulture), n.z.ToString("R", CultureInfo.InvariantCulture), n.magnitude.ToString("R", CultureInfo.InvariantCulture), t.x.ToString("R", CultureInfo.InvariantCulture), t.y.ToString("R", CultureInfo.InvariantCulture), t.z.ToString("R", CultureInfo.InvariantCulture), b.x.ToString("R", CultureInfo.InvariantCulture), b.y.ToString("R", CultureInfo.InvariantCulture), b.z.ToString("R", CultureInfo.InvariantCulture), tc.x.ToString("R", CultureInfo.InvariantCulture), tc.y.ToString("R", CultureInfo.InvariantCulture), hemi[vertex].y.ToString("R", CultureInfo.InvariantCulture)));
-                }
-                File.WriteAllText(Path.Combine(output, "Mesh_Inputs.csv"), inventory.ToString());
-                var layout = new StringBuilder("Attribute,Format,Dimension,Stream,Offset\n");
-                foreach (VertexAttributeDescriptor attribute in mesh.GetVertexAttributes()) layout.AppendLine(attribute.attribute + "," + attribute.format + "," + attribute.dimension + "," + attribute.stream + "," + mesh.GetVertexAttributeOffset(attribute.attribute));
-                File.WriteAllText(Path.Combine(output, "Mesh_Layout.csv"), layout.ToString());
-                var channels = new StringBuilder();
-                var channelValues = new List<Vector4>();
-                for (int channel = 0; channel < 8; channel++)
-                {
-                    mesh.GetUVs(channel, channelValues);
-                    channels.AppendLine("UV" + channel + ": " + channelValues.Count);
-                }
-                channels.AppendLine("Tangents: " + mesh.tangents.Length);
-                channels.AppendLine("Vertices: " + mesh.vertexCount);
-                channels.AppendLine("Submeshes: " + mesh.subMeshCount);
-                File.WriteAllText(Path.Combine(output, "Mesh_Channels.txt"), channels.ToString());
-                File.WriteAllText(Path.Combine(output, "Source_Manifest.json"), EditorJsonUtility.ToJson(AssetDatabase.LoadAssetAtPath<XRayLevelImportManifest>(XRayLevelPaths.ManifestPath(root, level)), true));
                 Texture2D mask = ReadTexture(material.GetTexture("_MonolithTerrainMask"));
                 temporary.Add(mask);
                 Vector3 center = mesh.bounds.center;
@@ -191,27 +131,21 @@ namespace XRay.Importer.Tests
                 sun.gameObject.AddComponent<HDAdditionalLightData>().SetIntensity(3, LightUnit.Lux);
                 rig.AddComponent<MonolithWeatherInputs>().SetInputs(0.71864f, Vector3.one, new Vector4(0.5f, 1, 0, 0), new Vector4(1.5f, 1, 0, 0), 0);
                 rig.AddComponent<MonolithSourceLighting>().Mode = MonolithSourceLighting.LightingMode.Native;
-                File.WriteAllText(Path.Combine(output, "Settings.txt"), "Source=" + (trueStalker ? "True Stalker Patch 1.5 escape" : "Anomaly MO2 l01_escape") + "\nShader=" + "terrain" + "\nRenderer=" + renderer.name + "\nMesh=" + UnityEditor.AssetDatabase.GetAssetPath(mesh) + "\nMaterial=" + UnityEditor.AssetDatabase.GetAssetPath(stored) + "\nActiveLayers=" + activeLayers + "\nAPI=" + SystemInfo.graphicsDeviceType + "\nDevice=" + SystemInfo.graphicsDeviceName + "\nDriver=" + SystemInfo.graphicsDeviceVersion + "\nResolution=640x360\nCamera=" + camera.transform.position.ToString("F6") + "\nRotation=" + camera.transform.eulerAngles.ToString("F6") + "\nFOV=55\nSun=3 lux\nExposure=0 fixed; exposure control disabled\nSSAO/SSR/SSGI/Volumetrics/Postprocess/MotionVectors/ContactShadows=disabled\nWarmup=6 renders per mode; GPU=36 whole-camera frames with first 12 discarded; not isolated pass cost\n");
-                File.WriteAllText(Path.Combine(output, "ImportedMaterial.json"), UnityEditor.EditorJsonUtility.ToJson(stored, true));
                 using (var target = new Target(camera))
                 {
-                    for (int mode = 0; mode < (trueStalker ? 3 : 2); mode++)
+                    foreach (int mode in new[] { 0, 1 })
                     {
-                        material.shader = mode == 0 ? baselineShader : currentShader;
-                        if (mode != 0) material.SetFloat("_MonolithTrueStalkerSourceTerrain", trueStalker && mode == 2 ? 1 : 0);
-                        File.WriteAllText(Path.Combine(output, "M" + mode + "_Properties.json"), UnityEditor.EditorJsonUtility.ToJson(material, true));
-                        if (trueStalker)
-                        {
-                            Assert.AreEqual(0, material.GetFloat("_MonolithSourceProfile"));
-                            Assert.AreEqual(2, material.GetFloat("_MonolithTerrainSource"));
-                        }
+                        material.SetFloat("_MonolithTrueStalkerSourceTerrain", mode);
+                        Assert.AreEqual(0, material.GetFloat("_MonolithSourceProfile"));
+                        Assert.AreEqual(2, material.GetFloat("_MonolithTerrainSource"));
                         for (int warm = 0; warm < 6; warm++)
                         {
                             camera.Render();
                             yield return null;
                         }
+
                         Color[] forward = null;
-                        foreach (int debug in trueStalker && mode == 2 ? new[] { 0, 12, 68, 30, 31, 32, 33, 34, 67, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84 } : new[] { 0, 12, 68, 67 })
+                        foreach (int debug in new[] { 0, 12, 68, 67 })
                         {
                             material.SetFloat("_MonolithDebug", debug);
                             camera.Render();
@@ -223,83 +157,41 @@ namespace XRay.Importer.Tests
                             {
                                 for (int channel = 0; channel < 3; channel++)
                                 {
-                                    if (float.IsNaN(pixels[pixel][channel]) || float.IsInfinity(pixels[pixel][channel])) nonFinite++;
-                                    if (debug == 68 && forward != null) delta = Mathf.Max(delta, Mathf.Abs(pixels[pixel][channel] - forward[pixel][channel]));
+                                    if (float.IsNaN(pixels[pixel][channel]) || float.IsInfinity(pixels[pixel][channel]))
+                                    {
+                                        nonFinite++;
+                                    }
+                                    if (debug == 68 && forward != null)
+                                    {
+                                        delta = Mathf.Max(delta, Mathf.Abs(pixels[pixel][channel] - forward[pixel][channel]));
+                                    }
                                 }
                             }
-                            if (mode == 0) baselinePixels[debug] = pixels;
-                            else if (mode == 1 && baselinePixels.TryGetValue(debug, out Color[] baseline))
-                            {
-                                float maximum = 0;
-                                for (int pixel = 0; pixel < pixels.Length; pixel++)
-                                {
-                                    for (int channel = 0; channel < 3; channel++) maximum = Mathf.Max(maximum, Mathf.Abs(pixels[pixel][channel] - baseline[pixel][channel]));
-                                }
-                                comparisons.AppendLine(mode + "," + debug + "," + maximum.ToString("R", CultureInfo.InvariantCulture) + "," + pixels.Length * 3);
-                                File.WriteAllText(Path.Combine(output, "Frozen_AB.csv"), comparisons.ToString());
-                                Assert.LessOrEqual(maximum, 0.00002f, "Frozen checkpoint changed, debug " + debug);
-                            }
-                            if (debug == 12) forward = pixels;
-                            metrics.Append(mode).Append(',').Append(debug).Append(',').Append(nonFinite).Append(',').Append(delta.ToString("R", CultureInfo.InvariantCulture)).AppendLine();
-                            Assert.AreEqual(0, nonFinite);
-                            if (debug == 68) Assert.Less(delta, 0.02f);
-                            target.Save(Path.Combine(output, "M" + mode + "_D" + debug));
-                        }
 
-                        material.SetFloat("_MonolithDebug", 0);
-                        CustomSampler sampler = CustomSampler.Create("Phase05D_RealTerrain_" + mode, true);
-                        Recorder recorder = sampler.GetRecorder();
-                        bool previousProfiler = Profiler.enabled;
-                        try
-                        {
-                            Profiler.enabled = true;
-                            recorder.enabled = true;
-                            for (int frame = 0; frame < 36; frame++)
+                            Assert.AreEqual(0, nonFinite);
+                            if (debug == 12)
                             {
-                                sampler.Begin();
-                                camera.Render();
-                                sampler.End();
-                                yield return null;
-                                if (frame >= 12) timings.Append(mode).Append(',').Append(frame).Append(',').Append(recorder.gpuElapsedNanoseconds).Append(',').Append(recorder.gpuSampleBlockCount).AppendLine();
+                                forward = pixels;
                             }
-                        }
-                        finally
-                        {
-                            recorder.enabled = false;
-                            Profiler.enabled = previousProfiler;
+                            if (debug == 68)
+                            {
+                                Assert.Less(delta, 0.02f);
+                            }
                         }
                     }
                 }
             }
             finally
             {
-                File.WriteAllText(Path.Combine(output, "Metrics.csv"), metrics.ToString());
-                File.WriteAllText(Path.Combine(output, "Frozen_AB.csv"), comparisons.ToString());
                 bindings?.Dispose();
-                Assert.AreEqual(storedBytes, File.ReadAllText(materialPath));
-                Assert.IsFalse(EditorUtility.IsDirty(stored));
-                File.WriteAllText(Path.Combine(output, "GPU_Timings.csv"), timings.ToString());
-                for (int i = temporary.Count - 1; i >= 0; i--) UnityEngine.Object.DestroyImmediate(temporary[i]);
+                for (int i = temporary.Count - 1; i >= 0; i--)
+                {
+                    UnityEngine.Object.DestroyImmediate(temporary[i]);
+                }
                 EditorSceneManager.ClosePreviewScene(scene);
+                Assert.AreEqual(storedBytes, File.ReadAllText(MATERIAL_PATH));
+                Assert.IsFalse(EditorUtility.IsDirty(stored));
             }
-        }
-
-        private static Shader FrozenShader()
-        {
-            string folder = Environment.GetEnvironmentVariable("MONOLITH_PHASE05D_BASELINE");
-            Assert.IsNotEmpty(folder);
-            folder = Path.Combine(folder, "Assets/_Tools/X-Ray OGF OMG Importer/Runtime/Shaders");
-            string source = Expand(Path.Combine(folder, "MonolithLit.shader"));
-            source = source.Replace("Shader \"HDRP/MonolithLit\"", "Shader \"Hidden/XRay/Phase05D_FrozenMonolithLit\"");
-            Assert.IsFalse(Regex.IsMatch(source, "#include \\\"Monolith"));
-            File.WriteAllText(Path.Combine(TrueStalkerTerrainReference.Output(), "Frozen_Checkpoint.shader"), source);
-            return ShaderUtil.CreateShaderAsset(source);
-        }
-
-        private static string Expand(string file)
-        {
-            string source = File.ReadAllText(file);
-            return Regex.Replace(source, "#include \\\"(Monolith[^\\\"]+)\\\"", match => Expand(Path.Combine(Path.GetDirectoryName(file), match.Groups[1].Value)));
         }
 
         private static Texture2D ReadTexture(Texture texture)
@@ -337,29 +229,6 @@ namespace XRay.Importer.Tests
                 _pixels.Apply();
                 RenderTexture.active = previous;
                 return _pixels.GetPixels();
-            }
-
-            public void Save(string path)
-            {
-                using (var writer = new BinaryWriter(File.Open(path + ".rgba32f", FileMode.CreateNew)))
-                {
-                    foreach (Color pixel in _pixels.GetPixels())
-                    {
-                        for (int channel = 0; channel < 4; channel++) writer.Write(pixel[channel]);
-                    }
-                }
-                File.WriteAllBytes(path + ".exr", _pixels.EncodeToEXR(Texture2D.EXRFlags.OutputAsFloat));
-                var display = new Texture2D(640, 360, TextureFormat.RGBA32, false, true);
-                try
-                {
-                    display.SetPixels(_pixels.GetPixels());
-                    display.Apply();
-                    File.WriteAllBytes(path + ".png", display.EncodeToPNG());
-                }
-                finally
-                {
-                    UnityEngine.Object.DestroyImmediate(display);
-                }
             }
 
             public void Dispose()

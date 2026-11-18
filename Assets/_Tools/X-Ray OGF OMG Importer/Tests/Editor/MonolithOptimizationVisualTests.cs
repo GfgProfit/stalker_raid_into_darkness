@@ -23,14 +23,13 @@ namespace XRay.Importer.Tests
         public void EnvironmentAndWetSurfaceImagesPreserveFiniteReferencePixels()
         {
             HdrpTestWarmup.Ensure();
-            string output = Environment.GetEnvironmentVariable("MONOLITH_OPTIMIZATION_OUTPUT");
+            string baselineRoot = Environment.GetEnvironmentVariable("MONOLITH_OPTIMIZATION_OUTPUT");
             string phase = Environment.GetEnvironmentVariable("MONOLITH_OPTIMIZATION_PHASE") ?? "Check";
-            if (!string.IsNullOrEmpty(output))
+            if (!string.IsNullOrEmpty(baselineRoot))
             {
-                output = Path.GetFullPath(output).Replace('\\', '/');
-                Assert.That(output, Does.StartWith(ARCHIVE));
+                baselineRoot = Path.GetFullPath(baselineRoot).Replace('\\', '/');
+                Assert.That(baselineRoot, Does.StartWith(ARCHIVE));
                 Assert.That(phase, Is.EqualTo("A").Or.EqualTo("B"));
-                Directory.CreateDirectory(Path.Combine(output, phase));
             }
             using (var fixture = new Fixture())
             {
@@ -77,18 +76,16 @@ namespace XRay.Importer.Tests
                 fixture.Direct(1.0f, 0.0f);
                 fixture.Lights(false);
                 images.Add("DirectNoLights", fixture.Capture());
-                var metrics = new List<string> { "Name,Width,Height,MinimumRGB,MaximumRGB,MeanRGB,Values,Preview" };
                 foreach (KeyValuePair<string, Color[]> image in images)
                 {
                     AssertFinite(image.Value, image.Key);
-                    if (string.IsNullOrEmpty(output)) continue;
-                    string path = Path.Combine(output, phase, image.Key);
-                    Save(path, image.Value, metrics, image.Key);
                 }
-                if (!string.IsNullOrEmpty(output)) File.WriteAllLines(Path.Combine(output, phase, "ImageMetrics.csv"), metrics);
-                if (!string.IsNullOrEmpty(output) && phase == "B")
+                if (!string.IsNullOrEmpty(baselineRoot) && phase == "B")
                 {
-                    foreach (KeyValuePair<string, Color[]> image in images) AssertEquivalent(Read(Path.Combine(output, "A", image.Key + ".rgba32f")), image.Value, image.Key);
+                    foreach (KeyValuePair<string, Color[]> image in images)
+                    {
+                        AssertEquivalent(Read(Path.Combine(baselineRoot, "A", image.Key + ".rgba32f")), image.Value, image.Key);
+                    }
                 }
                 Assert.That(Difference(images["EnvironmentOne"], images["EnvironmentTwo"]), Is.GreaterThan(0.0001));
                 Assert.That(Difference(images["EnvironmentLegacy"], images["EnvironmentZero"]), Is.GreaterThan(0.0001));
@@ -130,49 +127,6 @@ namespace XRay.Importer.Tests
             double sum = 0.0;
             for (int index = 0; index < left.Length; index++) sum += Math.Abs(left[index].r - right[index].r) + Math.Abs(left[index].g - right[index].g) + Math.Abs(left[index].b - right[index].b);
             return sum / (left.Length * 3);
-        }
-
-        private static void Save(string path, Color[] pixels, List<string> metrics, string name)
-        {
-            float minimum = float.PositiveInfinity;
-            float maximum = float.NegativeInfinity;
-            double sum = 0.0;
-            using (var writer = new BinaryWriter(File.Open(path + ".rgba32f", FileMode.Create)))
-            {
-                writer.Write(SIZE);
-                writer.Write(SIZE);
-                foreach (Color pixel in pixels)
-                {
-                    for (int channel = 0; channel < 4; channel++) writer.Write(pixel[channel]);
-                    minimum = Mathf.Min(minimum, Mathf.Min(pixel.r, Mathf.Min(pixel.g, pixel.b)));
-                    maximum = Mathf.Max(maximum, Mathf.Max(pixel.r, Mathf.Max(pixel.g, pixel.b)));
-                    sum += pixel.r + pixel.g + pixel.b;
-                }
-            }
-            metrics.Add(FormattableString.Invariant($"{name},{SIZE},{SIZE},{minimum:R},{maximum:R},{sum / (pixels.Length * 3):R},Finite,FixedReinhardThenSRGB"));
-            var preview = new Texture2D(SIZE, SIZE, TextureFormat.RGBA32, false, false);
-            try
-            {
-                var display = new Color[pixels.Length];
-                for (int index = 0; index < pixels.Length; index++)
-                {
-                    Color pixel = pixels[index];
-                    display[index] = new Color(Display(pixel.r), Display(pixel.g), Display(pixel.b), 1.0f);
-                }
-                preview.SetPixels(display);
-                preview.Apply(false, false);
-                File.WriteAllBytes(path + ".png", preview.EncodeToPNG());
-            }
-            finally
-            {
-                Object.DestroyImmediate(preview);
-            }
-        }
-
-        private static float Display(float value)
-        {
-            value = Mathf.Max(0.0f, value);
-            return Mathf.LinearToGammaSpace(value / (1.0f + value));
         }
 
         private static Color[] Read(string path)

@@ -30,6 +30,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
 
         private const string MENU = "Tools/Inventory/Setup First Person Weapon (AUG A3)";
         private const string LOG = "[FirstPersonWeapon] ";
+        private const string PLAYER_PREFAB_PATH = "Assets/_Source/FirstPerson/FPS_Player.prefab";
         private const string HUD_SECTION = IwpWeaponSetup.SECTION + "_hud";
         private const string A1_WEAPON_MOTIONS = "meshes/dynamics/weapons/wpn_aug/wpn_aug_hud_animation.omf";
         private const string IWP_CAMERA = "anims/camera_effects/weapon/";
@@ -447,7 +448,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
 
         private static bool ConfigurePrefab(StringBuilder log)
         {
-            GameObject root = PrefabUtility.LoadPrefabContents(StalkerPlayerSetup.PREFAB_PATH);
+            GameObject root = PrefabUtility.LoadPrefabContents(PLAYER_PREFAB_PATH);
 
             try
             {
@@ -487,7 +488,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
                 controllerObject.FindProperty("_shotAudio").objectReferenceValue = shotAudio;
                 controllerObject.ApplyModifiedPropertiesWithoutUndo();
                 ConfigureHud(root.transform, controller);
-                PrefabUtility.SaveAsPrefabAsset(root, StalkerPlayerSetup.PREFAB_PATH);
+                PrefabUtility.SaveAsPrefabAsset(root, PLAYER_PREFAB_PATH);
                 return true;
             }
             finally

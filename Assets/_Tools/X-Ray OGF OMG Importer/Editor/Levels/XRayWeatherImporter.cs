@@ -285,7 +285,7 @@ namespace XRay.Importer.Editor.Levels
             GameConfig config = GameConfig.Load();
             if (config == null) throw new InvalidDataException("The canonical Resources GameConfig.asset is required. Restore the Production configuration asset before importing a level.");
             if (!config.TryValidate(out string diagnostic)) throw new InvalidDataException("GameConfig is invalid: " + diagnostic + " Use the existing Tools/X-Ray/Weather catalog preparation commands to restore missing assets, then assign them in GameConfig.");
-            if (config.CelestialSettings.Shader == null) throw new InvalidDataException("GameConfig celestial settings require the imported celestial shader. Use Tools/X-Ray/Levels/Import Celestial Weather Resources.");
+            if (config.CelestialSettings.Shader == null) throw new InvalidDataException("GameConfig celestial settings require the imported celestial shader. Restore the celestial settings asset referenced by GameConfig.");
             foreach (XRayWeatherProfile profile in config.OrdinaryWeatherCatalog.Profiles)
             {
                 if (!HasSerializedResources(profile)) throw new InvalidDataException("GameConfig ordinary weather requires complete serialized sky and environment resources. Restore the prepared Ordinary Weather Catalog.");

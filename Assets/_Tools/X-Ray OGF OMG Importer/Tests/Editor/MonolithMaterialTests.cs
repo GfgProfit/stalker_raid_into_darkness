@@ -87,13 +87,40 @@ namespace XRay.Importer.Tests
         [Test]
         public void AugTestPreservesAtlasAndMaterialAssignments()
         {
-            Assert.That(MonolithAugA3TestSetup.Validate(), Does.Contain("shaderErrors=0"));
-            var production = AssetDatabase.LoadAssetAtPath<Material>("Assets/_Source/Items/Weapons/Models/Materials/aug_a3.mat");
-            Assert.That(production.shader.name, Is.EqualTo(MonolithMaterialConfigurator.SHADER_NAME));
-            var monolith = AssetDatabase.LoadAssetAtPath<Material>(MonolithAugA3TestSetup.MATERIAL_PATH);
-            Assert.That(((Texture2D)monolith.GetTexture("_MonolithBump")).isDataSRGB, Is.False);
+            const string FIXTURE_FOLDER = "Assets/_Source/Items/Weapons/Tests/MonolithHDRP";
+            const string MODEL_PATH = "Assets/_Source/Items/Weapons/Models/wpn_aug_a3.ogf";
+            const string ALBEDO_PATH = "Assets/_Source/Items/Weapons/Models/Textures/aug_a3.png";
+            Shader shader = Shader.Find(MonolithMaterialConfigurator.SHADER_NAME);
+            Assert.That(shader, Is.Not.Null);
+            foreach (var message in ShaderUtil.GetShaderMessages(shader))
+            {
+                Assert.That(message.severity, Is.Not.EqualTo(UnityEditor.Rendering.ShaderCompilerMessageSeverity.Error), message.message);
+            }
+
+            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(FIXTURE_FOLDER + "/AUG_A3_Monolith_Test.prefab");
+            var monolith = AssetDatabase.LoadAssetAtPath<Material>(FIXTURE_FOLDER + "/AUG_A3_Monolith_Test.mat");
+            var albedo = AssetDatabase.LoadAssetAtPath<Texture2D>(ALBEDO_PATH);
+            Assert.That(prefab, Is.Not.Null);
+            Assert.That(monolith, Is.Not.Null);
+            Assert.That(albedo, Is.Not.Null);
+            Assert.That(monolith.shader, Is.EqualTo(shader));
+            Assert.That(monolith.GetTexture("_BaseColorMap"), Is.EqualTo(albedo));
+            var bump = monolith.GetTexture("_MonolithBump") as Texture2D;
+            Assert.That(bump, Is.Not.Null);
+            Assert.That(bump.isDataSRGB, Is.False);
             Assert.That(monolith.GetFloat("_MonolithBumpFlipV"), Is.EqualTo(1.0f));
-            var importer = AssetImporter.GetAtPath(MonolithAugA3TestSetup.MODEL_PATH);
+
+            foreach (Renderer renderer in prefab.GetComponentsInChildren<Renderer>(true))
+            {
+                if (renderer.enabled)
+                {
+                    Assert.That(renderer.sharedMaterials, Is.All.EqualTo(monolith), renderer.name);
+                }
+            }
+
+            var production = AssetDatabase.LoadAssetAtPath<Material>("Assets/_Source/Items/Weapons/Models/Materials/aug_a3.mat");
+            Assert.That(production.shader, Is.EqualTo(shader));
+            var importer = AssetImporter.GetAtPath(MODEL_PATH);
             Assert.That(importer.GetExternalObjectMap().Values, Does.Contain(production));
         }
 

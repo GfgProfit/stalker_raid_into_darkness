@@ -268,6 +268,10 @@ namespace RaidIntoDarkness.Effects
             ParticleSystem child = Instantiate(template, _poolRoot);
             child.name = template.name + " Instance";
             child.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+            if (Application.isPlaying)
+            {
+                XRay.Importer.Levels.PunctualShadowDistance.RegisterHierarchy(child);
+            }
             return child;
         }
 

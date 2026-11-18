@@ -543,6 +543,7 @@ namespace XRay.Importer.Editor.Levels
 
 #if XRAY_HDRP
                 go.AddComponent<HDAdditionalLightData>();
+                go.AddComponent<PunctualShadowDistance>();
 #endif
                 created++;
             }

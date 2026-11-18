@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace XRay.Importer.Levels
@@ -18,6 +19,8 @@ namespace XRay.Importer.Levels
         [SerializeField] private PrecipitationConfig _precipitation;
         [SerializeField] private bool _instanceSubmissionGroupingEnabled;
         [SerializeField] private bool _instanceNativeSubmissionEnabled;
+        [SerializeField] private bool _punctualShadowDistanceEnabled = true;
+        [SerializeField, Min(0.01f)] private float _punctualShadowDistance = 75.0f;
         [SerializeField] private bool _fogEnabled = true;
         [SerializeField] private bool _sunShaftsEnabled = true;
         [SerializeField] private bool _lensFlareEnabled = true;
@@ -39,6 +42,8 @@ namespace XRay.Importer.Levels
         public PrecipitationConfig Precipitation => _precipitation;
         public bool InstanceSubmissionGroupingEnabled => _instanceSubmissionGroupingEnabled;
         public bool InstanceNativeSubmissionEnabled => _instanceNativeSubmissionEnabled;
+        public bool PunctualShadowDistanceEnabled => _punctualShadowDistanceEnabled;
+        public float PunctualShadowDistance => _punctualShadowDistance;
         public bool FogEnabled => _fogEnabled;
         public bool SunShaftsEnabled => _sunShaftsEnabled;
         public bool LensFlareEnabled => _lensFlareEnabled;
@@ -51,6 +56,8 @@ namespace XRay.Importer.Levels
         public AnomalyBalanceConfig AnomalyBalance => _anomalyBalance;
         public WeaponCrosshairSettings WeaponCrosshair => _weaponCrosshair;
         public int Revision { get; private set; }
+
+        public event Action Changed;
 
         public static GameConfig Load()
         {
@@ -69,6 +76,7 @@ namespace XRay.Importer.Levels
             else if (_weatherFxCatalog.OrdinaryCatalog != _ordinaryWeatherCatalog) diagnostic = "GameConfig WeatherFX and ordinary weather catalogs must reference the same ordinary catalog.";
             else if (_celestialSettings == null || _celestialSettings.Shader == null) diagnostic = "GameConfig requires celestial settings with a shader.";
             else if (_precipitation != null && !_precipitation.TryValidate(out string precipitationDiagnostic)) diagnostic = precipitationDiagnostic;
+            else if (!float.IsFinite(_punctualShadowDistance) || _punctualShadowDistance <= 0.0f) diagnostic = "GameConfig PunctualShadowDistance must be finite and positive.";
             else if (!float.IsFinite(_lensFlareIntensity) || _lensFlareIntensity < 0.0f) diagnostic = "GameConfig LensFlareIntensity must be finite and non-negative.";
             else if (!float.IsFinite(_expressiveFlareIntensity) || _expressiveFlareIntensity < 0.0f) diagnostic = "GameConfig ExpressiveFlareIntensity must be finite and non-negative.";
             else if (!float.IsFinite(_fxLightingAdaptation) || _fxLightingAdaptation < 0.0f || _fxLightingAdaptation > MAX_FX_LIGHTING_ADAPTATION) diagnostic = "GameConfig FxLightingAdaptation must be within its supported range.";
@@ -80,6 +88,7 @@ namespace XRay.Importer.Levels
         private void OnValidate()
         {
             Revision++;
+            Changed?.Invoke();
         }
     }
 }

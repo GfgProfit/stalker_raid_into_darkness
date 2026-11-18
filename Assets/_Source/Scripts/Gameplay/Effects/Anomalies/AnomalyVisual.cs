@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using XRay.Importer.Levels;
 
 namespace RaidIntoDarkness.Effects
 {
@@ -227,6 +228,10 @@ namespace RaidIntoDarkness.Effects
 
         protected virtual void OnEnable()
         {
+            if (Application.isPlaying)
+            {
+                PunctualShadowDistance.RegisterHierarchy(this);
+            }
             ShowIdle();
         }
 

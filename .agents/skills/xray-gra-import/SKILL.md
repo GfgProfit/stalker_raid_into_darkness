@@ -47,7 +47,7 @@ description: Use when GRA/Anomaly assets must be brought into the Unity project 
    - кость `lead_gun` есть, если к ней крепится предмет.
    Считай ошибки и возвращай `failures == 0`.
 7. Данные — в ScriptableObject (библиотека или каталог), связи — через `PrefabUtility.LoadPrefabContents` + `SerializedObject`, сохранение `SaveAsPrefabAsset`.
-8. Запуск — только через скилл `unity-batch-mirror` (зеркало, `meta_check`, `copy_back`). Результат проверь тестом и при необходимости кадрами.
+8. Запускай через Unity Open MCP в открытом Production Editor. Для batch-режима следуй `unity-batch-mirror`. Результат проверь тестом и при необходимости кадрами.
 
 ## Форматы
 

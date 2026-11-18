@@ -9,7 +9,7 @@ Maximally optimized code implements the required behavior with controlled CPU, G
 
 ## Project baseline
 
-Production uses Unity 6000.6.7f1 and HDRP 17.6.0. Inspect the installed implementation and nearby code before choosing APIs. Generic Unity 6.3 guidance is supporting material, not proof about this version. Follow AGENTS.md for canonical paths, scene safety, GameConfig ownership, tests and Archive cleanup. Do not synchronize or use Clean Tests unless the current task authorizes it.
+Production uses Unity 6000.6.7f1 and HDRP 17.6.0. Inspect the installed implementation and nearby code before choosing APIs. Generic Unity 6.3 guidance is supporting material, not proof about this version. Follow AGENTS.md for canonical paths, scene safety, GameConfig ownership, tests and Archive cleanup. Require explicit authorization for isolated testing and synchronization.
 
 ## Reduce work first
 

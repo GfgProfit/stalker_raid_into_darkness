@@ -24,8 +24,6 @@ The project contains gameplay systems, inventory, equipment, UI, item configs, r
 
 Work narrowly.
 
-Clean Tests remains on Unity 6000.3.4f1 / HDRP 17.3.0. It is an unsynchronized snapshot; do not upgrade or mass-sync it without explicit authorization.
-
 ## Instruction Priority
 
 Follow instructions in this priority order:
@@ -58,7 +56,7 @@ REQUIRED:
 
 ## Misc
 
-All reports, validation results, diagnostic EXR/PNG/CSV files, logs, temporary Player Builds, benchmarks, and other generated artifacts must be stored **exclusively outside both Unity projects**:
+All reports, validation results, diagnostic EXR/PNG/CSV files, logs, temporary Player Builds, benchmarks, and other generated artifacts must be stored **exclusively outside the Unity project**:
 
 `E:\Projects\stalker_raid_into_darkness_Archive`
 
@@ -141,55 +139,37 @@ Always use these exact locations:
 Production:
 E:\Projects\stalker_raid_into_darkness
 
-Clean Tests:
-E:\Projects\stalker_raid_into_darkness_clean_tests
 
 Archive:
 E:\Projects\stalker_raid_into_darkness_Archive
 ```
 
-Production is the authoritative source of production code and assets. Clean Tests is an isolated snapshot, not an automatically synchronized mirror or a source of authoritative production changes.
-
-If a required directory is missing, incomplete, or not a valid Unity project, report which operation cannot proceed and continue independent work. Never silently create an alternative Unity project. The user creates the canonical clean test copy.
-
-`CleanProject`, `TestMirror`, `UnityTestProject`, and temporary project paths are legacy aliases, not additional destinations. Report existing legacy projects and recommend their disposition; do not automatically use, delete, migrate, or synchronize them. This policy takes precedence over legacy mirror instructions, scripts, and remembered temporary paths, including `unity-batch-mirror`. Do not run legacy full-sync or copy-back workflows without explicit authorization for the exact operation.
+Production is the authoritative source of code and assets. Use Unity Open MCP in the active Production Editor for routine validation. An isolated test project requires explicit authorization and a user-specified location.
 
 ### B. Directory Roles
 
 - Production code, required Runtime/Editor systems, X-Ray importers, Monolith shaders, required scenes/assets/configuration, and essential automated regression tests belong in Production.
-- Isolated shader/rendering experiments, temporary fixtures, risky import/reimport and GUID experiments, destructive tests, and Editor lifecycle investigations belong in Clean Tests when isolation is needed.
 - Reports, validation results, PNG/EXR captures, CSV measurements, logs, temporary Player Builds, benchmark outputs, GPU/CPU readbacks, diagnostic JSON, temporary exports, and historical investigations belong in Archive when they are not required Unity assets.
-
-Keep these roles separate. Clean Tests is not a permanent artifact archive.
 
 ### C. Production Safety
 
-Never modify production scenes, materials, imported levels, ProjectSettings, or other important assets merely to run an experimental test. Use the dedicated clean test project for potentially unsafe changes.
+Never modify production scenes, materials, imported levels, ProjectSettings, or other important assets merely to run an experimental test. Run potentially unsafe experiments only in an explicitly authorized isolated project.
 
 Do not unexpectedly change the active Unity project. Verify its absolute path before using Unity tools. Respect existing dirty-scene protections and user instructions before opening or replacing scenes, saving changes, or discarding unsaved state.
 
-### D. Clean Test Project Lifecycle
+### D. Isolated Testing
 
-Before using Clean Tests:
-
-1. Confirm the directory exists and contains a valid Unity project.
-2. Read `ProjectSettings/ProjectVersion.txt` and verify Unity/HDRP compatibility with the intended test.
-3. Confirm that isolation is necessary and identify the exact files, assets, and systems being tested.
-4. Compare the relevant production code, assets, `.meta` files, and configuration with the snapshot; record differences and the production revision under test.
-
-Do not assume synchronization or copy completion. Production changes made after the snapshot may be absent. A clean test result validates current production only when the relevant implementations and assets match.
+Verify the isolated project path, Unity/HDRP versions, and relevant files against the Production revision before running tests. Document differences that affect the result.
 
 ### E. Synchronization
 
-Never automatically copy the entire Production project over Clean Tests or the entire Clean Tests project into Production. Never overwrite a project directory without explicit user authorization.
-
-When synchronization is required, identify and compare the exact source and destination files, preserve required `.meta` files and GUIDs, and protect unrelated experimental changes. Do not unnecessarily synchronize `Library`, `Temp`, `Obj`, or other regenerated Unity caches. Record the production revision and relevant file/content differences used for testing.
+Require explicit authorization for synchronization. Compare the exact files, preserve GUIDs and unrelated changes, and exclude regenerable caches. Do not create or synchronize a mirror automatically.
 
 ### F. Test Results and Archive
 
 Configure diagnostic output paths under Archive before running tools. Use a task-specific subdirectory and unique run directories or filenames; never overwrite retained results. Categories such as `CleanupAudits`, `ShaderValidation`, `RendererLifecycle`, `MO2ImporterValidation`, and `PerformanceBenchmarks` are illustrative, not alternate project roots.
 
-Do not store permanent reports or large diagnostic artifacts in `Assets`, either Unity project's root, or the clean test project. Preserve required Unity fixtures and their `.meta` files inside the appropriate project. Keep unrelated historical reports unchanged.
+Do not store permanent reports or large diagnostic artifacts in `Assets`, the Production project root, or an isolated test project. Preserve required Unity fixtures and their `.meta` files inside the appropriate project. Keep unrelated historical reports unchanged.
 
 #### Artifact Lifetime and Automatic Cleanup
 
@@ -200,39 +180,38 @@ Archive is a working output location. Keeping every generated run indefinitely i
 - Automatically delete superseded and completed temporary Player builds, abandoned outputs from failed runs, disposable caches, duplicate delivery packages, temporary exports, and intermediate captures created by the current task once they are no longer needed. Stop only task-owned processes before removing their files. Preserve reports, manifests, metrics, screenshots, and source or material backups stored inside build directories before deleting runtime binaries. Do not delete a task directory merely because it contains a build.
 - Preserve builds and other deliverables explicitly requested by the user until delivery and while they remain required. Preserve original inputs, unique source and asset backups, rollback copies, required regression fixtures, `.meta` files and GUID references, final reports, and evidence still needed for investigation. If ownership, reproducibility, or remaining use is uncertain, retain the affected files and state the reason in the final response.
 - When revisiting an Archive task directory, also remove older generated bulk that is confirmed redundant or reproducible. Record proof that the original inputs still exist and regeneration is supported, or verify an exact retained duplicate before deleting it. A directory name, file extension, age, or a successful newer run alone is insufficient evidence. Do not run a full Archive scan for every small task.
-- This standing authorization applies only to disposable generated artifacts inside `E:\Projects\stalker_raid_into_darkness_Archive`. Resolve and verify every deletion target stays inside that root, reject reparse points and junction traversal, and exclude files used by other active tasks. It does not authorize cleanup of Production, Clean Tests, legacy projects, Git data, or unique backups. Use file selections or verified artifact directories; never construct broad recursive deletions from unchecked paths.
+- This standing authorization applies only to disposable generated artifacts inside `E:\Projects\stalker_raid_into_darkness_Archive`. Resolve and verify every deletion target stays inside that root, reject reparse points and junction traversal, and exclude files used by other active tasks. It does not authorize cleanup of Production, isolated projects, legacy projects, Git data, or unique backups. Use file selections or verified artifact directories; never construct broad recursive deletions from unchecked paths.
 - Before completing the task, measure retained output size and free disk space, remove only empty directories left by the current cleanup, and save a compact cleanup record with paths, reasons, deleted bytes, and any failures in the task's Archive directory. Report retained artifacts and actual reclaimed space within the existing final response sections. Retain only the reports and helpers needed to understand or reproduce the final result.
 
 ### G. Production Regression Tests
 
-Keep essential automated regression tests in Production unless an audit proves relocation safe and the user explicitly approves it. The existence of Clean Tests does not justify removing required tests.
+Keep essential automated regression tests in Production unless an audit proves relocation safe and the user explicitly approves it.
 
 This includes X-Ray format parsing, importer correctness, material generation, Original TBN, Hemisphere, Flora, MT_LOD, Decals, renderer lifecycle, MO2 resolution, and GUID preservation. Specialized one-time diagnostic tools may be proposed for relocation only with dependency evidence and explicit approval; move complete assembly/asset dependency groups, never isolated pieces that break compilation.
 
 ### H. Final Reporting
 
-Within the existing final response sections, state which Unity project was modified, which project was used for testing, and which tests ran. State whether the relevant Clean Tests code/assets match the tested production revision, or that comparison/testing was not performed.
+Within the existing final response sections, state which Unity project was modified, which project was used for testing, and which tests ran. If an isolated project was used, state whether its relevant files matched the tested Production revision.
 
-Report the absolute Windows paths of reports and diagnostic results. State whether any task changes remain only in Clean Tests. Do not claim that an untested or materially different snapshot validates Production.
+Report the absolute Windows paths of reports and diagnostic results. State which changes, if any, exist only in the isolated project.
 
 ### I. Git Safety
 
-Before Git commands that inspect or modify repository state, verify the intended repository root. Prefer an explicit working directory or `git -C`. Do not confuse a copied Clean Tests repository with the production repository; a copied directory without Git metadata has no independently verified commit identity.
+Before Git commands that inspect or modify repository state, verify the intended repository root. Prefer an explicit working directory or `git -C`. Do not confuse a copied test repository with the production repository; a copied directory without Git metadata has no independently verified commit identity.
 
 Do not perform Git cleanup without explicit permission. Do not automatically stage, unstage, commit, reset, restore, delete untracked repository files, or rewrite history. During a read-only repository audit, modify only the instruction files explicitly authorized by that task; do not start repository cleanup until the user reviews and approves the audit. Automatic cleanup of disposable Archive artifacts under Section F is authorized separately and must not use Git cleanup commands.
 
 ### J. Production Integration
 
-When an experimental change succeeds in Clean Tests, identify the minimal production change and confirm reproducibility. Obtain approval when required by the task, apply only the necessary implementation to Production, preserve GUIDs and serialized references, run the relevant production regression tests, and document the production result.
+When an experimental change succeeds in an isolated project, identify the minimal production change and confirm reproducibility. Obtain approval when required by the task, apply only the necessary implementation to Production, preserve GUIDs and serialized references, run the relevant production regression tests, and document the production result.
 
-Never silently merge experimental changes into Production or present a change that exists only in Clean Tests as a completed production implementation.
+Never silently merge experimental changes into Production or present a change that exists only in an isolated project as a completed production implementation.
 
 ## Unity MCP Workflow
 
 - Use Unity Open MCP for Unity Editor inspection and validation.
 - Verify the active Unity project before modifying assets.
 - Use the main project for normal development and validation.
-- Use `E:\Projects\stalker_raid_into_darkness_clean_tests` only for risky or experimental changes, following Project Directories and Testing Policy.
 - Prefer read-only MCP operations during investigation.
 - Do not modify scenes, prefabs, materials, shaders, or project settings unless required by the task.
 - Never execute destructive MCP operations without explicit authorization.

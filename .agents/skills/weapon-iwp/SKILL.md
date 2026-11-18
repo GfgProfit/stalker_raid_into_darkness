@@ -86,7 +86,7 @@ description: Use for any weapon work in this project - weapons, attachments/modu
 - `UseOutline = false`;
 - камера сбоку `(0, -90, 0)`, дуло вправо.
 
-Пользователь может поправить иконку конкретного предмета вручную. При переносе из зеркала такие правки не затирай: переноси в проектный файл только нужные поля.
+Пользователь может поправить иконку конкретного предмета вручную. При обновлении проектного файла меняй только нужные поля и сохраняй ручные правки.
 
 ## Размер в сетке
 
@@ -162,7 +162,7 @@ description: Use for any weapon work in this project - weapons, attachments/modu
   - с источником `XRaySourceMode.CustomFolder` = корень IWP и `PreserveExistingMaterials = false`;
   - повторяй до `Completed`, потому что текстуры импортируются отложенно.
 - Ограничение импортёра: bump в BC7 (`DX10 DXGI 98`) не декодируется, материал остаётся без карты нормалей. Так у AUG A3 (`aug_a3_bump.dds`). Импортёр без запроса пользователя не правь — сообщи об этом.
-- Batch-сетапы и тесты запускай только через `unity-batch-mirror`.
+- Сетапы и тесты запускай через Unity Open MCP. Для batch-режима следуй `unity-batch-mirror`.
 - Данные стволов и модулей храни в `ItemDefinition` и его компонентах, как у снаряжения. Правила оружия не клади в UI.
 - Совместимость модулей бери из секций GRA, а не из имён файлов.
 - Папки создавай рядом с существующими предметами: `Assets/_Source/Items/Weapons`, `Assets/_Source/Items/Addons`, `Assets/_Source/Items/Definitions/{Weapons,Addons}`.

@@ -67,5 +67,36 @@ namespace XRay.Importer.Levels
             bounds.Expand(new Vector3(horizontal * 2.0f, vertical * 2.0f, horizontal * 2.0f));
             return bounds;
         }
+
+        internal readonly struct SnapshotKey
+        {
+            private readonly bool _present;
+            private readonly bool _initialized;
+            private readonly XRayFloraWindProfile _profile;
+            private readonly float _treesSetupZ;
+            private readonly float _treesSetupW;
+            private readonly float _velocity;
+            private readonly Vector3 _treeWind;
+            private readonly Vector3 _treeWindPrev;
+
+            public SnapshotKey(XRayFloraWindState state)
+            {
+                _present = state != null;
+                _initialized = state != null && state.Initialized;
+                _profile = state != null ? state.Profile : default;
+                bool ssfx = _profile == XRayFloraWindProfile.AnomalySsfx;
+                bool tree = _profile == XRayFloraWindProfile.TrueStalkerXRay;
+                _treesSetupZ = ssfx ? state.TreesSetup.z : default;
+                _treesSetupW = ssfx ? state.TreesSetup.w : default;
+                _velocity = ssfx ? state.Weather.Velocity : default;
+                _treeWind = tree ? new Vector3(state.TreeWind.x, state.TreeWind.y, state.TreeWind.z) : default;
+                _treeWindPrev = tree ? new Vector3(state.TreeWindPrev.x, state.TreeWindPrev.y, state.TreeWindPrev.z) : default;
+            }
+
+            public bool Equals(SnapshotKey other)
+            {
+                return _present == other._present && _initialized == other._initialized && _profile == other._profile && _treesSetupZ.Equals(other._treesSetupZ) && _treesSetupW.Equals(other._treesSetupW) && _velocity.Equals(other._velocity) && _treeWind.Equals(other._treeWind) && _treeWindPrev.Equals(other._treeWindPrev);
+            }
+        }
     }
 }

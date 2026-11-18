@@ -27,6 +27,8 @@ namespace XRay.Importer.Levels
         private readonly Dictionary<Material, bool> _materialSupport = new Dictionary<Material, bool>(new ReferenceComparer<Material>());
         private readonly Dictionary<Material, bool> _windMaterials = new Dictionary<Material, bool>(new ReferenceComparer<Material>());
         private readonly Dictionary<Material, Material> _resolvedMaterials = new Dictionary<Material, Material>(new ReferenceComparer<Material>());
+        private readonly List<XRayInstanceNativeRenderer> _retiredNativeRenderers = new List<XRayInstanceNativeRenderer>();
+        private readonly XRayInstanceNativeContext _nativeContext = new XRayInstanceNativeContext();
         private MaterialPropertyBlock _submissionBlock;
         private XRayLevelLodRenderer _lodRenderer;
         private int _propertyId;
@@ -40,14 +42,25 @@ namespace XRay.Importer.Levels
         private Bounds[] _sourceBounds;
         private byte[] _sourceVisibility;
         private Func<Material, Material> _materialResolver;
+        private Func<Material, Material> _nativePreparedResolver;
         private bool _orderIndependentResolver;
         private GameConfig _configuration;
+        private XRayInstanceNativeRenderer _nativeRenderer;
+        private bool? _nativeSubmissionOverride;
+        private Camera _nativeContextCamera;
+        private bool _nativeContextActive;
+        private bool _nativeContextAllowed;
+        private bool _nativeContextChecked;
+        private bool _nativePreparedCastShadows;
+        private int _nativePreparedLayer;
+        private string _nativeSubmissionFallbackReason;
 
         public XRayInstanceBatchSet BatchSet
         {
             get => _batchSet;
             set
             {
+                ReleaseNativeRenderer();
                 _batchSet = value;
                 _properties.Clear();
                 _lodScratch.Clear();
@@ -75,6 +88,33 @@ namespace XRay.Importer.Levels
             }
         }
         public GameConfig Configuration => _configuration;
+        public bool? NativeSubmissionOverride
+        {
+            get => _nativeSubmissionOverride;
+            set
+            {
+                _nativeSubmissionOverride = value;
+                if (value == false && !_nativeContextActive) _nativeRenderer?.Disable();
+            }
+        }
+        public bool NativeSubmissionActive => _nativeRenderer != null && _nativeRenderer.Active;
+        public long NativeSubmissionMemoryBytes => _nativeRenderer != null ? _nativeRenderer.MemoryBytes : 0L;
+        public int NativeCameraCommands => _nativeRenderer != null ? _nativeRenderer.LastCameraCommands : 0;
+        public int NativeCameraInstances => _nativeRenderer != null ? _nativeRenderer.LastCameraInstances : 0;
+        public int NativeCameraBatches => _nativeRenderer != null ? _nativeRenderer.LastCameraBatches : 0;
+        public int NativeShadowCommands => _nativeRenderer != null ? _nativeRenderer.LastShadowCommands : 0;
+        public int NativeShadowInstances => _nativeRenderer != null ? _nativeRenderer.LastShadowInstances : 0;
+        public int NativeReflectionCommands => _nativeRenderer != null ? _nativeRenderer.ReflectionCommands : 0;
+        public int NativeReflectionInstances => _nativeRenderer != null ? _nativeRenderer.ReflectionInstances : 0;
+        public int NativeReflectionBatches => _nativeRenderer != null ? _nativeRenderer.ReflectionBatches : 0;
+        public int NativeReflectionViews => _nativeRenderer != null ? _nativeRenderer.ReflectionViews : 0;
+        public int NativeRegisteredReflectionViews => _nativeRenderer != null ? _nativeRenderer.RegisteredReflectionViews : 0;
+        public int NativeCulledBatches => _nativeRenderer != null ? _nativeRenderer.LastCulledBatches : 0;
+        public int NativeCulledInstances => _nativeRenderer != null ? _nativeRenderer.LastCulledInstances : 0;
+        public int NativeShadowViews => _nativeRenderer != null ? _nativeRenderer.ShadowViews : 0;
+        public int NativeCullingInvocations => _nativeRenderer != null ? _nativeRenderer.CullingInvocations : 0;
+        public long NativeCullingOutputBytes => _nativeRenderer != null ? _nativeRenderer.LastCullingOutputBytes : 0L;
+        public string NativeSubmissionFallbackReason => _nativeRenderer != null && _nativeRenderer.FallbackReason != null ? _nativeRenderer.FallbackReason : _nativeSubmissionFallbackReason;
         public int LastVisibleBatches { get; private set; }
         public int LastVisibleInstances { get; private set; }
         public int LastShadowOnlyBatches { get; private set; }
@@ -97,6 +137,9 @@ namespace XRay.Importer.Levels
             _properties.Clear();
             _histories.Clear();
             RenderPipelineManager.beginCameraRendering += OnBeginCameraRendering;
+            RenderPipelineManager.beginContextRendering += OnBeginContextRendering;
+            RenderPipelineManager.endContextRendering -= OnEndContextRendering;
+            RenderPipelineManager.endContextRendering += OnEndContextRendering;
             _groupOwner = null;
             ReleaseCallbackCaches();
         }
@@ -104,6 +147,9 @@ namespace XRay.Importer.Levels
         private void OnDisable()
         {
             RenderPipelineManager.beginCameraRendering -= OnBeginCameraRendering;
+            RenderPipelineManager.beginContextRendering -= OnBeginContextRendering;
+            ReleaseNativeRenderer();
+            if (!_nativeContextActive) RenderPipelineManager.endContextRendering -= OnEndContextRendering;
             _properties.Clear();
             _lodScratch.Clear();
             _histories.Clear();
@@ -128,13 +174,23 @@ namespace XRay.Importer.Levels
             _resolvedMaterials.Clear();
             if (camera.cameraType == CameraType.Reflection)
             {
+                foreach (XRayInstanceNativeRenderer retired in _retiredNativeRenderers) retired.UnregisterReflection(camera);
+                bool nativeEnabled = _nativeSubmissionOverride ?? (_configuration != null && _configuration.InstanceNativeSubmissionEnabled);
+                if (nativeEnabled && _nativeContextActive && _nativeContextAllowed && _nativeRenderer != null && _nativeRenderer.Active && (MaterialResolver == null || _orderIndependentResolver) && ReferenceEquals(MaterialResolver, _nativePreparedResolver) && _castShadows == _nativePreparedCastShadows && gameObject.layer == _nativePreparedLayer && _maxDistance <= 0f && _nativeRenderer.TryRegisterReflection(camera)) return;
+                _nativeRenderer?.UnregisterReflection(camera);
                 RenderReflection(camera);
                 return;
             }
+            XRayFloraWindState wind = XRayFloraWindBounds.ActiveState();
+            bool historyPrepared;
+            bool native = TryNativeSubmission(camera, wind, out historyPrepared);
             EnsureProperties();
-            GeometryUtility.CalculateFrustumPlanes(camera, _planes);
-            ExperimentalShadowInfluence?.Prepare(camera);
-            Vector3 eye = camera.transform.position;
+            if (!native)
+            {
+                GeometryUtility.CalculateFrustumPlanes(camera, _planes);
+                ExperimentalShadowInfluence?.Prepare(camera);
+            }
+            Vector3 eye = native ? Vector3.zero : camera.transform.position;
             float maxDistanceSqr = _maxDistance > 0.0f ? _maxDistance * _maxDistance : float.MaxValue;
             int visibleBatches = 0;
             int visibleInstances = 0;
@@ -142,7 +198,7 @@ namespace XRay.Importer.Levels
             int rejectedShadowBatches = 0;
             int lodShadowOnly = 0;
             int lodDiscarded = 0;
-            XRayLevelLodSet lods = _lodImpostors ? _batchSet.Lods : null;
+            XRayLevelLodSet lods = !native && _lodImpostors ? _batchSet.Lods : null;
             byte[] states = null;
             if (lods != null && lods.Count > 0)
             {
@@ -157,11 +213,10 @@ namespace XRay.Importer.Levels
             }
 
             IReadOnlyList<XRayInstanceBatch> batches = _batchSet.Batches;
-            XRayFloraWindState wind = XRayFloraWindBounds.ActiveState();
             LastSubmittedCalls = 0;
             LastSubmittedInstances = 0;
-            bool grouped = PrepareGroups(camera, states);
-            for (int i = 0; i < batches.Count; i++)
+            bool grouped = !native && PrepareGroups(camera, states);
+            for (int i = 0; !native && i < batches.Count; i++)
             {
                 if (grouped && _groupByBatch[i] >= 0 && _groups[_groupByBatch[i]].Active)
                 {
@@ -169,7 +224,9 @@ namespace XRay.Importer.Levels
                     if (group.LeaderIndex != i || RenderGroup(camera, group, wind, ref visibleBatches, ref visibleInstances, ref shadowOnlyBatches)) continue;
                 }
                 XRayInstanceBatch batch = batches[i];
-                InstanceHistory history = History(i, batch);
+                bool castShadows = _castShadows && batch.CastShadows;
+                if (native && !castShadows) continue;
+                InstanceHistory history = historyPrepared ? _histories[i] : History(i, batch);
                 if (MeshSubmeshes(batch.Mesh) < 0 || batch.Count == 0)
                 {
                     continue;
@@ -183,13 +240,12 @@ namespace XRay.Importer.Levels
                     bounds = UsesWind(batch.Materials, wind) ? XRayFloraWindBounds.Expand(batch.Bounds, wind) : batch.Bounds;
                     visible = false;
                 }
-                if (bounds.SqrDistance(eye) > maxDistanceSqr)
+                if (!native && bounds.SqrDistance(eye) > maxDistanceSqr)
                 {
                     continue;
                 }
-                if (!grouped) visible = GeometryUtility.TestPlanesAABB(_planes, bounds);
+                if (!native && !grouped) visible = GeometryUtility.TestPlanesAABB(_planes, bounds);
 
-                bool castShadows = _castShadows && batch.CastShadows;
                 if (!visible && !castShadows)
                 {
                     continue;
@@ -216,7 +272,7 @@ namespace XRay.Importer.Levels
                     continue;
                 }
 
-                Submit(camera, batch, bounds, wind, _properties[i], history.Instances, batch.Data, batch.Count, castShadows ? visible ? ShadowCastingMode.On : ShadowCastingMode.ShadowsOnly : ShadowCastingMode.Off, history.Moving);
+                Submit(camera, batch, bounds, wind, _properties[i], history.Instances, batch.Data, batch.Count, castShadows ? visible ? ShadowCastingMode.On : ShadowCastingMode.ShadowsOnly : ShadowCastingMode.Off, history.Moving, null, native);
             }
 
             if (states != null)
@@ -350,14 +406,19 @@ namespace XRay.Importer.Levels
             return true;
         }
 
-        private void Submit(Camera camera, XRayInstanceBatch batch, Bounds bounds, XRayFloraWindState wind, MaterialPropertyBlock block, InstanceData[] matrices, Vector4[] data, int count, ShadowCastingMode mode, bool moving, Material[] resolvedMaterials = null)
+        private void Submit(Camera camera, XRayInstanceBatch batch, Bounds bounds, XRayFloraWindState wind, MaterialPropertyBlock block, InstanceData[] matrices, Vector4[] data, int count, ShadowCastingMode mode, bool moving, Material[] resolvedMaterials = null, bool preparedNativeMaterials = false)
         {
             int submeshes = Mathf.Min(MeshSubmeshes(batch.Mesh), batch.Materials.Length);
             for (int submesh = 0; submesh < submeshes; submesh++)
             {
                 Material source = batch.Materials[submesh];
                 Material material;
-                material = resolvedMaterials != null ? resolvedMaterials[submesh] : _orderIndependentResolver ? ResolveGroupingMaterial(source) : source != null && MaterialResolver != null ? MaterialResolver(source) : source;
+                if (preparedNativeMaterials)
+                {
+                    if (source == null) continue;
+                    if (!_nativeRenderer.TryGetResolvedMaterial(source, out material)) throw new InvalidOperationException("A prepared native material is missing from the primary shadow submission cache.");
+                }
+                else material = resolvedMaterials != null ? resolvedMaterials[submesh] : _orderIndependentResolver ? ResolveGroupingMaterial(source) : source != null && MaterialResolver != null ? MaterialResolver(source) : source;
                 if (material == null)
                 {
                     continue;
@@ -384,6 +445,7 @@ namespace XRay.Importer.Levels
 
         public void ResetMotionHistory()
         {
+            if (!_nativeContextActive) _nativeRenderer?.Disable();
             _histories.Clear();
             _groupOwner = null;
             _groups = null;
@@ -399,8 +461,96 @@ namespace XRay.Importer.Levels
 
         public void ApplyConfiguration(GameConfig configuration)
         {
+            if (!_nativeContextActive) _nativeRenderer?.Disable();
             _configuration = configuration;
             ReleaseGroups();
+        }
+
+        private bool TryNativeSubmission(Camera camera, XRayFloraWindState wind, out bool historyPrepared)
+        {
+            historyPrepared = false;
+            bool enabled = _nativeSubmissionOverride ?? (_configuration != null && _configuration.InstanceNativeSubmissionEnabled);
+            _nativeSubmissionFallbackReason = null;
+            if (!enabled)
+            {
+                _nativeSubmissionFallbackReason = "Native submission is disabled.";
+                return false;
+            }
+            if (!_nativeContextActive || !_nativeContextAllowed || camera != _nativeContextCamera)
+            {
+                _nativeSubmissionFallbackReason = "The render context does not contain a single supported camera.";
+                return false;
+            }
+            if (camera.cameraType != CameraType.Game || camera.stereoEnabled || _maxDistance > 0f || _lodImpostors || ExperimentalShadowInfluence != null || _configuration != null && _configuration.InstanceSubmissionGroupingEnabled || MaterialResolver != null && !_orderIndependentResolver || !_batchSet.HasPreparedMatrices)
+            {
+                _nativeSubmissionFallbackReason = "The renderer requires the original submission contract.";
+                return false;
+            }
+            if (!_nativeContextChecked)
+            {
+                _nativeContextAllowed = _nativeContext.Supports(camera);
+                _nativeContextChecked = true;
+            }
+            if (!_nativeContextAllowed)
+            {
+                _nativeSubmissionFallbackReason = "The render context requires the original submission path.";
+                return false;
+            }
+            IReadOnlyList<XRayInstanceBatch> batches = _batchSet.Batches;
+            bool moving = false;
+            for (int index = 0; index < batches.Count; index++)
+            {
+                moving |= History(index, batches[index]).Moving;
+            }
+            historyPrepared = true;
+            if (moving)
+            {
+                _nativeSubmissionFallbackReason = "Moving matrices require the original motion history path.";
+                return false;
+            }
+            _nativeRenderer ??= new XRayInstanceNativeRenderer();
+            Func<Material, Material> resolver = MaterialResolver;
+            int layer = gameObject.layer;
+            bool castShadows = _castShadows;
+            bool prepared = _nativeRenderer.Prepare(_batchSet, camera, layer, castShadows, wind, resolver);
+            if (prepared)
+            {
+                _nativePreparedResolver = resolver;
+                _nativePreparedCastShadows = castShadows;
+                _nativePreparedLayer = layer;
+            }
+            return prepared;
+        }
+
+        private void OnBeginContextRendering(ScriptableRenderContext context, List<Camera> cameras)
+        {
+            _nativeRenderer?.BeginContext();
+            _nativeContextActive = true;
+            _nativeContextChecked = false;
+            _nativePreparedResolver = null;
+            _nativeContextCamera = cameras != null && cameras.Count == 1 ? cameras[0] : null;
+            _nativeContextAllowed = _nativeContextCamera != null && _nativeContextCamera.cameraType == CameraType.Game && !_nativeContextCamera.stereoEnabled;
+        }
+
+        private void OnEndContextRendering(ScriptableRenderContext context, List<Camera> cameras)
+        {
+            _nativeRenderer?.Disable();
+            _nativeContextActive = false;
+            _nativeContextAllowed = false;
+            _nativeContextChecked = false;
+            _nativePreparedResolver = null;
+            _nativeContextCamera = null;
+            foreach (XRayInstanceNativeRenderer renderer in _retiredNativeRenderers) renderer.Dispose();
+            _retiredNativeRenderers.Clear();
+            if (this == null || !isActiveAndEnabled) RenderPipelineManager.endContextRendering -= OnEndContextRendering;
+        }
+
+        private void ReleaseNativeRenderer()
+        {
+            if (_nativeRenderer == null) return;
+            if (_nativeContextActive) _retiredNativeRenderers.Add(_nativeRenderer);
+            else _nativeRenderer.Dispose();
+            _nativeRenderer = null;
         }
 
         private void ReleaseGroups()

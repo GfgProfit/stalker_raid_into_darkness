@@ -17,6 +17,7 @@ namespace XRay.Importer.Levels
         [SerializeField] private XRayWeatherCelestialSettings _celestialSettings;
         [SerializeField] private PrecipitationConfig _precipitation;
         [SerializeField] private bool _instanceSubmissionGroupingEnabled;
+        [SerializeField] private bool _instanceNativeSubmissionEnabled;
         [SerializeField] private bool _fogEnabled = true;
         [SerializeField] private bool _sunShaftsEnabled = true;
         [SerializeField] private bool _lensFlareEnabled = true;
@@ -37,6 +38,7 @@ namespace XRay.Importer.Levels
         public XRayWeatherCelestialSettings CelestialSettings => _celestialSettings;
         public PrecipitationConfig Precipitation => _precipitation;
         public bool InstanceSubmissionGroupingEnabled => _instanceSubmissionGroupingEnabled;
+        public bool InstanceNativeSubmissionEnabled => _instanceNativeSubmissionEnabled;
         public bool FogEnabled => _fogEnabled;
         public bool SunShaftsEnabled => _sunShaftsEnabled;
         public bool LensFlareEnabled => _lensFlareEnabled;

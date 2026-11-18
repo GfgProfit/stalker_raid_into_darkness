@@ -14,6 +14,20 @@ namespace XRay.Importer.Tests
         private const float TOLERANCE = 0.000002f;
 
         [Test]
+        public void InstancePayloadKeepsDotsAndTraditionalShaderContracts()
+        {
+            string properties = File.ReadAllText("Assets/_Tools/X-Ray OGF OMG Importer/Runtime/Shaders/MonolithProperties.hlsl");
+            StringAssert.Contains("UNITY_DOTS_INSTANCING_START(UserPropertyMetadata)", properties);
+            StringAssert.Contains("UNITY_DOTS_INSTANCING_END(UserPropertyMetadata)", properties);
+            StringAssert.Contains("UNITY_DOTS_INSTANCED_PROP_OVERRIDE_SUPPORTED(float4, _MonolithInstanceData)", properties);
+            StringAssert.Contains("UNITY_DOTS_INSTANCED_PROP_OVERRIDE_SUPPORTED(float4, _MonolithInstanceExtra)", properties);
+            StringAssert.Contains("UNITY_ACCESS_DOTS_INSTANCED_PROP_WITH_CUSTOM_DEFAULT(float4, _MonolithInstanceData, float4(1.0, 0.0, 0.0, 0.0))", properties);
+            StringAssert.Contains("UNITY_ACCESS_DOTS_INSTANCED_PROP_WITH_CUSTOM_DEFAULT(float4, _MonolithInstanceExtra, float4(0.0, 1.0, 0.0, 1.0))", properties);
+            StringAssert.Contains("UNITY_ACCESS_INSTANCED_PROP(MonolithInstance, _MonolithInstanceData)", properties);
+            StringAssert.Contains("UNITY_ACCESS_INSTANCED_PROP(MonolithInstance, _MonolithInstanceExtra)", properties);
+        }
+
+        [Test]
         public void LightingMatchesIndependentSourceHlsl()
         {
             string[] lines = File.ReadAllLines(ROOT + "Fixtures/MonolithLightingReference.txt");

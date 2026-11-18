@@ -401,7 +401,12 @@ float4 MonolithFloraFixesInput()
 {
     return MonolithResolveFloraFixes(_MonolithFloraFixes2, _MonolithWeatherFloraFixes, _MonolithSourceProfile, _MonolithWeatherActive, _MonolithFloraSubsurface);
 }
-#if defined(UNITY_INSTANCING_ENABLED)
+#if defined(UNITY_DOTS_INSTANCING_ENABLED)
+UNITY_DOTS_INSTANCING_START(UserPropertyMetadata)
+UNITY_DOTS_INSTANCED_PROP_OVERRIDE_SUPPORTED(float4, _MonolithInstanceData)
+UNITY_DOTS_INSTANCED_PROP_OVERRIDE_SUPPORTED(float4, _MonolithInstanceExtra)
+UNITY_DOTS_INSTANCING_END(UserPropertyMetadata)
+#elif defined(UNITY_INSTANCING_ENABLED)
 UNITY_INSTANCING_BUFFER_START(MonolithInstance)
 UNITY_DEFINE_INSTANCED_PROP(float4, _MonolithInstanceData)
 UNITY_DEFINE_INSTANCED_PROP(float4, _MonolithInstanceExtra)
@@ -409,7 +414,9 @@ UNITY_INSTANCING_BUFFER_END(MonolithInstance)
 #endif
 float4 MonolithInstanceData()
 {
-    #if defined(UNITY_INSTANCING_ENABLED)
+    #if defined(UNITY_DOTS_INSTANCING_ENABLED)
+    return UNITY_ACCESS_DOTS_INSTANCED_PROP_WITH_CUSTOM_DEFAULT(float4, _MonolithInstanceData, float4(1.0, 0.0, 0.0, 0.0));
+    #elif defined(UNITY_INSTANCING_ENABLED)
     return UNITY_ACCESS_INSTANCED_PROP(MonolithInstance, _MonolithInstanceData);
     #else
     return float4(1.0, 0.0, 0.0, 0.0);
@@ -417,7 +424,9 @@ float4 MonolithInstanceData()
 }
 float4 MonolithInstanceExtra()
 {
-    #if defined(UNITY_INSTANCING_ENABLED)
+    #if defined(UNITY_DOTS_INSTANCING_ENABLED)
+    return UNITY_ACCESS_DOTS_INSTANCED_PROP_WITH_CUSTOM_DEFAULT(float4, _MonolithInstanceExtra, float4(0.0, 1.0, 0.0, 1.0));
+    #elif defined(UNITY_INSTANCING_ENABLED)
     return UNITY_ACCESS_INSTANCED_PROP(MonolithInstance, _MonolithInstanceExtra);
     #else
     return float4(0.0, 1.0, 0.0, 1.0);

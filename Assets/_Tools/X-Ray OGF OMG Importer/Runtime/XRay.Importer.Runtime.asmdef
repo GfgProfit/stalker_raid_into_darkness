@@ -3,12 +3,13 @@
     "rootNamespace": "XRay.Importer",
     "references": [
         "XRay.Importer.Core",
+        "Unity.Collections",
         "Unity.RenderPipelines.Core.Runtime",
         "Unity.RenderPipelines.HighDefinition.Runtime"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
-    "allowUnsafeCode": false,
+    "allowUnsafeCode": true,
     "overrideReferences": false,
     "precompiledReferences": [],
     "autoReferenced": true,

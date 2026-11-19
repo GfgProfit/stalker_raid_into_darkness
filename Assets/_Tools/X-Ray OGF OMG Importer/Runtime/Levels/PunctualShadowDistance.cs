@@ -112,6 +112,7 @@ namespace XRay.Importer.Levels
         private static PunctualShadowDistance Register(Light light, GameConfig configuration)
         {
             if (light == null || !light.gameObject.scene.IsValid()) return null;
+            XRayVideoLightShadows.Register(light);
             PunctualShadowDistance policy = light.GetComponent<PunctualShadowDistance>();
             if (policy != null && !policy.enabled) return policy;
             if (light.type != LightType.Point && light.type != LightType.Spot)

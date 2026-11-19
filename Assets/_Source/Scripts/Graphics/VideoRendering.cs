@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.HighDefinition;
 using UnityEngine.SceneManagement;
+using XRay.Importer.Levels;
 
 namespace RaidIntoDarkness.GraphicsOptions
 {
@@ -70,6 +71,7 @@ namespace RaidIntoDarkness.GraphicsOptions
             _shadows.cascadeShadowSplitCount.Override(quality.shadowQuality + 2);
             _contactShadows.enable.Override(quality.contactShadows);
             _contactShadows.quality.Override(quality.contactShadowQuality);
+            XRayVideoLightShadows.Apply(quality.shadowQuality, SupportsContactShadows ? quality.contactShadows : null);
             _ao.rayTracing.Override(false);
             _ao.intensity.Override(quality.ambientOcclusion > 0 ? 0.7f : 0.0f);
             _ao.quality.Override(Math.Max(0, quality.ambientOcclusion - 1));
@@ -88,6 +90,7 @@ namespace RaidIntoDarkness.GraphicsOptions
         {
             SceneManager.sceneUnloaded -= PruneCameras;
             RenderPipelineManager.beginContextRendering -= PrepareCameras;
+            XRayVideoLightShadows.Apply(null, null);
             foreach (CameraState state in _cameras.Values)
             {
                 state.Restore();

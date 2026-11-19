@@ -188,9 +188,8 @@ namespace Rvm.CleanReleaseRoute07.Editor
                     Type type = component.GetType();
                     string name = type.FullName;
                     bool benchmark = type.Namespace != null && type.Namespace.StartsWith("Rvm.Benchmark", StringComparison.Ordinal);
-                    bool overlay = name == "RaidIntoDarkness.Player.StalkerPlayerDebugOverlay";
                     bool probe = type.Namespace == "XRay.Importer.Levels" && (type.Name.EndsWith("Probe", StringComparison.Ordinal) || type.Name.StartsWith("XRayPrecipitationPlayer", StringComparison.Ordinal));
-                    if (benchmark || overlay || probe)
+                    if (benchmark || probe)
                     {
                         removed.Add(name + "|" + component.gameObject.name);
                         UnityEngine.Object.DestroyImmediate(component);

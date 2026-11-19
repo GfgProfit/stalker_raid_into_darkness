@@ -7,7 +7,6 @@ namespace RaidIntoDarkness.Player
     public sealed class StalkerPlayerInput : MonoBehaviour
     {
         private const string PLAYER_MAP = "Player";
-        private const string DEBUG_MAP = "Debug";
         private const float AXIS_THRESHOLD = 0.5f;
 
         [SerializeField] private InputActionAsset _actions;
@@ -29,10 +28,6 @@ namespace RaidIntoDarkness.Player
         private InputAction _primaryWeapon;
         private InputAction _secondaryWeapon;
         private InputAction _bolt;
-        private InputAction _toggleOverlay;
-        private InputAction _toggleCombat;
-        private InputAction _nextOutfit;
-        private InputAction _previousOutfit;
 
         public Vector2 LookDelta => _look != null ? _look.ReadValue<Vector2>() : Vector2.zero;
         public float ScopeZoomScroll => isActiveAndEnabled && Cursor.lockState == CursorLockMode.Locked && Mouse.current != null ? Mouse.current.scroll.ReadValue().y : 0f;
@@ -50,12 +45,8 @@ namespace RaidIntoDarkness.Player
         public bool PrimaryWeaponPressed => WasPressed(_primaryWeapon);
         public bool SecondaryWeaponPressed => WasPressed(_secondaryWeapon);
         public bool BoltPressed => WasPressed(_bolt);
-        public bool ToggleOverlayPressed => WasPressed(_toggleOverlay);
-        public bool ToggleCombatPressed => WasPressed(_toggleCombat);
         public bool CrouchKeyPressed => WasPressed(_crouch) || WasPressed(_lowCrouch);
         public bool CrouchKeyReleased => WasReleased(_crouch) || WasReleased(_lowCrouch);
-        public bool NextOutfitPressed => WasPressed(_nextOutfit);
-        public bool PreviousOutfitPressed => WasPressed(_previousOutfit);
         public InputActionAsset Actions => _actions;
 
         private void OnEnable()
@@ -84,15 +75,6 @@ namespace RaidIntoDarkness.Player
             _primaryWeapon = player.FindAction("PrimaryWeapon", true);
             _secondaryWeapon = player.FindAction("SecondaryWeapon", true);
             _bolt = player.FindAction("Bolt", false);
-            InputActionMap debug = _actions.FindActionMap(DEBUG_MAP, false);
-            if (debug != null)
-            {
-                _toggleOverlay = debug.FindAction("ToggleOverlay");
-                _toggleCombat = debug.FindAction("ToggleCombat");
-                _nextOutfit = debug.FindAction("NextOutfit");
-                _previousOutfit = debug.FindAction("PreviousOutfit");
-                debug.Enable();
-            }
 
             player.Enable();
         }

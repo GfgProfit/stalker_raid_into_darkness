@@ -3836,7 +3836,6 @@ GameObject:
   - component: {fileID: 8362631657092042833}
   - component: {fileID: 1434901721949175874}
   - component: {fileID: 334293385447183373}
-  - component: {fileID: 5170115981608553266}
   - component: {fileID: 3170219032278336436}
   - component: {fileID: 4394079865577217288}
   - component: {fileID: 163336873398552154}
@@ -4066,22 +4065,6 @@ MonoBehaviour:
   _foley: {fileID: 3924682037822528286}
   _surfaceDetector: {fileID: 4394079865577217288}
   _outfitSection: actor
---- !u!114 &5170115981608553266
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9095947929063771272}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4d03e9ce79ce9f4d92816790209805a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: RaidIntoDarkness.Player::RaidIntoDarkness.Player.StalkerPlayerDebugOverlay
-  _controller: {fileID: 334293385447183373}
-  _input: {fileID: 5296497837016955254}
-  _visible: 1
-  _showProfile: 0
 --- !u!114 &3170219032278336436
 MonoBehaviour:
   m_ObjectHideFlags: 0

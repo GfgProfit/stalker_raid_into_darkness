@@ -26,7 +26,6 @@ namespace RaidIntoDarkness.Player
         [SerializeField] private string _outfitSection = FirstPersonOutfitCatalog.NO_OUTFIT_SECTION;
 
         private string _appliedSection;
-        private int _outfitIndex = -1;
         private float _savedHudFieldOfView = -1.0f;
         private CharacterController _characterController;
         private StalkerVegetationAudio _vegetationAudio;
@@ -179,10 +178,6 @@ namespace RaidIntoDarkness.Player
                 return;
             }
             float deltaTime = Mathf.Min(Time.deltaTime, MAX_FRAME_DELTA);
-            if (!GameplayInputBlocked)
-            {
-                HandleDebugInput();
-            }
 
             if (_outfitSection != _appliedSection && _rig != null && _rig.Catalog != null)
             {
@@ -226,26 +221,6 @@ namespace RaidIntoDarkness.Player
             if (_cameraEffects != null)
             {
                 _cameraEffects.Tick(_motor.State, _motor.Condition.IsLimping(), _footsteps != null ? _footsteps.CyclePhase : -1.0f, deltaTime);
-            }
-        }
-
-        private void HandleDebugInput()
-        {
-            if (_input == null)
-            {
-                return;
-            }
-
-            if (_input.ToggleCombatPressed)
-            {
-                Combat = !Combat;
-            }
-
-            if ((_input.NextOutfitPressed || _input.PreviousOutfitPressed) && _rig != null && _rig.Catalog != null && _rig.Catalog.Entries.Count > 0)
-            {
-                int count = _rig.Catalog.Entries.Count;
-                _outfitIndex = (_outfitIndex + (_input.NextOutfitPressed ? 1 : count - 1)) % count;
-                ApplyOutfit(_rig.Catalog.Entries[_outfitIndex].Section);
             }
         }
 
@@ -332,11 +307,6 @@ namespace RaidIntoDarkness.Player
         {
             _appliedSection = entry.Section;
             _outfitSection = entry.Section;
-            if (_rig.Catalog != null)
-            {
-                _outfitIndex = IndexOf(entry);
-            }
-
             _visibleBody.SetLibrary(entry.BodyAnimations);
             if (bodyChanged || !_bodyPlayer.IsBound || _bodyPlayer.Body != _rig.Body)
             {
@@ -370,19 +340,6 @@ namespace RaidIntoDarkness.Player
                 _camera.HudFieldOfView = _savedHudFieldOfView;
                 _savedHudFieldOfView = -1.0f;
             }
-        }
-
-        private int IndexOf(FirstPersonOutfitEntry entry)
-        {
-            for (int i = 0; i < _rig.Catalog.Entries.Count; i++)
-            {
-                if (_rig.Catalog.Entries[i] == entry)
-                {
-                    return i;
-                }
-            }
-
-            return -1;
         }
     }
 }

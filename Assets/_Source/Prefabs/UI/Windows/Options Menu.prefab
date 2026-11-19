@@ -166,6 +166,8 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6209508311770038015}
+  - {fileID: 4465313302869951337}
+  - {fileID: 4148480005017454186}
   - {fileID: 6108828551096671322}
   m_Father: {fileID: 4424329543461305824}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -185,7 +187,7 @@ GameObject:
   - component: {fileID: 1874862229055729657}
   - component: {fileID: 4992245712755156810}
   - component: {fileID: 2940562825721552520}
-  - component: {fileID: 8016203792251546362}
+  - component: {fileID: 5643521991480177524}
   m_Layer: 5
   m_Name: Motion Blur T
   m_TagString: Untagged
@@ -252,7 +254,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &8016203792251546362
+--- !u!114 &5643521991480177524
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -261,17 +263,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 304435084576689978}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 894b30c2a29be6a4fbb3ecb66c495b61, type: 3}
+  m_Script: {fileID: 11500000, guid: 8b196756e251ea948b89e13f9ccff33b, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::HorizontalSelector
-  _leftArrowButton: {fileID: 0}
-  _rightArrowButton: {fileID: 0}
-  _currentContentText: {fileID: 0}
-  _horizontalLayoutGroup: {fileID: 0}
-  _itemPrefab: {fileID: 669795276272142438, guid: 2c29139f526529e4bad7e289c27ab0a0, type: 3}
-  _space: 10
-  _animationDuration: 0.2
-  _contents: []
+  m_EditorClassIdentifier: Assembly-CSharp::RaidIntoDarkness.GraphicsOptions.GraphicsSettingTooltipRow
+  _tooltip: {fileID: 858102390112548440}
+  _description: "\u0414\u043E\u0431\u0430\u0432\u043B\u044F\u0435\u0442 \u0440\u0430\u0437\u043C\u044B\u0442\u0438\u0435 \u043F\u0440\u0438 \u0434\u0432\u0438\u0436\u0435\u043D\u0438\u0438 \u043A\u0430\u043C\u0435\u0440\u044B \u0438\u043B\u0438 \u043E\u0431\u044A\u0435\u043A\u0442\u043E\u0432."
 --- !u!1 &322823821269180530
 GameObject:
   m_ObjectHideFlags: 0
@@ -1310,7 +1306,7 @@ GameObject:
   - component: {fileID: 2400281389887197554}
   - component: {fileID: 5957642148496908568}
   - component: {fileID: 5009928093182586957}
-  - component: {fileID: 2606206162535414350}
+  - component: {fileID: 6408884019328731690}
   m_Layer: 5
   m_Name: Bright SL
   m_TagString: Untagged
@@ -1378,7 +1374,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &2606206162535414350
+--- !u!114 &6408884019328731690
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1387,17 +1383,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 695176496758612655}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 894b30c2a29be6a4fbb3ecb66c495b61, type: 3}
+  m_Script: {fileID: 11500000, guid: 8b196756e251ea948b89e13f9ccff33b, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::HorizontalSelector
-  _leftArrowButton: {fileID: 0}
-  _rightArrowButton: {fileID: 0}
-  _currentContentText: {fileID: 0}
-  _horizontalLayoutGroup: {fileID: 0}
-  _itemPrefab: {fileID: 669795276272142438, guid: 2c29139f526529e4bad7e289c27ab0a0, type: 3}
-  _space: 10
-  _animationDuration: 0.2
-  _contents: []
+  m_EditorClassIdentifier: Assembly-CSharp::RaidIntoDarkness.GraphicsOptions.GraphicsSettingTooltipRow
+  _tooltip: {fileID: 858102390112548440}
+  _description: "\u041C\u0435\u043D\u044F\u0435\u0442 \u044F\u0440\u043A\u043E\u0441\u0442\u044C \u0438\u0437\u043E\u0431\u0440\u0430\u0436\u0435\u043D\u0438\u044F \u0438\u0433\u0440\u044B."
 --- !u!1 &707183684409665079
 GameObject:
   m_ObjectHideFlags: 0
@@ -1770,7 +1760,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 375, y: -1914}
+  m_AnchoredPosition: {x: 375, y: -1944}
   m_SizeDelta: {x: 750, y: 400}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2049311120496285218
@@ -2006,7 +1996,7 @@ GameObject:
   - component: {fileID: 3785698919637303703}
   - component: {fileID: 7882671464422857696}
   - component: {fileID: 4535585919082647148}
-  - component: {fileID: 2954192340751548396}
+  - component: {fileID: 4104999785272430906}
   m_Layer: 5
   m_Name: V Sync T
   m_TagString: Untagged
@@ -2073,7 +2063,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &2954192340751548396
+--- !u!114 &4104999785272430906
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2082,17 +2072,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 1051598996267609836}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 894b30c2a29be6a4fbb3ecb66c495b61, type: 3}
+  m_Script: {fileID: 11500000, guid: 8b196756e251ea948b89e13f9ccff33b, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::HorizontalSelector
-  _leftArrowButton: {fileID: 0}
-  _rightArrowButton: {fileID: 0}
-  _currentContentText: {fileID: 0}
-  _horizontalLayoutGroup: {fileID: 0}
-  _itemPrefab: {fileID: 669795276272142438, guid: 2c29139f526529e4bad7e289c27ab0a0, type: 3}
-  _space: 10
-  _animationDuration: 0.2
-  _contents: []
+  m_EditorClassIdentifier: Assembly-CSharp::RaidIntoDarkness.GraphicsOptions.GraphicsSettingTooltipRow
+  _tooltip: {fileID: 858102390112548440}
+  _description: "\u0421\u0438\u043D\u0445\u0440\u043E\u043D\u0438\u0437\u0438\u0440\u0443\u0435\u0442 \u0432\u044B\u0432\u043E\u0434 \u043A\u0430\u0434\u0440\u043E\u0432 \u0441 \u043E\u0431\u043D\u043E\u0432\u043B\u0435\u043D\u0438\u0435\u043C \u044D\u043A\u0440\u0430\u043D\u0430, \u0447\u0442\u043E\u0431\u044B \u0443\u043C\u0435\u043D\u044C\u0448\u0438\u0442\u044C \u0440\u0430\u0437\u0440\u044B\u0432\u044B \u0438\u0437\u043E\u0431\u0440\u0430\u0436\u0435\u043D\u0438\u044F."
 --- !u!1 &1098272570729649999
 GameObject:
   m_ObjectHideFlags: 0
@@ -2781,7 +2765,7 @@ GameObject:
   - component: {fileID: 5093766606981687946}
   - component: {fileID: 4582780512663714871}
   - component: {fileID: 4582790095216074124}
-  - component: {fileID: 7786773971027079834}
+  - component: {fileID: 8945655921023961789}
   m_Layer: 5
   m_Name: Contact Shadows T
   m_TagString: Untagged
@@ -2848,7 +2832,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &7786773971027079834
+--- !u!114 &8945655921023961789
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2857,17 +2841,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 1748460849740773508}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 894b30c2a29be6a4fbb3ecb66c495b61, type: 3}
+  m_Script: {fileID: 11500000, guid: 8b196756e251ea948b89e13f9ccff33b, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::HorizontalSelector
-  _leftArrowButton: {fileID: 0}
-  _rightArrowButton: {fileID: 0}
-  _currentContentText: {fileID: 0}
-  _horizontalLayoutGroup: {fileID: 0}
-  _itemPrefab: {fileID: 669795276272142438, guid: 2c29139f526529e4bad7e289c27ab0a0, type: 3}
-  _space: 10
-  _animationDuration: 0.2
-  _contents: []
+  m_EditorClassIdentifier: Assembly-CSharp::RaidIntoDarkness.GraphicsOptions.GraphicsSettingTooltipRow
+  _tooltip: {fileID: 858102390112548440}
+  _description: "\u0414\u043E\u0431\u0430\u0432\u043B\u044F\u0435\u0442 \u043A\u043E\u0440\u043E\u0442\u043A\u0438\u0435 \u0442\u0435\u043D\u0438 \u0432 \u043C\u0435\u0441\u0442\u0430\u0445, \u0433\u0434\u0435 \u043E\u0431\u044A\u0435\u043A\u0442\u044B \u0441\u043E\u043F\u0440\u0438\u043A\u0430\u0441\u0430\u044E\u0442\u0441\u044F \u0441 \u043F\u043E\u0432\u0435\u0440\u0445\u043D\u043E\u0441\u0442\u044F\u043C\u0438 \u0438\u043B\u0438 \u043F\u0440\u043E\u0445\u043E\u0434\u044F\u0442 \u0440\u044F\u0434\u043E\u043C \u0441 \u043D\u0438\u043C\u0438."
 --- !u!1 &1760964200371367861
 GameObject:
   m_ObjectHideFlags: 0
@@ -3142,6 +3120,81 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!1 &1799813513429968989
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4465313302869951337}
+  - component: {fileID: 2708381740579863608}
+  - component: {fileID: 7586641457008854270}
+  m_Layer: 5
+  m_Name: Preview Image
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &4465313302869951337
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1799813513429968989}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7720170529296242596}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 1, y: 1}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: -50, y: -100}
+  m_SizeDelta: {x: 570, y: 400}
+  m_Pivot: {x: 1, y: 1}
+--- !u!222 &2708381740579863608
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1799813513429968989}
+  m_CullTransparentMesh: 1
+--- !u!114 &7586641457008854270
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1799813513429968989}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 0}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
 --- !u!1 &1899744370177242884
 GameObject:
   m_ObjectHideFlags: 0
@@ -3387,7 +3440,7 @@ RectTransform:
   m_Father: {fileID: 6915441258695774294}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMax: {x: 0.33333334, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -4067,6 +4120,156 @@ RectTransform:
   m_AnchoredPosition: {x: 375, y: -50}
   m_SizeDelta: {x: 750, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!1 &2474023631538184307
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4148480005017454186}
+  - component: {fileID: 5316393239144934600}
+  - component: {fileID: 7086475146626203310}
+  - component: {fileID: 858102390112548440}
+  m_Layer: 5
+  m_Name: Settings Tooltip
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &4148480005017454186
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2474023631538184307}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7720170529296242596}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 1, y: 1}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: -50, y: -510}
+  m_SizeDelta: {x: 570, y: 200}
+  m_Pivot: {x: 1, y: 1}
+--- !u!222 &5316393239144934600
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2474023631538184307}
+  m_CullTransparentMesh: 1
+--- !u!114 &7086475146626203310
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2474023631538184307}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 0
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_text: 
+  m_isRightToLeft: 0
+  m_fontAsset: {fileID: 11400000, guid: cc5efc8ed1175bf45a893d4dd6e86295, type: 2}
+  m_sharedMaterial: {fileID: 5862831629170463714, guid: cc5efc8ed1175bf45a893d4dd6e86295, type: 2}
+  m_fontSharedMaterials: []
+  m_fontMaterial: {fileID: 0}
+  m_fontMaterials: []
+  m_fontColor32:
+    serializedVersion: 2
+    rgba: 4294967295
+  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+  m_enableVertexGradient: 0
+  m_colorMode: 3
+  m_fontColorGradient:
+    topLeft: {r: 1, g: 1, b: 1, a: 1}
+    topRight: {r: 1, g: 1, b: 1, a: 1}
+    bottomLeft: {r: 1, g: 1, b: 1, a: 1}
+    bottomRight: {r: 1, g: 1, b: 1, a: 1}
+  m_fontColorGradientPreset: {fileID: 0}
+  m_spriteAsset: {fileID: 0}
+  m_tintAllSprites: 0
+  m_StyleSheet: {fileID: 0}
+  m_TextStyleHashCode: -1183493901
+  m_overrideHtmlColors: 0
+  m_faceColor:
+    serializedVersion: 2
+    rgba: 4294967295
+  m_fontSize: 24
+  m_fontSizeBase: 24
+  m_fontWeight: 400
+  m_enableAutoSizing: 0
+  m_fontSizeMin: 0
+  m_fontSizeMax: 0
+  m_fontStyle: 0
+  m_HorizontalAlignment: 1
+  m_VerticalAlignment: 256
+  m_textAlignment: 65535
+  m_characterSpacing: 0
+  m_characterHorizontalScale: 1
+  m_wordSpacing: 0
+  m_lineSpacing: 0
+  m_lineSpacingMax: 0
+  m_paragraphSpacing: 0
+  m_charWidthMaxAdj: 0
+  m_TextWrappingMode: 1
+  m_wordWrappingRatios: 0.4
+  m_overflowMode: 0
+  m_linkedTextComponent: {fileID: 0}
+  parentLinkedComponent: {fileID: 0}
+  m_enableKerning: 0
+  m_ActiveFontFeatures: 
+  m_enableExtraPadding: 0
+  checkPaddingRequired: 0
+  m_isRichText: 1
+  m_EmojiFallbackSupport: 1
+  m_parseCtrlCharacters: 1
+  m_isOrthographic: 1
+  m_isCullingEnabled: 0
+  m_horizontalMapping: 0
+  m_verticalMapping: 0
+  m_uvLineOffset: 0
+  m_geometrySortingOrder: 0
+  m_IsTextObjectScaleStatic: 0
+  m_VertexBufferAutoSizeReduction: 0
+  m_useMaxVisibleDescender: 1
+  m_pageToDisplay: 1
+  m_margin: {x: 0, y: 0, z: 0, w: 0}
+  m_isUsingLegacyAnimationComponent: 0
+  m_isVolumetricText: 0
+  m_hasFontAssetChanged: 0
+  m_baseMaterial: {fileID: 0}
+  m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &858102390112548440
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2474023631538184307}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 711ef570e7fe84445ac6c76f58c0f8ca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RaidIntoDarkness.GraphicsOptions.GraphicsSettingsTooltip
 --- !u!1 &2492436506544079435
 GameObject:
   m_ObjectHideFlags: 0
@@ -4429,7 +4632,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 375, y: -2234}
+  m_AnchoredPosition: {x: 375, y: -2294}
   m_SizeDelta: {x: 750, y: 280}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &385145284075798405
@@ -5350,7 +5553,7 @@ GameObject:
   - component: {fileID: 6116327189383154175}
   - component: {fileID: 3048220843230962684}
   - component: {fileID: 3889220603826982457}
-  - component: {fileID: 4725932281193537363}
+  - component: {fileID: 7842677565641018124}
   m_Layer: 5
   m_Name: Light Flare T
   m_TagString: Untagged
@@ -5417,7 +5620,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &4725932281193537363
+--- !u!114 &7842677565641018124
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -5426,17 +5629,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 3411768693975703904}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 894b30c2a29be6a4fbb3ecb66c495b61, type: 3}
+  m_Script: {fileID: 11500000, guid: 8b196756e251ea948b89e13f9ccff33b, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::HorizontalSelector
-  _leftArrowButton: {fileID: 0}
-  _rightArrowButton: {fileID: 0}
-  _currentContentText: {fileID: 0}
-  _horizontalLayoutGroup: {fileID: 0}
-  _itemPrefab: {fileID: 669795276272142438, guid: 2c29139f526529e4bad7e289c27ab0a0, type: 3}
-  _space: 10
-  _animationDuration: 0.2
-  _contents: []
+  m_EditorClassIdentifier: Assembly-CSharp::RaidIntoDarkness.GraphicsOptions.GraphicsSettingTooltipRow
+  _tooltip: {fileID: 858102390112548440}
+  _description: "\u0414\u043E\u0431\u0430\u0432\u043B\u044F\u0435\u0442 \u0431\u043B\u0438\u043A\u0438 \u043E\u0431\u044A\u0435\u043A\u0442\u0438\u0432\u0430 \u043E\u0442 \u0438\u0441\u0442\u043E\u0447\u043D\u0438\u043A\u043E\u0432 \u0441\u0432\u0435\u0442\u0430, \u0434\u043B\u044F \u043A\u043E\u0442\u043E\u0440\u044B\u0445 \u043E\u043D\u0438 \u043D\u0430\u0441\u0442\u0440\u043E\u0435\u043D\u044B."
 --- !u!1 &3448239087576111394
 GameObject:
   m_ObjectHideFlags: 0
@@ -5684,6 +5881,7 @@ GameObject:
   - component: {fileID: 332593270359226775}
   - component: {fileID: 8493867316096565075}
   - component: {fileID: 4113798250858569154}
+  - component: {fileID: 7032268424886179566}
   m_Layer: 5
   m_Name: Grass Height SL
   m_TagString: Untagged
@@ -5710,7 +5908,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 375, y: -195}
+  m_AnchoredPosition: {x: 375, y: -255}
   m_SizeDelta: {x: 750, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &8493867316096565075
@@ -5751,6 +5949,20 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &7032268424886179566
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3755713890450364019}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b196756e251ea948b89e13f9ccff33b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RaidIntoDarkness.GraphicsOptions.GraphicsSettingTooltipRow
+  _tooltip: {fileID: 858102390112548440}
+  _description: "\u041C\u0435\u043D\u044F\u0435\u0442 \u0440\u0430\u0437\u043C\u0435\u0440 \u0442\u0440\u0430\u0432\u044B. \u041F\u0440\u0438 100% \u0438\u0441\u043F\u043E\u043B\u044C\u0437\u0443\u0435\u0442\u0441\u044F \u0438\u0441\u0445\u043E\u0434\u043D\u044B\u0439 \u0440\u0430\u0437\u043C\u0435\u0440."
 --- !u!1 &4106486151713171748
 GameObject:
   m_ObjectHideFlags: 0
@@ -6193,7 +6405,7 @@ GameObject:
   - component: {fileID: 7755519594989788594}
   - component: {fileID: 2271714704025925334}
   - component: {fileID: 6819404595811544370}
-  - component: {fileID: 5201591936299012635}
+  - component: {fileID: 7168292057732545621}
   m_Layer: 5
   m_Name: Sun Ray Distance SL
   m_TagString: Untagged
@@ -6261,7 +6473,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &5201591936299012635
+--- !u!114 &7168292057732545621
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -6270,17 +6482,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 4179859596214605669}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 894b30c2a29be6a4fbb3ecb66c495b61, type: 3}
+  m_Script: {fileID: 11500000, guid: 8b196756e251ea948b89e13f9ccff33b, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::HorizontalSelector
-  _leftArrowButton: {fileID: 0}
-  _rightArrowButton: {fileID: 0}
-  _currentContentText: {fileID: 0}
-  _horizontalLayoutGroup: {fileID: 0}
-  _itemPrefab: {fileID: 669795276272142438, guid: 2c29139f526529e4bad7e289c27ab0a0, type: 3}
-  _space: 10
-  _animationDuration: 0.2
-  _contents: []
+  m_EditorClassIdentifier: Assembly-CSharp::RaidIntoDarkness.GraphicsOptions.GraphicsSettingTooltipRow
+  _tooltip: {fileID: 858102390112548440}
+  _description: "\u0417\u0430\u0434\u0430\u0451\u0442 \u0434\u0430\u043B\u044C\u043D\u043E\u0441\u0442\u044C \u043E\u0442\u0440\u0438\u0441\u043E\u0432\u043A\u0438 \u0441\u043E\u043B\u043D\u0435\u0447\u043D\u044B\u0445 \u0442\u0435\u043D\u0435\u0439."
 --- !u!1 &4219141237658999899
 GameObject:
   m_ObjectHideFlags: 0
@@ -9072,7 +9278,7 @@ GameObject:
   - component: {fileID: 8686135118204934899}
   - component: {fileID: 2191866159431371375}
   - component: {fileID: 1620364149157974437}
-  - component: {fileID: 823706786984370117}
+  - component: {fileID: 8997236761013587576}
   m_Layer: 5
   m_Name: Bloom T
   m_TagString: Untagged
@@ -9139,7 +9345,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &823706786984370117
+--- !u!114 &8997236761013587576
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -9148,17 +9354,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 5869326207619877147}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 894b30c2a29be6a4fbb3ecb66c495b61, type: 3}
+  m_Script: {fileID: 11500000, guid: 8b196756e251ea948b89e13f9ccff33b, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::HorizontalSelector
-  _leftArrowButton: {fileID: 0}
-  _rightArrowButton: {fileID: 0}
-  _currentContentText: {fileID: 0}
-  _horizontalLayoutGroup: {fileID: 0}
-  _itemPrefab: {fileID: 669795276272142438, guid: 2c29139f526529e4bad7e289c27ab0a0, type: 3}
-  _space: 10
-  _animationDuration: 0.2
-  _contents: []
+  m_EditorClassIdentifier: Assembly-CSharp::RaidIntoDarkness.GraphicsOptions.GraphicsSettingTooltipRow
+  _tooltip: {fileID: 858102390112548440}
+  _description: "\u0414\u043E\u0431\u0430\u0432\u043B\u044F\u0435\u0442 \u043C\u044F\u0433\u043A\u043E\u0435 \u0441\u0432\u0435\u0447\u0435\u043D\u0438\u0435 \u0432\u043E\u043A\u0440\u0443\u0433 \u044F\u0440\u043A\u0438\u0445 \u0443\u0447\u0430\u0441\u0442\u043A\u043E\u0432 \u0438\u0437\u043E\u0431\u0440\u0430\u0436\u0435\u043D\u0438\u044F."
 --- !u!1 &5960243416813277749
 GameObject:
   m_ObjectHideFlags: 0
@@ -9882,7 +10082,7 @@ GameObject:
   - component: {fileID: 828798163046214182}
   - component: {fileID: 120781250886991032}
   - component: {fileID: 7705974892798280884}
-  - component: {fileID: 3231675436229516848}
+  - component: {fileID: 1451016145836179343}
   m_Layer: 5
   m_Name: Dynamic Scale SL
   m_TagString: Untagged
@@ -9950,7 +10150,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &3231675436229516848
+--- !u!114 &1451016145836179343
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -9959,17 +10159,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 6679946610977031931}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 894b30c2a29be6a4fbb3ecb66c495b61, type: 3}
+  m_Script: {fileID: 11500000, guid: 8b196756e251ea948b89e13f9ccff33b, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::HorizontalSelector
-  _leftArrowButton: {fileID: 0}
-  _rightArrowButton: {fileID: 0}
-  _currentContentText: {fileID: 0}
-  _horizontalLayoutGroup: {fileID: 0}
-  _itemPrefab: {fileID: 669795276272142438, guid: 2c29139f526529e4bad7e289c27ab0a0, type: 3}
-  _space: 10
-  _animationDuration: 0.2
-  _contents: []
+  m_EditorClassIdentifier: Assembly-CSharp::RaidIntoDarkness.GraphicsOptions.GraphicsSettingTooltipRow
+  _tooltip: {fileID: 858102390112548440}
+  _description: "\u041C\u0435\u043D\u044F\u0435\u0442 \u0432\u043D\u0443\u0442\u0440\u0435\u043D\u043D\u0435\u0435 \u0440\u0430\u0437\u0440\u0435\u0448\u0435\u043D\u0438\u0435 3D-\u0438\u0437\u043E\u0431\u0440\u0430\u0436\u0435\u043D\u0438\u044F. \u041D\u0438\u0437\u043A\u0438\u0435 \u0437\u043D\u0430\u0447\u0435\u043D\u0438\u044F \u043C\u043E\u0433\u0443\u0442 \u043F\u043E\u0432\u044B\u0441\u0438\u0442\u044C FPS, \u043D\u043E \u0441\u043D\u0438\u0437\u0438\u0442\u044C \u0447\u0451\u0442\u043A\u043E\u0441\u0442\u044C."
 --- !u!1 &6689273785156978580
 GameObject:
   m_ObjectHideFlags: 0
@@ -10341,7 +10535,7 @@ GameObject:
   - component: {fileID: 3246574985563576337}
   - component: {fileID: 4493709447470467029}
   - component: {fileID: 5813200702015555113}
-  - component: {fileID: 8886548830975215684}
+  - component: {fileID: 839756180366553385}
   m_Layer: 5
   m_Name: Local Light Distance SL
   m_TagString: Untagged
@@ -10409,7 +10603,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &8886548830975215684
+--- !u!114 &839756180366553385
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -10418,17 +10612,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 7132143857309575640}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 894b30c2a29be6a4fbb3ecb66c495b61, type: 3}
+  m_Script: {fileID: 11500000, guid: 8b196756e251ea948b89e13f9ccff33b, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::HorizontalSelector
-  _leftArrowButton: {fileID: 0}
-  _rightArrowButton: {fileID: 0}
-  _currentContentText: {fileID: 0}
-  _horizontalLayoutGroup: {fileID: 0}
-  _itemPrefab: {fileID: 669795276272142438, guid: 2c29139f526529e4bad7e289c27ab0a0, type: 3}
-  _space: 10
-  _animationDuration: 0.2
-  _contents: []
+  m_EditorClassIdentifier: Assembly-CSharp::RaidIntoDarkness.GraphicsOptions.GraphicsSettingTooltipRow
+  _tooltip: {fileID: 858102390112548440}
+  _description: "\u0417\u0430\u0434\u0430\u0451\u0442 \u0434\u0430\u043B\u044C\u043D\u043E\u0441\u0442\u044C \u0442\u0435\u043D\u0435\u0439 \u043E\u0442 \u0442\u043E\u0447\u0435\u0447\u043D\u044B\u0445 \u0438\u0441\u0442\u043E\u0447\u043D\u0438\u043A\u043E\u0432 \u0441\u0432\u0435\u0442\u0430 \u0438 \u043F\u0440\u043E\u0436\u0435\u043A\u0442\u043E\u0440\u043E\u0432."
 --- !u!1 &7186327969571851090
 GameObject:
   m_ObjectHideFlags: 0
@@ -11629,7 +11817,7 @@ GameObject:
   - component: {fileID: 2165028677871595381}
   - component: {fileID: 5956927156959213372}
   - component: {fileID: 7239240185459426091}
-  - component: {fileID: 8801364197698434548}
+  - component: {fileID: 15785285395416777}
   m_Layer: 5
   m_Name: Grass Render Distance SL
   m_TagString: Untagged
@@ -11697,7 +11885,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &8801364197698434548
+--- !u!114 &15785285395416777
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -11706,17 +11894,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 7733829185924641989}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 894b30c2a29be6a4fbb3ecb66c495b61, type: 3}
+  m_Script: {fileID: 11500000, guid: 8b196756e251ea948b89e13f9ccff33b, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::HorizontalSelector
-  _leftArrowButton: {fileID: 0}
-  _rightArrowButton: {fileID: 0}
-  _currentContentText: {fileID: 0}
-  _horizontalLayoutGroup: {fileID: 0}
-  _itemPrefab: {fileID: 669795276272142438, guid: 2c29139f526529e4bad7e289c27ab0a0, type: 3}
-  _space: 10
-  _animationDuration: 0.2
-  _contents: []
+  m_EditorClassIdentifier: Assembly-CSharp::RaidIntoDarkness.GraphicsOptions.GraphicsSettingTooltipRow
+  _tooltip: {fileID: 858102390112548440}
+  _description: "\u0417\u0430\u0434\u0430\u0451\u0442, \u043D\u0430 \u043A\u0430\u043A\u043E\u043C \u0440\u0430\u0441\u0441\u0442\u043E\u044F\u043D\u0438\u0438 \u043E\u0442 \u0438\u0433\u0440\u043E\u043A\u0430 \u0440\u0438\u0441\u0443\u0435\u0442\u0441\u044F \u0442\u0440\u0430\u0432\u0430."
 --- !u!1 &7755554552498454278
 GameObject:
   m_ObjectHideFlags: 0
@@ -13054,7 +13236,7 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967295
+    rgba: 4288268784
   m_fontColor: {r: 0.94, g: 0.79, b: 0.6, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
@@ -13089,7 +13271,7 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 0
+  m_TextWrappingMode: 1
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
@@ -13128,7 +13310,7 @@ GameObject:
   - component: {fileID: 1352458306646999282}
   - component: {fileID: 3371980391832709207}
   - component: {fileID: 3537917054410497297}
-  - component: {fileID: 839214924953365364}
+  - component: {fileID: 8562708043731960772}
   m_Layer: 5
   m_Name: Grass Shadows T
   m_TagString: Untagged
@@ -13154,7 +13336,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 375, y: -255}
+  m_AnchoredPosition: {x: 375, y: -315}
   m_SizeDelta: {x: 750, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &3371980391832709207
@@ -13195,7 +13377,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &839214924953365364
+--- !u!114 &8562708043731960772
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -13204,17 +13386,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 8749165210483939252}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 894b30c2a29be6a4fbb3ecb66c495b61, type: 3}
+  m_Script: {fileID: 11500000, guid: 8b196756e251ea948b89e13f9ccff33b, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::HorizontalSelector
-  _leftArrowButton: {fileID: 0}
-  _rightArrowButton: {fileID: 0}
-  _currentContentText: {fileID: 0}
-  _horizontalLayoutGroup: {fileID: 0}
-  _itemPrefab: {fileID: 669795276272142438, guid: 2c29139f526529e4bad7e289c27ab0a0, type: 3}
-  _space: 10
-  _animationDuration: 0.2
-  _contents: []
+  m_EditorClassIdentifier: Assembly-CSharp::RaidIntoDarkness.GraphicsOptions.GraphicsSettingTooltipRow
+  _tooltip: {fileID: 858102390112548440}
+  _description: "\u0412\u043A\u043B\u044E\u0447\u0430\u0435\u0442 \u0442\u0435\u043D\u0438 \u043E\u0442 \u0442\u0440\u0430\u0432\u044B \u0440\u044F\u0434\u043E\u043C \u0441 \u0438\u0433\u0440\u043E\u043A\u043E\u043C."
 --- !u!1 &8790259868781253516
 GameObject:
   m_ObjectHideFlags: 0
@@ -13452,7 +13628,7 @@ GameObject:
   - component: {fileID: 4651240159381741963}
   - component: {fileID: 5313975765214738790}
   - component: {fileID: 7075956821324433993}
-  - component: {fileID: 2072524741799051058}
+  - component: {fileID: 3164996794488758578}
   m_Layer: 5
   m_Name: Grass Amount SL
   m_TagString: Untagged
@@ -13520,7 +13696,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &2072524741799051058
+--- !u!114 &3164996794488758578
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -13529,17 +13705,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 8909604574388146220}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 894b30c2a29be6a4fbb3ecb66c495b61, type: 3}
+  m_Script: {fileID: 11500000, guid: 8b196756e251ea948b89e13f9ccff33b, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::HorizontalSelector
-  _leftArrowButton: {fileID: 0}
-  _rightArrowButton: {fileID: 0}
-  _currentContentText: {fileID: 0}
-  _horizontalLayoutGroup: {fileID: 0}
-  _itemPrefab: {fileID: 669795276272142438, guid: 2c29139f526529e4bad7e289c27ab0a0, type: 3}
-  _space: 10
-  _animationDuration: 0.2
-  _contents: []
+  m_EditorClassIdentifier: Assembly-CSharp::RaidIntoDarkness.GraphicsOptions.GraphicsSettingTooltipRow
+  _tooltip: {fileID: 858102390112548440}
+  _description: "\u041C\u0435\u043D\u044F\u0435\u0442 \u0433\u0443\u0441\u0442\u043E\u0442\u0443 \u0442\u0440\u0430\u0432\u044B. \u041F\u0440\u0438 \u0432\u044B\u0441\u043E\u043A\u043E\u0439 \u043F\u043B\u043E\u0442\u043D\u043E\u0441\u0442\u0438 \u0434\u0432\u0438\u0436\u043E\u043A \u043E\u0442\u0440\u0438\u0441\u043E\u0432\u044B\u0432\u0430\u0435\u0442 \u0431\u043E\u043B\u044C\u0448\u0435 \u0442\u0440\u0430\u0432\u0438\u043D\u043E\u043A."
 --- !u!1 &9013489551529861103
 GameObject:
   m_ObjectHideFlags: 0
@@ -14086,13 +14256,35 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2614391835900772667, guid: 065f082bbc6a7314eb0674d18740009c, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5232352701220020563}
   m_SourcePrefab: {fileID: 100100000, guid: 065f082bbc6a7314eb0674d18740009c, type: 3}
 --- !u!224 &1485100464162024118 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 1698500367953423050, guid: 065f082bbc6a7314eb0674d18740009c, type: 3}
   m_PrefabInstance: {fileID: 220230070694756476}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &2830025904754966855 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2614391835900772667, guid: 065f082bbc6a7314eb0674d18740009c, type: 3}
+  m_PrefabInstance: {fileID: 220230070694756476}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &5232352701220020563
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2830025904754966855}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b196756e251ea948b89e13f9ccff33b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RaidIntoDarkness.GraphicsOptions.GraphicsSettingTooltipRow
+  _tooltip: {fileID: 858102390112548440}
+  _description: "\u0417\u0430\u0434\u0430\u0451\u0442 \u0448\u0438\u0440\u0438\u043D\u0443 \u0438 \u0432\u044B\u0441\u043E\u0442\u0443 \u0438\u0437\u043E\u0431\u0440\u0430\u0436\u0435\u043D\u0438\u044F \u0432 \u043F\u0438\u043A\u0441\u0435\u043B\u044F\u0445."
 --- !u!1001 &1470450278645903871
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -14192,13 +14384,35 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2614391835900772667, guid: 065f082bbc6a7314eb0674d18740009c, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2679626876110342980}
   m_SourcePrefab: {fileID: 100100000, guid: 065f082bbc6a7314eb0674d18740009c, type: 3}
 --- !u!224 &286646706755066677 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 1698500367953423050, guid: 065f082bbc6a7314eb0674d18740009c, type: 3}
   m_PrefabInstance: {fileID: 1470450278645903871}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &3467834631059681476 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2614391835900772667, guid: 065f082bbc6a7314eb0674d18740009c, type: 3}
+  m_PrefabInstance: {fileID: 1470450278645903871}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &2679626876110342980
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3467834631059681476}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b196756e251ea948b89e13f9ccff33b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RaidIntoDarkness.GraphicsOptions.GraphicsSettingTooltipRow
+  _tooltip: {fileID: 858102390112548440}
+  _description: "\u0412\u044B\u0431\u0438\u0440\u0430\u0435\u0442 \u043F\u043E\u043B\u043D\u043E\u044D\u043A\u0440\u0430\u043D\u043D\u044B\u0439 \u0440\u0435\u0436\u0438\u043C, \u043E\u043A\u043D\u043E \u0431\u0435\u0437 \u0440\u0430\u043C\u043A\u0438 \u0438\u043B\u0438 \u043E\u0431\u044B\u0447\u043D\u043E\u0435 \u043E\u043A\u043D\u043E."
 --- !u!1001 &1898450446875958419
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -14298,13 +14512,35 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2614391835900772667, guid: 065f082bbc6a7314eb0674d18740009c, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6143170808803671746}
   m_SourcePrefab: {fileID: 100100000, guid: 065f082bbc6a7314eb0674d18740009c, type: 3}
 --- !u!224 &993870046306694745 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 1698500367953423050, guid: 065f082bbc6a7314eb0674d18740009c, type: 3}
   m_PrefabInstance: {fileID: 1898450446875958419}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &4472225177277898152 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2614391835900772667, guid: 065f082bbc6a7314eb0674d18740009c, type: 3}
+  m_PrefabInstance: {fileID: 1898450446875958419}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &6143170808803671746
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4472225177277898152}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b196756e251ea948b89e13f9ccff33b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RaidIntoDarkness.GraphicsOptions.GraphicsSettingTooltipRow
+  _tooltip: {fileID: 858102390112548440}
+  _description: "\u041C\u0435\u043D\u044F\u0435\u0442 \u043A\u0430\u0447\u0435\u0441\u0442\u0432\u043E \u0440\u0430\u0441\u0447\u0451\u0442\u0430 \u043A\u043E\u043D\u0442\u0430\u043A\u0442\u043D\u044B\u0445 \u0442\u0435\u043D\u0435\u0439. \u0422\u0440\u0435\u0431\u0443\u0435\u0442 \u0432\u043A\u043B\u044E\u0447\u0451\u043D\u043D\u044B\u0445 \u043A\u043E\u043D\u0442\u0430\u043A\u0442\u043D\u044B\u0445 \u0442\u0435\u043D\u0435\u0439."
 --- !u!1001 &2081593559522399725
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -14404,13 +14640,35 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2614391835900772667, guid: 065f082bbc6a7314eb0674d18740009c, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5259151935864081356}
   m_SourcePrefab: {fileID: 100100000, guid: 065f082bbc6a7314eb0674d18740009c, type: 3}
 --- !u!224 &824448202415095591 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 1698500367953423050, guid: 065f082bbc6a7314eb0674d18740009c, type: 3}
   m_PrefabInstance: {fileID: 2081593559522399725}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &4083465057292178646 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2614391835900772667, guid: 065f082bbc6a7314eb0674d18740009c, type: 3}
+  m_PrefabInstance: {fileID: 2081593559522399725}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &5259151935864081356
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4083465057292178646}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b196756e251ea948b89e13f9ccff33b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RaidIntoDarkness.GraphicsOptions.GraphicsSettingTooltipRow
+  _tooltip: {fileID: 858102390112548440}
+  _description: "\u0414\u043E\u0431\u0430\u0432\u043B\u044F\u0435\u0442 \u043C\u044F\u0433\u043A\u043E\u0435 \u0437\u0430\u0442\u0435\u043D\u0435\u043D\u0438\u0435 \u0432 \u0443\u0433\u043B\u0430\u0445 \u0438 \u043C\u0435\u0436\u0434\u0443 \u0431\u043B\u0438\u0437\u043A\u0438\u043C\u0438 \u043F\u043E\u0432\u0435\u0440\u0445\u043D\u043E\u0441\u0442\u044F\u043C\u0438."
 --- !u!1001 &2674604582891576765
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -14529,8 +14787,30 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 1698500367953423050, guid: 065f082bbc6a7314eb0674d18740009c, type: 3}
       insertIndex: -1
       addedObject: {fileID: 4652319116946377049}
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2614391835900772667, guid: 065f082bbc6a7314eb0674d18740009c, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7264233369001552278}
   m_SourcePrefab: {fileID: 100100000, guid: 065f082bbc6a7314eb0674d18740009c, type: 3}
+--- !u!1 &96322954109803654 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2614391835900772667, guid: 065f082bbc6a7314eb0674d18740009c, type: 3}
+  m_PrefabInstance: {fileID: 2674604582891576765}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &7264233369001552278
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 96322954109803654}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b196756e251ea948b89e13f9ccff33b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RaidIntoDarkness.GraphicsOptions.GraphicsSettingTooltipRow
+  _tooltip: {fileID: 858102390112548440}
+  _description: "\u0412\u044B\u0431\u0438\u0440\u0430\u0435\u0442 \u0433\u043E\u0442\u043E\u0432\u044B\u0439 \u043D\u0430\u0431\u043E\u0440 \u043F\u0430\u0440\u0430\u043C\u0435\u0442\u0440\u043E\u0432 \u043A\u0430\u0447\u0435\u0441\u0442\u0432\u0430 \u0438\u0437\u043E\u0431\u0440\u0430\u0436\u0435\u043D\u0438\u044F."
 --- !u!224 &3642378177094465399 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 1698500367953423050, guid: 065f082bbc6a7314eb0674d18740009c, type: 3}
@@ -14635,8 +14915,30 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2614391835900772667, guid: 065f082bbc6a7314eb0674d18740009c, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3154383482788159536}
   m_SourcePrefab: {fileID: 100100000, guid: 065f082bbc6a7314eb0674d18740009c, type: 3}
+--- !u!1 &671193082419809912 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2614391835900772667, guid: 065f082bbc6a7314eb0674d18740009c, type: 3}
+  m_PrefabInstance: {fileID: 3249524189292990275}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &3154383482788159536
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 671193082419809912}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b196756e251ea948b89e13f9ccff33b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RaidIntoDarkness.GraphicsOptions.GraphicsSettingTooltipRow
+  _tooltip: {fileID: 858102390112548440}
+  _description: "\u041C\u0435\u043D\u044F\u0435\u0442 \u0434\u0435\u0442\u0430\u043B\u0438\u0437\u0430\u0446\u0438\u044E \u0442\u0435\u043A\u0441\u0442\u0443\u0440 \u0438 \u0440\u0430\u0441\u0445\u043E\u0434 \u0432\u0438\u0434\u0435\u043E\u043F\u0430\u043C\u044F\u0442\u0438."
 --- !u!224 &4218439213938566537 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 1698500367953423050, guid: 065f082bbc6a7314eb0674d18740009c, type: 3}
@@ -14741,8 +15043,30 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2614391835900772667, guid: 065f082bbc6a7314eb0674d18740009c, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8478512319990130416}
   m_SourcePrefab: {fileID: 100100000, guid: 065f082bbc6a7314eb0674d18740009c, type: 3}
+--- !u!1 &1717084587696713427 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2614391835900772667, guid: 065f082bbc6a7314eb0674d18740009c, type: 3}
+  m_PrefabInstance: {fileID: 3718953839449731048}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &8478512319990130416
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1717084587696713427}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b196756e251ea948b89e13f9ccff33b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RaidIntoDarkness.GraphicsOptions.GraphicsSettingTooltipRow
+  _tooltip: {fileID: 858102390112548440}
+  _description: "\u041C\u0435\u043D\u044F\u0435\u0442 \u0434\u0435\u0442\u0430\u043B\u0438\u0437\u0430\u0446\u0438\u044E \u0441\u043E\u043B\u043D\u0435\u0447\u043D\u044B\u0445 \u0442\u0435\u043D\u0435\u0439 \u043D\u0430 \u0440\u0430\u0437\u043D\u044B\u0445 \u0440\u0430\u0441\u0441\u0442\u043E\u044F\u043D\u0438\u044F\u0445."
 --- !u!224 &2598059964392146210 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 1698500367953423050, guid: 065f082bbc6a7314eb0674d18740009c, type: 3}
@@ -14847,13 +15171,35 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2614391835900772667, guid: 065f082bbc6a7314eb0674d18740009c, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7287027310788763888}
   m_SourcePrefab: {fileID: 100100000, guid: 065f082bbc6a7314eb0674d18740009c, type: 3}
 --- !u!224 &6883085386917403995 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 1698500367953423050, guid: 065f082bbc6a7314eb0674d18740009c, type: 3}
   m_PrefabInstance: {fileID: 5194876491088738193}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &7809179223260870314 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2614391835900772667, guid: 065f082bbc6a7314eb0674d18740009c, type: 3}
+  m_PrefabInstance: {fileID: 5194876491088738193}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &7287027310788763888
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7809179223260870314}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b196756e251ea948b89e13f9ccff33b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RaidIntoDarkness.GraphicsOptions.GraphicsSettingTooltipRow
+  _tooltip: {fileID: 858102390112548440}
+  _description: "\u0417\u0430\u0434\u0430\u0451\u0442 \u0447\u0430\u0441\u0442\u043E\u0442\u0443 \u043E\u0431\u043D\u043E\u0432\u043B\u0435\u043D\u0438\u044F \u044D\u043A\u0440\u0430\u043D\u0430 \u0432 \u044D\u043A\u0441\u043A\u043B\u044E\u0437\u0438\u0432\u043D\u043E\u043C \u043F\u043E\u043B\u043D\u043E\u044D\u043A\u0440\u0430\u043D\u043D\u043E\u043C \u0440\u0435\u0436\u0438\u043C\u0435."
 --- !u!1001 &5710390866810232718
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -14953,13 +15299,35 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2614391835900772667, guid: 065f082bbc6a7314eb0674d18740009c, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8355306227071373264}
   m_SourcePrefab: {fileID: 100100000, guid: 065f082bbc6a7314eb0674d18740009c, type: 3}
 --- !u!224 &6389810900905243972 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 1698500367953423050, guid: 065f082bbc6a7314eb0674d18740009c, type: 3}
   m_PrefabInstance: {fileID: 5710390866810232718}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &7743743540753587893 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2614391835900772667, guid: 065f082bbc6a7314eb0674d18740009c, type: 3}
+  m_PrefabInstance: {fileID: 5710390866810232718}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &8355306227071373264
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7743743540753587893}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b196756e251ea948b89e13f9ccff33b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RaidIntoDarkness.GraphicsOptions.GraphicsSettingTooltipRow
+  _tooltip: {fileID: 858102390112548440}
+  _description: "\u041E\u043F\u0440\u0435\u0434\u0435\u043B\u044F\u0435\u0442, \u043D\u0430 \u043A\u0430\u043A\u043E\u043C \u0440\u0430\u0441\u0441\u0442\u043E\u044F\u043D\u0438\u0438 \u0434\u0435\u0442\u0430\u043B\u044C\u043D\u044B\u0435 \u043C\u043E\u0434\u0435\u043B\u0438 \u0441\u043C\u0435\u043D\u044F\u044E\u0442\u0441\u044F \u0443\u043F\u0440\u043E\u0449\u0451\u043D\u043D\u044B\u043C\u0438."
 --- !u!1001 &8066413868672747535
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -15059,8 +15427,30 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2614391835900772667, guid: 065f082bbc6a7314eb0674d18740009c, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6103031048979652065}
   m_SourcePrefab: {fileID: 100100000, guid: 065f082bbc6a7314eb0674d18740009c, type: 3}
+--- !u!1 &5456541033414920500 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2614391835900772667, guid: 065f082bbc6a7314eb0674d18740009c, type: 3}
+  m_PrefabInstance: {fileID: 8066413868672747535}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &6103031048979652065
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5456541033414920500}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b196756e251ea948b89e13f9ccff33b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RaidIntoDarkness.GraphicsOptions.GraphicsSettingTooltipRow
+  _tooltip: {fileID: 858102390112548440}
+  _description: "\u041E\u0433\u0440\u0430\u043D\u0438\u0447\u0438\u0432\u0430\u0435\u0442 \u0447\u0430\u0441\u0442\u043E\u0442\u0443 \u043A\u0430\u0434\u0440\u043E\u0432. \u041F\u0440\u0438 \u0432\u043A\u043B\u044E\u0447\u0451\u043D\u043D\u043E\u043C V-Sync \u0432\u044B\u0432\u043E\u0434 \u043A\u0430\u0434\u0440\u043E\u0432 \u043F\u043E\u0434\u0447\u0438\u043D\u044F\u0435\u0442\u0441\u044F \u0441\u0438\u043D\u0445\u0440\u043E\u043D\u0438\u0437\u0430\u0446\u0438\u0438."
 --- !u!224 &8675025491649749701 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 1698500367953423050, guid: 065f082bbc6a7314eb0674d18740009c, type: 3}
@@ -15165,8 +15555,30 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2614391835900772667, guid: 065f082bbc6a7314eb0674d18740009c, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8085347725112077789}
   m_SourcePrefab: {fileID: 100100000, guid: 065f082bbc6a7314eb0674d18740009c, type: 3}
+--- !u!1 &6227270333668972939 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2614391835900772667, guid: 065f082bbc6a7314eb0674d18740009c, type: 3}
+  m_PrefabInstance: {fileID: 8224587605940295856}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &8085347725112077789
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6227270333668972939}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b196756e251ea948b89e13f9ccff33b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RaidIntoDarkness.GraphicsOptions.GraphicsSettingTooltipRow
+  _tooltip: {fileID: 858102390112548440}
+  _description: "\u0412\u044B\u0431\u0438\u0440\u0430\u0435\u0442 \u0441\u043F\u043E\u0441\u043E\u0431 \u0441\u0433\u043B\u0430\u0436\u0438\u0432\u0430\u043D\u0438\u044F \u043D\u0435\u0440\u043E\u0432\u043D\u044B\u0445 \u043A\u0440\u0430\u0451\u0432 \u0438 \u043C\u0435\u0440\u0446\u0430\u043D\u0438\u044F \u0434\u0435\u0442\u0430\u043B\u0435\u0439."
 --- !u!224 &7327870958991913594 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 1698500367953423050, guid: 065f082bbc6a7314eb0674d18740009c, type: 3}
@@ -15271,8 +15683,30 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2614391835900772667, guid: 065f082bbc6a7314eb0674d18740009c, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 875358916622575559}
   m_SourcePrefab: {fileID: 100100000, guid: 065f082bbc6a7314eb0674d18740009c, type: 3}
+--- !u!1 &5960656891562366915 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2614391835900772667, guid: 065f082bbc6a7314eb0674d18740009c, type: 3}
+  m_PrefabInstance: {fileID: 8570541789285652216}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &875358916622575559
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5960656891562366915}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b196756e251ea948b89e13f9ccff33b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RaidIntoDarkness.GraphicsOptions.GraphicsSettingTooltipRow
+  _tooltip: {fileID: 858102390112548440}
+  _description: "\u0417\u0430\u0434\u0430\u0451\u0442 \u043A\u0430\u0447\u0435\u0441\u0442\u0432\u043E \u0441\u0433\u043B\u0430\u0436\u0438\u0432\u0430\u043D\u0438\u044F \u0434\u043B\u044F SMAA \u0438 TAA."
 --- !u!224 &7017425485847657522 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 1698500367953423050, guid: 065f082bbc6a7314eb0674d18740009c, type: 3}
@@ -15352,7 +15786,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1698500367953423050, guid: 065f082bbc6a7314eb0674d18740009c, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -315
+      value: -375
       objectReference: {fileID: 0}
     - target: {fileID: 1698500367953423050, guid: 065f082bbc6a7314eb0674d18740009c, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -15377,8 +15811,30 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2614391835900772667, guid: 065f082bbc6a7314eb0674d18740009c, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7087504184254782210}
   m_SourcePrefab: {fileID: 100100000, guid: 065f082bbc6a7314eb0674d18740009c, type: 3}
+--- !u!1 &6910319803924435620 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2614391835900772667, guid: 065f082bbc6a7314eb0674d18740009c, type: 3}
+  m_PrefabInstance: {fileID: 8912145075028317087}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &7087504184254782210
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6910319803924435620}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b196756e251ea948b89e13f9ccff33b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RaidIntoDarkness.GraphicsOptions.GraphicsSettingTooltipRow
+  _tooltip: {fileID: 858102390112548440}
+  _description: "\u041C\u0435\u043D\u044F\u0435\u0442 \u0434\u0435\u0442\u0430\u043B\u0438\u0437\u0430\u0446\u0438\u044E \u043E\u0431\u044A\u0451\u043C\u043D\u043E\u0433\u043E \u0442\u0443\u043C\u0430\u043D\u0430 \u0438 \u043D\u0430\u0433\u0440\u0443\u0437\u043A\u0443 \u043E\u0442 \u0435\u0433\u043E \u043E\u0442\u0440\u0438\u0441\u043E\u0432\u043A\u0438."
 --- !u!224 &7799114907323251029 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 1698500367953423050, guid: 065f082bbc6a7314eb0674d18740009c, type: 3}
@@ -15483,8 +15939,30 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2614391835900772667, guid: 065f082bbc6a7314eb0674d18740009c, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 235908860891971115}
   m_SourcePrefab: {fileID: 100100000, guid: 065f082bbc6a7314eb0674d18740009c, type: 3}
+--- !u!1 &6404352878140167687 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2614391835900772667, guid: 065f082bbc6a7314eb0674d18740009c, type: 3}
+  m_PrefabInstance: {fileID: 8982704915176986428}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &235908860891971115
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6404352878140167687}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b196756e251ea948b89e13f9ccff33b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RaidIntoDarkness.GraphicsOptions.GraphicsSettingTooltipRow
+  _tooltip: {fileID: 858102390112548440}
+  _description: "\u041F\u043E\u0432\u044B\u0448\u0430\u0435\u0442 \u0447\u0451\u0442\u043A\u043E\u0441\u0442\u044C \u0442\u0435\u043A\u0441\u0442\u0443\u0440 \u043D\u0430 \u043F\u043E\u0432\u0435\u0440\u0445\u043D\u043E\u0441\u0442\u044F\u0445, \u0432\u0438\u0434\u0438\u043C\u044B\u0445 \u043F\u043E\u0434 \u043E\u0441\u0442\u0440\u044B\u043C \u0443\u0433\u043B\u043E\u043C."
 --- !u!224 &7726685553809980918 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 1698500367953423050, guid: 065f082bbc6a7314eb0674d18740009c, type: 3}

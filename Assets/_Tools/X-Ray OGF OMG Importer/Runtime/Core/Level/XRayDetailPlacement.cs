@@ -101,18 +101,20 @@ namespace XRay.Importer.Core.Level
         private readonly XRayCollisionModel _collision;
         private readonly bool[] _passable;
         private readonly XRayDetailPlacementSettings _settings;
+        private readonly XRayDetailSlotGeometry _geometry;
         private readonly int[,] _dither = new int[16, 16];
         private readonly List<int> _triangles = new List<int>();
         private readonly HashSet<int> _seen = new HashSet<int>();
         private readonly float[][] _alpha = { new float[4], new float[4], new float[4], new float[4] };
         private readonly int[] _selected = new int[4];
 
-        public XRayDetailPlacement(XRayDetails details, XRayCollisionModel collision, bool[] passableMaterials, XRayDetailPlacementSettings settings)
+        public XRayDetailPlacement(XRayDetails details, XRayCollisionModel collision, bool[] passableMaterials, XRayDetailPlacementSettings settings, XRayDetailSlotGeometry geometry = null)
         {
             _details = details;
             _collision = collision;
             _passable = passableMaterials;
             _settings = settings;
+            _geometry = geometry;
             Statistics.PerModel = new int[details.Models.Count];
             BuildDither();
         }
@@ -137,13 +139,9 @@ namespace XRay.Importer.Core.Level
             Statistics.SlotsProcessed++;
             int sx = dbX - _details.OffsetX;
             int sz = dbZ - _details.OffsetZ;
-            float minX = sx * XRayDetails.SLOT_SIZE - EPS_L;
-            float minY = slot.YBase - EPS_L;
-            float minZ = sz * XRayDetails.SLOT_SIZE - EPS_L;
-            float maxX = sx * XRayDetails.SLOT_SIZE + XRayDetails.SLOT_SIZE + EPS_L;
-            float maxY = slot.YBase + slot.YHeight + EPS_L;
-            float maxZ = sz * XRayDetails.SLOT_SIZE + XRayDetails.SLOT_SIZE + EPS_L;
-            _collision.QueryBox(minX, minY, minZ, maxX, maxY, maxZ, _triangles, _seen);
+            var bounds = new XRayDetailSlotBounds(slot, sx, sz);
+            if (_geometry != null) _geometry.GetFaces(dbZ * _details.SizeX + dbX, _triangles);
+            else bounds.Query(_collision, _triangles, _seen);
             if (_triangles.Count == 0)
             {
                 Statistics.SlotsWithoutGround++;
@@ -193,8 +191,8 @@ namespace XRay.Importer.Core.Level
                     int index = selectedCount == 1 ? _selected[0] : _selected[selection.RandI(selectedCount)];
                     int modelId = slot.GetId(index);
                     Statistics.Candidates++;
-                    float rx = (float)x / size * XRayDetails.SLOT_SIZE + minX;
-                    float rz = (float)z / size * XRayDetails.SLOT_SIZE + minZ;
+                    float rx = (float)x / size * XRayDetails.SLOT_SIZE + bounds.MinX;
+                    float rz = (float)z / size * XRayDetails.SLOT_SIZE + bounds.MinZ;
                     float jx;
                     float jz;
                     if (_settings.JitterZBeforeX)
@@ -210,8 +208,8 @@ namespace XRay.Importer.Core.Level
 
                     float px = rx + jx;
                     float pz = rz + jz;
-                    float py = maxY;
-                    float y = minY - 5.0f;
+                    float py = bounds.MaxY;
+                    float y = bounds.MinY - 5.0f;
                     float nx = 0.0f;
                     float ny = 1.0f;
                     float nz = 0.0f;
@@ -257,7 +255,7 @@ namespace XRay.Importer.Core.Level
                         continue;
                     }
 
-                    if (y < minY || modelId >= _details.Models.Count)
+                    if (y < bounds.MinY || modelId >= _details.Models.Count)
                     {
                         Statistics.Rejected++;
                         continue;

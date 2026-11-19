@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using UnityEngine;
 using UnityEngine.Rendering;
 using XRay.Importer.Core.Level;
@@ -48,12 +49,14 @@ namespace XRay.Importer.Levels
         private GameConfig _configuration;
         private Vector3 _bakedBoundsPadding;
         private XRayDetailPopulation _population;
+        private CancellationTokenSource _sourceLifetime;
         private Vector4[][] _extraBuffers;
         private int _streamFrame = -1;
         private float _heightPrevious;
         private float _heightRendered;
         private double _lastStreamTime;
         private Camera _sceneStreamingCamera;
+        private Camera _fallbackRuntimeCamera;
         private int _heightFrame = -1;
 
         public XRayDetailDatabase Database
@@ -92,6 +95,7 @@ namespace XRay.Importer.Levels
                 _streamingCamera = value;
                 _streamFrame = -1;
                 _sceneStreamingCamera = null;
+                _fallbackRuntimeCamera = null;
             }
         }
 
@@ -127,8 +131,25 @@ namespace XRay.Importer.Levels
             _block = null;
         }
 
+        private void Start()
+        {
+            if (Application.IsPlaying(gameObject)) BeginRuntimePreparation();
+        }
+
+        private void LateUpdate()
+        {
+            if (!Application.IsPlaying(gameObject) || _database == null || !_database.HasRuntimeSource) return;
+            BeginRuntimePreparation();
+            Camera owner = _streamingCamera != null ? _streamingCamera : Camera.main;
+            if (owner == null) owner = _fallbackRuntimeCamera;
+            if (owner == null || !owner.isActiveAndEnabled || owner.cameraType != CameraType.Game || _streamFrame == Time.frameCount) return;
+            StreamSource(owner.transform.position);
+            _streamFrame = Time.frameCount;
+        }
+
         private void ResetCache()
         {
+            StopRuntimePreparation();
             _cache.Clear();
             _usage.Clear();
             _shadowCells.Clear();
@@ -142,6 +163,7 @@ namespace XRay.Importer.Levels
             _streamFrame = -1;
             _lastStreamTime = 0.0;
             _sceneStreamingCamera = null;
+            _fallbackRuntimeCamera = null;
             _heightFrame = -1;
         }
 
@@ -476,9 +498,63 @@ namespace XRay.Importer.Levels
 
         public void PrepareSource(XRayGrassSettings settings)
         {
+            StopRuntimePreparation();
             SetSettings(settings);
             _population = new XRayDetailPopulation(_database, _settings.Defaults);
             _population.Apply(_settings.Values);
+        }
+
+        private void BeginRuntimePreparation()
+        {
+            if (_population != null || _sourceLifetime != null || _database == null || !_database.HasRuntimeSource || SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null) return;
+            BindSettings();
+            if (_settings == null) return;
+            _sourceLifetime = CancellationTokenSource.CreateLinkedTokenSource(Application.exitCancellationToken);
+            _ = PrepareRuntimeSourceAsync(_sourceLifetime.Token);
+        }
+
+        private void StopRuntimePreparation()
+        {
+            if (_sourceLifetime == null) return;
+            _sourceLifetime.Cancel();
+            _sourceLifetime.Dispose();
+            _sourceLifetime = null;
+        }
+
+        private async Awaitable PrepareRuntimeSourceAsync(CancellationToken cancellationToken)
+        {
+            XRayDetailPopulation population = null;
+            Exception failure = null;
+            try
+            {
+                XRayDetailPopulation.Source source = XRayDetailPopulation.Source.Capture(_database, _settings.Defaults, false);
+                Camera owner = _streamingCamera != null ? _streamingCamera : Camera.main;
+                Vector3? initialEye = owner != null && owner.isActiveAndEnabled && owner.cameraType == CameraType.Game ? owner.transform.position : null;
+                XRayGrassValues initialValues = _settings.Values;
+                await Awaitable.BackgroundThreadAsync();
+                population = new XRayDetailPopulation(source, cancellationToken);
+                if (initialEye is Vector3 eye) population.PrepareNear(eye, initialValues, cancellationToken);
+            }
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+            {
+            }
+            catch (Exception exception)
+            {
+                failure = exception;
+            }
+
+            await Awaitable.MainThreadAsync();
+            if (cancellationToken.IsCancellationRequested) return;
+            if (failure != null)
+            {
+                Debug.LogError("Could not prepare grass for " + _database.LevelName + ": " + failure.Message, this);
+                return;
+            }
+
+            if (population.PreparedCollision != null) XRayRuntimeCollisionSource.Cache(_database.SourceCollision, population.PreparedCollision);
+            if (population.RejectedSlotGeometry) Debug.LogWarning("Grass slot geometry is outdated or damaged for " + _database.LevelName + "; using level collision.", this);
+            population.Apply(_settings.Values);
+            _population = population;
         }
 
         public void StreamSource(Vector3 eye)
@@ -486,6 +562,12 @@ namespace XRay.Importer.Levels
             if (_settings == null) return;
             if (_population == null)
             {
+                if (Application.IsPlaying(gameObject))
+                {
+                    BeginRuntimePreparation();
+                    return;
+                }
+
                 _population = new XRayDetailPopulation(_database, _settings.Defaults);
                 _population.Apply(_settings.Values);
             }
@@ -493,7 +575,8 @@ namespace XRay.Importer.Levels
             double now = Time.realtimeSinceStartupAsDouble;
             float delta = Application.isPlaying ? Time.deltaTime : _lastStreamTime > 0.0 ? Mathf.Clamp((float)(now - _lastStreamTime), 0.0f, 0.1f) : 0.0f;
             _lastStreamTime = now;
-            _population.Stream(eye, delta);
+            if (_sourceLifetime != null) _population.StreamBackground(eye, delta, _sourceLifetime.Token);
+            else _population.Stream(eye, delta);
         }
 
         private void RenderSource(Camera camera)
@@ -501,11 +584,11 @@ namespace XRay.Importer.Levels
             BindSettings();
             if (_settings == null) return;
             Vector3 eye = camera.transform.position;
-            if ((!Application.isPlaying || _streamFrame != Time.frameCount) && CanStreamFrom(camera))
+            if (!Application.isPlaying && CanStreamFrom(camera))
             {
                 StreamSource(eye);
-                _streamFrame = Time.frameCount;
             }
+            else if (Application.isPlaying && _streamingCamera == null && (_fallbackRuntimeCamera == null || !_fallbackRuntimeCamera.isActiveAndEnabled) && CanStreamFrom(camera)) _fallbackRuntimeCamera = camera;
 
             if (_population == null) return;
             XRayFloraWindProvider provider = XRayFloraWindProvider.Active;

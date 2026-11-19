@@ -1616,7 +1616,7 @@ namespace XRay.Importer.Editor.Levels
             builder.RequestTextures(_textures);
             _textures.ImportAll();
             XRayDetailDatabase database = builder.Build(_textures, _materials);
-            builder.BindRuntimeSource(database, path, LevelFile("level.cform"), _passable);
+            builder.BindRuntimeSource(database, path, LevelFile("level.cform"), _passable, _collision);
             foreach (XRayDetailModelEntry model in database.Models)
             {
                 if (model.Material != null && model.Material.GetTexture("_BaseColorMap") == null)
@@ -1798,8 +1798,16 @@ namespace XRay.Importer.Editor.Levels
             XRayLevelSourceManifest.Collect(_record, _info.Effective ?? new XRayEffectiveGamedata(_sourceIndex), _entry);
 
             bool occlusionChanged = false;
+            bool grassGeometryChanged = false;
             if (_record.Completed)
             {
+                if (_resourcesOnly && _content.Details == null && _request.Settings.ImportDetails && _request.Settings.RuntimeDetails)
+                {
+                    string databasePath = XRayLevelPaths.Details(_record.LevelName) + "/" + XRayLevelDetailBuilder.DATABASE_NAME;
+                    XRayDetailDatabase database = AssetDatabase.LoadAssetAtPath<XRayDetailDatabase>(databasePath);
+                    grassGeometryChanged = XRayDetailSlotGeometryPreparation.PrepareForImport(database, _record);
+                }
+
                 try
                 {
                     occlusionChanged = XRayVegetationOccluderPreparation.PrepareLevel(folder, _record, true);
@@ -1810,7 +1818,7 @@ namespace XRay.Importer.Editor.Levels
                 }
             }
 
-            bool unchanged = _record.Completed && _resourcesOnly && _anomalyPlan == null && _previous != null && !occlusionChanged && !_materials.Changed && _textures.Imported == 0 && _previous.Settings == _record.Settings && _record.Source.ChangesSincePrevious.Count == 0 && _record.Source.ProfileFingerprint == _previous.Source.ProfileFingerprint && _record.Source.IndexFingerprint == _previous.Source.IndexFingerprint && _previous.GetMetric("HomSourceTriangles") == _record.GetMetric("HomSourceTriangles") && _previous.GetMetric("HomOccluderTriangles") == _record.GetMetric("HomOccluderTriangles");
+            bool unchanged = _record.Completed && _resourcesOnly && _anomalyPlan == null && _previous != null && !occlusionChanged && !grassGeometryChanged && !_materials.Changed && _textures.Imported == 0 && _previous.Settings == _record.Settings && _record.Source.ChangesSincePrevious.Count == 0 && _record.Source.ProfileFingerprint == _previous.Source.ProfileFingerprint && _record.Source.IndexFingerprint == _previous.Source.IndexFingerprint && _previous.GetMetric("HomSourceTriangles") == _record.GetMetric("HomSourceTriangles") && _previous.GetMetric("HomOccluderTriangles") == _record.GetMetric("HomOccluderTriangles");
             string reportPath = XRayLevelPaths.AttemptReportPath(_record.LevelName, _record.Source.ProfileId);
             if (unchanged)
             {

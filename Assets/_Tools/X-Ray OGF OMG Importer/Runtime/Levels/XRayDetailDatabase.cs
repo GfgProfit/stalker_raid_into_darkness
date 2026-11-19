@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Security.Cryptography;
 using UnityEngine;
 
 namespace XRay.Importer.Levels
@@ -123,6 +125,10 @@ namespace XRay.Importer.Levels
         [SerializeField] private TextAsset _sourceCollision;
         [SerializeField] private bool[] _passable;
         [SerializeField] private int _sourceProfile;
+        [SerializeField] private TextAsset _sourceSlotGeometry;
+        [SerializeField] private string _sourceSlotGeometrySignature;
+        [SerializeField] private string _sourceSlotGeometryDetailsHash;
+        [SerializeField] private string _sourceSlotGeometryCollisionHash;
 
         public string LevelName => _levelName;
         public float ChunkSize => _chunkSize;
@@ -140,16 +146,39 @@ namespace XRay.Importer.Levels
 
         public TextAsset SourceDetails => _sourceDetails;
         public TextAsset SourceCollision => _sourceCollision;
+        public TextAsset SourceSlotGeometry => _sourceSlotGeometry;
+        public string SourceSlotGeometrySignature => _sourceSlotGeometrySignature;
+        public string SourceSlotGeometryDetailsHash => _sourceSlotGeometryDetailsHash;
+        public string SourceSlotGeometryCollisionHash => _sourceSlotGeometryCollisionHash;
         public bool[] Passable => _passable;
         public int SourceProfile => _sourceProfile;
         public bool HasRuntimeSource => _sourceDetails != null && _sourceCollision != null && _sourceProfile > 0;
 
         public void SetRuntimeSource(TextAsset details, TextAsset collision, bool[] passable, int sourceProfile)
         {
+            if (_sourceDetails != details || _sourceCollision != collision)
+            {
+                SetRuntimeSlotGeometry(null, null, null, null);
+            }
+
             _sourceDetails = details;
             _sourceCollision = collision;
             _passable = passable;
             _sourceProfile = sourceProfile;
+        }
+
+        public void SetRuntimeSlotGeometry(TextAsset geometry, string signature, string detailsHash, string collisionHash)
+        {
+            _sourceSlotGeometry = geometry;
+            _sourceSlotGeometrySignature = signature;
+            _sourceSlotGeometryDetailsHash = detailsHash;
+            _sourceSlotGeometryCollisionHash = collisionHash;
+        }
+
+        public static string ComputeSlotGeometrySourceHash(Stream stream)
+        {
+            using SHA256 sha = SHA256.Create();
+            return BitConverter.ToString(sha.ComputeHash(stream));
         }
 
         public void Initialize(string levelName, float chunkSize, float density, float heightScale, float slotSize, List<XRayDetailModelEntry> models, List<XRayDetailChunk> chunks, TextAsset instances, TextAsset slots, XRayDetailSwing swingNormal, XRayDetailSwing swingFast, int instanceCount, int slotCount)

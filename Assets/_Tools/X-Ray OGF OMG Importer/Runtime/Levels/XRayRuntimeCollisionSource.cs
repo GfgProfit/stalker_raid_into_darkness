@@ -19,6 +19,16 @@ namespace XRay.Importer.Levels
             return Application.isPlaying ? _cache.GetValue(source, Parse) : Parse(source);
         }
 
+        internal static XRayCollisionModel GetCached(TextAsset source)
+        {
+            return _cache.TryGetValue(source, out XRayCollisionModel collision) ? collision : null;
+        }
+
+        internal static void Cache(TextAsset source, XRayCollisionModel collision)
+        {
+            if (!_cache.TryGetValue(source, out _)) _cache.Add(source, collision);
+        }
+
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         private static void Reset()
         {

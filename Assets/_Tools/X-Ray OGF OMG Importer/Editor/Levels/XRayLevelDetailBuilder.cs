@@ -364,7 +364,7 @@ namespace XRay.Importer.Editor.Levels
             return materials.Get(new XRayLevelMaterialRequest { ShaderName = model.Shader, Surface = surface, Textures = set, Detail = true, RuntimeDetail = _settings.RuntimeDetails, Flora = _floraTextures?[model.Index] });
         }
 
-        public void BindRuntimeSource(XRayDetailDatabase database, string detailsPath, string collisionPath, bool[] passable)
+        public void BindRuntimeSource(XRayDetailDatabase database, string detailsPath, string collisionPath, bool[] passable, XRayCollisionModel collision)
         {
             if (!_settings.RuntimeDetails) return;
             if (passable == null) throw new InvalidOperationException("Runtime details require source gamemtl.xr passable flags.");
@@ -378,6 +378,7 @@ namespace XRay.Importer.Editor.Levels
             database.SetRuntimeSource(AssetDatabase.LoadAssetAtPath<TextAsset>(detailsAsset), AssetDatabase.LoadAssetAtPath<TextAsset>(collisionAsset), passable, _source.Profile == XRayFloraSourceProfile.AnomalySss ? 1 : 2);
             EditorUtility.SetDirty(database);
             AssetDatabase.SaveAssetIfDirty(database);
+            XRayDetailSlotGeometryPreparation.PrepareForImport(database, _record, _details, collision);
             _record.GeneratedAssets.Add(detailsAsset);
             _record.GeneratedAssets.Add(collisionAsset);
             _record.AddLimitation("Runtime details retain immutable source level.details and level.cform. Density resamples source slots without reimport; legacy baked DetailInstances are empty. Anomaly placement targets xray-monolith 2026.5.24; TS placement and HDRP cascades remain PARTIAL / SOURCE BLOCKED.");

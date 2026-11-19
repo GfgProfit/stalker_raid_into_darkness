@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using XRay.Importer.Levels;
 
 namespace RaidIntoDarkness.GraphicsOptions
 {
@@ -95,9 +96,10 @@ namespace RaidIntoDarkness.GraphicsOptions
         public bool vSync;
         public int fpsLimit;
         public int brightness;
+        public float grassHeight;
         public VideoQuality quality;
 
-        public bool Valid => version == VideoPresets.SAVE_VERSION && preset >= 0 && preset < VideoPresets.COUNT && display.Valid && VideoPresets.IsFrameLimit(fpsLimit) && brightness >= 50 && brightness <= 150 && quality.Valid;
+        public bool Valid => version == VideoPresets.SAVE_VERSION && preset >= 0 && preset < VideoPresets.COUNT && display.Valid && VideoPresets.IsFrameLimit(fpsLimit) && brightness >= 50 && brightness <= 150 && XRayGrassValues.IsValidHeight(grassHeight) && quality.Valid;
     }
 
     public sealed class VideoPresets
@@ -140,7 +142,7 @@ namespace RaidIntoDarkness.GraphicsOptions
 
         public VideoSettings Defaults(VideoDisplay display)
         {
-            return new VideoSettings { version = SAVE_VERSION, display = display, preset = DEFAULT_PRESET, brightness = 100, fpsLimit = -1, quality = _qualities[DEFAULT_PRESET] };
+            return new VideoSettings { version = SAVE_VERSION, display = display, preset = DEFAULT_PRESET, brightness = 100, fpsLimit = -1, grassHeight = XRayGrassValues.DEFAULT_HEIGHT, quality = _qualities[DEFAULT_PRESET] };
         }
 
         public VideoSettings Select(VideoSettings settings, int preset)
@@ -237,6 +239,7 @@ namespace RaidIntoDarkness.GraphicsOptions
                     settings.quality.ambientOcclusion = defaults.quality.ambientOcclusion;
                     break;
                 case VideoCategory.Vegetation:
+                    settings.grassHeight = defaults.grassHeight;
                     settings.quality.grassSpacing = defaults.quality.grassSpacing;
                     settings.quality.grassDistance = defaults.quality.grassDistance;
                     settings.quality.grassShadows = defaults.quality.grassShadows;

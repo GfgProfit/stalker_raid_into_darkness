@@ -86,9 +86,9 @@ namespace RaidIntoDarkness.GraphicsOptions
             if (_grass != null)
             {
                 XRayGrassValues current = _grass.Values;
-                if (!_grass.HasOverrides || !Mathf.Approximately(current.Density, quality.grassSpacing) || current.Radius != quality.grassDistance || current.Shadows != quality.grassShadows)
+                if (!_grass.HasOverrides || !Mathf.Approximately(current.Density, quality.grassSpacing) || current.Radius != quality.grassDistance || current.Height != settings.grassHeight || current.Shadows != quality.grassShadows)
                 {
-                    _grass.Set(new XRayGrassValues(quality.grassSpacing, quality.grassDistance, current.Height, quality.grassShadows), false);
+                    _grass.Set(new XRayGrassValues(quality.grassSpacing, quality.grassDistance, settings.grassHeight, quality.grassShadows), false);
                 }
             }
             _rendering?.Apply(quality);
@@ -120,14 +120,16 @@ namespace RaidIntoDarkness.GraphicsOptions
             int localDistance = Mathf.RoundToInt(XRayVideoOverrides.DefaultPunctualShadowDistance ?? 75.0f);
             Presets = new VideoPresets(baseline?.Density ?? 0.45f, localDistance, baseline?.Shadows ?? false);
             VideoSettings defaults = Presets.Defaults(Display.Read());
+            defaults.grassHeight = baseline?.Height ?? XRayGrassValues.DEFAULT_HEIGHT;
+            float legacyHeight = _grass?.Values.Height ?? defaults.grassHeight;
             string settingsPath = VideoSettingsStore.ResolvePath(Application.isEditor, Application.dataPath, Application.persistentDataPath, Application.productName);
             _store = new VideoSettingsStore(settingsPath);
-            bool loaded = _store.TryLoad(out VideoSettings initial, upgradeFile: true);
+            bool loaded = _store.TryLoad(out VideoSettings initial, upgradeFile: true, fallbackGrassHeight: legacyHeight);
             _hasSavedSettings = loaded;
             if (!loaded && Application.isEditor && !File.Exists(settingsPath))
             {
                 var previousStore = new VideoSettingsStore(Path.Combine(Application.persistentDataPath, VideoSettingsStore.FILE_NAME));
-                loaded = previousStore.TryLoad(out initial);
+                loaded = previousStore.TryLoad(out initial, fallbackGrassHeight: legacyHeight);
                 if (loaded)
                 {
                     _hasSavedSettings = _store.TrySave(initial);
@@ -139,6 +141,7 @@ namespace RaidIntoDarkness.GraphicsOptions
                 if (_grass != null && _grass.HasOverrides)
                 {
                     XRayGrassValues legacy = _grass.Values;
+                    initial.grassHeight = legacy.Height;
                     initial.quality.grassSpacing = legacy.Density;
                     initial.quality.grassDistance = legacy.Radius;
                     initial.quality.grassShadows = legacy.Shadows;

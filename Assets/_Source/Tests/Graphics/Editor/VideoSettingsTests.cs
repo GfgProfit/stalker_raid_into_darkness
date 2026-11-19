@@ -1,4 +1,5 @@
 using System.IO;
+using System.Reflection;
 using NUnit.Framework;
 using UnityEngine;
 
@@ -30,6 +31,7 @@ namespace RaidIntoDarkness.GraphicsOptions.Tests
             settings.vSync = true;
             settings.fpsLimit = 144;
             settings.brightness = 73;
+            settings.grassHeight = 1.35f;
             int[] grassDensities = { 30, 50, 75, 100, 115 };
             int[] grassDistances = { 50, 80, 90, 100, 110 };
             for (int index = 0; index < VideoPresets.COUNT; index++)
@@ -46,6 +48,7 @@ namespace RaidIntoDarkness.GraphicsOptions.Tests
                 Assert.That(settings.vSync, Is.True);
                 Assert.That(settings.fpsLimit, Is.EqualTo(144));
                 Assert.That(settings.brightness, Is.EqualTo(73));
+                Assert.That(settings.grassHeight, Is.EqualTo(1.35f));
             }
         }
 
@@ -74,12 +77,26 @@ namespace RaidIntoDarkness.GraphicsOptions.Tests
             for (int i = 0; i < VideoPresets.COUNT; i++)
             {
                 VideoSettings value = _presets.Select(_presets.Defaults(display), i);
+                value.grassHeight = 1.35f;
                 VideoSettings restored = JsonUtility.FromJson<VideoSettings>(JsonUtility.ToJson(value));
                 Assert.That(restored.Valid, Is.True);
                 Assert.That(restored, Is.EqualTo(value));
                 Assert.That(_presets.Match(restored.quality), Is.EqualTo(i));
             }
             Assert.That(JsonUtility.FromJson<VideoSettings>("{\"version\":" + VideoPresets.SAVE_VERSION + "}").Valid, Is.False);
+        }
+
+        [Test]
+        public void OlderGraphicsFileUsesExistingGrassHeight()
+        {
+            VideoSettings legacy = _presets.Defaults(_desktop);
+            legacy.brightness = 86;
+            legacy.grassHeight = 1.35f;
+            string json = $"{{\"version\":{legacy.version},\"preset\":{legacy.preset},\"display\":{JsonUtility.ToJson(legacy.display)},\"fpsLimit\":{legacy.fpsLimit},\"brightness\":{legacy.brightness},\"quality\":{JsonUtility.ToJson(legacy.quality)}}}";
+            MethodInfo deserialize = typeof(VideoSettingsStore).GetMethod("Deserialize", BindingFlags.NonPublic | BindingFlags.Static);
+            VideoSettings restored = (VideoSettings)deserialize.Invoke(null, new object[] { json, legacy.grassHeight, false });
+            Assert.That(restored.Valid, Is.True);
+            Assert.That(restored, Is.EqualTo(legacy));
         }
 
         [Test]
@@ -107,16 +124,20 @@ namespace RaidIntoDarkness.GraphicsOptions.Tests
             VideoSettings initial = _presets.Select(defaults, 1);
             initial.brightness = 89;
             initial.fpsLimit = 120;
+            initial.grassHeight = 1.35f;
             var session = new VideoSettingsSession(target, _presets, defaults, initial);
             session.Reset(VideoCategory.Image);
             Assert.That(session.Draft.brightness, Is.EqualTo(defaults.brightness));
             Assert.That(session.Draft.quality.renderScale, Is.EqualTo(defaults.quality.renderScale));
             Assert.That(session.Draft.quality.anisotropy, Is.EqualTo(initial.quality.anisotropy));
             Assert.That(session.Draft.fpsLimit, Is.EqualTo(120));
+            Assert.That(session.Draft.grassHeight, Is.EqualTo(initial.grassHeight));
             Assert.That(target.Brightness, Is.EqualTo(100));
             session.Cancel(0.0);
             Assert.That(target.Brightness, Is.EqualTo(89));
             Assert.That(session.Dirty, Is.False);
+            session.Reset(VideoCategory.Vegetation);
+            Assert.That(session.Draft.grassHeight, Is.EqualTo(defaults.grassHeight));
             session.Reset(VideoCategory.All);
             Assert.That(session.Draft, Is.EqualTo(defaults));
             Assert.That(session.Confirmed, Is.EqualTo(initial));

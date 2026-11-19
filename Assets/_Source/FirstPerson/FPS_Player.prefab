@@ -714,7 +714,8 @@ MonoBehaviour:
   _open: {fileID: 2017095082137650294}
   _back: {fileID: 8814361770052269847}
   _graphics: {fileID: 8934916860340707523}
-  _play: {fileID: 0}
+  _playMilitary: {fileID: 0}
+  _playDemo: {fileID: 0}
   _quit: {fileID: 0}
   _externalCancelInput: 1
   _apply: {fileID: 4782323947968782528}
@@ -742,6 +743,7 @@ MonoBehaviour:
   - {fileID: 4279114332325392425}
   - {fileID: 7823236174111851874}
   - {fileID: 6798985943707534926}
+  - {fileID: 3142556675854725345}
   _readouts:
   - {fileID: 6192799284197730878}
   - {fileID: 7251253777911242640}
@@ -749,6 +751,7 @@ MonoBehaviour:
   - {fileID: 2247848701739035836}
   - {fileID: 7909091316484302157}
   - {fileID: 219260381974561338}
+  - {fileID: 1877218414858004369}
   _toggles:
   - {fileID: 6119195343184247219}
   - {fileID: 8509419756699845748}
@@ -5416,6 +5419,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 894b30c2a29be6a4fbb3ecb66c495b61, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HorizontalSelector
+--- !u!114 &1877218414858004369 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8143657237022261551, guid: 5f197c5b7300fd745976262a93fafd20, type: 3}
+  m_PrefabInstance: {fileID: 7712745520999868094}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &1911309708709214757 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 8182894435213810843, guid: 5f197c5b7300fd745976262a93fafd20, type: 3}
@@ -5487,6 +5501,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 894b30c2a29be6a4fbb3ecb66c495b61, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HorizontalSelector
+--- !u!114 &3142556675854725345 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4653827595185739359, guid: 5f197c5b7300fd745976262a93fafd20, type: 3}
+  m_PrefabInstance: {fileID: 7712745520999868094}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 67db9e8f0e2ae9c40bc1e2b64352a6b4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Slider
 --- !u!114 &3581183378637306129 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 6538037403588435887, guid: 5f197c5b7300fd745976262a93fafd20, type: 3}

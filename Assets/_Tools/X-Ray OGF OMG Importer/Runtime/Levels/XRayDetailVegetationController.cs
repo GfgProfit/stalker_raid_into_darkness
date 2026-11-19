@@ -12,7 +12,7 @@ namespace XRay.Importer.Levels
     {
         [SerializeField, Range(0.04f, 1.0f), InspectorName("Плотность травы")] private float _density;
         [SerializeField, Range(50, 250), InspectorName("Дистанция травы")] private int _radius;
-        [SerializeField, Range(0.5f, 2.0f), InspectorName("Высота травы")] private float _height;
+        [SerializeField, Range(XRayGrassValues.MIN_HEIGHT, XRayGrassValues.MAX_HEIGHT), InspectorName("Высота травы")] private float _height;
         [SerializeField, InspectorName("Тени от травы")] private bool _shadows;
         [SerializeField, HideInInspector] private bool _initialized;
         [SerializeField, HideInInspector] private string _importRvmSnapshot;
@@ -89,7 +89,7 @@ namespace XRay.Importer.Levels
             _applyPending = false;
             _density = Mathf.Clamp(_density, 0.04f, 1.0f);
             _radius = Mathf.Clamp(_radius, 50, 250);
-            _height = Mathf.Clamp(_height, 0.5f, 2.0f);
+            _height = Mathf.Clamp(_height, XRayGrassValues.MIN_HEIGHT, XRayGrassValues.MAX_HEIGHT);
             if (_vegetation == null) _vegetation = GetComponent<XRayDetailVegetation>();
             Initialize(_vegetation);
             if (_settings == null) return;

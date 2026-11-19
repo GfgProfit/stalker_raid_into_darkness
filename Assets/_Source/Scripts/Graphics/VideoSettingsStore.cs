@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using UnityEngine;
+using XRay.Importer.Levels;
 
 namespace RaidIntoDarkness.GraphicsOptions
 {
@@ -29,7 +30,7 @@ namespace RaidIntoDarkness.GraphicsOptions
             return Path.Combine(Path.GetDirectoryName(dataPath), "appdata", "settings", FILE_NAME);
         }
 
-        public bool TryLoad(out VideoSettings settings, bool upgradeFile = false)
+        public bool TryLoad(out VideoSettings settings, bool upgradeFile = false, float fallbackGrassHeight = XRayGrassValues.DEFAULT_HEIGHT)
         {
             settings = default;
             if (!File.Exists(_path))
@@ -38,17 +39,7 @@ namespace RaidIntoDarkness.GraphicsOptions
             }
             try
             {
-                settings = JsonUtility.FromJson<VideoSettings>(File.ReadAllText(_path));
-                bool upgrade = settings.version >= FIRST_SAVE_VERSION && settings.version <= LAST_SAVE_VERSION_WITH_LEGACY_TEXTURE_QUALITY && settings.quality.textureQuality >= 0 && settings.quality.textureQuality <= LEGACY_MAX_TEXTURE_QUALITY;
-                if (upgrade)
-                {
-                    if (settings.version <= LAST_SAVE_VERSION_WITHOUT_CONTACT_SHADOWS)
-                    {
-                        VideoPresets.SetPresetContactShadows(ref settings.quality, settings.preset);
-                    }
-                    settings.quality.textureQuality += VideoQuality.MAX_TEXTURE_QUALITY - LEGACY_MAX_TEXTURE_QUALITY;
-                    settings.version = VideoPresets.SAVE_VERSION;
-                }
+                settings = Deserialize(File.ReadAllText(_path), fallbackGrassHeight, out bool upgrade);
                 if (settings.Valid)
                 {
                     if (upgrade && upgradeFile)
@@ -64,6 +55,26 @@ namespace RaidIntoDarkness.GraphicsOptions
                 Debug.LogWarning("Could not load video settings: " + exception.Message);
             }
             return false;
+        }
+
+        private static VideoSettings Deserialize(string json, float fallbackGrassHeight, out bool upgrade)
+        {
+            VideoSettings settings = JsonUtility.FromJson<VideoSettings>(json);
+            if (settings.grassHeight == 0.0f)
+            {
+                settings.grassHeight = fallbackGrassHeight;
+            }
+            upgrade = settings.version >= FIRST_SAVE_VERSION && settings.version <= LAST_SAVE_VERSION_WITH_LEGACY_TEXTURE_QUALITY && settings.quality.textureQuality >= 0 && settings.quality.textureQuality <= LEGACY_MAX_TEXTURE_QUALITY;
+            if (upgrade)
+            {
+                if (settings.version <= LAST_SAVE_VERSION_WITHOUT_CONTACT_SHADOWS)
+                {
+                    VideoPresets.SetPresetContactShadows(ref settings.quality, settings.preset);
+                }
+                settings.quality.textureQuality += VideoQuality.MAX_TEXTURE_QUALITY - LEGACY_MAX_TEXTURE_QUALITY;
+                settings.version = VideoPresets.SAVE_VERSION;
+            }
+            return settings;
         }
 
         public bool TrySave(VideoSettings settings)

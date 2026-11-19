@@ -7,6 +7,10 @@ namespace XRay.Importer.Levels
     [Serializable]
     public struct XRayGrassValues
     {
+        public const float MIN_HEIGHT = 0.5f;
+        public const float MAX_HEIGHT = 2.0f;
+        public const float DEFAULT_HEIGHT = 1.0f;
+
         [SerializeField] private float _density;
         [SerializeField] private int _radius;
         [SerializeField] private float _height;
@@ -25,7 +29,12 @@ namespace XRay.Importer.Levels
         public float Height => _height;
         public bool Shadows => _shadows;
         public float FadeDistance => Mathf.Floor(_radius / 4.0f) * 4.0f - 0.5f;
-        public bool Valid => !float.IsNaN(_density) && !float.IsInfinity(_density) && _density >= 0.04f && _density <= 1.0f && _radius >= 0 && _radius <= 250 && !float.IsNaN(_height) && !float.IsInfinity(_height) && _height >= 0.5f && _height <= 2.0f;
+        public bool Valid => !float.IsNaN(_density) && !float.IsInfinity(_density) && _density >= 0.04f && _density <= 1.0f && _radius >= 0 && _radius <= 250 && IsValidHeight(_height);
+
+        public static bool IsValidHeight(float height)
+        {
+            return height >= MIN_HEIGHT && height <= MAX_HEIGHT;
+        }
     }
 
     [Serializable]

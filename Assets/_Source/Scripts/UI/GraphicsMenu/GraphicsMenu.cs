@@ -9,6 +9,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.UI;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
+using XRay.Importer.Levels;
 
 namespace RaidIntoDarkness.GraphicsOptions
 {
@@ -102,7 +103,8 @@ namespace RaidIntoDarkness.GraphicsOptions
             SunShadows,
             LocalShadows,
             GrassDensity,
-            GrassDistance
+            GrassDistance,
+            GrassHeight
         }
 
         private enum Switch
@@ -161,6 +163,7 @@ namespace RaidIntoDarkness.GraphicsOptions
             Bind(Range.LocalShadows, 5, 75, (ref VideoSettings settings, int value) => settings.quality.localShadowDistance = value);
             Bind(Range.GrassDensity, 25, VideoPresets.MAX_GRASS_DENSITY, (ref VideoSettings settings, int value) => settings.quality.grassSpacing = _runtime.Presets.GrassSpacing(value));
             Bind(Range.GrassDistance, 0, VideoPresets.MAX_GRASS_DISTANCE, (ref VideoSettings settings, int value) => settings.quality.grassDistance = value);
+            Bind(Range.GrassHeight, Mathf.RoundToInt(XRayGrassValues.MIN_HEIGHT * 100f), Mathf.RoundToInt(XRayGrassValues.MAX_HEIGHT * 100f), (ref VideoSettings settings, int value) => settings.grassHeight = value / 100f);
 
             Bind(Switch.VSync, (ref VideoSettings settings, int value) => settings.vSync = value != 0);
             Bind(Switch.GrassShadows, (ref VideoSettings settings, int value) => settings.quality.grassShadows = value != 0);
@@ -451,6 +454,7 @@ namespace RaidIntoDarkness.GraphicsOptions
             SetSupported(Selector.ContactShadowQuality, QUALITY, quality.contactShadowQuality, contactShadowsSupported && quality.contactShadows, contactShadowsSupported ? "Контактные тени выкл." : "Недоступно в HDRP");
             Set(Range.GrassDensity, _runtime.Presets.GrassPercent(quality.grassSpacing), "%", _runtime.SupportsGrass ? null : "Настройки травы недоступны");
             Set(Range.GrassDistance, quality.grassDistance, " м", _runtime.SupportsGrass ? null : "Настройки травы недоступны");
+            Set(Range.GrassHeight, Mathf.RoundToInt(draft.grassHeight * 100f), "%", _runtime.SupportsGrass ? null : "Настройки травы недоступны");
             Set(Switch.GrassShadows, quality.grassShadows, _runtime.SupportsGrass);
             SetSupported(Selector.Fog, QUALITY, quality.fogQuality, _runtime.SupportsFog, "Объёмный туман недоступен");
             Set(Switch.MotionBlur, quality.motionBlur, _runtime.SupportsMotion);

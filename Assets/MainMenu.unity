@@ -2243,6 +2243,7 @@ MonoBehaviour:
   - {fileID: 28789657}
   - {fileID: 1033312507}
   - {fileID: 1153991094}
+  - {fileID: 388792873732802781}
   _readouts:
   - {fileID: 253366042}
   - {fileID: 1794020750}
@@ -2250,6 +2251,7 @@ MonoBehaviour:
   - {fileID: 1141304926}
   - {fileID: 1218058034}
   - {fileID: 399565649}
+  - {fileID: 388792873732802780}
   _toggles:
   - {fileID: 1348142966}
   - {fileID: 1053249999}
@@ -2763,6 +2765,28 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5f197c5b7300fd745976262a93fafd20, type: 3}
+--- !u!114 &388792873732802780 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8143657237022261551, guid: 5f197c5b7300fd745976262a93fafd20, type: 3}
+  m_PrefabInstance: {fileID: 388792873732802779}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &388792873732802781 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4653827595185739359, guid: 5f197c5b7300fd745976262a93fafd20, type: 3}
+  m_PrefabInstance: {fileID: 388792873732802779}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 67db9e8f0e2ae9c40bc1e2b64352a6b4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Slider
 --- !u!1001 &8717954750057067439
 PrefabInstance:
   m_ObjectHideFlags: 0

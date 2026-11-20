@@ -96,6 +96,61 @@ namespace XRay.Importer.Tests
             }
         }
 
+        [Test]
+        [Timeout(60000)]
+        public void LevelHemisphereKeepsWeatherFillWithoutScreenSpaceGi()
+        {
+            using (var fixture = new Fixture())
+            {
+                var daylight = new Vector4(0.15f, 0.18f, 0.21f, 0.0f);
+                fixture.Lights(false);
+                fixture.LevelHemisphere(0.0f, Vector4.zero);
+                Color[] unlit = fixture.Capture();
+                fixture.LevelHemisphere(0.0f, daylight);
+                Color[] shaded = fixture.Capture();
+                fixture.LevelHemisphere(0.0f, daylight * 0.05f);
+                Color[] night = fixture.Capture();
+                fixture.LevelHemisphere(1.0f, daylight);
+                Color[] exposed = fixture.Capture();
+                fixture.LevelHemisphere(1.0f, Vector4.zero);
+                Color[] exposedWithoutFill = fixture.Capture();
+                fixture.LevelHemisphere(0.0f, daylight);
+                fixture.Weather(false, Vector4.zero);
+                Color[] weatherDisabled = fixture.Capture();
+                AssertFinite(shaded, "Shaded level geometry");
+                Assert.That(Difference(shaded, unlit), Is.GreaterThan(0.005));
+                Assert.That(Difference(night, unlit), Is.LessThan(Difference(shaded, unlit) * 0.2));
+                AssertEquivalent(exposedWithoutFill, exposed, "Exposed level geometry");
+                AssertEquivalent(unlit, weatherDisabled, "Inactive level weather environment");
+            }
+        }
+
+        [Test]
+        [Timeout(60000)]
+        public void TerrainAndBushShadowsKeepWeatherFillWithoutScreenSpaceGi()
+        {
+            using (var fixture = new Fixture())
+            {
+                var daylight = new Vector4(384.0f, 416.0f, 448.0f, 0.0f);
+                int center = SIZE / 2 * SIZE + SIZE / 2;
+                fixture.Lights(false);
+                fixture.LevelHemisphere(0.55f, daylight);
+                foreach (bool terrain in new[] { true, false })
+                {
+                    string surface = terrain ? "Terrain" : "Bush";
+                    fixture.OutdoorSurface(terrain);
+                    fixture.Weather(false, Vector4.zero);
+                    Color[] unlit = fixture.Capture();
+                    fixture.Weather(true, new Vector4(1.0f, 0.0f, 0.0f, 0.0f));
+                    Color[] hemisphere = fixture.Capture(36.0f);
+                    Color[] shaded = fixture.Capture();
+                    AssertFinite(shaded, surface);
+                    Assert.That(hemisphere[center].r, Is.InRange(0.5f, 0.6f), surface + " hemisphere");
+                    Assert.That(shaded[center].grayscale, Is.GreaterThan(unlit[center].grayscale + 0.005f), surface + " shaded luminance");
+                }
+            }
+        }
+
         private static void AssertFinite(Color[] pixels, string name)
         {
             for (int index = 0; index < pixels.Length; index++)
@@ -320,6 +375,53 @@ namespace XRay.Importer.Tests
                 foreach (Light light in _lights) light.enabled = enabled;
             }
 
+            public void LevelHemisphere(float value, Vector4 radiance)
+            {
+                _material.DisableKeyword("_MONOLITH_ORIGINAL_ENVIRONMENT");
+                _material.DisableKeyword("_MONOLITH_PRECIPITATION");
+                _material.EnableKeyword("_MONOLITH_LEVEL");
+                _material.SetFloat("_MonolithSourceProfile", 0.0f);
+                _material.SetFloat("_MonolithLevelAmbientHemi", 1.0f);
+                _material.SetFloat("_MonolithLevelHemiMode", 1.0f);
+                var hemisphere = Own(new Texture2D(1, 1, TextureFormat.RGBA32, false, true));
+                hemisphere.SetPixel(0, 0, new Color(0.0f, 0.0f, 0.0f, value));
+                hemisphere.Apply(false, false);
+                _material.SetTexture("_MonolithLevelHemiMap", hemisphere);
+                Weather(true, new Vector4(1.0f, 0.0f, 0.0f, 0.0f));
+                Vector("_MonolithWeatherAmbientRadiance", radiance);
+                Vector("_MonolithDiagnosticOptions", Vector4.zero);
+            }
+
+            public void OutdoorSurface(bool terrain)
+            {
+                _material.DisableKeyword(terrain ? "_MONOLITH_LEVEL_FLORA" : "_MONOLITH_LEVEL_TERRAIN");
+                _material.EnableKeyword(terrain ? "_MONOLITH_LEVEL_TERRAIN" : "_MONOLITH_LEVEL_FLORA");
+                _material.SetFloat("_MonolithLevelHemiMode", terrain ? 3.0f : 2.0f);
+                _material.SetFloat("_MonolithSourceProfile", terrain ? 0.0f : 1.0f);
+                _material.SetTexture("_BaseColorMap", SolidTexture(new Color(0.4f, 0.35f, 0.28f, terrain ? 0.55f : 1.0f)));
+                if (terrain)
+                {
+                    _material.SetTexture("_MonolithTerrainMask", SolidTexture(new Color(1.0f, 0.0f, 0.0f, 0.0f)));
+                    _material.SetTexture("_MonolithTerrainDetailR", SolidTexture(new Color(0.5f, 0.5f, 0.5f, 1.0f)));
+                    _material.SetTexture("_MonolithTerrainBumpR", SolidTexture(new Color(0.1f, 1.0f, 0.5f, 0.5f)));
+                }
+                else
+                {
+                    _material.EnableKeyword("_ALPHATEST_ON");
+                    _material.SetFloat("_AlphaCutoffEnable", 1.0f);
+                    _material.SetFloat("_AlphaCutoff", 0.78f);
+                    _material.SetFloat("_MonolithFloraSource", 1.0f);
+                    _material.SetFloat("_MonolithHasBump", 1.0f);
+                    _material.SetTexture("_MonolithBump", SolidTexture(new Color(0.1f, 0.5f, 0.5f, 0.5f)));
+                    MeshFilter filter = _surface.GetComponent<MeshFilter>();
+                    Mesh mesh = Own(Object.Instantiate(filter.sharedMesh));
+                    var hemisphere = new Vector2[mesh.vertexCount];
+                    Array.Fill(hemisphere, new Vector2(0.0f, 0.55f));
+                    mesh.uv3 = hemisphere;
+                    filter.sharedMesh = mesh;
+                }
+            }
+
             public Color[] Capture(float debug = 0.0f)
             {
                 _material.SetFloat("_MonolithDebug", debug);
@@ -364,6 +466,14 @@ namespace XRay.Importer.Tests
                 }
                 cube.Apply();
                 return cube;
+            }
+
+            private Texture2D SolidTexture(Color color)
+            {
+                var texture = Own(new Texture2D(1, 1, TextureFormat.RGBA32, false, true));
+                texture.SetPixel(0, 0, color);
+                texture.Apply(false, false);
+                return texture;
             }
 
             private void Float(string name, float value)

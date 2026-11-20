@@ -7,6 +7,7 @@ using NUnit.Framework;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
 using XRay.Importer.Editor.Levels;
@@ -35,6 +36,51 @@ namespace XRay.Importer.Tests
                 var before = Snapshot(fixture.Root);
                 yield return XRayTerrainImportCapture.Run(fixture, false);
                 CollectionAssert.AreEquivalent(before, Snapshot(fixture.Root));
+            }
+        }
+
+        [UnityTest]
+        [Timeout(600000)]
+        public IEnumerator FreshImportBakesSkyOcclusionAndReusesProbeData()
+        {
+            Assume.That(SystemInfo.graphicsDeviceType != GraphicsDeviceType.Null);
+            using (var fixture = new XRayTerrainLevelFixture(false, true))
+            {
+                string hostPath = SceneManager.GetActiveScene().path;
+                var rejectedMeshes = new List<string>();
+                void CollectMeshRejection(string message, string stack, LogType type)
+                {
+                    if (message.IndexOf("invalid mesh was removed from light baking input", StringComparison.OrdinalIgnoreCase) >= 0) rejectedMeshes.Add(message);
+                }
+                Application.logMessageReceived += CollectMeshRejection;
+                try
+                {
+                    yield return Import(fixture, XRayTerrainImportMode.EnableVerifiedAnomaly, XRayTerrainQuality.High);
+                }
+                finally
+                {
+                    Application.logMessageReceived -= CollectMeshRejection;
+                }
+                Assert.IsEmpty(rejectedMeshes);
+                Assert.AreEqual(hostPath, SceneManager.GetActiveScene().path);
+                string scenePath = XRayLevelImportJob.LastRecord.ScenePath;
+                string sceneGuid = AssetDatabase.AssetPathToGUID(scenePath);
+                string sceneHash = XRayLevelSourceRefresh.HashFile(scenePath);
+                string apvFolder = Path.GetDirectoryName(scenePath).Replace('\\', '/') + "/APV";
+                string bakingSetPath = apvFolder + "/" + fixture.LevelName + "_BakingSet.asset";
+                string bakingSetGuid = AssetDatabase.AssetPathToGUID(bakingSetPath);
+                Assert.IsNotEmpty(bakingSetGuid);
+                AssertBakedScene(scenePath, sceneGuid, bakingSetPath, fixture.LevelName);
+                Assert.IsTrue(Array.Exists(Directory.GetFiles(apvFolder, "*.bytes", SearchOption.AllDirectories), path => new FileInfo(path).Length > 0));
+                Dictionary<string, string> before = Snapshot(apvFolder);
+                yield return Import(fixture, XRayTerrainImportMode.EnableVerifiedAnomaly, XRayTerrainQuality.High);
+                Assert.AreEqual(hostPath, SceneManager.GetActiveScene().path);
+                Assert.AreEqual(scenePath, XRayLevelImportJob.LastRecord.ScenePath);
+                Assert.AreEqual(sceneGuid, AssetDatabase.AssetPathToGUID(scenePath));
+                Assert.AreEqual(sceneHash, XRayLevelSourceRefresh.HashFile(scenePath));
+                Assert.AreEqual(bakingSetGuid, AssetDatabase.AssetPathToGUID(bakingSetPath));
+                CollectionAssert.AreEquivalent(before, Snapshot(apvFolder));
+                AssertBakedScene(scenePath, sceneGuid, bakingSetPath, fixture.LevelName);
             }
         }
 
@@ -291,6 +337,53 @@ namespace XRay.Importer.Tests
             Assert.IsNotNull(material);
             Assert.AreEqual("HDRP/MonolithLit", material.shader.name);
             return material;
+        }
+
+        private static void AssertBakedScene(string scenePath, string sceneGuid, string bakingSetPath, string levelName)
+        {
+            var bakingSet = AssetDatabase.LoadAssetAtPath<ProbeVolumeBakingSet>(bakingSetPath);
+            Assert.IsNotNull(bakingSet);
+            Assert.IsTrue(bakingSet.skyOcclusion);
+            Assert.IsTrue(bakingSet.HasBakedData());
+            CollectionAssert.AreEqual(new[] { sceneGuid }, bakingSet.sceneGUIDs);
+            Scene scene = EditorSceneManager.OpenScene(scenePath, OpenSceneMode.Additive);
+            try
+            {
+                GameObject[] roots = scene.GetRootGameObjects();
+                GameObject probeRoot = Array.Find(roots, root => root.GetComponentInChildren<ProbeVolume>(true) != null);
+                Assert.IsNotNull(probeRoot);
+                var volume = probeRoot.GetComponentInChildren<ProbeVolume>(true);
+                Assert.AreEqual(ProbeVolume.Mode.Global, volume.mode);
+                Assert.IsFalse(volume.fillEmptySpaces);
+                GameObject dataRoot = Array.Find(roots, root => root.GetComponentInChildren<ProbeVolumePerSceneData>(true) != null);
+                Assert.IsNotNull(dataRoot);
+                Assert.AreSame(bakingSet, dataRoot.GetComponentInChildren<ProbeVolumePerSceneData>(true).bakingSet);
+                GameObject level = Array.Find(roots, root => root.name == levelName);
+                Assert.IsNotNull(level);
+                Transform geometry = level.transform.Find("Geometry");
+                Assert.IsNotNull(geometry);
+                int contributors = 0;
+                foreach (MeshRenderer renderer in geometry.GetComponentsInChildren<MeshRenderer>(true))
+                {
+                    var filter = renderer.GetComponent<MeshFilter>();
+                    Assert.IsNotNull(filter);
+                    MeshFilter sourceFilter = PrefabUtility.GetCorrespondingObjectFromSource(filter);
+                    MeshRenderer sourceRenderer = PrefabUtility.GetCorrespondingObjectFromSource(renderer);
+                    Assert.IsNotNull(sourceFilter);
+                    Assert.IsNotNull(sourceRenderer);
+                    Assert.IsNotNull(filter.sharedMesh);
+                    Assert.AreSame(sourceFilter.sharedMesh, filter.sharedMesh);
+                    CollectionAssert.AreEqual(sourceRenderer.sharedMaterials, renderer.sharedMaterials);
+                    if ((GameObjectUtility.GetStaticEditorFlags(renderer.gameObject) & StaticEditorFlags.ContributeGI) == 0) continue;
+                    Assert.AreEqual(ReceiveGI.LightProbes, renderer.receiveGI);
+                    contributors++;
+                }
+                Assert.Greater(contributors, 0);
+            }
+            finally
+            {
+                EditorSceneManager.CloseScene(scene, true);
+            }
         }
 
         private static Dictionary<string, string> Snapshot(string root)

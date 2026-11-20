@@ -149,6 +149,7 @@ namespace XRay.Importer.Editor.Levels
                 foreach (KeyValuePair<int, List<XRayLevelGeometrySlice>> group in groups)
                 {
                     int indexStart = indices.Count;
+                    int firstVertex = vertexBase;
                     Vector3 groupMin = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
                     Vector3 groupMax = new Vector3(float.MinValue, float.MinValue, float.MinValue);
                     foreach (XRayLevelGeometrySlice slice in group.Value)
@@ -170,7 +171,7 @@ namespace XRay.Importer.Editor.Levels
                     }
 
                     var bounds = new Bounds((groupMin + groupMax) * 0.5f, groupMax - groupMin);
-                    descriptors.Add(new SubMeshDescriptor(indexStart, indices.Count - indexStart) { bounds = bounds });
+                    descriptors.Add(new SubMeshDescriptor(indexStart, indices.Count - indexStart) { bounds = bounds, firstVertex = firstVertex, vertexCount = vertexBase - firstVertex });
                     submeshShaders.Add(group.Key);
                     min = Vector3.Min(min, groupMin);
                     max = Vector3.Max(max, groupMax);

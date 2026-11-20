@@ -336,7 +336,7 @@ MonoBehaviour:
         m_DebugHDRxyMappingCS: {fileID: 7200000, guid: f055d2983d992b64494f1a03fc725cde, type: 3}
         m_ProbeVolumeSamplingDebugComputeShader: {fileID: 7200000, guid: 22de19bc461f84742857dd64c56b0397, type: 3}
         m_PlanarReflectionFilteringCS: {fileID: 7200000, guid: 9f3f8a01b8caaaa4595591dc96d43dd2, type: 3}
-        m_ScreenSpaceGlobalIlluminationCS: {fileID: 7200000, guid: 96170a954eb538b40a5ff369552c3629, type: 3}
+        m_ScreenSpaceGlobalIlluminationCS: {fileID: 7200000, guid: 94f876d488b8d5646b67bc115d8cb45a, type: 3}
         m_ScreenSpaceReflectionsCS: {fileID: 7200000, guid: d1de9ac7d9016204da289affe9677942, type: 3}
         m_ClearDispatchIndirectCS: {fileID: 7200000, guid: fc1f553acb80a6446a32d33e403d0656, type: 3}
         m_ClearLightListsCS: {fileID: 7200000, guid: 743eb3491795b9545955695d591195a1, type: 3}

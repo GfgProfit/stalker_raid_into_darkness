@@ -734,10 +734,10 @@ namespace XRay.Importer.Levels
         private void PublishEnvironment(XRayWeatherSnapshot snapshot, float effectWeight)
         {
             Vector2? scale = ActiveProfile.HasEnvironmentScale ? ActiveProfile.EnvironmentScale : (Vector2?)null;
+            float radianceScale = _ownedSky != null ? XRayWeatherSkyPass.GetEnvironmentRadianceScale(_ownedSky.Settings) : 1.0f;
             Vector4 fxLighting = Vector4.zero;
             if (effectWeight > 0.0f)
             {
-                float radianceScale = _ownedSky != null ? XRayWeatherSkyPass.GetEnvironmentRadianceScale(_ownedSky.Settings) : 1.0f;
                 XRayWeatherFxProfile effect = _fxPlayback.Effect;
                 bool night = effect.EffectName.EndsWith("_night", StringComparison.Ordinal);
                 float calibratedGain = night && effect.Kind == XRayWeatherFxKind.PsiStorm ? FX_PSI_NIGHT_GAIN : FX_DARK_SURFACE_GAIN;
@@ -745,7 +745,7 @@ namespace XRay.Importer.Levels
                 float gain = FxLightingAdaptationGain * calibratedGain * Mathf.Clamp01(snapshot.SkyColor.maxColorComponent) * (1.0f - directWeight);
                 fxLighting = new Vector4(effectWeight, radianceScale, gain, night ? FX_NIGHT_ART_RADIANCE_LIMIT : FX_DAY_ART_RADIANCE_LIMIT);
             }
-            _ownedWeather.SetWeatherEnvironment(this, snapshot, scale, fxLighting);
+            _ownedWeather.SetWeatherEnvironment(this, snapshot, scale, fxLighting, radianceScale);
         }
 
         private void PublishCelestial(float deltaSeconds, bool snap)

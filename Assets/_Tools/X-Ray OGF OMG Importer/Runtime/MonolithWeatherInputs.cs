@@ -16,6 +16,7 @@ namespace XRay.Importer
         private static readonly int _environmentWeightsId = Shader.PropertyToID("_MonolithWeatherEnvironmentWeights");
         private static readonly int _environmentColorId = Shader.PropertyToID("_MonolithWeatherEnvironmentColor");
         private static readonly int _ambientId = Shader.PropertyToID("_MonolithWeatherAmbient");
+        private static readonly int _ambientRadianceId = Shader.PropertyToID("_MonolithWeatherAmbientRadiance");
         private static readonly int _nightAmbientId = Shader.PropertyToID("_MonolithWeatherNightAmbient");
         private static readonly int _fxAmbientId = Shader.PropertyToID("_MonolithWeatherFxAmbient");
         private static readonly int[] _environmentIds = { Shader.PropertyToID("_MonolithWeatherEnvironment0"), Shader.PropertyToID("_MonolithWeatherEnvironment1"), Shader.PropertyToID("_MonolithWeatherEnvironment2"), Shader.PropertyToID("_MonolithWeatherEnvironment3") };
@@ -35,6 +36,7 @@ namespace XRay.Importer
         private XRayWeatherResources _weatherEnvironment;
         private Vector4 _weatherEnvironmentColor;
         private Vector4 _weatherAmbient;
+        private Vector4 _weatherAmbientRadiance;
         private Vector3 _weatherNightAmbient;
         private Vector4 _weatherFxAmbient;
         private bool _environmentReady;
@@ -60,7 +62,7 @@ namespace XRay.Importer
             return true;
         }
 
-        public void SetWeatherEnvironment(UnityEngine.Object owner, XRayWeatherSnapshot snapshot, Vector2? scale, Vector4 fxLighting = default)
+        public void SetWeatherEnvironment(UnityEngine.Object owner, XRayWeatherSnapshot snapshot, Vector2? scale, Vector4 fxLighting = default, float radianceScale = 1.0f)
         {
             if (_weatherOwner != owner || owner == null) return;
             _weatherEnvironment = snapshot.EnvironmentResources;
@@ -74,6 +76,7 @@ namespace XRay.Importer
             {
                 Vector2 value = scale.Value;
                 _weatherAmbient = new Vector4(Mathf.Max(snapshot.AmbientColor.r * 2.0f, 0.001f) * value.x, Mathf.Max(snapshot.AmbientColor.g * 2.0f, 0.001f) * value.x, Mathf.Max(snapshot.AmbientColor.b * 2.0f, 0.001f) * value.x, 0.0f);
+                _weatherAmbientRadiance = new Vector4(Mathf.Pow(Mathf.Clamp01(_weatherAmbient.x), 2.2f), Mathf.Pow(Mathf.Clamp01(_weatherAmbient.y), 2.2f), Mathf.Pow(Mathf.Clamp01(_weatherAmbient.z), 2.2f), 0.0f) * radianceScale;
                 _weatherEnvironmentColor = new Vector4((snapshot.HemisphereColor.r * 2.0f + 0.00001f) * 2.0f * value.y, (snapshot.HemisphereColor.g * 2.0f + 0.00001f) * 2.0f * value.y, (snapshot.HemisphereColor.b * 2.0f + 0.00001f) * 2.0f * value.y, 0.0f);
             }
             Publish();
@@ -179,6 +182,7 @@ namespace XRay.Importer
             if (_owner != this) return;
             Shader.SetGlobalFloat(_activeId, 0.0f);
             Shader.SetGlobalFloat(_environmentActiveId, 0.0f);
+            Shader.SetGlobalVector(_ambientRadianceId, Vector4.zero);
             Shader.SetGlobalVector(_nightAmbientId, Vector4.zero);
             Shader.SetGlobalVector(_fxAmbientId, Vector4.zero);
             _owner = null;
@@ -212,6 +216,7 @@ namespace XRay.Importer
             Shader.SetGlobalVector(_floraId, FloraFixes);
             Shader.SetGlobalVector(_nightAmbientId, NightAmbient);
             Shader.SetGlobalVector(_fxAmbientId, _weatherFxAmbient);
+            Shader.SetGlobalVector(_ambientRadianceId, EnvironmentActive ? _weatherAmbientRadiance : Vector4.zero);
             Shader.SetGlobalFloat(_environmentActiveId, EnvironmentActive ? 1.0f : 0.0f);
             if (EnvironmentActive)
             {
@@ -230,6 +235,7 @@ namespace XRay.Importer
             _owner = null;
             Shader.SetGlobalFloat(_activeId, 0.0f);
             Shader.SetGlobalFloat(_environmentActiveId, 0.0f);
+            Shader.SetGlobalVector(_ambientRadianceId, Vector4.zero);
             Shader.SetGlobalVector(_nightAmbientId, Vector4.zero);
             Shader.SetGlobalVector(_fxAmbientId, Vector4.zero);
         }

@@ -32,7 +32,7 @@ namespace XRay.Importer.Tests
         private readonly bool _ownsHost;
         private int _imports;
 
-        public XRayTerrainLevelFixture(bool trueStalker)
+        public XRayTerrainLevelFixture(bool trueStalker, bool createTemporaryHost = false)
         {
             _trueStalker = trueStalker;
             Root = PARENT + "/" + Guid.NewGuid().ToString("N").Substring(0, 8);
@@ -57,9 +57,11 @@ namespace XRay.Importer.Tests
             foreach (KeyValuePair<string, byte[]> file in _source.Files) Write(file.Key, file.Value);
             Write("levels/" + LevelName + "/level", _source.Level);
             Write("levels/" + LevelName + "/level.geom", _source.Geometry);
-            if (string.IsNullOrEmpty(SceneManager.GetActiveScene().path))
+            Scene activeScene = SceneManager.GetActiveScene();
+            if (string.IsNullOrEmpty(activeScene.path))
             {
-                Assert.IsTrue(Application.isBatchMode, "Save the active untitled scene before running full import acceptance in a live Editor.");
+                bool untitledTestScene = createTemporaryHost && SceneManager.sceneCount == 1 && !activeScene.isDirty;
+                Assert.IsTrue(Application.isBatchMode || untitledTestScene, "Save the active untitled scene before running full import acceptance in a live Editor.");
                 XRayLevelPaths.EnsureFolder(Root);
                 Scene host = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
                 Assert.IsTrue(EditorSceneManager.SaveScene(host, Root + "/AcceptanceHost.unity"));

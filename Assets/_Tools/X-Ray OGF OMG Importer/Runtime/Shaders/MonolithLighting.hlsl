@@ -245,8 +245,40 @@ float3 MonolithWeatherFxAdaptation(float3 irradiance)
 }
 #endif
 
+#if defined(_MONOLITH_LEVEL) || defined(_MONOLITH_LEVEL_DETAIL) || defined(_MONOLITH_LEVEL_LOD)
+bool MonolithUsesSpatialIndirectDiffuse(float3 V, PositionInputs posInput, BSDFData bsdfData, BuiltinData builtinData)
+{
+    #if !defined(LIGHT_EVALUATION_SKIP_INDIRECT_DIFFUSE)
+    if (builtinData.isLightmap) return true;
+    #if !defined(_SURFACE_TYPE_TRANSPARENT) && !defined(SCREEN_SPACE_INDIRECT_DIFFUSE_DISABLED)
+    if (_IndirectDiffuseMode != INDIRECTDIFFUSEMODE_OFF) return true;
+    #endif
+    #if defined(PROBE_VOLUMES_L1) || defined(PROBE_VOLUMES_L2)
+    [branch] if (_EnableProbeVolumes && _MonolithLevelHemiValue != 1.0)
+    {
+        float3 positionWS = posInput.positionWS;
+        #if (SHADEROPTIONS_CAMERA_RELATIVE_RENDERING != 0) && defined(USING_STEREO_MATRICES)
+        positionWS -= _WorldSpaceCameraPosViewOffset;
+        #endif
+        float3 samplePosition = AddNoiseToSamplingPosition(GetAbsolutePositionWS(positionWS), posInput.positionSS, V) - _APVWorldOffset;
+        float3 unusedUVW;
+        return TryToGetPoolUVW(FillAPVResources(), samplePosition, bsdfData.normalWS, V, unusedUVW);
+    }
+    #endif
+    #endif
+    return false;
+}
+#endif
+
+#if !defined(_SURFACE_TYPE_TRANSPARENT) && !defined(LIGHT_EVALUATION_SKIP_INDIRECT_DIFFUSE) && (defined(_MONOLITH_LEVEL_TERRAIN) || defined(_MONOLITH_LEVEL_FLORA) || defined(_MONOLITH_LEVEL_LOD))
+#define MONOLITH_OUTDOOR_WEATHER_FILL
+#endif
+
 void PostEvaluateBSDF(LightLoopContext lightLoopContext, float3 V, PositionInputs posInput, PreLightData preLightData, BSDFData bsdfData, BuiltinData builtinData, AggregateLighting lighting, out LightLoopOutput lightLoopOutput)
 {
+    #ifdef MONOLITH_OUTDOOR_WEATHER_FILL
+    float3 outdoorWeatherFill = 0.0;
+    #endif
     #ifdef _MONOLITH_ORIGINAL_ENVIRONMENT
     MonolithEnvironmentData environmentData;
     ZERO_INITIALIZE(MonolithEnvironmentData, environmentData);
@@ -274,8 +306,36 @@ void PostEvaluateBSDF(LightLoopContext lightLoopContext, float3 V, PositionInput
     #endif
     if (levelAmbientHemi)
     {
-        if (_MonolithSourceProfile < 0.5 || _IndirectDiffuseMode == INDIRECTDIFFUSEMODE_OFF) builtinData.bakeDiffuseLighting *= _MonolithLevelHemiValue;
+        bool spatialIndirect = MonolithUsesSpatialIndirectDiffuse(V, posInput, bsdfData, builtinData);
+        if (!spatialIndirect) builtinData.bakeDiffuseLighting *= _MonolithLevelHemiValue;
         lighting.indirect.specularReflected *= _MonolithLevelHemiValue;
+        #if !defined(_SURFACE_TYPE_TRANSPARENT) && !defined(LIGHT_EVALUATION_SKIP_INDIRECT_DIFFUSE)
+        bool weatherFill = !builtinData.isLightmap && (!spatialIndirect || _IndirectDiffuseMode != INDIRECTDIFFUSEMODE_OFF) && _MonolithWeatherActive > 0.5 && _MonolithWeatherEnvironmentActive > 0.5 && _MonolithTrueStalkerActive < 0.5 && _MonolithDebug < 0.5 && _MonolithDiagnosticOptions.z < 0.5;
+        #ifndef MONOLITH_OUTDOOR_WEATHER_FILL
+        weatherFill = weatherFill && _MonolithLevelHemiValue < 0.25;
+        #endif
+        [branch] if (weatherFill)
+        {
+            float3 irradiance = _MonolithWeatherAmbientRadiance.rgb;
+            #ifdef MONOLITH_OUTDOOR_WEATHER_FILL
+            float skyVisibility = saturate(_MonolithLevelHemiValue);
+            #ifdef _MONOLITH_LEVEL_TERRAIN
+            skyVisibility *= saturate(0.5 + 0.5 * bsdfData.geomNormalWS.y);
+            #endif
+            float3 zenithIrradiance = max(0.0, EvaluateAmbientProbe(float3(0.0, 1.0, 0.0)));
+            irradiance = max(irradiance, zenithIrradiance * saturate(_MonolithWeatherAmbient.rgb + 0.2 * skyVisibility));
+            #else
+            irradiance *= 1.0 - smoothstep(0.0, 0.25, _MonolithLevelHemiValue);
+            #endif
+            float3 fill = max(0.0, irradiance * (1.0 - saturate(_MonolithWeatherFxAmbient.x)) - _MonolithWeatherNightAmbient.rgb);
+            fill *= preLightData.diffuseFGD * GetDiffuseOrDefaultColor(bsdfData, _ReplaceDiffuseForIndirect).rgb;
+            #ifdef MONOLITH_OUTDOOR_WEATHER_FILL
+            outdoorWeatherFill = fill * GetIndirectDiffuseMultiplier(builtinData.renderingLayers);
+            #else
+            builtinData.bakeDiffuseLighting = max(builtinData.bakeDiffuseLighting, fill);
+            #endif
+        }
+        #endif
     }
     #endif
     #ifdef MONOLITH_WETNESS_INCLUDED
@@ -297,6 +357,9 @@ void PostEvaluateBSDF(LightLoopContext lightLoopContext, float3 V, PositionInput
         lighting.direct.specular = 0.0;
     }
     MonolithLegacyPostEvaluateBSDF(lightLoopContext, V, posInput, preLightData, bsdfData, builtinData, lighting, lightLoopOutput);
+    #ifdef MONOLITH_OUTDOOR_WEATHER_FILL
+    if (any(outdoorWeatherFill > 0.0)) lightLoopOutput.diffuseLighting = max(lightLoopOutput.diffuseLighting, outdoorWeatherFill);
+    #endif
     #ifdef _MONOLITH_ORIGINAL_ENVIRONMENT
     if (originalEnvironment && _MonolithDiagnosticOptions.z < 0.5) lightLoopOutput.diffuseLighting += environmentData.combined;
     #endif

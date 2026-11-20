@@ -6,7 +6,8 @@
         "XRay.Importer.Runtime",
         "XRay.Importer.Sources",
         "Unity.RenderPipelines.HighDefinition.Runtime",
-        "Unity.RenderPipelines.Core.Runtime"
+        "Unity.RenderPipelines.Core.Runtime",
+        "Unity.RenderPipelines.Core.Editor"
     ],
     "includePlatforms": [
         "Editor"

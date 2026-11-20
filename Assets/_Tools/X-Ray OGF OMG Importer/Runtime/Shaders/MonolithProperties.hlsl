@@ -120,6 +120,7 @@ float _MonolithWeatherEnvironmentActive;
 float4 _MonolithWeatherEnvironmentWeights;
 float4 _MonolithWeatherEnvironmentColor;
 float4 _MonolithWeatherAmbient;
+float4 _MonolithWeatherAmbientRadiance;
 float4 _MonolithWeatherNightAmbient;
 float4 _MonolithWeatherFxAmbient;
 float _MonolithSourceLightingMode;

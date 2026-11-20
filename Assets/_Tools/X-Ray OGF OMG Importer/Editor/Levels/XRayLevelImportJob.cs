@@ -191,6 +191,12 @@ namespace XRay.Importer.Editor.Levels
                         Finish(_record.Errors.Count == 0 ? XRayLevelJobState.Completed : XRayLevelJobState.Failed, null);
                         return;
                     }
+#if XRAY_HDRP
+                    if (ReferenceEquals(_routine.Current, XRayLevelApvBaking.WAIT_FOR_EDITOR))
+                    {
+                        break;
+                    }
+#endif
                 }
 
                 UnityEditor.Progress.Report(_progressId, Progress, Stage);
@@ -306,6 +312,10 @@ namespace XRay.Importer.Editor.Levels
                 {
                     RecordAnomalies(XRayLevelAnomalyImporter.UpdatePrefab(_record.PrefabPath, _anomalyPlan));
                 }
+                foreach (object step in PrepareAdaptiveProbeVolumes(false))
+                {
+                    yield return step;
+                }
                 SetStage("Done", 1.0f);
                 yield break;
             }
@@ -332,9 +342,28 @@ namespace XRay.Importer.Editor.Levels
             yield return null;
             SetStage("Building scene", 0.92f);
             timer.Restart();
-            BuildScene();
+            bool sceneCreated = BuildScene();
             _record.SetMetric("SceneSeconds", timer.Elapsed.TotalSeconds);
+            foreach (object step in PrepareAdaptiveProbeVolumes(sceneCreated))
+            {
+                yield return step;
+            }
+            OpenSceneAfterImport();
             SetStage("Done", 1.0f);
+        }
+
+        private IEnumerable<object> PrepareAdaptiveProbeVolumes(bool sceneCreated)
+        {
+#if XRAY_HDRP
+            SetStage("Preparing adaptive probe volumes", 0.96f);
+            _record.SetMetric("ProbeVolumeBakeUpdated", 0);
+            foreach (object step in XRayLevelApvBaking.Prepare(_record.ScenePath, _record.PrefabPath, sceneCreated, _record))
+            {
+                yield return step;
+            }
+#else
+            yield break;
+#endif
         }
 
         private void Prepare()
@@ -1670,7 +1699,7 @@ namespace XRay.Importer.Editor.Levels
             }
         }
 
-        private void BuildScene()
+        private bool BuildScene()
         {
             string prefabPath = XRayLevelPaths.PrefabPath(_entry.Name);
             string scenePath = XRayLevelPaths.ScenePath(_entry.Name);
@@ -1728,6 +1757,11 @@ namespace XRay.Importer.Editor.Levels
             }
 
             _record.GeneratedAssets.Add(scenePath);
+            return !sceneExists;
+        }
+
+        private void OpenSceneAfterImport()
+        {
             if (_request.Settings.OpenSceneAfterImport)
             {
                 bool dirty = false;
@@ -1738,7 +1772,7 @@ namespace XRay.Importer.Editor.Levels
 
                 if (!dirty && !Application.isPlaying)
                 {
-                    EditorSceneManager.OpenScene(scenePath, OpenSceneMode.Single);
+                    EditorSceneManager.OpenScene(_record.ScenePath, OpenSceneMode.Single);
                     XRayLevelSceneBuilder.FrameSceneView(_content.Bounds);
                 }
                 else
@@ -1818,7 +1852,7 @@ namespace XRay.Importer.Editor.Levels
                 }
             }
 
-            bool unchanged = _record.Completed && _resourcesOnly && _anomalyPlan == null && _previous != null && !occlusionChanged && !grassGeometryChanged && !_materials.Changed && _textures.Imported == 0 && _previous.Settings == _record.Settings && _record.Source.ChangesSincePrevious.Count == 0 && _record.Source.ProfileFingerprint == _previous.Source.ProfileFingerprint && _record.Source.IndexFingerprint == _previous.Source.IndexFingerprint && _previous.GetMetric("HomSourceTriangles") == _record.GetMetric("HomSourceTriangles") && _previous.GetMetric("HomOccluderTriangles") == _record.GetMetric("HomOccluderTriangles");
+            bool unchanged = _record.Completed && _resourcesOnly && _anomalyPlan == null && _previous != null && !occlusionChanged && !grassGeometryChanged && !_materials.Changed && _textures.Imported == 0 && _record.GetMetric("ProbeVolumeBakeUpdated") == 0 && _previous.Settings == _record.Settings && _record.Source.ChangesSincePrevious.Count == 0 && _record.Source.ProfileFingerprint == _previous.Source.ProfileFingerprint && _record.Source.IndexFingerprint == _previous.Source.IndexFingerprint && _previous.GetMetric("HomSourceTriangles") == _record.GetMetric("HomSourceTriangles") && _previous.GetMetric("HomOccluderTriangles") == _record.GetMetric("HomOccluderTriangles");
             string reportPath = XRayLevelPaths.AttemptReportPath(_record.LevelName, _record.Source.ProfileId);
             if (unchanged)
             {

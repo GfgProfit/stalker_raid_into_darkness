@@ -34,14 +34,24 @@ namespace XRay.Importer.Levels
         private bool _visible;
 
         public int ViewCount => _views.Count;
+        public int DropBudget { get; private set; }
+        public int SplashBudget { get; private set; }
         public int LastDropCount { get; private set; }
         public int RenderCount { get; private set; }
         public Camera LastCamera { get; private set; }
-        public long EstimatedBytes => _views.Count * (long)(_settings != null ? _settings.DropBudget : 0) * DROP_STRIDE;
+        public long EstimatedBytes => _views.Count * (long)DropBudget * DROP_STRIDE;
 
         public void Configure(GameObject owner, PrecipitationConfig settings, XRayPrecipitationGeometry geometry, Color radiance, Vector3 direction, float speedFactor, float windVelocity, float density, float realTime, float realDelta, bool visible)
         {
-            if (_density <= 0.0f && density > 0.0f) ResetRain();
+            Configure(owner, settings, geometry, radiance, direction, speedFactor, windVelocity, density, realTime, realDelta, visible, null);
+        }
+
+        internal void Configure(GameObject owner, PrecipitationConfig settings, XRayPrecipitationGeometry geometry, Color radiance, Vector3 direction, float speedFactor, float windVelocity, float density, float realTime, float realDelta, bool visible, XRayPrecipitationQuality? videoQuality)
+        {
+            int dropBudget = settings != null ? settings.GetDropBudget(videoQuality ?? settings.Quality) : 0;
+            if (_density <= 0.0f && density > 0.0f || DropBudget != dropBudget) ResetRain();
+            DropBudget = dropBudget;
+            SplashBudget = settings != null ? Mathf.Min(dropBudget, settings.GetSplashBudget(videoQuality)) : 0;
             _owner = owner;
             _settings = settings;
             _geometry = geometry;
@@ -122,14 +132,8 @@ namespace XRay.Importer.Levels
             if (!_views.TryGetValue(camera, out View view))
             {
                 if (_views.Count >= _settings.MaxCameraViews) return;
-                view = new View(camera, _settings.DropBudget);
+                view = new View(camera, DropBudget);
                 _views.Add(camera, view);
-            }
-            if (view.Capacity != _settings.DropBudget)
-            {
-                view.Dispose();
-                view = new View(camera, _settings.DropBudget);
-                _views[camera] = view;
             }
             LastDropCount = XRayPrecipitationMath.DropCount(_density, view.Capacity);
             float minimumFlightSeconds = XRayPrecipitationMath.SOURCE_MAX_DISTANCE / Mathf.Max(XRayPrecipitationMath.SOURCE_MAX_SPEED * _speedFactor, 0.01f);
@@ -145,7 +149,7 @@ namespace XRay.Importer.Levels
             context.cmd.SetComputeVectorParam(_compute, "_XRayRainMotion", new Vector4(_direction.x, _direction.y, _direction.z, _speedFactor));
             context.cmd.SetComputeIntParam(_compute, "_XRayRainDropCount", view.Capacity);
             context.cmd.SetComputeIntParam(_compute, "_XRayRainActiveCount", LastDropCount);
-            context.cmd.SetComputeIntParam(_compute, "_XRayRainSplashBudget", _settings.SplashesEnabled ? _settings.MaxSplashes : 0);
+            context.cmd.SetComputeIntParam(_compute, "_XRayRainSplashBudget", SplashBudget);
             context.cmd.SetComputeFloatParam(_compute, "_XRayRainDelta", initialize ? 0.0f : view.PendingDelta);
             context.cmd.DispatchCompute(_compute, kernel, (view.Capacity + 63) / 64, 1, 1);
             view.Initialized = true;
@@ -159,11 +163,10 @@ namespace XRay.Importer.Levels
             properties.SetVector("_XRayRainWorldMapping", _geometry.WorldMapping);
             properties.SetVector("_XRayRainCamera", new Vector4(center.x, center.y, center.z, 0.0f));
             properties.SetVector("_XRayRainShape", new Vector4(_settings.DropLength, _settings.DropHalfWidth, _settings.SplashSize, _settings.RainOpacity));
-            properties.SetVector("_XRayRainAppearance", new Vector4(_density, _realTime, _settings.DrawRadius, _settings.SplashesEnabled ? 1.0f : 0.0f));
+            properties.SetVector("_XRayRainAppearance", new Vector4(_density, _realTime, _settings.DrawRadius, SplashBudget > 0 ? 1.0f : 0.0f));
             properties.SetVector("_XRayRainColor", new Vector4(_radiance.r, _radiance.g, _radiance.b, _radiance.a));
             if (LastDropCount > 0) context.cmd.DrawProcedural(Matrix4x4.identity, _material, 0, MeshTopology.Triangles, 6, LastDropCount, properties);
-            int splashes = Mathf.Min(view.Capacity, _settings.MaxSplashes);
-            if (_settings.SplashesEnabled && splashes > 0) context.cmd.DrawProcedural(Matrix4x4.identity, _material, 1, MeshTopology.Triangles, 6, splashes, properties);
+            if (SplashBudget > 0) context.cmd.DrawProcedural(Matrix4x4.identity, _material, 1, MeshTopology.Triangles, 6, SplashBudget, properties);
             LastCamera = camera;
             RenderCount++;
         }

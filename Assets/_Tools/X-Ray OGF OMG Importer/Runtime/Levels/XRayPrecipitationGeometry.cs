@@ -43,9 +43,15 @@ namespace XRay.Importer.Levels
 
         public void Refresh(PrecipitationConfig config, float realDelta, bool force = false)
         {
+            Refresh(config, realDelta, force, null);
+        }
+
+        internal void Refresh(PrecipitationConfig config, float realDelta, bool force, XRayPrecipitationQuality? videoQuality)
+        {
             if (config == null || !_scene.IsValid() || !_scene.isLoaded) return;
             _refreshElapsed += realDelta;
-            bool resized = _heights == null || _heights.width != config.AtlasResolution || _shader != config.HeightShader;
+            int atlasResolution = PrecipitationConfig.GetAtlasResolution(videoQuality ?? config.Quality);
+            bool resized = _heights == null || _heights.width != atlasResolution || _shader != config.HeightShader;
             if (!force && !resized && _refreshElapsed < config.GeometryRefreshSeconds) return;
             _refreshElapsed = 0.0f;
             _roots.Clear();
@@ -53,7 +59,7 @@ namespace XRay.Importer.Levels
             int signature = CaptureGeometrySignature();
             if (!force && !resized && signature == _geometrySignature) return;
             _geometrySignature = signature;
-            Rebuild(config);
+            Rebuild(config, atlasResolution);
         }
 
         public void Dispose()
@@ -154,7 +160,7 @@ namespace XRay.Importer.Levels
             return material != null && renderer.MaterialResolver != null ? renderer.MaterialResolver(material) : material;
         }
 
-        private void Rebuild(PrecipitationConfig config)
+        private void Rebuild(PrecipitationConfig config, int atlasResolution)
         {
             if (config.HeightShader == null || !config.HeightShader.isSupported) throw new InvalidOperationException("The precipitation height shader is missing or unsupported.");
             if (_material == null || _shader != config.HeightShader)
@@ -164,15 +170,20 @@ namespace XRay.Importer.Levels
                 _material.enableInstancing = true;
                 _shader = config.HeightShader;
             }
-            if (_heights == null || _heights.width != config.AtlasResolution)
+            if (_heights == null || _heights.width != atlasResolution)
             {
+                var heights = new RenderTexture(atlasResolution, atlasResolution, 0, RenderTextureFormat.ARGBFloat, RenderTextureReadWrite.Linear);
+                heights.name = "XRay precipitation world heights";
+                heights.hideFlags = HideFlags.HideAndDontSave;
+                heights.filterMode = FilterMode.Point;
+                heights.wrapMode = TextureWrapMode.Clamp;
+                if (!heights.Create())
+                {
+                    CoreUtils.Destroy(heights);
+                    throw new InvalidOperationException("Could not allocate the precipitation height atlas.");
+                }
                 if (_heights != null) CoreUtils.Destroy(_heights);
-                _heights = new RenderTexture(config.AtlasResolution, config.AtlasResolution, 0, RenderTextureFormat.ARGBFloat, RenderTextureReadWrite.Linear);
-                _heights.name = "XRay precipitation world heights";
-                _heights.hideFlags = HideFlags.HideAndDontSave;
-                _heights.filterMode = FilterMode.Point;
-                _heights.wrapMode = TextureWrapMode.Clamp;
-                if (!_heights.Create()) throw new InvalidOperationException("Could not allocate the precipitation height atlas.");
+                _heights = heights;
             }
             _draws.Clear();
             _instancedDraws.Clear();

@@ -24,6 +24,7 @@ namespace RaidIntoDarkness.Effects
         {
             Root = root;
             _systems = root != null ? root.GetComponentsInChildren<ParticleSystem>(true) : Array.Empty<ParticleSystem>();
+            if (root != null) AnomalyVisualQuality.RegisterPlayableHierarchy(root.transform, _systems);
             _rootIndex = rootIndex;
             _stopIndices = stopIndices ?? Array.Empty<int>();
             _stopTimes = stopTimes ?? Array.Empty<float>();

@@ -12,6 +12,7 @@ namespace RaidIntoDarkness.GraphicsOptions
         private const int FIRST_SAVE_VERSION = 1;
         private const int LAST_SAVE_VERSION_WITHOUT_CONTACT_SHADOWS = 2;
         private const int LAST_SAVE_VERSION_WITH_LEGACY_TEXTURE_QUALITY = 3;
+        private const int LAST_SAVE_VERSION_WITHOUT_ADVANCED_QUALITY = 4;
         private const int LEGACY_MAX_TEXTURE_QUALITY = 2;
 
         private readonly string _path;
@@ -64,16 +65,26 @@ namespace RaidIntoDarkness.GraphicsOptions
             {
                 settings.grassHeight = fallbackGrassHeight;
             }
-            upgrade = settings.version >= FIRST_SAVE_VERSION && settings.version <= LAST_SAVE_VERSION_WITH_LEGACY_TEXTURE_QUALITY && settings.quality.textureQuality >= 0 && settings.quality.textureQuality <= LEGACY_MAX_TEXTURE_QUALITY;
-            if (upgrade)
+            upgrade = false;
+            if (settings.version < FIRST_SAVE_VERSION || settings.version > LAST_SAVE_VERSION_WITHOUT_ADVANCED_QUALITY)
             {
+                return settings;
+            }
+            if (settings.version <= LAST_SAVE_VERSION_WITH_LEGACY_TEXTURE_QUALITY)
+            {
+                if (settings.quality.textureQuality < 0 || settings.quality.textureQuality > LEGACY_MAX_TEXTURE_QUALITY)
+                {
+                    return settings;
+                }
                 if (settings.version <= LAST_SAVE_VERSION_WITHOUT_CONTACT_SHADOWS)
                 {
                     VideoPresets.SetPresetContactShadows(ref settings.quality, settings.preset);
                 }
                 settings.quality.textureQuality += VideoQuality.MAX_TEXTURE_QUALITY - LEGACY_MAX_TEXTURE_QUALITY;
-                settings.version = VideoPresets.SAVE_VERSION;
             }
+            VideoPresets.SetLegacyAdvancedQuality(ref settings.quality);
+            settings.version = VideoPresets.SAVE_VERSION;
+            upgrade = true;
             return settings;
         }
 

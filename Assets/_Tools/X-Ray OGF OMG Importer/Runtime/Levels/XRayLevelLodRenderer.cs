@@ -16,6 +16,8 @@ namespace XRay.Importer.Levels
         public const float EPS_S = 0.0000001f;
         public const float HEMI_SCALE = 2.0f * 1.55f;
 
+        private const float MAX_DECORATIVE_RADIUS = 3.0f;
+
         private static readonly int[] VERTEX_ORDER = { 3, 0, 2, 1 };
         private static readonly VertexAttributeDescriptor[] LAYOUT =
         {
@@ -57,7 +59,7 @@ namespace XRay.Importer.Levels
             Evaluate(camera, set, null, null);
         }
 
-        internal void Evaluate(Camera camera, XRayLevelLodSet set, bool[] owners, XRayVegetationOcclusion occlusion)
+        internal void Evaluate(Camera camera, XRayLevelLodSet set, bool[] owners, XRayVegetationOcclusion occlusion, float objectDistance = 0f, bool[] decorativeOwners = null)
         {
             bool preserveGeometryWithoutImpostor = owners != null;
             int count = set.Count;
@@ -106,6 +108,12 @@ namespace XRay.Importer.Levels
                 Vector4 sphere = spheres[lod];
                 var center = new Vector3(sphere.x, sphere.y, sphere.z);
                 float distanceSqr = (center - eye).sqrMagnitude + EPS;
+                if (decorativeOwners != null && decorativeOwners[lod] && BeyondObjectDistance(sphere.w, distanceSqr, objectDistance))
+                {
+                    _states[lod] = STATE_DISCARD;
+                    discarded++;
+                    continue;
+                }
                 float ssa = sphere.w / distanceSqr * set.LodFactors[lod];
                 if (ssa >= lodA || preserveGeometryWithoutImpostor && (!validThresholds || !float.IsFinite(ssa) || sphere.w <= 0.0f || set.LodFactors[lod] <= 0.0f))
                 {
@@ -151,6 +159,13 @@ namespace XRay.Importer.Levels
             if (owners != null && impostors == 0 && !_meshes.ContainsKey(camera)) return;
             Mesh mesh = GetMesh(camera);
             UploadMesh(mesh, impostors);
+        }
+
+        internal static bool BeyondObjectDistance(float radius, float distanceSquared, float limit)
+        {
+            if (!(radius > 0f && radius <= MAX_DECORATIVE_RADIUS) || !float.IsFinite(distanceSquared)) return false;
+            float distance = limit + radius;
+            return distanceSquared > distance * distance;
         }
 
         public void Render(Camera camera, XRayLevelLodSet set, int layer)

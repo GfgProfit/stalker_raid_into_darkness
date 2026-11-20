@@ -61,6 +61,7 @@ namespace RaidIntoDarkness.Effects
 
             _sources = new List<AnomalyParticleEmissionSource>(sources);
             _states = new SourceState[_sources.Count];
+            RegisterQualitySources();
         }
 
         public static int SampleCount(float rate, float randomValue)
@@ -93,6 +94,7 @@ namespace RaidIntoDarkness.Effects
             }
 
             EnsureStates();
+            float density = AnomalyVisualQuality.Density;
             for (int index = 0; index < _sources.Count; index++)
             {
                 AnomalyParticleEmissionSource source = _sources[index];
@@ -141,12 +143,11 @@ namespace RaidIntoDarkness.Effects
                         continue;
                     }
 
-                    int count = SampleCount(source.Rate, UnityEngine.Random.value);
-                    int capacity = Mathf.Max(0, main.maxParticles - system.particleCount);
-                    if (count > 0 && capacity > 0)
+                    int count = SampleCount(source.Rate * density, UnityEngine.Random.value);
+                    if (count > 0 && AnomalyVisualQuality.CanEmitAmbient(system))
                     {
-                        int actual = Mathf.Min(count, capacity);
-                        system.Emit(actual);
+                        int capacity = Mathf.Max(0, main.maxParticles - system.particleCount);
+                        if (capacity > 0) system.Emit(Mathf.Min(count, capacity));
                     }
                 }
             }
@@ -163,6 +164,7 @@ namespace RaidIntoDarkness.Effects
         private void OnEnable()
         {
             ResetSources();
+            RegisterQualitySources();
             _visual = GetComponent<AnomalyVisual>();
             if (_visual != null)
             {
@@ -184,6 +186,15 @@ namespace RaidIntoDarkness.Effects
         private void Update()
         {
             Tick(Time.deltaTime);
+        }
+
+        private void RegisterQualitySources()
+        {
+            if (!Application.isPlaying || _sources == null) return;
+            foreach (AnomalyParticleEmissionSource source in _sources)
+            {
+                if (source != null) AnomalyVisualQuality.Register(source.System);
+            }
         }
 
         private void EnsureStates()

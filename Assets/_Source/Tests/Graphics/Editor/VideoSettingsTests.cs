@@ -100,6 +100,47 @@ namespace RaidIntoDarkness.GraphicsOptions.Tests
         }
 
         [Test]
+        public void VersionFourRestoresIndependentAdvancedSettings()
+        {
+            VideoSettings legacy = _presets.Select(_presets.Defaults(_desktop), 0);
+            legacy.version = 4;
+            legacy.quality.shadowQuality = 1;
+            legacy.quality.shadowCascades = 0;
+            MethodInfo deserialize = typeof(VideoSettingsStore).GetMethod("Deserialize", BindingFlags.NonPublic | BindingFlags.Static);
+            object[] arguments = { JsonUtility.ToJson(legacy), legacy.grassHeight, false };
+            VideoSettings settings = (VideoSettings)deserialize.Invoke(null, arguments);
+
+            Assert.That(arguments[2], Is.True);
+            Assert.That(settings.Valid, Is.True);
+            Assert.That(settings.quality.shadowQuality, Is.EqualTo(1));
+            Assert.That(settings.quality.shadowCascades, Is.EqualTo(3));
+            Assert.That(settings.quality.reflections, Is.EqualTo(3));
+            Assert.That(VideoPresets.LocalShadowBudget(settings.quality.localShadowBudget), Is.EqualTo(-1));
+            Assert.That(VideoPresets.StreamingBudget(settings.quality.streamingBudget), Is.EqualTo(512));
+            Assert.That(settings.quality.objectDrawDistance, Is.EqualTo(VideoPresets.MAX_OBJECT_DISTANCE));
+        }
+
+        [Test]
+        public void EditingResolutionDoesNotChangeShadowCascadesOrBudget()
+        {
+            VideoSettings settings = _presets.Defaults(_desktop);
+            settings.quality.shadowQuality = 3;
+            settings.quality.shadowCascades = 1;
+            settings.quality.localShadowBudget = 2;
+            settings.quality.upscalingMethod = 1;
+            settings.quality.upscalingQuality = 2;
+            VideoSettings restored = JsonUtility.FromJson<VideoSettings>(JsonUtility.ToJson(settings));
+
+            Assert.That(restored.Valid, Is.True);
+            Assert.That(restored.quality.shadowQuality, Is.EqualTo(3));
+            Assert.That(restored.quality.shadowCascades, Is.EqualTo(1));
+            Assert.That(VideoPresets.LocalShadowBudget(restored.quality.localShadowBudget), Is.EqualTo(8));
+            VideoSettings reset = VideoPresets.ResetCategory(restored, _presets.Defaults(_desktop), VideoCategory.Lighting);
+            Assert.That(reset.quality.upscalingMethod, Is.EqualTo(1));
+            Assert.That(reset.quality.upscalingQuality, Is.EqualTo(2));
+        }
+
+        [Test]
         public void IdentifiesMatchingPresetAfterLoadingAndMarksManualChanges()
         {
             var target = new Target(_desktop, _desktop);

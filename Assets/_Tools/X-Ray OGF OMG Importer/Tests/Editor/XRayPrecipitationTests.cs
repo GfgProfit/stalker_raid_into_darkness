@@ -358,6 +358,56 @@ namespace XRay.Importer.Tests
         }
 
         [Test]
+        public void VideoQualityOverridesRainResourcesAndRestoresTheAuthoredBudget()
+        {
+            GameConfig game = GameConfig.Load();
+            PrecipitationConfig config = Object.Instantiate(game.Precipitation);
+            Scene scene = EditorSceneManager.NewPreviewScene();
+            try
+            {
+                var settings = new SerializedObject(config);
+                settings.FindProperty("_quality").enumValueIndex = (int)XRayPrecipitationQuality.Medium;
+                settings.FindProperty("_maxDrops").intValue = 2500;
+                settings.FindProperty("_splashesEnabled").boolValue = true;
+                settings.FindProperty("_maxSplashes").intValue = 1000;
+                settings.FindProperty("_wetnessEnabled").boolValue = true;
+                settings.FindProperty("_nonCameraReflectionsEnabled").boolValue = false;
+                settings.FindProperty("_planarReflectionsEnabled").boolValue = false;
+                settings.ApplyModifiedPropertiesWithoutUndo();
+                string authored = JsonUtility.ToJson(config);
+                var root = new GameObject("Precipitation quality fixture");
+                SceneManager.MoveGameObjectToScene(root, scene);
+                using var rain = new XRayPrecipitationSystem(root);
+                XRayWeatherProfile profile = FindRain(game.OrdinaryWeatherCatalog, out double seconds);
+                Assert.IsTrue(profile.TryEvaluate(seconds, out XRayWeatherSnapshot snapshot, out string diagnostic), diagnostic);
+                int?[] qualities = { 0, 1, 2, null };
+                int[] resolutions = { 256, 512, 1024, 512 };
+                int[] drops = { 625, 1250, 2500, 1250 };
+                int[] splashes = { 250, 500, 1000, 1000 };
+                for (int i = 0; i < qualities.Length; i++)
+                {
+                    XRayPrecipitationSystem.SetVideoQuality(qualities[i]);
+                    rain.Publish(config, snapshot, 0.0f, 1.0f, true, true);
+                    Assert.AreEqual(resolutions[i], rain.Geometry.Heights.width);
+                    Assert.AreEqual(resolutions[i], rain.Wetness.Width);
+                    Assert.AreEqual(drops[i], rain.Pass.DropBudget);
+                    Assert.AreEqual(splashes[i], rain.Pass.SplashBudget);
+                    Assert.AreEqual(Mathf.Clamp01(snapshot.RainDensity * config.IntensityMultiplier), rain.RainDensity);
+                    int captures = rain.Geometry.CaptureCount;
+                    rain.Publish(config, snapshot, 0.0f, 1.0f, true, true);
+                    Assert.AreEqual(captures, rain.Geometry.CaptureCount);
+                }
+                Assert.AreEqual(authored, JsonUtility.ToJson(config));
+            }
+            finally
+            {
+                XRayPrecipitationSystem.SetVideoQuality(null);
+                EditorSceneManager.ClosePreviewScene(scene);
+                Object.DestroyImmediate(config);
+            }
+        }
+
+        [Test]
         public void HeightAtlasTracksRendererVisibilityAndMeshReplacementWithoutHierarchyChanges()
         {
             PrecipitationConfig config = Object.Instantiate(GameConfig.Load().Precipitation);

@@ -213,8 +213,8 @@ MonoBehaviour:
   m_NumIterationsEnclosingSphere: 64
   m_RenderPipelineSettings:
     supportShadowMask: 0
-    supportSSR: 0
-    supportSSRTransparent: 0
+    supportSSR: 1
+    supportSSRTransparent: 1
     supportSSAO: 1
     supportSSGI: 1
     supportSubsurfaceScattering: 1
@@ -371,7 +371,9 @@ MonoBehaviour:
       enabled: 1
       useMipBias: 0
       advancedUpscalersByPriority: 
-      advancedUpscalerNames: []
+      advancedUpscalerNames:
+      - DLSS
+      - FSR2
       DLSSPerfQualitySetting: 0
       DLSSInjectionPoint: 0
       TAAUInjectionPoint: 0
@@ -392,7 +394,7 @@ MonoBehaviour:
       fsrOverrideSharpness: 0
       fsrSharpness: 0.92
       maxPercentage: 100
-      minPercentage: 50
+      minPercentage: 33
       dynResType: 0
       upsampleFilter: 1
       forceResolution: 0

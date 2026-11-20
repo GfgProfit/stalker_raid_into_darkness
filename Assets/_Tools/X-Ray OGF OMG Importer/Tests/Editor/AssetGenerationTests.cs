@@ -189,6 +189,34 @@ namespace XRay.Importer.Tests
         }
 
         [Test]
+        public void ResourceRefreshPreservesExplicitMipStreaming()
+        {
+            using (var directory = new TestDirectory())
+            {
+                Mo2Fixture fixture = CreateFixture(directory);
+                using (var scope = new XRayImportTestScope(fixture.CreateConfiguration("Main")))
+                {
+                    string model = scope.ImportModel("wpn_test_hud.ogf", CreateModel());
+                    Material body = XRayImportTestScope.GetRendererMaterial(model, 0);
+                    string texture = AssetDatabase.GetAssetPath(body.GetTexture("_BaseColorMap"));
+                    var importer = (TextureImporter)AssetImporter.GetAtPath(texture);
+                    importer.streamingMipmaps = true;
+                    importer.streamingMipmapsPriority = 2;
+                    importer.ignorePngGamma = false;
+                    importer.SaveAndReimport();
+
+                    Assert.AreEqual(XRayGenerationOutcome.Completed, XRayAssetGenerationCoordinator.Refresh(model, out _));
+                    scope.Settle();
+
+                    importer = (TextureImporter)AssetImporter.GetAtPath(texture);
+                    Assert.IsTrue(importer.ignorePngGamma);
+                    Assert.IsTrue(importer.streamingMipmaps);
+                    Assert.AreEqual(2, importer.streamingMipmapsPriority);
+                }
+            }
+        }
+
+        [Test]
         public void UserMaterialChangesArePreserved()
         {
             using (var directory = new TestDirectory())

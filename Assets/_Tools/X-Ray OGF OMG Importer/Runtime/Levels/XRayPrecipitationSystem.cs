@@ -10,6 +10,7 @@ namespace XRay.Importer.Levels
     public sealed class XRayPrecipitationSystem : IDisposable
     {
         private static readonly ProfilerMarker _wetnessTickMarker = new ProfilerMarker("XRay.Precipitation.WetnessTick");
+        private static XRayPrecipitationQuality? _videoQuality;
 
         private readonly GameObject _owner;
 
@@ -19,6 +20,7 @@ namespace XRay.Importer.Levels
         private XRayWetnessField _wetness;
         private XRayWetMaterialBindings _wetMaterials;
         private XRayWetnessReflection _reflections;
+        private XRayPrecipitationQuality? _appliedVideoQuality;
         private int _revision = -1;
         private int _materialGeometryCapture = -1;
         private float _materialRefreshElapsed;
@@ -35,11 +37,24 @@ namespace XRay.Importer.Levels
         public XRayPuddleArtProfile? ArtProfileOverride { get; set; }
         public long EstimatedBytes => Geometry.EstimatedBytes + (_pass != null ? _pass.EstimatedBytes : 0L) + (_wetness != null ? _wetness.EstimatedBytes : 0L) + (_wetMaterials != null ? _wetMaterials.EstimatedBytes : 0L) + (_reflections != null ? _reflections.EstimatedBytes : 0L);
 
+        internal bool HasPendingVideoQuality => Enabled && _appliedVideoQuality != _videoQuality;
+
         public XRayPrecipitationSystem(GameObject owner)
         {
             if (owner == null) throw new ArgumentNullException(nameof(owner));
             _owner = owner;
             Geometry = new XRayPrecipitationGeometry(owner.scene);
+        }
+
+        public static void SetVideoQuality(int? quality)
+        {
+            _videoQuality = quality.HasValue ? (XRayPrecipitationQuality)Mathf.Clamp(quality.Value, 0, 2) : null;
+        }
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void ResetVideoQuality()
+        {
+            _videoQuality = null;
         }
 
         public void Publish(PrecipitationConfig config, XRayWeatherSnapshot weather, float realDelta, float radianceScale, bool enabled, bool rainVisible)
@@ -75,7 +90,8 @@ namespace XRay.Importer.Levels
             Enabled = true;
             RainDensity = Mathf.Clamp01(weather.RainDensity * config.IntensityMultiplier);
             RealTime += realDelta;
-            Geometry.Refresh(config, realDelta, changed);
+            XRayPrecipitationQuality? videoQuality = _videoQuality;
+            Geometry.Refresh(config, realDelta, changed, videoQuality);
             PublishWetness(config, realDelta, changed, weather.WindVelocity);
             EnsurePass();
             float noise = Mathf.PerlinNoise(RealTime * 0.3f, 0.5f) * 2.0f - 1.0f;
@@ -85,7 +101,8 @@ namespace XRay.Importer.Levels
             Color ambient = weather.AmbientColor.linear + weather.HemisphereColor.linear * 0.205f;
             Color color = tint * ambient * Mathf.Max(0.0f, radianceScale);
             color.a = 1.0f;
-            _pass.Configure(_owner, config, Geometry, color, direction, speed, weather.WindVelocity, RainDensity, RealTime, realDelta, rainVisible);
+            _pass.Configure(_owner, config, Geometry, color, direction, speed, weather.WindVelocity, RainDensity, RealTime, realDelta, rainVisible, videoQuality);
+            _appliedVideoQuality = videoQuality;
         }
 
         public void ResetRain()

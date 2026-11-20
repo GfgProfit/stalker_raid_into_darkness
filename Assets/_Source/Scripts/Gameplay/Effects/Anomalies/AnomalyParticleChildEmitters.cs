@@ -231,6 +231,7 @@ namespace RaidIntoDarkness.Effects
 
         private void Spawn(uint seed, int linkIndex, ParentState parent)
         {
+            if (_children.Count >= AnomalyVisualQuality.ChildLimit || !AnomalyVisualQuality.CanDraw(parent.Position)) return;
             AnomalyParticleChildLink link = _links[linkIndex];
             if (link == null || link.Template == null)
             {
@@ -271,6 +272,7 @@ namespace RaidIntoDarkness.Effects
             if (Application.isPlaying)
             {
                 XRay.Importer.Levels.PunctualShadowDistance.RegisterHierarchy(child);
+                AnomalyVisualQuality.RegisterHierarchy(child);
             }
             return child;
         }
@@ -280,6 +282,12 @@ namespace RaidIntoDarkness.Effects
             for (int index = _children.Count - 1; index >= 0; index--)
             {
                 ChildState child = _children[index];
+                if (index >= AnomalyVisualQuality.ChildLimit)
+                {
+                    Release(child);
+                    _children.RemoveAt(index);
+                    continue;
+                }
                 if (child.System == null)
                 {
                     _children.RemoveAt(index);
@@ -322,9 +330,13 @@ namespace RaidIntoDarkness.Effects
             }
             child.System.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
             child.System.gameObject.SetActive(false);
-            if (child.Link < _pools.Count)
+            if (child.Link < _pools.Count && _pools[child.Link].Count < AnomalyVisualQuality.ChildLimit)
             {
                 _pools[child.Link].Push(child.System);
+            }
+            else
+            {
+                Destroy(child.System.gameObject);
             }
         }
 

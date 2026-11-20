@@ -231,6 +231,15 @@ namespace RaidIntoDarkness.Effects
             if (Application.isPlaying)
             {
                 PunctualShadowDistance.RegisterHierarchy(this);
+                AnomalyVisualQuality.RegisterHierarchy(_idle);
+                AnomalyVisualQuality.RegisterHierarchy(_awaking);
+                if (_idleAuxiliarySystems != null)
+                {
+                    foreach (ParticleSystem system in _idleAuxiliarySystems)
+                    {
+                        AnomalyVisualQuality.RegisterHierarchy(system);
+                    }
+                }
             }
             ShowIdle();
         }

@@ -47,6 +47,7 @@ namespace RaidIntoDarkness.Effects
                 return false;
             }
             _discharges.Add(playback);
+            TrimDischarges();
             _lightRemaining = _dischargeLightDuration;
             _lightDelayRemaining = _dischargeLightDelay;
             UpdateLight(0f);
@@ -63,6 +64,7 @@ namespace RaidIntoDarkness.Effects
 
         protected override void TickVisual(float deltaTime)
         {
+            TrimDischarges();
             for (int index = _discharges.Count - 1; index >= 0; index--)
             {
                 AnomalyParticlePlayback discharge = _discharges[index];
@@ -100,6 +102,17 @@ namespace RaidIntoDarkness.Effects
                 Destroy(discharge.Root);
             }
             _discharges.Clear();
+        }
+
+        private void TrimDischarges()
+        {
+            while (_discharges.Count > AnomalyVisualQuality.DischargeLimit)
+            {
+                AnomalyParticlePlayback oldest = _discharges[0];
+                oldest.Stop();
+                Destroy(oldest.Root);
+                _discharges.RemoveAt(0);
+            }
         }
     }
 }

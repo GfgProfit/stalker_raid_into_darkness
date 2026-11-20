@@ -17,6 +17,8 @@ namespace XRay.Importer.Levels
         private const float PLANAR_CAPTURE_DISTANCE = 80.0f;
         private const float PLANAR_GRID_SPACING = 4.0f;
 
+        private static int? _videoQuality;
+
         private readonly GameObject _owner;
         private readonly ProbeSlot[] _slots = new ProbeSlot[MAX_PROBES];
 
@@ -34,6 +36,7 @@ namespace XRay.Importer.Levels
         private float _planarWeight = 1.0f;
         private double _planarNextHeightRead;
         private int _resolution;
+        private int _probeBudget;
         private int _generation;
         private int _planarGeneration;
         private int _planarResolution;
@@ -101,24 +104,45 @@ namespace XRay.Importer.Levels
             return _slots[index]?.Probe;
         }
 
+        public static void SetVideoQuality(int? quality)
+        {
+            _videoQuality = quality;
+        }
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void ResetVideoQuality()
+        {
+            _videoQuality = null;
+        }
+
         public void Tick(PrecipitationConfig settings, float realDelta, XRayWetnessField wetness = null)
         {
             if (settings == null) throw new ArgumentNullException(nameof(settings));
             if (!float.IsFinite(realDelta) || realDelta < 0.0f) throw new ArgumentOutOfRangeException(nameof(realDelta));
-            if (!settings.NonCameraReflectionsEnabled || settings.ReflectionIntensity <= 0.0f || !settings.WetnessEnabled && !settings.PuddlesEnabled)
+            if (_videoQuality == 0 || !settings.NonCameraReflectionsEnabled || settings.ReflectionIntensity <= 0.0f || !settings.WetnessEnabled && !settings.PuddlesEnabled)
             {
                 Dispose();
                 return;
             }
-            int resolution = settings.Quality == XRayPrecipitationQuality.Low ? 64 : 128;
-            if (Probe != null && _resolution != resolution) Dispose();
+            (int probes, int resolution, int planar) = _videoQuality switch
+            {
+                1 => (1, 64, 0),
+                2 => (2, 64, 128),
+                3 => (MAX_PROBES, 128, 256),
+                4 => (MAX_PROBES, 256, 512),
+                _ => (MAX_PROBES, settings.Quality == XRayPrecipitationQuality.Low ? 64 : 128, settings.PlanarReflectionResolution)
+            };
+            if (Probe != null && (_resolution != resolution || _probeBudget != probes)) Dispose();
             _settings = settings;
             if (wetness != null) _wetness = wetness;
-            if (!settings.PlanarReflectionsEnabled || !settings.PuddlesEnabled || settings.PuddleStrength <= 0.0f || _planar != null && _planarResolution != settings.PlanarReflectionResolution) ReleasePlanar();
+            if (!settings.PlanarReflectionsEnabled || !settings.PuddlesEnabled || settings.PuddleStrength <= 0.0f) planar = 0;
+            if (_planarResolution != planar) ReleasePlanar();
+            _planarResolution = planar;
             AdvanceClock();
             if (Probe == null)
             {
                 _resolution = resolution;
+                _probeBudget = probes;
                 _slots[0] = Create();
                 RenderPipelineManager.beginCameraRendering += BeginCameraRendering;
             }
@@ -144,6 +168,8 @@ namespace XRay.Importer.Levels
             _lastClock = 0.0;
             _requestElapsed = 0.0f;
             _resolution = 0;
+            _probeBudget = 0;
+            _planarResolution = 0;
             _planarNextHeightRead = 0.0;
             PlanarGroundHeights = Vector2.zero;
             PlanarGroundHeight = 0.0f;
@@ -217,7 +243,7 @@ namespace XRay.Importer.Levels
             foreach (ProbeSlot slot in _slots)
             {
                 if (slot == null || !slot.HeightReady || !Desired(slot.Cell, cell)) continue;
-                if (slot.Captured && (_time - slot.LastCapture < _settings.ReflectionRefreshSeconds || _requestElapsed < _settings.ReflectionRefreshSeconds / MAX_PROBES)) continue;
+                if (slot.Captured && (_time - slot.LastCapture < _settings.ReflectionRefreshSeconds || _requestElapsed < _settings.ReflectionRefreshSeconds / _probeBudget)) continue;
                 if (next == null || !slot.Captured && next.Captured || slot.Captured == next.Captured && slot.LastCapture < next.LastCapture) next = slot;
             }
             if (next == null) return;
@@ -233,9 +259,11 @@ namespace XRay.Importer.Levels
 
         private void EnsureLocalSlots(Vector2Int cell)
         {
-            for (int z = 0; z < 2; z++)
+            int width = _probeBudget > 1 ? 2 : 1;
+            int height = _probeBudget > 2 ? 2 : 1;
+            for (int z = 0; z < height; z++)
             {
-                for (int x = 0; x < 2; x++)
+                for (int x = 0; x < width; x++)
                 {
                     var desired = cell + new Vector2Int(x, z);
                     bool exists = false;
@@ -244,7 +272,7 @@ namespace XRay.Importer.Levels
                         if (slot != null && slot.Assigned && slot.Cell == desired) exists = true;
                     }
                     if (exists) continue;
-                    for (int i = 0; i < _slots.Length; i++)
+                    for (int i = 0; i < _probeBudget; i++)
                     {
                         ProbeSlot slot = _slots[i];
                         if (slot != null && (slot == _rendering || slot == _reading || slot.Assigned && Desired(slot.Cell, cell))) continue;
@@ -319,7 +347,7 @@ namespace XRay.Importer.Levels
 
         private void UpdatePlanar(Camera camera)
         {
-            if (!_settings.PlanarReflectionsEnabled || !_settings.PuddlesEnabled || _settings.PuddleStrength <= 0.0f || _wetness?.Buffer == null || !SystemInfo.supportsAsyncGPUReadback || _planarHeightPending || _weight <= 0.0f || _planarWeight <= 0.0f) return;
+            if (_planarResolution == 0 || _wetness?.Buffer == null || !SystemInfo.supportsAsyncGPUReadback || _planarHeightPending || _weight <= 0.0f || _planarWeight <= 0.0f) return;
             Vector3 position = camera.transform.position;
             Vector3 forward = camera.transform.forward;
             forward.y = 0.0f;
@@ -403,7 +431,7 @@ namespace XRay.Importer.Levels
             _planar.settingsRaw.proxySettings.mirrorPositionProxySpace = Vector3.zero;
             _planar.settingsRaw.proxySettings.mirrorRotationProxySpace = Quaternion.LookRotation(Vector3.up, Vector3.forward);
             _planar.settingsRaw.resolutionScalable.useOverride = true;
-            _planar.settingsRaw.resolutionScalable.@override = (PlanarReflectionAtlasResolution)_settings.PlanarReflectionResolution;
+            _planar.settingsRaw.resolutionScalable.@override = (PlanarReflectionAtlasResolution)_planarResolution;
             _planar.settingsRaw.roughReflections = true;
             _planar.settingsRaw.frustum.fieldOfViewMode = ProbeSettings.Frustum.FOVMode.Viewer;
             _planar.settingsRaw.frustum.viewerScale = 1.0f;
@@ -416,7 +444,6 @@ namespace XRay.Importer.Levels
             _planar.multiplier = 1.0f;
             _planar.weight = _weight * _planarWeight;
             _planar.fadeDistance = 48.0f;
-            _planarResolution = _settings.PlanarReflectionResolution;
             root.SetActive(true);
         }
 
@@ -434,7 +461,6 @@ namespace XRay.Importer.Levels
                 CoreUtils.Destroy(_planar.gameObject);
             }
             _planar = null;
-            _planarResolution = 0;
         }
 
         private void RestartPendingCapture()
@@ -482,14 +508,18 @@ namespace XRay.Importer.Levels
             }
         }
 
-        private static Vector2Int GridCell(Vector3 position)
+        private Vector2Int GridCell(Vector3 position)
         {
-            return new Vector2Int(Mathf.FloorToInt(position.x / GRID_SPACING), Mathf.FloorToInt(position.z / GRID_SPACING));
+            float x = position.x / GRID_SPACING;
+            float z = position.z / GRID_SPACING;
+            return new Vector2Int(_probeBudget > 1 ? Mathf.FloorToInt(x) : Mathf.RoundToInt(x), _probeBudget > 2 ? Mathf.FloorToInt(z) : Mathf.RoundToInt(z));
         }
 
-        private static bool Desired(Vector2Int candidate, Vector2Int cell)
+        private bool Desired(Vector2Int candidate, Vector2Int cell)
         {
-            return candidate.x >= cell.x && candidate.x <= cell.x + 1 && candidate.y >= cell.y && candidate.y <= cell.y + 1;
+            int maxX = _probeBudget > 1 ? cell.x + 1 : cell.x;
+            int maxZ = _probeBudget > 2 ? cell.y + 1 : cell.y;
+            return candidate.x >= cell.x && candidate.x <= maxX && candidate.y >= cell.y && candidate.y <= maxZ;
         }
 
         private sealed class ProbeSlot

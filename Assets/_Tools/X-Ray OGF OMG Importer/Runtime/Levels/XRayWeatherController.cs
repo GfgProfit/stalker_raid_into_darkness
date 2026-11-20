@@ -565,7 +565,12 @@ namespace XRay.Importer.Levels
 
         private void Update()
         {
-            if (!Application.IsPlaying(gameObject) || Time.timeScale == 0.0f || Time.frameCount == _lastFrame) return;
+            if (!Application.IsPlaying(gameObject) || Time.frameCount == _lastFrame) return;
+            if (Time.timeScale == 0.0f)
+            {
+                if (_precipitation != null && _precipitation.HasPendingVideoQuality) PublishPrecipitation(0.0f);
+                return;
+            }
             _lastFrame = Time.frameCount;
             TickSimulation(Time.unscaledDeltaTime);
         }
@@ -710,15 +715,20 @@ namespace XRay.Importer.Levels
             }
             if (_ownedFog != null && !FogEnabled && _ownedFog.HasWeather) _ownedFog.ReleaseWeather(this);
             PublishEnvironment(snapshot, effectWeight);
-            if (_precipitation == null) _precipitation = new XRayPrecipitationSystem(gameObject);
-            float precipitationRadiance = _ownedSky != null ? XRayWeatherSkyPass.GetEnvironmentRadianceScale(_ownedSky.Settings) : 1.0f;
-            _precipitation.Publish(EffectivePrecipitationConfig, snapshot, _simulationPaused ? 0.0f : deltaSeconds, precipitationRadiance, PrecipitationEnabled, RainVisualOverride ?? true);
+            PublishPrecipitation(deltaSeconds);
             _ownedWeather.SetWeatherNightAmbient(this, _ownedSky != null ? XRayWeatherSkyPass.GetNightRadiance(_ownedSky.Settings) : Vector3.zero);
             bool transitionCompletedWithoutGameTime = IsTransitioning && _transitionElapsed >= _transitionDuration && _simulationTimeScale == 0.0f;
             PublishCelestial(deltaSeconds, resetPrevious && resetCelestial || transitionCompletedWithoutGameTime || effectFlareHandover);
             _rebaseWind = false;
             Diagnostic = ActiveProfile.HasSsfxWindTrees ? diagnostic : "INPUT BLOCKED: imported ssfx_wind_trees are unavailable; wind uses the provider's authored diagnostic tree settings.";
             if (!ActiveProfile.HasSunLightScale) Diagnostic = "INPUT BLOCKED: saved source sunlight scale is unavailable; descriptor RGB remains an explicit diagnostic light input.";
+        }
+
+        private void PublishPrecipitation(float deltaSeconds)
+        {
+            if (_precipitation == null) _precipitation = new XRayPrecipitationSystem(gameObject);
+            float radiance = _ownedSky != null ? XRayWeatherSkyPass.GetEnvironmentRadianceScale(_ownedSky.Settings) : 1.0f;
+            _precipitation.Publish(EffectivePrecipitationConfig, _snapshot, _simulationPaused ? 0.0f : deltaSeconds, radiance, PrecipitationEnabled, RainVisualOverride ?? true);
         }
 
         private void PublishEnvironment(XRayWeatherSnapshot snapshot, float effectWeight)

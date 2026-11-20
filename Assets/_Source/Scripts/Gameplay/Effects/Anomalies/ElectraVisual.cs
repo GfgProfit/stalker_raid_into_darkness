@@ -21,6 +21,7 @@ namespace RaidIntoDarkness.Effects
 
         protected override bool StartDischarge()
         {
+            AnomalyVisualQuality.RegisterHierarchy(_discharge);
             Clear(_discharge);
             _isDischarging = true;
             _dischargeLightTime = 0f;

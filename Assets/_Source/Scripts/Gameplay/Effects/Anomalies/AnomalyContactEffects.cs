@@ -153,7 +153,7 @@ namespace RaidIntoDarkness.Effects
             for (int index = _instances.Count - 1; index >= 0; index--)
             {
                 ContactInstance instance = _instances[index];
-                if (instance.Target == null || instance.Target.gameObject.activeInHierarchy == false || (instance.Follow && instance.Anchor == null) || instance.Playback.Root == null)
+                if (index >= AnomalyVisualQuality.ContactLimit || instance.Target == null || instance.Target.gameObject.activeInHierarchy == false || (instance.Follow && instance.Anchor == null) || instance.Playback.Root == null)
                 {
                     Release(index);
                     continue;
@@ -169,11 +169,12 @@ namespace RaidIntoDarkness.Effects
 
         private bool CanPlay(Transform target)
         {
-            return isActiveAndEnabled && _template != null && target != null && target.gameObject.activeInHierarchy;
+            return isActiveAndEnabled && _template != null && target != null && target.gameObject.activeInHierarchy && AnomalyVisualQuality.CanDraw(target.position);
         }
 
         private void Create(Transform target, Transform anchor, bool follow, Quaternion rotation)
         {
+            if (_instances.Count >= AnomalyVisualQuality.ContactLimit) return;
             AnomalyContactRegistry registry = null;
             int registrationToken = 0;
             if (follow && string.IsNullOrEmpty(_sourceEffectKey) == false)

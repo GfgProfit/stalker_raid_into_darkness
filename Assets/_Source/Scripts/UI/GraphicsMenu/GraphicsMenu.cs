@@ -16,13 +16,21 @@ namespace RaidIntoDarkness.GraphicsOptions
     [DisallowMultipleComponent]
     public sealed class GraphicsMenu : MonoBehaviour
     {
-        private const string MILITARY_SCENE = "Assets/_Source/Levels/Anomaly/1v2_DX11_v_12gb_2.5_168_662acc8d/l07_military/Scenes/l07_military.unity";
+        private const string MILITARY_SCENE = "Assets/_Source/Levels/Anomaly/test_5665bccf/y04_pole/Scenes/y04_pole.unity";
         private const string DEMO_SCENE = "Assets/TEST_SCENE.unity";
         private const string HDRP_UNAVAILABLE = "Требуется HDRP";
         private static readonly string[] PRESETS = { "Низкие", "Средние", "Высокие", "Максимальные", "Ультра" };
         private static readonly string[] QUALITY = { "Низкое", "Среднее", "Высокое" };
         private static readonly string[] LOD = { "Низкая", "Средняя", "Высокая" };
         private static readonly string[] AO = { "Выкл.", "Низкое", "Среднее", "Высокое" };
+        private static readonly string[] REFLECTIONS = { "Выкл.", "Низкое", "Среднее", "Высокое", "Ультра" };
+        private static readonly string[] SHADOW_RESOLUTION = { "Низкое", "Среднее", "Высокое", "Ультра" };
+        private static readonly string[] CASCADES = { "1", "2", "3", "4" };
+        private static readonly string[] LOCAL_SHADOW_BUDGET = { "Выкл.", "4", "8", "16", "Без ограничения" };
+        private static readonly string[] STREAMING_BUDGET = { "256 МБ", "512 МБ", "1 ГБ", "2 ГБ", "4 ГБ" };
+        private static readonly string[] UPSCALERS = { "Native", "TAAU", "AMD FSR 2", "NVIDIA DLSS" };
+        private static readonly string[] UPSCALER_QUALITY = { "Качество", "Баланс", "Производительность" };
+        private static readonly string[] UPSCALER_QUALITY_WITH_ULTRA = { "Качество", "Баланс", "Производительность", "Ультра" };
         private static readonly string[] ANISOTROPY = { "Выкл.", "2×", "4×", "8×", "16×" };
         private static readonly string[] FPS = { "30", "60", "90", "120", "144", "165", "240", "Без ограничения" };
         private static readonly int[] ANISOTROPY_VALUES = VideoPresets.AnisotropyLevels;
@@ -61,6 +69,7 @@ namespace RaidIntoDarkness.GraphicsOptions
 
         private readonly List<FullScreenMode> _modeOptions = new();
         private readonly List<VideoAntialiasing> _aaOptions = new();
+        private readonly List<int> _upscalingOptions = new();
         private readonly List<string> _labels = new();
         private VideoSettingsRuntime _runtime;
         private VideoSettingsSession _session;
@@ -93,7 +102,18 @@ namespace RaidIntoDarkness.GraphicsOptions
             ShadowQuality,
             AmbientOcclusion,
             Fog,
-            ContactShadowQuality
+            ContactShadowQuality,
+            Reflections,
+            Rain,
+            Anomalies,
+            LocalShadowBudget,
+            Ssgi,
+            Ssr,
+            ShadowCascades,
+            Decals,
+            StreamingBudget,
+            UpscalingMethod,
+            UpscalingQuality
         }
 
         private enum Range
@@ -104,7 +124,9 @@ namespace RaidIntoDarkness.GraphicsOptions
             LocalShadows,
             GrassDensity,
             GrassDistance,
-            GrassHeight
+            GrassHeight,
+            ObjectDistance,
+            Sharpening
         }
 
         private enum Switch
@@ -156,6 +178,17 @@ namespace RaidIntoDarkness.GraphicsOptions
             Bind(Selector.AmbientOcclusion, (ref VideoSettings settings, int value) => settings.quality.ambientOcclusion = value);
             Bind(Selector.Fog, (ref VideoSettings settings, int value) => settings.quality.fogQuality = value);
             Bind(Selector.ContactShadowQuality, (ref VideoSettings settings, int value) => settings.quality.contactShadowQuality = value);
+            Bind(Selector.Reflections, (ref VideoSettings settings, int value) => settings.quality.reflections = value);
+            Bind(Selector.Rain, (ref VideoSettings settings, int value) => settings.quality.rainQuality = value);
+            Bind(Selector.Anomalies, (ref VideoSettings settings, int value) => settings.quality.anomalyQuality = value);
+            Bind(Selector.LocalShadowBudget, (ref VideoSettings settings, int value) => settings.quality.localShadowBudget = value);
+            Bind(Selector.Ssgi, (ref VideoSettings settings, int value) => settings.quality.ssgi = value);
+            Bind(Selector.Ssr, (ref VideoSettings settings, int value) => settings.quality.ssr = value);
+            Bind(Selector.ShadowCascades, (ref VideoSettings settings, int value) => settings.quality.shadowCascades = value + 1);
+            Bind(Selector.Decals, (ref VideoSettings settings, int value) => settings.quality.decals = value);
+            Bind(Selector.StreamingBudget, (ref VideoSettings settings, int value) => settings.quality.streamingBudget = value);
+            Bind(Selector.UpscalingMethod, SelectUpscaling);
+            Bind(Selector.UpscalingQuality, (ref VideoSettings settings, int value) => settings.quality.upscalingQuality = value);
 
             Bind(Range.Brightness, 50, 150, (ref VideoSettings settings, int value) => settings.brightness = value);
             Bind(Range.RenderScale, 50, 100, (ref VideoSettings settings, int value) => settings.quality.renderScale = value);
@@ -164,6 +197,8 @@ namespace RaidIntoDarkness.GraphicsOptions
             Bind(Range.GrassDensity, 25, VideoPresets.MAX_GRASS_DENSITY, (ref VideoSettings settings, int value) => settings.quality.grassSpacing = _runtime.Presets.GrassSpacing(value));
             Bind(Range.GrassDistance, 0, VideoPresets.MAX_GRASS_DISTANCE, (ref VideoSettings settings, int value) => settings.quality.grassDistance = value);
             Bind(Range.GrassHeight, Mathf.RoundToInt(XRayGrassValues.MIN_HEIGHT * 100f), Mathf.RoundToInt(XRayGrassValues.MAX_HEIGHT * 100f), (ref VideoSettings settings, int value) => settings.grassHeight = value / 100f);
+            Bind(Range.ObjectDistance, VideoPresets.MIN_OBJECT_DISTANCE, VideoPresets.MAX_OBJECT_DISTANCE, (ref VideoSettings settings, int value) => settings.quality.objectDrawDistance = value);
+            Bind(Range.Sharpening, 0, 100, (ref VideoSettings settings, int value) => settings.quality.sharpening = value);
 
             Bind(Switch.VSync, (ref VideoSettings settings, int value) => settings.vSync = value != 0);
             Bind(Switch.GrassShadows, (ref VideoSettings settings, int value) => settings.quality.grassShadows = value != 0);
@@ -373,12 +408,21 @@ namespace RaidIntoDarkness.GraphicsOptions
 
         private void Bind(Selector selector, EditValue action)
         {
-            _selectors[(int)selector].IndexChanged += value => Edit(action, value);
+            int index = (int)selector;
+            if (index < _selectors.Length && _selectors[index] != null)
+            {
+                _selectors[index].IndexChanged += value => Edit(action, value);
+            }
         }
 
         private void Bind(Range range, int minimum, int maximum, EditValue action)
         {
-            Slider slider = _sliders[(int)range];
+            int index = (int)range;
+            if (index >= _sliders.Length || _sliders[index] == null)
+            {
+                return;
+            }
+            Slider slider = _sliders[index];
             slider.wholeNumbers = true;
             slider.minValue = minimum;
             slider.maxValue = maximum;
@@ -421,6 +465,16 @@ namespace RaidIntoDarkness.GraphicsOptions
             settings.quality.antialiasingQuality = VideoPresets.HasAntialiasingQuality(settings.quality.antialiasing) ? 1 : 0;
         }
 
+        private void SelectUpscaling(ref VideoSettings settings, int index)
+        {
+            int method = _upscalingOptions[index];
+            settings.quality.upscalingMethod = method;
+            if (settings.quality.upscalingQuality == 3 && !_runtime.SupportsUltraPerformance(method))
+            {
+                settings.quality.upscalingQuality = 2;
+            }
+        }
+
         private void Refresh()
         {
             RefreshDialog();
@@ -432,20 +486,21 @@ namespace RaidIntoDarkness.GraphicsOptions
             VideoQuality quality = draft.quality;
             _apply.interactable = _session.Dirty;
             _cancel.interactable = _session.Dirty;
-            _status.text = _session.Error ?? "";
+            int upscaler = _runtime.ResolveUpscalingMethod(quality.upscalingMethod);
+            _status.text = _session.Error ?? (upscaler == quality.upscalingMethod ? "" : UPSCALERS[quality.upscalingMethod] + " недоступен · " + UPSCALERS[upscaler]);
             _customLabel.gameObject.SetActive(_runtime.Presets.IsCustom(draft));
             Set(Selector.Preset, PRESETS, draft.preset);
             RefreshDisplay(draft);
             Set(Selector.FrameLimit, FPS, Array.IndexOf(FPS_VALUES, draft.fpsLimit));
             _fpsHint.text = draft.vSync ? "FPS · ПРИОРИТЕТ VSYNC" : "ОГРАНИЧЕНИЕ FPS";
             Set(Switch.VSync, draft.vSync);
-            RefreshAntialiasing(quality);
+            RefreshAntialiasing(quality, upscaler);
             Set(Range.Brightness, draft.brightness, "%", _runtime.SupportsRendering ? null : HDRP_UNAVAILABLE);
-            Set(Range.RenderScale, quality.renderScale, "%", _runtime.SupportsRenderScale ? null : "Масштаб HDRP недоступен");
+            Set(Range.RenderScale, quality.renderScale, "%", upscaler != 0 ? "Задаёт апскейлер" : _runtime.SupportsRenderScale ? null : "Масштаб HDRP недоступен");
             Set(Selector.TextureQuality, PRESETS, quality.textureQuality);
             Set(Selector.Anisotropy, ANISOTROPY, Array.IndexOf(ANISOTROPY_VALUES, quality.anisotropy));
             Set(Selector.Lod, LOD, quality.lodQuality);
-            SetSupported(Selector.ShadowQuality, QUALITY, quality.shadowQuality, _runtime.SupportsRendering, HDRP_UNAVAILABLE);
+            SetSupported(Selector.ShadowQuality, SHADOW_RESOLUTION, quality.shadowQuality, _runtime.SupportsRendering, HDRP_UNAVAILABLE);
             Set(Range.SunShadows, quality.sunShadowDistance, " м", _runtime.SupportsRendering ? null : HDRP_UNAVAILABLE);
             Set(Range.LocalShadows, quality.localShadowDistance, " м", _runtime.SupportsLocalShadows ? null : "Тени Point/Spot недоступны");
             SetSupported(Selector.AmbientOcclusion, AO, quality.ambientOcclusion, _runtime.SupportsAmbientOcclusion, "SSAO недоступно");
@@ -460,6 +515,7 @@ namespace RaidIntoDarkness.GraphicsOptions
             Set(Switch.MotionBlur, quality.motionBlur, _runtime.SupportsMotion);
             Set(Switch.Bloom, quality.bloom, _runtime.SupportsRendering);
             Set(Switch.LensFlare, quality.lensFlare, _runtime.SupportsRendering);
+            RefreshAdvancedQuality(quality, upscaler);
             for (int i = 0; i < _calibration.Length; i++)
             {
                 float level = Mathf.Clamp01(CALIBRATION_LEVELS[i] * draft.brightness * 0.01f);
@@ -469,6 +525,34 @@ namespace RaidIntoDarkness.GraphicsOptions
                 }
                 _calibration[i].color = new Color(level, level, level);
             }
+        }
+
+        private void RefreshAdvancedQuality(VideoQuality quality, int upscaler)
+        {
+            SetSupported(Selector.Reflections, REFLECTIONS, quality.reflections, _runtime.SupportsReflections, "Отражения недоступны");
+            Set(Selector.Rain, QUALITY, quality.rainQuality);
+            Set(Selector.Anomalies, QUALITY, quality.anomalyQuality);
+            SetSupported(Selector.LocalShadowBudget, LOCAL_SHADOW_BUDGET, quality.localShadowBudget, _runtime.SupportsRendering, HDRP_UNAVAILABLE);
+            SetSupported(Selector.Ssgi, AO, quality.ssgi, _runtime.SupportsSsgi, "SSGI недоступно");
+            SetSupported(Selector.Ssr, AO, quality.ssr, _runtime.SupportsSsr, "SSR недоступно");
+            SetSupported(Selector.ShadowCascades, CASCADES, quality.shadowCascades - 1, _runtime.SupportsRendering, HDRP_UNAVAILABLE);
+            SetSupported(Selector.Decals, AO, quality.decals, _runtime.SupportsDecals, "Декали недоступны");
+            SetSupported(Selector.StreamingBudget, STREAMING_BUDGET, quality.streamingBudget, _runtime.SupportsTextureStreaming, "Стриминг недоступен");
+            Set(Range.ObjectDistance, quality.objectDrawDistance, " м", null, quality.objectDrawDistance == VideoPresets.MAX_OBJECT_DISTANCE ? "Без ограничения" : null);
+            Set(Range.Sharpening, quality.sharpening, "%", _runtime.SupportsSharpening ? null : HDRP_UNAVAILABLE);
+            _upscalingOptions.Clear();
+            _labels.Clear();
+            for (int method = 0; method < UPSCALERS.Length; method++)
+            {
+                if (_runtime.SupportsUpscaling(method))
+                {
+                    _upscalingOptions.Add(method);
+                    _labels.Add(UPSCALERS[method]);
+                }
+            }
+            Set(Selector.UpscalingMethod, _labels, Mathf.Max(0, _upscalingOptions.IndexOf(upscaler)));
+            string[] qualityOptions = _runtime.SupportsUltraPerformance(upscaler) ? UPSCALER_QUALITY_WITH_ULTRA : UPSCALER_QUALITY;
+            SetSupported(Selector.UpscalingQuality, qualityOptions, Mathf.Min(quality.upscalingQuality, qualityOptions.Length - 1), _runtime.SupportsUpscalingQuality(upscaler), "Ручной масштаб");
         }
 
         private void RefreshDisplay(VideoSettings draft)
@@ -528,12 +612,18 @@ namespace RaidIntoDarkness.GraphicsOptions
             Set(Selector.RefreshRate, _labels, selectedRate);
         }
 
-        private void RefreshAntialiasing(VideoQuality quality)
+        private void RefreshAntialiasing(VideoQuality quality, int upscaler)
         {
             if (!_runtime.SupportsRendering)
             {
                 Set(Selector.Antialiasing, new[] { HDRP_UNAVAILABLE }, 0);
                 Set(Selector.AntialiasingQuality, new[] { HDRP_UNAVAILABLE }, 0);
+                return;
+            }
+            if (upscaler != 0)
+            {
+                SetSupported(Selector.Antialiasing, QUALITY, 0, false, "Задаёт апскейлер");
+                SetSupported(Selector.AntialiasingQuality, QUALITY, 0, false, "Задаёт апскейлер");
                 return;
             }
             _aaOptions.Clear();
@@ -619,7 +709,11 @@ namespace RaidIntoDarkness.GraphicsOptions
 
         private void Set(Selector selector, IReadOnlyList<string> values, int index)
         {
-            _selectors[(int)selector].SetOptions(values, index);
+            int slot = (int)selector;
+            if (slot < _selectors.Length && _selectors[slot] != null)
+            {
+                _selectors[slot].SetOptions(values, index);
+            }
         }
 
         private void SetSupported(Selector selector, string[] values, int index, bool supported, string reason)
@@ -627,12 +721,17 @@ namespace RaidIntoDarkness.GraphicsOptions
             Set(selector, supported ? values : new[] { reason }, supported ? index : 0);
         }
 
-        private void Set(Range range, int value, string unit, string reason)
+        private void Set(Range range, int value, string unit, string reason, string readout = null)
         {
-            Slider slider = _sliders[(int)range];
+            int slot = (int)range;
+            if (slot >= _sliders.Length || slot >= _readouts.Length || _sliders[slot] == null || _readouts[slot] == null)
+            {
+                return;
+            }
+            Slider slider = _sliders[slot];
             slider.interactable = reason == null;
             slider.SetValueWithoutNotify(value);
-            _readouts[(int)range].text = reason ?? value.ToString() + unit;
+            _readouts[slot].text = reason ?? readout ?? value.ToString() + unit;
         }
 
         private void Set(Switch toggle, bool value, bool supported = true)

@@ -10,6 +10,7 @@ namespace XRay.Importer.Levels
         public static float? PunctualShadowDistance { get; private set; }
         public static bool? LensFlare { get; private set; }
         public static int? FogQuality { get; private set; }
+        public static float? ObjectDrawDistance { get; private set; }
         public static float LodBias { get; private set; } = 1.0f;
 
         public static float? DefaultPunctualShadowDistance
@@ -42,6 +43,11 @@ namespace XRay.Importer.Levels
             }
         }
 
+        public static void SetObjectDrawDistance(float? distance)
+        {
+            ObjectDrawDistance = distance.HasValue && float.IsFinite(distance.Value) && distance.Value > 0f ? distance : null;
+        }
+
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         private static void Reset()
         {
@@ -49,6 +55,7 @@ namespace XRay.Importer.Levels
             PunctualShadowDistance = null;
             LensFlare = null;
             FogQuality = null;
+            ObjectDrawDistance = null;
             LodBias = 1.0f;
             PunctualShadowDistanceChanged = null;
         }

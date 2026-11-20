@@ -3,6 +3,7 @@
     "rootNamespace": "RaidIntoDarkness.GraphicsOptions",
     "references": [
         "XRay.Importer.Runtime",
+        "RaidIntoDarkness.Effects",
         "Unity.RenderPipelines.Core.Runtime",
         "Unity.RenderPipelines.HighDefinition.Runtime"
     ],

@@ -127,7 +127,9 @@ namespace XRay.Importer.Levels
 
         private void OnEnable()
         {
-            if (Application.isPlaying) ApplyConfiguration(_configuration != null ? _configuration : GameConfig.Load());
+            if (!Application.isPlaying) return;
+            ApplyConfiguration(_configuration != null ? _configuration : GameConfig.Load());
+            XRayVideoLightShadows.Register(_light);
         }
 
         private void OnDisable()

@@ -140,9 +140,25 @@ namespace XRay.Importer.Levels
         public Texture2D PuddleNoise => _puddleNoise;
         public Texture2D RippleNormal => _rippleNormal;
         public Texture2DArray WetSurfaceTextures => _wetSurfaceTextures;
-        public int AtlasResolution => 256 << (int)_quality;
-        public int DropBudget => Mathf.Max(1, _maxDrops >> (2 - (int)_quality));
+        public int AtlasResolution => GetAtlasResolution(_quality);
+        public int DropBudget => GetDropBudget(_quality);
         public int Revision { get; private set; }
+
+        internal static int GetAtlasResolution(XRayPrecipitationQuality quality)
+        {
+            return 256 << (int)quality;
+        }
+
+        internal int GetDropBudget(XRayPrecipitationQuality quality)
+        {
+            return Mathf.Max(1, _maxDrops >> (2 - (int)quality));
+        }
+
+        internal int GetSplashBudget(XRayPrecipitationQuality? videoQuality)
+        {
+            if (!_splashesEnabled || _maxSplashes == 0) return 0;
+            return videoQuality.HasValue ? Mathf.Max(1, _maxSplashes >> (2 - (int)videoQuality.Value)) : _maxSplashes;
+        }
 
         public Vector4 GetPuddleShape(XRayPuddleArtProfile profile)
         {

@@ -20,6 +20,7 @@ namespace RaidIntoDarkness.GraphicsOptions
         private readonly Fog _fog;
         private readonly MotionBlur _motionBlur;
         private readonly Bloom _bloom;
+        private readonly VideoHdEffects _effects;
         private readonly Dictionary<Camera, CameraState> _cameras = new();
         private readonly List<Camera> _removedCameras = new();
         private readonly int _volumeLayerMask;
@@ -50,6 +51,7 @@ namespace RaidIntoDarkness.GraphicsOptions
             _fog = _profile.Add<Fog>();
             _motionBlur = _profile.Add<MotionBlur>();
             _bloom = _profile.Add<Bloom>();
+            _effects = new VideoHdEffects(_profile);
             var volume = volumeObject.AddComponent<Volume>();
             volume.isGlobal = true;
             volume.priority = 10000.0f;
@@ -68,16 +70,17 @@ namespace RaidIntoDarkness.GraphicsOptions
             _quality = quality;
             _revision++;
             _shadows.maxShadowDistance.Override(quality.sunShadowDistance);
-            _shadows.cascadeShadowSplitCount.Override(quality.shadowQuality + 2);
+            _shadows.cascadeShadowSplitCount.Override(quality.shadowCascades);
             _contactShadows.enable.Override(quality.contactShadows);
             _contactShadows.quality.Override(quality.contactShadowQuality);
-            XRayVideoLightShadows.Apply(quality.shadowQuality, SupportsContactShadows ? quality.contactShadows : null);
+            XRayVideoLightShadows.Apply(quality.shadowQuality, SupportsContactShadows ? quality.contactShadows : null, VideoPresets.LocalShadowBudget(quality.localShadowBudget));
             _ao.rayTracing.Override(false);
             _ao.intensity.Override(quality.ambientOcclusion > 0 ? 0.7f : 0.0f);
             _ao.quality.Override(Math.Max(0, quality.ambientOcclusion - 1));
             _fog.quality.Override(quality.fogQuality);
             _motionBlur.intensity.Override(quality.motionBlur ? 0.35f : 0.0f);
             _bloom.intensity.Override(quality.bloom ? 0.2f : 0.0f);
+            _effects.Apply(quality.reflections, quality.ssgi, quality.ssr, quality.decals, quality.sharpening);
         }
 
         public void SetBrightness(int brightness)
@@ -91,6 +94,7 @@ namespace RaidIntoDarkness.GraphicsOptions
             SceneManager.sceneUnloaded -= PruneCameras;
             RenderPipelineManager.beginContextRendering -= PrepareCameras;
             XRayVideoLightShadows.Apply(null, null);
+            _effects.Dispose();
             foreach (CameraState state in _cameras.Values)
             {
                 state.Restore();
@@ -106,7 +110,7 @@ namespace RaidIntoDarkness.GraphicsOptions
 
         private float GetRenderScale()
         {
-            return _quality.renderScale;
+            return VideoUpscaling.GetRenderScale(_quality.upscalingMethod, _quality.upscalingQuality, _quality.renderScale);
         }
 
         private static float FullRenderScale()
@@ -141,7 +145,7 @@ namespace RaidIntoDarkness.GraphicsOptions
                 }
                 if (state.Revision != _revision)
                 {
-                    state.Apply(_quality, _volumeLayerMask, _revision);
+                    state.Apply(_quality, _volumeLayerMask, _revision, _effects);
                 }
             }
         }
@@ -169,11 +173,11 @@ namespace RaidIntoDarkness.GraphicsOptions
             private readonly FrameSettings _settings;
             private readonly FrameSettingsOverrideMask _mask;
             private readonly bool _customSettings;
-            private readonly bool _dynamicResolution;
             private readonly LayerMask _volumeMask;
             private readonly HDAdditionalCameraData.AntialiasingMode _antialiasing;
             private readonly HDAdditionalCameraData.SMAAQualityLevel _smaa;
             private readonly HDAdditionalCameraData.TAAQualityLevel _taa;
+            private readonly VideoUpscaling.CameraState _upscaling;
 
             public int Revision { get; private set; }
             public bool Valid => _camera != null;
@@ -184,14 +188,14 @@ namespace RaidIntoDarkness.GraphicsOptions
                 _settings = camera.renderingPathCustomFrameSettings;
                 _mask = camera.renderingPathCustomFrameSettingsOverrideMask;
                 _customSettings = camera.customRenderingSettings;
-                _dynamicResolution = camera.allowDynamicResolution;
                 _volumeMask = camera.volumeLayerMask;
                 _antialiasing = camera.antialiasing;
                 _smaa = camera.SMAAQuality;
                 _taa = camera.TAAQuality;
+                _upscaling = new VideoUpscaling.CameraState(camera);
             }
 
-            public void Apply(VideoQuality quality, int volumeLayerMask, int revision)
+            public void Apply(VideoQuality quality, int volumeLayerMask, int revision, VideoHdEffects effects)
             {
                 var settings = _settings;
                 FrameSettingsOverrideMask mask = _customSettings ? _mask : default;
@@ -199,7 +203,6 @@ namespace RaidIntoDarkness.GraphicsOptions
                 bool temporal = quality.antialiasing == VideoAntialiasing.Taa;
                 _camera.volumeLayerMask = _volumeMask.value | volumeLayerMask;
                 _camera.customRenderingSettings = true;
-                _camera.allowDynamicResolution = quality.renderScale < 100;
                 _camera.antialiasing = quality.antialiasing switch
                 {
                     VideoAntialiasing.Fxaa => HDAdditionalCameraData.AntialiasingMode.FastApproximateAntialiasing,
@@ -209,7 +212,8 @@ namespace RaidIntoDarkness.GraphicsOptions
                 };
                 _camera.SMAAQuality = (HDAdditionalCameraData.SMAAQualityLevel)quality.antialiasingQuality;
                 _camera.TAAQuality = (HDAdditionalCameraData.TAAQualityLevel)quality.antialiasingQuality;
-                Set(ref settings, ref mask, FrameSettingsField.Antialiasing, allowPost && quality.antialiasing != VideoAntialiasing.Off);
+                bool temporalUpscaler = _upscaling.Apply(quality.upscalingMethod, quality.upscalingQuality, quality.renderScale, allowPost);
+                Set(ref settings, ref mask, FrameSettingsField.Antialiasing, allowPost && (quality.antialiasing != VideoAntialiasing.Off || temporalUpscaler));
                 Set(ref settings, ref mask, FrameSettingsField.ContactShadows, quality.contactShadows);
                 Set(ref settings, ref mask, FrameSettingsField.SSAO, quality.ambientOcclusion > 0);
                 Set(ref settings, ref mask, FrameSettingsField.DepthOfField, false);
@@ -220,7 +224,7 @@ namespace RaidIntoDarkness.GraphicsOptions
                 {
                     Set(ref settings, ref mask, FrameSettingsField.LensFlareScreenSpace, false);
                 }
-                if (allowPost && (temporal || quality.motionBlur))
+                if (allowPost && (temporal || temporalUpscaler || quality.motionBlur))
                 {
                     Set(ref settings, ref mask, FrameSettingsField.MotionVectors, true);
                 }
@@ -230,6 +234,7 @@ namespace RaidIntoDarkness.GraphicsOptions
                 mask.mask[(uint)FrameSettingsField.LODBiasMode] = true;
                 _camera.renderingPathCustomFrameSettings = settings;
                 _camera.renderingPathCustomFrameSettingsOverrideMask = mask;
+                effects.PrepareCamera(_camera);
                 Revision = revision;
             }
 
@@ -242,11 +247,11 @@ namespace RaidIntoDarkness.GraphicsOptions
                 _camera.renderingPathCustomFrameSettings = _settings;
                 _camera.renderingPathCustomFrameSettingsOverrideMask = _mask;
                 _camera.customRenderingSettings = _customSettings;
-                _camera.allowDynamicResolution = _dynamicResolution;
                 _camera.volumeLayerMask = _volumeMask;
                 _camera.antialiasing = _antialiasing;
                 _camera.SMAAQuality = _smaa;
                 _camera.TAAQuality = _taa;
+                _upscaling.Restore();
             }
 
             private static void Set(ref FrameSettings settings, ref FrameSettingsOverrideMask mask, FrameSettingsField field, bool enabled)

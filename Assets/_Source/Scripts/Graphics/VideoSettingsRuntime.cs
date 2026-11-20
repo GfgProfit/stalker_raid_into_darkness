@@ -1,4 +1,5 @@
 using System.IO;
+using RaidIntoDarkness.Effects;
 using UnityEngine;
 using UnityEngine.Rendering;
 using XRay.Importer.Levels;
@@ -14,6 +15,8 @@ namespace RaidIntoDarkness.GraphicsOptions
         private int _initialFrameRate;
         private int _initialMipmapLimit;
         private AnisotropicFiltering _initialAnisotropy;
+        private bool _initialStreamingActive;
+        private float _initialStreamingBudget;
         private int _lastAnisotropy = -1;
         private bool _hasSavedSettings;
 
@@ -30,6 +33,32 @@ namespace RaidIntoDarkness.GraphicsOptions
         public bool SupportsMotion => VideoRendering.SupportsMotion;
         public bool SupportsLocalShadows => XRayVideoOverrides.DefaultPunctualShadowDistance.HasValue;
         public bool SupportsGrass => _grass != null;
+        public bool SupportsTextureStreaming => SystemInfo.supportsMipStreaming;
+        public bool SupportsReflections => VideoHdEffects.SupportsReflections;
+        public bool SupportsSsgi => VideoHdEffects.SupportsSsgi;
+        public bool SupportsSsr => VideoHdEffects.SupportsSsr;
+        public bool SupportsDecals => VideoHdEffects.SupportsDecals;
+        public bool SupportsSharpening => VideoHdEffects.SupportsSharpening;
+
+        public bool SupportsUpscaling(int method)
+        {
+            return VideoUpscaling.IsSupported(method);
+        }
+
+        public int ResolveUpscalingMethod(int method)
+        {
+            return VideoUpscaling.ResolveMethod(method);
+        }
+
+        public bool SupportsUpscalingQuality(int method)
+        {
+            return VideoUpscaling.UsesQuality(method);
+        }
+
+        public bool SupportsUltraPerformance(int method)
+        {
+            return VideoUpscaling.SupportsUltraPerformance(method);
+        }
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void StartRuntime()
@@ -82,7 +111,23 @@ namespace RaidIntoDarkness.GraphicsOptions
                 Texture.SetGlobalAnisotropicFilteringLimits(aniso, aniso);
                 _lastAnisotropy = quality.anisotropy;
             }
+            if (SupportsTextureStreaming)
+            {
+                int budget = VideoPresets.StreamingBudget(quality.streamingBudget);
+                if (!QualitySettings.streamingMipmapsActive)
+                {
+                    QualitySettings.streamingMipmapsActive = true;
+                }
+                if (QualitySettings.streamingMipmapsMemoryBudget != budget)
+                {
+                    QualitySettings.streamingMipmapsMemoryBudget = budget;
+                }
+            }
             XRayVideoOverrides.Apply(quality.localShadowDistance, quality.lensFlare, quality.fogQuality, VideoPresets.LodBias(quality.lodQuality));
+            XRayVideoOverrides.SetObjectDrawDistance(quality.objectDrawDistance < VideoPresets.MAX_OBJECT_DISTANCE ? quality.objectDrawDistance : null);
+            XRayPrecipitationSystem.SetVideoQuality(quality.rainQuality);
+            AnomalyVisualQuality.Apply(quality.anomalyQuality);
+            XRayLevelDecalOrdering.ApplyVideoQuality(quality.decals);
             if (_grass != null)
             {
                 XRayGrassValues current = _grass.Values;
@@ -151,6 +196,8 @@ namespace RaidIntoDarkness.GraphicsOptions
             _initialFrameRate = Application.targetFrameRate;
             _initialMipmapLimit = QualitySettings.globalTextureMipmapLimit;
             _initialAnisotropy = QualitySettings.anisotropicFiltering;
+            _initialStreamingActive = QualitySettings.streamingMipmapsActive;
+            _initialStreamingBudget = QualitySettings.streamingMipmapsMemoryBudget;
             if (SupportsRendering)
             {
                 _rendering = new VideoRendering(gameObject);
@@ -179,10 +226,19 @@ namespace RaidIntoDarkness.GraphicsOptions
             Session.Changed -= SyncTick;
             _rendering?.Dispose();
             XRayVideoOverrides.Apply(null, null, null, 1.0f);
+            XRayVideoOverrides.SetObjectDrawDistance(null);
+            XRayPrecipitationSystem.SetVideoQuality(null);
+            AnomalyVisualQuality.Apply(null);
+            XRayLevelDecalOrdering.ApplyVideoQuality(null);
             QualitySettings.vSyncCount = _initialVSync;
             Application.targetFrameRate = _initialFrameRate;
             QualitySettings.globalTextureMipmapLimit = _initialMipmapLimit;
             QualitySettings.anisotropicFiltering = _initialAnisotropy;
+            if (SupportsTextureStreaming)
+            {
+                QualitySettings.streamingMipmapsMemoryBudget = _initialStreamingBudget;
+                QualitySettings.streamingMipmapsActive = _initialStreamingActive;
+            }
             Texture.SetGlobalAnisotropicFilteringLimits(1, 16);
             Instance = null;
         }

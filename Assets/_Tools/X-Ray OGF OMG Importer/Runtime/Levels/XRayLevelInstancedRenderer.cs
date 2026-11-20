@@ -32,6 +32,10 @@ namespace XRay.Importer.Levels
         private MaterialPropertyBlock _submissionBlock;
         private XRayLevelLodRenderer _lodRenderer;
         private bool[] _lodOwners;
+        private bool[] _decorativeOwners;
+        private DecorativePart[] _decorativeParts;
+        private byte[] _objectDistanceStates;
+        private Dictionary<Material, DecorativePart> _decorativeMaterials;
         private int _propertyId;
         private XRayInstanceBatchSet _groupOwner;
         private int _groupRevision = -1;
@@ -188,13 +192,18 @@ namespace XRay.Importer.Levels
             XRayFloraWindState wind = XRayFloraWindBounds.ActiveState();
             XRayVegetationOcclusion occlusion = XRayVegetationOcclusion.Begin(camera, transform.parent);
             bool authoredLod = LodImpostors;
-            bool automaticLod = _lodImpostorsOverride == null && !authoredLod && (_configuration?.VegetationTreeImpostorsEnabled ?? true) && _maxDistance <= 0f && camera.cameraType == CameraType.Game && camera.targetTexture == null && !camera.orthographic && !camera.stereoEnabled;
-            XRayLevelLodSet lods = automaticLod || authoredLod ? _batchSet.Lods : null;
+            bool gameplayView = camera.cameraType == CameraType.Game && camera.targetTexture == null && !camera.orthographic && !camera.stereoEnabled;
+            bool automaticLod = _lodImpostorsOverride == null && !authoredLod && (_configuration?.VegetationTreeImpostorsEnabled ?? true) && _maxDistance <= 0f && gameplayView;
+            float objectDistance = Application.isPlaying && gameplayView ? XRayVideoOverrides.ObjectDrawDistance.GetValueOrDefault() : 0f;
+            XRayLevelLodSet lods = _batchSet.Lods;
+            bool hasLods = lods != null && lods.HasImpostorData;
+            bool hasOwners = hasLods && (automaticLod || objectDistance > 0f) && PrepareAutomaticLodOwners(lods, objectDistance > 0f);
+            bool[] decorativeOwners = hasOwners && objectDistance > 0f ? _decorativeOwners : null;
             byte[] states = null;
-            if (lods != null && lods.HasImpostorData && (!automaticLod || PrepareAutomaticLodOwners(lods)))
+            if (hasLods && (authoredLod || automaticLod && hasOwners))
             {
                 _lodRenderer ??= new XRayLevelLodRenderer();
-                _lodRenderer.Evaluate(camera, lods, automaticLod ? _lodOwners : null, automaticLod ? occlusion : null);
+                _lodRenderer.Evaluate(camera, lods, automaticLod ? _lodOwners : null, automaticLod ? occlusion : null, objectDistance, decorativeOwners);
                 states = _lodRenderer.States;
             }
             else if (_lodRenderer != null)
@@ -202,6 +211,7 @@ namespace XRay.Importer.Levels
                 _lodRenderer.Dispose();
                 _lodRenderer = null;
             }
+            if (states == null && decorativeOwners != null) states = PrepareObjectDistanceStates(lods, camera.transform.position, objectDistance);
             bool native = TryNativeSubmission(camera, wind, occlusion, states, out bool historyPrepared);
             if (!native)
             {
@@ -281,12 +291,12 @@ namespace XRay.Importer.Levels
                 Submit(camera, batch, bounds, wind, _properties[i], history.Instances, batch.Data, batch.Count, castShadows ? visible ? ShadowCastingMode.On : ShadowCastingMode.ShadowsOnly : ShadowCastingMode.Off, history.Moving, null, native);
             }
 
-            if (states != null)
+            if (_lodRenderer != null)
             {
                 _lodRenderer.Render(camera, lods, gameObject.layer);
             }
 
-            LastImpostors = states != null ? _lodRenderer.LastImpostors : 0;
+            LastImpostors = _lodRenderer?.LastImpostors ?? 0;
             LastLodShadowOnlyInstances = lodShadowOnly;
             LastLodDiscardedInstances = lodDiscarded;
             LastVisibleBatches = visibleBatches;
@@ -295,23 +305,80 @@ namespace XRay.Importer.Levels
             LastRejectedShadowBatches = rejectedShadowBatches;
         }
 
-        private bool PrepareAutomaticLodOwners(XRayLevelLodSet lods)
+        private bool PrepareAutomaticLodOwners(XRayLevelLodSet lods, bool classifyDecorative)
         {
             if (_lodOwners == null || _lodOwners.Length != lods.Count) _lodOwners = new bool[lods.Count];
             Array.Clear(_lodOwners, 0, _lodOwners.Length);
+            if (classifyDecorative)
+            {
+                if (_decorativeParts == null || _decorativeParts.Length != lods.Count)
+                {
+                    _decorativeParts = new DecorativePart[lods.Count];
+                    _decorativeOwners = new bool[lods.Count];
+                }
+                Array.Clear(_decorativeParts, 0, _decorativeParts.Length);
+                _decorativeMaterials ??= new Dictionary<Material, DecorativePart>(new ReferenceComparer<Material>());
+                _decorativeMaterials.Clear();
+            }
             bool hasOwners = false;
             foreach (XRayInstanceBatch batch in _batchSet.Batches)
             {
                 if (!batch.HasLods) continue;
                 if (batch.MatricesExposed) return false;
+                DecorativePart parts = classifyDecorative ? ClassifyDecorativeParts(batch.Materials) : DecorativePart.None;
                 foreach (int lod in batch.LodIndices)
                 {
                     if (lod < 0 || lod >= _lodOwners.Length) continue;
                     _lodOwners[lod] = true;
+                    if (classifyDecorative) _decorativeParts[lod] |= parts;
                     hasOwners = true;
                 }
             }
+            if (classifyDecorative)
+            {
+                for (int lod = 0; lod < lods.Count; lod++)
+                {
+                    DecorativePart parts = _decorativeParts[lod];
+                    _decorativeOwners[lod] = (parts & DecorativePart.Other) == 0 && ((parts & DecorativePart.Shrub) != 0 || (parts & (DecorativePart.Clutter | DecorativePart.Bark)) == DecorativePart.Clutter);
+                }
+            }
             return hasOwners;
+        }
+
+        private DecorativePart ClassifyDecorativeParts(Material[] materials)
+        {
+            if (materials == null || materials.Length == 0) return DecorativePart.Other;
+            DecorativePart result = DecorativePart.None;
+            foreach (Material material in materials)
+            {
+                if (material == null) return DecorativePart.Other;
+                if (!_decorativeMaterials.TryGetValue(material, out DecorativePart part))
+                {
+                    string name = material.name;
+                    if (name.StartsWith("trees_bushes", StringComparison.OrdinalIgnoreCase)) part = DecorativePart.Shrub;
+                    else if (name.StartsWith("trees_bark_a_", StringComparison.OrdinalIgnoreCase)) part = DecorativePart.Bark;
+                    else if (name.StartsWith("mtl_barrel", StringComparison.OrdinalIgnoreCase) || name.StartsWith("wood_collect", StringComparison.OrdinalIgnoreCase) || name.StartsWith("wood_wood_collect", StringComparison.OrdinalIgnoreCase) || name.StartsWith("wood_fire", StringComparison.OrdinalIgnoreCase) || name.StartsWith("wood_old", StringComparison.OrdinalIgnoreCase)) part = DecorativePart.Clutter;
+                    else part = DecorativePart.Other;
+                    _decorativeMaterials.Add(material, part);
+                }
+                result |= part;
+            }
+            return result;
+        }
+
+        private byte[] PrepareObjectDistanceStates(XRayLevelLodSet lods, Vector3 eye, float distance)
+        {
+            if (_objectDistanceStates == null || _objectDistanceStates.Length != lods.Count) _objectDistanceStates = new byte[lods.Count];
+            bool anyHidden = false;
+            for (int lod = 0; lod < lods.Count; lod++)
+            {
+                Vector4 sphere = lods.Spheres[lod];
+                var center = new Vector3(sphere.x, sphere.y, sphere.z);
+                bool hidden = _decorativeOwners[lod] && XRayLevelLodRenderer.BeyondObjectDistance(sphere.w, (center - eye).sqrMagnitude, distance);
+                _objectDistanceStates[lod] = hidden ? XRayLevelLodRenderer.STATE_DISCARD : XRayLevelLodRenderer.STATE_FULL;
+                anyHidden |= hidden;
+            }
+            return anyHidden ? _objectDistanceStates : null;
         }
 
         private void RenderReflection(Camera camera)
@@ -776,6 +843,10 @@ namespace XRay.Importer.Levels
         {
             _sourceBounds = null;
             _sourceVisibility = null;
+            _decorativeOwners = null;
+            _decorativeParts = null;
+            _objectDistanceStates = null;
+            _decorativeMaterials = null;
             _meshSubmeshes.Clear();
             _meshSubmeshes.TrimExcess();
             _materialSupport.Clear();
@@ -784,6 +855,16 @@ namespace XRay.Importer.Levels
             _windMaterials.TrimExcess();
             _resolvedMaterials.Clear();
             _resolvedMaterials.TrimExcess();
+        }
+
+        [Flags]
+        private enum DecorativePart : byte
+        {
+            None = 0,
+            Shrub = 1,
+            Bark = 2,
+            Clutter = 4,
+            Other = 8
         }
 
         private Material ResolveGroupingMaterial(Material source)

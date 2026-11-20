@@ -115,7 +115,6 @@ namespace XRay.Importer.Editor
             int size = Mathf.Max(sourceWidth, sourceHeight);
             importer.mipmapEnabled = true;
             importer.ignoreMipmapLimit = false;
-            importer.streamingMipmaps = false;
             importer.ignorePngGamma = true;
             importer.npotScale = PngScale(sourceWidth, sourceHeight);
             importer.maxTextureSize = SizeLimit(importer.maxTextureSize, size);
@@ -134,7 +133,7 @@ namespace XRay.Importer.Editor
         {
             int size = Mathf.Max(sourceWidth, sourceHeight);
             TextureImporterPlatformSettings standalone = importer.GetPlatformTextureSettings("Standalone");
-            return !importer.mipmapEnabled || importer.ignoreMipmapLimit || importer.streamingMipmaps || !importer.ignorePngGamma || importer.npotScale != PngScale(sourceWidth, sourceHeight) || importer.maxTextureSize != SizeLimit(importer.maxTextureSize, size) || (standalone.overridden && standalone.maxTextureSize != SizeLimit(standalone.maxTextureSize, size));
+            return !importer.mipmapEnabled || importer.ignoreMipmapLimit || !importer.ignorePngGamma || importer.npotScale != PngScale(sourceWidth, sourceHeight) || importer.maxTextureSize != SizeLimit(importer.maxTextureSize, size) || (standalone.overridden && standalone.maxTextureSize != SizeLimit(standalone.maxTextureSize, size));
         }
 
         private static int SizeLimit(int current, int sourceSize)

@@ -87,11 +87,11 @@ namespace RaidIntoDarkness.Player.Tests
                 emitter.Tick(0.02f);
                 Assert.That(system.particleCount, Is.Zero);
                 emitter.enabled = false;
-                emitter.SendMessage("OnDisable", SendMessageOptions.DontRequireReceiver);
+                InvokeLifecycle(emitter, "OnDisable");
                 emitter.Tick(1f);
                 Assert.That(system.particleCount, Is.Zero);
                 emitter.enabled = true;
-                emitter.SendMessage("OnEnable", SendMessageOptions.DontRequireReceiver);
+                InvokeLifecycle(emitter, "OnEnable");
                 emitter.Tick(0.02f);
                 Assert.That(system.particleCount, Is.Zero);
                 emitter.Tick(0.013f);
@@ -248,6 +248,77 @@ namespace RaidIntoDarkness.Player.Tests
             });
         }
 
+        [Test]
+        public void LoopWrapKeepsThePendingStepAndEarlierRewindClearsIt()
+        {
+            WithRig((root, emitter, system, visual) =>
+            {
+                system.time = 9.99f;
+                emitter.Tick(0.02f);
+                Assert.That(system.particleCount, Is.Zero);
+                system.time = 0.002f;
+                emitter.Tick(0.013f);
+                Assert.That(system.particleCount, Is.EqualTo(33));
+
+                system.time = 0.5f;
+                emitter.Tick(0.02f);
+                system.time = 0.1f;
+                int beforeRewind = system.particleCount;
+                emitter.Tick(0.013f);
+                Assert.That(system.particleCount, Is.EqualTo(beforeRewind));
+                emitter.Tick(0.02f);
+                Assert.That(system.particleCount, Is.EqualTo(beforeRewind + 33));
+            });
+        }
+
+        [Test]
+        public void EmptyAndFullSourcesConsumeTheirDrawButAnExpiredSourceDoesNot()
+        {
+            WithRig((root, emitter, empty, visual) =>
+            {
+                ParticleSystem full = CreateSystem(root.transform, "Full");
+                ParticleSystem limited = CreateSystem(root.transform, "Limited");
+                ParticleSystem observed = CreateSystem(root.transform, "Observed");
+                ParticleSystem.MainModule fullMain = full.main;
+                fullMain.maxParticles = 1;
+                full.Emit(1);
+                float step = AnomalyParticleEmission.SOURCE_STEP;
+                float rate = 0.5f / step;
+                emitter.Configure(new[]
+                {
+                    new AnomalyParticleEmissionSource(empty, 0f),
+                    new AnomalyParticleEmissionSource(full, 1000f),
+                    new AnomalyParticleEmissionSource(limited, 1000f, step),
+                    new AnomalyParticleEmissionSource(observed, rate)
+                });
+                UnityEngine.Random.InitState(38571);
+                UnityEngine.Random.State initial = UnityEngine.Random.state;
+                var expectedState = new UnityEngine.Random.State[6];
+                var expectedObserved = new int[6];
+                int total = 0;
+                for (int index = 0; index < expectedState.Length; index++)
+                {
+                    _ = UnityEngine.Random.value;
+                    _ = UnityEngine.Random.value;
+                    if (index == 0) _ = UnityEngine.Random.value;
+                    total += AnomalyParticleEmission.SampleCount(rate, UnityEngine.Random.value);
+                    expectedObserved[index] = total;
+                    expectedState[index] = UnityEngine.Random.state;
+                }
+
+                UnityEngine.Random.state = initial;
+                for (int index = 0; index < expectedState.Length; index++)
+                {
+                    emitter.Tick(step);
+                    Assert.That(empty.particleCount, Is.Zero);
+                    Assert.That(full.particleCount, Is.EqualTo(1));
+                    Assert.That(limited.particleCount, Is.EqualTo(33));
+                    Assert.That(observed.particleCount, Is.EqualTo(expectedObserved[index]));
+                    Assert.That(UnityEngine.Random.state, Is.EqualTo(expectedState[index]));
+                }
+            });
+        }
+
         private static ParticleSystem CreateSystem(Transform parent, string name)
         {
             var root = new GameObject(name);
@@ -286,20 +357,25 @@ namespace RaidIntoDarkness.Player.Tests
                 typeof(AnomalyVisual).GetField("_idle", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(visual, system);
                 emitter = root.AddComponent<AnomalyParticleEmission>();
                 emitter.Configure(new[] { new AnomalyParticleEmissionSource(system, 1000f) });
-                emitter.SendMessage("OnDisable", SendMessageOptions.DontRequireReceiver);
-                emitter.SendMessage("OnEnable", SendMessageOptions.DontRequireReceiver);
+                InvokeLifecycle(emitter, "OnDisable");
+                InvokeLifecycle(emitter, "OnEnable");
                 action(root, emitter, system, visual);
             }
             finally
             {
                 if (emitter != null)
                 {
-                    emitter.SendMessage("OnDisable", SendMessageOptions.DontRequireReceiver);
+                    InvokeLifecycle(emitter, "OnDisable");
                 }
 
                 EditorSceneManager.ClosePreviewScene(scene);
                 UnityEngine.Random.state = random;
             }
+        }
+
+        private static void InvokeLifecycle(AnomalyParticleEmission emitter, string method)
+        {
+            typeof(AnomalyParticleEmission).GetMethod(method, BindingFlags.Instance | BindingFlags.NonPublic).Invoke(emitter, null);
         }
     }
 }

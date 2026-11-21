@@ -11,6 +11,9 @@ namespace RaidIntoDarkness.Effects
         [SerializeField, Min(0f)] private float _rate;
         [SerializeField, Min(0f)] private float _timeLimit;
 
+        private ParticleSystem _ownerSystem;
+        private GameObject _owner;
+
         public ParticleSystem System => _system;
         public float Rate => _rate;
         public float TimeLimit => _timeLimit;
@@ -25,6 +28,16 @@ namespace RaidIntoDarkness.Effects
             _system = system;
             _rate = rate;
             _timeLimit = timeLimit;
+        }
+
+        internal bool IsOwnerActive(ParticleSystem system)
+        {
+            if (!ReferenceEquals(_ownerSystem, system))
+            {
+                _ownerSystem = system;
+                _owner = system.gameObject;
+            }
+            return _owner.activeInHierarchy;
         }
     }
 
@@ -77,7 +90,7 @@ namespace RaidIntoDarkness.Effects
                 return int.MaxValue;
             }
 
-            int count = Mathf.FloorToInt(exact);
+            int count = (int)exact;
             return randomValue < exact - count ? count + 1 : count;
         }
 
@@ -100,7 +113,7 @@ namespace RaidIntoDarkness.Effects
                 AnomalyParticleEmissionSource source = _sources[index];
                 ParticleSystem system = source != null ? source.System : null;
                 ref SourceState state = ref _states[index];
-                if (system == null || !system.gameObject.activeInHierarchy)
+                if (system == null || !source.IsOwnerActive(system))
                 {
                     state = default;
                     continue;
@@ -120,8 +133,9 @@ namespace RaidIntoDarkness.Effects
                 ParticleSystem.MainModule main = system.main;
                 float scaledDelta = deltaTime * main.simulationSpeed;
                 float currentTime = system.time;
-                bool loopWrapped = main.loop && state.LastTime >= main.duration - scaledDelta - CLOCK_EPSILON && currentTime <= scaledDelta + CLOCK_EPSILON;
-                if (state.System != system || !state.Playing || currentTime + CLOCK_EPSILON < state.LastTime && !loopWrapped)
+                bool rewound = currentTime + CLOCK_EPSILON < state.LastTime;
+                bool loopWrapped = rewound && currentTime <= scaledDelta + CLOCK_EPSILON && main.loop && state.LastTime >= main.duration - scaledDelta - CLOCK_EPSILON;
+                if (state.System != system || !state.Playing || rewound && !loopWrapped)
                 {
                     state = new SourceState { System = system, Playing = true };
                 }
@@ -135,15 +149,19 @@ namespace RaidIntoDarkness.Effects
                 }
 
                 state.Accumulated %= SOURCE_STEP;
+                float timeLimit = source.TimeLimit;
+                float rate = source.Rate * density;
+                bool looping = main.loop;
+                float duration = looping ? 0f : main.duration;
                 for (int step = 0; step < steps; step++)
                 {
                     state.Elapsed += SOURCE_STEP;
-                    if (source.TimeLimit > 0f && state.Elapsed > source.TimeLimit + CLOCK_EPSILON || !main.loop && (state.Elapsed > main.duration + CLOCK_EPSILON || currentTime >= main.duration))
+                    if (timeLimit > 0f && state.Elapsed > timeLimit + CLOCK_EPSILON || !looping && (state.Elapsed > duration + CLOCK_EPSILON || currentTime >= duration))
                     {
                         continue;
                     }
 
-                    int count = SampleCount(source.Rate * density, UnityEngine.Random.value);
+                    int count = SampleCount(rate, UnityEngine.Random.value);
                     if (count > 0 && AnomalyVisualQuality.CanEmitAmbient(system))
                     {
                         int capacity = Mathf.Max(0, main.maxParticles - system.particleCount);

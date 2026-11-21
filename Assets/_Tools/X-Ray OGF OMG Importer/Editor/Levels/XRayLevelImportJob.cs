@@ -197,6 +197,10 @@ namespace XRay.Importer.Editor.Levels
                         break;
                     }
 #endif
+                    if (ReferenceEquals(_routine.Current, XRayLevelOcclusionBaking.WAIT_FOR_EDITOR))
+                    {
+                        break;
+                    }
                 }
 
                 UnityEditor.Progress.Report(_progressId, Progress, Stage);
@@ -316,6 +320,10 @@ namespace XRay.Importer.Editor.Levels
                 {
                     yield return step;
                 }
+                foreach (object step in PrepareStaticOcclusion())
+                {
+                    yield return step;
+                }
                 SetStage("Done", 1.0f);
                 yield break;
             }
@@ -348,6 +356,10 @@ namespace XRay.Importer.Editor.Levels
             {
                 yield return step;
             }
+            foreach (object step in PrepareStaticOcclusion())
+            {
+                yield return step;
+            }
             OpenSceneAfterImport();
             SetStage("Done", 1.0f);
         }
@@ -364,6 +376,15 @@ namespace XRay.Importer.Editor.Levels
 #else
             yield break;
 #endif
+        }
+
+        private IEnumerable<object> PrepareStaticOcclusion()
+        {
+            SetStage("Baking Unity occlusion culling", 0.98f);
+            foreach (object step in XRayLevelOcclusionBaking.Prepare(_record.ScenePath, _record.PrefabPath, _record))
+            {
+                yield return step;
+            }
         }
 
         private void Prepare()
@@ -1744,6 +1765,7 @@ namespace XRay.Importer.Editor.Levels
                 Camera camera = cameraObject.AddComponent<Camera>();
                 camera.nearClipPlane = 0.1f;
                 camera.farClipPlane = 3000.0f;
+                camera.useOcclusionCulling = true;
                 cameraObject.tag = "MainCamera";
 #if XRAY_HDRP
                 var cameraData = cameraObject.AddComponent<UnityEngine.Rendering.HighDefinition.HDAdditionalCameraData>();
@@ -1852,7 +1874,7 @@ namespace XRay.Importer.Editor.Levels
                 }
             }
 
-            bool unchanged = _record.Completed && _resourcesOnly && _anomalyPlan == null && _previous != null && !occlusionChanged && !grassGeometryChanged && !_materials.Changed && _textures.Imported == 0 && _record.GetMetric("ProbeVolumeBakeUpdated") == 0 && _previous.Settings == _record.Settings && _record.Source.ChangesSincePrevious.Count == 0 && _record.Source.ProfileFingerprint == _previous.Source.ProfileFingerprint && _record.Source.IndexFingerprint == _previous.Source.IndexFingerprint && _previous.GetMetric("HomSourceTriangles") == _record.GetMetric("HomSourceTriangles") && _previous.GetMetric("HomOccluderTriangles") == _record.GetMetric("HomOccluderTriangles");
+            bool unchanged = _record.Completed && _resourcesOnly && _anomalyPlan == null && _previous != null && !occlusionChanged && !grassGeometryChanged && !_materials.Changed && _textures.Imported == 0 && _record.GetMetric("ProbeVolumeBakeUpdated") == 0 && _record.GetMetric(XRayLevelOcclusionBaking.UPDATED_METRIC) == 0 && _previous.Settings == _record.Settings && _record.Source.ChangesSincePrevious.Count == 0 && _record.Source.ProfileFingerprint == _previous.Source.ProfileFingerprint && _record.Source.IndexFingerprint == _previous.Source.IndexFingerprint && _previous.GetMetric("HomSourceTriangles") == _record.GetMetric("HomSourceTriangles") && _previous.GetMetric("HomOccluderTriangles") == _record.GetMetric("HomOccluderTriangles");
             string reportPath = XRayLevelPaths.AttemptReportPath(_record.LevelName, _record.Source.ProfileId);
             if (unchanged)
             {

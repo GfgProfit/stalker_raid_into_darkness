@@ -26,6 +26,33 @@ namespace XRay.Importer.Tests
             Assert.IsNull(XRayLevelImportJob.Current);
         }
 
+        [Test]
+        public void StaticOcclusionUsesOnlyOpaqueVisibleTrianglesAsOccluders()
+        {
+            Shader shader = Shader.Find("HDRP/MonolithLit");
+            Assert.IsNotNull(shader);
+            var mesh = new Mesh();
+            var opaque = new Material(shader);
+            var clipped = new Material(shader);
+            try
+            {
+                mesh.vertices = new[] { Vector3.zero, Vector3.right, Vector3.up };
+                mesh.subMeshCount = 2;
+                mesh.SetTriangles(new[] { 0, 1, 2 }, 0);
+                mesh.SetTriangles(new[] { 0, 1, 2 }, 1);
+                clipped.SetFloat("_AlphaCutoffEnable", 1.0f);
+                Assert.AreEqual(StaticEditorFlags.OccluderStatic | StaticEditorFlags.OccludeeStatic, XRayLevelOcclusionBaking.GeometryFlags(mesh, new[] { opaque, opaque }, ShadowCastingMode.On));
+                Assert.AreEqual(StaticEditorFlags.OccludeeStatic, XRayLevelOcclusionBaking.GeometryFlags(mesh, new[] { opaque, clipped }, ShadowCastingMode.On));
+                Assert.AreEqual((StaticEditorFlags)0, XRayLevelOcclusionBaking.GeometryFlags(mesh, new[] { opaque, opaque }, ShadowCastingMode.ShadowsOnly));
+            }
+            finally
+            {
+                UnityEngine.Object.DestroyImmediate(clipped);
+                UnityEngine.Object.DestroyImmediate(opaque);
+                UnityEngine.Object.DestroyImmediate(mesh);
+            }
+        }
+
         [UnityTest]
         [Timeout(600000)]
         public IEnumerator AnomalySavedImportRendersAllQualityModes()
@@ -72,6 +99,11 @@ namespace XRay.Importer.Tests
                 Assert.IsNotEmpty(bakingSetGuid);
                 AssertBakedScene(scenePath, sceneGuid, bakingSetPath, fixture.LevelName);
                 Assert.IsTrue(Array.Exists(Directory.GetFiles(apvFolder, "*.bytes", SearchOption.AllDirectories), path => new FileInfo(path).Length > 0));
+                string occlusionPath = XRayLevelOcclusionBaking.FindDataPath(scenePath);
+                Assert.IsNotNull(occlusionPath, string.Join("\n", XRayLevelImportJob.LastRecord.Warnings));
+                Assert.Greater(XRayLevelImportJob.LastRecord.GetMetric("StaticOcclusionDataBytes"), 0.0);
+                string occlusionHash = XRayLevelSourceRefresh.HashFile(occlusionPath);
+                string occlusionGuid = AssetDatabase.AssetPathToGUID(occlusionPath);
                 Dictionary<string, string> before = Snapshot(apvFolder);
                 yield return Import(fixture, XRayTerrainImportMode.EnableVerifiedAnomaly, XRayTerrainQuality.High);
                 Assert.AreEqual(hostPath, SceneManager.GetActiveScene().path);
@@ -79,6 +111,10 @@ namespace XRay.Importer.Tests
                 Assert.AreEqual(sceneGuid, AssetDatabase.AssetPathToGUID(scenePath));
                 Assert.AreEqual(sceneHash, XRayLevelSourceRefresh.HashFile(scenePath));
                 Assert.AreEqual(bakingSetGuid, AssetDatabase.AssetPathToGUID(bakingSetPath));
+                Assert.AreEqual(occlusionPath, XRayLevelOcclusionBaking.FindDataPath(scenePath));
+                Assert.AreEqual(occlusionGuid, AssetDatabase.AssetPathToGUID(occlusionPath));
+                Assert.AreEqual(occlusionHash, XRayLevelSourceRefresh.HashFile(occlusionPath));
+                Assert.Zero(XRayLevelImportJob.LastRecord.GetMetric(XRayLevelOcclusionBaking.UPDATED_METRIC));
                 CollectionAssert.AreEquivalent(before, Snapshot(apvFolder));
                 AssertBakedScene(scenePath, sceneGuid, bakingSetPath, fixture.LevelName);
             }

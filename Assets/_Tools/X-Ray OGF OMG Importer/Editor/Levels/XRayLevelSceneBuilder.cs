@@ -89,7 +89,7 @@ namespace XRay.Importer.Editor.Levels
                 renderer.receiveShadows = true;
                 renderer.motionVectorGenerationMode = MotionVectorGenerationMode.Camera;
                 renderer.lightProbeUsage = LightProbeUsage.BlendProbes;
-                GameObjectUtility.SetStaticEditorFlags(go, StaticEditorFlags.OccluderStatic | StaticEditorFlags.OccludeeStatic);
+                GameObjectUtility.SetStaticEditorFlags(go, XRayLevelOcclusionBaking.GeometryFlags(chunk.Mesh, chunk.Materials, renderer.shadowCastingMode));
             }
 
             if (decals.Count > 0)

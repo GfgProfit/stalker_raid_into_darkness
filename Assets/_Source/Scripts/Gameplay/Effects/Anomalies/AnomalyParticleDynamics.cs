@@ -117,12 +117,15 @@ namespace RaidIntoDarkness.Effects
             {
                 _worldActions = new AnomalyParticleMotionAction[actionCount];
             }
+            bool usesRandom = false;
             for (int index = 0; index < actionCount; index++)
             {
                 _worldActions[index] = _actions[index].ToWorld(pose);
+                XRayParticleActionType type = _worldActions[index].Type;
+                usesRandom |= type is XRayParticleActionType.RandomAccel or XRayParticleActionType.RandomDisplace or XRayParticleActionType.RandomVelocity;
             }
             _sampleId++;
-            UnityEngine.Random.State randomState = UnityEngine.Random.state;
+            UnityEngine.Random.State randomState = usesRandom ? UnityEngine.Random.state : default;
             try
             {
                 for (int index = 0; index < count; index++)
@@ -154,7 +157,10 @@ namespace RaidIntoDarkness.Effects
                         {
                             continue;
                         }
-                        UnityEngine.Random.state = state.RandomState;
+                        if (usesRandom)
+                        {
+                            UnityEngine.Random.state = state.RandomState;
+                        }
                         Vector3 position = state.Position;
                         Vector3 velocity = state.Velocity;
                         for (int action = 0; action < actionCount; action++)
@@ -167,13 +173,19 @@ namespace RaidIntoDarkness.Effects
                         }
                         state.Position = position;
                         state.Velocity = velocity;
-                        state.RandomState = UnityEngine.Random.state;
+                        if (usesRandom)
+                        {
+                            state.RandomState = UnityEngine.Random.state;
+                        }
                     }
                 }
             }
             finally
             {
-                UnityEngine.Random.state = randomState;
+                if (usesRandom)
+                {
+                    UnityEngine.Random.state = randomState;
+                }
             }
             for (int index = 0; index < count; index++)
             {

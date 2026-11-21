@@ -13,6 +13,9 @@ namespace RaidIntoDarkness.Effects
 
         private static readonly int FRAME_SIZE_ID = Shader.PropertyToID("_FrameSize");
         private static readonly int FRAME_COLUMNS_ID = Shader.PropertyToID("_FrameColumns");
+        private static readonly int FRAME_LOOKUP_ID = Shader.PropertyToID("_FrameLookup");
+        private static readonly int FRAME_LOOKUP_LENGTH_ID = Shader.PropertyToID("_FrameLookupLength");
+        private static readonly int FRAME_LOOKUP_LIFETIME_ID = Shader.PropertyToID("_FrameLookupLifetime");
 
         [SerializeField] private ParticleSystem _system;
         [SerializeField] private int _frameCount = 1;
@@ -22,6 +25,7 @@ namespace RaidIntoDarkness.Effects
         [SerializeField] private bool _animated;
         [SerializeField] private bool _randomStart;
         [SerializeField] private bool _randomPlayback;
+        [SerializeField] private bool _renderFrameOnGpu;
 
         private ParticleSystem.Particle[] _particles;
         private List<Vector4> _frames;
@@ -31,7 +35,9 @@ namespace RaidIntoDarkness.Effects
         private ParticleSystemRenderer _renderer;
         private MaterialPropertyBlock _originalProperties;
         private MaterialPropertyBlock _properties;
+        private List<ParticleSystemVertexStream> _originalVertexStreams;
         private bool _hasOriginalProperties;
+        private bool _usesShaderFrames;
 
         private struct PersistentFrame
         {
@@ -98,14 +104,16 @@ namespace RaidIntoDarkness.Effects
         private void Awake()
         {
             ResolveSystem();
-            EnsureStorage();
         }
 
         private void OnEnable()
         {
             ResolveSystem();
-            EnsureStorage();
             ApplyAtlas();
+            if (!_usesShaderFrames)
+            {
+                EnsureStorage();
+            }
         }
 
         private void OnDisable()
@@ -116,9 +124,9 @@ namespace RaidIntoDarkness.Effects
 
         private void LateUpdate()
         {
-            if (_system != null && !AnomalyVisualQuality.IsAmbientSuspended(_system))
+            if (!_usesShaderFrames && !AnomalyVisualQuality.IsAmbientSuspended(_system))
             {
-                UpdateFrames(_system.main.useUnscaledTime ? Time.unscaledDeltaTime : Time.deltaTime);
+                WriteFrames(0f, true);
             }
         }
 
@@ -132,29 +140,61 @@ namespace RaidIntoDarkness.Effects
 
         private void UpdateFrames(float deltaTime)
         {
-            if (_system == null)
+            WriteFrames(deltaTime, false);
+        }
+
+        private void WriteFrames(float deltaTime, bool useSystemClock)
+        {
+            if (_system == null || _usesShaderFrames)
             {
                 return;
             }
             EnsureStorage();
             int count = _system.GetParticles(_particles);
-            UpdatePersistentSeeds(count);
-            double elapsed = _system.isPlaying && !float.IsNaN(deltaTime) && !float.IsInfinity(deltaTime) ? Math.Max(0.0, deltaTime) * _system.main.simulationSpeed : 0.0;
             _frames.Clear();
+            if (count == 0)
+            {
+                ResetPersistentFrames();
+                return;
+            }
+            _seenPersistentSeeds.Clear();
+            FiniteParticleFrameCache.SequenceSet sequences = null;
+            bool resolvedSequences = false;
+            bool resolvedElapsed = false;
+            double elapsed = 0.0;
             for (int index = 0; index < count; index++)
             {
                 ParticleSystem.Particle particle = _particles[index];
                 float frame;
                 if (float.IsPositiveInfinity(particle.startLifetime))
                 {
+                    if (!resolvedElapsed)
+                    {
+                        if (useSystemClock)
+                        {
+                            deltaTime = _system.main.useUnscaledTime ? Time.unscaledDeltaTime : Time.deltaTime;
+                        }
+                        elapsed = _system.isPlaying && !float.IsNaN(deltaTime) && !float.IsInfinity(deltaTime) ? Math.Max(0.0, deltaTime) * _system.main.simulationSpeed : 0.0;
+                        resolvedElapsed = true;
+                    }
+                    _seenPersistentSeeds.Add(particle.randomSeed);
                     frame = PersistentFrameValue(particle.randomSeed, elapsed);
                 }
                 else
                 {
+                    if (!resolvedSequences)
+                    {
+                        sequences = FiniteParticleFrameCache.Resolve(_frameCount, _framesPerSecond, _animated);
+                        resolvedSequences = true;
+                    }
                     float age = particle.startLifetime - particle.remainingLifetime;
-                    frame = FiniteParticleFrameCache.Evaluate(age, particle.randomSeed, _frameCount, _framesPerSecond, _animated, _randomStart, _randomPlayback);
+                    frame = sequences != null ? sequences.Evaluate(age, particle.randomSeed, _randomStart, _randomPlayback) : SpatialBubbleParticleFrames.EvaluateFrame(age, particle.randomSeed, _frameCount, _framesPerSecond, _animated, _randomStart, _randomPlayback);
                 }
                 _frames.Add(new Vector4(Mathf.Floor(frame), 0f, 0f, 0f));
+            }
+            if (_persistentFrames.Count != _seenPersistentSeeds.Count)
+            {
+                RemoveExpiredPersistentFrames();
             }
             _system.SetCustomParticleData(_frames, ParticleSystemCustomData.Custom1);
         }
@@ -183,16 +223,8 @@ namespace RaidIntoDarkness.Effects
             return state.Frame;
         }
 
-        private void UpdatePersistentSeeds(int count)
+        private void RemoveExpiredPersistentFrames()
         {
-            _seenPersistentSeeds.Clear();
-            for (int index = 0; index < count; index++)
-            {
-                if (float.IsPositiveInfinity(_particles[index].startLifetime))
-                {
-                    _seenPersistentSeeds.Add(_particles[index].randomSeed);
-                }
-            }
             _deadPersistentSeeds.Clear();
             foreach (KeyValuePair<uint, PersistentFrame> item in _persistentFrames)
             {
@@ -241,16 +273,76 @@ namespace RaidIntoDarkness.Effects
             _renderer.GetPropertyBlock(_properties);
             _properties.SetVector(FRAME_SIZE_ID, new Vector4(_frameSize.x, _frameSize.y, 0f, 0f));
             _properties.SetFloat(FRAME_COLUMNS_ID, _frameColumns);
+            ApplyShaderFrames();
             _renderer.SetPropertyBlock(_properties);
+        }
+
+        private void ApplyShaderFrames()
+        {
+            bool previouslyUsedShader = _usesShaderFrames;
+            _usesShaderFrames = false;
+            Texture2D lookup = null;
+            float lookupLifetime = 1f;
+            Material material = _renderFrameOnGpu ? _renderer.sharedMaterial : null;
+            if (material != null && material.shader != null && material.shader.name == "RaidIntoDarkness/XRayParticle")
+            {
+                _usesShaderFrames = !_animated && (!_randomStart || _frameCount == 1);
+                if (_animated && !_randomStart && !_randomPlayback && _renderer.renderMode != ParticleSystemRenderMode.Mesh)
+                {
+                    ParticleSystem.MinMaxCurve lifetime = _system.main.startLifetime;
+                    if (lifetime.mode == ParticleSystemCurveMode.Constant)
+                    {
+                        lookupLifetime = lifetime.constant;
+                        lookup = FiniteParticleFrameCache.ResolveShaderLookup(_frameCount, _framesPerSecond, lookupLifetime);
+                        if (lookup != null && !SetAgeStream()) lookup = null;
+                        _usesShaderFrames = lookup != null;
+                    }
+                }
+            }
+            if (lookup == null)
+            {
+                RestoreVertexStreams();
+            }
+            else
+            {
+                _properties.SetTexture(FRAME_LOOKUP_ID, lookup);
+                _properties.SetFloat(FRAME_LOOKUP_LIFETIME_ID, lookupLifetime);
+            }
+            if (_usesShaderFrames || previouslyUsedShader)
+            {
+                _properties.SetFloat(FRAME_LOOKUP_LENGTH_ID, lookup != null ? lookup.width : _usesShaderFrames ? -1f : 0f);
+            }
+        }
+
+        private bool SetAgeStream()
+        {
+            if (_originalVertexStreams != null) return true;
+            var streams = new List<ParticleSystemVertexStream>(4);
+            _renderer.GetActiveVertexStreams(streams);
+            if (streams.Count != 4 || streams[0] != ParticleSystemVertexStream.Position || streams[1] != ParticleSystemVertexStream.Color || streams[2] != ParticleSystemVertexStream.UV || streams[3] != ParticleSystemVertexStream.Custom1X) return false;
+            streams[3] = ParticleSystemVertexStream.AgePercent;
+            _renderer.SetActiveVertexStreams(streams);
+            streams[3] = ParticleSystemVertexStream.Custom1X;
+            _originalVertexStreams = streams;
+            return true;
+        }
+
+        private void RestoreVertexStreams()
+        {
+            if (_originalVertexStreams == null) return;
+            if (_renderer != null) _renderer.SetActiveVertexStreams(_originalVertexStreams);
+            _originalVertexStreams = null;
         }
 
         private void RestoreAtlas()
         {
+            RestoreVertexStreams();
             if (_renderer != null && _hasOriginalProperties)
             {
                 _renderer.SetPropertyBlock(_originalProperties.isEmpty ? null : _originalProperties);
             }
             _hasOriginalProperties = false;
+            _usesShaderFrames = false;
         }
 
         private void EnsureStorage()

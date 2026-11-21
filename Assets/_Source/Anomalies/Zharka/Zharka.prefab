@@ -44024,6 +44024,7 @@ MonoBehaviour:
   _animated: 1
   _randomStart: 0
   _randomPlayback: 0
+  _renderFrameOnGpu: 1
 --- !u!1 &3155757968845815709
 GameObject:
   m_ObjectHideFlags: 0

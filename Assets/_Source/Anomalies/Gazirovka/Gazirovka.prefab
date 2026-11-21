@@ -41812,6 +41812,7 @@ MonoBehaviour:
   _animated: 0
   _randomStart: 1
   _randomPlayback: 0
+  _renderFrameOnGpu: 0
 --- !u!1 &2818716384013175136
 GameObject:
   m_ObjectHideFlags: 0
@@ -47371,6 +47372,7 @@ MonoBehaviour:
   _animated: 1
   _randomStart: 0
   _randomPlayback: 1
+  _renderFrameOnGpu: 0
 --- !u!1 &3361040932828371785
 GameObject:
   m_ObjectHideFlags: 0
@@ -62368,6 +62370,7 @@ MonoBehaviour:
   _animated: 1
   _randomStart: 1
   _randomPlayback: 0
+  _renderFrameOnGpu: 0
 --- !u!1 &4046946845064378618
 GameObject:
   m_ObjectHideFlags: 0
@@ -133939,6 +133942,7 @@ MonoBehaviour:
   _animated: 0
   _randomStart: 1
   _randomPlayback: 0
+  _renderFrameOnGpu: 0
 --- !u!1 &8988062138152910077
 GameObject:
   m_ObjectHideFlags: 0

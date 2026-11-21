@@ -47589,6 +47589,7 @@ MonoBehaviour:
   _animated: 1
   _randomStart: 0
   _randomPlayback: 0
+  _renderFrameOnGpu: 1
 --- !u!1 &5725470749999148456
 GameObject:
   m_ObjectHideFlags: 0
@@ -100999,6 +101000,7 @@ MonoBehaviour:
   _animated: 0
   _randomStart: 0
   _randomPlayback: 0
+  _renderFrameOnGpu: 1
 --- !u!1 &9182995532552591288
 GameObject:
   m_ObjectHideFlags: 0

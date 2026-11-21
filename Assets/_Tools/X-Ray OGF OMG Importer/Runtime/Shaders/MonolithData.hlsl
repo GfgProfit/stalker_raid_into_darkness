@@ -286,8 +286,10 @@ void GetSurfaceAndBuiltinData(FragInputs input, float3 V, inout PositionInputs p
     #ifdef _MONOLITH_LEVEL_FLORA
     float floraSource = MonolithFloraSourceMode(_MonolithFloraSource, _MonolithHasBump, _MonolithHasBumpCorrection);
     float floraVariation = 0.0;
+    bool floraVariationDiagnostic = _MonolithDebug > 85.5 && _MonolithDebug < 86.5;
     _MonolithFloraSourceActive = floraSource;
-    if (floraSource > 0.5 && floraSource < 1.5)
+    [branch]
+    if (floraSource > 0.5 && floraSource < 1.5 && (_MonolithFloraVariationEnabled > 0.5 || floraVariationDiagnostic))
     {
         float4x4 floraObjectToWorld = GetObjectToWorldMatrix();
         floraVariation = MonolithAnomalyTreeVariation(GetAbsolutePositionWS(floraObjectToWorld._m03_m13_m23), floraObjectToWorld._m00, _MonolithFloraVariation.w);
@@ -545,7 +547,7 @@ void GetSurfaceAndBuiltinData(FragInputs input, float3 V, inout PositionInputs p
         surfaceData.tangentWS = Orthonormalize(abs(floraNormal.x) < 0.99 ? float3(1.0, 0.0, 0.0) : float3(0.0, 0.0, 1.0), floraNormal);
         _MonolithLevelHemiValue = floraSource > 0.5 ? MonolithFloraPackedHemisphere(clamp(_MonolithLevelHemiValue, 0.3, 1.0)) : saturate(_MonolithLevelHemiValue);
         if (_MonolithDebug > 84.5 && _MonolithDebug < 85.5) _MonolithDiagnosticValue = float3(baseSample.a * _BaseColor.a, baseSample.a * _BaseColor.a >= _AlphaCutoff ? 1.0 : 0.0, floraSource * 0.5);
-        if (_MonolithDebug > 85.5 && _MonolithDebug < 86.5) _MonolithDiagnosticValue = float3(floraVariation, _MonolithLevelHemiValue, material);
+        if (floraVariationDiagnostic) _MonolithDiagnosticValue = float3(floraVariation, _MonolithLevelHemiValue, material);
         if (_MonolithDebug > 86.5 && _MonolithDebug < 87.5) _MonolithDiagnosticValue = float3(gloss, encodedAlbedo.g, floraSource > 0.5 ? 1.0 : 0.0);
     }
     #endif

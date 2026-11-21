@@ -38,7 +38,6 @@ namespace XRay.Importer.Levels
         private readonly XRayInstanceVisibilityIndex _index = new XRayInstanceVisibilityIndex();
         private BatchRendererGroup _group;
         private Shader _shader;
-        private LocalKeyword[] _unsupportedShaderKeywords;
         private GraphicsBuffer _buffer;
         private XRayInstanceBatchSet _set;
         private XRayInstanceBatchSet _rejectedSet;
@@ -58,6 +57,8 @@ namespace XRay.Importer.Levels
         private ushort[] _instanceMasks;
         private int[] _sourceStamps;
         private int[] _selectedSources;
+        private BatchDrawCommand[] _plannedCommands;
+        private int[] _visibleIndices;
         private Vector4[] _payload;
         private byte[] _cameraLodStates;
         private XRayVegetationOcclusion _cameraOcclusion;
@@ -81,7 +82,7 @@ namespace XRay.Importer.Levels
         public static IReadOnlyList<string> UnsupportedShaderKeywords => UNSUPPORTED_SHADER_KEYWORDS;
 
         public bool Active => _active;
-        public long MemoryBytes => (_buffer != null ? (long)_buffer.count * _buffer.stride : 0L) + (_instanceBounds != null ? _instanceBounds.LongLength * 24L : 0L) + (_windBounds != null ? _windBounds.LongLength * 24L : 0L) + (_windBoundsStamps != null ? _windBoundsStamps.LongLength * sizeof(int) : 0L) + (_sourceWind != null ? _sourceWind.LongLength : 0L) + (_sourceBounds != null ? _sourceBounds.LongLength * 24L : 0L) + (_physicalSourceBounds != null ? _physicalSourceBounds.LongLength * 24L : 0L) + (_sourceSplitMasks != null ? _sourceSplitMasks.LongLength * 2L : 0L) + (_sourceShadowCounts != null ? _sourceShadowCounts.LongLength * sizeof(int) : 0L) + (_payload != null ? _payload.LongLength * VECTOR_BYTES : 0L) + (_instanceMasks != null ? _instanceMasks.LongLength * 2L : 0L) + (_sources != null ? _sources.LongLength * 120L : 0L) + (_draws != null ? _draws.LongLength * 32L : 0L) + _planes.LongLength * VECTOR_BYTES + _index.MemoryBytes + (long)_reflectionViews.Capacity * UnsafeUtility.SizeOf<ReflectionView>();
+        public long MemoryBytes => (_buffer != null ? (long)_buffer.count * _buffer.stride : 0L) + (_instanceBounds != null ? _instanceBounds.LongLength * 24L : 0L) + (_windBounds != null ? _windBounds.LongLength * 24L : 0L) + (_windBoundsStamps != null ? _windBoundsStamps.LongLength * sizeof(int) : 0L) + (_sourceWind != null ? _sourceWind.LongLength : 0L) + (_sourceBounds != null ? _sourceBounds.LongLength * 24L : 0L) + (_physicalSourceBounds != null ? _physicalSourceBounds.LongLength * 24L : 0L) + (_sourceSplitMasks != null ? _sourceSplitMasks.LongLength * 2L : 0L) + (_sourceShadowCounts != null ? _sourceShadowCounts.LongLength * sizeof(int) : 0L) + (_payload != null ? _payload.LongLength * VECTOR_BYTES : 0L) + (_instanceMasks != null ? _instanceMasks.LongLength * 2L : 0L) + (_sources != null ? _sources.LongLength * 120L : 0L) + (_draws != null ? _draws.LongLength * 32L : 0L) + (_plannedCommands != null ? _plannedCommands.LongLength * UnsafeUtility.SizeOf<BatchDrawCommand>() : 0L) + (_visibleIndices != null ? _visibleIndices.LongLength * sizeof(int) : 0L) + _planes.LongLength * VECTOR_BYTES + _index.MemoryBytes + (long)_reflectionViews.Capacity * UnsafeUtility.SizeOf<ReflectionView>();
         public int LastCameraCommands { get; private set; }
         public int LastCameraInstances { get; private set; }
         public int LastCameraBatches { get; private set; }
@@ -116,14 +117,6 @@ namespace XRay.Importer.Levels
             if (_shader == null)
             {
                 _shader = Shader.Find("HDRP/MonolithLit");
-                if (_shader != null)
-                {
-                    _unsupportedShaderKeywords = new LocalKeyword[UNSUPPORTED_SHADER_KEYWORDS.Count];
-                    for (int index = 0; index < _unsupportedShaderKeywords.Length; index++)
-                    {
-                        _unsupportedShaderKeywords[index] = _shader.keywordSpace.FindKeyword(UNSUPPORTED_SHADER_KEYWORDS[index]);
-                    }
-                }
             }
             if (HasUnsupportedGlobalShaderKeyword()) return Unsupported("A global keyword does not support the native instance shader contract.");
             _meshes.Clear();
@@ -390,11 +383,22 @@ namespace XRay.Importer.Levels
 
         private bool HasUnsupportedGlobalShaderKeyword()
         {
-            if (_unsupportedShaderKeywords == null) return false;
-            for (int index = 0; index < _unsupportedShaderKeywords.Length; index++)
+            if (_shader == null)
             {
-                LocalKeyword keyword = _unsupportedShaderKeywords[index];
-                if (keyword.isValid && keyword.isOverridable && Shader.IsKeywordEnabled(UNSUPPORTED_SHADER_KEYWORDS[index])) return true;
+                return false;
+            }
+            for (int index = 0; index < UNSUPPORTED_SHADER_KEYWORDS.Count; index++)
+            {
+                string keywordName = UNSUPPORTED_SHADER_KEYWORDS[index];
+                if (!Shader.IsKeywordEnabled(keywordName))
+                {
+                    continue;
+                }
+                LocalKeyword keyword = _shader.keywordSpace.FindKeyword(keywordName);
+                if (keyword.isValid && keyword.isOverridable)
+                {
+                    return true;
+                }
             }
             return false;
         }
@@ -427,7 +431,6 @@ namespace XRay.Importer.Levels
             _planes = Array.Empty<Plane>();
             _wind = null;
             _shader = null;
-            _unsupportedShaderKeywords = null;
             _rejectedSet = null;
             _rejectedReason = null;
         }
@@ -476,6 +479,8 @@ namespace XRay.Importer.Levels
             _instanceMasks = null;
             _sourceStamps = null;
             _selectedSources = null;
+            _plannedCommands = null;
+            _visibleIndices = null;
             _payload = null;
             _instanceCount = 0;
             _index.Ensure(null);
@@ -592,6 +597,8 @@ namespace XRay.Importer.Levels
                 metadata.Dispose();
             }
             _draws = new Draw[_specifications.Count];
+            _plannedCommands = new BatchDrawCommand[_draws.Length];
+            _visibleIndices = new int[instanceCount];
             for (int index = 0; index < _specifications.Count; index++)
             {
                 DrawSpec specification = _specifications[index];
@@ -654,118 +661,129 @@ namespace XRay.Importer.Levels
                 else _cullingStamp++;
                 _selectedCount = 0;
                 Select(context.cullingPlanes, 0, context.cullingPlanes.Length, reflectionIndex);
-                int commandCapacity = 0;
-                int instanceCapacity = 0;
-                int survivingInstances = 0;
-                for (int selected = 0; selected < _selectedCount; selected++)
-                {
-                    int sourceIndex = _selectedSources[selected];
-                    Source source = _sources[sourceIndex];
-                    int count = 0;
-                    for (int index = source.Start; index < source.Start + source.Count; index++) if (_instanceMasks[index] != 0) count++;
-                    survivingInstances += count;
-                    commandCapacity += source.DrawCount;
-                    instanceCapacity += count * source.DrawCount;
-                }
+                WriteCullingOutput(output, false, reflection, out int commands, out int submittedInstances, out int survivingInstances);
                 if (reflection)
                 {
                     ReflectionViews++;
                     ReflectionBatches += _selectedCount;
+                    ReflectionCommands += commands;
+                    ReflectionInstances += submittedInstances;
                 }
                 else
                 {
                     LastCameraBatches = _selectedCount;
                     LastCulledBatches = _sources.Length - _selectedCount;
                     LastCulledInstances = _instanceCount - survivingInstances;
-                    LastCameraCommands = 0;
-                    LastCameraInstances = 0;
-                }
-                if (instanceCapacity == 0) return default;
-                var commands = (BatchCullingOutputDrawCommands*)output.drawCommands.GetUnsafePtr();
-                commands->drawCommands = (BatchDrawCommand*)UnsafeUtility.Malloc((long)UnsafeUtility.SizeOf<BatchDrawCommand>() * commandCapacity, UnsafeUtility.AlignOf<BatchDrawCommand>(), Allocator.TempJob);
-                commands->visibleInstances = (int*)UnsafeUtility.Malloc((long)sizeof(int) * instanceCapacity, UnsafeUtility.AlignOf<int>(), Allocator.TempJob);
-                commands->drawRanges = (BatchDrawRange*)UnsafeUtility.Malloc((long)UnsafeUtility.SizeOf<BatchDrawRange>() * commandCapacity, UnsafeUtility.AlignOf<BatchDrawRange>(), Allocator.TempJob);
-                int commandCount = 0;
-                int visibleCount = 0;
-                for (int selected = 0; selected < _selectedCount; selected++)
-                {
-                    Source source = _sources[_selectedSources[selected]];
-                    for (int drawIndex = source.DrawStart; drawIndex < source.DrawStart + source.DrawCount; drawIndex++)
-                    {
-                        Draw draw = _draws[drawIndex];
-                        int first = visibleCount;
-                        for (int index = source.Start; index < source.Start + source.Count; index++)
-                        {
-                            if (_instanceMasks[index] != 0) commands->visibleInstances[visibleCount++] = index;
-                        }
-                        BatchDrawCommandFlags flags = draw.Wind && !reflection ? BatchDrawCommandFlags.HasMotion : BatchDrawCommandFlags.None;
-                        commands->drawCommands[commandCount] = new BatchDrawCommand { batchID = _batchId, materialID = draw.MaterialId, meshID = draw.MeshId, submeshIndex = (ushort)draw.Submesh, visibleOffset = (uint)first, visibleCount = (uint)(visibleCount - first), splitVisibilityMask = ushort.MaxValue, flags = flags, sortingPosition = 0 };
-                        commands->drawRanges[commandCount] = new BatchDrawRange { drawCommandsBegin = (uint)commandCount, drawCommandsCount = 1, filterSettings = new BatchFilterSettings { renderingLayerMask = _renderingLayerMask, layer = (byte)_layer, receiveShadows = true, shadowCastingMode = ShadowCastingMode.Off, motionMode = reflection ? MotionVectorGenerationMode.ForceNoMotion : draw.Wind ? MotionVectorGenerationMode.Object : MotionVectorGenerationMode.Camera, staticShadowCaster = false, allDepthSorted = false, sceneCullingMask = ulong.MaxValue } };
-                        commandCount++;
-                    }
-                }
-                commands->drawCommandCount = commandCount;
-                commands->visibleInstanceCount = visibleCount;
-                commands->drawRangeCount = commandCount;
-                LastCullingOutputBytes += (long)commandCapacity * (UnsafeUtility.SizeOf<BatchDrawCommand>() + UnsafeUtility.SizeOf<BatchDrawRange>()) + (long)instanceCapacity * sizeof(int);
-                if (reflection)
-                {
-                    ReflectionCommands += commandCount;
-                    ReflectionInstances += visibleCount;
-                }
-                else
-                {
-                    LastCameraCommands = commandCount;
-                    LastCameraInstances = visibleCount;
+                    LastCameraCommands = commands;
+                    LastCameraInstances = submittedInstances;
                 }
                 return default;
             }
         }
 
-        private unsafe JobHandle CullShadows(BatchCullingContext context, BatchCullingOutput output)
+        private JobHandle CullShadows(BatchCullingContext context, BatchCullingOutput output)
         {
             Camera owner = SHADOW_CAMERA();
             if (owner == null || owner.GetEntityId() != _cameraId) return default;
             if ((context.cullingLayerMask & (1u << _layer)) == 0u) return default;
             ShadowViews++;
             PrepareShadowSources(context);
-            int commandCapacity = 0;
-            int instanceCapacity = 0;
+            WriteCullingOutput(output, true, false, out int commands, out int submittedInstances, out _);
+            LastShadowCommands += commands;
+            LastShadowInstances += submittedInstances;
+            return default;
+        }
+
+        private unsafe void WriteCullingOutput(BatchCullingOutput output, bool shadows, bool reflection, out int commandCount, out int submittedInstances, out int survivingInstances)
+        {
+            commandCount = 0;
+            submittedInstances = 0;
+            survivingInstances = 0;
+            int visibleCount = 0;
+            int rangeCount = 0;
             for (int selected = 0; selected < _selectedCount; selected++)
             {
                 int sourceIndex = _selectedSources[selected];
                 Source source = _sources[sourceIndex];
-                commandCapacity = checked(commandCapacity + source.DrawCount);
-                instanceCapacity = checked(instanceCapacity + _sourceShadowCounts[sourceIndex] * source.DrawCount);
-            }
-            if (commandCapacity == 0) return default;
-            var commands = (BatchCullingOutputDrawCommands*)output.drawCommands.GetUnsafePtr();
-            commands->drawCommands = (BatchDrawCommand*)UnsafeUtility.Malloc((long)UnsafeUtility.SizeOf<BatchDrawCommand>() * commandCapacity, UnsafeUtility.AlignOf<BatchDrawCommand>(), Allocator.TempJob);
-            commands->visibleInstances = (int*)UnsafeUtility.Malloc((long)sizeof(int) * instanceCapacity, UnsafeUtility.AlignOf<int>(), Allocator.TempJob);
-            commands->drawRanges = (BatchDrawRange*)UnsafeUtility.Malloc((long)UnsafeUtility.SizeOf<BatchDrawRange>() * commandCapacity, UnsafeUtility.AlignOf<BatchDrawRange>(), Allocator.TempJob);
-            int commandCount = 0;
-            int instanceCount = 0;
-            for (int selected = 0; selected < _selectedCount; selected++)
-            {
-                int sourceIndex = _selectedSources[selected];
-                Source source = _sources[sourceIndex];
+                int first = visibleCount;
+                int count = 0;
+                int end = source.Start + source.Count;
+                for (int index = source.Start; index < end; index++)
+                {
+                    if (_instanceMasks[index] != 0)
+                    {
+                        _visibleIndices[first + count++] = index;
+                    }
+                }
+                survivingInstances += count;
+                if (source.DrawCount == 0 || count == 0)
+                {
+                    continue;
+                }
+                visibleCount += count;
+                submittedInstances = checked(submittedInstances + count * source.DrawCount);
+                ushort splitMask = shadows ? _sourceSplitMasks[sourceIndex] : ushort.MaxValue;
                 for (int drawIndex = source.DrawStart; drawIndex < source.DrawStart + source.DrawCount; drawIndex++)
                 {
                     Draw draw = _draws[drawIndex];
-                    int first = instanceCount;
-                    for (int index = source.Start; index < source.Start + source.Count; index++) if (_instanceMasks[index] != 0) commands->visibleInstances[instanceCount++] = index;
-                    commands->drawCommands[commandCount] = new BatchDrawCommand { batchID = _batchId, materialID = draw.MaterialId, meshID = draw.MeshId, submeshIndex = (ushort)draw.Submesh, visibleOffset = (uint)first, visibleCount = (uint)(instanceCount - first), splitVisibilityMask = _sourceSplitMasks[sourceIndex], flags = BatchDrawCommandFlags.None, sortingPosition = 0 };
-                    commands->drawRanges[commandCount] = new BatchDrawRange { drawCommandsBegin = (uint)commandCount, drawCommandsCount = 1, filterSettings = new BatchFilterSettings { renderingLayerMask = _renderingLayerMask, layer = (byte)_layer, receiveShadows = true, shadowCastingMode = ShadowCastingMode.ShadowsOnly, motionMode = MotionVectorGenerationMode.Camera, staticShadowCaster = false, allDepthSorted = false, sceneCullingMask = ulong.MaxValue } };
-                    commandCount++;
+                    BatchDrawCommandFlags flags = !shadows && !reflection && draw.Wind ? BatchDrawCommandFlags.HasMotion : BatchDrawCommandFlags.None;
+                    if (commandCount > 0)
+                    {
+                        ref BatchDrawCommand previous = ref _plannedCommands[commandCount - 1];
+                        if (previous.visibleOffset + previous.visibleCount == (uint)first && previous.meshID.value == draw.MeshId.value && previous.materialID.value == draw.MaterialId.value && previous.submeshIndex == draw.Submesh && previous.flags == flags && previous.splitVisibilityMask == splitMask)
+                        {
+                            previous.visibleCount += (uint)count;
+                            continue;
+                        }
+                        if (previous.flags != flags)
+                        {
+                            rangeCount++;
+                        }
+                    }
+                    else
+                    {
+                        rangeCount++;
+                    }
+                    _plannedCommands[commandCount++] = new BatchDrawCommand { batchID = _batchId, materialID = draw.MaterialId, meshID = draw.MeshId, submeshIndex = (ushort)draw.Submesh, visibleOffset = (uint)first, visibleCount = (uint)count, splitVisibilityMask = splitMask, flags = flags, sortingPosition = 0 };
                 }
             }
+            if (commandCount == 0)
+            {
+                return;
+            }
+            long commandBytes = (long)UnsafeUtility.SizeOf<BatchDrawCommand>() * commandCount;
+            long indexBytes = (long)sizeof(int) * visibleCount;
+            long rangeBytes = (long)UnsafeUtility.SizeOf<BatchDrawRange>() * rangeCount;
+            var commands = (BatchCullingOutputDrawCommands*)output.drawCommands.GetUnsafePtr();
+            commands->drawCommands = (BatchDrawCommand*)UnsafeUtility.Malloc(commandBytes, UnsafeUtility.AlignOf<BatchDrawCommand>(), Allocator.TempJob);
+            commands->visibleInstances = (int*)UnsafeUtility.Malloc(indexBytes, UnsafeUtility.AlignOf<int>(), Allocator.TempJob);
+            commands->drawRanges = (BatchDrawRange*)UnsafeUtility.Malloc(rangeBytes, UnsafeUtility.AlignOf<BatchDrawRange>(), Allocator.TempJob);
+            fixed (BatchDrawCommand* planned = _plannedCommands)
+            {
+                UnsafeUtility.MemCpy(commands->drawCommands, planned, commandBytes);
+            }
+            fixed (int* indices = _visibleIndices)
+            {
+                UnsafeUtility.MemCpy(commands->visibleInstances, indices, indexBytes);
+            }
+            var filter = new BatchFilterSettings { renderingLayerMask = _renderingLayerMask, layer = (byte)_layer, receiveShadows = true, shadowCastingMode = shadows ? ShadowCastingMode.ShadowsOnly : ShadowCastingMode.Off, staticShadowCaster = false, allDepthSorted = false, sceneCullingMask = ulong.MaxValue };
+            int rangeStart = 0;
+            int rangeIndex = 0;
+            for (int index = 1; index <= commandCount; index++)
+            {
+                BatchDrawCommandFlags flags = _plannedCommands[rangeStart].flags;
+                if (index < commandCount && _plannedCommands[index].flags == flags)
+                {
+                    continue;
+                }
+                filter.motionMode = reflection ? MotionVectorGenerationMode.ForceNoMotion : flags == BatchDrawCommandFlags.HasMotion ? MotionVectorGenerationMode.Object : MotionVectorGenerationMode.Camera;
+                commands->drawRanges[rangeIndex++] = new BatchDrawRange { drawCommandsBegin = (uint)rangeStart, drawCommandsCount = (uint)(index - rangeStart), drawCommandsType = BatchDrawCommandType.Direct, filterSettings = filter };
+                rangeStart = index;
+            }
             commands->drawCommandCount = commandCount;
-            commands->visibleInstanceCount = instanceCount;
-            commands->drawRangeCount = commandCount;
-            LastShadowCommands += commandCount;
-            LastShadowInstances += instanceCount;
-            LastCullingOutputBytes += (long)commandCapacity * (UnsafeUtility.SizeOf<BatchDrawCommand>() + UnsafeUtility.SizeOf<BatchDrawRange>()) + (long)instanceCapacity * sizeof(int);
-            return default;
+            commands->visibleInstanceCount = visibleCount;
+            commands->drawRangeCount = rangeCount;
+            LastCullingOutputBytes += commandBytes + indexBytes + rangeBytes;
         }
 
         private void PrepareShadowSources(BatchCullingContext context)

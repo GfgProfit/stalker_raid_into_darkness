@@ -514,8 +514,8 @@ namespace XRay.Importer.Tests
                         Assert.That(payloadMetrics.legacySubmissionCalls, Is.Zero);
                     }
                     Assert.That(payloadMetrics.cullingInvocations, Is.GreaterThan(0), "Payload native callback was not invoked: " + payloadMetrics.fallbackReason);
-                    Assert.That(payloadMetrics.cameraCommands, Is.GreaterThan(0));
-                    Assert.That(payloadMetrics.cameraInstances, Is.GreaterThanOrEqualTo(2));
+                    Assert.That(payloadMetrics.cameraCommands, Is.EqualTo(1));
+                    Assert.That(payloadMetrics.cameraInstances, Is.EqualTo(2));
                     Assert.That(casterMetrics.shadowViews, Is.GreaterThan(0));
                     Assert.That(casterMetrics.shadowCommands, Is.GreaterThan(0));
                     Assert.That(casterMetrics.shadowInstances, Is.GreaterThan(0));

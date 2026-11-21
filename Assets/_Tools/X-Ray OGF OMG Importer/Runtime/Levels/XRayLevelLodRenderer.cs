@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using Unity.Collections.LowLevel.Unsafe;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -37,6 +38,9 @@ namespace XRay.Importer.Levels
         private byte[] _states;
         private ImpostorVertex[] _vertices;
         private int[] _indices;
+        private Mesh _uploadedMesh;
+        private ImpostorVertex[] _uploadedVertices;
+        private int _uploadedVertexCount;
 
         [StructLayout(LayoutKind.Sequential)]
         private struct ImpostorVertex
@@ -197,6 +201,9 @@ namespace XRay.Importer.Levels
             }
 
             _meshes.Clear();
+            _uploadedMesh = null;
+            _uploadedVertices = null;
+            _uploadedVertexCount = 0;
         }
 
         private bool InFrustum(Vector3 center, float radius)
@@ -301,6 +308,10 @@ namespace XRay.Importer.Levels
             int capacity = _states.Length;
             if (mesh.vertexCount != capacity * 4)
             {
+                if (_uploadedMesh == mesh)
+                {
+                    _uploadedMesh = null;
+                }
                 mesh.subMeshCount = 0;
                 mesh.SetVertexBufferParams(capacity * 4, LAYOUT);
                 mesh.SetIndexBufferParams(capacity * 6, IndexFormat.UInt32);
@@ -309,11 +320,22 @@ namespace XRay.Importer.Levels
 
             if (impostors == 0)
             {
-                mesh.subMeshCount = 0;
+                if (mesh.subMeshCount != 0)
+                {
+                    mesh.subMeshCount = 0;
+                }
+                if (_uploadedMesh == mesh)
+                {
+                    _uploadedMesh = null;
+                }
                 return;
             }
 
             int vertexCount = impostors * 4;
+            if (_uploadedMesh == mesh && _uploadedVertexCount == vertexCount && UploadedVerticesMatch(vertexCount))
+            {
+                return;
+            }
             mesh.SetVertexBufferData(_vertices, 0, 0, vertexCount, 0, FLAGS);
             Vector3 min = _vertices[0].Position;
             Vector3 max = min;
@@ -327,6 +349,21 @@ namespace XRay.Importer.Levels
             mesh.subMeshCount = 1;
             mesh.SetSubMesh(0, new SubMeshDescriptor(0, impostors * 6) { bounds = bounds, vertexCount = vertexCount }, FLAGS);
             mesh.bounds = bounds;
+            if (_uploadedVertices == null || _uploadedVertices.Length < vertexCount)
+            {
+                _uploadedVertices = new ImpostorVertex[Mathf.NextPowerOfTwo(vertexCount)];
+            }
+            Array.Copy(_vertices, _uploadedVertices, vertexCount);
+            _uploadedVertexCount = vertexCount;
+            _uploadedMesh = mesh;
+        }
+
+        private unsafe bool UploadedVerticesMatch(int vertexCount)
+        {
+            fixed (ImpostorVertex* current = _vertices, uploaded = _uploadedVertices)
+            {
+                return UnsafeUtility.MemCmp(current, uploaded, (long)vertexCount * sizeof(ImpostorVertex)) == 0;
+            }
         }
     }
 }

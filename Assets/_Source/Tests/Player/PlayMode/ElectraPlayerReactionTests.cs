@@ -1,6 +1,8 @@
 #if UNITY_EDITOR
 using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.Reflection;
 using NUnit.Framework;
 using RaidIntoDarkness.Effects;
 using UnityEditor;
@@ -15,11 +17,14 @@ namespace RaidIntoDarkness.Player.Tests
     {
         private const string PLAYER_PATH = "Assets/_Source/FirstPerson/FPS_Player.prefab";
         private const string ELECTRA_PATH = "Assets/_Source/Anomalies/Electra/Electra.prefab";
+        private const string AMBIENT_PATH = "Assets/_Source/Anomalies/AcidicComet/AcidicComet.prefab";
         private const float AWAKING_TIME = 0.2f;
         private const float BLOWOUT_TIME = 0.15f;
         private const float ACCUMULATE_TIME = 0.6f;
         private const float CYCLE_TIME = AWAKING_TIME + BLOWOUT_TIME + ACCUMULATE_TIME;
         private const float TIMEOUT = 3f;
+
+        private readonly List<Camera> _disabledViews = new();
 
         private Scene _scene;
         private Scene _previousScene;
@@ -30,8 +35,11 @@ namespace RaidIntoDarkness.Player.Tests
         private ElectraVisual _visual;
         private Vector3 _origin;
         private float _previousTimeScale;
+        private int? _previousAnomalyQuality;
+        private bool _controlsAnomalyQuality;
         private CursorLockMode _previousCursorLock;
         private bool _previousCursorVisible;
+        private RenderTexture _effectsTarget;
 
         [UnitySetUp]
         public IEnumerator SetUp()
@@ -83,6 +91,7 @@ namespace RaidIntoDarkness.Player.Tests
             {
                 listener.enabled = false;
             }
+            floor.AddComponent<AudioListener>();
 
             _holder.SetActive(true);
             var anomalyHolder = new GameObject("ElectraReactionAnomaly");
@@ -111,6 +120,11 @@ namespace RaidIntoDarkness.Player.Tests
         [UnityTearDown]
         public IEnumerator TearDown()
         {
+            if (_controlsAnomalyQuality)
+            {
+                AnomalyVisualQuality.Apply(_previousAnomalyQuality);
+                _controlsAnomalyQuality = false;
+            }
             if (_previousScene.IsValid() && _previousScene.isLoaded)
             {
                 SceneManager.SetActiveScene(_previousScene);
@@ -120,7 +134,20 @@ namespace RaidIntoDarkness.Player.Tests
             {
                 yield return SceneManager.UnloadSceneAsync(_scene);
             }
+            if (_effectsTarget != null)
+            {
+                Object.Destroy(_effectsTarget);
+                _effectsTarget = null;
+            }
 
+            foreach (Camera view in _disabledViews)
+            {
+                if (view != null)
+                {
+                    view.enabled = true;
+                }
+            }
+            _disabledViews.Clear();
             Time.timeScale = _previousTimeScale;
             Cursor.lockState = _previousCursorLock;
             Cursor.visible = _previousCursorVisible;
@@ -206,6 +233,107 @@ namespace RaidIntoDarkness.Player.Tests
             yield return WaitPhysics(0.2f);
             Assert.That(_reaction.Phase, Is.EqualTo(AnomalyPhase.Idle), "Destroyed player left a repeating reaction behind.");
             Assert.That(_reaction.CooldownRemaining, Is.Zero);
+            LogAssert.NoUnexpectedReceived();
+        }
+
+        [UnityTest]
+        public IEnumerator AmbientParticlesPauseAndResumeWithoutInterruptingDischarge()
+        {
+            var tierField = typeof(AnomalyVisualQuality).GetField("_tier", BindingFlags.Static | BindingFlags.NonPublic);
+            Assert.That(tierField, Is.Not.Null);
+            int tier = (int)tierField.GetValue(null);
+            _previousAnomalyQuality = tier >= 0 ? tier : null;
+            _controlsAnomalyQuality = true;
+            AnomalyVisualQuality.Apply(2);
+
+            var ambientPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(AMBIENT_PATH);
+            Assert.That(ambientPrefab, Is.Not.Null);
+            var ambient = Object.Instantiate(ambientPrefab, _origin + Vector3.forward * 20f, Quaternion.identity);
+            var ambientVisual = ambient.GetComponent<OverlappingAnomalyVisual>();
+            Assert.That(ambientVisual, Is.Not.Null);
+            var auxiliarySystems = new SerializedObject(ambientVisual).FindProperty("_idleAuxiliarySystems");
+            ParticleSystem idle = null;
+            for (int index = 0; index < auxiliarySystems.arraySize; index++)
+            {
+                if (auxiliarySystems.GetArrayElementAtIndex(index).objectReferenceValue is ParticleSystem system && system.name == "heat_glow00_green_00")
+                {
+                    idle = system;
+                    break;
+                }
+            }
+            Assert.That(idle, Is.Not.Null);
+            var idleRenderer = idle.GetComponent<ParticleSystemRenderer>();
+            Assert.That(idleRenderer, Is.Not.Null);
+            Assert.That(idleRenderer.enabled, Is.True);
+
+            var visual = new SerializedObject(_visual);
+            var lightCarryingIdle = (ParticleSystem)visual.FindProperty("_idle").objectReferenceValue;
+            var discharge = (ParticleSystem)visual.FindProperty("_discharge").objectReferenceValue;
+            Assert.That(lightCarryingIdle, Is.Not.Null);
+            Assert.That(lightCarryingIdle.lights.enabled, Is.True);
+            Assert.That(discharge, Is.Not.Null);
+
+            foreach (Camera existingView in Camera.allCameras)
+            {
+                if (existingView.cameraType == CameraType.Game || existingView.cameraType == CameraType.VR)
+                {
+                    _disabledViews.Add(existingView);
+                    existingView.enabled = false;
+                }
+            }
+
+            var view = new GameObject("ElectraEffectsView").AddComponent<Camera>();
+            _effectsTarget = new RenderTexture(64, 64, 24);
+            view.targetTexture = _effectsTarget;
+            view.cullingMask = (1 << idle.gameObject.layer) | (1 << discharge.gameObject.layer);
+            view.farClipPlane = 800f;
+            Vector3 nearPosition = _origin - Vector3.forward * 40f;
+            Vector3 farPosition = _origin - Vector3.forward * 500f;
+            view.transform.SetPositionAndRotation(nearPosition, Quaternion.identity);
+            yield return WaitUntil(() => idle.isPlaying && !idleRenderer.forceRenderingOff, "The visible idle effect did not start.");
+
+            view.transform.position = farPosition;
+            yield return WaitUntil(() => idleRenderer.forceRenderingOff, "The test camera did not drive distance culling.");
+            yield return WaitUntil(() => idle.isPaused, "Distant idle particles kept simulating.");
+            float pausedTime = idle.time;
+            yield return WaitPhysics(0.3f);
+            Assert.That(idle.time, Is.EqualTo(pausedTime).Within(0.0001f), "The idle simulation advanced while suspended.");
+            Assert.That(ambientVisual.IsVisible, Is.True, "Distance culling hid the anomaly itself.");
+            Assert.That(lightCarryingIdle.isPaused, Is.False, "Distance culling paused Electra's per-particle lights.");
+
+            view.transform.position = nearPosition;
+            yield return WaitUntil(() => idle.isPlaying && !idleRenderer.forceRenderingOff, "Distant idle particles did not return in range.");
+            view.transform.rotation = Quaternion.Euler(0f, 180f, 0f);
+            yield return WaitUntil(() => idle.isPaused, "In-range idle particles behind the camera kept simulating.");
+            view.transform.rotation = Quaternion.identity;
+            yield return WaitUntil(() => idle.isPlaying, "The idle effect did not return when the camera turned back.");
+            float resumedTime = idle.time;
+            yield return WaitUntil(() => Mathf.Abs(idle.time - resumedTime) > 0.01f, "The resumed idle simulation did not advance.");
+
+            idle.Pause(false);
+            view.transform.position = farPosition;
+            yield return WaitUntil(() => idleRenderer.forceRenderingOff, "The manually paused effect did not enter the distance culling range.");
+            view.transform.position = nearPosition;
+            yield return WaitUntil(() => !idleRenderer.forceRenderingOff, "The manually paused effect did not leave the distance culling range.");
+            Assert.That(idle.isPaused, Is.True, "Returning in range resumed a pause owned by another caller.");
+            idle.Play(false);
+
+            view.transform.rotation = Quaternion.Euler(0f, 180f, 0f);
+            yield return WaitUntil(() => idle.isPaused, "Idle particles did not suspend again.");
+            Assert.That(lightCarryingIdle.isPaused, Is.False, "Frustum culling paused Electra's per-particle lights.");
+            var dischargeMain = discharge.main;
+            dischargeMain.simulationSpeed = 0.1f;
+            dischargeMain.cullingMode = ParticleSystemCullingMode.AlwaysSimulate;
+            yield return WaitUntil(() => _reaction.IsReady, "Electra did not become ready.");
+            MovePlayer(true);
+            yield return WaitUntil(() => _reaction.Phase == AnomalyPhase.Awaking, "The offscreen anomaly ignored player contact.");
+            MovePlayer(false);
+            yield return WaitUntil(() => _reaction.Phase == AnomalyPhase.Blowout, "The offscreen anomaly did not discharge.");
+            Assert.That(_visual.IsDischarging, Is.True);
+            float dischargeTime = discharge.time;
+            yield return WaitPhysics(0.45f);
+            Assert.That(discharge.isPaused, Is.False, "Visibility culling paused the discharge.");
+            Assert.That(discharge.time, Is.GreaterThan(dischargeTime), "Offscreen discharge particles did not advance.");
             LogAssert.NoUnexpectedReceived();
         }
 

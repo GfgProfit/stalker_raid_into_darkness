@@ -76,6 +76,7 @@ namespace XRay.Importer.Editor.Levels
                 go.AddComponent<MeshFilter>().sharedMesh = chunk.Mesh;
                 var renderer = go.AddComponent<MeshRenderer>();
                 renderer.sharedMaterials = chunk.Materials;
+                XRayTerrainGpuCompatibility.ConfigureImportedRenderer(renderer, chunk.Materials);
                 foreach (Material material in chunk.Materials)
                 {
                     if (material != null && material.shader.name == XRayLevelMaterialLibrary.DECAL_SHADER_NAME)

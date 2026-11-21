@@ -45,6 +45,7 @@ namespace XRay.Importer.Levels
         public Vector3[] Vertices => _vertices;
     }
 
+    [ExecuteAlways]
     public sealed class XRayLevelMetadata : MonoBehaviour
     {
         public const string COLLISION_LAYER = "X-Ray Level Collision";
@@ -85,6 +86,14 @@ namespace XRay.Importer.Levels
                 {
                     collider.gameObject.layer = layer;
                 }
+            }
+        }
+
+        private void OnEnable()
+        {
+            if (transform.parent != null)
+            {
+                XRayTerrainGpuCompatibility.ApplyToExistingGeometry(transform.parent.Find("Geometry"));
             }
         }
 

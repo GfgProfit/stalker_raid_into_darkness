@@ -47,6 +47,8 @@ namespace XRay.Importer.Levels
 
     public sealed class XRayLevelMetadata : MonoBehaviour
     {
+        public const string COLLISION_LAYER = "X-Ray Level Collision";
+
         [SerializeField] private string _levelName;
         [SerializeField] private int _xrlcVersion;
         [SerializeField] private string _sourceFolder;
@@ -64,6 +66,27 @@ namespace XRay.Importer.Levels
         public IReadOnlyList<XRayLevelSectorInfo> Sectors => _sectors;
         public IReadOnlyList<XRayLevelPortalInfo> Portals => _portals;
         public IReadOnlyList<string> Limitations => _limitations;
+
+        private void Awake()
+        {
+            if (!Application.IsPlaying(gameObject))
+            {
+                return;
+            }
+            int layer = LayerMask.NameToLayer(COLLISION_LAYER);
+            Transform collision = transform.parent != null ? transform.parent.Find("Collision") : null;
+            if (layer < 0 || collision == null)
+            {
+                return;
+            }
+            foreach (MeshCollider collider in collision.GetComponentsInChildren<MeshCollider>(true))
+            {
+                if (collider.gameObject.layer == 0 && !collider.isTrigger && collider.attachedRigidbody == null && !collider.TryGetComponent<Renderer>(out _))
+                {
+                    collider.gameObject.layer = layer;
+                }
+            }
+        }
 
         public void Initialize(string levelName, int xrlcVersion, string sourceFolder, string importedUtc, Bounds bounds, List<XRayLevelSectorInfo> sectors, List<XRayLevelPortalInfo> portals, List<string> limitations)
         {

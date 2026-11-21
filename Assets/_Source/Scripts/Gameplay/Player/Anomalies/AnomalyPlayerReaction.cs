@@ -36,6 +36,7 @@ namespace RaidIntoDarkness.Player
         private bool _pulsePending;
         private bool _sourceActive = true;
         private XRayAnomalyActivationVolume _activationVolume;
+        private Collider[] _localTriggerShapes;
         private ulong _dischargeSequence;
         private bool _confirmedPulse;
         private bool _presentingDischarge;
@@ -103,6 +104,21 @@ namespace RaidIntoDarkness.Player
         private void Awake()
         {
             _activationVolume = GetComponent<XRayAnomalyActivationVolume>();
+            if (_activationVolume != null)
+            {
+                foreach (Collider shape in _activationVolume.ActualShapes)
+                {
+                    AnomalyTriggerCollision.Configure(shape);
+                }
+            }
+            else
+            {
+                _localTriggerShapes = GetComponents<Collider>();
+                foreach (Collider shape in _localTriggerShapes)
+                {
+                    AnomalyTriggerCollision.Configure(shape);
+                }
+            }
             if (_visual == null)
             {
                 _visual = GetComponent<AnomalyVisual>();
@@ -222,7 +238,7 @@ namespace RaidIntoDarkness.Player
 
         private void OnTriggerExit(Collider other)
         {
-            if (other == null || _activationVolume != null && _activationVolume.Overlaps(other))
+            if (other == null || (!_probeContacts.ContainsKey(other) && !_contacts.ContainsKey(other)) || _activationVolume != null && _activationVolume.Overlaps(other))
             {
                 return;
             }
@@ -246,7 +262,7 @@ namespace RaidIntoDarkness.Player
 
         private void RegisterContact(Collider other)
         {
-            if (CanDetect == false || other == null || other.enabled == false || other.gameObject.activeInHierarchy == false || IsWithinSourceShapes(other) == false || _contacts.ContainsKey(other) || _probeContacts.ContainsKey(other))
+            if (CanDetect == false || other == null || other.enabled == false || other.gameObject.activeInHierarchy == false || _contacts.ContainsKey(other) || _probeContacts.ContainsKey(other))
             {
                 return;
             }
@@ -255,6 +271,10 @@ namespace RaidIntoDarkness.Player
             if (player == null || player.isActiveAndEnabled == false)
             {
                 RegisterProbe(other);
+                return;
+            }
+            if (IsWithinSourceShapes(other) == false)
+            {
                 return;
             }
 
@@ -319,12 +339,12 @@ namespace RaidIntoDarkness.Player
 
         private void RegisterProbe(Collider collider)
         {
-            if (_actorOnly || _probeContacts.ContainsKey(collider))
+            if (_actorOnly)
             {
                 return;
             }
             AnomalyProbe probe = collider.GetComponentInParent<AnomalyProbe>();
-            if (probe == null || probe.isActiveAndEnabled == false)
+            if (probe == null || probe.isActiveAndEnabled == false || IsWithinSourceShapes(collider) == false)
             {
                 return;
             }
@@ -442,7 +462,29 @@ namespace RaidIntoDarkness.Player
 
         private bool IsWithinSourceShapes(Collider collider)
         {
-            return _activationVolume == null || _activationVolume.Overlaps(collider);
+            if (_activationVolume != null)
+            {
+                return _activationVolume.Overlaps(collider);
+            }
+            if (_localTriggerShapes == null)
+            {
+                return true;
+            }
+            Bounds bounds = collider.bounds;
+            bool hasTrigger = false;
+            foreach (Collider shape in _localTriggerShapes)
+            {
+                if (shape == null || !shape.isTrigger)
+                {
+                    continue;
+                }
+                hasTrigger = true;
+                if (shape.enabled && shape.bounds.Intersects(bounds))
+                {
+                    return true;
+                }
+            }
+            return !hasTrigger;
         }
 
         private sealed class ProbeContact

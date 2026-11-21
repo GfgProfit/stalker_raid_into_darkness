@@ -31,6 +31,7 @@ namespace RaidIntoDarkness.Player
         private void Awake()
         {
             _volume = GetComponent<SphereCollider>();
+            AnomalyTriggerCollision.Configure(_volume);
             UpdateVolume();
         }
 
@@ -102,10 +103,18 @@ namespace RaidIntoDarkness.Player
 
         private void UpdateVolume()
         {
-            if (_volume != null)
+            if (_volume == null)
+            {
+                return;
+            }
+            if (!_volume.center.Equals(Vector3.zero))
             {
                 _volume.center = Vector3.zero;
-                _volume.radius = ProximityRadius / Mathf.Max(0.0001f, MaximumScale(transform.lossyScale));
+            }
+            float radius = ProximityRadius / Mathf.Max(0.0001f, MaximumScale(transform.lossyScale));
+            if (_volume.radius != radius)
+            {
+                _volume.radius = radius;
             }
         }
 

@@ -27,11 +27,28 @@ namespace RaidIntoDarkness.Effects
         private float _lightRemaining;
         private float _lightDelayRemaining;
 
-        public override bool IsDischarging => _discharges.Count > 0;
+        public override bool IsDischarging => _discharges.Count > 0 || (ParticlePrototype != null && ParticlePrototype.IsDischarging);
 
         protected override bool HasDischarge => _dischargeTemplate != null;
 
         protected override bool StartDischarge()
+        {
+            if (ParticlePrototype != null)
+            {
+                if (!ParticlePrototype.StartDischarge(_dischargeEffectDelay)) return false;
+            }
+            else if (!StartParticleDischarge())
+            {
+                return false;
+            }
+
+            _lightRemaining = _dischargeLightDuration;
+            _lightDelayRemaining = _dischargeLightDelay;
+            UpdateLight(0f);
+            return true;
+        }
+
+        private bool StartParticleDischarge()
         {
             GameObject instance = Instantiate(_dischargeTemplate, transform);
             instance.name = "Discharge";
@@ -48,9 +65,6 @@ namespace RaidIntoDarkness.Effects
             }
             _discharges.Add(playback);
             TrimDischarges();
-            _lightRemaining = _dischargeLightDuration;
-            _lightDelayRemaining = _dischargeLightDelay;
-            UpdateLight(0f);
             return true;
         }
 
@@ -60,10 +74,12 @@ namespace RaidIntoDarkness.Effects
             _lightDelayRemaining = 0f;
             UpdateLight(0f);
             ClearDischarges();
+            if (ParticlePrototype != null) ParticlePrototype.StopDischarges();
         }
 
         protected override void TickVisual(float deltaTime)
         {
+            if (ParticlePrototype != null) ParticlePrototype.TickDischarges(deltaTime);
             TrimDischarges();
             for (int index = _discharges.Count - 1; index >= 0; index--)
             {

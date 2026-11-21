@@ -150,8 +150,8 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             var data = new SerializedObject(prefab.GetComponent<OverlappingAnomalyVisual>());
             Light idle = data.FindProperty("_idleIllumination").objectReferenceValue as Light;
             Light discharge = data.FindProperty("_dischargeLight").objectReferenceValue as Light;
-            AssertLight(idle, 4f, LightShadows.None);
-            AssertLight(discharge, 7f, LightShadows.Soft);
+            AssertLight(idle, 4f, LightShadows.Hard);
+            AssertLight(discharge, 7f, LightShadows.Hard);
             Assert.That(discharge.color, Is.EqualTo(new Color(1.1f, 1.7f, 1.4f)));
             Assert.That(data.FindProperty("_idleLightRange").floatValue, Is.EqualTo(4f));
             Assert.That(data.FindProperty("_idleLightRangeJitter").floatValue, Is.EqualTo(0.25f));
@@ -219,10 +219,12 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
         }
 
         [Test]
-        public void PrefabContainsOnlySharedPresentationAndReactionComponents()
+        public void PrefabUsesSharedReactionAndGazirovkaVisualSwitch()
         {
             GameObject prefab = Prefab();
-            var allowed = new HashSet<Type> { typeof(AnomalyPlayerReaction), typeof(AnomalyProximityZone), typeof(OverlappingAnomalyVisual), typeof(AnomalyAudio), typeof(AnomalyAudioGain), typeof(AnomalyParticleEmission), typeof(AnomalyParticleFrames) };
+            var allowed = new HashSet<Type> { typeof(AnomalyPlayerReaction), typeof(AnomalyDamageSource), typeof(AnomalyProximityZone), typeof(OverlappingAnomalyVisual), typeof(AnomalyAudio), typeof(AnomalyAudioGain), typeof(AnomalyParticleEmission), typeof(AnomalyParticleFrames), typeof(GazirovkaVfxPrototype) };
+            Assert.That(prefab.GetComponents<GazirovkaVfxPrototype>().Length, Is.EqualTo(1));
+            Assert.That(AssetDatabase.LoadAssetAtPath<UnityEngine.VFX.VisualEffectAsset>(ROOT + "/VfxPrototype/Resources/GazirovkaVfxPrototype.vfx"), Is.Not.Null);
             bool hasGrassBender = false;
             foreach (MonoBehaviour component in prefab.GetComponentsInChildren<MonoBehaviour>(true))
             {

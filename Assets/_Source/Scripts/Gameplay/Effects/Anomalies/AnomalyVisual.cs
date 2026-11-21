@@ -26,12 +26,16 @@ namespace RaidIntoDarkness.Effects
 
         private bool _isVisible;
         private bool _sourceActive = true;
+        private GazirovkaVfxPrototype _particlePrototype;
 
         public bool IsVisible => _isVisible;
         public AnomalyAudio Audio => _audio;
         public abstract bool IsDischarging { get; }
 
         protected abstract bool HasDischarge { get; }
+        protected GazirovkaVfxPrototype ParticlePrototype => _particlePrototype;
+
+        internal ParticleSystem IdleParticleSystem => _idle;
 
         public event Action DischargeStarted;
         public event Action Hidden;
@@ -226,18 +230,26 @@ namespace RaidIntoDarkness.Effects
             }
         }
 
+        internal void SetParticlePrototype(GazirovkaVfxPrototype prototype)
+        {
+            _particlePrototype = prototype;
+            if (!isActiveAndEnabled) return;
+            if (prototype == null) AnomalyVisualQuality.RegisterAmbientHierarchy(_idle, this, _playIdleChildren);
+            if (_isVisible) EnsureIdle();
+        }
+
         protected virtual void OnEnable()
         {
             if (Application.isPlaying)
             {
                 PunctualShadowDistance.RegisterHierarchy(this);
-                AnomalyVisualQuality.RegisterHierarchy(_idle);
+                AnomalyVisualQuality.RegisterAmbientHierarchy(_idle, this, _playIdleChildren);
                 AnomalyVisualQuality.RegisterHierarchy(_awaking);
                 if (_idleAuxiliarySystems != null)
                 {
                     foreach (ParticleSystem system in _idleAuxiliarySystems)
                     {
-                        AnomalyVisualQuality.RegisterHierarchy(system);
+                        AnomalyVisualQuality.RegisterAmbientHierarchy(system, this, true);
                     }
                 }
             }
@@ -278,7 +290,8 @@ namespace RaidIntoDarkness.Effects
             {
                 _idleIllumination.enabled = false;
             }
-            Clear(_idle);
+            if (_particlePrototype != null) _particlePrototype.SetIdle(false);
+            else Clear(_idle);
             if (_idleAuxiliarySystems == null)
             {
                 return;
@@ -291,12 +304,14 @@ namespace RaidIntoDarkness.Effects
 
         private void EnsureIdle()
         {
+            bool visible = _isVisible && isActiveAndEnabled;
             if (_idleIllumination != null)
             {
-                _idleIllumination.enabled = _isVisible && isActiveAndEnabled;
+                _idleIllumination.enabled = visible;
                 UpdateIdleLight(Time.time);
             }
-            if (_idle != null && _isVisible && isActiveAndEnabled && _idle.isPlaying == false)
+            if (_particlePrototype != null) _particlePrototype.SetIdle(visible);
+            else if (_idle != null && visible && _idle.isPlaying == false && !AnomalyVisualQuality.IsAmbientSuspended(_idle))
             {
                 _idle.Play(_playIdleChildren);
             }

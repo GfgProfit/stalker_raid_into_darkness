@@ -116,7 +116,7 @@ namespace RaidIntoDarkness.Effects
 
         private void LateUpdate()
         {
-            if (_system != null)
+            if (_system != null && !AnomalyVisualQuality.IsAmbientSuspended(_system))
             {
                 UpdateFrames(_system.main.useUnscaledTime ? Time.unscaledDeltaTime : Time.deltaTime);
             }

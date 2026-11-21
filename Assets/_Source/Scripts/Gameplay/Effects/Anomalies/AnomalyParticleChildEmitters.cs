@@ -132,6 +132,11 @@ namespace RaidIntoDarkness.Effects
             {
                 return;
             }
+            if (AnomalyVisualQuality.IsAmbientSuspended(_source))
+            {
+                UpdateChildren();
+                return;
+            }
             int maximum = Mathf.Max(1, _source.main.maxParticles);
             if (_particles.Length < maximum)
             {

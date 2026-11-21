@@ -82,7 +82,7 @@ namespace RaidIntoDarkness.Effects
 
         private void Update()
         {
-            ClearRenderVelocity();
+            if (!AnomalyVisualQuality.IsAmbientSuspended(_system)) ClearRenderVelocity();
         }
 
         private void LateUpdate()

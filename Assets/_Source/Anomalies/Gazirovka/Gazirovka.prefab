@@ -106665,6 +106665,7 @@ GameObject:
   - component: {fileID: 2242762563448848170}
   - component: {fileID: 1754871560475818866}
   - component: {fileID: 8338606880030080481}
+  - component: {fileID: 2981656467156482618}
   m_Layer: 0
   m_Name: Gazirovka
   m_TagString: Untagged
@@ -106891,6 +106892,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: RaidIntoDarkness.Player::RaidIntoDarkness.Player.AnomalyDamageSource
   _variant: {fileID: 11400000, guid: f30bc703e61eac94086511da575d7ee8, type: 2}
   _sourceSection: zone_mine_acidic_average
+--- !u!114 &2981656467156482618
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6534194022986100575}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b87fe0f71a968574cbe8ccd8a51baa91, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: RaidIntoDarkness.Effects::RaidIntoDarkness.Effects.GazirovkaVfxPrototype
 --- !u!1 &6874206171167252841
 GameObject:
   m_ObjectHideFlags: 0

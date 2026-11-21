@@ -33,6 +33,8 @@ namespace RaidIntoDarkness.Effects
         public abstract bool IsDischarging { get; }
 
         protected abstract bool HasDischarge { get; }
+        protected Light IdleIllumination => _idleIllumination;
+        protected bool IdleLightOverridden { get; set; }
         protected GazirovkaVfxPrototype ParticlePrototype => _particlePrototype;
 
         internal ParticleSystem IdleParticleSystem => _idle;
@@ -271,6 +273,14 @@ namespace RaidIntoDarkness.Effects
         protected abstract void StopDischarge();
         protected abstract void TickVisual(float deltaTime);
 
+        protected virtual void SetIdleLightEnabled(bool enabled)
+        {
+            if (_idleIllumination != null && _idleIllumination.enabled != enabled)
+            {
+                _idleIllumination.enabled = enabled;
+            }
+        }
+
         private AnomalyContactEffects SelectContact(AnomalyContactEffects large, AnomalyContactEffects small, bool isSmall)
         {
             return isSmall && (_useSourceContactEffects || small != null) ? small : large;
@@ -286,10 +296,7 @@ namespace RaidIntoDarkness.Effects
 
         private void ClearIdle()
         {
-            if (_idleIllumination != null)
-            {
-                _idleIllumination.enabled = false;
-            }
+            SetIdleLightEnabled(false);
             if (_particlePrototype != null) _particlePrototype.SetIdle(false);
             else Clear(_idle);
             if (_idleAuxiliarySystems == null)
@@ -305,11 +312,8 @@ namespace RaidIntoDarkness.Effects
         private void EnsureIdle()
         {
             bool visible = _isVisible && isActiveAndEnabled;
-            if (_idleIllumination != null)
-            {
-                _idleIllumination.enabled = visible;
-                UpdateIdleLight(Time.time);
-            }
+            SetIdleLightEnabled(visible);
+            UpdateIdleLight(Time.time);
             if (_particlePrototype != null) _particlePrototype.SetIdle(visible);
             else if (_idle != null && visible && _idle.isPlaying == false && !AnomalyVisualQuality.IsAmbientSuspended(_idle))
             {
@@ -319,7 +323,7 @@ namespace RaidIntoDarkness.Effects
 
         private void UpdateIdleLight(float globalTime)
         {
-            if (_idleIllumination == null || _idleIllumination.enabled == false)
+            if (IdleLightOverridden || _idleIllumination == null || _idleIllumination.enabled == false)
             {
                 return;
             }

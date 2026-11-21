@@ -106776,6 +106776,8 @@ MonoBehaviour:
   _dischargeLightRange: 7
   _dischargeLightDuration: 0.35
   _dischargeLightDelay: 0
+  _dischargeLightColor: {r: 1, g: 1, b: 1, a: 1}
+  _dischargeLightLocalPosition: {x: 0, y: 0, z: 0}
 --- !u!135 &7338377824110602544
 SphereCollider:
   m_ObjectHideFlags: 0

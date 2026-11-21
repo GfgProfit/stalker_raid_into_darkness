@@ -308,7 +308,9 @@ namespace RaidIntoDarkness.Player.Tests.Editor
                 Light discharge = dischargeProperty != null ? dischargeProperty.objectReferenceValue as Light : null;
                 Assert.That(idle != null, Is.EqualTo(definition.IdleRange > 0f), definition.Name);
                 Assert.That(discharge != null, Is.EqualTo(definition.BlowoutRange > 0f), definition.Name);
-                Assert.That(prefab.GetComponentsInChildren<Light>(true).Length, Is.EqualTo((definition.IdleRange > 0f ? 1 : 0) + (definition.BlowoutRange > 0f ? 1 : 0)), definition.Name);
+                bool shared = definition.Name == "Teleport";
+                int expectedLights = shared ? 1 : (definition.IdleRange > 0f ? 1 : 0) + (definition.BlowoutRange > 0f ? 1 : 0);
+                Assert.That(prefab.GetComponentsInChildren<Light>(true).Length, Is.EqualTo(expectedLights), definition.Name);
                 if (idle != null)
                 {
                     AssertLight(idle, definition.IdleRange, definition.Name);
@@ -317,9 +319,22 @@ namespace RaidIntoDarkness.Player.Tests.Editor
                 }
                 if (discharge != null)
                 {
-                    AssertLight(discharge, definition.BlowoutRange, definition.Name);
-                    Assert.That(discharge.enabled, Is.False, definition.Name);
                     Assert.That(visual.FindProperty("_dischargeLightDuration").floatValue, Is.GreaterThan(0f), definition.Name);
+                    if (shared)
+                    {
+                        Assert.That(discharge, Is.SameAs(idle), definition.Name);
+                        Assert.That(visual.FindProperty("_keepIdleDuringDischarge").boolValue, Is.False, definition.Name);
+                        Assert.That(visual.FindProperty("_dischargeLightRange").floatValue, Is.EqualTo(definition.BlowoutRange), definition.Name);
+                        Assert.That(visual.FindProperty("_dischargeLightColor").colorValue, Is.EqualTo(new Color(1.4f, 1.6f, 1.8f, 1f)), definition.Name);
+                        Assert.That(visual.FindProperty("_dischargeLightLocalPosition").vector3Value, Is.EqualTo(new Vector3(0f, 1.5f, 0f)), definition.Name);
+                        Assert.That(visual.FindProperty("_dischargeLightDelay").floatValue, Is.EqualTo(0.8f), definition.Name);
+                    }
+                    else
+                    {
+                        Assert.That(discharge, Is.Not.SameAs(idle), definition.Name);
+                        AssertLight(discharge, definition.BlowoutRange, definition.Name);
+                        Assert.That(discharge.enabled, Is.False, definition.Name);
+                    }
                 }
             }
         }

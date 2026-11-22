@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 335ab8779db4fc317dd646dd295ff541, type: 3}
+  m_Name: generic_weapon_machine_gun
+  m_EditorClassIdentifier: RaidIntoDarkness.Effects::RaidIntoDarkness.Effects.XRayParticleGroupAsset
+  _groupName: weapons\generic_weapon_machine_gun
+  _timeLimit: 20
+  _entries:
+  - _effect: {fileID: 11400000, guid: 1a7123ff708fd4d42aa18e4a292440a0, type: 2}
+    _time0: 0.1
+    _time1: 10
+    _flags: 4
+  - _effect: {fileID: 11400000, guid: 628d24ff1bf13c94e81f12ffcbcb49ba, type: 2}
+    _time0: 0.1
+    _time1: 10
+    _flags: 4
+  - _effect: {fileID: 11400000, guid: d3816962812ddd84690f802de665b581, type: 2}
+    _time0: 0
+    _time1: 0
+    _flags: 4
+  - _effect: {fileID: 11400000, guid: a7f20de7219439d4ea19bbc4a4b6c795, type: 2}
+    _time0: 0
+    _time1: 0
+    _flags: 4

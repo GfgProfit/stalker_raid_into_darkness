@@ -31,7 +31,7 @@ namespace RaidIntoDarkness.GraphicsOptions
         private static readonly string[] UPSCALERS = { "Native", "TAAU", "AMD FSR 2", "NVIDIA DLSS" };
         private static readonly string[] UPSCALER_QUALITY = { "Качество", "Баланс", "Производительность" };
         private static readonly string[] UPSCALER_QUALITY_WITH_ULTRA = { "Качество", "Баланс", "Производительность", "Ультра" };
-        private static readonly string[] ANISOTROPY = { "Выкл.", "2×", "4×", "8×", "16×" };
+        private static readonly string[] ANISOTROPY = { "Выкл.", "2x", "4x", "8x", "16x" };
         private static readonly string[] FPS = { "30", "60", "90", "120", "144", "165", "240", "Без ограничения" };
         private static readonly int[] ANISOTROPY_VALUES = VideoPresets.AnisotropyLevels;
         private static readonly int[] FPS_VALUES = VideoPresets.FrameLimits;
@@ -743,7 +743,7 @@ namespace RaidIntoDarkness.GraphicsOptions
 
         private static string SizeLabel(VideoDisplay display)
         {
-            return display.width + " × " + display.height;
+            return display.width + " x " + display.height;
         }
 
         private static void Select(GameObject target)

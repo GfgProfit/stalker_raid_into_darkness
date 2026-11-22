@@ -25,7 +25,7 @@
 1. В Canvas создайте `UI → Image` (или `GameObject → UI → Inventory → Inventory Grid`).
 2. Добавьте компонент `InventoryGridView`.
 3. В инспекторе задайте `Container Id`, `Owner Id`, размер ячейки и режим размера:
-   - **Auto Size** — задаёте `Columns`/`Rows`, RectTransform подгоняется под `columns × cellWidth`, `rows × cellHeight`;
+   - **Auto Size** — задаёте `Columns`/`Rows`, RectTransform подгоняется под `columns x cellWidth`, `rows x cellHeight`;
    - **Size From Rect** — количество ячеек вычисляется из размера RectTransform. Если размер не кратен ячейке, инспектор показывает предупреждение, остаток не используется.
 4. Сетка рисуется процедурно (`InventoryGridGraphic`) и обновляется в edit mode, prefab stage и runtime. Служебные дочерние объекты (`__InventoryGrid`, `__InventoryHighlight`, `__InventoryItems`, `__InventoryLabels`) не сохраняются в сцену и не дублируются; ваши дочерние объекты не трогаются.
 5. Цвета, толщина линий и подсветки задаются в `Style`.

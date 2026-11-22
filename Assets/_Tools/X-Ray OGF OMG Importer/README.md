@@ -143,7 +143,7 @@ camera_shoot.anm
 ### Формат (Core, `Runtime/Core/Anm`, без UnityEngine)
 
 * Chunk `0x1100`: `name` (stringZ cp1251), `frame_start` и `frame_end` (`int32`, поэтому `0xFFFFFFFF` читается как `-1`), `fps` (`f32`), `version` (`u16`).
-* Шесть envelope: behaviour pre/post (`u8`×2 в v4/v5, `int32`×2 в v3) и число ключей (`u16` / `u32`). Ключ: `value` (`f32`), `time` (`f32`, секунды) и `shape` (`u8` / `u32 & 0xFF`). В v4/v5 дальше идут 7 значений `q16` в диапазоне [-32, 32] (`tension`, `continuity`, `bias`, `param[0..3]`), у Stepped их нет. В v3 это 7 × `f32`.
+* Шесть envelope: behaviour pre/post (`u8`x2 в v4/v5, `int32`x2 в v3) и число ключей (`u16` / `u32`). Ключ: `value` (`f32`), `time` (`f32`, секунды) и `shape` (`u8` / `u32 & 0xFF`). В v4/v5 дальше идут 7 значений `q16` в диапазоне [-32, 32] (`tension`, `continuity`, `bias`, `param[0..3]`), у Stepped их нет. В v3 это 7 x `f32`.
 * Порядок каналов, как в `COMotion::Load` движка: v3 и v5 — `X, Y, Z, H, P, B`; v4 — `X, Y, Z, P, H, B`. blender-xray читает все версии в порядке v5, поэтому v4-файлы в Blender получают перепутанные H и P.
 * Проверяются границы данных, число ключей относительно размера буфера, версия, FPS и наличие chunk. Ошибка указывает файл, chunk и смещение.
 

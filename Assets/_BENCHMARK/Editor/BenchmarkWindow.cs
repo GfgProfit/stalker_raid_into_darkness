@@ -84,7 +84,7 @@ namespace Rvm.Benchmark.Editor
                     EditorGUILayout.HelpBox("Используется уже выбранный стабильный профиль. Переходы/FX запрещены; часы ставятся на паузу и восстанавливаются после остановки. Аномалии, NPC и физика продолжают работу.", MessageType.Info);
                 }
                 serialized.ApplyModifiedProperties();
-                EditorGUILayout.LabelField("Измеряемое время", BenchmarkOutput.Number(_scenario.PositionSeconds * 4) + " секунд; основной протокол — 4 × 5");
+                EditorGUILayout.LabelField("Измеряемое время", BenchmarkOutput.Number(_scenario.PositionSeconds * 4) + " секунд; основной протокол — 4 x 5");
                 _camera = (Camera)EditorGUILayout.ObjectField("Рабочая камера", _camera, typeof(Camera), true);
                 for (int i = 0; i < 4; i++)
                 {

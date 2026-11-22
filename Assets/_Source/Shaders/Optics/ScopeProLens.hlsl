@@ -7,11 +7,19 @@ CBUFFER_START(UnityPerMaterial)
     float _LensReflectionStrength;
     float _LensEnvironmentIntensity;
     float _LensRoughness;
+    float _LensAdsReflection;
+    float4 _LensTransmissionTint;
     float _LensUseEnvironment;
     float _ScopeVisibility;
     float4 _IlluminationColor;
     float4 _ScopeRightWS;
     float4 _ScopeUpWS;
+    float4 _ScopeLensCenterWS;
+    float4 _ScopeLensHalfSize;
+    float _ScopeCalibratedAperture;
+    float _ScopeApertureShape;
+    float _ScopeEyeRelief;
+    float4 _ScopeEyeReference;
     float _ReticleSize;
     float _ScopeDepth;
     float _ScopeApperture;
@@ -142,7 +150,7 @@ float4 ScopeProFragment(ScopeProVaryings input) : SV_Target
     UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
     float visibility = saturate(_ScopeVisibility) * step(0.5, _ScopeAvailable);
     float3 reflection = 0.0;
-    if (visibility < 1.0)
+    if (visibility < 1.0 || _LensAdsReflection > 0.0)
     {
         reflection = ScopeProLensReflection(input);
     }
@@ -154,14 +162,25 @@ float4 ScopeProFragment(ScopeProVaryings input) : SV_Target
     float3 viewDirection = GetWorldSpaceNormalizeViewDir(input.positionWS);
     float2 viewDirectionTangent = float2(dot(viewDirection, _ScopeRightWS.xyz), dot(viewDirection, _ScopeUpWS.xyz));
     float2 centered = input.uv - viewDirectionTangent - 0.5;
-    float radius = length(centered * max(_ScopeDepth, 0.0));
+    float2 pupilOffset = 0.0;
+    if (_ScopeCalibratedAperture > 0.5)
+    {
+        float3 relative = input.positionWS - GetCameraRelativePositionWS(_ScopeLensCenterWS.xyz);
+        float2 lensPosition = float2(dot(relative, _ScopeRightWS.xyz), dot(relative, _ScopeUpWS.xyz));
+        centered = lensPosition / max(2.0 * _ScopeLensHalfSize.xy, 0.0001);
+        float3 eyeToCenter = _ScopeLensCenterWS.xyz - _WorldSpaceCameraPos;
+        float2 eyeOffset = float2(dot(eyeToCenter, _ScopeRightWS.xyz), dot(eyeToCenter, _ScopeUpWS.xyz)) - _ScopeEyeReference.xy;
+        pupilOffset = eyeOffset * (_ScopeEyeRelief / 2.0) / max(2.0 * _ScopeLensHalfSize.xy, 0.0001);
+    }
+    float2 pupilPosition = (centered + pupilOffset) * max(_ScopeDepth, 0.0);
+    float radius = _ScopeApertureShape > 0.5 ? max(abs(pupilPosition.x), abs(pupilPosition.y)) : length(pupilPosition);
     float fade = min(_ScopeFade, _ScopeApperture - 0.0001);
     float aperture = 1.0 - smoothstep(fade, max(_ScopeApperture, fade + 0.0001), radius);
     float2 worldUv = centered * clamp(_RenderSize, 0.001, 2.0) + 0.5;
     float2 reticleUv = centered * max(_ReticleSize, 0.0001) / max(_ReticleRuntimeScale, 0.0001) + 0.5;
     float3 world = SAMPLE_TEXTURE2D(_RenderTexture, sampler_RenderTexture, worldUv).rgb;
     float reticleInside = step(0.0, reticleUv.x) * step(reticleUv.x, 1.0) * step(0.0, reticleUv.y) * step(reticleUv.y, 1.0);
-    float3 exposedWorld = max(world, 0.0) * GetCurrentExposureMultiplier();
+    float3 exposedWorld = max(world, 0.0) * max(_LensTransmissionTint.rgb, 0.0) * GetCurrentExposureMultiplier();
     float3 color;
     if (_ReticleMode > 0.5 && _ReticleSdfAvailable > 0.5)
     {
@@ -175,6 +194,7 @@ float4 ScopeProFragment(ScopeProVaryings input) : SV_Target
         color = lerp(exposedWorld, reticleColor, saturate(reticle.a) * reticleInside) * aperture;
     }
 
+    color += reflection * _LensAdsReflection * aperture;
     return float4(lerp(reflection, max(color, 0.0), visibility), 1.0);
 }
 

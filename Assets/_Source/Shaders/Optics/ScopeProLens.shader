@@ -17,6 +17,8 @@ Shader "RaidIntoDarkness/Optics/ScopeProLens"
         _LensReflectionStrength("Lens Reflection Amount", Range(0, 1)) = 1
         _LensEnvironmentIntensity("Lens Environment Intensity", Range(0, 20)) = 1
         _LensRoughness("Lens Reflection Roughness", Range(0, 1)) = 0.15
+        _LensAdsReflection("Lens Reflection in ADS", Range(0, 1)) = 0
+        _LensTransmissionTint("Lens Transmission Tint", Color) = (1, 1, 1, 1)
         [HideInInspector] _LensUseEnvironment("Use Baked Lens Environment", Float) = 0
         [HideInInspector] [NoScaleOffset] _LensEnvironment("Baked Lens Environment", Cube) = "black" {}
         [HideInInspector] _ScopeVisibility("Scope Visibility", Float) = 1
@@ -30,6 +32,12 @@ Shader "RaidIntoDarkness/Optics/ScopeProLens"
         [HideInInspector] _ScopeAvailable("Scope Available", Float) = 0
         [HideInInspector] _ScopeRightWS("Scope Right", Vector) = (1, 0, 0, 0)
         [HideInInspector] _ScopeUpWS("Scope Up", Vector) = (0, 1, 0, 0)
+        [ToggleUI] _ScopeCalibratedAperture("Calibrated Aperture", Float) = 0
+        [Enum(Round, 0, Rectangular, 1)] _ScopeApertureShape("Aperture Shape", Float) = 0
+        _ScopeEyeRelief("Eye Relief Response", Range(0, 5)) = 0
+        _ScopeEyeReference("Calibrated Eye Offset", Vector) = (0, 0, 0, 0)
+        [HideInInspector] _ScopeLensCenterWS("Ocular Center", Vector) = (0, 0, 0, 0)
+        [HideInInspector] _ScopeLensHalfSize("Ocular Half Size", Vector) = (0.01, 0.01, 0, 0)
         [HideInInspector] _ReticleRuntimeScale("Reticle Runtime Scale", Float) = 1
         [HideInInspector] _ReticleSdfAvailable("Reticle SDF Available", Float) = 0
     }

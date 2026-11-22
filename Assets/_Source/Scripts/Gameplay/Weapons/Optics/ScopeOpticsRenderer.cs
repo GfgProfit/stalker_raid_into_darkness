@@ -19,6 +19,9 @@ namespace RaidIntoDarkness.Weapons.Optics
         private static readonly int SCOPE_PRO_TEXTURE = Shader.PropertyToID("_RenderTexture");
         private static readonly int SCOPE_PRO_RIGHT = Shader.PropertyToID("_ScopeRightWS");
         private static readonly int SCOPE_PRO_UP = Shader.PropertyToID("_ScopeUpWS");
+        private static readonly int SCOPE_CALIBRATED_APERTURE = Shader.PropertyToID("_ScopeCalibratedAperture");
+        private static readonly int SCOPE_LENS_CENTER = Shader.PropertyToID("_ScopeLensCenterWS");
+        private static readonly int SCOPE_LENS_HALF_SIZE = Shader.PropertyToID("_ScopeLensHalfSize");
         private static readonly int SCOPE_PRO_RETICLE_SCALE = Shader.PropertyToID("_ReticleRuntimeScale");
         private static readonly int SCOPE_PRO_RENDER_SIZE = Shader.PropertyToID("_RenderSize");
         private static readonly int LENS_ENVIRONMENT = Shader.PropertyToID("_LensEnvironment");
@@ -63,6 +66,7 @@ namespace RaidIntoDarkness.Weapons.Optics
         private float _lensShear;
         private float _aimVisibility = 1f;
         private float _scopeProRenderSize = 1f;
+        private bool _scopeUsesCalibratedAperture;
         private ScopeLensEnvironment _lensEnvironment;
         private Scene _environmentScene;
         private string _lastDiagnostic;
@@ -179,7 +183,6 @@ namespace RaidIntoDarkness.Weapons.Optics
             ReleaseResources();
             _viewerCamera = viewer;
             _excludedRoot = excludedRoot;
-            _captureExclusion = excludedRoot != null ? new ScopeCaptureExclusion(excludedRoot) : null;
             if (Application.isPlaying && isActiveAndEnabled)
             {
                 OnEnable();
@@ -226,6 +229,7 @@ namespace RaidIntoDarkness.Weapons.Optics
 
         public bool TryValidate(out string diagnostic)
         {
+            EnsureCaptureExclusion();
             diagnostic = null;
             if (_configuration == null) diagnostic = "ScopeOpticsRenderer requires Configuration.";
             else if (!_configuration.TryValidate(out diagnostic)) return false;
@@ -251,6 +255,7 @@ namespace RaidIntoDarkness.Weapons.Optics
                     Material material = _materials[_materialIndex];
                     _lensMaterial = material;
                     _scopeProRenderSize = ScopeOpticsMath.FiniteClamp(material.GetFloat(SCOPE_PRO_RENDER_SIZE), 0.001f, 2f, 1f);
+                    _scopeUsesCalibratedAperture = material.HasProperty(SCOPE_CALIBRATED_APERTURE) && material.GetFloat(SCOPE_CALIBRATED_APERTURE) > 0.5f;
                 }
             }
 
@@ -280,6 +285,7 @@ namespace RaidIntoDarkness.Weapons.Optics
             }
 
             _captureExclusion?.Restore();
+            _captureExclusion = null;
             RestoreSurface();
             if (_controlledCamera != null)
             {
@@ -404,7 +410,7 @@ namespace RaidIntoDarkness.Weapons.Optics
             Matrix4x4 projection = ScopeOpticsMath.BuildProjection(_configuration, _state.Magnification, _effectiveLensHalfSizeMeters, projectionEye, _controlledCamera.nearClipPlane, _controlledCamera.farClipPlane);
             if (_configuration.ProjectionMode != ScopeProjectionMode.CalibratedFieldOfView)
             {
-                Vector2 projectionScale = ScopeProProjection.GetCaptureProjectionScale(_effectiveLensHalfSizeMeters, -eyeLocal.z, _scopeProRenderSize);
+                Vector2 projectionScale = _scopeUsesCalibratedAperture ? Vector2.one * _scopeProRenderSize : ScopeProProjection.GetCaptureProjectionScale(_effectiveLensHalfSizeMeters, -eyeLocal.z, _scopeProRenderSize);
                 projection.m00 *= projectionScale.x;
                 projection.m11 *= projectionScale.y;
             }
@@ -461,12 +467,21 @@ namespace RaidIntoDarkness.Weapons.Optics
         {
             if (camera == _controlledCamera && camera != null && camera.enabled && _state != null && _state.Active)
             {
+                EnsureCaptureExclusion();
                 _captureExclusion?.Hide();
             }
             else
             {
                 RestoreTracerExposure();
                 _captureExclusion?.Restore();
+            }
+        }
+
+        private void EnsureCaptureExclusion()
+        {
+            if (_captureExclusion == null && _excludedRoot != null)
+            {
+                _captureExclusion = new ScopeCaptureExclusion(_excludedRoot);
             }
         }
 
@@ -520,6 +535,11 @@ namespace RaidIntoDarkness.Weapons.Optics
 
         public void UpdateLensEnvironment()
         {
+            UpdateLensEnvironmentInScene(SceneManager.GetActiveScene());
+        }
+
+        private void UpdateLensEnvironmentInScene(Scene scene)
+        {
             if (!EnsureSurfaceBinding())
             {
                 return;
@@ -527,7 +547,7 @@ namespace RaidIntoDarkness.Weapons.Optics
 
             _propertyBlock ??= new MaterialPropertyBlock();
             _boundRenderer.GetPropertyBlock(_propertyBlock, _boundMaterialIndex);
-            ApplyLensEnvironment();
+            ApplyLensEnvironment(scene);
             _boundRenderer.SetPropertyBlock(_propertyBlock, _boundMaterialIndex);
         }
 
@@ -558,9 +578,8 @@ namespace RaidIntoDarkness.Weapons.Optics
             return true;
         }
 
-        private void ApplyLensEnvironment()
+        private void ApplyLensEnvironment(Scene scene)
         {
-            Scene scene = SceneManager.GetActiveScene();
             if (_environmentScene != scene)
             {
                 _environmentScene = scene;
@@ -608,11 +627,17 @@ namespace RaidIntoDarkness.Weapons.Optics
             _boundRenderer.GetPropertyBlock(_propertyBlock, _boundMaterialIndex);
             _propertyBlock.SetFloat(SCOPE_AVAILABLE, available ? 1.0f : 0.0f);
             _propertyBlock.SetFloat(SCOPE_VISIBILITY, _aimVisibility);
-            ApplyLensEnvironment();
+            ApplyLensEnvironment(SceneManager.GetActiveScene());
             _propertyBlock.SetFloat(RETICLE_SDF_AVAILABLE, _lensMaterial != null && _lensMaterial.HasProperty(RETICLE_SDF) && _lensMaterial.GetTexture(RETICLE_SDF) != null ? 1f : 0f);
             _propertyBlock.SetTexture(SCOPE_PRO_TEXTURE, _target != null ? _target : Texture2D.blackTexture);
             _propertyBlock.SetVector(SCOPE_PRO_RIGHT, _opticalRotation * Vector3.right);
             _propertyBlock.SetVector(SCOPE_PRO_UP, _opticalRotation * Vector3.up);
+            if (_scopeUsesCalibratedAperture && _opticalAxis != null)
+            {
+                _propertyBlock.SetVector(SCOPE_LENS_CENTER, _opticalAxis.position);
+                _propertyBlock.SetVector(SCOPE_LENS_HALF_SIZE, new Vector4(_effectiveLensHalfSizeMeters.x, _effectiveLensHalfSizeMeters.y, 0f, 0f));
+            }
+
             float scale = ScopeOpticsMath.GetReticleScale(_configuration, _state.Magnification, _effectiveLensHalfSizeMeters.y, Mathf.Max(0.001f, -_eyeLocal.z));
             _propertyBlock.SetFloat(SCOPE_PRO_RETICLE_SCALE, scale);
             _boundRenderer.SetPropertyBlock(_propertyBlock, _boundMaterialIndex);

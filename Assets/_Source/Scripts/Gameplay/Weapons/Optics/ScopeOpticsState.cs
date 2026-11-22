@@ -46,8 +46,8 @@ namespace RaidIntoDarkness.Weapons.Optics
                 return;
             }
 
-            _targetMagnification = ScopeOpticsMath.ClampMagnification(value, config.MinMagnification, config.MaxMagnification);
-            if (immediate)
+            _targetMagnification = config.ResolveMagnification(value);
+            if (immediate || config.HasDiscreteMagnification)
             {
                 _magnification = _targetMagnification;
             }

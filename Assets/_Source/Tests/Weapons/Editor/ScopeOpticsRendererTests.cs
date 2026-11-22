@@ -127,9 +127,8 @@ namespace RaidIntoDarkness.Weapons.Tests
         {
             Shader shader = Shader.Find("RaidIntoDarkness/Optics/ScopeProLens");
             Assert.That(shader, Is.Not.Null);
-            Scene originalScene = SceneManager.GetActiveScene();
-            Scene firstScene = SceneManager.CreateScene("ScopeEnvironmentFirst_" + _root.GetEntityId());
-            Scene secondScene = SceneManager.CreateScene("ScopeEnvironmentSecond_" + _root.GetEntityId());
+            Scene firstScene = EditorSceneManager.NewPreviewScene();
+            Scene secondScene = EditorSceneManager.NewPreviewScene();
             var first = new Cubemap(1, TextureFormat.RGBAHalf, false);
             var second = new Cubemap(1, TextureFormat.RGBAHalf, false);
             var material = new Material(shader);
@@ -157,31 +156,28 @@ namespace RaidIntoDarkness.Weapons.Tests
                 ScopeLensEnvironment secondEnvironment = secondObject.AddComponent<ScopeLensEnvironment>();
                 SetField(secondEnvironment, "_cubemap", second);
                 SetField(secondEnvironment, "_useBakedEnvironment", true);
-                SceneManager.SetActiveScene(firstScene);
-                _renderer.UpdateLensEnvironment();
+                Invoke(_renderer, "UpdateLensEnvironmentInScene", firstScene);
                 lens.GetPropertyBlock(block, 0);
                 Assert.That(block.GetTexture("_LensEnvironment"), Is.SameAs(first));
                 Assert.That(block.GetFloat("_LensUseEnvironment"), Is.EqualTo(1f));
                 Assert.That(lens.motionVectorGenerationMode, Is.EqualTo(MotionVectorGenerationMode.ForceNoMotion));
-                SceneManager.SetActiveScene(secondScene);
-                _renderer.UpdateLensEnvironment();
+                Invoke(_renderer, "UpdateLensEnvironmentInScene", secondScene);
                 lens.GetPropertyBlock(block, 0);
                 Assert.That(block.GetTexture("_LensEnvironment"), Is.SameAs(second));
                 Assert.That(material.GetTexture("_LensEnvironment"), Is.SameAs(first));
                 Assert.That(material.GetFloat("_LensReflectionStrength"), Is.EqualTo(0.37f));
                 Assert.That(material.GetFloat("_LensEnvironmentIntensity"), Is.EqualTo(2.5f));
                 SetField(secondEnvironment, "_useBakedEnvironment", false);
-                _renderer.UpdateLensEnvironment();
+                Invoke(_renderer, "UpdateLensEnvironmentInScene", secondScene);
                 lens.GetPropertyBlock(block, 0);
                 Assert.That(block.GetFloat("_LensUseEnvironment"), Is.Zero);
                 SetField(secondEnvironment, "_useBakedEnvironment", true);
                 SetField(secondEnvironment, "_cubemap", null);
-                _renderer.UpdateLensEnvironment();
+                Invoke(_renderer, "UpdateLensEnvironmentInScene", secondScene);
                 lens.GetPropertyBlock(block, 0);
                 Assert.That(block.GetFloat("_LensUseEnvironment"), Is.Zero);
-                SceneManager.SetActiveScene(firstScene);
                 firstEnvironment.enabled = false;
-                _renderer.UpdateLensEnvironment();
+                Invoke(_renderer, "UpdateLensEnvironmentInScene", firstScene);
                 lens.GetPropertyBlock(block, 0);
                 Assert.That(block.GetFloat("_LensUseEnvironment"), Is.Zero);
                 _renderer.ReleaseResources();
@@ -194,9 +190,8 @@ namespace RaidIntoDarkness.Weapons.Tests
             }
             finally
             {
-                SceneManager.SetActiveScene(originalScene);
-                EditorSceneManager.CloseScene(firstScene, true);
-                EditorSceneManager.CloseScene(secondScene, true);
+                EditorSceneManager.ClosePreviewScene(firstScene);
+                EditorSceneManager.ClosePreviewScene(secondScene);
                 Object.DestroyImmediate(material);
                 Object.DestroyImmediate(first);
                 Object.DestroyImmediate(second);

@@ -36,6 +36,25 @@ namespace RaidIntoDarkness.Weapons.Tests
         }
 
         [Test]
+        public void DiscreteMagnificationOnlyUsesConfiguredStepsAndChangesImmediately()
+        {
+            SetField(_configuration, "_maxMagnification", 4f);
+            SetField(_configuration, "_calibrationMagnification", 1f);
+            SetField(_configuration, "_magnificationSteps", new[] { 1f, 2f, 4f });
+            Assert.That(_configuration.TryValidate(out string diagnostic), Is.True, diagnostic);
+            var state = new ScopeOpticsState(_configuration);
+            state.SetMagnification(_configuration.GetNextMagnificationStep(state.Magnification, 1f), _configuration);
+            Assert.That(state.Magnification, Is.EqualTo(2f));
+            state.SetMagnification(_configuration.GetNextMagnificationStep(state.Magnification, 1f), _configuration);
+            Assert.That(state.Magnification, Is.EqualTo(4f));
+            state.SetMagnification(_configuration.GetNextMagnificationStep(state.Magnification, -1f), _configuration);
+            Assert.That(state.Magnification, Is.EqualTo(2f));
+            Assert.That(state.TargetMagnification, Is.EqualTo(state.Magnification));
+            state.SetMagnification(3.9f, _configuration);
+            Assert.That(state.Magnification, Is.EqualTo(4f));
+        }
+
+        [Test]
         public void MagnificationResponseIsIndependentOfFrameSubdivision()
         {
             var coarse = new ScopeOpticsState(_configuration);

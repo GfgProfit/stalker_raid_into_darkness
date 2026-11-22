@@ -90,6 +90,12 @@ namespace RaidIntoDarkness.Weapons.Optics
 
             float sensitivity = ScopeOpticsMath.FiniteClamp(_magnificationPerScrollNotch, 0.001f, float.MaxValue, 0.35f);
             ScopeOpticsConfig config = _renderer.Configuration;
+            if (config.HasDiscreteMagnification)
+            {
+                SetMagnification(config.GetNextMagnificationStep(_magnification, scroll));
+                return;
+            }
+
             float current = ScopeOpticsMath.ClampMagnification(_magnification, config.MinMagnification, config.MaxMagnification);
             float logarithm = Mathf.Clamp(Mathf.Log(current) + scroll * Mathf.Log(1f + sensitivity), Mathf.Log(config.MinMagnification), Mathf.Log(config.MaxMagnification));
             SetMagnification(Mathf.Exp(logarithm));
@@ -116,7 +122,7 @@ namespace RaidIntoDarkness.Weapons.Optics
             }
 
             ScopeOpticsConfig config = _renderer.Configuration;
-            _magnification = ScopeOpticsMath.ClampMagnification(_magnification, config.MinMagnification, config.MaxMagnification);
+            _magnification = config.ResolveMagnification(_magnification);
             _renderer.SetMagnification(_magnification, immediate);
         }
 

@@ -21,6 +21,7 @@ namespace RaidIntoDarkness.Weapons.Optics
         [SerializeField, Min(0.1f)] private float _minMagnification = 1f;
         [SerializeField, Min(0.1f)] private float _maxMagnification = 6f;
         [SerializeField, Min(0.1f)] private float _calibrationMagnification = 6f;
+        [SerializeField] private float[] _magnificationSteps = System.Array.Empty<float>();
         [SerializeField] private ScopeProjectionMode _projectionMode;
         [SerializeField, Range(0.01f, 170f)] private float _calibrationVerticalFov = 5f;
         [SerializeField, Range(0.25f, 4f)] private float _trueOnePowerCalibration = 1f;
@@ -36,6 +37,7 @@ namespace RaidIntoDarkness.Weapons.Optics
         public float MinMagnification => ScopeOpticsMath.FiniteClamp(_minMagnification, 0.1f, 100f, 1f);
         public float MaxMagnification => ScopeOpticsMath.FiniteClamp(_maxMagnification, MinMagnification, 100f, MinMagnification);
         public float CalibrationMagnification => ScopeOpticsMath.ClampMagnification(_calibrationMagnification, MinMagnification, MaxMagnification);
+        public bool HasDiscreteMagnification => _magnificationSteps != null && _magnificationSteps.Length > 1;
         public ScopeProjectionMode ProjectionMode => _projectionMode;
         public float CalibrationVerticalFov => ScopeOpticsMath.FiniteClamp(_calibrationVerticalFov, 0.01f, 170f, 5f);
         public float TrueOnePowerCalibration => ScopeOpticsMath.FiniteClamp(_trueOnePowerCalibration, 0.25f, 4f, 1f);
@@ -48,6 +50,38 @@ namespace RaidIntoDarkness.Weapons.Optics
             return EvaluatePositiveCurve(_fieldOfViewMultiplier, magnification, 1f, 0.01f, 100f);
         }
 
+        public float ResolveMagnification(float magnification)
+        {
+            float value = ScopeOpticsMath.ClampMagnification(magnification, MinMagnification, MaxMagnification);
+            if (!HasDiscreteMagnification)
+            {
+                return value;
+            }
+
+            float closest = _magnificationSteps[0];
+            foreach (float step in _magnificationSteps)
+            {
+                if (Mathf.Abs(step - value) < Mathf.Abs(closest - value))
+                {
+                    closest = step;
+                }
+            }
+
+            return closest;
+        }
+
+        public float GetNextMagnificationStep(float current, float direction)
+        {
+            float value = ResolveMagnification(current);
+            if (!HasDiscreteMagnification || direction == 0f)
+            {
+                return value;
+            }
+
+            int index = System.Array.IndexOf(_magnificationSteps, value);
+            return _magnificationSteps[Mathf.Clamp(index + (direction > 0f ? 1 : -1), 0, _magnificationSteps.Length - 1)];
+        }
+
         public bool TryValidate(out string diagnostic)
         {
             diagnostic = null;
@@ -58,6 +92,25 @@ namespace RaidIntoDarkness.Weapons.Optics
             else if (_reticlePlane != ScopeReticlePlane.FirstFocalPlane && _reticlePlane != ScopeReticlePlane.SecondFocalPlane) diagnostic = "Scope ReticlePlane is invalid.";
             else if (!float.IsFinite(_calibrationVerticalFov) || _calibrationVerticalFov < 0.01f || _calibrationVerticalFov > 170f) diagnostic = "Scope CalibrationVerticalFov must be between 0.01 and 170 degrees.";
             else if (_overrideAimHudFieldOfView && (!float.IsFinite(_aimHudFieldOfView) || _aimHudFieldOfView < 0.1f || _aimHudFieldOfView > 1f)) diagnostic = "Scope AimHudFieldOfView must be finite and between 0.1 and 1.";
+            else if (_magnificationSteps != null && _magnificationSteps.Length > 0)
+            {
+                if (!HasDiscreteMagnification || !Mathf.Approximately(_magnificationSteps[0], MinMagnification) || !Mathf.Approximately(_magnificationSteps[^1], MaxMagnification))
+                {
+                    diagnostic = "Discrete magnification requires steps from MinMagnification through MaxMagnification.";
+                }
+                else
+                {
+                    for (int i = 1; i < _magnificationSteps.Length; i++)
+                    {
+                        if (!float.IsFinite(_magnificationSteps[i]) || _magnificationSteps[i] <= _magnificationSteps[i - 1])
+                        {
+                            diagnostic = "Discrete magnification steps must be finite and strictly increasing.";
+                            break;
+                        }
+                    }
+                }
+            }
+
             return diagnostic == null;
         }
 

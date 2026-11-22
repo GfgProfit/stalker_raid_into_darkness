@@ -25,6 +25,7 @@ namespace RaidIntoDarkness.Player
         private InputAction _reload;
         private InputAction _nextAmmo;
         private InputAction _fireMode;
+        private InputAction _nextReticle;
         private InputAction _primaryWeapon;
         private InputAction _secondaryWeapon;
         private InputAction _bolt;
@@ -42,6 +43,7 @@ namespace RaidIntoDarkness.Player
         public bool ReloadPressed => WasPressed(_reload);
         public bool NextAmmoPressed => WasPressed(_nextAmmo);
         public bool FireModePressed => WasPressed(_fireMode);
+        public bool NextReticlePressed => WasPressed(_nextReticle);
         public bool PrimaryWeaponPressed => WasPressed(_primaryWeapon);
         public bool SecondaryWeaponPressed => WasPressed(_secondaryWeapon);
         public bool BoltPressed => WasPressed(_bolt);
@@ -72,6 +74,7 @@ namespace RaidIntoDarkness.Player
             _reload = player.FindAction("Reload", true);
             _nextAmmo = player.FindAction("NextAmmo", true);
             _fireMode = player.FindAction("FireMode", true);
+            _nextReticle = player.FindAction("NextReticle", false);
             _primaryWeapon = player.FindAction("PrimaryWeapon", true);
             _secondaryWeapon = player.FindAction("SecondaryWeapon", true);
             _bolt = player.FindAction("Bolt", false);

@@ -6,9 +6,17 @@ Shader "Scope Pro/Red Dot Effect"
         [HDR] _RedDotColor("Emission Color", Color) = (1, 0.05, 0.02, 1)
         [NoScaleOffset] _RedDotTex("Red Dot Texture (A)", 2D) = "white" {}
         _RedDotIntensity("Emission Intensity", Range(0, 64)) = 8
+        [ToggleUI] _OpticalSdf("Optical SDF Reticle", Float) = 0
+        [ToggleUI] _ReticleTextureColor("Use Reticle Texture Color", Float) = 0
+        [ToggleUI] _CalibratedDotProjection("Calibrated Dot Projection", Float) = 0
+        [HideInInspector] _DotCenterWS("Dot Center", Vector) = (0, 0, 0, 0)
+        [HideInInspector] _DotRightWS("Dot Right", Vector) = (0, 0, 0, 0)
+        [HideInInspector] _DotUpWS("Dot Up", Vector) = (0, 0, 0, 0)
+        _DotEyeReference("Calibrated Eye Offset", Vector) = (0, 0, 0, 0)
+        [Enum(UnityEngine.Rendering.CullMode)] _ReticleCull("Cull Mode", Float) = 2
         _RedDotSize("Size", Range(0.0001, 10)) = 1
         [Toggle(FIXED_SIZE)] _FixedSize("Use Fixed Size", Float) = 0
-        _RedDotDist("Collimation", Range(0, 50)) = 2
+        _RedDotDist("Collimation Distance", Range(0, 50)) = 2
         _OffsetX("Horizontal Offset", Float) = 0
         _OffsetY("Vertical Offset", Float) = 0
         _ViewFadeStart("View Fade Start", Range(0, 1)) = 0.03
@@ -53,7 +61,7 @@ Shader "Scope Pro/Red Dot Effect"
             Tags { "LightMode" = "SRPDefaultUnlit" }
 
             Blend One OneMinusSrcAlpha
-            Cull Back
+            Cull [_ReticleCull]
             ZWrite Off
             ZTest LEqual
 
@@ -76,8 +84,15 @@ Shader "Scope Pro/Red Dot Effect"
                 float4 _Color;
                 float4 _RedDotColor;
                 float4 _LensFresnelColor;
+                float4 _DotCenterWS;
+                float4 _DotRightWS;
+                float4 _DotUpWS;
+                float4 _DotEyeReference;
                 float _FixedSize;
                 float _RedDotIntensity;
+                float _OpticalSdf;
+                float _ReticleTextureColor;
+                float _CalibratedDotProjection;
                 float _RedDotSize;
                 float _RedDotDist;
                 float _OffsetX;
@@ -150,6 +165,19 @@ Shader "Scope Pro/Red Dot Effect"
                 output.positionCS = TransformWorldToHClip(positionWS);
                 output.redDotUV = redDotPositionOS / redDotSize + 0.5;
                 output.viewFacing = abs(viewDirectionOS.z) / max(length(viewDirectionOS), 0.0001);
+                if (_CalibratedDotProjection > 0.5 && dot(_DotRightWS.xyz, _DotRightWS.xyz) > 0.0)
+                {
+                    float3 relative = absolutePositionWS - _DotCenterWS.xyz;
+                    float3 eyeToCenter = _DotCenterWS.xyz - _WorldSpaceCameraPos;
+                    float3 axis = normalize(cross(_DotRightWS.xyz, _DotUpWS.xyz));
+                    float eyeDepth = abs(dot(eyeToCenter, axis));
+                    float projection = max(_RedDotDist, 0.0) / max(eyeDepth + _RedDotDist, 0.0001);
+                    float2 eyeOffset = float2(dot(eyeToCenter, _DotRightWS.xyz), dot(eyeToCenter, _DotUpWS.xyz));
+                    float2 lensOffset = float2(dot(relative, _DotRightWS.xyz), dot(relative, _DotUpWS.xyz));
+                    float2 markOffset = lensOffset + (eyeOffset - _DotEyeReference.xy) * projection - float2(_OffsetX, _OffsetY);
+                    output.redDotUV = markOffset / redDotSize + 0.5;
+                    output.viewFacing = abs(dot(viewDirectionWS, axis)) / max(length(viewDirectionWS), 0.0001);
+                }
                 output.normalWS = TransformObjectToWorldNormal(input.normalOS);
                 output.viewDirWS = viewDirectionWS;
                 output.lensUV = input.uv;
@@ -207,8 +235,18 @@ Shader "Scope Pro/Red Dot Effect"
             {
                 UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
 
-                float redDotMask = SampleRedDotAlpha(input.redDotUV);
-                float speckle = GetReticleSpeckle(input.redDotUV, input.viewDirWS);
+                bool calibrated = _CalibratedDotProjection > 0.5;
+                if (_OpticalSdf > 0.5 && !calibrated)
+                {
+                    float2 field = SAMPLE_TEXTURE2D(_RedDotTex, sampler_RedDotTex, saturate(input.redDotUV)).rg;
+                    float2 halfWidth = max(0.5 * fwidth(field), 0.00001);
+                    float2 coverage = smoothstep(0.5 - halfWidth, 0.5 + halfWidth, field) * GetUvInside(input.redDotUV);
+                    return float4(_RedDotColor.rgb * _RedDotIntensity * coverage.g, max(coverage.r, coverage.g));
+                }
+
+                float4 mark = SAMPLE_TEXTURE2D(_RedDotTex, sampler_RedDotTex, saturate(input.redDotUV));
+                float redDotMask = mark.a * GetUvInside(input.redDotUV);
+                float speckle = _ReticleSpeckleEnabled > 0.5 ? GetReticleSpeckle(input.redDotUV, input.viewDirWS) : 1.0;
 
                 float fadeRange = max(_ViewFadeEnd - _ViewFadeStart, 0.0001);
                 float viewFade = saturate((input.viewFacing - _ViewFadeStart) / fadeRange);
@@ -216,7 +254,7 @@ Shader "Scope Pro/Red Dot Effect"
                 float2 lensCentered = input.lensUV * 2.0 - 1.0;
                 float lensRadius = length(lensCentered);
                 float apertureFade = 1.0 - smoothstep(0.82, 0.98, lensRadius);
-                viewFade *= apertureFade;
+                viewFade *= calibrated ? 1.0 : apertureFade;
 
                 float2 eyeBoxOffset = input.redDotUV - 0.5;
                 float eyeBoxDistance = length(eyeBoxOffset);
@@ -224,22 +262,31 @@ Shader "Scope Pro/Red Dot Effect"
                 viewFade *= lerp(1.0, eyeBoxFade, _EyeBoxIntensity);
 
                 float haloMask = 0.0;
-                haloMask += SampleRedDotAlpha(input.redDotUV + float2(_ReticleHaloSize, 0.0));
-                haloMask += SampleRedDotAlpha(input.redDotUV - float2(_ReticleHaloSize, 0.0));
-                haloMask += SampleRedDotAlpha(input.redDotUV + float2(0.0, _ReticleHaloSize));
-                haloMask += SampleRedDotAlpha(input.redDotUV - float2(0.0, _ReticleHaloSize));
-                haloMask *= 0.25;
+                if (_ReticleHaloIntensity > 0.0)
+                {
+                    haloMask += SampleRedDotAlpha(input.redDotUV + float2(_ReticleHaloSize, 0.0));
+                    haloMask += SampleRedDotAlpha(input.redDotUV - float2(_ReticleHaloSize, 0.0));
+                    haloMask += SampleRedDotAlpha(input.redDotUV + float2(0.0, _ReticleHaloSize));
+                    haloMask += SampleRedDotAlpha(input.redDotUV - float2(0.0, _ReticleHaloSize));
+                    haloMask *= 0.25;
+                }
 
                 float redDotBaseAlpha = saturate(redDotMask * _RedDotColor.a * viewFade);
                 float redDotAlpha = redDotBaseAlpha;
                 float redDotEmission = redDotBaseAlpha * speckle;
                 float haloEmission = saturate(haloMask - redDotMask) * _ReticleHaloIntensity * _RedDotColor.a;
-                float flickerNoise = ReticleNoise(float2(_Time.y * 12.0, _Time.y * 3.7));
+                float flickerNoise = _ReticleFlickerIntensity > 0.0 ? ReticleNoise(float2(_Time.y * 12.0, _Time.y * 3.7)) : 0.5;
                 float flicker = 1.0 + (flickerNoise * 2.0 - 1.0) * saturate(_ReticleFlickerIntensity);
                 redDotEmission *= flicker;
                 haloEmission *= flicker;
 
-                float3 reticleEmission = _RedDotColor.rgb * redDotEmission;
+                float3 reticleColor = _RedDotColor.rgb;
+                if (_ReticleTextureColor > 0.5)
+                {
+                    reticleColor *= mark.rgb;
+                }
+
+                float3 reticleEmission = reticleColor * redDotEmission;
                 if (_ReticleFringeIntensity > 0.0)
                 {
                     float2 fringeOffset = float2(_ReticleFringeOffset, 0.0);
@@ -247,7 +294,7 @@ Shader "Scope Pro/Red Dot Effect"
                     float fringeMaskG = redDotMask;
                     float fringeMaskB = SampleRedDotAlpha(input.redDotUV - fringeOffset);
                     float3 fringeEmission = saturate(float3(fringeMaskR, fringeMaskG, fringeMaskB) * _RedDotColor.a * viewFade) * speckle * flicker;
-                    reticleEmission = lerp(reticleEmission, _RedDotColor.rgb * fringeEmission, saturate(_ReticleFringeIntensity));
+                    reticleEmission = lerp(reticleEmission, reticleColor * fringeEmission, saturate(_ReticleFringeIntensity));
                 }
 
                 float starburstEmission = 0.0;
@@ -270,10 +317,10 @@ Shader "Scope Pro/Red Dot Effect"
 
                 float2 viewGhostShift = normalize(input.viewDirWS).xy * _ReticleGhostOffset;
                 float2 ghostUV = (input.redDotUV - 0.5) * _ReticleGhostScale + 0.5 + viewGhostShift;
-                float ghostMask = SampleRedDotAlpha(ghostUV);
+                float ghostMask = _ReticleGhostIntensity > 0.0 ? SampleRedDotAlpha(ghostUV) : 0.0;
                 float ghostEmission = ghostMask * _ReticleGhostIntensity * _RedDotColor.a * viewFade;
 
-                float lensDirt = SAMPLE_TEXTURE2D(_LensDirtTex, sampler_LensDirtTex, input.lensUV).r;
+                float lensDirt = _LensDirtIntensity > 0.0 ? SAMPLE_TEXTURE2D(_LensDirtTex, sampler_LensDirtTex, input.lensUV).r : 0.0;
                 float dirtOcclusion = lerp(1.0, 1.0 - lensDirt, _LensDirtIntensity * 0.5);
                 reticleEmission *= dirtOcclusion;
                 haloEmission *= dirtOcclusion;
@@ -286,6 +333,10 @@ Shader "Scope Pro/Red Dot Effect"
                 float fresnel = pow(1.0 - saturate(dot(normalize(input.normalWS), normalize(input.viewDirWS))), _LensFresnelPower);
                 float coating = pow(1.0 - saturate(input.viewFacing), 2.5);
                 float lensReflection = max(fresnel, coating);
+                if (calibrated)
+                {
+                    lensReflection = (0.035 + 0.965 * pow(1.0 - saturate(input.viewFacing), _LensFresnelPower)) * _LensFresnelColor.a;
+                }
                 outputColor += _LensFresnelColor.rgb * lensReflection * _LensFresnelIntensity;
                 outputAlpha = saturate(outputAlpha + lensReflection * _LensFresnelIntensity * 0.2);
 

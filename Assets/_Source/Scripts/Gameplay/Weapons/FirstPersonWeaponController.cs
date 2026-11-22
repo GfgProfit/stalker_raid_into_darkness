@@ -40,6 +40,7 @@ namespace RaidIntoDarkness.Weapons
         private readonly Slot[] _slots = { new Slot(), new Slot() };
         private readonly Dictionary<object, WeaponState> _weaponStates = new Dictionary<object, WeaponState>();
         private readonly List<MonoBehaviour> _opticsBindings = new List<MonoBehaviour>();
+        private readonly List<WeaponReticleCycle> _reticleBindings = new List<WeaponReticleCycle>();
         private IFirstPersonWeaponAmmoSource _ammoSource;
         private FirstPersonWeaponGraph _graph;
         private FirstPersonWeaponEffects _effects;
@@ -540,6 +541,17 @@ namespace RaidIntoDarkness.Weapons
             {
                 _burstLeft = 0;
                 return;
+            }
+
+            if (_input.NextReticlePressed)
+            {
+                foreach (WeaponReticleCycle reticle in _reticleBindings)
+                {
+                    if (reticle != null && reticle.isActiveAndEnabled)
+                    {
+                        reticle.Next();
+                    }
+                }
             }
 
             if (_input.NextAmmoPressed && _ammoSource != null && _ammoSource.TrySwitchAmmo(_slots[ActiveSlot].Key))
@@ -1231,6 +1243,7 @@ namespace RaidIntoDarkness.Weapons
 
         private void BindOptics()
         {
+            _model.GetComponentsInChildren(true, _reticleBindings);
             Camera viewer = _player != null && _player.CameraController != null ? _player.CameraController.Camera : null;
             foreach (MonoBehaviour behaviour in _model.GetComponentsInChildren<MonoBehaviour>(true))
             {
@@ -1285,6 +1298,7 @@ namespace RaidIntoDarkness.Weapons
             }
 
             _opticsBindings.Clear();
+            _reticleBindings.Clear();
             if (_graph != null)
             {
                 _graph.Destroy();

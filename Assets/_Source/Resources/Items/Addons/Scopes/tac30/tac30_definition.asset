@@ -73,7 +73,7 @@ MonoBehaviour:
         _camDispersionIncrementFactor: 1
         _scopeZoomFactor: 20
         _overrideAimOffsetPosition: 1
-        _aimOffsetPosition: {x: 0, y: 0, z: 0}
+        _aimOffsetPosition: {x: 0.012456026, y: -0.008687505, z: 0}
         _attachSound: {fileID: 0}
         _detachSound: {fileID: 0}
     - rid: 3479885496768528609

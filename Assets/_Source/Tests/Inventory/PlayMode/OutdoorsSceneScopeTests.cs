@@ -50,7 +50,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             Assert.That(inventory.WeaponAttachments.Apply(first, weapon).Success, Is.True);
             Assert.That(controller.Model, Is.SameAs(original));
             AssertScope(original, first.Definition);
-            Assert.That(controller.AimOffsetPosition, Is.EqualTo(Vector3.zero));
+            Assert.That(controller.AimOffsetPosition, Is.EqualTo(first.Definition.GetComponent<WeaponAddonComponent>().AimOffsetPosition));
             Assert.That(inventory.WeaponAttachments.Install(silencer, weapon).Success, Is.True);
             Assert.That(controller.IsSilenced, Is.True);
             AssertScope(original, first.Definition);
@@ -80,6 +80,57 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             Assert.That(dropped.GetComponentsInChildren<Rigidbody>(true).Length, Is.EqualTo(1));
             Assert.That(Object.FindAnyObjectByType<WorldItemInteractor>().TryPickUp(dropped), Is.True);
             Assert.That(inventory.WeaponAttachments.GetScope(model.GetItem(weapon.InstanceId)), Is.SameAs(first.Definition));
+        }
+
+        [UnityTest]
+        public IEnumerator EqualsCyclesOnlyTheMountedScopeReticle()
+        {
+            SceneManager.LoadScene(SceneName, LoadSceneMode.Single);
+            yield return new WaitForSeconds(0.6f);
+            InventoryWindowController inventory = Object.FindAnyObjectByType<InventoryWindowController>();
+            InventoryModel model = inventory.Inventory.Model;
+            FirstPersonWeaponController controller = inventory.Player.GetComponentInChildren<FirstPersonWeaponController>();
+            ItemInstance weapon = Add(inventory, "wpn_aug_a3");
+            ItemInstance scope = Add(inventory, "0kp2");
+            Assert.That(model.TryEquip(weapon.InstanceId, inventory.Window.EquipmentContainerId).Success, Is.True);
+            Assert.That(controller.Select(FirstPersonWeaponController.PRIMARY_SLOT), Is.True);
+            float timeout = Time.time + 6f;
+
+            while (controller.State != FirstPersonWeaponState.Ready && Time.time < timeout)
+            {
+                yield return null;
+            }
+
+            Assert.That(controller.State, Is.EqualTo(FirstPersonWeaponState.Ready));
+            Assert.That(inventory.WeaponAttachments.Apply(scope, weapon).Success, Is.True);
+            WeaponReticleCycle reticle = controller.Model.GetComponentInChildren<WeaponReticleCycle>();
+            Assert.That(reticle, Is.Not.Null);
+            Assert.That(reticle.VariantCount, Is.EqualTo(6));
+            Assert.That(reticle.VariantIndex, Is.Zero);
+            Renderer renderer = reticle.GetComponent<Renderer>();
+            int textureProperty = Shader.PropertyToID("_RedDotTex");
+            var properties = new MaterialPropertyBlock();
+            Keyboard keyboard = Keyboard.current;
+
+            for (int step = 1; step <= reticle.VariantCount; step++)
+            {
+                Press(keyboard.equalsKey, queueEventOnly: true);
+                yield return null;
+                Assert.That(reticle.VariantIndex, Is.EqualTo(step % reticle.VariantCount));
+                Release(keyboard.equalsKey, queueEventOnly: true);
+                yield return null;
+            }
+
+            renderer.GetPropertyBlock(properties, 0);
+            Assert.That(properties.GetTexture(textureProperty), Is.SameAs(renderer.sharedMaterial.GetTexture(textureProperty)));
+
+            foreach (WeaponReticleCycle inactive in controller.Model.GetComponentsInChildren<WeaponReticleCycle>(true))
+            {
+                if (inactive != reticle)
+                {
+                    Assert.That(inactive.VariantIndex, Is.Zero);
+                }
+            }
         }
 
         private static ItemInstance Add(InventoryWindowController inventory, string section)

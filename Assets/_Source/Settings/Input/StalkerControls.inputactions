@@ -123,6 +123,15 @@
                     "initialStateCheck": false
                 },
                 {
+                    "name": "NextReticle",
+                    "type": "Button",
+                    "id": "c9d79485-88c3-4dc3-8db6-dddc28b68052",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
                     "name": "SecondaryWeapon",
                     "type": "Button",
                     "id": "1d4a6b0e-7c3a-4c55-8a14-5e1a8b3c2d14",
@@ -344,6 +353,17 @@
                     "processors": "",
                     "groups": "Keyboard&Mouse",
                     "action": "FireMode",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "816ebb64-87ea-467b-a02e-ffd871bafb05",
+                    "path": "<Keyboard>/equals",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "NextReticle",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },

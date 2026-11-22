@@ -265,7 +265,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
             paths.Clear();
             foreach (ItemProtectionData item in data.itemProtections)
             {
-                string prefix = InventoryDemoContentBuilder.IsBackpackResourcePath(item.assetPath) ? InventoryDemoContentBuilder.BACKPACKS_FOLDER + "/" : DEFINITIONS_FOLDER;
+                string prefix = InventoryDemoContentBuilder.IsClothesResourcePath(item.assetPath) ? InventoryDemoContentBuilder.CLOTHES_FOLDER + "/" : DEFINITIONS_FOLDER;
                 RequireAssetPath(item.assetPath, prefix, ".asset");
                 if (!paths.Add(item.assetPath) || item.entries == null || item.entries.Length != 8)
                 {

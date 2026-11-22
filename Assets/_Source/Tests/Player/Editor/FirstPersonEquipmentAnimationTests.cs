@@ -203,7 +203,7 @@ namespace RaidIntoDarkness.Player.Tests
             Assert.That(library.Find(library.GetBackpackSection(FirstPersonEquipmentAnimationLibrary.BACKPACK_EQUIP_PREFIX, FirstPersonEquipmentAnimationLibrary.DEFAULT_COMMUNITY), FirstPersonEquipmentAnimationLibrary.ANM_USE).ItemModel, Is.Not.Null);
             Assert.That(library.Find(library.GetBackpackSection(FirstPersonEquipmentAnimationLibrary.BACKPACK_UNEQUIP_PREFIX, FirstPersonEquipmentAnimationLibrary.DEFAULT_COMMUNITY), FirstPersonEquipmentAnimationLibrary.ANM_USE).ItemModel, Is.Not.Null);
             Assert.That(library.HeadgearBlacklist, Is.SupersetOf(new[] { "helm_bandana", "helm_cloth_mask", "helm_rp_bala" }));
-            foreach (string guid in AssetDatabase.FindAssets("t:ScriptableObject", new[] { "Assets/_Source/Items/Definitions/Head" }))
+            foreach (string guid in AssetDatabase.FindAssets("t:ScriptableObject", new[] { "Assets/_Source/Resources/Items/Clothes/Helmets" }))
             {
                 string text = System.IO.File.ReadAllText(AssetDatabase.GUIDToAssetPath(guid));
                 int index = text.IndexOf("_section: ", System.StringComparison.Ordinal);

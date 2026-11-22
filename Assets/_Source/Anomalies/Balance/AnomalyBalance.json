@@ -9655,7 +9655,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Head/helm_ach7.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Helmets/helm_ach7/helm_ach7_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -9708,7 +9708,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Head/helm_ach7ex.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Helmets/helm_ach7ex/helm_ach7ex_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -9761,7 +9761,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Head/helm_bandana.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Helmets/helm_bandana/helm_bandana_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -9814,7 +9814,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Head/helm_battle.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Helmets/helm_battle/helm_battle_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -9867,7 +9867,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Head/helm_cloth_mask.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Helmets/helm_cloth_mask/helm_cloth_mask_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -9920,7 +9920,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Head/helm_exo.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Helmets/helm_exo/helm_exo_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -9973,7 +9973,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Head/helm_hardhat_snag.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Helmets/helm_hardhat_snag/helm_hardhat_snag_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -10026,7 +10026,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Head/helm_hardhat.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Helmets/helm_hardhat/helm_hardhat_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -10079,7 +10079,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Head/helm_m40.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Helmets/helm_m40/helm_m40_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -10132,7 +10132,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Head/helm_m50.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Helmets/helm_m50/helm_m50_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -10185,7 +10185,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Head/helm_metro.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Helmets/helm_metro/helm_metro_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -10238,7 +10238,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Head/helm_ppm88.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Helmets/helm_ppm88/helm_ppm88_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -10291,7 +10291,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Head/helm_protective.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Helmets/helm_protective/helm_protective_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -10344,7 +10344,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Head/helm_ranger.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Helmets/helm_ranger/helm_ranger_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -10397,7 +10397,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Head/helm_resp.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Helmets/helm_resp/helm_resp_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -10450,7 +10450,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Head/helm_respirator_gp5.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Helmets/helm_respirator_gp5/helm_respirator_gp5_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -10503,7 +10503,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Head/helm_respirator_old.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Helmets/helm_respirator_old/helm_respirator_old_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -10556,7 +10556,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Head/helm_respirator.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Helmets/helm_respirator/helm_respirator_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -10609,7 +10609,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Head/helm_rp_bala.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Helmets/helm_rp_bala/helm_rp_bala_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -10662,7 +10662,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Head/helm_spartan.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Helmets/helm_spartan/helm_spartan_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -10715,7 +10715,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Head/helm_tactic.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Helmets/helm_tactic/helm_tactic_definition.asset",
       "entries": [
         {
           "type": "Burn",

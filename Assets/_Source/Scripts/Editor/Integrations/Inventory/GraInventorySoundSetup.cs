@@ -220,7 +220,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
                 {
                     folder = GraWeaponAddonSetup.ADDONS_FOLDER + SHARED_AUDIO;
                 }
-                else if (InventoryDemoContentBuilder.IsBackpackResourcePath(definitionPath))
+                else if (InventoryDemoContentBuilder.IsClothesResourcePath(definitionPath))
                 {
                     folder = InventoryDemoContentBuilder.CLOTHES_FOLDER + SHARED_AUDIO;
                 }

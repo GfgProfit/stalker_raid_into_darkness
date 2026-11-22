@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Inventory;
 using Inventory.UI;
 using Inventory.IconGeneration;
@@ -16,6 +17,10 @@ namespace RaidIntoDarkness.Integrations.Inventory
         private readonly InventoryModel _model;
         private readonly FirstPersonWeaponController _controller;
         private readonly InventoryWeaponAmmoSource _ammo;
+        private readonly List<string> _configuredVariant = new();
+
+        private GameObject _configuredModel;
+        private ItemDefinition _configuredDefinition;
 
         public FirstPersonWeaponBinder(InventoryWindow window, FirstPersonWeaponController controller)
         {
@@ -73,7 +78,8 @@ namespace RaidIntoDarkness.Integrations.Inventory
 
         private void ApplyActiveVisual()
         {
-            if (_controller.Model == null || _model.GetContainer(_window.EquipmentContainerId) is not SlottedContainer equipment)
+            GameObject model = _controller.Model;
+            if (model == null || _model.GetContainer(_window.EquipmentContainerId) is not SlottedContainer equipment)
             {
                 return;
             }
@@ -81,10 +87,34 @@ namespace RaidIntoDarkness.Integrations.Inventory
             string slotId = _controller.ActiveSlot == FirstPersonWeaponController.PRIMARY_SLOT ? PRIMARY_SLOT : SECONDARY_SLOT;
             ItemInstance item = equipment.GetSlotOccupant(slotId);
 
-            if (item != null)
+            if (item == null || model == _configuredModel && item.Definition == _configuredDefinition && HasConfiguredVariant(item.VisualVariant))
             {
-                ItemIconVisualConfigurators.Apply(_controller.Model, item.Definition, item.VisualVariant);
+                return;
             }
+
+            ItemIconVisualConfigurators.Apply(model, item.Definition, item.VisualVariant);
+            _configuredModel = model;
+            _configuredDefinition = item.Definition;
+            _configuredVariant.Clear();
+            _configuredVariant.AddRange(item.VisualVariant);
+        }
+
+        private bool HasConfiguredVariant(IReadOnlyList<string> variant)
+        {
+            if (variant.Count != _configuredVariant.Count)
+            {
+                return false;
+            }
+
+            for (int i = 0; i < variant.Count; i++)
+            {
+                if (variant[i] != _configuredVariant[i])
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         private void OnItemChanged(InventoryChange change)

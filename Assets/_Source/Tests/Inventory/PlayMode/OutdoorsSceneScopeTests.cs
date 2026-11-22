@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Linq;
 using Inventory;
 using Inventory.IconGeneration;
 using Inventory.UI;
@@ -131,6 +132,95 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
                     Assert.That(inactive.VariantIndex, Is.Zero);
                 }
             }
+        }
+
+        [UnityTest]
+        public IEnumerator FiringKeepsTheSelectedOpticalReticleAndRenderTarget()
+        {
+            SceneManager.LoadScene(SceneName, LoadSceneMode.Single);
+            yield return new WaitForSeconds(0.6f);
+            InventoryWindowController inventory = Object.FindAnyObjectByType<InventoryWindowController>();
+            FirstPersonWeaponController controller = inventory.Player.GetComponentInChildren<FirstPersonWeaponController>();
+            ItemInstance weapon = Add(inventory, "wpn_aug_a3");
+            ItemInstance scope = Add(inventory, "specter");
+            string ammoSection = weapon.Definition.GetComponent<WeaponStatsComponent>().AmmoClasses[0];
+            ItemDefinition ammo = inventory.Inventory.Database.Definitions.Single(item => item.GetComponent<AmmoStatsComponent>()?.Section == ammoSection);
+            weapon.SetState(InventoryWeaponAmmoSource.AMMO_SECTION_STATE, ammoSection);
+            weapon.SetState(InventoryWeaponAmmoSource.MAGAZINE_STATE, "2");
+            InventoryModel model = inventory.Inventory.Model;
+            Assert.That(model.TryEquip(weapon.InstanceId, inventory.Window.EquipmentContainerId).Success, Is.True);
+            int slot = weapon.Location.SlotId == FirstPersonWeaponBinder.PRIMARY_SLOT ? FirstPersonWeaponController.PRIMARY_SLOT : FirstPersonWeaponController.SECONDARY_SLOT;
+            Assert.That(controller.Select(slot), Is.True);
+            float timeout = Time.time + 6f;
+
+            while (controller.State != FirstPersonWeaponState.Ready && Time.time < timeout)
+            {
+                yield return null;
+            }
+
+            Assert.That(controller.State, Is.EqualTo(FirstPersonWeaponState.Ready));
+            Assert.That(inventory.WeaponAttachments.Install(scope, weapon).Success, Is.True);
+            inventory.Player.CameraController.SetCursorLocked(true);
+            DevTest aimOverride = controller.GetComponent<DevTest>();
+            if (aimOverride != null)
+            {
+                aimOverride.enabled = false;
+            }
+
+            controller.DevelopmentAimOverride = true;
+            WeaponReticleCycle reticle = controller.Model.GetComponentInChildren<WeaponReticleCycle>();
+            Assert.That(reticle, Is.Not.Null);
+            Assert.That(reticle.VariantCount, Is.GreaterThan(1));
+            Renderer lens = reticle.GetComponent<Renderer>();
+            int textureProperty = Shader.PropertyToID("_ReticleSdf");
+            int targetProperty = Shader.PropertyToID("_RenderTexture");
+            int availableProperty = Shader.PropertyToID("_ScopeAvailable");
+            var properties = new MaterialPropertyBlock();
+            timeout = Time.time + 6f;
+            lens.GetPropertyBlock(properties, 0);
+
+            while (properties.GetFloat(availableProperty) <= 0f && Time.time < timeout)
+            {
+                yield return null;
+                lens.GetPropertyBlock(properties, 0);
+            }
+
+            Assert.That(properties.GetFloat(availableProperty), Is.GreaterThan(0f));
+            Texture target = properties.GetTexture(targetProperty);
+            Assert.That(target, Is.TypeOf<RenderTexture>());
+            Press(Keyboard.current.equalsKey, queueEventOnly: true);
+            yield return null;
+            Release(Keyboard.current.equalsKey, queueEventOnly: true);
+            Assert.That(reticle.VariantIndex, Is.EqualTo(1));
+            lens.GetPropertyBlock(properties, 0);
+            Texture selected = properties.GetTexture(textureProperty);
+            Assert.That(selected, Is.Not.Null);
+            string ownerId = model.GetContainer(weapon.ContainerId).OwnerId;
+            float weaponWeight = weapon.UnitWeight;
+            float carriedWeight = model.GetOwnerWeight(ownerId);
+            bool inventoryNotified = false;
+            void ObserveShot(InventoryChange change)
+            {
+                if (change.Kind == InventoryChangeKind.ItemStateChanged && change.Item == weapon)
+                {
+                    inventoryNotified = true;
+                }
+            }
+
+            model.Changed += ObserveShot;
+            Press(Mouse.current.leftButton, queueEventOnly: true);
+            yield return null;
+            Release(Mouse.current.leftButton, queueEventOnly: true);
+            yield return null;
+            model.Changed -= ObserveShot;
+            Assert.That(controller.Magazine, Is.EqualTo(1));
+            Assert.That(inventoryNotified, Is.True);
+            Assert.That(weapon.UnitWeight, Is.EqualTo(weaponWeight - ammo.Weight).Within(0.0001f));
+            Assert.That(model.GetOwnerWeight(ownerId), Is.EqualTo(carriedWeight - ammo.Weight).Within(0.0001f));
+            Assert.That(reticle.VariantIndex, Is.EqualTo(1));
+            lens.GetPropertyBlock(properties, 0);
+            Assert.That(properties.GetTexture(targetProperty), Is.SameAs(target));
+            Assert.That(properties.GetTexture(textureProperty), Is.SameAs(selected));
         }
 
         private static ItemInstance Add(InventoryWindowController inventory, string section)

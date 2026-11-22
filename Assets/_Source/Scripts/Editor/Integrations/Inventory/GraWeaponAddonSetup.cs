@@ -31,7 +31,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
         public const string SCOPE_TAG = "Scope";
         public const string GRENADE_LAUNCHER_TAG = "GrenadeLauncher";
         public const string SCENE_GROUP = "Addons";
-        public const string ICONS_FOLDER = "Assets/_Source/Items/Icons";
+        public const string ICONS_FOLDER = "Assets/_Source/UI/Item Icons";
         public const string VISUALS_FOLDER = ADDONS_FOLDER + "/Visuals";
 
         private const string MENU = "Tools/Inventory/Setup GRA Weapon Addons";

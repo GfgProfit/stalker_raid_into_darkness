@@ -13,7 +13,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
 {
     public static class GraEquipmentIconSetup
     {
-        public const string ATLAS_PATH = "Assets/_Source/Items/Icons/gra_equipment_factions.png";
+        public const string ATLAS_PATH = "Assets/_Source/UI/Item Icons/gra_equipment_factions.png";
 
         private const string DEFINITIONS_FOLDER = "Assets/_Source/Items/Definitions/Armor";
         private const string CONFIG_PATH = "configs/plugins/eq_icons_settings.ltx";

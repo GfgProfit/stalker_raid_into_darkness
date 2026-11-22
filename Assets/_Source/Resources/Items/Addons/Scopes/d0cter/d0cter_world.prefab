@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 7613415551525571158}
   - component: {fileID: 6091108771396562484}
   m_Layer: 0
-  m_Name: d0cter
+  m_Name: d0cter_world
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -99,6 +99,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: RaidIntoDarkness.Integrations.Inventory::RaidIntoDarkness.Integrations.Inventory.WorldItem
   _definition: {fileID: 11400000, guid: 1525e10127d18f242aba1fc3711ae389, type: 2}
   _amount: 1
+  _silencerVisual: {fileID: 0}
+  _silencerCollider: {fileID: 0}
 --- !u!82 &7613415551525571158
 AudioSource:
   m_ObjectHideFlags: 0

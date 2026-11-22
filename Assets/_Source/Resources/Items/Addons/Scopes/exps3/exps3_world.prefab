@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 1478638948479652350}
   - component: {fileID: 7218190416415406871}
   m_Layer: 0
-  m_Name: exps3
+  m_Name: exps3_world
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -99,6 +99,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: RaidIntoDarkness.Integrations.Inventory::RaidIntoDarkness.Integrations.Inventory.WorldItem
   _definition: {fileID: 11400000, guid: 95347acdc8dd3584c9538dac3fa17378, type: 2}
   _amount: 1
+  _silencerVisual: {fileID: 0}
+  _silencerCollider: {fileID: 0}
 --- !u!82 &1478638948479652350
 AudioSource:
   m_ObjectHideFlags: 0
@@ -221,6 +223,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 3389154699152993529}
     m_Modifications:
+    - target: {fileID: -8086868054170773070, guid: 2de87574aafde5240a8bb8f2546e7d21, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: fd00e81094a7c4a4b9996282e4d842d7, type: 2}
     - target: {fileID: -745663287867137214, guid: 2de87574aafde5240a8bb8f2546e7d21, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0

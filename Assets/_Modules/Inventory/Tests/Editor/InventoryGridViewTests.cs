@@ -135,7 +135,7 @@ namespace Inventory.Tests
         public void TooltipStatsKeepLongLabelsSeparateFromValues(bool hasBar)
         {
             CreateWindow(out InventoryTooltip tooltip, out InventoryModel model);
-            ItemInstance item = model.CreateItem(_items.Create("item", Vector2Int.one));
+            ItemInstance item = model.CreateItem(_items.Create("item", Vector2Int.one, maxStack: 20, weight: 0.5f), 3);
             var stats = new[]
             {
                 new InventoryItemStat("Protection against a very long localized characteristic name", "100%", comparison: "(+25%)", fill: hasBar ? 0.75f : -1f),
@@ -143,6 +143,8 @@ namespace Inventory.Tests
             };
             tooltip.Show(item, new Vector2(400f, 400f), _cameraObject.GetComponent<Camera>(), stats);
             Canvas.ForceUpdateCanvases();
+            TextMeshProUGUI weight = tooltip.transform.Find("Layout/Weight").GetComponent<TextMeshProUGUI>();
+            Assert.That(weight.text, Is.EqualTo("1.50 kg"));
             Transform root = tooltip.transform.Find("Layout/Stats");
             var firstRow = (RectTransform)root.GetChild(0);
             var secondRow = (RectTransform)root.GetChild(1);

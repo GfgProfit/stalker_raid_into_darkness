@@ -120,7 +120,6 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
             ("failure_DependentSlotOccupied", "Сначала освободите зависимые слоты"),
             ("failure_Duplicate", "Предмет уже здесь"),
             ("tooltip_weight", "Вес: "),
-            ("tooltip_amount", "   Количество: "),
             ("unit_kg", " кг"),
             ("split_title", "Разделить: "),
             ("button_split", "Разделить"),

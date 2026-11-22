@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -31,7 +30,6 @@ namespace Inventory.UI
         private static readonly Color HIGHLIGHT_COLOR = Color.white;
         private static readonly Color COMPARISON_COLOR = new(0.9f, 0.9f, 0.9f, 1f);
 
-        private readonly StringBuilder _builder = new(256);
         private readonly List<StatRow> _statRows = new();
         private RectTransform _rectTransform;
         private Image _background;
@@ -55,15 +53,7 @@ namespace Inventory.UI
         {
             EnsureBuilt();
             ItemDefinition definition = item.Definition;
-            _builder.Clear();
-            _builder.Append(InventoryUIFactory.FormatWeight(item.TotalWeight)).Append(InventoryTheme.Resolve(Theme, "unit_kg", " kg"));
-
-            if (definition.IsStackable)
-            {
-                _builder.Append(InventoryTheme.Resolve(Theme, "tooltip_amount", "   Amount: ")).Append(item.Amount).Append('/').Append(definition.MaxStack);
-            }
-
-            _weight.text = _builder.ToString();
+            _weight.text = InventoryUIFactory.FormatWeight(item.TotalWeight) + InventoryTheme.Resolve(Theme, "unit_kg", " kg");
             ShowContent(definition.DisplayName, description ?? definition.Description, stats, true, screenPosition, eventCamera);
         }
 

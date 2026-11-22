@@ -265,7 +265,8 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
             paths.Clear();
             foreach (ItemProtectionData item in data.itemProtections)
             {
-                RequireAssetPath(item.assetPath, DEFINITIONS_FOLDER, ".asset");
+                string prefix = InventoryDemoContentBuilder.IsBackpackResourcePath(item.assetPath) ? InventoryDemoContentBuilder.BACKPACKS_FOLDER + "/" : DEFINITIONS_FOLDER;
+                RequireAssetPath(item.assetPath, prefix, ".asset");
                 if (!paths.Add(item.assetPath) || item.entries == null || item.entries.Length != 8)
                 {
                     throw new InvalidOperationException("Each item requires exactly eight authored anomaly protections: " + item.assetPath);

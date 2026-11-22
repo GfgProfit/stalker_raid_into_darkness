@@ -9337,7 +9337,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Backpack/equ_military_pack.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Backpacks/equ_military_pack/equ_military_pack_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -9390,7 +9390,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Backpack/equ_small_military_pack.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Backpacks/equ_small_military_pack/equ_small_military_pack_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -9443,7 +9443,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Backpack/equ_small_pack.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Backpacks/equ_small_pack/equ_small_pack_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -9496,7 +9496,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Backpack/equ_tourist_pack.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Backpacks/equ_tourist_pack/equ_tourist_pack_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -9549,7 +9549,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Backpack/itm_backpack.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Backpacks/itm_backpack/itm_backpack_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -9602,7 +9602,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Backpack/kit_hunt.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Backpacks/kit_hunt/kit_hunt_definition.asset",
       "entries": [
         {
           "type": "Burn",

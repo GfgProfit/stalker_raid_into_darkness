@@ -28,12 +28,16 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
         public const string RIFLE_TAG = "Rifle";
         public const string PISTOL_TAG = "Pistol";
         public const string KNIFE_TAG = "Knife";
-
         public const string EQUIPMENT_MASK = "HHTTDD\nHHOORR\nKKOOBB\nKKOONN\nPPPPP.\nPPPPP.\nSSSSS.\nSSSSS.\n1234bg\navwxy.";
 
-        internal static readonly string[] ITEM_DEFINITION_FOLDERS = { DEFINITIONS_FOLDER, GraWeaponAddonSetup.ADDONS_FOLDER, IwpAmmoSetup.AMMO_FOLDER };
+        internal const string CLOTHES_FOLDER = "Assets/_Source/Resources/Items/Clothes";
+        internal const string BACKPACKS_FOLDER = CLOTHES_FOLDER + "/Backpacks";
 
-        internal static bool IsItemResourcePath(string path) => GraWeaponAddonSetup.IsAddonResourcePath(path) || IwpAmmoSetup.IsAmmoResourcePath(path);
+        internal static readonly string[] ITEM_DEFINITION_FOLDERS = { DEFINITIONS_FOLDER, GraWeaponAddonSetup.ADDONS_FOLDER, IwpAmmoSetup.AMMO_FOLDER, BACKPACKS_FOLDER };
+
+        internal static bool IsItemResourcePath(string path) => GraWeaponAddonSetup.IsAddonResourcePath(path) || IwpAmmoSetup.IsAmmoResourcePath(path) || IsBackpackResourcePath(path);
+
+        internal static bool IsBackpackResourcePath(string path) => path?.StartsWith(BACKPACKS_FOLDER + "/", System.StringComparison.Ordinal) == true;
 
         public sealed class DemoContent
         {

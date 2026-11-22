@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Inventory;
 using RaidIntoDarkness.Player;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -29,6 +30,12 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             {
                 base.TearDown();
             }
+        }
+
+        protected static string DefinitionSection(ItemDefinition definition)
+        {
+            string section = definition?.GetComponent<WeaponStatsComponent>()?.Section;
+            return string.IsNullOrEmpty(section) ? definition?.name : section;
         }
 
         private static void DisposeSceneInput(string sceneName)

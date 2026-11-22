@@ -340,7 +340,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
         {
             foreach (ItemDefinition definition in controller.Inventory.Database.Definitions)
             {
-                if (definition.name == section)
+                if (DefinitionSection(definition) == section)
                 {
                     return definition;
                 }

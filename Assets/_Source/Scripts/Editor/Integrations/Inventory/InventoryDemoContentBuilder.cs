@@ -32,14 +32,20 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
 
         internal const string CLOTHES_FOLDER = "Assets/_Source/Resources/Items/Clothes";
 
-        internal static readonly string[] ITEM_DEFINITION_FOLDERS = { DEFINITIONS_FOLDER, GraWeaponAddonSetup.ADDONS_FOLDER, IwpAmmoSetup.AMMO_FOLDER, CLOTHES_FOLDER };
+        internal static readonly string[] ITEM_DEFINITION_FOLDERS = { DEFINITIONS_FOLDER, GraWeaponAddonSetup.ADDONS_FOLDER, IwpAmmoSetup.AMMO_FOLDER, CLOTHES_FOLDER, IwpWeaponSetup.WEAPONS_FOLDER };
 
-        internal static bool IsItemResourcePath(string path) => GraWeaponAddonSetup.IsAddonResourcePath(path) || IwpAmmoSetup.IsAmmoResourcePath(path) || IsClothesResourcePath(path);
+        internal static bool IsItemResourcePath(string path) => GraWeaponAddonSetup.IsAddonResourcePath(path) || IwpAmmoSetup.IsAmmoResourcePath(path) || IsClothesResourcePath(path) || IwpWeaponSetup.IsWeaponResourcePath(path);
 
         internal static bool IsClothesResourcePath(string path) => path?.StartsWith(CLOTHES_FOLDER + "/", System.StringComparison.Ordinal) == true;
 
         internal static string GetItemResourceName(ItemDefinition definition, string path)
         {
+            if (IwpWeaponSetup.IsWeaponResourcePath(path))
+            {
+                string section = definition.GetComponent<WeaponStatsComponent>()?.Section;
+                return string.IsNullOrEmpty(section) ? definition.name : section;
+            }
+
             EquipmentStatsComponent stats = IsClothesResourcePath(path) ? definition.GetComponent<EquipmentStatsComponent>() : null;
             return stats != null && stats.Section.Length > 0 ? stats.Section : definition.name;
         }

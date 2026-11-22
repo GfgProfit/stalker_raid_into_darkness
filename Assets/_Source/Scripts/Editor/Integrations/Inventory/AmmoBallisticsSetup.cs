@@ -11,7 +11,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
 {
     public static class AmmoBallisticsSetup
     {
-        public const string FOLDER = "Assets/_Source/Items/Weapons/Ballistics";
+        public const string FOLDER = IwpWeaponSetup.WEAPONS_FOLDER + "/_Shared Ballistics";
         public const string MATERIAL_PATH = FOLDER + "/BallisticTracer.mat";
         public const string BULLET_PATH = FOLDER + "/Bullet.prefab";
         public const string PROFILES_PATH = "Assets/_Source/Scripts/Editor/Integrations/Inventory/AmmoBallisticsProfiles.json";
@@ -104,7 +104,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
                 count++;
             }
 
-            foreach (string guid in AssetDatabase.FindAssets("t:FirstPersonWeaponAsset", new[] { "Assets/_Source/Items/Weapons/FirstPerson" }))
+            foreach (string guid in AssetDatabase.FindAssets("t:FirstPersonWeaponAsset", new[] { IwpWeaponSetup.WEAPONS_FOLDER }))
             {
                 FirstPersonWeaponAsset weapon = AssetDatabase.LoadAssetAtPath<FirstPersonWeaponAsset>(AssetDatabase.GUIDToAssetPath(guid));
                 var serialized = new SerializedObject(weapon);

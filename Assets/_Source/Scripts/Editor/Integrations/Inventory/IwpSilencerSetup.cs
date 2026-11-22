@@ -15,8 +15,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
 {
     public static class IwpSilencerSetup
     {
-        private const string VISUAL_FOLDER = "Assets/_Source/Items/Weapons/Visuals/";
-        private const string SOUND_FOLDER = "Assets/_Source/Audio/Weapons/aug/";
+        private const string SOUND_FOLDER = IwpWeaponSetup.AUDIO_FOLDER + "/";
         private const string ITEM_SOUND_FOLDER = "Assets/_Source/Audio/Inventory/";
 
         public static string LastResult { get; private set; }
@@ -39,8 +38,8 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
                 throw new InvalidOperationException("Missing NATO silencer definition: " + silencerPath);
             }
 
-            ConfigureVisual(VISUAL_FOLDER + "wpn_aug_a3.prefab", silencer, false);
-            ConfigureVisual(VISUAL_FOLDER + "wpn_aug_a3_hud.prefab", silencer, true);
+            ConfigureVisual(IwpWeaponSetup.WORLD_VISUAL_PATH, silencer, false);
+            ConfigureVisual(IwpWeaponSetup.HUD_VISUAL_PATH, silencer, true);
             Directory.CreateDirectory(SOUND_FOLDER);
             var clips = new List<AudioClip>();
 
@@ -83,7 +82,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
 
             try
             {
-                ItemDefinition weapon = AssetDatabase.LoadAssetAtPath<ItemDefinition>("Assets/_Source/Items/Definitions/Weapons/wpn_aug_a3.asset");
+                ItemDefinition weapon = AssetDatabase.LoadAssetAtPath<ItemDefinition>(IwpWeaponSetup.DEFINITION_PATH);
                 int count = await ItemIconBatchBake.BakeAsync(new[] { weapon }, false, CancellationToken.None);
                 LastResult = "Baked AUG icon profiles: " + count;
                 Debug.Log(LastResult);

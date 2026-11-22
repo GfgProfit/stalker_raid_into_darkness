@@ -86,7 +86,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
         {
             foreach (ItemDefinition definition in inventory.Inventory.Database.Definitions)
             {
-                if (definition.name != section)
+                if (DefinitionSection(definition) != section)
                 {
                     continue;
                 }

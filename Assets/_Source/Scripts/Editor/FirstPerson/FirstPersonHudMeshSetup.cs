@@ -13,7 +13,7 @@ namespace RaidIntoDarkness.FirstPerson.Editor
             var paths = new List<string>();
             paths.AddRange(Directory.GetFiles("Assets/_Source/FirstPerson/Hands/Models", "*.ogf", SearchOption.AllDirectories));
             paths.AddRange(Directory.GetFiles("Assets/_Source/FirstPerson/Body/Models", "*.ogf", SearchOption.AllDirectories));
-            paths.AddRange(Directory.GetFiles("Assets/_Source/Items/Weapons/Models", "*_hud.ogf", SearchOption.AllDirectories));
+            paths.AddRange(Directory.GetFiles("Assets/_Source/Resources/Items/Weapons", "*_hud.ogf", SearchOption.AllDirectories));
             paths.Sort(StringComparer.Ordinal);
             int changed = 0;
             int end = Mathf.Min(paths.Count, offset + count);

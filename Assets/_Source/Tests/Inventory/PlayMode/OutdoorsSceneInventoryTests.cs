@@ -92,7 +92,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
 
                 foreach (ItemDefinition candidate in controller.Inventory.Database.Definitions)
                 {
-                    if (candidate.name == section)
+                    if (DefinitionSection(candidate) == section)
                     {
                         definition = candidate;
                     }
@@ -553,7 +553,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
 
             foreach (WorldItem candidate in Object.FindObjectsByType<WorldItem>(FindObjectsSortMode.None))
             {
-                if (candidate.Definition != null && candidate.Definition.name == "wpn_aug_a3")
+                if (DefinitionSection(candidate.Definition) == "wpn_aug_a3")
                 {
                     aug = candidate;
                 }
@@ -664,7 +664,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
 
             foreach (ItemDefinition definition in controller.Inventory.Database.Definitions)
             {
-                if (definition.name == "wpn_aug_a3")
+                if (DefinitionSection(definition) == "wpn_aug_a3")
                 {
                     aug = definition.GetComponent<WeaponStatsComponent>();
                 }
@@ -712,7 +712,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
 
             foreach (ItemDefinition definition in controller.Inventory.Database.Definitions)
             {
-                if (definition.name == definitionName)
+                if (DefinitionSection(definition) == definitionName)
                 {
                     found = definition;
                 }

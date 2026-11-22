@@ -204,8 +204,9 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
                     continue;
                 }
 
-                EquipmentStatsComponent stats = definition.GetComponent<EquipmentStatsComponent>();
-                string section = stats != null && stats.Section.Length > 0 ? stats.Section : definition.name;
+                string definitionPath = AssetDatabase.GetAssetPath(definition);
+                string equipmentSection = definition.GetComponent<EquipmentStatsComponent>()?.Section;
+                string section = string.IsNullOrEmpty(equipmentSection) ? InventoryDemoContentBuilder.GetItemResourceName(definition, definitionPath) : equipmentSection;
                 string category = system.GetValue(section, "snd_on_take");
                 category = category != null ? category.Trim() : null;
                 if (string.IsNullOrEmpty(category) || !categories.TryGetValue(category, out string value))
@@ -214,7 +215,6 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
                     continue;
                 }
 
-                string definitionPath = AssetDatabase.GetAssetPath(definition);
                 string folder = ITEM_AUDIO;
                 if (GraWeaponAddonSetup.IsAddonResourcePath(definitionPath) && category is "attchscope" or "attchscopenv" or "attchsilen")
                 {
@@ -223,6 +223,10 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
                 else if (InventoryDemoContentBuilder.IsClothesResourcePath(definitionPath))
                 {
                     folder = InventoryDemoContentBuilder.CLOTHES_FOLDER + SHARED_AUDIO;
+                }
+                else if (IwpWeaponSetup.IsWeaponResourcePath(definitionPath))
+                {
+                    folder = IwpWeaponSetup.SHARED_AUDIO_FOLDER;
                 }
 
                 string clipKey = folder + "/" + category;

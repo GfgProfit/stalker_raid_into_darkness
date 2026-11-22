@@ -87,9 +87,9 @@ namespace XRay.Importer.Tests
         [Test]
         public void AugTestPreservesAtlasAndMaterialAssignments()
         {
-            const string FIXTURE_FOLDER = "Assets/_Source/Items/Weapons/Tests/MonolithHDRP";
-            const string MODEL_PATH = "Assets/_Source/Items/Weapons/Models/wpn_aug_a3.ogf";
-            const string ALBEDO_PATH = "Assets/_Source/Items/Weapons/Models/Textures/aug_a3.png";
+            const string FIXTURE_FOLDER = "Assets/_Source/Tests/Weapons/Fixtures/MonolithHDRP";
+            const string MODEL_PATH = "Assets/_Source/Resources/Items/Weapons/wpn_aug_a3/wpn_aug_a3.ogf";
+            const string ALBEDO_PATH = "Assets/_Source/Resources/Items/Weapons/wpn_aug_a3/Textures/aug_a3.png";
             Shader shader = Shader.Find(MonolithMaterialConfigurator.SHADER_NAME);
             Assert.That(shader, Is.Not.Null);
             foreach (var message in ShaderUtil.GetShaderMessages(shader))
@@ -118,7 +118,7 @@ namespace XRay.Importer.Tests
                 }
             }
 
-            var production = AssetDatabase.LoadAssetAtPath<Material>("Assets/_Source/Items/Weapons/Models/Materials/aug_a3.mat");
+            var production = AssetDatabase.LoadAssetAtPath<Material>("Assets/_Source/Resources/Items/Weapons/wpn_aug_a3/Materials/aug_a3.mat");
             Assert.That(production.shader, Is.EqualTo(shader));
             var importer = AssetImporter.GetAtPath(MODEL_PATH);
             Assert.That(importer.GetExternalObjectMap().Values, Does.Contain(production));

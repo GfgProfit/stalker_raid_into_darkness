@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: da0f90c2955673d46b25d465cbe44ed0, type: 3}
-  m_Name: wpn_aug_a3
+  m_Name: wpn_aug_a3_definition
   m_EditorClassIdentifier: Inventory::Inventory.ItemDefinition
   _definitionId: 36d0b42ed2880d842bd2f2fef624d0a0
   _displayName: Steyr AUG A3

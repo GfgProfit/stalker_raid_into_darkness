@@ -389,7 +389,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
         {
             foreach (ItemDefinition definition in controller.Inventory.Database.Definitions)
             {
-                if (definition.name == section)
+                if (DefinitionSection(definition) == section)
                 {
                     ItemInstance item = controller.Inventory.Model.CreateItem(definition);
                     Assert.That(controller.Inventory.Model.TryAddAuto(item, containerId, false).Success, Is.True, section);

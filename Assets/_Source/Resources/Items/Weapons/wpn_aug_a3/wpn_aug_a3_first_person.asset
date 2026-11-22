@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 14d88a9e75d60c249be9eadb7fbef0ec, type: 3}
-  m_Name: wpn_aug_a3
+  m_Name: wpn_aug_a3_first_person
   m_EditorClassIdentifier: RaidIntoDarkness.Weapons::RaidIntoDarkness.Weapons.FirstPersonWeaponAsset
   _hudModel: {fileID: 4618218789475996202, guid: 11c183dedd4743e4c994e0706a708472, type: 3}
   _handsPosition: {x: 0, y: 0, z: 0}

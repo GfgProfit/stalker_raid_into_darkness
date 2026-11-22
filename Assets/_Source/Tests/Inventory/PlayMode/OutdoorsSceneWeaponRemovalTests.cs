@@ -132,7 +132,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
 
             foreach (ItemDefinition candidate in _controller.Inventory.Database.Definitions)
             {
-                if (candidate.name == AUG)
+                if (DefinitionSection(candidate) == AUG)
                 {
                     definition = candidate;
                     break;
@@ -175,7 +175,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
 
             foreach (WorldItem item in Object.FindObjectsByType<WorldItem>(FindObjectsSortMode.None))
             {
-                if (item.Definition != null && item.Definition.name == AUG)
+                if (DefinitionSection(item.Definition) == AUG)
                 {
                     count++;
                 }

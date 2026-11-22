@@ -529,7 +529,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
 
             foreach (WorldItem candidate in Object.FindObjectsByType<WorldItem>(FindObjectsSortMode.None))
             {
-                if (candidate.Definition != null && candidate.Definition.name == AUG)
+                if (DefinitionSection(candidate.Definition) == AUG)
                 {
                     aug = candidate;
                 }
@@ -992,7 +992,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
         {
             foreach (WorldItem item in Object.FindObjectsByType<WorldItem>(FindObjectsSortMode.None))
             {
-                if (item.Definition.name == section)
+                if (DefinitionSection(item.Definition) == section)
                 {
                     return item.Definition;
                 }

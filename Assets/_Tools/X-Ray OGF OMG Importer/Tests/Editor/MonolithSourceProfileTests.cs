@@ -14,7 +14,7 @@ namespace XRay.Importer.Tests
     {
         private const string COMPUTE_PATH = "Assets/_Tools/X-Ray OGF OMG Importer/Tests/Editor/MonolithSourceProfileValidation.compute";
         private const string REFERENCE_PATH = "Assets/_Tools/X-Ray OGF OMG Importer/Tests/Editor/Fixtures/MonolithSourceProfileReference.txt";
-        private const string MATERIAL_PATH = "Assets/_Source/Items/Weapons/Tests/MonolithHDRP/AUG_A3_Monolith_Test.mat";
+        private const string MATERIAL_PATH = "Assets/_Source/Tests/Weapons/Fixtures/MonolithHDRP/AUG_A3_Monolith_Test.mat";
         private const string OUTPUT_VARIABLE = "MONOLITH_PARITY_OUTPUT";
         private const int CASES_PER_SET = 24;
         private const int REFERENCE_COLUMNS = 39;

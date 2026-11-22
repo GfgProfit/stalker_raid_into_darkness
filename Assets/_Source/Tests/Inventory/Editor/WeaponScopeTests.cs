@@ -25,7 +25,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
         [SetUp]
         public void SetUp()
         {
-            _weapon = Load("Weapons/wpn_aug_a3");
+            _weapon = Resources.Load<ItemDefinition>("Items/Weapons/wpn_aug_a3/wpn_aug_a3_definition");
             _first = LoadScope("leupold");
             _second = LoadScope("ac10632");
             _preview = EditorSceneManager.NewPreviewScene();
@@ -309,8 +309,6 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             Assert.That(_model.TryAddAuto(item, container).Success, Is.True, definition.name);
             return item;
         }
-
-        private static ItemDefinition Load(string name) => AssetDatabase.LoadAssetAtPath<ItemDefinition>("Assets/_Source/Items/Definitions/" + name + ".asset");
 
         private static ItemDefinition LoadScope(string name) => Resources.Load<ItemDefinition>("Items/Addons/Scopes/" + name + "/" + name + "_definition");
 

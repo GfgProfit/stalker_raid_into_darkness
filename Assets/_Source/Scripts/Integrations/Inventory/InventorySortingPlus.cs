@@ -228,6 +228,12 @@ namespace RaidIntoDarkness.Integrations.Inventory
 
         private static string GetSortName(ItemDefinition definition)
         {
+            if (definition.IsCategory("Weapon"))
+            {
+                string weaponSection = definition.GetComponent<WeaponStatsComponent>()?.Section;
+                return string.IsNullOrEmpty(weaponSection) ? definition.name : weaponSection;
+            }
+
             string section = definition.IsCategory(AnomalyEquipmentProtection.OUTFIT_CATEGORY) ? definition.GetComponent<EquipmentStatsComponent>()?.Section : null;
             return string.IsNullOrEmpty(section) ? definition.name : section;
         }

@@ -26,13 +26,17 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
     {
         public const string IWP_ROOT = "E:/STALKER CoC IWP Unpacked pacth 16.03.2026";
         public const string SECTION = "wpn_aug_a3";
-        public const string WEAPONS_FOLDER = "Assets/_Source/Items/Weapons";
-        public const string MODELS_FOLDER = WEAPONS_FOLDER + "/Models";
-        public const string VISUALS_FOLDER = WEAPONS_FOLDER + "/Visuals";
-        public const string DEFINITIONS_FOLDER = InventoryDemoContentBuilder.DEFINITIONS_FOLDER + "/Weapons";
-        public const string DEFINITION_PATH = DEFINITIONS_FOLDER + "/" + SECTION + ".asset";
-        public const string HANDS_MOTIONS_FOLDER = "Assets/_Source/FirstPerson/Animations/Hands/Weapons";
+        public const string WEAPONS_FOLDER = "Assets/_Source/Resources/Items/Weapons";
+        public const string DEFINITION_PATH = WEAPON_FOLDER + "/" + SECTION + "_definition.asset";
+        public const string HANDS_MOTIONS_FOLDER = WEAPON_FOLDER + "/Animations/Hands";
         public const string HANDS_MOTION_PREFIX = "aug_";
+
+        internal const string WEAPON_FOLDER = WEAPONS_FOLDER + "/" + SECTION;
+        internal const string WORLD_VISUAL_PATH = WEAPON_FOLDER + "/" + SECTION + "_world_visual.prefab";
+        internal const string HUD_VISUAL_PATH = WEAPON_FOLDER + "/" + SECTION + "_hud_visual.prefab";
+        internal const string WEAPON_MOTIONS_FOLDER = WEAPON_FOLDER + "/Animations/Weapon";
+        internal const string AUDIO_FOLDER = WEAPON_FOLDER + "/Audio";
+        internal const string SHARED_AUDIO_FOLDER = WEAPONS_FOLDER + "/_Shared Audio";
 
         private const string WORLD_MODEL = "meshes/dynamics/weapons/wpn_aug/wpn_aug_a3.ogf";
         internal const string HUD_MODEL = "meshes/dynamics/weapons/wpn_aug/wpn_aug_a3_hud.ogf";
@@ -51,6 +55,8 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
         private static readonly string[] GRA_SCOPE = { "configs", "sounds" };
         private static readonly string[] PREFERRED_SLOTS = { "Primary", "Secondary" };
         private static readonly string[] ATTACHMENT_BONES = { WeaponHudComponent.SCOPE_BONE, WeaponHudComponent.SILENCER_BONE, WeaponHudComponent.GRENADE_LAUNCHER_BONE };
+
+        internal static bool IsWeaponResourcePath(string path) => path?.StartsWith(WEAPONS_FOLDER + "/", StringComparison.Ordinal) == true;
 
         [MenuItem(MENU)]
         public static void SetupFromMenu()
@@ -96,9 +102,9 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
                 return null;
             }
 
-            string worldPath = MODELS_FOLDER + "/" + Path.GetFileName(WORLD_MODEL);
-            string hudPath = MODELS_FOLDER + "/" + Path.GetFileName(HUD_MODEL);
-            string weaponMotionsPath = MODELS_FOLDER + "/" + Path.GetFileName(WEAPON_MOTIONS);
+            string worldPath = WEAPON_FOLDER + "/" + Path.GetFileName(WORLD_MODEL);
+            string hudPath = WEAPON_FOLDER + "/" + Path.GetFileName(HUD_MODEL);
+            string weaponMotionsPath = WEAPON_MOTIONS_FOLDER + "/" + Path.GetFileName(WEAPON_MOTIONS);
             string handsMotionsPath = HANDS_MOTIONS_FOLDER + "/" + Path.GetFileName(HANDS_MOTIONS);
 
             if (CopyFromIwp(new[] { WORLD_MODEL, HUD_MODEL, WEAPON_MOTIONS, HANDS_MOTIONS }, new[] { worldPath, hudPath, weaponMotionsPath, handsMotionsPath }) == false)
@@ -125,8 +131,8 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
             failures += ValidateWeaponMotions(weaponMotions, hudModel, log);
             failures += ValidateHandsMotions(handsMotions, log);
             List<string> bones = FindAttachmentBones(hudModel, log);
-            GameObject worldVisual = CreateCleanVisual(worldModel, VISUALS_FOLDER + "/" + SECTION + ".prefab", log);
-            GameObject hudVisual = CreateCleanVisual(hudModel, VISUALS_FOLDER + "/" + SECTION + "_hud.prefab", log);
+            GameObject worldVisual = CreateCleanVisual(worldModel, WORLD_VISUAL_PATH, log);
+            GameObject hudVisual = CreateCleanVisual(hudModel, HUD_VISUAL_PATH, log);
             ItemDefinition definition = CreateDefinition(system, strings, GraTextFormatter.LoadColors(sources), worldVisual, hudVisual, weaponMotions, handsMotions, bones);
             AddToDatabase(definition);
             List<WorldItem> prefabs = WorldItemPrefabBuilder.Build(new[] { definition });
@@ -222,6 +228,8 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
         {
             XRayAssetSourceOptions options = XRayAssetSourceSettings.GetEffective();
             options.Sources = new XRaySourceConfiguration { Mode = XRaySourceMode.CustomFolder, CustomFolder = Path.GetFullPath(IWP_ROOT), LocalAppDataFolder = options.Sources.LocalAppDataFolder, IncludeGameGamedata = false };
+            options.Import.CreateTexturesFolder = true;
+            options.Import.CreateMaterialsFolder = true;
             options.Import.PreserveExistingMaterials = false;
             int errors = 0;
 
@@ -367,7 +375,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
 
         private static GameObject CreateCleanVisual(GameObject model, string path, StringBuilder log)
         {
-            StalkerXRaySources.EnsureFolder(VISUALS_FOLDER);
+            StalkerXRaySources.EnsureFolder(WEAPON_FOLDER);
             var existing = AssetDatabase.LoadAssetAtPath<GameObject>(path);
             FirstPersonWeaponView view = existing != null ? existing.GetComponent<FirstPersonWeaponView>() : null;
             Transform muzzle = view != null ? view.Muzzle : null;
@@ -448,7 +456,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
 
         private static ItemDefinition CreateDefinition(XRayLtxDatabase system, XRayStringTable strings, IReadOnlyDictionary<string, Color32> colors, GameObject worldModel, GameObject hudModel, XRayMotionLibrary weaponMotions, XRayMotionLibrary handsMotions, List<string> bones)
         {
-            StalkerXRaySources.EnsureFolder(DEFINITIONS_FOLDER);
+            StalkerXRaySources.EnsureFolder(WEAPON_FOLDER);
             var definition = AssetDatabase.LoadAssetAtPath<ItemDefinition>(DEFINITION_PATH);
 
             if (definition == null)

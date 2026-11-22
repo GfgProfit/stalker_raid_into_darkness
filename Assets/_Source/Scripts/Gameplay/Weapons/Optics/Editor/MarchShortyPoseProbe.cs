@@ -13,7 +13,7 @@ namespace RaidIntoDarkness.Weapons.Optics.Editor
     public static class MarchShortyPoseProbe
     {
         private const string PLAYER_PATH = "Assets/_Source/FirstPerson/FPS_Player.prefab";
-        private const string WEAPON_PATH = "Assets/_Source/Items/Weapons/FirstPerson/wpn_aug_a3.asset";
+        private const string WEAPON_PATH = "Assets/_Source/Resources/Items/Weapons/wpn_aug_a3/wpn_aug_a3_first_person.asset";
         private const string PROFILE_PATH = "Assets/_Source/Settings/Player/StalkerMovementProfile.asset";
         private const string HANDS_PATH = "Assets/_Source/FirstPerson/Hands/Models/wpn_hand_01.ogf";
         private const string DEFINITION_PATH = ScopeOpticsPrefabSetup.MARCH_ITEM;

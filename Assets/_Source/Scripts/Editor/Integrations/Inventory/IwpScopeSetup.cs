@@ -13,9 +13,9 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
 {
     public static class IwpScopeSetup
     {
-        public const string WEAPON_PATH = "Assets/_Source/Items/Definitions/Weapons/wpn_aug_a3.asset";
-        public const string WORLD_VISUAL_PATH = "Assets/_Source/Items/Weapons/Visuals/wpn_aug_a3.prefab";
-        public const string HUD_VISUAL_PATH = "Assets/_Source/Items/Weapons/Visuals/wpn_aug_a3_hud.prefab";
+        public const string WEAPON_PATH = IwpWeaponSetup.DEFINITION_PATH;
+        public const string WORLD_VISUAL_PATH = IwpWeaponSetup.WORLD_VISUAL_PATH;
+        public const string HUD_VISUAL_PATH = IwpWeaponSetup.HUD_VISUAL_PATH;
 
         private const string ARCHIVE_ROOT = "E:/Projects/stalker_raid_into_darkness_Archive";
 

@@ -22,7 +22,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
         private const string SCENE_PATH = "Assets/TEST_SCENE.unity";
         private const string SCENE_GROUP = "Ammo";
         private const string SCOPE_TEMPLATE = "Assets/_Source/Resources/Items/Addons/Scopes/0kp2/0kp2_definition.asset";
-        private const string AUG_DEFINITION = "Assets/_Source/Items/Definitions/Weapons/wpn_aug_a3.asset";
+        private const string AUG_DEFINITION = IwpWeaponSetup.DEFINITION_PATH;
         private const string SHARED_AUDIO_FOLDER = AMMO_FOLDER + "/_Shared Audio";
         private const uint OGF_DESCRIPTION_CHUNK = 0x12;
         private const int OGF_HEADER_SIZE = 44;

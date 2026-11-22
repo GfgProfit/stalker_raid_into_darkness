@@ -17,11 +17,9 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
 {
     public static class IwpFirstPersonWeaponSetup
     {
-        public const string FIRST_PERSON_FOLDER = IwpWeaponSetup.WEAPONS_FOLDER + "/FirstPerson";
-        public const string CAMERA_FOLDER = IwpWeaponSetup.WEAPONS_FOLDER + "/Animations/Camera";
-        public const string BLEND_FOLDER = IwpWeaponSetup.WEAPONS_FOLDER + "/Animations/Blend";
-        public const string SOUNDS_FOLDER = "Assets/_Source/Audio/Weapons";
-        public const string ASSET_PATH = FIRST_PERSON_FOLDER + "/" + IwpWeaponSetup.SECTION + ".asset";
+        public const string CAMERA_FOLDER = IwpWeaponSetup.WEAPON_FOLDER + "/Animations/Camera";
+        public const string BLEND_FOLDER = IwpWeaponSetup.WEAPON_FOLDER + "/Animations/Blend";
+        public const string ASSET_PATH = IwpWeaponSetup.WEAPON_FOLDER + "/" + IwpWeaponSetup.SECTION + "_first_person.asset";
         public const string WEAPON_AUDIO = "WeaponAudio";
         public const string WEAPON_SHOT_AUDIO = "WeaponShotAudio";
         public const string WEAPON_HUD = "WeaponHud";
@@ -162,7 +160,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
             var log = new StringBuilder();
             var copySources = new List<string>();
             var copyTargets = new List<string>();
-            string a1MotionsPath = IwpWeaponSetup.MODELS_FOLDER + "/" + Path.GetFileName(A1_WEAPON_MOTIONS);
+            string a1MotionsPath = IwpWeaponSetup.WEAPON_MOTIONS_FOLDER + "/" + Path.GetFileName(A1_WEAPON_MOTIONS);
             AddCopy(copySources, copyTargets, A1_WEAPON_MOTIONS, a1MotionsPath);
 
             foreach (string effect in CAMERA_EFFECTS)
@@ -202,7 +200,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
                 return null;
             }
 
-            string hudModelPath = IwpWeaponSetup.MODELS_FOLDER + "/" + Path.GetFileName(IwpWeaponSetup.HUD_MODEL);
+            string hudModelPath = IwpWeaponSetup.WEAPON_FOLDER + "/" + Path.GetFileName(IwpWeaponSetup.HUD_MODEL);
             IwpWeaponSetup.AssignRig(a1MotionsPath, hudModelPath);
             string flamePath = XRayParticleImporter.GroupPrefabPath(Get(system, IwpWeaponSetup.SECTION, "flame_particles"));
             string smokePath = XRayParticleImporter.GroupPrefabPath(Get(system, IwpWeaponSetup.SECTION, "smoke_particles"));
@@ -212,11 +210,11 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
                 XRayParticleImporter.Import();
             }
 
-            string hudVisualPath = IwpWeaponSetup.VISUALS_FOLDER + "/" + IwpWeaponSetup.SECTION + "_hud.prefab";
+            string hudVisualPath = IwpWeaponSetup.HUD_VISUAL_PATH;
             ConfigureMuzzle(hudVisualPath, log);
             var hudVisual = AssetDatabase.LoadAssetAtPath<GameObject>(hudVisualPath);
             var handsMotions = AssetDatabase.LoadAssetAtPath<XRayMotionLibrary>(IwpWeaponSetup.HANDS_MOTIONS_FOLDER + "/" + Path.GetFileName(IwpWeaponSetup.HANDS_MOTIONS));
-            var a3Motions = AssetDatabase.LoadAssetAtPath<XRayMotionLibrary>(IwpWeaponSetup.MODELS_FOLDER + "/" + Path.GetFileName(IwpWeaponSetup.WEAPON_MOTIONS));
+            var a3Motions = AssetDatabase.LoadAssetAtPath<XRayMotionLibrary>(IwpWeaponSetup.WEAPON_MOTIONS_FOLDER + "/" + Path.GetFileName(IwpWeaponSetup.WEAPON_MOTIONS));
             var a1Motions = AssetDatabase.LoadAssetAtPath<XRayMotionLibrary>(a1MotionsPath);
 
             if (hudVisual == null || handsMotions == null || a3Motions == null || a1Motions == null)
@@ -606,7 +604,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
                 return asset;
             }
 
-            StalkerXRaySources.EnsureFolder(FIRST_PERSON_FOLDER);
+            StalkerXRaySources.EnsureFolder(IwpWeaponSetup.WEAPON_FOLDER);
             asset = ScriptableObject.CreateInstance<FirstPersonWeaponAsset>();
             AssetDatabase.CreateAsset(asset, ASSET_PATH);
             return asset;
@@ -653,7 +651,8 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
 
         private static string SoundPath(string name)
         {
-            return SOUNDS_FOLDER + "/" + name + ".ogg";
+            const string AUG_PREFIX = "aug/";
+            return name.StartsWith(AUG_PREFIX, StringComparison.OrdinalIgnoreCase) ? IwpWeaponSetup.AUDIO_FOLDER + "/" + name.Substring(AUG_PREFIX.Length) + ".ogg" : IwpWeaponSetup.SHARED_AUDIO_FOLDER + "/" + name + ".ogg";
         }
 
         private static AudioClip LoadSound(string name)

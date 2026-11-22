@@ -94,6 +94,7 @@ namespace Inventory.IconGeneration
         private readonly GameObject _cameraObject;
         private readonly Camera _renderCamera;
         private readonly GameObject _volumeObject;
+        private readonly Volume _volume;
         private readonly VolumeProfile _volumeProfile;
         private readonly Light[] _lights;
         private readonly ItemIconSceneIsolationScope _sceneIsolation;
@@ -110,6 +111,8 @@ namespace Inventory.IconGeneration
             _settings = settings;
             _sceneIsolation = new ItemIconSceneIsolationScope();
             _volumeObject = ItemIconVolumeFactory.Create("Shared Runtime Item Icons", settings, out _volumeProfile);
+            _volume = _volumeObject.GetComponent<Volume>();
+            _volume.enabled = false;
             _cameraObject = new GameObject("Shared Runtime Item Icon Camera", typeof(Camera))
             {
                 hideFlags = HideFlags.HideAndDontSave
@@ -153,9 +156,6 @@ namespace Inventory.IconGeneration
 
             RenderTexture renderTexture = null;
             RenderTexture readbackTexture = null;
-            bool sceneEnvironmentIsolated = false;
-            bool readbackRequested = false;
-            AsyncGPUReadbackRequest readbackRequest = default;
             int antiAliasing = definition.Icon.AntiAliasing;
 
             try
@@ -164,50 +164,16 @@ namespace Inventory.IconGeneration
                 int textureHeight = renderProfile.TextureHeight;
                 renderTexture = RenderTexture.GetTemporary(textureWidth, textureHeight, 24, _settings.RenderTextureFormat, RenderTextureReadWrite.Default, antiAliasing);
                 renderTexture.filterMode = FilterMode.Bilinear;
-                ClearRenderTexture(renderTexture, true);
-
                 if (_requiresExposureWarmup)
                 {
-                    RenderExposureWarmupFrame(definition, bounds, renderTexture, renderProfile, antiAliasing);
+                    RenderFrame(definition, bounds, renderTexture, renderProfile, antiAliasing);
                     _requiresExposureWarmup = false;
                     await UniTask.Yield(PlayerLoopTiming.Update, cancellationToken);
-                    ClearRenderTexture(renderTexture, true);
                 }
 
-                try
-                {
-                    _sceneIsolation.Apply(_settings.ExcludeIconLayerFromSceneLights);
-                    sceneEnvironmentIsolated = true;
-                    ItemIconCameraConfigurator.ConfigureRenderCamera(_renderCamera, bounds, renderTexture, _settings, renderProfile, antiAliasing);
-
-                    if (renderProfile.UseDirectionalLight)
-                    {
-                        ItemIconLightFactory.Configure(_lights, definition, _renderCamera.transform, _settings, renderProfile);
-                    }
-
-                    ClearRenderTexture(renderTexture, true);
-                    _renderCamera.Render();
-                    readbackTexture = PrepareReadbackTexture(renderTexture, textureWidth, textureHeight);
-                    readbackRequest = AsyncGPUReadback.Request(readbackTexture, 0, TextureFormat.RGBA32);
-                    readbackRequested = true;
-                }
-                finally
-                {
-                    _renderCamera.targetTexture = null;
-
-                    if (sceneEnvironmentIsolated)
-                    {
-                        _sceneIsolation.Restore();
-                        sceneEnvironmentIsolated = false;
-                    }
-
-                    ItemIconLightFactory.Disable(_lights);
-                }
-
-                if (readbackRequested == false)
-                {
-                    return null;
-                }
+                RenderFrame(definition, bounds, renderTexture, renderProfile, antiAliasing);
+                readbackTexture = PrepareReadbackTexture(renderTexture, textureWidth, textureHeight);
+                AsyncGPUReadbackRequest readbackRequest = AsyncGPUReadback.Request(readbackTexture, 0, TextureFormat.RGBA32);
 
                 while (readbackRequest.done == false)
                 {
@@ -241,14 +207,8 @@ namespace Inventory.IconGeneration
             }
             finally
             {
-                if (sceneEnvironmentIsolated)
-                {
-                    _sceneIsolation.Restore();
-                }
-
                 if (renderTexture != null)
                 {
-                    _renderCamera.targetTexture = null;
                     RenderTexture.ReleaseTemporary(renderTexture);
                 }
 
@@ -256,8 +216,6 @@ namespace Inventory.IconGeneration
                 {
                     RenderTexture.ReleaseTemporary(readbackTexture);
                 }
-
-                ItemIconLightFactory.Disable(_lights);
             }
         }
 
@@ -350,14 +308,12 @@ namespace Inventory.IconGeneration
             }
         }
 
-        private void RenderExposureWarmupFrame(ItemDefinition definition, Bounds bounds, RenderTexture renderTexture, IconRenderProfile renderProfile, int antiAliasing)
+        private void RenderFrame(ItemDefinition definition, Bounds bounds, RenderTexture renderTexture, IconRenderProfile renderProfile, int antiAliasing)
         {
-            bool sceneEnvironmentIsolated = false;
-
             try
             {
-                _sceneIsolation.Apply(_settings.ExcludeIconLayerFromSceneLights);
-                sceneEnvironmentIsolated = true;
+                _sceneIsolation.Apply(_settings.ExcludeIconLayerFromSceneLights, _rootObject.transform, _settings.RenderLayer);
+                _volume.enabled = true;
                 ItemIconCameraConfigurator.ConfigureRenderCamera(_renderCamera, bounds, renderTexture, _settings, renderProfile, antiAliasing);
 
                 if (renderProfile.UseDirectionalLight)
@@ -365,17 +321,14 @@ namespace Inventory.IconGeneration
                     ItemIconLightFactory.Configure(_lights, definition, _renderCamera.transform, _settings, renderProfile);
                 }
 
+                ClearRenderTexture(renderTexture, true);
                 _renderCamera.Render();
             }
             finally
             {
                 _renderCamera.targetTexture = null;
-
-                if (sceneEnvironmentIsolated)
-                {
-                    _sceneIsolation.Restore();
-                }
-
+                _volume.enabled = false;
+                _sceneIsolation.Restore();
                 ItemIconLightFactory.Disable(_lights);
             }
         }

@@ -89,6 +89,53 @@ namespace Inventory.Tests
         });
 
         [UnityTest]
+        public IEnumerator RenderIgnoresModelFromAnotherOpenSession() => UniTask.ToCoroutine(async () =>
+        {
+            ItemDefinition first = CreateRenderableItem("first_open_session_item");
+            ItemDefinition second = CreateRenderableItem("second_open_session_item");
+            GameObject extraMesh = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            extraMesh.transform.SetParent(first.VisualPrefab.transform, false);
+            extraMesh.transform.localScale = new Vector3(1f, 3f, 3f);
+            var material = _items.Track(new Material(Shader.Find("HDRP/Lit")));
+            material.SetColor("_BaseColor", Color.red);
+            extraMesh.GetComponent<Renderer>().sharedMaterial = material;
+
+            using var secondSession = new ItemIconBatchRenderSession(_settings);
+            Color32[] baseline = await RenderPixels(secondSession, second, Array.Empty<string>(), CancellationToken.None);
+            using var firstSession = new ItemIconBatchRenderSession(_settings);
+            Color32[] firstPixels = await RenderPixels(firstSession, first, Array.Empty<string>(), CancellationToken.None);
+            Color32[] withFirstSessionOpen = await RenderPixels(secondSession, second, Array.Empty<string>(), CancellationToken.None);
+            Color32[] fromNewSession = await RenderPixels(second, Array.Empty<string>(), CancellationToken.None);
+
+            Assert.That(MaxDifference(baseline, firstPixels), Is.GreaterThan(50));
+            Assert.That(MaxDifference(baseline, withFirstSessionOpen), Is.LessThanOrEqualTo(3));
+            Assert.That(MaxDifference(baseline, fromNewSession), Is.LessThanOrEqualTo(3));
+        });
+
+        [UnityTest]
+        public IEnumerator RenderIgnoresUnrelatedGeometryOnIconLayerAndRestoresVisibility() => UniTask.ToCoroutine(async () =>
+        {
+            ItemDefinition definition = CreateRenderableItem("layer_isolated_item");
+            Color32[] baseline = await RenderPixels(definition, Array.Empty<string>(), CancellationToken.None);
+            GameObject unrelated = _items.Track(GameObject.CreatePrimitive(PrimitiveType.Cube));
+            unrelated.layer = _settings.RenderLayer;
+            unrelated.transform.position = _settings.RenderOrigin;
+            unrelated.transform.localScale = Vector3.one * 1.5f;
+            var renderer = unrelated.GetComponent<Renderer>();
+            var material = _items.Track(new Material(Shader.Find("HDRP/Lit")));
+            material.SetColor("_BaseColor", Color.red);
+            renderer.sharedMaterial = material;
+
+            Color32[] withUnrelatedModel = await RenderPixels(definition, Array.Empty<string>(), CancellationToken.None);
+
+            Assert.That(MaxDifference(baseline, withUnrelatedModel), Is.LessThanOrEqualTo(3));
+            Assert.That(renderer.enabled, Is.True);
+            Assert.That(renderer.forceRenderingOff, Is.False);
+            Assert.That(unrelated.activeSelf, Is.True);
+            Assert.That(unrelated.layer, Is.EqualTo(_settings.RenderLayer));
+        });
+
+        [UnityTest]
         public IEnumerator VariantChangesRenderedIcon() => UniTask.ToCoroutine(async () =>
         {
             ItemDefinition definition = CreateRenderableItem("variant_item", true);
@@ -140,6 +187,11 @@ namespace Inventory.Tests
         private async UniTask<Color32[]> RenderPixels(ItemDefinition definition, string[] variantIds, CancellationToken cancellationToken)
         {
             using var session = new ItemIconBatchRenderSession(_settings);
+            return await RenderPixels(session, definition, variantIds, cancellationToken);
+        }
+
+        private static async UniTask<Color32[]> RenderPixels(ItemIconBatchRenderSession session, ItemDefinition definition, string[] variantIds, CancellationToken cancellationToken)
+        {
             Texture2D texture = await session.RenderAsync(definition, variantIds, definition.Width, definition.Height, ItemIconProfileType.Default, cancellationToken);
             Assert.That(texture, Is.Not.Null);
             Color32[] pixels = texture.GetPixels32();

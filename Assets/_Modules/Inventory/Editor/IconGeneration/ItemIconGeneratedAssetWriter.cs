@@ -209,11 +209,13 @@ namespace Inventory.Editor
 
     internal static class ItemIconBakeSignatureBuilder
     {
+        private const int RENDER_VERSION = 2;
+
         public static string Build(ItemIconBakeVariant variant, ItemIconGeneratorSettings settings)
         {
             var source = new StringBuilder(512);
             BakedItemIconEntry keyEntry = BakedItemIconEntry.Create(variant.Definition, variant.VariantIds, variant.Width, variant.Height, variant.ProfileType, settings, string.Empty, string.Empty, AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(variant.Definition)), variant.EstimatedTextureBytes);
-            source.Append(BuildIdentity(keyEntry));
+            source.Append(RENDER_VERSION).Append('|').Append(BuildIdentity(keyEntry));
             AppendDependency(source, variant.Definition);
             AppendDependency(source, variant.Definition.VisualPrefab);
             AppendDependency(source, settings);

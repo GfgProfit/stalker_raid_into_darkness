@@ -119,6 +119,7 @@ namespace Inventory.IconGeneration
         private readonly bool[] _volumeEnabledStates;
         private readonly ReflectionProbe[] _reflectionProbes;
         private readonly bool[] _reflectionProbeEnabledStates;
+        private readonly List<Renderer> _suppressedRenderers = new();
         private bool _lightsDisabled;
         private bool _applied;
 
@@ -134,7 +135,7 @@ namespace Inventory.IconGeneration
 
         public bool IsApplied => _applied;
 
-        public void Apply(bool disableSceneLights)
+        public void Apply(bool disableSceneLights, Transform itemRoot, int renderLayer)
         {
             if (_applied)
             {
@@ -151,6 +152,23 @@ namespace Inventory.IconGeneration
 
             DisableBehaviours(_volumes, _volumeEnabledStates);
             DisableBehaviours(_reflectionProbes, _reflectionProbeEnabledStates);
+
+            foreach (Renderer renderer in Resources.FindObjectsOfTypeAll<Renderer>())
+            {
+                if (renderer == null || renderer.forceRenderingOff || renderer.enabled == false)
+                {
+                    continue;
+                }
+
+                GameObject owner = renderer.gameObject;
+                if (owner.layer != renderLayer || owner.activeInHierarchy == false || renderer.transform.IsChildOf(itemRoot))
+                {
+                    continue;
+                }
+
+                _suppressedRenderers.Add(renderer);
+                renderer.forceRenderingOff = true;
+            }
         }
 
         public void Restore()
@@ -160,6 +178,15 @@ namespace Inventory.IconGeneration
                 return;
             }
 
+            foreach (Renderer renderer in _suppressedRenderers)
+            {
+                if (renderer != null)
+                {
+                    renderer.forceRenderingOff = false;
+                }
+            }
+
+            _suppressedRenderers.Clear();
             RestoreBehaviours(_reflectionProbes, _reflectionProbeEnabledStates);
             RestoreBehaviours(_volumes, _volumeEnabledStates);
 

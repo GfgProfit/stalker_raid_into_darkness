@@ -23,30 +23,36 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
 {
     public static class GraWeaponAddonSetup
     {
-        public const string ADDONS_FOLDER = "Assets/_Source/Items/Addons";
-        public const string MODELS_FOLDER = ADDONS_FOLDER + "/Models";
-        public const string DEFINITIONS_FOLDER = InventoryDemoContentBuilder.DEFINITIONS_FOLDER + "/Addons";
+        public const string ADDONS_FOLDER = "Assets/_Source/Resources/Items/Addons";
+        public const string SCOPES_FOLDER = ADDONS_FOLDER + "/Scopes";
+        public const string SILENCERS_FOLDER = ADDONS_FOLDER + "/Silencers";
         public const string ATTACHMENT_CATEGORY = "Attachment";
         public const string SILENCER_TAG = "Silencer";
         public const string SCOPE_TAG = "Scope";
         public const string GRENADE_LAUNCHER_TAG = "GrenadeLauncher";
         public const string SCENE_GROUP = "Addons";
         public const string ICONS_FOLDER = "Assets/_Source/UI/Item Icons";
-        public const string VISUALS_FOLDER = ADDONS_FOLDER + "/Visuals";
 
         private const string MENU = "Tools/Inventory/Setup GRA Weapon Addons";
         private const string LOG = "[WeaponAddons] ";
         private const string DEFAULT_ICONS_TEXTURE = "ui\\ui_icon_equipment";
         private const float ICON_CELL = 50f;
         private const string SILENCER_CLASS = "WP_SILEN";
+        internal const string AUG_SILENCER_SECTION = "wpn_sil_nato";
         private const string SCOPE_CLASS = "WP_SCOPE";
         private const string GRENADE_LAUNCHER_CLASS = "WP_GLAUN";
         private const int MAX_SETTLE_PASSES = 4;
 
         private static readonly string[] INDEX_SCOPE = { "configs", "sounds", "textures/ui", "meshes/dynamics/weapons/wpn_upgrade", "meshes/dynamics/weapons/wpn_addon_world_models", "meshes/dynamics/weapons/wpn_vssk", "meshes/attachments" };
         private static readonly string[] ADDON_LIST_KEYS = { "scopes", "silencer_name", "grenade_launcher_name" };
-        private static readonly string[] EXCLUDED = { "placeholder" };
-        private static readonly Dictionary<string, string> MESH_ONLY = new Dictionary<string, string>(StringComparer.Ordinal) { { "wpn_sil_spec_isg", "wpn_silencer_hexagon12" } };
+        private static readonly string[] EXCLUDED =
+        {
+            "placeholder", "1p87", "ac11090", "aim_acro", "bravo4", "c-more", "compm4s", "ekp8_18", "eot", "hamr", "march_f_shorty_alt",
+            "mepro", "monstrum", "pk6", "po434", "point_aimpro", "romeo8", "spec_alt", "triji", "trihawk", "uh2",
+            "wpn_addon_scope", "wpn_addon_scope_g43", "wpn_addon_scope_galil", "wpn_addon_scope_po4x34", "wpn_addon_scope_pu", "wpn_addon_scope_susat", "wpn_addon_scope_zf4",
+            "wpn_addon_grenade_launcher", "wpn_addon_grenade_launcher_l85", "wpn_addon_grenade_launcher_m203", "wpn_addon_grenade_launcher_monolit", "wpn_addon_grenade_launcher_scar",
+            "bossxe", "c79", "devo", "e0t2_magd", "e0t2_magd_flipped", "exps3_mag", "exps3_mag_flipped", "gee36", "gee36_dove", "side", "uh1_magd", "uh1_magd_flipped"
+        };
         private static readonly Regex ITEM_LISTS = new Regex("trade|death|treasure|loot|craft|stash|drop", RegexOptions.Compiled | RegexOptions.IgnoreCase);
         private static readonly Regex LIST_KEY = new Regex("^\\s*([\\w.\\-]+)\\s*=", RegexOptions.Compiled | RegexOptions.Multiline);
 
@@ -87,44 +93,49 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
 
             XRayLtxDatabase system = XRayLtxDatabase.LoadSystem(sources.Index);
             XRayStringTable strings = XRayStringTable.Load(sources.Index, "rus");
-            Dictionary<string, Color32> colors = GraTextFormatter.LoadColors(sources);
             var log = new StringBuilder(sources.Describe()).AppendLine();
             SortedDictionary<string, int> used = CollectUsedAddons(sources, system, log);
-            var models = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            var models = new Dictionary<string, string>(StringComparer.Ordinal);
+            var importedModels = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            var atlasSections = new List<string>();
             int failures = 0;
-            StalkerXRaySources.EnsureFolder(MODELS_FOLDER);
-            StalkerXRaySources.EnsureFolder(DEFINITIONS_FOLDER);
-
             foreach (string section in used.Keys)
             {
+                WeaponAddonKind kind = GetAddonKind(Get(system, section, "class"));
+                if (kind == WeaponAddonKind.GrenadeLauncher)
+                {
+                    atlasSections.Add(section);
+                }
+
                 string visual = ResolveVisual(sources, system, section);
 
-                if (visual == null || models.ContainsKey(visual))
+                if (visual == null)
                 {
                     continue;
                 }
 
-                string assetPath = sources.CopyToProject(visual, MODELS_FOLDER, Path.GetFileName(visual));
-
-                if (assetPath == null)
+                string folder = AddonFolder(kind, section);
+                string name = Path.GetFileName(visual);
+                string assetPath = folder + "/" + name;
+                if (!importedModels.Contains(assetPath) && sources.CopyToProject(visual, folder, name) == null)
                 {
                     log.AppendLine($"ERROR: [{section}] model '{visual}' is missing in GRA.");
                     failures++;
                     continue;
                 }
 
-                models[visual] = assetPath;
+                importedModels.Add(assetPath);
+                models[section] = assetPath;
             }
 
             AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
-            failures += SettleMaterials(new List<string>(models.Values), log);
-            Dictionary<string, Sprite> icons = ImportIcons(sources, system, used.Keys, log);
+            failures += SettleMaterials(new List<string>(importedModels), log);
+            Dictionary<string, Sprite> icons = ImportIcons(sources, system, atlasSections, log);
             var definitions = new List<ItemDefinition>();
 
             foreach (KeyValuePair<string, int> pair in used)
             {
-                string visual = ResolveVisual(sources, system, pair.Key);
-                GameObject model = visual != null && models.TryGetValue(visual, out string path) ? AssetDatabase.LoadAssetAtPath<GameObject>(path) : null;
+                GameObject model = models.TryGetValue(pair.Key, out string path) ? AssetDatabase.LoadAssetAtPath<GameObject>(path) : null;
 
                 if (model == null)
                 {
@@ -133,18 +144,14 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
                     continue;
                 }
 
-                if (icons.TryGetValue(pair.Key, out Sprite icon) == false)
+                WeaponAddonKind kind = GetAddonKind(Get(system, pair.Key, "class"));
+                if (icons.TryGetValue(pair.Key, out Sprite icon) == false && kind == WeaponAddonKind.GrenadeLauncher)
                 {
                     log.AppendLine($"ERROR: [{pair.Key}] has no GRA icon.");
                     failures++;
                 }
 
-                if (MESH_ONLY.TryGetValue(pair.Key, out string material))
-                {
-                    model = CreateMeshOnlyVisual(model, pair.Key, material, log);
-                }
-
-                definitions.Add(CreateDefinition(system, strings, colors, pair.Key, model, icon));
+                definitions.Add(CreateDefinition(system, strings, kind, pair.Key, model, icon));
             }
 
             AddToDatabase(definitions);
@@ -152,7 +159,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
             GraInventorySoundSetup.SetupTakeSounds(sources, definitions, log);
             AssetDatabase.SaveAssets();
             failures += PlaceInScene(prefabs, log) ? 0 : 1;
-            Debug.Log($"{LOG}{definitions.Count} addons from {used.Count} referenced sections, {models.Count} models, failures {failures}.\n{log}");
+            Debug.Log($"{LOG}{definitions.Count} addons from {used.Count} referenced sections, {importedModels.Count} models, failures {failures}.\n{log}");
             return failures == 0 ? definitions : null;
         }
 
@@ -160,6 +167,26 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
         {
             return new Vector2Int(Mathf.Max(1, (graWidth + 1) / 2), Mathf.Max(1, (graHeight + 1) / 2));
         }
+
+        internal static bool IsExcludedAddon(string section) => Array.IndexOf(EXCLUDED, section) >= 0;
+
+        internal static string ScopeFolder(string section) => SCOPES_FOLDER + "/" + section;
+
+        internal static string ScopeDefinitionPath(string section) => AddonDefinitionPath(WeaponAddonKind.Scope, section);
+
+        internal static bool IsAddonResourcePath(string path) => path.StartsWith(ADDONS_FOLDER + "/", StringComparison.Ordinal);
+
+        internal static string AddonFolder(WeaponAddonKind kind, string section)
+        {
+            return kind switch
+            {
+                WeaponAddonKind.Scope => ScopeFolder(section),
+                WeaponAddonKind.Silencer => SILENCERS_FOLDER + "/" + section,
+                _ => ADDONS_FOLDER + "/GrenadeLaunchers/" + section
+            };
+        }
+
+        internal static string AddonDefinitionPath(WeaponAddonKind kind, string section) => AddonFolder(kind, section) + "/" + section + "_definition.asset";
 
         private static async UniTaskVoid RunBatchAsync()
         {
@@ -179,11 +206,12 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
 
         private static SortedDictionary<string, int> CollectUsedAddons(StalkerXRaySources sources, XRayLtxDatabase system, StringBuilder log)
         {
+            HashSet<string> excluded = GetExcludedSections(system);
             var addons = new HashSet<string>(StringComparer.Ordinal);
 
             foreach (string section in system.Sections.Keys)
             {
-                if (IsAddonClass(Get(system, section, "class") ?? string.Empty) && Array.IndexOf(EXCLUDED, section) < 0 && Get(system, section, "visual") != null)
+                if (excluded.Contains(section) == false && IsAddonClass(Get(system, section, "class")) && Get(system, section, "visual") != null)
                 {
                     addons.Add(section);
                 }
@@ -208,7 +236,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
                 {
                     foreach (string item in system.GetList(section, key))
                     {
-                        AddReference(item, addons, used, rejected);
+                        AddReference(item, addons, excluded, used, rejected);
                     }
                 }
 
@@ -218,7 +246,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
                 {
                     foreach (string item in system.GetList(group, "scopes"))
                     {
-                        AddReference(item, addons, used, rejected);
+                        AddReference(item, addons, excluded, used, rejected);
                     }
                 }
             }
@@ -256,16 +284,30 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
                 }
             }
 
-            log.AppendLine($"Addon sections: {addons.Count} (excluded: {string.Join(", ", EXCLUDED)}), used: {used.Count} ({fromWeapons} referenced by {weapons} weapons, the rest from {listed} trade/loot lists), unused: {string.Join(", ", unused)}.");
+            log.AppendLine($"Addon sections: {addons.Count} (excluded: {excluded.Count}), used: {used.Count} ({fromWeapons} referenced by {weapons} weapons, the rest from {listed} trade/loot lists), unused: {string.Join(", ", unused)}.");
             log.AppendLine($"Non-addon references in weapon lists: {string.Join(", ", rejected)}.");
             return used;
         }
 
-        private static void AddReference(string item, HashSet<string> addons, SortedDictionary<string, int> used, SortedSet<string> rejected)
+        private static HashSet<string> GetExcludedSections(XRayLtxDatabase system)
+        {
+            var excluded = new HashSet<string>(EXCLUDED, StringComparer.Ordinal);
+            foreach (string section in system.Sections.Keys)
+            {
+                if (section != AUG_SILENCER_SECTION && Get(system, section, "class") == SILENCER_CLASS)
+                {
+                    excluded.Add(section);
+                }
+            }
+
+            return excluded;
+        }
+
+        private static void AddReference(string item, HashSet<string> addons, HashSet<string> excluded, SortedDictionary<string, int> used, SortedSet<string> rejected)
         {
             string name = item.Trim().ToLowerInvariant();
 
-            if (name.Length == 0)
+            if (name.Length == 0 || excluded.Contains(name))
             {
                 return;
             }
@@ -316,57 +358,27 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
             return remaining.Count;
         }
 
-        public static string TranslateAddon(XRayStringTable strings, string key)
+        private static WeaponAddonKind GetAddonKind(string cls) => cls == SILENCER_CLASS ? WeaponAddonKind.Silencer : cls == SCOPE_CLASS ? WeaponAddonKind.Scope : WeaponAddonKind.GrenadeLauncher;
+
+        private static ItemDefinition CreateDefinition(XRayLtxDatabase system, XRayStringTable strings, WeaponAddonKind kind, string section, GameObject model, Sprite icon)
         {
-            string translated = strings.Translate(key);
-
-            if (translated == key && key != null && key.StartsWith("st_addon_scope_aim_acro", StringComparison.Ordinal))
-            {
-                return strings.Translate(key.Replace("st_addon_scope_aim_acro", "st_addon_scope_acro"));
-            }
-
-            return translated;
-        }
-
-        public static string RepairAcroText()
-        {
-            StalkerXRaySources sources = StalkerXRaySources.Open(new[] { "configs" }, out string error);
-
-            if (sources == null)
-            {
-                throw new InvalidOperationException(error);
-            }
-
-            XRayStringTable strings = XRayStringTable.Load(sources.Index, "rus");
-            ItemDefinition definition = AssetDatabase.LoadAssetAtPath<ItemDefinition>(DEFINITIONS_FOLDER + "/aim_acro.asset");
-            var serialized = new SerializedObject(definition);
-            serialized.FindProperty("_displayName").stringValue = TranslateAddon(strings, "st_addon_scope_aim_acro");
-            serialized.FindProperty("_shortName").stringValue = TranslateAddon(strings, "st_addon_scope_aim_acro");
-            serialized.FindProperty("_description").stringValue = GraTextFormatter.Format(TranslateAddon(strings, "st_addon_scope_aim_acro_descr"), GraTextFormatter.LoadColors(sources));
-            serialized.ApplyModifiedPropertiesWithoutUndo();
-            AssetDatabase.SaveAssets();
-            return definition.DisplayName;
-        }
-
-        private static ItemDefinition CreateDefinition(XRayLtxDatabase system, XRayStringTable strings, IReadOnlyDictionary<string, Color32> colors, string section, GameObject model, Sprite icon)
-        {
-            string path = DEFINITIONS_FOLDER + "/" + section + ".asset";
+            string path = AddonDefinitionPath(kind, section);
             var definition = AssetDatabase.LoadAssetAtPath<ItemDefinition>(path);
+            bool preserveAddon = kind != WeaponAddonKind.GrenadeLauncher && definition != null;
 
             if (definition == null)
             {
                 definition = ScriptableObject.CreateInstance<ItemDefinition>();
                 AssetDatabase.CreateAsset(definition, path);
+                definition.name = section;
             }
 
-            string cls = Get(system, section, "class");
-            WeaponAddonKind kind = cls == SILENCER_CLASS ? WeaponAddonKind.Silencer : cls == SCOPE_CLASS ? WeaponAddonKind.Scope : WeaponAddonKind.GrenadeLauncher;
             string name = Get(system, section, "inv_name") ?? section;
             var serialized = new SerializedObject(definition);
             serialized.FindProperty("_definitionId").stringValue = AssetDatabase.AssetPathToGUID(path);
-            serialized.FindProperty("_displayName").stringValue = TranslateAddon(strings, name);
-            serialized.FindProperty("_shortName").stringValue = TranslateAddon(strings, Get(system, section, "inv_name_short") ?? name);
-            serialized.FindProperty("_description").stringValue = GraTextFormatter.Format(TranslateAddon(strings, Get(system, section, "description")), colors);
+            serialized.FindProperty("_displayName").stringValue = strings.Translate(name);
+            serialized.FindProperty("_shortName").stringValue = strings.Translate(Get(system, section, "inv_name_short") ?? name);
+            serialized.FindProperty("_description").stringValue = string.Empty;
             serialized.FindProperty("_category").stringValue = ATTACHMENT_CATEGORY;
             SerializedProperty tags = serialized.FindProperty("_tags");
             tags.arraySize = 1;
@@ -376,14 +388,40 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
             serialized.FindProperty("_maxStack").intValue = 1;
             serialized.FindProperty("_allowRotation").boolValue = true;
             serialized.FindProperty("_visualPrefab").objectReferenceValue = model;
-            ItemIconDefaults.Apply(serialized, ItemIconDefaults.SIDE_VIEW_ANGLES);
-            serialized.FindProperty("_iconOverride").objectReferenceValue = icon;
-            serialized.FindProperty("_icon._generateIcon").boolValue = icon == null;
+            if (!preserveAddon)
+            {
+                ItemIconDefaults.Apply(serialized, ItemIconDefaults.SIDE_VIEW_ANGLES);
+                serialized.FindProperty("_iconOverride").objectReferenceValue = icon;
+                serialized.FindProperty("_icon._generateIcon").boolValue = icon == null;
+            }
+
             SerializedProperty components = serialized.FindProperty("_components");
-            components.ClearArray();
-            components.arraySize = 1;
-            SerializedProperty addon = components.GetArrayElementAtIndex(0);
-            addon.managedReferenceValue = new WeaponAddonComponent();
+            SerializedProperty addon = null;
+            if (preserveAddon)
+            {
+                for (int i = 0; i < components.arraySize; i++)
+                {
+                    SerializedProperty component = components.GetArrayElementAtIndex(i);
+                    if (component.managedReferenceValue is WeaponAddonComponent)
+                    {
+                        addon = component;
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                components.ClearArray();
+            }
+
+            if (addon == null)
+            {
+                int index = components.arraySize;
+                components.arraySize++;
+                addon = components.GetArrayElementAtIndex(index);
+                addon.managedReferenceValue = new WeaponAddonComponent();
+            }
+
             addon.FindPropertyRelative("_section").stringValue = section;
             addon.FindPropertyRelative("_kind").enumValueIndex = (int)kind;
             addon.FindPropertyRelative("_cost").intValue = GetInt(system, section, "cost");
@@ -445,37 +483,6 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
             EditorUtility.SetDirty(database);
         }
 
-        private static GameObject CreateMeshOnlyVisual(GameObject model, string section, string material, StringBuilder log)
-        {
-            StalkerXRaySources.EnsureFolder(VISUALS_FOLDER);
-            var root = (GameObject)PrefabUtility.InstantiatePrefab(model);
-
-            try
-            {
-                int kept = 0;
-
-                foreach (Renderer renderer in root.GetComponentsInChildren<Renderer>(true))
-                {
-                    bool keep = renderer.sharedMaterial != null && renderer.sharedMaterial.name == material;
-                    renderer.gameObject.SetActive(keep);
-                    kept += keep ? 1 : 0;
-                }
-
-                if (kept == 0)
-                {
-                    log.AppendLine($"ERROR: [{section}] model '{model.name}' has no mesh with material '{material}'.");
-                    return model;
-                }
-
-                log.AppendLine($"[{section}] GRA model '{model.name}' is a whole weapon; only '{material}' meshes are kept ({kept}).");
-                return PrefabUtility.SaveAsPrefabAsset(root, VISUALS_FOLDER + "/" + section + ".prefab");
-            }
-            finally
-            {
-                UnityEngine.Object.DestroyImmediate(root);
-            }
-        }
-
         private static string ResolveVisual(StalkerXRaySources sources, XRayLtxDatabase system, string section)
         {
             string hud = Get(system, section, "hud");
@@ -483,13 +490,19 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
             return attached != null && sources.Exists(attached) ? attached : ModelPath(Get(system, section, "visual"));
         }
 
-        internal static Dictionary<string, Sprite> ImportIcons(StalkerXRaySources sources, XRayLtxDatabase system, IEnumerable<string> sections, StringBuilder log)
+        internal static Dictionary<string, Sprite> ImportIcons(StalkerXRaySources sources, XRayLtxDatabase system, IEnumerable<string> sections, StringBuilder log, string iconsFolder = ICONS_FOLDER)
         {
+            HashSet<string> excluded = GetExcludedSections(system);
             var byTexture = new SortedDictionary<string, List<string>>(StringComparer.Ordinal);
 
             foreach (string section in sections)
             {
-                string texture = Regex.Replace(Get(system, section, "icons_texture") ?? DEFAULT_ICONS_TEXTURE, "\\s+", string.Empty).Replace('\\', '/').ToLowerInvariant();
+                if (excluded.Contains(section))
+                {
+                    continue;
+                }
+
+                string texture = GetIconTexture(system, section);
 
                 if (byTexture.TryGetValue(texture, out List<string> list) == false)
                 {
@@ -501,11 +514,11 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
             }
 
             var icons = new Dictionary<string, Sprite>(StringComparer.Ordinal);
-            StalkerXRaySources.EnsureFolder(ICONS_FOLDER);
+            StalkerXRaySources.EnsureFolder(iconsFolder);
 
             foreach (KeyValuePair<string, List<string>> pair in byTexture)
             {
-                string assetPath = ICONS_FOLDER + "/" + pair.Key.Replace("ui/", string.Empty).Replace('/', '_') + ".png";
+                string assetPath = iconsFolder + "/" + pair.Key.Replace("ui/", string.Empty).Replace('/', '_') + ".png";
                 byte[] data = sources.ReadBytes("textures/" + pair.Key + ".dds");
 
                 if (data == null)
@@ -522,19 +535,17 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
                     continue;
                 }
 
-                File.WriteAllBytes(Path.GetFullPath(assetPath), EncodePng(DdsDecoder.DecodeTopLevel(data, header), header.Width, header.Height));
-                AssetDatabase.ImportAsset(assetPath, ImportAssetOptions.ForceSynchronousImport);
                 var rects = new List<KeyValuePair<string, Rect>>();
 
                 foreach (string section in pair.Value)
                 {
-                    int width = GetInt(system, section, "inv_grid_width");
-                    int height = GetInt(system, section, "inv_grid_height");
-                    float x = GetInt(system, section, "inv_grid_x") * ICON_CELL;
-                    float y = header.Height - (GetInt(system, section, "inv_grid_y") + height) * ICON_CELL;
-                    rects.Add(new KeyValuePair<string, Rect>(section, new Rect(x, y, width * ICON_CELL, height * ICON_CELL)));
+                    rects.Add(new KeyValuePair<string, Rect>(section, GetIconRect(system, section, header.Height)));
                 }
 
+                byte[] pixels = DdsDecoder.DecodeTopLevel(data, header);
+                ClearExcludedIconPixels(system, excluded, pair.Key, header, rects, pixels);
+                File.WriteAllBytes(Path.GetFullPath(assetPath), EncodePng(pixels, header.Width, header.Height));
+                AssetDatabase.ImportAsset(assetPath, ImportAssetOptions.ForceSynchronousImport);
                 ConfigureSprites(assetPath, Math.Max(header.Width, header.Height), rects);
 
                 foreach (UnityEngine.Object asset in AssetDatabase.LoadAllAssetsAtPath(assetPath))
@@ -549,6 +560,66 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
             }
 
             return icons;
+        }
+
+        private static string GetIconTexture(XRayLtxDatabase system, string section)
+        {
+            return Regex.Replace(Get(system, section, "icons_texture") ?? DEFAULT_ICONS_TEXTURE, "\\s+", string.Empty).Replace('\\', '/').ToLowerInvariant();
+        }
+
+        private static Rect GetIconRect(XRayLtxDatabase system, string section, int textureHeight)
+        {
+            int width = GetInt(system, section, "inv_grid_width");
+            int height = GetInt(system, section, "inv_grid_height");
+            float x = GetInt(system, section, "inv_grid_x") * ICON_CELL;
+            float y = textureHeight - (GetInt(system, section, "inv_grid_y") + height) * ICON_CELL;
+            return new Rect(x, y, width * ICON_CELL, height * ICON_CELL);
+        }
+
+        private static void ClearExcludedIconPixels(XRayLtxDatabase system, HashSet<string> excluded, string texture, DdsHeader header, List<KeyValuePair<string, Rect>> rects, byte[] pixels)
+        {
+            foreach (string section in excluded)
+            {
+                if (IsAddonClass(Get(system, section, "class")) == false || GetIconTexture(system, section) != texture)
+                {
+                    continue;
+                }
+
+                Rect rect = GetIconRect(system, section, header.Height);
+                List<KeyValuePair<string, Rect>> overlaps = rects.FindAll(entry => entry.Value.Overlaps(rect));
+                int left = Mathf.Max(0, (int)rect.xMin);
+                int right = Mathf.Min(header.Width, (int)rect.xMax);
+                int bottom = Mathf.Max(0, (int)rect.yMin);
+                int top = Mathf.Min(header.Height, (int)rect.yMax);
+
+                for (int y = bottom; y < top; y++)
+                {
+                    int row = (header.Height - 1 - y) * header.Width;
+                    if (overlaps.Count == 0 && left < right)
+                    {
+                        Array.Clear(pixels, (row + left) * 4, (right - left) * 4);
+                        continue;
+                    }
+
+                    for (int x = left; x < right; x++)
+                    {
+                        bool shared = false;
+                        foreach (KeyValuePair<string, Rect> entry in overlaps)
+                        {
+                            if (entry.Value.Contains(new Vector2(x, y)))
+                            {
+                                shared = true;
+                                break;
+                            }
+                        }
+
+                        if (shared == false)
+                        {
+                            Array.Clear(pixels, (row + x) * 4, 4);
+                        }
+                    }
+                }
+            }
         }
 
         internal static void ConfigureSprites(string assetPath, int maxSize, List<KeyValuePair<string, Rect>> rects)

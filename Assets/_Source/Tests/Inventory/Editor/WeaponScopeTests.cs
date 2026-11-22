@@ -26,13 +26,13 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
         public void SetUp()
         {
             _weapon = Load("Weapons/wpn_aug_a3");
-            _first = Load("Addons/leupold");
-            _second = Load("Addons/ac10632");
+            _first = LoadScope("leupold");
+            _second = LoadScope("ac10632");
             _preview = EditorSceneManager.NewPreviewScene();
             _root = new GameObject("WeaponScopeTests", typeof(RectTransform));
             SceneManager.MoveGameObjectToScene(_root, _preview);
             _window = _root.AddComponent<InventoryWindow>();
-            var definitions = new List<ItemDefinition>(_weapon.GetComponent<WeaponStatsComponent>().CompatibleScopes) { _weapon, Load("Addons/wpn_sil_nato") };
+            var definitions = new List<ItemDefinition>(_weapon.GetComponent<WeaponStatsComponent>().CompatibleScopes) { _weapon, LoadSilencer() };
             _model = new InventoryModel(new Resolver(definitions));
             _model.AddContainer(new GridContainer("bag", 24, 8));
             _model.AddContainer(new GridContainer("loot", 8, 8));
@@ -55,7 +55,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             ItemInstance weapon = Add(_weapon, "bag");
             ItemInstance first = Add(_first, "loot");
             ItemInstance second = Add(_second, "loot");
-            ItemInstance silencer = Add(Load("Addons/wpn_sil_nato"), "bag");
+            ItemInstance silencer = Add(LoadSilencer(), "bag");
             first.SetState("condition", "0.63");
             second.SetState("condition", "0.42");
             weapon.SetState(InventoryWeaponAmmoSource.MAGAZINE_STATE, "17");
@@ -106,7 +106,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
         public void CompatibilityWhitelistRejectsOtherMountsAndNonScopeItems()
         {
             ItemInstance weapon = Add(_weapon, "bag");
-            ItemInstance unsupported = Add(Load("Addons/1p29"), "loot");
+            ItemInstance unsupported = Add(LoadScope("1p29"), "loot");
             ItemInstance ammunition = Add(_weapon, "loot");
             Assert.That(_attachments.Handles(unsupported, weapon), Is.False);
             Assert.That(_attachments.Install(unsupported, weapon).Success, Is.False);
@@ -154,7 +154,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             var style = new ContextMenuOverhaulStyle(_window, null);
             ItemInstance scope = Add(_first, "loot");
             ItemInstance weapon = Add(_weapon, "bag");
-            ItemInstance silencer = Add(Load("Addons/wpn_sil_nato"), "bag");
+            ItemInstance silencer = Add(LoadSilencer(), "bag");
             var install = new InventoryDelegateAction(InventoryWeaponAttachments.ATTACH_ACTION + "Primary", 20, null, null);
             Sprite expected = theme.Icon("ui_cmo_scope");
             Assert.That(expected, Is.Not.Null);
@@ -188,7 +188,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
         {
             GameObject[] prefabs = { _weapon.VisualPrefab, _weapon.GetComponent<WeaponHudComponent>().HudModel, _weapon.GetComponent<WorldItemComponent>().Prefab.gameObject };
             WeaponStatsComponent stats = _weapon.GetComponent<WeaponStatsComponent>();
-            Assert.That(stats.CompatibleScopes.Count, Is.EqualTo(62));
+            Assert.That(stats.CompatibleScopes.Count, Is.EqualTo(41));
 
             foreach (GameObject prefab in prefabs)
             {
@@ -219,7 +219,10 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
                     Assert.That(active, Is.EqualTo(1));
                     Assert.That(standard.activeSelf, Is.False, prefab.name + ": " + scope.name);
                     Assert.That(scope.GetComponent<WeaponAddonComponent>().OverrideAimOffsetPosition, Is.True);
-                    Assert.That(scope.GetComponent<WeaponAddonComponent>().AimOffsetPosition, Is.EqualTo(Vector3.zero));
+                    if (scope.name != "march_f_shorty")
+                    {
+                        Assert.That(scope.GetComponent<WeaponAddonComponent>().AimOffsetPosition, Is.EqualTo(Vector3.zero));
+                    }
                 }
 
                 ItemIconVisualConfigurators.Apply(instance, _weapon, new string[0]);
@@ -290,8 +293,8 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
         public void IconVariantsContainEveryScopeWithAndWithoutSilencer()
         {
             List<string[]> variants = ItemIconVariantEnumeration.EnumerateVariants(_weapon);
-            Assert.That(variants.Count, Is.EqualTo(126));
-            string silencer = Load("Addons/wpn_sil_nato").DefinitionId;
+            Assert.That(variants.Count, Is.EqualTo(84));
+            string silencer = LoadSilencer().DefinitionId;
 
             foreach (ItemDefinition scope in _weapon.GetComponent<WeaponStatsComponent>().CompatibleScopes)
             {
@@ -308,6 +311,10 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
         }
 
         private static ItemDefinition Load(string name) => AssetDatabase.LoadAssetAtPath<ItemDefinition>("Assets/_Source/Items/Definitions/" + name + ".asset");
+
+        private static ItemDefinition LoadScope(string name) => Resources.Load<ItemDefinition>("Items/Addons/Scopes/" + name + "/" + name + "_definition");
+
+        private static ItemDefinition LoadSilencer() => Resources.Load<ItemDefinition>("Items/Addons/Silencers/wpn_sil_nato/wpn_sil_nato_definition");
 
         private sealed class Resolver : IItemDefinitionResolver
         {

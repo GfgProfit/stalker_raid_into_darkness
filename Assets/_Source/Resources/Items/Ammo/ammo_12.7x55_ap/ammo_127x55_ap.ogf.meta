@@ -1,0 +1,30 @@
+fileFormatVersion: 2
+guid: e94d01ea26b809d4a8b2dcf2c54d5693
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\ash12\ammo\boxap|models\weapons
+    second: {fileID: 2100000, guid: 8f7f52247056f2a4b9074ea78715c75f, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\wpn_ammo\ammo_12.7x55_ap|models\weapons
+    second: {fileID: 2100000, guid: 2b8e9e74cbdb38545967dfb14e125fad, type: 2}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 61e536e21e96f284493f2969a9250cdf, type: 3}
+  _scale: 1
+  _importMaterials: 1
+  _texturesFolder: 
+  _searchTexturesByName: 1
+  _importEmbeddedMotions: 1
+  _embeddedLoopMode: 0
+  _addAnimator: 1
+  _readableMeshes: 0
+  _updateWhenOffscreen: 0
+  _autoResolveResources: 1

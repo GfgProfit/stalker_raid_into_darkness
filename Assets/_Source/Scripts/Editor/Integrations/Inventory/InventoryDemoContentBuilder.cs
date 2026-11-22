@@ -31,6 +31,10 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
 
         public const string EQUIPMENT_MASK = "HHTTDD\nHHOORR\nKKOOBB\nKKOONN\nPPPPP.\nPPPPP.\nSSSSS.\nSSSSS.\n1234bg\navwxy.";
 
+        internal static readonly string[] ITEM_DEFINITION_FOLDERS = { DEFINITIONS_FOLDER, GraWeaponAddonSetup.ADDONS_FOLDER, IwpAmmoSetup.AMMO_FOLDER };
+
+        internal static bool IsItemResourcePath(string path) => GraWeaponAddonSetup.IsAddonResourcePath(path) || IwpAmmoSetup.IsAmmoResourcePath(path);
+
         public sealed class DemoContent
         {
             public readonly Dictionary<string, ItemDefinition> Items = new();
@@ -53,7 +57,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
 
             var content = new DemoContent();
 
-            string[] definitionGuids = AssetDatabase.IsValidFolder(DEFINITIONS_FOLDER) ? AssetDatabase.FindAssets("t:" + nameof(ItemDefinition), new[] { DEFINITIONS_FOLDER }) : new string[0];
+            string[] definitionGuids = AssetDatabase.FindAssets("t:" + nameof(ItemDefinition), ITEM_DEFINITION_FOLDERS);
 
             foreach (string guid in definitionGuids)
             {
@@ -65,7 +69,8 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
                     continue;
                 }
 
-                content.Items[Path.GetFileNameWithoutExtension(path)] = definition;
+                string key = IsItemResourcePath(path) ? definition.name : Path.GetFileNameWithoutExtension(path);
+                content.Items[key] = definition;
 
                 if (definition.IsCategory(CONSUMABLE_CATEGORY) && definition.GetComponent<ConsumableItemComponent>() == null)
                 {

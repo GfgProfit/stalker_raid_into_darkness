@@ -16,7 +16,7 @@ namespace RaidIntoDarkness.Weapons.Optics.Editor
         private const string WEAPON_PATH = "Assets/_Source/Items/Weapons/FirstPerson/wpn_aug_a3.asset";
         private const string PROFILE_PATH = "Assets/_Source/Settings/Player/StalkerMovementProfile.asset";
         private const string HANDS_PATH = "Assets/_Source/FirstPerson/Hands/Models/wpn_hand_01.ogf";
-        private const string DEFINITION_PATH = "Assets/_Source/Items/Definitions/Addons/march_f_shorty.asset";
+        private const string DEFINITION_PATH = ScopeOpticsPrefabSetup.MARCH_ITEM;
         private const string SCOPE_NAME = "march_f_shorty";
         private const float OCULAR_HALF_SIZE = 0.0158353858f;
 

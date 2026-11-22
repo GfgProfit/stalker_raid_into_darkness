@@ -1,0 +1,108 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da0f90c2955673d46b25d465cbe44ed0, type: 3}
+  m_Name: ammo_m209
+  m_EditorClassIdentifier: Inventory::Inventory.ItemDefinition
+  _definitionId: 1c042c1da4d1ccf409566d75019fe278
+  _displayName: "\u0413\u0440\u0430\u043D\u0430\u0442\u0430 M433 HEDP"
+  _shortName: M433 HEDP
+  _description: "\u0412\u044B\u0441\u0442\u0440\u0435\u043B M433 HEDP \u0434\u043B\u044F \u043F\u043E\u0434\u0441\u0442\u0432\u043E\u043B\u044C\u043D\u044B\u0445 \u0433\u0440\u0430\u043D\u0430\u0442\u043E\u043C\u0451\u0442\u043E\u0432 \u041D\u0410\u0422\u041E."
+  _category: Ammo
+  _tags:
+  - Ammo
+  _size: {x: 1, y: 1}
+  _weight: 0.265
+  _maxStack: 0
+  _allowRotation: 1
+  _backgroundColor: {r: 1, g: 1, b: 1, a: 0.04}
+  _fallbackIcon: {fileID: 0}
+  _iconOverride: {fileID: -1057735981, guid: ffbb95c1826004343baca3d552702564, type: 3}
+  _visualPrefab: {fileID: 7171843177624627607, guid: 85148f4cffdbcb14f84b2745ab8dba11, type: 3}
+  _defaultIconVariant: []
+  _icon:
+    _generateIcon: 0
+    _pixelsPerCell: 64
+    _antiAliasing: 1
+    _useOutline: 0
+    _outlineWidth: 2
+    _useShadow: 1
+    _shadowOffset: {x: 2, y: -2}
+    _shadowBlur: 2
+    _defaultView:
+      _modelEulerAngles: {x: 0, y: 90, z: 0}
+      _modelScale: {x: 1, y: 1, z: 1}
+      _cameraEulerAngles: {x: 0, y: -90, z: 0}
+      _padding: 1.15
+      _useDirectionalLight: 1
+      _lightIntensity: 5
+    _useCustomSlotView: 0
+    _slotView:
+      _modelEulerAngles: {x: 0, y: 90, z: 0}
+      _modelScale: {x: 1, y: 1, z: 1}
+      _cameraEulerAngles: {x: 0, y: -90, z: 0}
+      _padding: 1.15
+      _useDirectionalLight: 1
+      _lightIntensity: 5
+  _components:
+  - rid: 115149063313949052
+  - rid: 115149063313949053
+  - rid: 115149063313949088
+  - rid: 115149063313949130
+  references:
+    version: 2
+    RefIds:
+    - rid: 115149063313949052
+      type: {class: AmmoStatsComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      data:
+        _section: ammo_m209
+        _boxSize: 1
+        _boxWeight: 0.265
+        _cost: 1950
+        _armorPiercing: 0
+        _hitMultiplier: 1.1
+        _impulseMultiplier: 1
+        _speedMultiplier: 1
+        _dispersionMultiplier: 1
+        _airResistance: 0
+        _buckshot: 1
+        _averageWeaponHitPower: -1
+        _monsterDamageMultiplier: 1
+        _penetration: 0
+        _damagePerProjectile: -1
+        _hasTooltipParameters: 0
+    - rid: 115149063313949053
+      type: {class: ItemTakeSoundComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      data:
+        _category: ammolarge
+        _clips:
+        - {fileID: 8300000, guid: ee0bff93b001d4a47b84688a3735b533, type: 3}
+        - {fileID: 8300000, guid: af16938bf1330cb488994004d4df86b1, type: 3}
+        - {fileID: 8300000, guid: db9d17fa52c8c16449a42dc3f0f089cd, type: 3}
+    - rid: 115149063313949088
+      type: {class: WorldItemComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      data:
+        _prefab: {fileID: 2398640502569234776, guid: 203f73d615a26754aa331f390a6d07e8, type: 3}
+    - rid: 115149063313949130
+      type: {class: AmmoBallisticsComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      data:
+        _data:
+          _allowRicochet: 0
+          _distanceMultiplier: 1
+          _ammoTracerEnabled: 0
+          _ammoTracerMaterial: {fileID: 2100000, guid: 63245ef99c06fa845abd38f65c194c7c, type: 2}
+          _ammoTracerColor: {r: 1, g: 0.50980395, b: 0, a: 1}
+          _ammoTracerWidthMeters: 0.08
+          _ammoTracerTrailDurationSeconds: 0.02
+          _ammoTracerIgnitionDistanceMeters: 70
+          _ammoTracerBurnDurationSeconds: 3
+          _ammoTracerEmissionIntensity: 12
+          _projectileCount: 1

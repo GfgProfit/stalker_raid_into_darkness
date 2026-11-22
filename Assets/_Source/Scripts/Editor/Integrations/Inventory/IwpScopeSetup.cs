@@ -269,8 +269,8 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
 
         private static ItemDefinition ResolveDefinition(GameObject root)
         {
-            ItemDefinition definition = root.GetComponent<WorldItem>()?.Definition;
-            definition = definition != null ? definition : AssetDatabase.LoadAssetAtPath<ItemDefinition>("Assets/_Source/Items/Definitions/Addons/" + root.name + ".asset");
+            ItemDefinition definition = root.GetComponent<WorldItem>()?.Definition ?? root.GetComponent<ItemIconVariantPart>()?.Part;
+            definition = definition != null ? definition : AssetDatabase.LoadAssetAtPath<ItemDefinition>(GraWeaponAddonSetup.ScopeDefinitionPath(root.name));
             return definition?.GetComponent<WeaponAddonComponent>()?.Kind == WeaponAddonKind.Scope ? definition : null;
         }
 

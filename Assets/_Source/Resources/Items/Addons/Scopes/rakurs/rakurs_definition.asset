@@ -1,0 +1,88 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da0f90c2955673d46b25d465cbe44ed0, type: 3}
+  m_Name: rakurs
+  m_EditorClassIdentifier: Inventory::Inventory.ItemDefinition
+  _definitionId: a8d55a8e471dd694a95d62d72362acc4
+  _displayName: "\u041F\u0440\u0438\u0446\u0435\u043B 1\u041F76 \"\u0420\u0430\u043A\u0443\u0440\u0441-\u0410\" (\u043A\u0440\u0435\u043F\u043B\u0435\u043D\u0438\u0435 \u041F\u0438\u043A\u0430\u0442\u0438\u043D\u043D\u0438/\u0412\u0438\u0432\u0435\u0440)"
+  _shortName: "\u041F\u0440\u0438\u0446\u0435\u043B 1\u041F76 \"\u0420\u0430\u043A\u0443\u0440\u0441-\u0410\" (\u043A\u0440\u0435\u043F\u043B\u0435\u043D\u0438\u0435 \u041F\u0438\u043A\u0430\u0442\u0438\u043D\u043D\u0438/\u0412\u0438\u0432\u0435\u0440)"
+  _description: 
+  _category: Attachment
+  _tags:
+  - Scope
+  _size: {x: 1, y: 1}
+  _weight: 0.5
+  _maxStack: 1
+  _allowRotation: 1
+  _backgroundColor: {r: 1, g: 1, b: 1, a: 0.04}
+  _fallbackIcon: {fileID: 0}
+  _iconOverride: {fileID: 0}
+  _visualPrefab: {fileID: 8425686498068658130, guid: c60e7675f3082534c869cea0189c6197, type: 3}
+  _defaultIconVariant: []
+  _icon:
+    _generateIcon: 1
+    _pixelsPerCell: 64
+    _antiAliasing: 1
+    _useOutline: 0
+    _outlineWidth: 2
+    _useShadow: 1
+    _shadowOffset: {x: 2, y: -2}
+    _shadowBlur: 2
+    _defaultView:
+      _modelEulerAngles: {x: 0, y: 0, z: 0}
+      _modelScale: {x: 1, y: 1, z: 1}
+      _cameraEulerAngles: {x: 0, y: -90, z: 0}
+      _padding: 1.15
+      _useDirectionalLight: 1
+      _lightIntensity: 10
+    _useCustomSlotView: 0
+    _slotView:
+      _modelEulerAngles: {x: 0, y: 0, z: 0}
+      _modelScale: {x: 1, y: 1, z: 1}
+      _cameraEulerAngles: {x: 0, y: -90, z: 0}
+      _padding: 1.15
+      _useDirectionalLight: 1
+      _lightIntensity: 10
+  _components:
+  - rid: 3479885496768528453
+  - rid: 3479885496768528599
+  - rid: 3479885496768528745
+  references:
+    version: 2
+    RefIds:
+    - rid: 3479885496768528453
+      type: {class: WeaponAddonComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      data:
+        _section: rakurs
+        _kind: 1
+        _cost: 2800
+        _bulletHitPowerFactor: 1
+        _bulletHitImpulseFactor: 1
+        _bulletSpeedFactor: 1
+        _fireDispersionBaseFactor: 1
+        _camDispersionFactor: 1
+        _camDispersionIncrementFactor: 1
+        _scopeZoomFactor: 0
+        _overrideAimOffsetPosition: 1
+        _aimOffsetPosition: {x: 0, y: 0, z: 0}
+        _attachSound: {fileID: 0}
+        _detachSound: {fileID: 0}
+    - rid: 3479885496768528599
+      type: {class: WorldItemComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      data:
+        _prefab: {fileID: 4595295918718632547, guid: 425d0ec93536bc14dba570e1e76cc778, type: 3}
+    - rid: 3479885496768528745
+      type: {class: ItemTakeSoundComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      data:
+        _category: attchscope
+        _clips:
+        - {fileID: 8300000, guid: 1694b29543aca0b4b91ce712213948d6, type: 3}

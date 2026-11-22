@@ -1,0 +1,50 @@
+fileFormatVersion: 2
+guid: de2ddd4b5a0eb88408b111c91cad4ced
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: none|models\scope_back
+    second: {fileID: 2100000, guid: 8603fad8f25044e2802272fe0e393fdf, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: none|models\scope_zwrite
+    second: {fileID: 2100000, guid: c797d0faf5cd496080fb8871ff38291f, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\crosshair_red_dot_simple|models\reflex_reticle_simple
+    second: {fileID: 2100000, guid: 5096224d490156940a5d653d60c75beb, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\prs\wpn_addon_lens_holo|models\reflex_lens
+    second: {fileID: 2100000, guid: 64088db022f53904f8b9b33208e84fc5, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\scope_ncstar_advance_dual_optic_3_9x_42|models\model
+    second: {fileID: 2100000, guid: 256fd9bb5c39cfe468617412a3f01e35, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\scope_reticles\ncstar|models\scope_reticle_precise
+    second: {fileID: 2100000, guid: 5c35e7d5d738ce044b250fa52fec2b05, type: 2}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 61e536e21e96f284493f2969a9250cdf, type: 3}
+  _scale: 1
+  _importMaterials: 1
+  _texturesFolder: 
+  _searchTexturesByName: 1
+  _importEmbeddedMotions: 1
+  _embeddedLoopMode: 0
+  _addAnimator: 1
+  _readableMeshes: 0
+  _updateWhenOffscreen: 0
+  _autoResolveResources: 1

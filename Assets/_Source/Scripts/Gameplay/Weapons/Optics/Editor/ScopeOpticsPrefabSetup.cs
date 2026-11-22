@@ -11,13 +11,14 @@ namespace RaidIntoDarkness.Weapons.Optics.Editor
 {
     public static class ScopeOpticsPrefabSetup
     {
-        private const string MARCH_PREFAB = "Assets/_Source/Items/Addons/Prefabs/march_f_shorty.prefab";
-        private const string MARCH_MODEL = "Assets/_Source/Items/Addons/Models/march_f_shorty.ogf";
-        private const string MARCH_ITEM = "Assets/_Source/Items/Definitions/Addons/march_f_shorty.asset";
-        private const string MARCH_RETICLE = "Assets/_Source/UI/3dscopes/march_f_shorty.png";
-        private const string OPTICS_DIRECTORY = "Assets/_Source/Items/Addons/Optics/march_f_shorty";
-        private const string CONFIGURATION_PATH = OPTICS_DIRECTORY + "/march_f_shorty.asset";
-        private const string MATERIAL_PATH = OPTICS_DIRECTORY + "/march_f_shorty_lens.mat";
+        internal const string OPTICS_DIRECTORY = "Assets/_Source/Resources/Items/Addons/Scopes/march_f_shorty";
+        internal const string MARCH_PREFAB = OPTICS_DIRECTORY + "/march_f_shorty_world.prefab";
+        internal const string MARCH_ITEM = OPTICS_DIRECTORY + "/march_f_shorty_definition.asset";
+
+        private const string MARCH_MODEL = OPTICS_DIRECTORY + "/march_f_shorty.ogf";
+        private const string MARCH_RETICLE = OPTICS_DIRECTORY + "/Textures/march_f_shorty.png";
+        private const string CONFIGURATION_PATH = OPTICS_DIRECTORY + "/march_f_shorty_optics.asset";
+        private const string MATERIAL_PATH = OPTICS_DIRECTORY + "/Materials/march_f_shorty_lens.mat";
 
         private static readonly Vector3 OCULAR_CENTER = new Vector3(0.0001934683f, 0.03417937f, -0.0187098235f);
         private static readonly Vector2 OCULAR_HALF_SIZE = new Vector2(0.0158353858f, 0.0158353858f);
@@ -153,7 +154,7 @@ namespace RaidIntoDarkness.Weapons.Optics.Editor
                     throw new InvalidOperationException("March Shorty requires its existing ocular mesh and march_f_shorty.png.");
                 }
 
-                EnsureDirectory(OPTICS_DIRECTORY);
+                EnsureDirectory(OPTICS_DIRECTORY + "/Materials");
                 ScopeOpticsConfig configuration = ConfigureOptics();
                 Material material = AssetDatabase.LoadAssetAtPath<Material>(MATERIAL_PATH);
                 Shader shader = Shader.Find("RaidIntoDarkness/Optics/ScopeProLens");

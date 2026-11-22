@@ -31,6 +31,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
 
         private const string MENU = "Tools/Inventory/Setup GRA Inventory Sounds";
         private const string LOG = "[InventorySounds] ";
+        private const string SHARED_AUDIO = "/_Shared Audio";
         private const float AUDIO_MIN_DISTANCE = 1f;
 
         private static readonly string[] INDEX_SCOPE = { "configs", "scripts", "sounds", "materials", StalkerGameMtlLibrary.GAMEMTL };
@@ -194,10 +195,15 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
 
             log.AppendLine($"{ITEM_SOUNDS_LTX}: {categories.Count} snd_on_take categories");
             XRayLtxDatabase system = XRayLtxDatabase.LoadSystem(sources.Index);
-            var clipsByCategory = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
-            var assigned = new List<KeyValuePair<ItemDefinition, string>>();
+            var clipPaths = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
+            var assigned = new List<(ItemDefinition Definition, string Category, string ClipKey)>();
             foreach (ItemDefinition definition in definitions)
             {
+                if (definition.GetComponent<AmmoStatsComponent>() != null)
+                {
+                    continue;
+                }
+
                 EquipmentStatsComponent stats = definition.GetComponent<EquipmentStatsComponent>();
                 string section = stats != null && stats.Section.Length > 0 ? stats.Section : definition.name;
                 string category = system.GetValue(section, "snd_on_take");
@@ -208,17 +214,25 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
                     continue;
                 }
 
-                if (!clipsByCategory.ContainsKey(category))
+                string definitionPath = AssetDatabase.GetAssetPath(definition);
+                string folder = ITEM_AUDIO;
+                if (GraWeaponAddonSetup.IsAddonResourcePath(definitionPath) && category is "attchscope" or "attchscopenv" or "attchsilen")
                 {
-                    clipsByCategory[category] = CopyTakeSounds(sources, category, value, log);
+                    folder = GraWeaponAddonSetup.ADDONS_FOLDER + SHARED_AUDIO;
                 }
 
-                assigned.Add(new KeyValuePair<ItemDefinition, string>(definition, category));
+                string clipKey = folder + "/" + category;
+                if (!clipPaths.ContainsKey(clipKey))
+                {
+                    clipPaths[clipKey] = CopyTakeSounds(sources, folder, category, value, log);
+                }
+
+                assigned.Add((definition, category, clipKey));
             }
 
             AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
             var clips = new Dictionary<string, List<AudioClip>>(StringComparer.OrdinalIgnoreCase);
-            foreach (KeyValuePair<string, List<string>> pair in clipsByCategory)
+            foreach (KeyValuePair<string, List<string>> pair in clipPaths)
             {
                 var list = new List<AudioClip>();
                 foreach (string assetPath in pair.Value)
@@ -233,16 +247,16 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
                 clips[pair.Key] = list;
             }
 
-            foreach (KeyValuePair<ItemDefinition, string> pair in assigned)
+            foreach (var entry in assigned)
             {
-                SetTakeSound(pair.Key, pair.Value, clips[pair.Value]);
+                SetTakeSound(entry.Definition, entry.Category, clips[entry.ClipKey]);
             }
 
             log.AppendLine($"Item definitions with snd_on_take sounds: {assigned.Count}");
             return assigned.Count;
         }
 
-        private static List<string> CopyTakeSounds(StalkerXRaySources sources, string category, string value, StringBuilder log)
+        private static List<string> CopyTakeSounds(StalkerXRaySources sources, string folder, string category, string value, StringBuilder log)
         {
             string[] parts = value.Split(',');
             string sound = parts[0].Trim();
@@ -263,7 +277,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
             foreach (string name in names)
             {
                 string virtualPath = SoundPath(name);
-                string assetPath = sources.CopyToProject(virtualPath, ITEM_AUDIO, Path.GetFileName(virtualPath));
+                string assetPath = sources.CopyToProject(virtualPath, folder, Path.GetFileName(virtualPath));
                 if (assetPath == null)
                 {
                     log.AppendLine($"WARNING: {virtualPath} ({category}) is missing.");
@@ -277,7 +291,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
             return result;
         }
 
-        private static void SetTakeSound(ItemDefinition definition, string category, List<AudioClip> clips)
+        internal static void SetTakeSound(ItemDefinition definition, string category, List<AudioClip> clips)
         {
             var serialized = new SerializedObject(definition);
             SerializedProperty list = serialized.FindProperty("_components");
@@ -545,7 +559,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
         private static List<ItemDefinition> LoadDefinitions()
         {
             var result = new List<ItemDefinition>();
-            foreach (string guid in AssetDatabase.FindAssets("t:ItemDefinition", new[] { DEFINITIONS_FOLDER }))
+            foreach (string guid in AssetDatabase.FindAssets("t:ItemDefinition", InventoryDemoContentBuilder.ITEM_DEFINITION_FOLDERS))
             {
                 var definition = AssetDatabase.LoadAssetAtPath<ItemDefinition>(AssetDatabase.GUIDToAssetPath(guid));
                 if (definition != null)

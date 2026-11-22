@@ -1,0 +1,35 @@
+fileFormatVersion: 2
+guid: 5df472d5fe6db4945851428525ab23f0
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\prs\wpn_addon_lens_holo|models\reflex_lens
+    second: {fileID: 2100000, guid: 8a96ad7c06214743a95aa393d38c1876, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\scope_elcan_specter_hco|models\model
+    second: {fileID: 2100000, guid: 458ba5633b2dffa4db7211d48eec7348, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\wpn_crosshair_specter_hco_reticle|models\reflex_reticle
+    second: {fileID: 2100000, guid: 8680f8a34ef4dae41a2af7f2c940c301, type: 2}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 61e536e21e96f284493f2969a9250cdf, type: 3}
+  _scale: 1
+  _importMaterials: 1
+  _texturesFolder: 
+  _searchTexturesByName: 1
+  _importEmbeddedMotions: 1
+  _embeddedLoopMode: 0
+  _addAnimator: 1
+  _readableMeshes: 0
+  _updateWhenOffscreen: 0
+  _autoResolveResources: 1

@@ -1,0 +1,35 @@
+fileFormatVersion: 2
+guid: 32e50e07987af6e49a17653b52de9e09
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\ammo\44_mag_boom|models\model
+    second: {fileID: 2100000, guid: e60795b7137a0b54aa4c46a6b78e8a75, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\ammo\44_mag_holder|models\model
+    second: {fileID: 2100000, guid: 1f73a9598708e1642882fe6f5e910cc7, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\taurus\bullet|models\weapons
+    second: {fileID: 2100000, guid: a635eccc9fffb07479c58d1d243bdd2e, type: 2}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 61e536e21e96f284493f2969a9250cdf, type: 3}
+  _scale: 1
+  _importMaterials: 1
+  _texturesFolder: 
+  _searchTexturesByName: 1
+  _importEmbeddedMotions: 1
+  _embeddedLoopMode: 0
+  _addAnimator: 1
+  _readableMeshes: 0
+  _updateWhenOffscreen: 0
+  _autoResolveResources: 1

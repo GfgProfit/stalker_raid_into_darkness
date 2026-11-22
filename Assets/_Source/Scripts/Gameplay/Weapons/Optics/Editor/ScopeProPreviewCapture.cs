@@ -14,11 +14,11 @@ namespace RaidIntoDarkness.Weapons.Optics.Editor
     public static class ScopeProPreviewCapture
     {
         private const string ARCHIVE_ROOT = "E:\\Projects\\stalker_raid_into_darkness_Archive";
-        private const string PREFAB_PATH = "Assets/_Source/Items/Addons/Prefabs/march_f_shorty.prefab";
+        private const string PREFAB_PATH = ScopeOpticsPrefabSetup.MARCH_PREFAB;
         private const string PROFILE_PATH = "Assets/_Source/Settings/Player/StalkerMovementProfile.asset";
         private const string SHADER_NAME = "RaidIntoDarkness/Optics/ScopeProLens";
-        private const string SDF_PATH = "Assets/_Source/Items/Addons/Optics/march_f_shorty/reticle_sdf.png";
-        private const string PNG_PATH = "Assets/_Source/Items/Addons/Optics/march_f_shorty/reticle_png.png";
+        private const string SDF_PATH = ScopeOpticsPrefabSetup.OPTICS_DIRECTORY + "/Textures/reticle_sdf.png";
+        private const string PNG_PATH = ScopeOpticsPrefabSetup.OPTICS_DIRECTORY + "/Textures/reticle_png.png";
         private const int CAPTURE_SIZE = 1024;
         private const int GRID_SIZE = 512;
         private const float EYE_DISTANCE = 0.124698281f;

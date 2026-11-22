@@ -68,7 +68,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
 
             foreach (Profile profile in profiles.Entries)
             {
-                string path = GraAmmoSetup.DEFINITIONS_FOLDER + "/" + profile.Section + ".asset";
+                string path = IwpAmmoSetup.DefinitionPath(profile.Section);
                 ItemDefinition definition = AssetDatabase.LoadAssetAtPath<ItemDefinition>(path);
 
                 if (definition == null || !profile.Data.IsConfigured)

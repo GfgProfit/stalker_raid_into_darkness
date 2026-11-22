@@ -1,0 +1,45 @@
+fileFormatVersion: 2
+guid: ecbfc4902b4de2c49a30433808e7ca29
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: none|models\scope_back
+    second: {fileID: 2100000, guid: 64a6185b0c3843ed90f547de37dbc3b0, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: none|models\scope_zwrite
+    second: {fileID: 2100000, guid: 86516c8aeaf148809a29beef45100cd2, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\scope_reticles\pks07|models\scope_reticle_precise
+    second: {fileID: 2100000, guid: 5f0cc04a21f00c04996eff8657a79ae1, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\wpn_addons\wpn_addon_scope_pks-07\wpn_addon_scope_pks-07|models\model
+    second: {fileID: 2100000, guid: 0b2b3a895c535db4ca1d54e86ec77554, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\wpn_addons\wpn_addon_scope_wa2000\wpn_addon_scope_wa2000_le|models\model
+    second: {fileID: 2100000, guid: 22d3cc76d17f81740a3c3f8f52ae2530, type: 2}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 61e536e21e96f284493f2969a9250cdf, type: 3}
+  _scale: 1
+  _importMaterials: 1
+  _texturesFolder: 
+  _searchTexturesByName: 1
+  _importEmbeddedMotions: 1
+  _embeddedLoopMode: 0
+  _addAnimator: 1
+  _readableMeshes: 0
+  _updateWhenOffscreen: 0
+  _autoResolveResources: 1

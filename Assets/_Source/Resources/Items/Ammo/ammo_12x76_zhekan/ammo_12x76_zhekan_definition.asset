@@ -1,0 +1,108 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da0f90c2955673d46b25d465cbe44ed0, type: 3}
+  m_Name: ammo_12x76_zhekan
+  m_EditorClassIdentifier: Inventory::Inventory.ItemDefinition
+  _definitionId: f1f154d3db7b9454598318d80e8a7483
+  _displayName: "\u041F\u0430\u0442\u0440\u043E\u043D\u044B 12x76 \xAB\u0416\u0435\u043A\u0430\u043D\xBB"
+  _shortName: "12x76 \u0416\u0435\u043A\u0430\u043D"
+  _description: "\u041E\u0445\u043E\u0442\u043D\u0438\u0447\u0438\u0439 \u043F\u0430\u0442\u0440\u043E\u043D \xAB\u0416\u0435\u043A\u0430\u043D\xBB \u0441 \u043F\u0443\u043B\u0435\u0439 \u0434\u043B\u044F \u0433\u043B\u0430\u0434\u043A\u043E\u0441\u0442\u0432\u043E\u043B\u044C\u043D\u043E\u0433\u043E \u043E\u0440\u0443\u0436\u0438\u044F."
+  _category: Ammo
+  _tags:
+  - Ammo
+  _size: {x: 2, y: 1}
+  _weight: 0.0625
+  _maxStack: 0
+  _allowRotation: 1
+  _backgroundColor: {r: 1, g: 1, b: 1, a: 0.04}
+  _fallbackIcon: {fileID: 0}
+  _iconOverride: {fileID: 1532124127, guid: ffbb95c1826004343baca3d552702564, type: 3}
+  _visualPrefab: {fileID: 6026430210879233388, guid: e655cc2b88146d840b90e5a8b4d949e2, type: 3}
+  _defaultIconVariant: []
+  _icon:
+    _generateIcon: 0
+    _pixelsPerCell: 64
+    _antiAliasing: 1
+    _useOutline: 0
+    _outlineWidth: 2
+    _useShadow: 1
+    _shadowOffset: {x: 2, y: -2}
+    _shadowBlur: 2
+    _defaultView:
+      _modelEulerAngles: {x: 0, y: 90, z: 0}
+      _modelScale: {x: 1, y: 1, z: 1}
+      _cameraEulerAngles: {x: 0, y: -90, z: 0}
+      _padding: 1.15
+      _useDirectionalLight: 1
+      _lightIntensity: 5
+    _useCustomSlotView: 0
+    _slotView:
+      _modelEulerAngles: {x: 0, y: 90, z: 0}
+      _modelScale: {x: 1, y: 1, z: 1}
+      _cameraEulerAngles: {x: 0, y: -90, z: 0}
+      _padding: 1.15
+      _useDirectionalLight: 1
+      _lightIntensity: 5
+  _components:
+  - rid: 115149063313948982
+  - rid: 115149063313948983
+  - rid: 115149063313949061
+  - rid: 115149063313949095
+  references:
+    version: 2
+    RefIds:
+    - rid: 115149063313948982
+      type: {class: AmmoStatsComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      data:
+        _section: ammo_12x76_zhekan
+        _boxSize: 8
+        _boxWeight: 0.5
+        _cost: 950
+        _armorPiercing: 0.45
+        _hitMultiplier: 0.8
+        _impulseMultiplier: 22.66
+        _speedMultiplier: 1.031
+        _dispersionMultiplier: 1
+        _airResistance: 1.5
+        _buckshot: 1
+        _averageWeaponHitPower: -1
+        _monsterDamageMultiplier: 1
+        _penetration: 30
+        _damagePerProjectile: -1
+        _hasTooltipParameters: 0
+    - rid: 115149063313948983
+      type: {class: ItemTakeSoundComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      data:
+        _category: ammoshell
+        _clips:
+        - {fileID: 8300000, guid: ee0cb86bc88924746a52c92420023b4f, type: 3}
+        - {fileID: 8300000, guid: 8b13077925cc62648b059690f63ffb70, type: 3}
+        - {fileID: 8300000, guid: a7827b06c953fc04cbb67911402fc8c8, type: 3}
+    - rid: 115149063313949061
+      type: {class: WorldItemComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      data:
+        _prefab: {fileID: 5997032961750766607, guid: 03ec6ef49148a3a49a1370afd5973f42, type: 3}
+    - rid: 115149063313949095
+      type: {class: AmmoBallisticsComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      data:
+        _data:
+          _allowRicochet: 1
+          _distanceMultiplier: 1
+          _ammoTracerEnabled: 0
+          _ammoTracerMaterial: {fileID: 2100000, guid: 63245ef99c06fa845abd38f65c194c7c, type: 2}
+          _ammoTracerColor: {r: 1, g: 0.50980395, b: 0, a: 1}
+          _ammoTracerWidthMeters: 0.08
+          _ammoTracerTrailDurationSeconds: 0.02
+          _ammoTracerIgnitionDistanceMeters: 70
+          _ammoTracerBurnDurationSeconds: 3
+          _ammoTracerEmissionIntensity: 12
+          _projectileCount: 1

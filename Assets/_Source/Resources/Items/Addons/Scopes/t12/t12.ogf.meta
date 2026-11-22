@@ -1,0 +1,40 @@
+fileFormatVersion: 2
+guid: 6dbb2e7795019ba469426061c3ceadf8
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: none|models\scope_back
+    second: {fileID: 2100000, guid: 15a0420b22e240e2b98eceb0101a3a9f, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: none|models\scope_zwrite
+    second: {fileID: 2100000, guid: 8f5e992f4f36474eb3bb2978566accb8, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\eft_torrey\eft_torrey_base|models\model
+    second: {fileID: 2100000, guid: 7ab8fa68307d6624ab04de21f9d0cb93, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\scope_reticles\t12|models\scope_reticle_precise
+    second: {fileID: 2100000, guid: 600f615382fb7a54489a5bab42e8c662, type: 2}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 61e536e21e96f284493f2969a9250cdf, type: 3}
+  _scale: 1
+  _importMaterials: 1
+  _texturesFolder: 
+  _searchTexturesByName: 1
+  _importEmbeddedMotions: 1
+  _embeddedLoopMode: 0
+  _addAnimator: 1
+  _readableMeshes: 0
+  _updateWhenOffscreen: 0
+  _autoResolveResources: 1

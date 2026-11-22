@@ -15,7 +15,6 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
 {
     public static class IwpSilencerSetup
     {
-        private const string SILENCER_PATH = "Assets/_Source/Items/Definitions/Addons/wpn_sil_nato.asset";
         private const string VISUAL_FOLDER = "Assets/_Source/Items/Weapons/Visuals/";
         private const string SOUND_FOLDER = "Assets/_Source/Audio/Weapons/aug/";
         private const string ITEM_SOUND_FOLDER = "Assets/_Source/Audio/Inventory/";
@@ -32,11 +31,12 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
 
         public static string Setup()
         {
-            ItemDefinition silencer = AssetDatabase.LoadAssetAtPath<ItemDefinition>(SILENCER_PATH);
+            string silencerPath = GraWeaponAddonSetup.AddonDefinitionPath(WeaponAddonKind.Silencer, GraWeaponAddonSetup.AUG_SILENCER_SECTION);
+            ItemDefinition silencer = AssetDatabase.LoadAssetAtPath<ItemDefinition>(silencerPath);
 
             if (silencer == null)
             {
-                throw new InvalidOperationException("Missing NATO silencer definition: " + SILENCER_PATH);
+                throw new InvalidOperationException("Missing NATO silencer definition: " + silencerPath);
             }
 
             ConfigureVisual(VISUAL_FOLDER + "wpn_aug_a3.prefab", silencer, false);
@@ -211,7 +211,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
             AudioClip attach = ImportSound(sources, "inv_attach_addon");
             AudioClip detach = ImportSound(sources, "inv_detach_addon");
 
-            foreach (string guid in AssetDatabase.FindAssets("t:ItemDefinition", new[] { "Assets/_Source/Items/Definitions/Addons" }))
+            foreach (string guid in AssetDatabase.FindAssets("t:ItemDefinition", new[] { GraWeaponAddonSetup.SILENCERS_FOLDER }))
             {
                 ItemDefinition definition = AssetDatabase.LoadAssetAtPath<ItemDefinition>(AssetDatabase.GUIDToAssetPath(guid));
 

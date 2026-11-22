@@ -90,7 +90,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             InventoryModel model = controller.Inventory.Model;
             ItemInstance weapon = Add(controller, Find(controller, "wpn_aug_a3"), window.PrimaryContainerId);
             ItemInstance silencer = Add(controller, Find(controller, "wpn_sil_nato"), window.PrimaryContainerId);
-            Add(controller, Find(controller, "ammo_5.56x45_fmj"), window.PrimaryContainerId, 30);
+            Add(controller, Find(controller, "ammo_5.56x45_ss190"), window.PrimaryContainerId, 30);
 
             using (var ammo = new InventoryWeaponAmmoSource(model, window.PrimaryContainerId))
             {
@@ -98,7 +98,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
                 float total = model.GetOwnerWeight(model.GetContainer(window.PrimaryContainerId).OwnerId);
                 Assert.That(controller.WeaponAttachments.Install(silencer, weapon).Success, Is.True);
                 Assert.That(model.GetOwnerWeight(model.GetContainer(window.PrimaryContainerId).OwnerId), Is.EqualTo(total).Within(0.0001f));
-                Assert.That(weapon.UnitWeight, Is.EqualTo(weapon.Definition.Weight + silencer.Definition.Weight + Find(controller, "ammo_5.56x45_fmj").Weight * 30).Within(0.0001f));
+                Assert.That(weapon.UnitWeight, Is.EqualTo(weapon.Definition.Weight + silencer.Definition.Weight + Find(controller, "ammo_5.56x45_ss190").Weight * 30).Within(0.0001f));
                 var restored = new InventoryModel(model.Resolver);
                 InventoryContainer backpack = model.GetContainer(window.PrimaryContainerId);
                 restored.AddContainer(new GridContainer(backpack.Id, backpack.Width, backpack.Height, backpack.OwnerId));
@@ -148,7 +148,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             ItemInstance equipped = Add(controller, weapon.Definition, window.PrimaryContainerId);
             Assert.That(model.TryEquip(equipped.InstanceId, window.EquipmentContainerId).Success, Is.True);
             ItemInstance silencer = Add(controller, Find(controller, "wpn_sil_nato"), window.PrimaryContainerId);
-            ItemInstance incompatible = Add(controller, Find(controller, "wpn_sil_pbs1"), window.SecondaryContainerId);
+            ItemInstance incompatible = Add(controller, Find(controller, "ammo_9x18_fmj"), window.SecondaryContainerId);
             controller.Open(true);
             yield return null;
             yield return null;
@@ -262,7 +262,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             FirstPersonWeaponController weapons = controller.Player.GetComponentInChildren<FirstPersonWeaponController>();
             ItemInstance weapon = Add(controller, Find(controller, "wpn_aug_a3"), window.PrimaryContainerId);
             ItemInstance silencer = Add(controller, Find(controller, "wpn_sil_nato"), window.PrimaryContainerId);
-            Add(controller, Find(controller, "ammo_5.56x45_fmj"), window.PrimaryContainerId, 30);
+            Add(controller, Find(controller, "ammo_5.56x45_ss190"), window.PrimaryContainerId, 30);
             Assert.That(model.TryEquip(weapon.InstanceId, window.EquipmentContainerId).Success, Is.True);
 
             using (var ammo = new InventoryWeaponAmmoSource(model, window.PrimaryContainerId))
@@ -302,7 +302,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             Release(_mouse.leftButton, queueEventOnly: true);
             yield return null;
             Assert.That(weapons.Magazine, Is.EqualTo(29));
-            Assert.That(weapon.TotalWeight, Is.EqualTo(weightBeforeShot - Find(controller, "ammo_5.56x45_fmj").Weight).Within(0.0001f));
+            Assert.That(weapon.TotalWeight, Is.EqualTo(weightBeforeShot - Find(controller, "ammo_5.56x45_ss190").Weight).Within(0.0001f));
             bool smoke = false;
 
             foreach (XRayParticleGroupPlayer effect in Object.FindObjectsByType<XRayParticleGroupPlayer>(FindObjectsSortMode.None))
@@ -320,7 +320,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
 
         private static IEnumerator LoadScene()
         {
-            SceneManager.LoadScene("OutdoorsScene", LoadSceneMode.Single);
+            SceneManager.LoadScene("TEST_SCENE", LoadSceneMode.Single);
             yield return new WaitForSeconds(0.6f);
         }
 

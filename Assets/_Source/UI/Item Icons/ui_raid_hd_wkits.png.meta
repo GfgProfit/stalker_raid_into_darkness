@@ -97,28 +97,6 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: march_f_shorty_alt
-      rect:
-        serializedVersion: 2
-        x: 1700
-        y: 1948
-        width: 200
-        height: 100
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 037247b21a28ee943b511a01bf698258
-      internalID: 600791341
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
       name: mark8_rmr
       rect:
         serializedVersion: 2
@@ -140,50 +118,6 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
-    - serializedVersion: 2
-      name: spec_alt
-      rect:
-        serializedVersion: 2
-        x: 1500
-        y: 1748
-        width: 200
-        height: 100
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: b2f321e2778f15a4f85cda786c625425
-      internalID: -954997683
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: triji
-      rect:
-        serializedVersion: 2
-        x: 1500
-        y: 1548
-        width: 200
-        height: 100
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 442ec9f6767e34d43a006d6ab945b571
-      internalID: 1595715935
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
     outline: []
     customData: 
     physicsShape: []
@@ -198,10 +132,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      march_f_shorty_alt: 600791341
       mark8_rmr: 688896650
-      spec_alt: -954997683
-      triji: 1595715935
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

@@ -50,7 +50,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
             string run = archive + "/ItemIconIntensity_" + DateTime.UtcNow.ToString("yyyyMMdd_HHmmss_fff", CultureInfo.InvariantCulture) + "_" + Guid.NewGuid().ToString("N").Substring(0, 8);
             Directory.CreateDirectory(run + "/Before");
             Directory.CreateDirectory(run + "/After");
-            string[] guids = AssetDatabase.FindAssets("t:ItemDefinition", new[] { DEFINITIONS_FOLDER });
+            string[] guids = AssetDatabase.FindAssets("t:ItemDefinition", InventoryDemoContentBuilder.ITEM_DEFINITION_FOLDERS);
             Array.Sort(guids, StringComparer.Ordinal);
             var definitions = new List<ItemDefinition>();
             var paths = new List<string>();
@@ -59,7 +59,8 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
             for (int i = 0; i < guids.Length; i++)
             {
                 string path = AssetDatabase.GUIDToAssetPath(guids[i]).Replace('\\', '/');
-                if (!path.StartsWith(DEFINITIONS_FOLDER + "/", StringComparison.Ordinal) || !path.EndsWith(".asset", StringComparison.OrdinalIgnoreCase))
+                bool itemPath = path.StartsWith(DEFINITIONS_FOLDER + "/", StringComparison.Ordinal) || InventoryDemoContentBuilder.IsItemResourcePath(path);
+                if (!itemPath || !path.EndsWith(".asset", StringComparison.OrdinalIgnoreCase))
                 {
                     throw new InvalidOperationException("Unexpected ItemDefinition path: " + path);
                 }

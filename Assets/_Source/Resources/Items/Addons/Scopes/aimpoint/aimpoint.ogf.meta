@@ -1,0 +1,40 @@
+fileFormatVersion: 2
+guid: 8a34f478e53bba244abf2649aeccaa16
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\prs\wpn_addon_lens_orange|models\reflex_lens
+    second: {fileID: 2100000, guid: 4bf07e70ed4e44038b3ab3e01dfa595a, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\wpn_addon_crosshair_docter_dynamic|models\reflex_reticle
+    second: {fileID: 2100000, guid: af013b49861b4199852692e422bdec7b, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\wpn_mount_aimpoint_t1_weaver_diff|models\model
+    second: {fileID: 2100000, guid: 723e450d8bf546498226c76d1b330a68, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\wpn_scope_aimpoint_micro_t1_diff|models\model
+    second: {fileID: 2100000, guid: 50580c812a5f41e79ca98c28d435e9d6, type: 2}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 61e536e21e96f284493f2969a9250cdf, type: 3}
+  _scale: 1
+  _importMaterials: 1
+  _texturesFolder: 
+  _searchTexturesByName: 1
+  _importEmbeddedMotions: 1
+  _embeddedLoopMode: 0
+  _addAnimator: 1
+  _readableMeshes: 0
+  _updateWhenOffscreen: 0
+  _autoResolveResources: 1

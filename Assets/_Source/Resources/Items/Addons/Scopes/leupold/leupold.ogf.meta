@@ -1,0 +1,50 @@
+fileFormatVersion: 2
+guid: 179974e6743f85946b493224651e2ca6
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: none|models\scope_back
+    second: {fileID: 2100000, guid: f5015cabc6b0455eadf975ebd999bf24, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: none|models\scope_zwrite
+    second: {fileID: 2100000, guid: 6d306963409446baa984a0fd728e47ba, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\scope_reticles\leupold_cross|models\scope_reticle_precise
+    second: {fileID: 2100000, guid: 379cea481f0fbfe4091739d8f7d7e9fe, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\wpn_addon_scope_cqbss|models\weapons
+    second: {fileID: 2100000, guid: f5e3b2b82eaa82642ac5c32d5bd9d45f, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\wpn_addon_scope_mount_cqbss|models\weapons
+    second: {fileID: 2100000, guid: c0acea47f9cc1e040abcbdf38c755be2, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\wpn_scope_pso_1m2-1_lens_diff|models\weapons
+    second: {fileID: 2100000, guid: fef5aa5e0e7644945b11f8279bb5b654, type: 2}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 61e536e21e96f284493f2969a9250cdf, type: 3}
+  _scale: 1
+  _importMaterials: 1
+  _texturesFolder: 
+  _searchTexturesByName: 1
+  _importEmbeddedMotions: 1
+  _embeddedLoopMode: 0
+  _addAnimator: 1
+  _readableMeshes: 0
+  _updateWhenOffscreen: 0
+  _autoResolveResources: 1

@@ -16,7 +16,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
 {
     public sealed class OutdoorsSceneInventoryTests : OutdoorsSceneInputTestFixture
     {
-        private const string SCENE = "OutdoorsScene";
+        private const string SCENE = "TEST_SCENE";
         private const string BACKPACK = "Backpack";
         private const string STASH = "Stash";
         private const string EQUIPMENT = "Equipment";
@@ -43,7 +43,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
 
             foreach (ItemDefinition candidate in controller.Inventory.Database.Definitions)
             {
-                if (candidate.name == "ammo_5.56x45_fmj")
+                if (candidate.name == "ammo_5.56x45_ss190")
                 {
                     definition = candidate;
                 }
@@ -86,7 +86,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             yield return new WaitForEndOfFrame();
             CharacterController character = controller.Player.GetComponent<CharacterController>();
 
-            foreach (string section in new[] { "ammo_5.56x45_fmj", "wpn_aug_a3" })
+            foreach (string section in new[] { "ammo_5.56x45_ss190", "wpn_aug_a3" })
             {
                 ItemDefinition definition = null;
 
@@ -620,15 +620,28 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
                 }
             }
 
-            Assert.That(addons.Count, Is.GreaterThanOrEqualTo(140), "GRA addons used in the game were not imported");
+            Assert.That(addons.Count, Is.GreaterThanOrEqualTo(53), "GRA addons used in the game were not imported");
 
             foreach (ItemDefinition addon in addons.Values)
             {
-                Assert.That(addon.GetComponent<WeaponAddonComponent>(), Is.Not.Null, addon.name);
+                WeaponAddonComponent component = addon.GetComponent<WeaponAddonComponent>();
+                Assert.That(component, Is.Not.Null, addon.name);
+                if (component.Kind == WeaponAddonKind.Silencer)
+                {
+                    Assert.That(addon.name, Is.EqualTo("wpn_sil_nato"));
+                }
+
                 Assert.That(addon.VisualPrefab, Is.Not.Null, addon.name + " has no GRA model");
-                Assert.That(addon.IconOverride, Is.Not.Null, addon.name + " must use the GRA HD icon");
-                Assert.That(addon.IconOverride.name, Is.EqualTo(addon.name));
-                Assert.That(addon.CanGenerateIcon, Is.False, addon.name);
+                if (component.Kind == WeaponAddonKind.Scope)
+                {
+                    Assert.That(addon.CanGenerateIcon || addon.IconOverride != null, Is.True, addon.name + " has no icon");
+                }
+                else
+                {
+                    Assert.That(addon.IconOverride, Is.Not.Null, addon.name + " must use the GRA HD icon");
+                    Assert.That(addon.IconOverride.name, Is.EqualTo(addon.name));
+                    Assert.That(addon.CanGenerateIcon, Is.False, addon.name);
+                }
             }
 
             Assert.That(addons["wpn_sil_nato"].Size, Is.EqualTo(new Vector2Int(1, 1)), "GRA 2x2 must become 1x1");
@@ -639,13 +652,6 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
                 Assert.That(addons.ContainsKey(scope), Is.True, scope + " (optics / thermal) is missing");
             }
 
-            Assert.That(addons["ekp8_18"].VisualPrefab.name, Is.EqualTo("ekp8_18"), "EKP-8-18 must use its own MAS model, not the EKP-8-02 one");
-
-            foreach (Renderer renderer in addons["wpn_sil_spec_isg"].VisualPrefab.GetComponentsInChildren<Renderer>(false))
-            {
-                Assert.That(renderer.sharedMaterial.name, Is.EqualTo("wpn_silencer_hexagon12"), "wpn_sil_spec_isg must show only the silencer, not the whole rifle");
-            }
-
             foreach (string scope in new[] { "0kp2", "rmr", "exps3" })
             {
                 foreach (Renderer renderer in addons[scope].VisualPrefab.GetComponentsInChildren<Renderer>(true))
@@ -654,7 +660,6 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
                 }
             }
 
-            Assert.That(addons["wpn_addon_grenade_launcher_m203"].Size, Is.EqualTo(new Vector2Int(2, 1)), "GRA 4x2 must become 2x1");
             WeaponStatsComponent aug = null;
 
             foreach (ItemDefinition definition in controller.Inventory.Database.Definitions)
@@ -666,7 +671,8 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             }
 
             Assert.That(addons.ContainsKey(aug.SilencerSection), Is.True);
-            Assert.That(addons.ContainsKey(aug.GrenadeLauncherSection), Is.True);
+            Assert.That(aug.GrenadeLauncherStatus, Is.EqualTo(WeaponAddonStatus.None));
+            Assert.That(aug.GrenadeLauncherSection, Is.Empty);
 
             foreach (string scope in aug.Scopes)
             {

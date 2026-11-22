@@ -1,947 +1,1412 @@
 {
+  "_augAmmo": [
+    "ammo_5.56x45_ss190",
+    "ammo_5.56x45_ap"
+  ],
   "_entries": [
     {
-      "_section": "ammo_11.43x23_fmj",
-      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
-      "_data": {
-        "_allowRicochet": true,
-        "_distanceMultiplier": 1,
-        "_projectileCount": 1,
-        "_ammoTracerEnabled": false,
-        "_ammoTracerWidthMeters": 0.225,
-        "_ammoTracerTrailDurationSeconds": 0.025,
-        "_ammoTracerIgnitionDistanceMeters": 10,
-        "_ammoTracerBurnDurationSeconds": 1.5,
-        "_ammoTracerEmissionIntensity": 8,
-        "_ammoTracerColor": {
-          "r": 1,
-          "g": 0.35,
-          "b": 0.015,
-          "a": 1
-        }
-      }
-    },
-    {
-      "_section": "ammo_11.43x23_hydro",
-      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
-      "_data": {
-        "_allowRicochet": true,
-        "_distanceMultiplier": 1,
-        "_projectileCount": 1,
-        "_ammoTracerEnabled": false,
-        "_ammoTracerWidthMeters": 0.225,
-        "_ammoTracerTrailDurationSeconds": 0.025,
-        "_ammoTracerIgnitionDistanceMeters": 10,
-        "_ammoTracerBurnDurationSeconds": 1.5,
-        "_ammoTracerEmissionIntensity": 8,
-        "_ammoTracerColor": {
-          "r": 1,
-          "g": 0.35,
-          "b": 0.015,
-          "a": 1
-        }
-      }
-    },
-    {
-      "_section": "ammo_12.7x55_ap",
-      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
-      "_data": {
-        "_allowRicochet": true,
-        "_distanceMultiplier": 1,
-        "_projectileCount": 1,
-        "_ammoTracerEnabled": true,
-        "_ammoTracerWidthMeters": 0.225,
-        "_ammoTracerTrailDurationSeconds": 0.02,
-        "_ammoTracerIgnitionDistanceMeters": 70,
-        "_ammoTracerBurnDurationSeconds": 3,
-        "_ammoTracerEmissionIntensity": 12,
-        "_ammoTracerColor": {
-          "r": 1,
-          "g": 0.35,
-          "b": 0.015,
-          "a": 1
-        }
-      }
-    },
-    {
-      "_section": "ammo_12.7x55_fmj",
-      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
-      "_data": {
-        "_allowRicochet": true,
-        "_distanceMultiplier": 1,
-        "_projectileCount": 1,
-        "_ammoTracerEnabled": true,
-        "_ammoTracerWidthMeters": 0.225,
-        "_ammoTracerTrailDurationSeconds": 0.02,
-        "_ammoTracerIgnitionDistanceMeters": 70,
-        "_ammoTracerBurnDurationSeconds": 3,
-        "_ammoTracerEmissionIntensity": 12,
-        "_ammoTracerColor": {
-          "r": 1,
-          "g": 0.35,
-          "b": 0.015,
-          "a": 1
-        }
-      }
-    },
-    {
       "_section": "ammo_12x70_buck",
-      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
+      "_reference": "IWP Standalone Final weapons_ammo.ltx:34",
+      "_model": "meshes/dynamics/weapons/wpn_ammo/ammo_12x70_buck.ogf",
+      "_displayName": "Патроны 12х70 «Рекорд»",
+      "_shortName": "12x70 Рекорд",
+      "_description": "Дробовой патрон «Рекорд» для гладкоствольного оружия.",
+      "_boxSize": 8,
+      "_boxWeight": 0.45,
+      "_gridWidth": 2,
+      "_gridHeight": 1,
+      "_cost": 750,
+      "_takeSoundCategory": "ammoshell",
+      "_armorPiercing": 0.33,
+      "_hitMultiplier": 0.25,
+      "_impulseMultiplier": 11.39,
+      "_speedMultiplier": 0.929,
+      "_dispersionMultiplier": 13.5,
+      "_airResistance": 3.65,
       "_data": {
         "_allowRicochet": true,
-        "_distanceMultiplier": 0.75,
+        "_distanceMultiplier": 0.27,
         "_projectileCount": 9,
         "_ammoTracerEnabled": false,
-        "_ammoTracerWidthMeters": 0.225,
-        "_ammoTracerTrailDurationSeconds": 0.025,
-        "_ammoTracerIgnitionDistanceMeters": 10,
+        "_ammoTracerWidthMeters": 0.08,
+        "_ammoTracerTrailDurationSeconds": 0.02,
+        "_ammoTracerIgnitionDistanceMeters": 70,
         "_ammoTracerBurnDurationSeconds": 3,
-        "_ammoTracerEmissionIntensity": 8,
+        "_ammoTracerEmissionIntensity": 12,
         "_ammoTracerColor": {
-          "r": 1,
-          "g": 0.35,
-          "b": 0.015,
-          "a": 1
-        }
-      }
-    },
-    {
-      "_section": "ammo_12x70_buck_self",
-      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
-      "_data": {
-        "_allowRicochet": true,
-        "_distanceMultiplier": 0.7,
-        "_projectileCount": 11,
-        "_ammoTracerEnabled": false,
-        "_ammoTracerWidthMeters": 0.225,
-        "_ammoTracerTrailDurationSeconds": 0.025,
-        "_ammoTracerIgnitionDistanceMeters": 10,
-        "_ammoTracerBurnDurationSeconds": 3,
-        "_ammoTracerEmissionIntensity": 8,
-        "_ammoTracerColor": {
-          "r": 1,
-          "g": 0.35,
-          "b": 0.015,
-          "a": 1
-        }
-      }
-    },
-    {
-      "_section": "ammo_12x70_raid",
-      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
-      "_data": {
-        "_allowRicochet": true,
-        "_distanceMultiplier": 0.75,
-        "_projectileCount": 9,
-        "_ammoTracerEnabled": false,
-        "_ammoTracerWidthMeters": 0.225,
-        "_ammoTracerTrailDurationSeconds": 0.025,
-        "_ammoTracerIgnitionDistanceMeters": 10,
-        "_ammoTracerBurnDurationSeconds": 3,
-        "_ammoTracerEmissionIntensity": 8,
-        "_ammoTracerColor": {
-          "r": 1,
-          "g": 0.35,
-          "b": 0.015,
-          "a": 1
-        }
-      }
-    },
-    {
-      "_section": "ammo_12x76_bull",
-      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
-      "_data": {
-        "_allowRicochet": true,
-        "_distanceMultiplier": 1,
-        "_projectileCount": 1,
-        "_ammoTracerEnabled": false,
-        "_ammoTracerWidthMeters": 0.225,
-        "_ammoTracerTrailDurationSeconds": 0.025,
-        "_ammoTracerIgnitionDistanceMeters": 10,
-        "_ammoTracerBurnDurationSeconds": 3,
-        "_ammoTracerEmissionIntensity": 8,
-        "_ammoTracerColor": {
-          "r": 1,
-          "g": 0.35,
-          "b": 0.015,
-          "a": 1
-        }
-      }
-    },
-    {
-      "_section": "ammo_12x76_dart",
-      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
-      "_data": {
-        "_allowRicochet": true,
-        "_distanceMultiplier": 1,
-        "_projectileCount": 1,
-        "_ammoTracerEnabled": false,
-        "_ammoTracerWidthMeters": 0.225,
-        "_ammoTracerTrailDurationSeconds": 0.025,
-        "_ammoTracerIgnitionDistanceMeters": 10,
-        "_ammoTracerBurnDurationSeconds": 3,
-        "_ammoTracerEmissionIntensity": 8,
-        "_ammoTracerColor": {
-          "r": 1,
-          "g": 0.35,
-          "b": 0.015,
-          "a": 1
+          "r": 1.0,
+          "g": 0.5098039215686274,
+          "b": 0.0,
+          "a": 1.0
         }
       }
     },
     {
       "_section": "ammo_12x76_zhekan",
-      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
+      "_reference": "IWP Standalone Final weapons_ammo.ltx:66",
+      "_model": "meshes/dynamics/weapons/wpn_ammo/ammo_12x76_zhekan.ogf",
+      "_displayName": "Патроны 12x76 «Стрела»",
+      "_shortName": "12x76 Стрела",
+      "_description": "Охотничий патрон «Стрела» с пулей для гладкоствольного оружия.",
+      "_boxSize": 8,
+      "_boxWeight": 0.5,
+      "_gridWidth": 2,
+      "_gridHeight": 1,
+      "_cost": 950,
+      "_takeSoundCategory": "ammoshell",
+      "_armorPiercing": 0.45,
+      "_hitMultiplier": 0.8,
+      "_impulseMultiplier": 22.66,
+      "_speedMultiplier": 1.031,
+      "_dispersionMultiplier": 1.0,
+      "_airResistance": 1.5,
       "_data": {
         "_allowRicochet": true,
-        "_distanceMultiplier": 0.9,
+        "_distanceMultiplier": 1.0,
         "_projectileCount": 1,
         "_ammoTracerEnabled": false,
-        "_ammoTracerWidthMeters": 0.225,
-        "_ammoTracerTrailDurationSeconds": 0.025,
-        "_ammoTracerIgnitionDistanceMeters": 10,
-        "_ammoTracerBurnDurationSeconds": 3,
-        "_ammoTracerEmissionIntensity": 8,
-        "_ammoTracerColor": {
-          "r": 1,
-          "g": 0.35,
-          "b": 0.015,
-          "a": 1
-        }
-      }
-    },
-    {
-      "_section": "ammo_20x70_buck",
-      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
-      "_data": {
-        "_allowRicochet": true,
-        "_distanceMultiplier": 0.75,
-        "_projectileCount": 9,
-        "_ammoTracerEnabled": false,
-        "_ammoTracerWidthMeters": 0.225,
-        "_ammoTracerTrailDurationSeconds": 0.025,
-        "_ammoTracerIgnitionDistanceMeters": 10,
-        "_ammoTracerBurnDurationSeconds": 3,
-        "_ammoTracerEmissionIntensity": 8,
-        "_ammoTracerColor": {
-          "r": 1,
-          "g": 0.35,
-          "b": 0.015,
-          "a": 1
-        }
-      }
-    },
-    {
-      "_section": "ammo_23x75_barrikada",
-      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
-      "_data": {
-        "_allowRicochet": true,
-        "_distanceMultiplier": 1,
-        "_projectileCount": 1,
-        "_ammoTracerEnabled": false,
-        "_ammoTracerWidthMeters": 0.225,
-        "_ammoTracerTrailDurationSeconds": 0.025,
-        "_ammoTracerIgnitionDistanceMeters": 10,
-        "_ammoTracerBurnDurationSeconds": 3,
-        "_ammoTracerEmissionIntensity": 8,
-        "_ammoTracerColor": {
-          "r": 1,
-          "g": 0.35,
-          "b": 0.015,
-          "a": 1
-        }
-      }
-    },
-    {
-      "_section": "ammo_23x75_shrapnel",
-      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
-      "_data": {
-        "_allowRicochet": true,
-        "_distanceMultiplier": 0.8,
-        "_projectileCount": 6,
-        "_ammoTracerEnabled": false,
-        "_ammoTracerWidthMeters": 0.225,
-        "_ammoTracerTrailDurationSeconds": 0.025,
-        "_ammoTracerIgnitionDistanceMeters": 10,
-        "_ammoTracerBurnDurationSeconds": 3,
-        "_ammoTracerEmissionIntensity": 8,
-        "_ammoTracerColor": {
-          "r": 1,
-          "g": 0.35,
-          "b": 0.015,
-          "a": 1
-        }
-      }
-    },
-    {
-      "_section": "ammo_338_federal",
-      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
-      "_data": {
-        "_allowRicochet": true,
-        "_distanceMultiplier": 1,
-        "_projectileCount": 1,
-        "_ammoTracerEnabled": true,
-        "_ammoTracerWidthMeters": 0.225,
-        "_ammoTracerTrailDurationSeconds": 0.02,
-        "_ammoTracerIgnitionDistanceMeters": 50,
-        "_ammoTracerBurnDurationSeconds": 3,
-        "_ammoTracerEmissionIntensity": 14,
-        "_ammoTracerColor": {
-          "r": 1,
-          "g": 0.65,
-          "b": 0.03,
-          "a": 1
-        }
-      }
-    },
-    {
-      "_section": "ammo_357_hp_mag",
-      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
-      "_data": {
-        "_allowRicochet": true,
-        "_distanceMultiplier": 1,
-        "_projectileCount": 1,
-        "_ammoTracerEnabled": false,
-        "_ammoTracerWidthMeters": 0.225,
-        "_ammoTracerTrailDurationSeconds": 0.025,
-        "_ammoTracerIgnitionDistanceMeters": 10,
-        "_ammoTracerBurnDurationSeconds": 1.5,
-        "_ammoTracerEmissionIntensity": 8,
-        "_ammoTracerColor": {
-          "r": 1,
-          "g": 0.65,
-          "b": 0.03,
-          "a": 1
-        }
-      }
-    },
-    {
-      "_section": "ammo_5.45x39_ap",
-      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
-      "_data": {
-        "_allowRicochet": true,
-        "_distanceMultiplier": 1,
-        "_projectileCount": 1,
-        "_ammoTracerEnabled": true,
-        "_ammoTracerWidthMeters": 0.225,
+        "_ammoTracerWidthMeters": 0.08,
         "_ammoTracerTrailDurationSeconds": 0.02,
         "_ammoTracerIgnitionDistanceMeters": 70,
         "_ammoTracerBurnDurationSeconds": 3,
         "_ammoTracerEmissionIntensity": 12,
         "_ammoTracerColor": {
-          "r": 0.1,
-          "g": 1,
-          "b": 0.05,
-          "a": 1
-        }
-      }
-    },
-    {
-      "_section": "ammo_5.45x39_ep",
-      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
-      "_data": {
-        "_allowRicochet": true,
-        "_distanceMultiplier": 1,
-        "_projectileCount": 1,
-        "_ammoTracerEnabled": true,
-        "_ammoTracerWidthMeters": 0.225,
-        "_ammoTracerTrailDurationSeconds": 0.02,
-        "_ammoTracerIgnitionDistanceMeters": 70,
-        "_ammoTracerBurnDurationSeconds": 3,
-        "_ammoTracerEmissionIntensity": 12,
-        "_ammoTracerColor": {
-          "r": 0.1,
-          "g": 1,
-          "b": 0.05,
-          "a": 1
-        }
-      }
-    },
-    {
-      "_section": "ammo_5.45x39_fmj",
-      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
-      "_data": {
-        "_allowRicochet": true,
-        "_distanceMultiplier": 1,
-        "_projectileCount": 1,
-        "_ammoTracerEnabled": true,
-        "_ammoTracerWidthMeters": 0.225,
-        "_ammoTracerTrailDurationSeconds": 0.02,
-        "_ammoTracerIgnitionDistanceMeters": 70,
-        "_ammoTracerBurnDurationSeconds": 3,
-        "_ammoTracerEmissionIntensity": 12,
-        "_ammoTracerColor": {
-          "r": 0.1,
-          "g": 1,
-          "b": 0.05,
-          "a": 1
-        }
-      }
-    },
-    {
-      "_section": "ammo_5.56x45_ap",
-      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
-      "_data": {
-        "_allowRicochet": true,
-        "_distanceMultiplier": 1,
-        "_projectileCount": 1,
-        "_ammoTracerEnabled": true,
-        "_ammoTracerWidthMeters": 0.225,
-        "_ammoTracerTrailDurationSeconds": 0.02,
-        "_ammoTracerIgnitionDistanceMeters": 70,
-        "_ammoTracerBurnDurationSeconds": 3,
-        "_ammoTracerEmissionIntensity": 12,
-        "_ammoTracerColor": {
-          "r": 1,
-          "g": 0.12,
-          "b": 0.02,
-          "a": 1
-        }
-      }
-    },
-    {
-      "_section": "ammo_5.56x45_fmj",
-      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
-      "_data": {
-        "_allowRicochet": true,
-        "_distanceMultiplier": 1,
-        "_projectileCount": 1,
-        "_ammoTracerEnabled": true,
-        "_ammoTracerWidthMeters": 0.225,
-        "_ammoTracerTrailDurationSeconds": 0.02,
-        "_ammoTracerIgnitionDistanceMeters": 70,
-        "_ammoTracerBurnDurationSeconds": 3,
-        "_ammoTracerEmissionIntensity": 12,
-        "_ammoTracerColor": {
-          "r": 1,
-          "g": 0.12,
-          "b": 0.02,
-          "a": 1
-        }
-      }
-    },
-    {
-      "_section": "ammo_5.56x45_ss190",
-      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
-      "_data": {
-        "_allowRicochet": true,
-        "_distanceMultiplier": 1,
-        "_projectileCount": 1,
-        "_ammoTracerEnabled": true,
-        "_ammoTracerWidthMeters": 0.225,
-        "_ammoTracerTrailDurationSeconds": 0.02,
-        "_ammoTracerIgnitionDistanceMeters": 70,
-        "_ammoTracerBurnDurationSeconds": 3,
-        "_ammoTracerEmissionIntensity": 12,
-        "_ammoTracerColor": {
-          "r": 1,
-          "g": 0.12,
-          "b": 0.02,
-          "a": 1
-        }
-      }
-    },
-    {
-      "_section": "ammo_5.7x28_ss190",
-      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
-      "_data": {
-        "_allowRicochet": true,
-        "_distanceMultiplier": 1,
-        "_projectileCount": 1,
-        "_ammoTracerEnabled": true,
-        "_ammoTracerWidthMeters": 0.225,
-        "_ammoTracerTrailDurationSeconds": 0.02,
-        "_ammoTracerIgnitionDistanceMeters": 20,
-        "_ammoTracerBurnDurationSeconds": 2.5,
-        "_ammoTracerEmissionIntensity": 12,
-        "_ammoTracerColor": {
-          "r": 1,
-          "g": 0.12,
-          "b": 0.02,
-          "a": 1
-        }
-      }
-    },
-    {
-      "_section": "ammo_5.7x28_ss195",
-      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
-      "_data": {
-        "_allowRicochet": true,
-        "_distanceMultiplier": 1,
-        "_projectileCount": 1,
-        "_ammoTracerEnabled": true,
-        "_ammoTracerWidthMeters": 0.225,
-        "_ammoTracerTrailDurationSeconds": 0.02,
-        "_ammoTracerIgnitionDistanceMeters": 20,
-        "_ammoTracerBurnDurationSeconds": 2.5,
-        "_ammoTracerEmissionIntensity": 12,
-        "_ammoTracerColor": {
-          "r": 1,
-          "g": 0.12,
-          "b": 0.02,
-          "a": 1
-        }
-      }
-    },
-    {
-      "_section": "ammo_7.62x25_p",
-      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
-      "_data": {
-        "_allowRicochet": true,
-        "_distanceMultiplier": 1,
-        "_projectileCount": 1,
-        "_ammoTracerEnabled": false,
-        "_ammoTracerWidthMeters": 0.225,
-        "_ammoTracerTrailDurationSeconds": 0.025,
-        "_ammoTracerIgnitionDistanceMeters": 10,
-        "_ammoTracerBurnDurationSeconds": 1.5,
-        "_ammoTracerEmissionIntensity": 8,
-        "_ammoTracerColor": {
-          "r": 0.1,
-          "g": 1,
-          "b": 0.05,
-          "a": 1
-        }
-      }
-    },
-    {
-      "_section": "ammo_7.62x25_ps",
-      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
-      "_data": {
-        "_allowRicochet": true,
-        "_distanceMultiplier": 1,
-        "_projectileCount": 1,
-        "_ammoTracerEnabled": false,
-        "_ammoTracerWidthMeters": 0.225,
-        "_ammoTracerTrailDurationSeconds": 0.025,
-        "_ammoTracerIgnitionDistanceMeters": 10,
-        "_ammoTracerBurnDurationSeconds": 1.5,
-        "_ammoTracerEmissionIntensity": 8,
-        "_ammoTracerColor": {
-          "r": 0.1,
-          "g": 1,
-          "b": 0.05,
-          "a": 1
-        }
-      }
-    },
-    {
-      "_section": "ammo_7.62x39_ap",
-      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
-      "_data": {
-        "_allowRicochet": true,
-        "_distanceMultiplier": 1,
-        "_projectileCount": 1,
-        "_ammoTracerEnabled": true,
-        "_ammoTracerWidthMeters": 0.225,
-        "_ammoTracerTrailDurationSeconds": 0.02,
-        "_ammoTracerIgnitionDistanceMeters": 50,
-        "_ammoTracerBurnDurationSeconds": 3,
-        "_ammoTracerEmissionIntensity": 12,
-        "_ammoTracerColor": {
-          "r": 0.1,
-          "g": 1,
-          "b": 0.05,
-          "a": 1
-        }
-      }
-    },
-    {
-      "_section": "ammo_7.62x39_fmj",
-      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
-      "_data": {
-        "_allowRicochet": true,
-        "_distanceMultiplier": 1,
-        "_projectileCount": 1,
-        "_ammoTracerEnabled": true,
-        "_ammoTracerWidthMeters": 0.225,
-        "_ammoTracerTrailDurationSeconds": 0.02,
-        "_ammoTracerIgnitionDistanceMeters": 50,
-        "_ammoTracerBurnDurationSeconds": 3,
-        "_ammoTracerEmissionIntensity": 12,
-        "_ammoTracerColor": {
-          "r": 0.1,
-          "g": 1,
-          "b": 0.05,
-          "a": 1
-        }
-      }
-    },
-    {
-      "_section": "ammo_7.62x51_ap",
-      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
-      "_data": {
-        "_allowRicochet": true,
-        "_distanceMultiplier": 1,
-        "_projectileCount": 1,
-        "_ammoTracerEnabled": true,
-        "_ammoTracerWidthMeters": 0.225,
-        "_ammoTracerTrailDurationSeconds": 0.02,
-        "_ammoTracerIgnitionDistanceMeters": 50,
-        "_ammoTracerBurnDurationSeconds": 3,
-        "_ammoTracerEmissionIntensity": 12,
-        "_ammoTracerColor": {
-          "r": 1,
-          "g": 0.65,
-          "b": 0.03,
-          "a": 1
-        }
-      }
-    },
-    {
-      "_section": "ammo_7.62x51_fmj",
-      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
-      "_data": {
-        "_allowRicochet": true,
-        "_distanceMultiplier": 1,
-        "_projectileCount": 1,
-        "_ammoTracerEnabled": true,
-        "_ammoTracerWidthMeters": 0.225,
-        "_ammoTracerTrailDurationSeconds": 0.02,
-        "_ammoTracerIgnitionDistanceMeters": 50,
-        "_ammoTracerBurnDurationSeconds": 3,
-        "_ammoTracerEmissionIntensity": 12,
-        "_ammoTracerColor": {
-          "r": 1,
-          "g": 0.65,
-          "b": 0.03,
-          "a": 1
-        }
-      }
-    },
-    {
-      "_section": "ammo_7.62x54_7h1",
-      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
-      "_data": {
-        "_allowRicochet": true,
-        "_distanceMultiplier": 1,
-        "_projectileCount": 1,
-        "_ammoTracerEnabled": true,
-        "_ammoTracerWidthMeters": 0.225,
-        "_ammoTracerTrailDurationSeconds": 0.025,
-        "_ammoTracerIgnitionDistanceMeters": 50,
-        "_ammoTracerBurnDurationSeconds": 3.5,
-        "_ammoTracerEmissionIntensity": 14,
-        "_ammoTracerColor": {
-          "r": 0.1,
-          "g": 1,
-          "b": 0.05,
-          "a": 1
-        }
-      }
-    },
-    {
-      "_section": "ammo_7.62x54_7h14",
-      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
-      "_data": {
-        "_allowRicochet": true,
-        "_distanceMultiplier": 1,
-        "_projectileCount": 1,
-        "_ammoTracerEnabled": true,
-        "_ammoTracerWidthMeters": 0.225,
-        "_ammoTracerTrailDurationSeconds": 0.025,
-        "_ammoTracerIgnitionDistanceMeters": 50,
-        "_ammoTracerBurnDurationSeconds": 3.5,
-        "_ammoTracerEmissionIntensity": 14,
-        "_ammoTracerColor": {
-          "r": 0.1,
-          "g": 1,
-          "b": 0.05,
-          "a": 1
-        }
-      }
-    },
-    {
-      "_section": "ammo_7.62x54_ap",
-      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
-      "_data": {
-        "_allowRicochet": true,
-        "_distanceMultiplier": 1,
-        "_projectileCount": 1,
-        "_ammoTracerEnabled": true,
-        "_ammoTracerWidthMeters": 0.225,
-        "_ammoTracerTrailDurationSeconds": 0.025,
-        "_ammoTracerIgnitionDistanceMeters": 50,
-        "_ammoTracerBurnDurationSeconds": 3.5,
-        "_ammoTracerEmissionIntensity": 14,
-        "_ammoTracerColor": {
-          "r": 0.1,
-          "g": 1,
-          "b": 0.05,
-          "a": 1
-        }
-      }
-    },
-    {
-      "_section": "ammo_7.92x33_ap",
-      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
-      "_data": {
-        "_allowRicochet": true,
-        "_distanceMultiplier": 1,
-        "_projectileCount": 1,
-        "_ammoTracerEnabled": true,
-        "_ammoTracerWidthMeters": 0.225,
-        "_ammoTracerTrailDurationSeconds": 0.02,
-        "_ammoTracerIgnitionDistanceMeters": 70,
-        "_ammoTracerBurnDurationSeconds": 3,
-        "_ammoTracerEmissionIntensity": 12,
-        "_ammoTracerColor": {
-          "r": 1,
-          "g": 0.35,
-          "b": 0.015,
-          "a": 1
-        }
-      }
-    },
-    {
-      "_section": "ammo_7.92x33_fmj",
-      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
-      "_data": {
-        "_allowRicochet": true,
-        "_distanceMultiplier": 1,
-        "_projectileCount": 1,
-        "_ammoTracerEnabled": true,
-        "_ammoTracerWidthMeters": 0.225,
-        "_ammoTracerTrailDurationSeconds": 0.02,
-        "_ammoTracerIgnitionDistanceMeters": 70,
-        "_ammoTracerBurnDurationSeconds": 3,
-        "_ammoTracerEmissionIntensity": 12,
-        "_ammoTracerColor": {
-          "r": 1,
-          "g": 0.35,
-          "b": 0.015,
-          "a": 1
-        }
-      }
-    },
-    {
-      "_section": "ammo_9x18_ap",
-      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
-      "_data": {
-        "_allowRicochet": true,
-        "_distanceMultiplier": 1,
-        "_projectileCount": 1,
-        "_ammoTracerEnabled": false,
-        "_ammoTracerWidthMeters": 0.225,
-        "_ammoTracerTrailDurationSeconds": 0.025,
-        "_ammoTracerIgnitionDistanceMeters": 10,
-        "_ammoTracerBurnDurationSeconds": 1.5,
-        "_ammoTracerEmissionIntensity": 8,
-        "_ammoTracerColor": {
-          "r": 0.1,
-          "g": 1,
-          "b": 0.05,
-          "a": 1
+          "r": 1.0,
+          "g": 0.5098039215686274,
+          "b": 0.0,
+          "a": 1.0
         }
       }
     },
     {
       "_section": "ammo_9x18_fmj",
-      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
+      "_reference": "IWP Standalone Final weapons_ammo.ltx:110",
+      "_model": "meshes/dynamics/weapons/wpn_ammo/ammo_9x18_fmj.ogf",
+      "_displayName": "Патроны 9х18 мм ПСО гж",
+      "_shortName": "9x18 ПСО",
+      "_description": "Спортивно-охотничий патрон ПСО для пистолета Макарова.",
+      "_boxSize": 20,
+      "_boxWeight": 0.21,
+      "_gridWidth": 1,
+      "_gridHeight": 1,
+      "_cost": 300,
+      "_takeSoundCategory": "ammosmall",
+      "_armorPiercing": 0.35,
+      "_hitMultiplier": 0.27,
+      "_impulseMultiplier": 2.07,
+      "_speedMultiplier": 1.112,
+      "_dispersionMultiplier": 1.0,
+      "_airResistance": 2.2,
       "_data": {
         "_allowRicochet": true,
-        "_distanceMultiplier": 1,
+        "_distanceMultiplier": 1.0,
         "_projectileCount": 1,
         "_ammoTracerEnabled": false,
-        "_ammoTracerWidthMeters": 0.225,
-        "_ammoTracerTrailDurationSeconds": 0.025,
-        "_ammoTracerIgnitionDistanceMeters": 10,
-        "_ammoTracerBurnDurationSeconds": 1.5,
-        "_ammoTracerEmissionIntensity": 8,
+        "_ammoTracerWidthMeters": 0.08,
+        "_ammoTracerTrailDurationSeconds": 0.02,
+        "_ammoTracerIgnitionDistanceMeters": 70,
+        "_ammoTracerBurnDurationSeconds": 3,
+        "_ammoTracerEmissionIntensity": 12,
         "_ammoTracerColor": {
-          "r": 0.1,
-          "g": 1,
-          "b": 0.05,
-          "a": 1
+          "r": 1.0,
+          "g": 0.5098039215686274,
+          "b": 0.0,
+          "a": 1.0
         }
       }
     },
     {
       "_section": "ammo_9x18_pmm",
-      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
+      "_reference": "IWP Standalone Final weapons_ammo.ltx:142",
+      "_model": "meshes/dynamics/weapons/wpn_ammo/ammo_9x18_pmm.ogf",
+      "_displayName": "Патроны 9х18 мм ПММ гж (7Н16)",
+      "_shortName": "9x18 ПММ",
+      "_description": "Патрон ПММ, разработанный на основе штатного патрона пистолета Макарова.",
+      "_boxSize": 20,
+      "_boxWeight": 0.26,
+      "_gridWidth": 1,
+      "_gridHeight": 1,
+      "_cost": 500,
+      "_takeSoundCategory": "ammosmall",
+      "_armorPiercing": 0.4,
+      "_hitMultiplier": 0.3,
+      "_impulseMultiplier": 2.83,
+      "_speedMultiplier": 0.741,
+      "_dispersionMultiplier": 0.71,
+      "_airResistance": 1.9,
       "_data": {
         "_allowRicochet": true,
-        "_distanceMultiplier": 1,
+        "_distanceMultiplier": 1.0,
         "_projectileCount": 1,
         "_ammoTracerEnabled": false,
-        "_ammoTracerWidthMeters": 0.225,
-        "_ammoTracerTrailDurationSeconds": 0.025,
-        "_ammoTracerIgnitionDistanceMeters": 10,
-        "_ammoTracerBurnDurationSeconds": 1.5,
-        "_ammoTracerEmissionIntensity": 8,
+        "_ammoTracerWidthMeters": 0.08,
+        "_ammoTracerTrailDurationSeconds": 0.02,
+        "_ammoTracerIgnitionDistanceMeters": 70,
+        "_ammoTracerBurnDurationSeconds": 3,
+        "_ammoTracerEmissionIntensity": 12,
         "_ammoTracerColor": {
-          "r": 0.1,
-          "g": 1,
-          "b": 0.05,
-          "a": 1
+          "r": 1.0,
+          "g": 0.5098039215686274,
+          "b": 0.0,
+          "a": 1.0
         }
       }
     },
     {
-      "_section": "ammo_9x19_ap",
-      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
+      "_section": "ammo_7.62x25",
+      "_reference": "IWP Standalone Final weapons_ammo.ltx:174",
+      "_model": "meshes/dynamics/weapons/wpn_ammo/ammo_tt33.ogf",
+      "_displayName": "Патроны 7.62х25 мм ПСТ гл",
+      "_shortName": "7,62x25 ПСТ",
+      "_description": "Советский пистолетный патрон, хорошо известный со времён Второй мировой войны. В Зоне он широко распространён благодаря запасам на старых военных складах.",
+      "_boxSize": 20,
+      "_boxWeight": 0.36,
+      "_gridWidth": 2,
+      "_gridHeight": 1,
+      "_cost": 500,
+      "_takeSoundCategory": "ammosmall",
+      "_armorPiercing": 0.49,
+      "_hitMultiplier": 0.35,
+      "_impulseMultiplier": 3.67,
+      "_speedMultiplier": 0.976,
+      "_dispersionMultiplier": 0.94,
+      "_airResistance": 1.82,
       "_data": {
         "_allowRicochet": true,
-        "_distanceMultiplier": 1,
+        "_distanceMultiplier": 1.0,
         "_projectileCount": 1,
         "_ammoTracerEnabled": false,
-        "_ammoTracerWidthMeters": 0.225,
-        "_ammoTracerTrailDurationSeconds": 0.025,
-        "_ammoTracerIgnitionDistanceMeters": 10,
-        "_ammoTracerBurnDurationSeconds": 1.5,
-        "_ammoTracerEmissionIntensity": 8,
+        "_ammoTracerWidthMeters": 0.08,
+        "_ammoTracerTrailDurationSeconds": 0.02,
+        "_ammoTracerIgnitionDistanceMeters": 70,
+        "_ammoTracerBurnDurationSeconds": 3,
+        "_ammoTracerEmissionIntensity": 12,
         "_ammoTracerColor": {
-          "r": 1,
-          "g": 0.12,
-          "b": 0.02,
-          "a": 1
+          "r": 1.0,
+          "g": 0.5098039215686274,
+          "b": 0.0,
+          "a": 1.0
         }
       }
     },
     {
       "_section": "ammo_9x19_fmj",
-      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
+      "_reference": "IWP Standalone Final weapons_ammo.ltx:206",
+      "_model": "meshes/dynamics/weapons/wpn_ammo/ammo_9x19_fmj.ogf",
+      "_displayName": "Патроны 9х19 мм ПСО гж",
+      "_shortName": "9x19 ПСО",
+      "_description": "Спортивно-охотничий патрон ПСО семейства «Парабеллум».",
+      "_boxSize": 20,
+      "_boxWeight": 0.24,
+      "_gridWidth": 1,
+      "_gridHeight": 1,
+      "_cost": 400,
+      "_takeSoundCategory": "ammosmall",
+      "_armorPiercing": 0.4,
+      "_hitMultiplier": 0.28,
+      "_impulseMultiplier": 3.21,
+      "_speedMultiplier": 1.105,
+      "_dispersionMultiplier": 1.0,
+      "_airResistance": 1.9,
       "_data": {
         "_allowRicochet": true,
-        "_distanceMultiplier": 1,
+        "_distanceMultiplier": 1.0,
         "_projectileCount": 1,
         "_ammoTracerEnabled": false,
-        "_ammoTracerWidthMeters": 0.225,
-        "_ammoTracerTrailDurationSeconds": 0.025,
-        "_ammoTracerIgnitionDistanceMeters": 10,
-        "_ammoTracerBurnDurationSeconds": 1.5,
-        "_ammoTracerEmissionIntensity": 8,
+        "_ammoTracerWidthMeters": 0.08,
+        "_ammoTracerTrailDurationSeconds": 0.02,
+        "_ammoTracerIgnitionDistanceMeters": 70,
+        "_ammoTracerBurnDurationSeconds": 3,
+        "_ammoTracerEmissionIntensity": 12,
         "_ammoTracerColor": {
-          "r": 1,
-          "g": 0.12,
-          "b": 0.02,
-          "a": 1
+          "r": 1.0,
+          "g": 0.5098039215686274,
+          "b": 0.0,
+          "a": 1.0
         }
       }
     },
     {
       "_section": "ammo_9x19_pbp",
-      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
+      "_reference": "IWP Standalone Final weapons_ammo.ltx:238",
+      "_model": "meshes/dynamics/weapons/wpn_ammo/ammo_9x19_pbp.ogf",
+      "_displayName": "Патроны 9x19 мм ПП гж (7Н30)",
+      "_shortName": "9x19 7Н30",
+      "_description": "Патрон 7Н30, разработанный КБАЛ имени Л. Н. Кошкина совместно с Тульским патронным заводом.",
+      "_boxSize": 20,
+      "_boxWeight": 0.3,
+      "_gridWidth": 1,
+      "_gridHeight": 1,
+      "_cost": 600,
+      "_takeSoundCategory": "ammosmall",
+      "_armorPiercing": 0.45,
+      "_hitMultiplier": 0.34,
+      "_impulseMultiplier": 3.67,
+      "_speedMultiplier": 0.89,
+      "_dispersionMultiplier": 0.94,
+      "_airResistance": 1.82,
       "_data": {
         "_allowRicochet": true,
-        "_distanceMultiplier": 1,
-        "_projectileCount": 1,
-        "_ammoTracerEnabled": false,
-        "_ammoTracerWidthMeters": 0.225,
-        "_ammoTracerTrailDurationSeconds": 0.025,
-        "_ammoTracerIgnitionDistanceMeters": 10,
-        "_ammoTracerBurnDurationSeconds": 1.5,
-        "_ammoTracerEmissionIntensity": 8,
-        "_ammoTracerColor": {
-          "r": 1,
-          "g": 0.12,
-          "b": 0.02,
-          "a": 1
-        }
-      }
-    },
-    {
-      "_section": "ammo_9x21_sp10",
-      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
-      "_data": {
-        "_allowRicochet": true,
-        "_distanceMultiplier": 1,
-        "_projectileCount": 1,
-        "_ammoTracerEnabled": false,
-        "_ammoTracerWidthMeters": 0.225,
-        "_ammoTracerTrailDurationSeconds": 0.025,
-        "_ammoTracerIgnitionDistanceMeters": 10,
-        "_ammoTracerBurnDurationSeconds": 1.5,
-        "_ammoTracerEmissionIntensity": 8,
-        "_ammoTracerColor": {
-          "r": 1,
-          "g": 0.12,
-          "b": 0.02,
-          "a": 1
-        }
-      }
-    },
-    {
-      "_section": "ammo_9x39_ap",
-      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
-      "_data": {
-        "_allowRicochet": true,
-        "_distanceMultiplier": 1,
+        "_distanceMultiplier": 1.0,
         "_projectileCount": 1,
         "_ammoTracerEnabled": true,
-        "_ammoTracerWidthMeters": 0.225,
-        "_ammoTracerTrailDurationSeconds": 0.025,
-        "_ammoTracerIgnitionDistanceMeters": 10,
-        "_ammoTracerBurnDurationSeconds": 2,
-        "_ammoTracerEmissionIntensity": 10,
+        "_ammoTracerWidthMeters": 0.08,
+        "_ammoTracerTrailDurationSeconds": 0.02,
+        "_ammoTracerIgnitionDistanceMeters": 70,
+        "_ammoTracerBurnDurationSeconds": 3,
+        "_ammoTracerEmissionIntensity": 12,
         "_ammoTracerColor": {
-          "r": 0.1,
-          "g": 1,
-          "b": 0.05,
-          "a": 1
+          "r": 1.0,
+          "g": 0.09803921568627451,
+          "b": 0.0,
+          "a": 1.0
+        }
+      }
+    },
+    {
+      "_section": "ammo_9x21",
+      "_reference": "IWP Standalone Final weapons_ammo.ltx:270",
+      "_model": "meshes/dynamics/weapons/wpn_ammo/ammo_9x21.ogf",
+      "_displayName": "Патроны 9x21 СП-10",
+      "_shortName": "9x21 СП-10",
+      "_description": "Пистолетный патрон СП-10 с бронебойной пулей.",
+      "_boxSize": 20,
+      "_boxWeight": 0.27,
+      "_gridWidth": 2,
+      "_gridHeight": 1,
+      "_cost": 800,
+      "_takeSoundCategory": "ammosmall",
+      "_armorPiercing": 0.5,
+      "_hitMultiplier": 0.46,
+      "_impulseMultiplier": 3.97,
+      "_speedMultiplier": 1.042,
+      "_dispersionMultiplier": 1.14,
+      "_airResistance": 1.72,
+      "_data": {
+        "_allowRicochet": true,
+        "_distanceMultiplier": 1.0,
+        "_projectileCount": 1,
+        "_ammoTracerEnabled": true,
+        "_ammoTracerWidthMeters": 0.08,
+        "_ammoTracerTrailDurationSeconds": 0.02,
+        "_ammoTracerIgnitionDistanceMeters": 70,
+        "_ammoTracerBurnDurationSeconds": 3,
+        "_ammoTracerEmissionIntensity": 12,
+        "_ammoTracerColor": {
+          "r": 1.0,
+          "g": 0.09803921568627451,
+          "b": 0.0,
+          "a": 1.0
+        }
+      }
+    },
+    {
+      "_section": "ammo_11.43x23_fmj",
+      "_reference": "IWP Standalone Final weapons_ammo.ltx:302",
+      "_model": "meshes/dynamics/weapons/wpn_ammo/ammo_1143x23_fmj.ogf",
+      "_displayName": "Патроны 11.43x23 мм FMJ («Винчестер»)",
+      "_shortName": ".45 FMJ",
+      "_description": "Пистолетный патрон .45 ACP с оболочечной пулей.",
+      "_boxSize": 20,
+      "_boxWeight": 0.28,
+      "_gridWidth": 2,
+      "_gridHeight": 1,
+      "_cost": 400,
+      "_takeSoundCategory": "ammosmall",
+      "_armorPiercing": 0.46,
+      "_hitMultiplier": 0.42,
+      "_impulseMultiplier": 3.91,
+      "_speedMultiplier": 1.155,
+      "_dispersionMultiplier": 1.0,
+      "_airResistance": 1.6,
+      "_data": {
+        "_allowRicochet": true,
+        "_distanceMultiplier": 1.0,
+        "_projectileCount": 1,
+        "_ammoTracerEnabled": false,
+        "_ammoTracerWidthMeters": 0.08,
+        "_ammoTracerTrailDurationSeconds": 0.02,
+        "_ammoTracerIgnitionDistanceMeters": 70,
+        "_ammoTracerBurnDurationSeconds": 3,
+        "_ammoTracerEmissionIntensity": 12,
+        "_ammoTracerColor": {
+          "r": 1.0,
+          "g": 0.5098039215686274,
+          "b": 0.0,
+          "a": 1.0
+        }
+      }
+    },
+    {
+      "_section": "ammo_11.43x23_hydro",
+      "_reference": "IWP Standalone Final weapons_ammo.ltx:334",
+      "_model": "meshes/dynamics/weapons/wpn_ammo/ammo_1143x23_hydro.ogf",
+      "_displayName": "Патроны 11.43x23 мм Hydra-Shok",
+      "_shortName": ".45 Hydra-Shok",
+      "_description": "Патрон .45 ACP с пулей Hydra-Shok компании Federal.",
+      "_boxSize": 20,
+      "_boxWeight": 0.35,
+      "_gridWidth": 2,
+      "_gridHeight": 1,
+      "_cost": 680,
+      "_takeSoundCategory": "ammosmall",
+      "_armorPiercing": 0.51,
+      "_hitMultiplier": 0.5,
+      "_impulseMultiplier": 4.09,
+      "_speedMultiplier": 1.076,
+      "_dispersionMultiplier": 0.81,
+      "_airResistance": 2.4,
+      "_data": {
+        "_allowRicochet": true,
+        "_distanceMultiplier": 1.0,
+        "_projectileCount": 1,
+        "_ammoTracerEnabled": true,
+        "_ammoTracerWidthMeters": 0.08,
+        "_ammoTracerTrailDurationSeconds": 0.02,
+        "_ammoTracerIgnitionDistanceMeters": 70,
+        "_ammoTracerBurnDurationSeconds": 3,
+        "_ammoTracerEmissionIntensity": 12,
+        "_ammoTracerColor": {
+          "r": 1.0,
+          "g": 0.09803921568627451,
+          "b": 0.0,
+          "a": 1.0
+        }
+      }
+    },
+    {
+      "_section": "ammo_44mag",
+      "_reference": "IWP Standalone Final weapons_ammo.ltx:366",
+      "_model": "meshes/dynamics/weapons/wpn_ammo/ammo_44_mag.ogf",
+      "_displayName": "Патроны .44 Remington Magnum",
+      "_shortName": ".44 Magnum",
+      "_description": "Револьверный патрон, разработанный на основе .44 Special. Применяется также в некоторых карабинах и винтовках.",
+      "_boxSize": 16,
+      "_boxWeight": 0.45,
+      "_gridWidth": 2,
+      "_gridHeight": 1,
+      "_cost": 900,
+      "_takeSoundCategory": "ammolarge",
+      "_armorPiercing": 0.55,
+      "_hitMultiplier": 0.8,
+      "_impulseMultiplier": 25.0,
+      "_speedMultiplier": 1.294,
+      "_dispersionMultiplier": 1.0,
+      "_airResistance": 2.6,
+      "_data": {
+        "_allowRicochet": true,
+        "_distanceMultiplier": 1.0,
+        "_projectileCount": 1,
+        "_ammoTracerEnabled": true,
+        "_ammoTracerWidthMeters": 0.08,
+        "_ammoTracerTrailDurationSeconds": 0.02,
+        "_ammoTracerIgnitionDistanceMeters": 70,
+        "_ammoTracerBurnDurationSeconds": 3,
+        "_ammoTracerEmissionIntensity": 12,
+        "_ammoTracerColor": {
+          "r": 1.0,
+          "g": 0.09803921568627451,
+          "b": 0.0,
+          "a": 1.0
+        }
+      }
+    },
+    {
+      "_section": "ammo_44mag_boom",
+      "_reference": "IWP Standalone Final weapons_ammo.ltx:398",
+      "_model": "meshes/dynamics/weapons/wpn_ammo/ammo_44_mag_boom.ogf",
+      "_displayName": "Патроны .44 Panthera Magnum Boom",
+      "_shortName": ".44 Panthera Boom",
+      "_description": "Редкий револьверный патрон с разрывной пулей на базе .44 Remington Magnum.",
+      "_boxSize": 16,
+      "_boxWeight": 0.55,
+      "_gridWidth": 2,
+      "_gridHeight": 1,
+      "_cost": 900,
+      "_takeSoundCategory": "ammolarge",
+      "_armorPiercing": 0.55,
+      "_hitMultiplier": 1.0,
+      "_impulseMultiplier": 50.0,
+      "_speedMultiplier": 1.294,
+      "_dispersionMultiplier": 1.0,
+      "_airResistance": 2.6,
+      "_data": {
+        "_allowRicochet": true,
+        "_distanceMultiplier": 1.0,
+        "_projectileCount": 1,
+        "_ammoTracerEnabled": true,
+        "_ammoTracerWidthMeters": 0.08,
+        "_ammoTracerTrailDurationSeconds": 0.02,
+        "_ammoTracerIgnitionDistanceMeters": 70,
+        "_ammoTracerBurnDurationSeconds": 3,
+        "_ammoTracerEmissionIntensity": 12,
+        "_ammoTracerColor": {
+          "r": 1.0,
+          "g": 0.09803921568627451,
+          "b": 0.0,
+          "a": 1.0
+        }
+      }
+    },
+    {
+      "_section": "ammo_50ae",
+      "_reference": "IWP Standalone Final weapons_ammo.ltx:417",
+      "_model": "meshes/dynamics/weapons/wpn_ammo/ammo_50_ae.ogf",
+      "_displayName": "Патроны .50 Action Express",
+      "_shortName": ".50 AE",
+      "_description": "Пистолетный патрон, разработанный для Desert Eagle.",
+      "_boxSize": 20,
+      "_boxWeight": 0.65,
+      "_gridWidth": 2,
+      "_gridHeight": 1,
+      "_cost": 900,
+      "_takeSoundCategory": "ammolarge",
+      "_armorPiercing": 0.61,
+      "_hitMultiplier": 0.9,
+      "_impulseMultiplier": 40.0,
+      "_speedMultiplier": 1.068,
+      "_dispersionMultiplier": 1.0,
+      "_airResistance": 2.7,
+      "_data": {
+        "_allowRicochet": true,
+        "_distanceMultiplier": 1.0,
+        "_projectileCount": 1,
+        "_ammoTracerEnabled": true,
+        "_ammoTracerWidthMeters": 0.08,
+        "_ammoTracerTrailDurationSeconds": 0.02,
+        "_ammoTracerIgnitionDistanceMeters": 70,
+        "_ammoTracerBurnDurationSeconds": 3,
+        "_ammoTracerEmissionIntensity": 12,
+        "_ammoTracerColor": {
+          "r": 1.0,
+          "g": 0.09803921568627451,
+          "b": 0.0,
+          "a": 1.0
+        }
+      }
+    },
+    {
+      "_section": "ammo_5.45x39_fmj",
+      "_reference": "IWP Standalone Final weapons_ammo.ltx:449",
+      "_model": "meshes/dynamics/weapons/wpn_ammo/ammo_545x39_fmj.ogf",
+      "_displayName": "Патроны 5.45x39 мм ПС гж (7Н6)",
+      "_shortName": "5,45x39 7Н6",
+      "_description": "Советский патрон 7Н6, принятый на вооружение в 1974 году.",
+      "_boxSize": 30,
+      "_boxWeight": 0.31,
+      "_gridWidth": 2,
+      "_gridHeight": 1,
+      "_cost": 800,
+      "_takeSoundCategory": "ammolarge",
+      "_armorPiercing": 0.66,
+      "_hitMultiplier": 0.4,
+      "_impulseMultiplier": 3.29,
+      "_speedMultiplier": 1.01,
+      "_dispersionMultiplier": 1.0,
+      "_airResistance": 1.6,
+      "_data": {
+        "_allowRicochet": true,
+        "_distanceMultiplier": 1.0,
+        "_projectileCount": 1,
+        "_ammoTracerEnabled": false,
+        "_ammoTracerWidthMeters": 0.08,
+        "_ammoTracerTrailDurationSeconds": 0.02,
+        "_ammoTracerIgnitionDistanceMeters": 70,
+        "_ammoTracerBurnDurationSeconds": 3,
+        "_ammoTracerEmissionIntensity": 12,
+        "_ammoTracerColor": {
+          "r": 1.0,
+          "g": 0.5098039215686274,
+          "b": 0.0,
+          "a": 1.0
+        }
+      }
+    },
+    {
+      "_section": "ammo_5.45x39_ap",
+      "_reference": "IWP Standalone Final weapons_ammo.ltx:481",
+      "_model": "meshes/dynamics/weapons/wpn_ammo/ammo_545x39_ap.ogf",
+      "_displayName": "Патроны 5.45x39 мм БП гж (7Н22)",
+      "_shortName": "5,45x39 7Н22",
+      "_description": "Армейский патрон 7Н22 с бронебойной пулей.",
+      "_boxSize": 30,
+      "_boxWeight": 0.36,
+      "_gridWidth": 2,
+      "_gridHeight": 1,
+      "_cost": 1925,
+      "_takeSoundCategory": "ammolarge",
+      "_armorPiercing": 0.72,
+      "_hitMultiplier": 0.45,
+      "_impulseMultiplier": 3.28,
+      "_speedMultiplier": 0.989,
+      "_dispersionMultiplier": 1.0,
+      "_airResistance": 1.58,
+      "_data": {
+        "_allowRicochet": true,
+        "_distanceMultiplier": 1.0,
+        "_projectileCount": 1,
+        "_ammoTracerEnabled": true,
+        "_ammoTracerWidthMeters": 0.08,
+        "_ammoTracerTrailDurationSeconds": 0.02,
+        "_ammoTracerIgnitionDistanceMeters": 70,
+        "_ammoTracerBurnDurationSeconds": 3,
+        "_ammoTracerEmissionIntensity": 12,
+        "_ammoTracerColor": {
+          "r": 1.0,
+          "g": 0.09803921568627451,
+          "b": 0.0,
+          "a": 1.0
+        }
+      }
+    },
+    {
+      "_section": "ammo_5.56x45_ss190",
+      "_reference": "IWP Standalone Final weapons_ammo.ltx:513",
+      "_model": "meshes/dynamics/weapons/wpn_ammo/ammo_556x45_ss190.ogf",
+      "_displayName": "Патроны 5.56х45 мм М855",
+      "_shortName": "5,56x45 M855",
+      "_description": "Американский армейский патрон M855, разработанный как эквивалент FN SS109.",
+      "_boxSize": 30,
+      "_boxWeight": 0.33,
+      "_gridWidth": 2,
+      "_gridHeight": 1,
+      "_cost": 1050,
+      "_takeSoundCategory": "ammolarge",
+      "_armorPiercing": 0.72,
+      "_hitMultiplier": 0.4,
+      "_impulseMultiplier": 3.61,
+      "_speedMultiplier": 0.922,
+      "_dispersionMultiplier": 1.0,
+      "_airResistance": 1.5,
+      "_data": {
+        "_allowRicochet": true,
+        "_distanceMultiplier": 1.0,
+        "_projectileCount": 1,
+        "_ammoTracerEnabled": false,
+        "_ammoTracerWidthMeters": 0.08,
+        "_ammoTracerTrailDurationSeconds": 0.02,
+        "_ammoTracerIgnitionDistanceMeters": 70,
+        "_ammoTracerBurnDurationSeconds": 3,
+        "_ammoTracerEmissionIntensity": 12,
+        "_ammoTracerColor": {
+          "r": 1.0,
+          "g": 0.5098039215686274,
+          "b": 0.0,
+          "a": 1.0
+        }
+      }
+    },
+    {
+      "_section": "ammo_5.56x45_ap",
+      "_reference": "IWP Standalone Final weapons_ammo.ltx:545",
+      "_model": "meshes/dynamics/weapons/wpn_ammo/ammo_556x45_ap.ogf",
+      "_displayName": "Патроны 5.56x45 мм M856A1",
+      "_shortName": "5,56x45 M856A1",
+      "_description": "Трассирующий патрон M856A1 для целеуказания и корректировки огня.",
+      "_boxSize": 30,
+      "_boxWeight": 0.38,
+      "_gridWidth": 2,
+      "_gridHeight": 1,
+      "_cost": 1925,
+      "_takeSoundCategory": "ammolarge",
+      "_armorPiercing": 0.79,
+      "_hitMultiplier": 0.44,
+      "_impulseMultiplier": 3.81,
+      "_speedMultiplier": 0.925,
+      "_dispersionMultiplier": 0.92,
+      "_airResistance": 1.37,
+      "_data": {
+        "_allowRicochet": true,
+        "_distanceMultiplier": 1.0,
+        "_projectileCount": 1,
+        "_ammoTracerEnabled": true,
+        "_ammoTracerWidthMeters": 0.08,
+        "_ammoTracerTrailDurationSeconds": 0.02,
+        "_ammoTracerIgnitionDistanceMeters": 70,
+        "_ammoTracerBurnDurationSeconds": 3,
+        "_ammoTracerEmissionIntensity": 12,
+        "_ammoTracerColor": {
+          "r": 1.0,
+          "g": 0.09803921568627451,
+          "b": 0.0,
+          "a": 1.0
+        }
+      }
+    },
+    {
+      "_section": "ammo_5.7x28_fmj",
+      "_reference": "IWP Standalone Final weapons_ammo.ltx:577",
+      "_model": "meshes/dynamics/weapons/wpn_ammo/ammo_57x28_fmj.ogf",
+      "_displayName": "Патроны 5.7x28 FN SB193",
+      "_shortName": "5,7x28 SB193",
+      "_description": "Патрон FN SB193 для пистолета Five-seveN и пистолета-пулемёта P90.",
+      "_boxSize": 30,
+      "_boxWeight": 0.35,
+      "_gridWidth": 2,
+      "_gridHeight": 1,
+      "_cost": 670,
+      "_takeSoundCategory": "ammolarge",
+      "_armorPiercing": 0.74,
+      "_hitMultiplier": 0.425,
+      "_impulseMultiplier": 3.61,
+      "_speedMultiplier": 0.909,
+      "_dispersionMultiplier": 1.0,
+      "_airResistance": 1.37,
+      "_data": {
+        "_allowRicochet": true,
+        "_distanceMultiplier": 1.0,
+        "_projectileCount": 1,
+        "_ammoTracerEnabled": false,
+        "_ammoTracerWidthMeters": 0.08,
+        "_ammoTracerTrailDurationSeconds": 0.02,
+        "_ammoTracerIgnitionDistanceMeters": 70,
+        "_ammoTracerBurnDurationSeconds": 3,
+        "_ammoTracerEmissionIntensity": 12,
+        "_ammoTracerColor": {
+          "r": 1.0,
+          "g": 0.5098039215686274,
+          "b": 0.0,
+          "a": 1.0
         }
       }
     },
     {
       "_section": "ammo_9x39_pab9",
-      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
+      "_reference": "IWP Standalone Final weapons_ammo.ltx:609",
+      "_model": "meshes/dynamics/weapons/wpn_ammo/ammo_9x39_pab9.ogf",
+      "_displayName": "Патроны 9х39 мм СП-5 гс",
+      "_shortName": "9x39 СП-5",
+      "_description": "Снайперский патрон СП-5 для винтовки ВСС.",
+      "_boxSize": 20,
+      "_boxWeight": 0.75,
+      "_gridWidth": 2,
+      "_gridHeight": 1,
+      "_cost": 1150,
+      "_takeSoundCategory": "ammolarge",
+      "_armorPiercing": 0.6,
+      "_hitMultiplier": 0.65,
+      "_impulseMultiplier": 4.99,
+      "_speedMultiplier": 0.999,
+      "_dispersionMultiplier": 1.0,
+      "_airResistance": 1.37,
       "_data": {
         "_allowRicochet": true,
-        "_distanceMultiplier": 1,
+        "_distanceMultiplier": 1.0,
         "_projectileCount": 1,
-        "_ammoTracerEnabled": true,
-        "_ammoTracerWidthMeters": 0.225,
-        "_ammoTracerTrailDurationSeconds": 0.025,
-        "_ammoTracerIgnitionDistanceMeters": 10,
-        "_ammoTracerBurnDurationSeconds": 2,
-        "_ammoTracerEmissionIntensity": 10,
+        "_ammoTracerEnabled": false,
+        "_ammoTracerWidthMeters": 0.08,
+        "_ammoTracerTrailDurationSeconds": 0.02,
+        "_ammoTracerIgnitionDistanceMeters": 70,
+        "_ammoTracerBurnDurationSeconds": 3,
+        "_ammoTracerEmissionIntensity": 12,
         "_ammoTracerColor": {
-          "r": 0.1,
-          "g": 1,
-          "b": 0.05,
-          "a": 1
+          "r": 1.0,
+          "g": 0.5098039215686274,
+          "b": 0.0,
+          "a": 1.0
         }
       }
     },
     {
-      "_section": "ammo_magnum_300",
-      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
+      "_section": "ammo_9x39_ap",
+      "_reference": "IWP Standalone Final weapons_ammo.ltx:641",
+      "_model": "meshes/dynamics/weapons/wpn_ammo/ammo_9x39_ap.ogf",
+      "_displayName": "Патроны 9x39 мм СП-6 гс",
+      "_shortName": "9x39 СП-6",
+      "_description": "Патрон СП-6, бронебойная модификация СП-5.",
+      "_boxSize": 20,
+      "_boxWeight": 0.8,
+      "_gridWidth": 2,
+      "_gridHeight": 1,
+      "_cost": 2100,
+      "_takeSoundCategory": "ammolarge",
+      "_armorPiercing": 0.66,
+      "_hitMultiplier": 0.7,
+      "_impulseMultiplier": 4.52,
+      "_speedMultiplier": 0.982,
+      "_dispersionMultiplier": 1.0,
+      "_airResistance": 1.21,
       "_data": {
         "_allowRicochet": true,
-        "_distanceMultiplier": 1,
+        "_distanceMultiplier": 1.0,
+        "_projectileCount": 1,
+        "_ammoTracerEnabled": false,
+        "_ammoTracerWidthMeters": 0.08,
+        "_ammoTracerTrailDurationSeconds": 0.02,
+        "_ammoTracerIgnitionDistanceMeters": 70,
+        "_ammoTracerBurnDurationSeconds": 3,
+        "_ammoTracerEmissionIntensity": 12,
+        "_ammoTracerColor": {
+          "r": 1.0,
+          "g": 0.5098039215686274,
+          "b": 0.0,
+          "a": 1.0
+        }
+      }
+    },
+    {
+      "_section": "ammo_12.7x55_fmj",
+      "_reference": "IWP Standalone Final weapons_ammo.ltx:673",
+      "_model": "meshes/dynamics/weapons/wpn_ammo/ammo_127x55_fmj.ogf",
+      "_displayName": "Патроны СЦ-130 ПТ (7н34)",
+      "_shortName": "12,7x55 СЦ-130 ПТ",
+      "_description": "Специальный патрон СЦ-130 ПТ с оболочечной пулей.",
+      "_boxSize": 20,
+      "_boxWeight": 0.5,
+      "_gridWidth": 2,
+      "_gridHeight": 1,
+      "_cost": 2300,
+      "_takeSoundCategory": "ammolarge",
+      "_armorPiercing": 1.05,
+      "_hitMultiplier": 0.96,
+      "_impulseMultiplier": 25.0,
+      "_speedMultiplier": 1.026,
+      "_dispersionMultiplier": 1.0,
+      "_airResistance": 1.05,
+      "_data": {
+        "_allowRicochet": true,
+        "_distanceMultiplier": 1.0,
+        "_projectileCount": 1,
+        "_ammoTracerEnabled": false,
+        "_ammoTracerWidthMeters": 0.08,
+        "_ammoTracerTrailDurationSeconds": 0.02,
+        "_ammoTracerIgnitionDistanceMeters": 70,
+        "_ammoTracerBurnDurationSeconds": 3,
+        "_ammoTracerEmissionIntensity": 12,
+        "_ammoTracerColor": {
+          "r": 1.0,
+          "g": 0.5098039215686274,
+          "b": 0.0,
+          "a": 1.0
+        }
+      }
+    },
+    {
+      "_section": "ammo_12.7x55_ap",
+      "_reference": "IWP Standalone Final weapons_ammo.ltx:705",
+      "_model": "meshes/dynamics/weapons/wpn_ammo/ammo_127x55_ap.ogf",
+      "_displayName": "Патроны СЦ-130 ВПС",
+      "_shortName": "12,7x55 СЦ-130 ВПС",
+      "_description": "Бронебойный вариант патрона СЦ-130.",
+      "_boxSize": 20,
+      "_boxWeight": 0.5,
+      "_gridWidth": 2,
+      "_gridHeight": 1,
+      "_cost": 3220,
+      "_takeSoundCategory": "ammolarge",
+      "_armorPiercing": 1.15,
+      "_hitMultiplier": 1.06,
+      "_impulseMultiplier": 30.0,
+      "_speedMultiplier": 1.026,
+      "_dispersionMultiplier": 1.0,
+      "_airResistance": 1.0,
+      "_data": {
+        "_allowRicochet": true,
+        "_distanceMultiplier": 1.0,
         "_projectileCount": 1,
         "_ammoTracerEnabled": true,
-        "_ammoTracerWidthMeters": 0.225,
+        "_ammoTracerWidthMeters": 0.08,
         "_ammoTracerTrailDurationSeconds": 0.02,
-        "_ammoTracerIgnitionDistanceMeters": 50,
+        "_ammoTracerIgnitionDistanceMeters": 70,
         "_ammoTracerBurnDurationSeconds": 3,
-        "_ammoTracerEmissionIntensity": 14,
+        "_ammoTracerEmissionIntensity": 12,
         "_ammoTracerColor": {
-          "r": 1,
-          "g": 0.65,
-          "b": 0.03,
-          "a": 1
+          "r": 1.0,
+          "g": 0.09803921568627451,
+          "b": 0.0,
+          "a": 1.0
+        }
+      }
+    },
+    {
+      "_section": "ammo_7.62x39_fmj",
+      "_reference": "IWP Standalone Final weapons_ammo.ltx:737",
+      "_model": "meshes/dynamics/weapons/wpn_ammo/ammo_762x39_fmj.ogf",
+      "_displayName": "Патроны 7.62x39 мм ПС (М43)",
+      "_shortName": "7,62x39 ПС",
+      "_description": "Советский патрон ПС, также известный как M43. Принят на вооружение в 1949 году.",
+      "_boxSize": 30,
+      "_boxWeight": 0.45,
+      "_gridWidth": 2,
+      "_gridHeight": 1,
+      "_cost": 1000,
+      "_takeSoundCategory": "ammolarge",
+      "_armorPiercing": 0.75,
+      "_hitMultiplier": 0.45,
+      "_impulseMultiplier": 3.29,
+      "_speedMultiplier": 1.0,
+      "_dispersionMultiplier": 1.0,
+      "_airResistance": 1.6,
+      "_data": {
+        "_allowRicochet": true,
+        "_distanceMultiplier": 1.0,
+        "_projectileCount": 1,
+        "_ammoTracerEnabled": false,
+        "_ammoTracerWidthMeters": 0.08,
+        "_ammoTracerTrailDurationSeconds": 0.02,
+        "_ammoTracerIgnitionDistanceMeters": 70,
+        "_ammoTracerBurnDurationSeconds": 3,
+        "_ammoTracerEmissionIntensity": 12,
+        "_ammoTracerColor": {
+          "r": 1.0,
+          "g": 0.5098039215686274,
+          "b": 0.0,
+          "a": 1.0
+        }
+      }
+    },
+    {
+      "_section": "ammo_7.62x39_ap",
+      "_reference": "IWP Standalone Final weapons_ammo.ltx:769",
+      "_model": "meshes/dynamics/weapons/wpn_ammo/ammo_762x39_ap.ogf",
+      "_displayName": "Патроны 7.62x39 мм БП (7Н23)",
+      "_shortName": "7,62x39 7Н23",
+      "_description": "Армейский бронебойный патрон 7Н23, созданный на базе патрона ПС.",
+      "_boxSize": 30,
+      "_boxWeight": 0.5,
+      "_gridWidth": 2,
+      "_gridHeight": 1,
+      "_cost": 2300,
+      "_takeSoundCategory": "ammolarge",
+      "_armorPiercing": 0.81,
+      "_hitMultiplier": 0.48,
+      "_impulseMultiplier": 7.28,
+      "_speedMultiplier": 0.95,
+      "_dispersionMultiplier": 1.0,
+      "_airResistance": 1.58,
+      "_data": {
+        "_allowRicochet": true,
+        "_distanceMultiplier": 1.0,
+        "_projectileCount": 1,
+        "_ammoTracerEnabled": true,
+        "_ammoTracerWidthMeters": 0.08,
+        "_ammoTracerTrailDurationSeconds": 0.02,
+        "_ammoTracerIgnitionDistanceMeters": 70,
+        "_ammoTracerBurnDurationSeconds": 3,
+        "_ammoTracerEmissionIntensity": 12,
+        "_ammoTracerColor": {
+          "r": 1.0,
+          "g": 0.09803921568627451,
+          "b": 0.0,
+          "a": 1.0
+        }
+      }
+    },
+    {
+      "_section": "ammo_7.62x51_fmj",
+      "_reference": "IWP Standalone Final weapons_ammo.ltx:801",
+      "_model": "meshes/dynamics/weapons/wpn_ammo/ammo_762x51_fmj.ogf",
+      "_displayName": "Патроны .308 Winchester",
+      "_shortName": ".308 Winchester",
+      "_description": "Винтовочный патрон .308 Winchester для охоты и спортивной стрельбы.",
+      "_boxSize": 20,
+      "_boxWeight": 0.51,
+      "_gridWidth": 2,
+      "_gridHeight": 1,
+      "_cost": 1000,
+      "_takeSoundCategory": "ammolarge",
+      "_armorPiercing": 0.88,
+      "_hitMultiplier": 0.56,
+      "_impulseMultiplier": 15.75,
+      "_speedMultiplier": 0.905,
+      "_dispersionMultiplier": 1.0,
+      "_airResistance": 1.33,
+      "_data": {
+        "_allowRicochet": true,
+        "_distanceMultiplier": 1.0,
+        "_projectileCount": 1,
+        "_ammoTracerEnabled": true,
+        "_ammoTracerWidthMeters": 0.08,
+        "_ammoTracerTrailDurationSeconds": 0.02,
+        "_ammoTracerIgnitionDistanceMeters": 70,
+        "_ammoTracerBurnDurationSeconds": 3,
+        "_ammoTracerEmissionIntensity": 12,
+        "_ammoTracerColor": {
+          "r": 0.30196078431372547,
+          "g": 1.0,
+          "b": 0.30196078431372547,
+          "a": 1.0
+        }
+      }
+    },
+    {
+      "_section": "ammo_7.62x51_ap",
+      "_reference": "IWP Standalone Final weapons_ammo.ltx:833",
+      "_model": "meshes/dynamics/weapons/wpn_ammo/ammo_762x51_ap.ogf",
+      "_displayName": "Патроны 7.62x51 мм М62",
+      "_shortName": "7,62x51 M62",
+      "_description": "Трассирующий патрон M62 для целеуказания и корректировки огня.",
+      "_boxSize": 20,
+      "_boxWeight": 0.56,
+      "_gridWidth": 2,
+      "_gridHeight": 1,
+      "_cost": 2300,
+      "_takeSoundCategory": "ammolarge",
+      "_armorPiercing": 0.95,
+      "_hitMultiplier": 0.59,
+      "_impulseMultiplier": 10.0,
+      "_speedMultiplier": 0.915,
+      "_dispersionMultiplier": 1.0,
+      "_airResistance": 1.27,
+      "_data": {
+        "_allowRicochet": true,
+        "_distanceMultiplier": 1.0,
+        "_projectileCount": 1,
+        "_ammoTracerEnabled": true,
+        "_ammoTracerWidthMeters": 0.08,
+        "_ammoTracerTrailDurationSeconds": 0.02,
+        "_ammoTracerIgnitionDistanceMeters": 70,
+        "_ammoTracerBurnDurationSeconds": 3,
+        "_ammoTracerEmissionIntensity": 12,
+        "_ammoTracerColor": {
+          "r": 0.30196078431372547,
+          "g": 1.0,
+          "b": 0.30196078431372547,
+          "a": 1.0
+        }
+      }
+    },
+    {
+      "_section": "ammo_7.62x54_7h1",
+      "_reference": "IWP Standalone Final weapons_ammo.ltx:865",
+      "_model": "meshes/dynamics/weapons/wpn_ammo/ammo_762x54_7h1.ogf",
+      "_displayName": "Патроны 7.62x54 мм Т-46М гж (7Т2М)",
+      "_shortName": "7,62x54 Т-46М",
+      "_description": "Трассирующий патрон Т-46М, модернизированный вариант Т-46.",
+      "_boxSize": 20,
+      "_boxWeight": 0.36,
+      "_gridWidth": 2,
+      "_gridHeight": 1,
+      "_cost": 1500,
+      "_takeSoundCategory": "ammolarge",
+      "_armorPiercing": 1.05,
+      "_hitMultiplier": 0.66,
+      "_impulseMultiplier": 20.0,
+      "_speedMultiplier": 0.965,
+      "_dispersionMultiplier": 1.0,
+      "_airResistance": 1.17,
+      "_data": {
+        "_allowRicochet": true,
+        "_distanceMultiplier": 1.0,
+        "_projectileCount": 1,
+        "_ammoTracerEnabled": true,
+        "_ammoTracerWidthMeters": 0.08,
+        "_ammoTracerTrailDurationSeconds": 0.02,
+        "_ammoTracerIgnitionDistanceMeters": 70,
+        "_ammoTracerBurnDurationSeconds": 3,
+        "_ammoTracerEmissionIntensity": 12,
+        "_ammoTracerColor": {
+          "r": 0.30196078431372547,
+          "g": 1.0,
+          "b": 0.30196078431372547,
+          "a": 1.0
+        }
+      }
+    },
+    {
+      "_section": "ammo_7.62x54_7h14",
+      "_reference": "IWP Standalone Final weapons_ammo.ltx:897",
+      "_model": "meshes/dynamics/weapons/wpn_ammo/ammo_762x54_7h14.ogf",
+      "_displayName": "Патроны 7.62x54 мм БТ гж (7БT1)",
+      "_shortName": "7,62x54 БТ",
+      "_description": "Бронебойно-трассирующий патрон БТ, созданный на основе Т-46М.",
+      "_boxSize": 20,
+      "_boxWeight": 0.23,
+      "_gridWidth": 2,
+      "_gridHeight": 1,
+      "_cost": 1900,
+      "_takeSoundCategory": "ammolarge",
+      "_armorPiercing": 1.15,
+      "_hitMultiplier": 0.65,
+      "_impulseMultiplier": 25.0,
+      "_speedMultiplier": 1.006,
+      "_dispersionMultiplier": 1.0,
+      "_airResistance": 1.17,
+      "_data": {
+        "_allowRicochet": true,
+        "_distanceMultiplier": 1.0,
+        "_projectileCount": 1,
+        "_ammoTracerEnabled": true,
+        "_ammoTracerWidthMeters": 0.08,
+        "_ammoTracerTrailDurationSeconds": 0.02,
+        "_ammoTracerIgnitionDistanceMeters": 70,
+        "_ammoTracerBurnDurationSeconds": 3,
+        "_ammoTracerEmissionIntensity": 12,
+        "_ammoTracerColor": {
+          "r": 0.30196078431372547,
+          "g": 1.0,
+          "b": 0.30196078431372547,
+          "a": 1.0
+        }
+      }
+    },
+    {
+      "_section": "ammo_300_win",
+      "_reference": "IWP Standalone Final weapons_ammo.ltx:929",
+      "_model": "meshes/dynamics/weapons/wpn_ammo/ammo_300_win.ogf",
+      "_displayName": "Патроны .300 Winchester Magnum",
+      "_shortName": ".300 Win Mag",
+      "_description": "Винтовочный патрон .300 Winchester Magnum, созданный на базе гильзы .338 Winchester Magnum.",
+      "_boxSize": 20,
+      "_boxWeight": 0.6,
+      "_gridWidth": 2,
+      "_gridHeight": 1,
+      "_cost": 4200,
+      "_takeSoundCategory": "ammolarge",
+      "_armorPiercing": 1.25,
+      "_hitMultiplier": 1.1,
+      "_impulseMultiplier": 30.0,
+      "_speedMultiplier": 0.987,
+      "_dispersionMultiplier": 1.0,
+      "_airResistance": 1.08,
+      "_data": {
+        "_allowRicochet": true,
+        "_distanceMultiplier": 1.0,
+        "_projectileCount": 1,
+        "_ammoTracerEnabled": true,
+        "_ammoTracerWidthMeters": 0.08,
+        "_ammoTracerTrailDurationSeconds": 0.02,
+        "_ammoTracerIgnitionDistanceMeters": 70,
+        "_ammoTracerBurnDurationSeconds": 3,
+        "_ammoTracerEmissionIntensity": 12,
+        "_ammoTracerColor": {
+          "r": 0.30196078431372547,
+          "g": 1.0,
+          "b": 0.30196078431372547,
+          "a": 1.0
+        }
+      }
+    },
+    {
+      "_section": "ammo_338_lm",
+      "_reference": "IWP Standalone Final weapons_ammo.ltx:961",
+      "_model": "meshes/dynamics/weapons/wpn_ammo/ammo_338_lm.ogf",
+      "_displayName": "Патроны .338 Lapua Magnum",
+      "_shortName": ".338 Lapua",
+      "_description": "Снайперский патрон .338 Lapua Magnum. Применяется также на охоте и в спортивной стрельбе.",
+      "_boxSize": 20,
+      "_boxWeight": 0.7,
+      "_gridWidth": 2,
+      "_gridHeight": 1,
+      "_cost": 4200,
+      "_takeSoundCategory": "ammolarge",
+      "_armorPiercing": 1.45,
+      "_hitMultiplier": 1.5,
+      "_impulseMultiplier": 40.0,
+      "_speedMultiplier": 0.931,
+      "_dispersionMultiplier": 1.0,
+      "_airResistance": 1.03,
+      "_data": {
+        "_allowRicochet": true,
+        "_distanceMultiplier": 1.0,
+        "_projectileCount": 1,
+        "_ammoTracerEnabled": false,
+        "_ammoTracerWidthMeters": 0.08,
+        "_ammoTracerTrailDurationSeconds": 0.02,
+        "_ammoTracerIgnitionDistanceMeters": 70,
+        "_ammoTracerBurnDurationSeconds": 3,
+        "_ammoTracerEmissionIntensity": 12,
+        "_ammoTracerColor": {
+          "r": 1.0,
+          "g": 0.5098039215686274,
+          "b": 0.0,
+          "a": 1.0
+        }
+      }
+    },
+    {
+      "_section": "ammo_gauss",
+      "_reference": "IWP Standalone Final weapons_ammo.ltx:993",
+      "_model": "meshes/dynamics/weapons/wpn_ammo/ammo_gauss.ogf",
+      "_displayName": "Кассета ИЭМВ",
+      "_shortName": "Кассета ИЭМВ",
+      "_description": "Кассета для гаусс-пушки. Источником энергии служит капсулированный фрагмент артефакта «Вспышка».",
+      "_boxSize": 10,
+      "_boxWeight": 0.5,
+      "_gridWidth": 1,
+      "_gridHeight": 1,
+      "_cost": 6500,
+      "_takeSoundCategory": "ammolarge",
+      "_armorPiercing": 999.0,
+      "_hitMultiplier": 2.58,
+      "_impulseMultiplier": 13.2,
+      "_speedMultiplier": 1.0,
+      "_dispersionMultiplier": 1.0,
+      "_airResistance": 0.0,
+      "_data": {
+        "_allowRicochet": false,
+        "_distanceMultiplier": 1.0,
+        "_projectileCount": 1,
+        "_ammoTracerEnabled": false,
+        "_ammoTracerWidthMeters": 0.08,
+        "_ammoTracerTrailDurationSeconds": 0.02,
+        "_ammoTracerIgnitionDistanceMeters": 70,
+        "_ammoTracerBurnDurationSeconds": 3,
+        "_ammoTracerEmissionIntensity": 12,
+        "_ammoTracerColor": {
+          "r": 1.0,
+          "g": 0.5098039215686274,
+          "b": 0.0,
+          "a": 1.0
+        }
+      }
+    },
+    {
+      "_section": "ammo_gauss_cardan",
+      "_reference": "IWP Standalone Final weapons_ammo.ltx:1024",
+      "_model": "meshes/dynamics/weapons/wpn_ammo/ammo_gauss_custom.ogf",
+      "_displayName": "Мини-кассета ИЭМВ",
+      "_shortName": "Мини-кассета ИЭМВ",
+      "_description": "Кустарная мини-кассета для гаусс-пушки.",
+      "_boxSize": 6,
+      "_boxWeight": 0.8,
+      "_gridWidth": 1,
+      "_gridHeight": 1,
+      "_cost": 8399,
+      "_takeSoundCategory": "ammolarge",
+      "_armorPiercing": 999.0,
+      "_hitMultiplier": 2.58,
+      "_impulseMultiplier": 13.2,
+      "_speedMultiplier": 1.0,
+      "_dispersionMultiplier": 1.0,
+      "_airResistance": 0.0,
+      "_data": {
+        "_allowRicochet": false,
+        "_distanceMultiplier": 1.0,
+        "_projectileCount": 1,
+        "_ammoTracerEnabled": false,
+        "_ammoTracerWidthMeters": 0.08,
+        "_ammoTracerTrailDurationSeconds": 0.02,
+        "_ammoTracerIgnitionDistanceMeters": 70,
+        "_ammoTracerBurnDurationSeconds": 3,
+        "_ammoTracerEmissionIntensity": 12,
+        "_ammoTracerColor": {
+          "r": 1.0,
+          "g": 0.5098039215686274,
+          "b": 0.0,
+          "a": 1.0
         }
       }
     },
     {
       "_section": "ammo_pkm_100",
-      "_reference": "GRA 2.5 MO2 + X-Ray Monolith single player",
+      "_reference": "IWP Standalone Final weapons_ammo.ltx:1039",
+      "_model": "meshes/dynamics/weapons/wpn_ammo/ammo_pkm.ogf",
+      "_displayName": "Короб патронов 7.62x54 мм БТ гж (7БT1)",
+      "_shortName": "7,62x54 БТ (короб)",
+      "_description": "Короб патронов БТ для пулемёта ПКМ.",
+      "_boxSize": 100,
+      "_boxWeight": 3.9,
+      "_gridWidth": 2,
+      "_gridHeight": 1,
+      "_cost": 3700,
+      "_takeSoundCategory": "ammolarge",
+      "_armorPiercing": 1.1,
+      "_hitMultiplier": 0.75,
+      "_impulseMultiplier": 20.0,
+      "_speedMultiplier": 1.006,
+      "_dispersionMultiplier": 1.0,
+      "_airResistance": 1.17,
       "_data": {
         "_allowRicochet": true,
-        "_distanceMultiplier": 1,
+        "_distanceMultiplier": 1.0,
         "_projectileCount": 1,
         "_ammoTracerEnabled": true,
-        "_ammoTracerWidthMeters": 0.225,
-        "_ammoTracerTrailDurationSeconds": 0.025,
-        "_ammoTracerIgnitionDistanceMeters": 50,
-        "_ammoTracerBurnDurationSeconds": 3.5,
-        "_ammoTracerEmissionIntensity": 14,
+        "_ammoTracerWidthMeters": 0.08,
+        "_ammoTracerTrailDurationSeconds": 0.02,
+        "_ammoTracerIgnitionDistanceMeters": 70,
+        "_ammoTracerBurnDurationSeconds": 3,
+        "_ammoTracerEmissionIntensity": 12,
         "_ammoTracerColor": {
-          "r": 0.1,
-          "g": 1,
-          "b": 0.05,
-          "a": 1
+          "r": 0.30196078431372547,
+          "g": 1.0,
+          "b": 0.30196078431372547,
+          "a": 1.0
+        }
+      }
+    },
+    {
+      "_section": "ammo_og-7b",
+      "_reference": "IWP Standalone Final weapons_ammo.ltx:1072",
+      "_model": "meshes/dynamics/weapons/wpn_ammo/ammo_og_7b.ogf",
+      "_displayName": "Граната ОГ-7B",
+      "_shortName": "ОГ-7В",
+      "_description": "Осколочно-фугасный выстрел для РПГ-7.",
+      "_boxSize": 1,
+      "_boxWeight": 2.0,
+      "_gridWidth": 5,
+      "_gridHeight": 1,
+      "_cost": 2800,
+      "_takeSoundCategory": "ammolarge",
+      "_armorPiercing": 2.0,
+      "_hitMultiplier": 2.4,
+      "_impulseMultiplier": 1.0,
+      "_speedMultiplier": 1.0,
+      "_dispersionMultiplier": 1.0,
+      "_airResistance": 0.0,
+      "_data": {
+        "_allowRicochet": false,
+        "_distanceMultiplier": 1.0,
+        "_projectileCount": 1,
+        "_ammoTracerEnabled": false,
+        "_ammoTracerWidthMeters": 0.08,
+        "_ammoTracerTrailDurationSeconds": 0.02,
+        "_ammoTracerIgnitionDistanceMeters": 70,
+        "_ammoTracerBurnDurationSeconds": 3,
+        "_ammoTracerEmissionIntensity": 12,
+        "_ammoTracerColor": {
+          "r": 1.0,
+          "g": 0.5098039215686274,
+          "b": 0.0,
+          "a": 1.0
+        }
+      }
+    },
+    {
+      "_section": "ammo_vog-25",
+      "_reference": "IWP Standalone Final weapons_ammo.ltx:1104",
+      "_model": "meshes/dynamics/weapons/wpn_ammo/ammo_vog_25.ogf",
+      "_displayName": "Граната ВОГ-25",
+      "_shortName": "ВОГ-25",
+      "_description": "Осколочный выстрел для ГП-25 «Костёр», ОЦ-14 «Гроза» и РГ-6.",
+      "_boxSize": 1,
+      "_boxWeight": 0.25,
+      "_gridWidth": 1,
+      "_gridHeight": 1,
+      "_cost": 1950,
+      "_takeSoundCategory": "ammolarge",
+      "_armorPiercing": 0.0,
+      "_hitMultiplier": 1.1,
+      "_impulseMultiplier": 1.0,
+      "_speedMultiplier": 1.0,
+      "_dispersionMultiplier": 1.0,
+      "_airResistance": 0.0,
+      "_data": {
+        "_allowRicochet": false,
+        "_distanceMultiplier": 1.0,
+        "_projectileCount": 1,
+        "_ammoTracerEnabled": false,
+        "_ammoTracerWidthMeters": 0.08,
+        "_ammoTracerTrailDurationSeconds": 0.02,
+        "_ammoTracerIgnitionDistanceMeters": 70,
+        "_ammoTracerBurnDurationSeconds": 3,
+        "_ammoTracerEmissionIntensity": 12,
+        "_ammoTracerColor": {
+          "r": 1.0,
+          "g": 0.5098039215686274,
+          "b": 0.0,
+          "a": 1.0
+        }
+      }
+    },
+    {
+      "_section": "ammo_vog-25p",
+      "_reference": "IWP Standalone Final weapons_ammo.ltx:1193",
+      "_model": "meshes/dynamics/weapons/wpn_ammo/ammo_vog_25p.ogf",
+      "_displayName": "Граната ВОГ-25П",
+      "_shortName": "ВОГ-25П",
+      "_description": "Вариант выстрела ВОГ-25 с подпрыгивающей гранатой.",
+      "_boxSize": 1,
+      "_boxWeight": 0.26,
+      "_gridWidth": 1,
+      "_gridHeight": 1,
+      "_cost": 1850,
+      "_takeSoundCategory": "ammolarge",
+      "_armorPiercing": 0.0,
+      "_hitMultiplier": 1.3,
+      "_impulseMultiplier": 1.0,
+      "_speedMultiplier": 1.0,
+      "_dispersionMultiplier": 1.0,
+      "_airResistance": 0.0,
+      "_data": {
+        "_allowRicochet": false,
+        "_distanceMultiplier": 1.0,
+        "_projectileCount": 1,
+        "_ammoTracerEnabled": false,
+        "_ammoTracerWidthMeters": 0.08,
+        "_ammoTracerTrailDurationSeconds": 0.02,
+        "_ammoTracerIgnitionDistanceMeters": 70,
+        "_ammoTracerBurnDurationSeconds": 3,
+        "_ammoTracerEmissionIntensity": 12,
+        "_ammoTracerColor": {
+          "r": 1.0,
+          "g": 0.5098039215686274,
+          "b": 0.0,
+          "a": 1.0
+        }
+      }
+    },
+    {
+      "_section": "ammo_m209",
+      "_reference": "IWP Standalone Final weapons_ammo.ltx:1271",
+      "_model": "meshes/dynamics/weapons/wpn_ammo/ammo_m209.ogf",
+      "_displayName": "Граната M433 HEDP",
+      "_shortName": "M433 HEDP",
+      "_description": "Выстрел M433 HEDP для подствольных гранатомётов НАТО.",
+      "_boxSize": 1,
+      "_boxWeight": 0.265,
+      "_gridWidth": 1,
+      "_gridHeight": 1,
+      "_cost": 1950,
+      "_takeSoundCategory": "ammolarge",
+      "_armorPiercing": 0.0,
+      "_hitMultiplier": 1.1,
+      "_impulseMultiplier": 1.0,
+      "_speedMultiplier": 1.0,
+      "_dispersionMultiplier": 1.0,
+      "_airResistance": 0.0,
+      "_data": {
+        "_allowRicochet": false,
+        "_distanceMultiplier": 1.0,
+        "_projectileCount": 1,
+        "_ammoTracerEnabled": false,
+        "_ammoTracerWidthMeters": 0.08,
+        "_ammoTracerTrailDurationSeconds": 0.02,
+        "_ammoTracerIgnitionDistanceMeters": 70,
+        "_ammoTracerBurnDurationSeconds": 3,
+        "_ammoTracerEmissionIntensity": 12,
+        "_ammoTracerColor": {
+          "r": 1.0,
+          "g": 0.5098039215686274,
+          "b": 0.0,
+          "a": 1.0
+        }
+      }
+    },
+    {
+      "_section": "ammo_m397a1",
+      "_reference": "IWP Standalone Final weapons_ammo.ltx:1349",
+      "_model": "meshes/dynamics/weapons/wpn_ammo/ammo_m397a1.ogf",
+      "_displayName": "Граната M397A1",
+      "_shortName": "M397A1",
+      "_description": "Выстрел M397A1 для подствольных гранатомётов НАТО. Предназначен для поражения целей в укрытии.",
+      "_boxSize": 1,
+      "_boxWeight": 0.275,
+      "_gridWidth": 1,
+      "_gridHeight": 1,
+      "_cost": 1950,
+      "_takeSoundCategory": "ammolarge",
+      "_armorPiercing": 0.0,
+      "_hitMultiplier": 1.3,
+      "_impulseMultiplier": 1.0,
+      "_speedMultiplier": 1.0,
+      "_dispersionMultiplier": 1.0,
+      "_airResistance": 0.0,
+      "_data": {
+        "_allowRicochet": false,
+        "_distanceMultiplier": 1.0,
+        "_projectileCount": 1,
+        "_ammoTracerEnabled": false,
+        "_ammoTracerWidthMeters": 0.08,
+        "_ammoTracerTrailDurationSeconds": 0.02,
+        "_ammoTracerIgnitionDistanceMeters": 70,
+        "_ammoTracerBurnDurationSeconds": 3,
+        "_ammoTracerEmissionIntensity": 12,
+        "_ammoTracerColor": {
+          "r": 1.0,
+          "g": 0.5098039215686274,
+          "b": 0.0,
+          "a": 1.0
         }
       }
     }

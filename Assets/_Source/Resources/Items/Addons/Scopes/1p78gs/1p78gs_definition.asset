@@ -1,0 +1,88 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da0f90c2955673d46b25d465cbe44ed0, type: 3}
+  m_Name: 1p78gs
+  m_EditorClassIdentifier: Inventory::Inventory.ItemDefinition
+  _definitionId: 101eee143b83c0144a7a1d6a672fbc8a
+  _displayName: "\u041F\u0440\u0438\u0446\u0435\u043B 1\u041F78-1 \u041A\u0430\u0448\u0442\u0430\u043D"
+  _shortName: "\u041F\u0440\u0438\u0446\u0435\u043B 1\u041F78-1 \u041A\u0430\u0448\u0442\u0430\u043D"
+  _description: 
+  _category: Attachment
+  _tags:
+  - Scope
+  _size: {x: 1, y: 1}
+  _weight: 0.5
+  _maxStack: 1
+  _allowRotation: 1
+  _backgroundColor: {r: 1, g: 1, b: 1, a: 0.04}
+  _fallbackIcon: {fileID: 0}
+  _iconOverride: {fileID: 0}
+  _visualPrefab: {fileID: -2939021199561218084, guid: 76f3331133c985c459eef013a55fbdc5, type: 3}
+  _defaultIconVariant: []
+  _icon:
+    _generateIcon: 1
+    _pixelsPerCell: 64
+    _antiAliasing: 1
+    _useOutline: 0
+    _outlineWidth: 2
+    _useShadow: 1
+    _shadowOffset: {x: 2, y: -2}
+    _shadowBlur: 2
+    _defaultView:
+      _modelEulerAngles: {x: 0, y: 0, z: 0}
+      _modelScale: {x: 1, y: 1, z: 1}
+      _cameraEulerAngles: {x: 0, y: -90, z: 0}
+      _padding: 1.15
+      _useDirectionalLight: 1
+      _lightIntensity: 10
+    _useCustomSlotView: 0
+    _slotView:
+      _modelEulerAngles: {x: 0, y: 0, z: 0}
+      _modelScale: {x: 1, y: 1, z: 1}
+      _cameraEulerAngles: {x: 0, y: -90, z: 0}
+      _padding: 1.15
+      _useDirectionalLight: 1
+      _lightIntensity: 10
+  _components:
+  - rid: 3479885496768528389
+  - rid: 3479885496768528535
+  - rid: 3479885496768528681
+  references:
+    version: 2
+    RefIds:
+    - rid: 3479885496768528389
+      type: {class: WeaponAddonComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      data:
+        _section: 1p78gs
+        _kind: 1
+        _cost: 4800
+        _bulletHitPowerFactor: 1
+        _bulletHitImpulseFactor: 1
+        _bulletSpeedFactor: 1
+        _fireDispersionBaseFactor: 1
+        _camDispersionFactor: 1
+        _camDispersionIncrementFactor: 1
+        _scopeZoomFactor: 30
+        _overrideAimOffsetPosition: 0
+        _aimOffsetPosition: {x: 0, y: 0, z: 0}
+        _attachSound: {fileID: 0}
+        _detachSound: {fileID: 0}
+    - rid: 3479885496768528535
+      type: {class: WorldItemComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      data:
+        _prefab: {fileID: 4462324689923689719, guid: e82cb918727d09c4da6753ae1fba0d2b, type: 3}
+    - rid: 3479885496768528681
+      type: {class: ItemTakeSoundComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      data:
+        _category: attchscope
+        _clips:
+        - {fileID: 8300000, guid: 1694b29543aca0b4b91ce712213948d6, type: 3}

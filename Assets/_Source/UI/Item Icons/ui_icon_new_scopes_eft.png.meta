@@ -118,28 +118,6 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
-    - serializedVersion: 2
-      name: po434
-      rect:
-        serializedVersion: 2
-        x: 0
-        y: 312
-        width: 100
-        height: 50
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: a1af0c52144788440bfa1122a8bcb0f1
-      internalID: 343091985
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
     outline: []
     customData: 
     physicsShape: []
@@ -155,7 +133,6 @@ TextureImporter:
       entries: []
     nameFileIdTable:
       p434: -855026514
-      po434: 343091985
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

@@ -1,0 +1,55 @@
+fileFormatVersion: 2
+guid: f0c526588afd3374897232b4a7c0710e
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: none|models\scope_back
+    second: {fileID: 2100000, guid: 3043fed2dd9b403bb52546205c39fc19, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: none|models\scope_zwrite
+    second: {fileID: 2100000, guid: 26f6a9726cfd4317ad83b737899fa9f3, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\eft_echo1\scope_sig_sauer_echo1_thermal_sight|models\model
+    second: {fileID: 2100000, guid: 67819576bdaf06d4a95bd44a223fb911, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\eft_echo1\scope_sig_sauer_rear_sight|models\model
+    second: {fileID: 2100000, guid: 09b56e85a665fb84fb0b0066fdac7688, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\eft_echo1\sight_front_p226_meprolight|models\model
+    second: {fileID: 2100000, guid: 3f4e439aedc2531478a922914f2307fc, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\hd_tritium_white|models\laserray
+    second: {fileID: 2100000, guid: 60a81f18e8254114d97b5702f773e222, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\scope_reticles\sig_sauer_echo1_thermal_reflex_sight|models\scope_reticle_precise
+    second: {fileID: 2100000, guid: 06246c4460650ec40bd0a19d9449b4f9, type: 2}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 61e536e21e96f284493f2969a9250cdf, type: 3}
+  _scale: 1
+  _importMaterials: 1
+  _texturesFolder: 
+  _searchTexturesByName: 1
+  _importEmbeddedMotions: 1
+  _embeddedLoopMode: 0
+  _addAnimator: 1
+  _readableMeshes: 0
+  _updateWhenOffscreen: 0
+  _autoResolveResources: 1

@@ -53,7 +53,9 @@ TextureImporter:
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
   alphaIsTransparency: 1
+  spriteTessellationMethod: 0
   spriteTessellationDetail: -1
+  spriteGeometrySubdivision: -1
   textureType: 8
   textureShape: 1
   singleChannelComponent: 0
@@ -581,28 +583,6 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ammo_12x70_buck_self
-      rect:
-        serializedVersion: 2
-        x: 1800
-        y: 1948
-        width: 200
-        height: 100
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 6aa63256b64117c4d8ebd72d3a65659a
-      internalID: 712435583
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
       name: ammo_12x76_bull
       rect:
         serializedVersion: 2
@@ -1086,6 +1066,116 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: ammo_gauss_cardan
+      rect:
+        serializedVersion: 2
+        x: 1900
+        y: 1648
+        width: 100
+        height: 100
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: afadf2de83f9c3b44ae9feddee476f62
+      internalID: 872119168
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ammo_gauss
+      rect:
+        serializedVersion: 2
+        x: 1800
+        y: 1748
+        width: 100
+        height: 100
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 69a7c04c43d0eea448fc9acb64b647a5
+      internalID: 870021288
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ammo_m209
+      rect:
+        serializedVersion: 2
+        x: 1800
+        y: 1548
+        width: 100
+        height: 100
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: cf8c1b519c1c50a48918d5466d3891dd
+      internalID: -1057735981
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ammo_og-7b
+      rect:
+        serializedVersion: 2
+        x: 1200
+        y: 848
+        width: 300
+        height: 100
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b5e24ce7966063349b13f4efe2df9938
+      internalID: 1683349813
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ammo_vog-25
+      rect:
+        serializedVersion: 2
+        x: 1900
+        y: 1448
+        width: 100
+        height: 100
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2ef60a683d64ff44ca41b569edc8e507
+      internalID: -1192017093
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     customData: 
     physicsShape: []
@@ -1105,7 +1195,6 @@ TextureImporter:
       ammo_12.7x55_ap: 14970272
       ammo_12.7x55_fmj: -1382912731
       ammo_12x70_buck: 520457991
-      ammo_12x70_buck_self: 712435583
       ammo_12x70_raid: 1345629728
       ammo_12x76_bull: 1103194783
       ammo_12x76_dart: -1666290137
@@ -1113,16 +1202,21 @@ TextureImporter:
       ammo_20x70_buck: -2064062995
       ammo_23x75_barrikada: 1522024333
       ammo_23x75_shrapnel: 969611502
+      ammo_300_win: 272112393
       ammo_338_federal: 822433392
       ammo_357_hp_mag: 1976775198
+      ammo_44mag: -566078845
+      ammo_44mag_boom: 1925350267
       ammo_5.45x39_ap: -1983766707
       ammo_5.45x39_ep: 1218562924
       ammo_5.45x39_fmj: 850696525
       ammo_5.56x45_ap: -1588790026
       ammo_5.56x45_fmj: -1156662196
       ammo_5.56x45_ss190: -541076406
+      ammo_5.7x28_fmj: -905937890
       ammo_5.7x28_ss190: -1434074842
       ammo_5.7x28_ss195: -2044647296
+      ammo_50ae: 1002673591
       ammo_7.62x25_p: 294047990
       ammo_7.62x25_ps: 1979256405
       ammo_7.62x39_ap: -1246675511
@@ -1143,8 +1237,15 @@ TextureImporter:
       ammo_9x21_sp10: 640253932
       ammo_9x39_ap: 1807636589
       ammo_9x39_pab9: 111148660
+      ammo_gauss: 870021288
+      ammo_gauss_cardan: 872119168
+      ammo_m209: -1057735981
+      ammo_m397a1: -355704117
       ammo_magnum_300: 483909573
+      ammo_og-7b: 1683349813
       ammo_pkm_100: -122860704
+      ammo_vog-25: -1192017093
+      ammo_vog-25p: 86540644
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

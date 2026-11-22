@@ -218,7 +218,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
             importer.SaveAndReimport();
         }
 
-        private static int GenerateIwpMaterials(IReadOnlyList<string> models)
+        internal static int GenerateIwpMaterials(IReadOnlyList<string> models)
         {
             XRayAssetSourceOptions options = XRayAssetSourceSettings.GetEffective();
             options.Sources = new XRaySourceConfiguration { Mode = XRaySourceMode.CustomFolder, CustomFolder = Path.GetFullPath(IWP_ROOT), LocalAppDataFolder = options.Sources.LocalAppDataFolder, IncludeGameGamedata = false };
@@ -462,7 +462,8 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
             serialized.FindProperty("_definitionId").stringValue = AssetDatabase.AssetPathToGUID(DEFINITION_PATH);
             serialized.FindProperty("_displayName").stringValue = strings.Translate(name);
             serialized.FindProperty("_shortName").stringValue = strings.Translate(Get(system, "inv_name_short") ?? name);
-            serialized.FindProperty("_description").stringValue = GraTextFormatter.Format(strings.Translate(Get(system, "description")), colors);
+            string description = strings.Translate(Get(system, "description"))?.Replace(", C-more Railway Tactical", string.Empty, StringComparison.Ordinal).Replace(", «EOTech»", string.Empty, StringComparison.Ordinal);
+            serialized.FindProperty("_description").stringValue = GraTextFormatter.Format(description, colors);
             serialized.FindProperty("_category").stringValue = InventoryDemoContentBuilder.WEAPON_CATEGORY;
             SerializedProperty tags = serialized.FindProperty("_tags");
             tags.arraySize = 1;
@@ -511,7 +512,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
             }
 
             stats.FindPropertyRelative("_magazineSize").intValue = GetInt(system, "ammo_mag_size");
-            SetStrings(stats.FindPropertyRelative("_ammoClasses"), system.GetList(SECTION, "ammo_class") ?? new List<string>());
+            SetStrings(stats.FindPropertyRelative("_ammoClasses"), IwpAmmoSetup.ReadAugAmmoClasses());
             stats.FindPropertyRelative("_fireDispersionBase").floatValue = GetFloat(system, "fire_dispersion_base");
             stats.FindPropertyRelative("_camDispersion").floatValue = GetFloat(system, "cam_dispersion");
             stats.FindPropertyRelative("_camDispersionIncrement").floatValue = GetFloat(system, "cam_dispersion_inc");
@@ -520,9 +521,13 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
             stats.FindPropertyRelative("_silencerStatus").enumValueIndex = GetInt(system, "silencer_status");
             stats.FindPropertyRelative("_silencerSection").stringValue = Get(system, "silencer_name") ?? string.Empty;
             stats.FindPropertyRelative("_scopeStatus").enumValueIndex = GetInt(system, "scope_status");
-            SetStrings(stats.FindPropertyRelative("_scopes"), system.GetList(SECTION, "scopes") ?? new List<string>());
-            stats.FindPropertyRelative("_grenadeLauncherStatus").enumValueIndex = GetInt(system, "grenade_launcher_status");
-            stats.FindPropertyRelative("_grenadeLauncherSection").stringValue = Get(system, "grenade_launcher_name") ?? string.Empty;
+            List<string> scopes = system.GetList(SECTION, "scopes") ?? new List<string>();
+            scopes.RemoveAll(GraWeaponAddonSetup.IsExcludedAddon);
+            SetStrings(stats.FindPropertyRelative("_scopes"), scopes);
+            string launcher = Get(system, "grenade_launcher_name") ?? string.Empty;
+            bool excludedLauncher = GraWeaponAddonSetup.IsExcludedAddon(launcher);
+            stats.FindPropertyRelative("_grenadeLauncherStatus").enumValueIndex = excludedLauncher ? (int)WeaponAddonStatus.None : GetInt(system, "grenade_launcher_status");
+            stats.FindPropertyRelative("_grenadeLauncherSection").stringValue = excludedLauncher ? string.Empty : launcher;
         }
 
         private static SerializedProperty AddComponent(SerializedProperty components, ItemDefinitionComponent component)

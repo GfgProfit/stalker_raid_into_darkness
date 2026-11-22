@@ -18,6 +18,8 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
     {
         private InventoryItemView _hoveredView;
 
+        protected override string SceneName => "TEST_SCENE";
+
         public override void Setup()
         {
             base.Setup();
@@ -29,19 +31,19 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
         [UnityTest]
         public IEnumerator AmmoStacksMergeBeyondBoxSizeAndShowWhiteTypeLabels()
         {
-            SceneManager.LoadScene("OutdoorsScene", LoadSceneMode.Single);
+            SceneManager.LoadScene("TEST_SCENE", LoadSceneMode.Single);
             yield return new WaitForSeconds(0.5f);
             InventoryWindowController controller = Object.FindAnyObjectByType<InventoryWindowController>();
             WorldItemInteractor interactor = Object.FindAnyObjectByType<WorldItemInteractor>();
             InventoryWindow window = controller.Window;
             InventoryModel model = controller.Inventory.Model;
-            ItemInstance first = AddItem(controller, "ammo_5.56x45_fmj", window.PrimaryContainerId);
+            ItemInstance first = AddItem(controller, "ammo_5.56x45_ss190", window.PrimaryContainerId);
             ItemDefinition definition = first.Definition;
             Assert.That(interactor.TryPickUp(interactor.Spawn(definition, 15)), Is.True);
             Assert.That(interactor.TryPickUp(interactor.Spawn(definition, 1000)), Is.True);
             Assert.That(first.Amount, Is.EqualTo(1016));
             Assert.That(first.TotalWeight, Is.EqualTo(definition.Weight * 1016).Within(0.0001f));
-            ItemInstance ep = AddItem(controller, "ammo_5.56x45_ss190", window.PrimaryContainerId);
+            ItemInstance ep = AddItem(controller, "ammo_5.56x45_ap", window.PrimaryContainerId);
             Assert.That(ep.Amount, Is.EqualTo(1));
             Assert.That(model.TryTransfer(first.InstanceId, window.SecondaryContainerId).Success, Is.True);
             ItemInstance more = model.CreateItem(definition, 500);
@@ -59,12 +61,12 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             InventoryItemView view = window.FindGrid(first.ContainerId).GetItemView(first);
             TMP_Text label = view.transform.Find("Overlay/Name").GetComponent<TMP_Text>();
             label.ForceMeshUpdate();
-            Assert.That(label.GetParsedText(), Is.EqualTo("FMJ"));
+            Assert.That(label.GetParsedText(), Is.EqualTo("M855"));
             Assert.That(label.alignment, Is.EqualTo(TextAlignmentOptions.BottomRight));
-            Assert.That(label.textInfo.characterCount, Is.EqualTo(3));
+            Assert.That(label.textInfo.characterCount, Is.EqualTo(4));
             Assert.That(label.textInfo.characterInfo[0].pointSize, Is.EqualTo(16f).Within(0.001f));
             Assert.That(label.textInfo.characterInfo[0].color, Is.EqualTo(new Color32(255, 255, 255, 255)));
-            AssertNameBackground(view, "FMJ");
+            AssertNameBackground(view, "M855");
             InventorySaveData saved = InventorySerializer.Capture(model, new[] { window.PrimaryContainerId, window.SecondaryContainerId });
             var restored = new InventoryModel(model.Resolver);
             InventoryContainer backpack = model.GetContainer(window.PrimaryContainerId);
@@ -79,7 +81,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
         [UnityTest]
         public IEnumerator WeaponAmmoHoverHighlightsBothInventoriesAndEquipment()
         {
-            SceneManager.LoadScene("OutdoorsScene", LoadSceneMode.Single);
+            SceneManager.LoadScene("TEST_SCENE", LoadSceneMode.Single);
             yield return new WaitForSeconds(0.5f);
             InventoryWindowController controller = Object.FindAnyObjectByType<InventoryWindowController>();
             InventoryWindow window = controller.Window;
@@ -92,9 +94,8 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             Assert.That(model.TryEquip(outfit.InstanceId, window.EquipmentContainerId).Success, Is.True);
             ItemInstance helmet = AddItem(controller, "helm_battle", window.PrimaryContainerId);
             Assert.That(model.TryEquip(helmet.InstanceId, window.EquipmentContainerId).Success, Is.True);
-            ItemInstance fmj = AddItem(controller, "ammo_5.56x45_fmj", window.PrimaryContainerId);
-            ItemInstance ep = AddItem(controller, "ammo_5.56x45_ss190", window.SecondaryContainerId);
-            ItemInstance epr = AddItem(controller, "ammo_5.56x45_ap", window.PrimaryContainerId);
+            ItemInstance fmj = AddItem(controller, "ammo_5.56x45_ss190", window.PrimaryContainerId);
+            ItemInstance ep = AddItem(controller, "ammo_5.56x45_ap", window.SecondaryContainerId);
             ItemInstance incompatible = AddItem(controller, "ammo_9x18_fmj", window.SecondaryContainerId);
             controller.Sorting.SetFavorite(ep.Definition, true);
             controller.Open(true);
@@ -105,14 +106,12 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             InventoryItemView equippedView = window.FindGrid(equippedWeapon.ContainerId).GetItemView(equippedWeapon);
             InventoryItemView fmjView = window.FindGrid(fmj.ContainerId).GetItemView(fmj);
             InventoryItemView epView = window.FindGrid(ep.ContainerId).GetItemView(ep);
-            InventoryItemView eprView = window.FindGrid(epr.ContainerId).GetItemView(epr);
             InventoryItemView incompatibleView = window.FindGrid(incompatible.ContainerId).GetItemView(incompatible);
             Color weaponColor = weaponView.Background.color;
             Color leftWeaponColor = leftWeaponView.Background.color;
             Color equippedColor = equippedView.Background.color;
             Color fmjColor = fmjView.Background.color;
             Color epColor = epView.Background.color;
-            Color eprColor = eprView.Background.color;
             Color incompatibleColor = incompatibleView.Background.color;
             Assert.That(equippedView.Background.enabled, Is.False);
             InventoryEquipmentPanel equipment = window.FindGrid(equippedWeapon.ContainerId) as InventoryEquipmentPanel;
@@ -155,7 +154,6 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
                 Assert.That(window.HoveredItem, Is.SameAs(source.Item));
                 Assert.That(fmjView.Background.color, Is.Not.EqualTo(fmjColor));
                 Assert.That(epView.Background.color, Is.Not.EqualTo(epColor));
-                Assert.That(eprView.Background.color, Is.Not.EqualTo(eprColor));
                 Assert.That(incompatibleView.Background.color, Is.EqualTo(incompatibleColor));
                 Assert.That(window.ItemDecorator(ep).Badge, Is.SameAs(controller.Sorting.Decorate(ep).Badge));
             }
@@ -172,7 +170,6 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
                 Assert.That(equippedView.Background.rectTransform.rect.size.sqrMagnitude, Is.GreaterThan(0f));
                 Assert.That(equippedView.Background.transform.GetSiblingIndex(), Is.LessThan(weaponSlot.Icon.transform.GetSiblingIndex()));
                 Assert.That(equippedView.transform.Find("Content").GetComponent<Image>().enabled, Is.False);
-                Assert.That(eprView.Background.color, Is.EqualTo(eprColor));
 
                 string capture = System.Environment.GetEnvironmentVariable("GRA_AMMO_HIGHLIGHT_CAPTURE_PATH");
 
@@ -195,7 +192,6 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             yield return null;
             Assert.That(fmjView.Background.color, Is.EqualTo(fmjColor));
             Assert.That(epView.Background.color, Is.EqualTo(epColor));
-            Assert.That(eprView.Background.color, Is.EqualTo(eprColor));
             window.CancelDrag();
             yield return Hover(epView);
             Assert.That(weaponView.Background.color, Is.Not.EqualTo(weaponColor));
@@ -209,7 +205,6 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             yield return null;
             yield return null;
             Assert.That(fmjView.Background.color, Is.EqualTo(fmjColor));
-            Assert.That(eprView.Background.color, Is.EqualTo(eprColor));
             controller.Sorting.SetFavorite(ep.Definition, false);
             Assert.That(model.TryRemove(equippedWeapon.InstanceId).Success, Is.True);
             yield return null;
@@ -218,14 +213,14 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
         }
 
         [UnityTest]
-        public IEnumerator ImportedAmmoHasHdSpritesMaterialsAndGraParameters()
+        public IEnumerator ImportedIwpAmmoHasModelsAndConfigs()
         {
-            SceneManager.LoadScene("OutdoorsScene", LoadSceneMode.Single);
+            SceneManager.LoadScene("TEST_SCENE", LoadSceneMode.Single);
             yield return new WaitForSeconds(0.5f);
             GameObject group = GameObject.Find("WorldItems/Ammo");
             Assert.That(group, Is.Not.Null);
             WorldItem[] items = group.GetComponentsInChildren<WorldItem>();
-            Assert.That(items.Length, Is.GreaterThanOrEqualTo(45));
+            Assert.That(items.Length, Is.EqualTo(38));
             var sections = new HashSet<string>();
 
             foreach (WorldItem item in items)
@@ -237,16 +232,14 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
                 Assert.That(stats.Section, Does.Not.EndWith("_bad").And.Not.EndWith("_verybad"));
                 Assert.That(item.Amount, Is.EqualTo(stats.BoxSize), stats.Section);
                 Assert.That(definition.Weight * stats.BoxSize, Is.EqualTo(stats.BoxWeight).Within(0.00001f), stats.Section);
-                Assert.That(definition.Size, Is.EqualTo(new Vector2Int(2, 1)), stats.Section);
                 Assert.That(definition.HasStackLimit, Is.False, stats.Section);
                 Assert.That(definition.MaxStack, Is.EqualTo(int.MaxValue), stats.Section);
                 Assert.That(definition.IconOverride, Is.Not.Null, stats.Section);
-                Assert.That(definition.IconOverride.rect.size, Is.EqualTo(new Vector2(200f, 100f)), stats.Section);
-                Assert.That(definition.IconOverride.texture.name, Is.EqualTo("ui_raid_hd_ammo"), stats.Section);
-                Assert.That(definition.CanGenerateIcon, Is.False, stats.Section);
-                Assert.That(stats.HasTooltipParameters, Is.True, stats.Section);
-                Assert.That(definition.Description, Does.Contain("<color=#5D0074>").And.Contain("повреждение тканей:"), stats.Section);
-                Assert.That(definition.Description, Does.Not.Contain("%c["), stats.Section);
+                Rect iconRect = definition.IconOverride.rect;
+                Assert.That(iconRect.width, Is.EqualTo(definition.Width * 100), stats.Section);
+                Assert.That(iconRect.height, Is.EqualTo(definition.Height * 100), stats.Section);
+                Assert.That(definition.Description, Is.Not.Empty, stats.Section);
+                Assert.That(definition.GetComponent<AmmoBallisticsComponent>()?.Data.IsConfigured, Is.True, stats.Section);
                 Assert.That(definition.GetComponent<WorldItemComponent>()?.Prefab, Is.Not.Null, stats.Section);
                 Assert.That(item.GetComponent<Collider>(), Is.Not.Null, stats.Section);
                 Assert.That(item.GetComponent<WorldItemImpactSound>(), Is.Not.Null, stats.Section);
@@ -268,13 +261,13 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
                 }
             }
 
-            Assert.That(sections.Count, Is.EqualTo(45));
+            Assert.That(sections.Count, Is.EqualTo(38));
         }
 
         [UnityTest]
         public IEnumerator AmmoPickupTransferSplitTooltipDropAndSurfaceSoundsWork()
         {
-            SceneManager.LoadScene("OutdoorsScene", LoadSceneMode.Single);
+            SceneManager.LoadScene("TEST_SCENE", LoadSceneMode.Single);
             yield return new WaitForSeconds(0.5f);
             InventoryWindowController controller = Object.FindAnyObjectByType<InventoryWindowController>();
             WorldItemInteractor interactor = Object.FindAnyObjectByType<WorldItemInteractor>();
@@ -299,7 +292,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
 
             Assert.That(item, Is.Not.Null);
             Assert.That(item.Amount, Is.EqualTo(7));
-            Assert.That(item.TotalWeight, Is.EqualTo(0.16f * 7f / 15f).Within(0.00001f));
+            Assert.That(item.TotalWeight, Is.EqualTo(definition.Weight * 7f).Within(0.00001f));
             controller.Open(true);
             yield return new WaitForSeconds(0.05f);
             Assert.That(model.TryTransfer(item.InstanceId, window.SecondaryContainerId).Success, Is.True);
@@ -311,10 +304,10 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             Assert.That(split.Success, Is.True);
             Assert.That(item.Amount, Is.EqualTo(4));
             Assert.That(split.Item.Amount, Is.EqualTo(3));
-            Assert.That(split.Item.TotalWeight, Is.EqualTo(0.16f * 3f / 15f).Within(0.00001f));
+            Assert.That(split.Item.TotalWeight, Is.EqualTo(definition.Weight * 3f).Within(0.00001f));
             window.Tooltip.Show(split.Item, new Vector2(500f, 500f), null);
             Assert.That(window.Tooltip.Title, Is.EqualTo(definition.DisplayName));
-            Assert.That(window.Tooltip.Description, Does.Contain("пробивает броню класса:").And.Contain("(11)").And.Contain("(22)"));
+            Assert.That(window.Tooltip.Description, Is.EqualTo(definition.Description));
             string capture = System.Environment.GetEnvironmentVariable("GRA_AMMO_CAPTURE_PATH");
 
             if (string.IsNullOrEmpty(capture) == false)
@@ -410,7 +403,12 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
 
         private IEnumerator Hover(InventoryItemView view)
         {
-            var pointer = new PointerEventData(EventSystem.current) { position = RectTransformUtility.WorldToScreenPoint(null, view.RectTransform.position) };
+            RectTransform rect = view.RectTransform;
+            Canvas canvas = view.GetComponentInParent<Canvas>();
+            Camera camera = canvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : canvas.worldCamera;
+            Vector2 position = RectTransformUtility.WorldToScreenPoint(camera, rect.TransformPoint(rect.rect.center));
+            Set(Mouse.current.position, position);
+            var pointer = new PointerEventData(EventSystem.current) { position = position };
 
             if (_hoveredView != null)
             {

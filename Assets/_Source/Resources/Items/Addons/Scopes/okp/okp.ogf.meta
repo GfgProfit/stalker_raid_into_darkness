@@ -1,0 +1,40 @@
+fileFormatVersion: 2
+guid: eb7255207863a3b4eb2de8810882e2f8
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\prs\wpn_addon_lens_orange|models\reflex_lens
+    second: {fileID: 2100000, guid: df7521afcdc546cd8a285c1ce010e76c, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\wpn_addon_scope_okp7|models\model
+    second: {fileID: 2100000, guid: 22c8c85c601419e4f8c130b1be1afc99, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\wpn_okp2_reticle_dynamic|models\reflex_reticle
+    second: {fileID: 2100000, guid: 5f321aafc2064be09bee97902d5893da, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\wpn_scope_all_lens2_blue|models\window
+    second: {fileID: 2100000, guid: 79f8614b27cf4b938a2228356eaf9592, type: 2}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 61e536e21e96f284493f2969a9250cdf, type: 3}
+  _scale: 1
+  _importMaterials: 1
+  _texturesFolder: 
+  _searchTexturesByName: 1
+  _importEmbeddedMotions: 1
+  _embeddedLoopMode: 0
+  _addAnimator: 1
+  _readableMeshes: 0
+  _updateWhenOffscreen: 0
+  _autoResolveResources: 1

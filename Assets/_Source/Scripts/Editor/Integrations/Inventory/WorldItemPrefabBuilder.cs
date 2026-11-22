@@ -26,7 +26,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
         private const float SEARCH_STEP = 1f;
         private const float FLAT_TOLERANCE = 0.25f;
 
-        public static List<WorldItem> Build(IEnumerable<ItemDefinition> definitions)
+        public static List<WorldItem> Build(IEnumerable<ItemDefinition> definitions, bool rebuild = false)
         {
             var sorted = new List<ItemDefinition>();
 
@@ -43,10 +43,14 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
 
             foreach (ItemDefinition definition in sorted)
             {
+                string definitionPath = AssetDatabase.GetAssetPath(definition);
+                bool itemResource = InventoryDemoContentBuilder.IsItemResourcePath(definitionPath);
                 string modelFolder = Path.GetDirectoryName(AssetDatabase.GetAssetPath(definition.VisualPrefab)).Replace('\\', '/');
-                string folder = Path.GetDirectoryName(modelFolder).Replace('\\', '/') + "/" + PREFABS_FOLDER;
+                string folder = itemResource ? Path.GetDirectoryName(definitionPath).Replace('\\', '/') : Path.GetDirectoryName(modelFolder).Replace('\\', '/') + "/" + PREFABS_FOLDER;
                 InventoryDemoContentBuilder.EnsureFolder(folder);
-                WorldItem prefab = CreatePrefab(definition, $"{folder}/{definition.name}.prefab");
+                string path = itemResource ? $"{folder}/{definition.name}_world.prefab" : $"{folder}/{definition.name}.prefab";
+                WorldItem prefab = itemResource && !rebuild ? AssetDatabase.LoadAssetAtPath<GameObject>(path)?.GetComponent<WorldItem>() : null;
+                prefab = prefab != null && prefab.Definition == definition ? prefab : CreatePrefab(definition, path);
                 SetWorldComponent(definition, prefab);
                 prefabs.Add(prefab);
             }
@@ -271,10 +275,11 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
                 collider.center = bounds.center;
                 collider.size = Vector3.Max(bounds.size, Vector3.one * MIN_COLLIDER_SIZE);
                 var body = root.AddComponent<Rigidbody>();
-                body.mass = Mathf.Max(MIN_MASS, definition.Weight);
+                AmmoStatsComponent ammo = definition.GetComponent<AmmoStatsComponent>();
+                body.mass = ammo != null ? Mathf.Max(0.001f, ammo.BoxWeight) : Mathf.Max(MIN_MASS, definition.Weight);
                 body.interpolation = RigidbodyInterpolation.Interpolate;
                 body.collisionDetectionMode = CollisionDetectionMode.Continuous;
-                root.AddComponent<WorldItem>().Configure(definition, 1);
+                root.AddComponent<WorldItem>().Configure(definition, ammo?.BoxSize ?? 1);
                 GraInventorySoundSetup.ConfigureImpact(root, definition, AssetDatabase.LoadAssetAtPath<StalkerCollideSoundLibrary>(GraInventorySoundSetup.COLLIDE_LIBRARY_PATH), AssetDatabase.LoadAssetAtPath<StalkerSurfaceAudioLibrary>(StalkerSurfaceAudioBuilder.LIBRARY_PATH));
                 return PrefabUtility.SaveAsPrefabAsset(root, path).GetComponent<WorldItem>();
             }

@@ -804,7 +804,7 @@
   ],
   "itemProtections": [
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/army_nosorog_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/army_nosorog_outfit/army_nosorog_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -857,7 +857,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/army_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/army_outfit/army_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -910,7 +910,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/bandit_exo_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/bandit_exo_outfit/bandit_exo_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -963,7 +963,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/bandit_exolight_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/bandit_exolight_outfit/bandit_exolight_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -1016,7 +1016,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/bandit_nbc_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/bandit_nbc_outfit/bandit_nbc_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -1069,7 +1069,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/bandit_novice_outfit_alt.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/bandit_novice_outfit_alt/bandit_novice_outfit_alt_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -1122,7 +1122,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/bandit_novice_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/bandit_novice_outfit/bandit_novice_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -1175,7 +1175,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/bandit_ps5_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/bandit_ps5_outfit/bandit_ps5_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -1228,7 +1228,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/bandit_scientific_dark_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/bandit_scientific_dark_outfit/bandit_scientific_dark_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -1281,7 +1281,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/bandit_scientific_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/bandit_scientific_outfit/bandit_scientific_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -1334,7 +1334,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/bandit_sun_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/bandit_sun_outfit/bandit_sun_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -1387,7 +1387,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/banditmerc_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/banditmerc_outfit/banditmerc_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -1440,7 +1440,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/cs_exo_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/cs_exo_outfit/cs_exo_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -1493,7 +1493,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/cs_exolight_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/cs_exolight_outfit/cs_exolight_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -1546,7 +1546,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/cs_heavy_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/cs_heavy_outfit/cs_heavy_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -1599,7 +1599,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/cs_light_novice_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/cs_light_novice_outfit/cs_light_novice_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -1652,7 +1652,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/cs_light_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/cs_light_outfit/cs_light_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -1705,7 +1705,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/cs_medium_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/cs_medium_outfit/cs_medium_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -1758,7 +1758,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/cs_nbc_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/cs_nbc_outfit/cs_nbc_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -1811,7 +1811,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/cs_novice_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/cs_novice_outfit/cs_novice_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -1864,7 +1864,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/cs_scientific_outfit_good.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/cs_scientific_outfit_good/cs_scientific_outfit_good_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -1917,7 +1917,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/cs_scientific_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/cs_scientific_outfit/cs_scientific_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -1970,7 +1970,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/cs_stalker_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/cs_stalker_outfit/cs_stalker_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -2023,7 +2023,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/cs_stalker_proto_exo_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/cs_stalker_proto_exo_outfit/cs_stalker_proto_exo_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -2076,7 +2076,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/dolg_exo_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/dolg_exo_outfit/dolg_exo_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -2129,7 +2129,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/dolg_exolight_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/dolg_exolight_outfit/dolg_exolight_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -2182,7 +2182,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/dolg_heavy_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/dolg_heavy_outfit/dolg_heavy_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -2235,7 +2235,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/dolg_heavy_proto_exo_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/dolg_heavy_proto_exo_outfit/dolg_heavy_proto_exo_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -2288,7 +2288,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/dolg_heavy_redline_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/dolg_heavy_redline_outfit/dolg_heavy_redline_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -2341,7 +2341,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/dolg_nosorog_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/dolg_nosorog_outfit/dolg_nosorog_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -2394,7 +2394,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/dolg_novice_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/dolg_novice_outfit/dolg_novice_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -2447,7 +2447,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/dolg_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/dolg_outfit/dolg_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -2500,7 +2500,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/dolg_pantsir_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/dolg_pantsir_outfit/dolg_pantsir_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -2553,7 +2553,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/dolg_proto_exo_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/dolg_proto_exo_outfit/dolg_proto_exo_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -2606,7 +2606,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/dolg_red_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/dolg_red_outfit/dolg_red_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -2659,7 +2659,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/dolg_scientific_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/dolg_scientific_outfit/dolg_scientific_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -2712,7 +2712,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/dolg_scientific_red_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/dolg_scientific_red_outfit/dolg_scientific_red_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -2765,7 +2765,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/dolg_scientific_wood_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/dolg_scientific_wood_outfit/dolg_scientific_wood_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -2818,7 +2818,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/dolg_scout_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/dolg_scout_outfit/dolg_scout_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -2871,7 +2871,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/dolg_specops_red_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/dolg_specops_red_outfit/dolg_specops_red_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -2924,7 +2924,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/dolg_voin_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/dolg_voin_outfit/dolg_voin_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -2977,7 +2977,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/ecolog_exo_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/ecolog_exo_outfit/ecolog_exo_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -3030,7 +3030,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/ecolog_guard_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/ecolog_guard_outfit/ecolog_guard_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -3083,7 +3083,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/ecolog_outfit_blue.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/ecolog_outfit_blue/ecolog_outfit_blue_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -3136,7 +3136,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/ecolog_outfit_green.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/ecolog_outfit_green/ecolog_outfit_green_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -3189,7 +3189,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/ecolog_outfit_orange.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/ecolog_outfit_orange/ecolog_outfit_orange_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -3242,7 +3242,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/ecolog_outfit_red.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/ecolog_outfit_red/ecolog_outfit_red_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -3295,7 +3295,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/ecolog_outfit_white.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/ecolog_outfit_white/ecolog_outfit_white_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -3348,7 +3348,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/ecolog_outfit_yello.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/ecolog_outfit_yello/ecolog_outfit_yello_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -3401,7 +3401,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/ecolog_proto_exo_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/ecolog_proto_exo_outfit/ecolog_proto_exo_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -3454,7 +3454,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/exo_dolg_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/exo_dolg_outfit/exo_dolg_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -3507,7 +3507,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/exo_dolg_red_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/exo_dolg_red_outfit/exo_dolg_red_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -3560,7 +3560,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/exo_dolg_urban_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/exo_dolg_urban_outfit/exo_dolg_urban_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -3613,7 +3613,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/exo_dolg_wood_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/exo_dolg_wood_outfit/exo_dolg_wood_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -3666,7 +3666,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/exo_merc_grass_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/exo_merc_grass_outfit/exo_merc_grass_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -3719,7 +3719,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/exo_merc_urban_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/exo_merc_urban_outfit/exo_merc_urban_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -3772,7 +3772,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/exo_merc_wood_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/exo_merc_wood_outfit/exo_merc_wood_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -3825,7 +3825,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/exo_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/exo_outfit/exo_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -3878,7 +3878,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/exo_wood_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/exo_wood_outfit/exo_wood_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -3931,7 +3931,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/exolight_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/exolight_outfit/exolight_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -3984,7 +3984,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/freedom_exo_vineleaf_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/freedom_exo_vineleaf_outfit/freedom_exo_vineleaf_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -4037,7 +4037,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/freedom_nosorog_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/freedom_nosorog_outfit/freedom_nosorog_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -4090,7 +4090,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/ghillie_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/ghillie_outfit/ghillie_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -4143,7 +4143,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/greh_armored_camo_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/greh_armored_camo_outfit/greh_armored_camo_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -4196,7 +4196,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/greh_armored_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/greh_armored_outfit/greh_armored_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -4249,7 +4249,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/greh_exo_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/greh_exo_outfit/greh_exo_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -4302,7 +4302,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/greh_ps5_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/greh_ps5_outfit/greh_ps5_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -4355,7 +4355,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/greh_trenchcoat_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/greh_trenchcoat_outfit/greh_trenchcoat_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -4408,7 +4408,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/hybrid_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/hybrid_outfit/hybrid_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -4461,7 +4461,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/isg_camo_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/isg_camo_outfit/isg_camo_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -4514,7 +4514,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/isg_exo_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/isg_exo_outfit/isg_exo_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -4567,7 +4567,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/isg_exolight_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/isg_exolight_outfit/isg_exolight_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -4620,7 +4620,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/isg_lcs_camo_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/isg_lcs_camo_outfit/isg_lcs_camo_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -4673,7 +4673,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/isg_lcs_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/isg_lcs_outfit/isg_lcs_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -4726,7 +4726,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/isg_lcs_urban_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/isg_lcs_urban_outfit/isg_lcs_urban_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -4779,7 +4779,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/isg_nosorog_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/isg_nosorog_outfit/isg_nosorog_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -4832,7 +4832,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/isg_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/isg_outfit/isg_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -4885,7 +4885,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/isg_proto_exo_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/isg_proto_exo_outfit/isg_proto_exo_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -4938,7 +4938,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/isg_scientific_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/isg_scientific_outfit/isg_scientific_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -4991,7 +4991,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/light_dolg_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/light_dolg_outfit/light_dolg_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -5044,7 +5044,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/light_freedom_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/light_freedom_outfit/light_freedom_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -5097,7 +5097,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/light_isg_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/light_isg_outfit/light_isg_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -5150,7 +5150,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/light_loner_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/light_loner_outfit/light_loner_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -5203,7 +5203,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/light_merc_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/light_merc_outfit/light_merc_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -5256,7 +5256,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/light_monolit_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/light_monolit_outfit/light_monolit_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -5309,7 +5309,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/light_voen_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/light_voen_outfit/light_voen_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -5362,7 +5362,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/merc_ace_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/merc_ace_outfit/merc_ace_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -5415,7 +5415,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/merc_combat_scientific_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/merc_combat_scientific_outfit/merc_combat_scientific_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -5468,7 +5468,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/merc_coyote_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/merc_coyote_outfit/merc_coyote_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -5521,7 +5521,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/merc_exo_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/merc_exo_outfit/merc_exo_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -5574,7 +5574,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/merc_exolight_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/merc_exolight_outfit/merc_exolight_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -5627,7 +5627,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/merc_fighter_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/merc_fighter_outfit/merc_fighter_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -5680,7 +5680,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/merc_jackal_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/merc_jackal_outfit/merc_jackal_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -5733,7 +5733,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/merc_nighthunter_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/merc_nighthunter_outfit/merc_nighthunter_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -5786,7 +5786,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/merc_nosorog_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/merc_nosorog_outfit/merc_nosorog_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -5839,7 +5839,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/merc_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/merc_outfit/merc_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -5892,7 +5892,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/merc_scientific_armored_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/merc_scientific_armored_outfit/merc_scientific_armored_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -5945,7 +5945,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/merc_scientific_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/merc_scientific_outfit/merc_scientific_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -5998,7 +5998,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/merc_scout_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/merc_scout_outfit/merc_scout_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -6051,7 +6051,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/merc_sun_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/merc_sun_outfit/merc_sun_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -6104,7 +6104,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/merc_sunset_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/merc_sunset_outfit/merc_sunset_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -6157,7 +6157,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/merc_wolven_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/merc_wolven_outfit/merc_wolven_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -6210,7 +6210,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/military_bandit_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/military_bandit_outfit/military_bandit_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -6263,7 +6263,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/military_exo_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/military_exo_outfit/military_exo_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -6316,7 +6316,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/military_exolight_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/military_exolight_outfit/military_exolight_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -6369,7 +6369,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/military_freedom_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/military_freedom_outfit/military_freedom_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -6422,7 +6422,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/military_merc_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/military_merc_outfit/military_merc_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -6475,7 +6475,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/military_monolit_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/military_monolit_outfit/military_monolit_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -6528,7 +6528,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/military_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/military_outfit/military_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -6581,7 +6581,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/military_proto_exo_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/military_proto_exo_outfit/military_proto_exo_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -6634,7 +6634,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/military_sky_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/military_sky_outfit/military_sky_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -6687,7 +6687,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/monolith_exo_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/monolith_exo_outfit/monolith_exo_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -6740,7 +6740,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/monolith_exolight_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/monolith_exolight_outfit/monolith_exolight_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -6793,7 +6793,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/monolith_nbc_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/monolith_nbc_outfit/monolith_nbc_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -6846,7 +6846,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/monolith_nosorog_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/monolith_nosorog_outfit/monolith_nosorog_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -6899,7 +6899,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/monolith_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/monolith_outfit/monolith_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -6952,7 +6952,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/monolith_proto_exo_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/monolith_proto_exo_outfit/monolith_proto_exo_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -7005,7 +7005,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/monolith_scientific_light_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/monolith_scientific_light_outfit/monolith_scientific_light_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -7058,7 +7058,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/monolith_scientific_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/monolith_scientific_outfit/monolith_scientific_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -7111,7 +7111,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/monolith_trenchcoat_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/monolith_trenchcoat_outfit/monolith_trenchcoat_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -7164,7 +7164,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/nbc_dolg_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/nbc_dolg_outfit/nbc_dolg_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -7217,7 +7217,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/nbc_freedom_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/nbc_freedom_outfit/nbc_freedom_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -7270,7 +7270,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/nbc_merc_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/nbc_merc_outfit/nbc_merc_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -7323,7 +7323,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/nbc_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/nbc_outfit/nbc_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -7376,7 +7376,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/nomad_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/nomad_outfit/nomad_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -7429,7 +7429,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/novice_outfit_camo.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/novice_outfit_camo/novice_outfit_camo_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -7482,7 +7482,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/novice_outfit_tourist.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/novice_outfit_tourist/novice_outfit_tourist_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -7535,7 +7535,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/novice_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/novice_outfit/novice_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -7588,7 +7588,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/redline_novice_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/redline_novice_outfit/redline_novice_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -7641,7 +7641,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/renegade_exo_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/renegade_exo_outfit/renegade_exo_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -7694,7 +7694,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/renegade_scientific_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/renegade_scientific_outfit/renegade_scientific_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -7747,7 +7747,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/renegademerc_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/renegademerc_outfit/renegademerc_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -7800,7 +7800,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/scientific_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/scientific_outfit/scientific_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -7853,7 +7853,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/specops_bandit_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/specops_bandit_outfit/specops_bandit_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -7906,7 +7906,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/specops_dolg_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/specops_dolg_outfit/specops_dolg_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -7959,7 +7959,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/specops_merc_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/specops_merc_outfit/specops_merc_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -8012,7 +8012,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/specops_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/specops_outfit/specops_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -8065,7 +8065,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/stalker_autumn_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/stalker_autumn_outfit/stalker_autumn_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -8118,7 +8118,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/stalker_bear_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/stalker_bear_outfit/stalker_bear_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -8171,7 +8171,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/stalker_drought_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/stalker_drought_outfit/stalker_drought_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -8224,7 +8224,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/stalker_graphite_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/stalker_graphite_outfit/stalker_graphite_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -8277,7 +8277,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/stalker_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/stalker_outfit/stalker_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -8330,7 +8330,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/stalker_predator_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/stalker_predator_outfit/stalker_predator_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -8383,7 +8383,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/stalker_proto_exo_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/stalker_proto_exo_outfit/stalker_proto_exo_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -8436,7 +8436,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/stalker_salamander_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/stalker_salamander_outfit/stalker_salamander_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -8489,7 +8489,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/stalker_tigerstripe_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/stalker_tigerstripe_outfit/stalker_tigerstripe_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -8542,7 +8542,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/svoboda_exo_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/svoboda_exo_outfit/svoboda_exo_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -8595,7 +8595,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/svoboda_exolight_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/svoboda_exolight_outfit/svoboda_exolight_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -8648,7 +8648,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/svoboda_heavy_outfit_2.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/svoboda_heavy_outfit_2/svoboda_heavy_outfit_2_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -8701,7 +8701,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/svoboda_heavy_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/svoboda_heavy_outfit/svoboda_heavy_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -8754,7 +8754,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/svoboda_light_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/svoboda_light_outfit/svoboda_light_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -8807,7 +8807,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/svoboda_light_proto_exo_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/svoboda_light_proto_exo_outfit/svoboda_light_proto_exo_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -8860,7 +8860,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/svoboda_novice_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/svoboda_novice_outfit/svoboda_novice_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -8913,7 +8913,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/svoboda_scientific_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/svoboda_scientific_outfit/svoboda_scientific_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -8966,7 +8966,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/travel_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/travel_outfit/travel_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -9019,7 +9019,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/trenchcoat_brown_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/trenchcoat_brown_outfit/trenchcoat_brown_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -9072,7 +9072,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/trenchcoat_dolg_brown_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/trenchcoat_dolg_brown_outfit/trenchcoat_dolg_brown_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -9125,7 +9125,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/trenchcoat_freedom_brown_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/trenchcoat_freedom_brown_outfit/trenchcoat_freedom_brown_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -9178,7 +9178,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/trenchcoat_green_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/trenchcoat_green_outfit/trenchcoat_green_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -9231,7 +9231,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/trenchcoat_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/trenchcoat_outfit/trenchcoat_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",
@@ -9284,7 +9284,7 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Items/Definitions/Armor/wastelander_outfit.asset",
+      "assetPath": "Assets/_Source/Resources/Items/Clothes/Armor/wastelander_outfit/wastelander_outfit_definition.asset",
       "entries": [
         {
           "type": "Burn",

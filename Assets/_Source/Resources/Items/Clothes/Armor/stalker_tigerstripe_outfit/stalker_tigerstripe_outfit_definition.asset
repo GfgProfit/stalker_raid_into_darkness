@@ -1,0 +1,145 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da0f90c2955673d46b25d465cbe44ed0, type: 3}
+  m_Name: stalker_tigerstripe_outfit_definition
+  m_EditorClassIdentifier: Inventory::Inventory.ItemDefinition
+  _definitionId: 42aa3006e5451b246bf82e672caaafde
+  _displayName: "\u041A\u043E\u043C\u0431\u0438\u043D\u0435\u0437\u043E\u043D \u0441 \u0442\u0438\u0433\u0440\u043E\u0432\u044B\u043C\u0438 \u043F\u043E\u043B\u043E\u0441\u0430\u043C\u0438"
+  _shortName: "\u041A\u043E\u043C\u0431\u0438\u043D\u0435\u0437\u043E\u043D \u0441 \u0442\u0438\u0433\u0440\u043E\u0432\u044B\u043C\u0438 \u043F\u043E\u043B\u043E\u0441\u0430\u043C\u0438"
+  _description: "\u041F\u0440\u043E\u0438\u0437\u0432\u0435\u0434\u0451\u043D\u043D\u044B\u0439 \u0432 \u0417\u043E\u043D\u0435 \u043C\u0435\u0441\u0442\u043D\u044B\u043C\u0438 \u0443\u043C\u0435\u043B\u044C\u0446\u0430\u043C\u0438 \u043A\u043E\u043C\u0431\u0438\u043D\u0435\u0437\u043E\u043D \u043D\u0430 \u0431\u0430\u0437\u0435 \xAB\u0417\u0430\u0440\u0438\xBB. \u041E\u0434\u0438\u043D \u0438\u0437 \u0442\u044F\u0436\u0451\u043B\u044B\u0445 \u043F\u0440\u0435\u0434\u0441\u0442\u0430\u0432\u0438\u0442\u0435\u043B\u0435\u0439 \u0441\u0442\u0430\u043B\u043A\u0435\u0440\u0441\u043A\u0438\u0445 \u043A\u043E\u043C\u0431\u0438\u043D\u0435\u0437\u043E\u043D\u043E\u0432, \u0441\u043E\u0437\u0434\u0430\u043D\u043D\u044B\u0439 \u0432 \u043E\u0441\u043D\u043E\u0432\u043D\u043E\u043C \u0434\u043B\u044F \u0442\u0435\u0445, \u043A\u0442\u043E \u043F\u0440\u0435\u0434\u043F\u043E\u0447\u0438\u0442\u0430\u0435\u0442 \u043F\u043E\u0433\u043E\u043D\u0435 \u0437\u0430 \u0430\u0440\u0442\u0435\u0444\u0430\u043A\u0442\u0430\u043C\u0438 \u0438\u043B\u0438 \u043E\u0445\u043E\u0442\u0435 \u043D\u0430\u0451\u043C\u043D\u0438\u0447\u0435\u0441\u0442\u0432\u043E \u0438 \u043E\u0445\u043E\u0442\u0443 \u0437\u0430 \u0433\u043E\u043B\u043E\u0432\u0430\u043C\u0438. \u041F\u0440\u0435\u0434\u043E\u0441\u0442\u0430\u0432\u043B\u044F\u0435\u0442 \u043F\u043E\u0432\u044B\u0448\u0435\u043D\u043D\u044B\u0435 \u0431\u0430\u043B\u043B\u0438\u0441\u0442\u0438\u0447\u0435\u0441\u043A\u0443\u044E \u0438 \u043F\u0440\u043E\u0442\u0438\u0432\u043E\u043E\u0441\u043A\u043E\u043B\u043E\u0447\u043D\u0443\u044E \u0437\u0430\u0449\u0438\u0442\u044B, \u0430 \u0442\u0430\u043A\u0436\u0435 \u044F\u0432\u043B\u044F\u0435\u0442\u0441\u044F \u0431\u043E\u043B\u0435\u0435 \u0441\u0442\u043E\u0439\u043A\u0438\u043C \u043A \u0443\u0434\u0430\u0440\u0430\u043C \u0438 \u043F\u043E\u0440\u0435\u0437\u0430\u043C \u043F\u043E \u0441\u0440\u0430\u0432\u043D\u0435\u043D\u0438\u044E \u0441 \u043E\u0431\u044B\u0447\u043D\u044B\u043C \u0441\u0442\u0430\u043B\u043A\u0435\u0440\u0441\u043A\u0438\u043C \u043A\u043E\u043C\u0431\u0438\u043D\u0435\u0437\u043E\u043D\u043E\u043C. \u0421\u0440\u0435\u0434\u0438 \u0431\u043E\u0435\u0432\u044B\u0445 \u043A\u043E\u043C\u0431\u0438\u043D\u0435\u0437\u043E\u043D\u043E\u0432 \u0432\u044B\u0434\u0435\u043B\u044F\u0435\u0442\u0441\u044F \u0433\u043B\u0430\u0432\u043D\u044B\u043C \u043E\u0431\u0440\u0430\u0437\u043E\u043C \u0441\u0432\u043E\u0435\u0439 \u0434\u0435\u0448\u0435\u0432\u0438\u0437\u043D\u043E\u0439 \u0442\u0435\u0445\u043E\u0431\u0441\u043B\u0443\u0436\u0438\u0432\u0430\u043D\u0438\u044F."
+  _category: Armor
+  _tags: []
+  _size: {x: 3, y: 3}
+  _weight: 6.44
+  _maxStack: 1
+  _allowRotation: 1
+  _backgroundColor: {r: 1, g: 1, b: 1, a: 0.04}
+  _fallbackIcon: {fileID: 0}
+  _iconOverride: {fileID: -352432763, guid: 5bb3bcf1e5ed7dd438cdba2f9a1d7797, type: 3}
+  _visualPrefab: {fileID: 9193538156750292212, guid: d93fc98cc798421ab78fa73676df06c0, type: 3}
+  _defaultIconVariant: []
+  _icon:
+    _generateIcon: 1
+    _pixelsPerCell: 64
+    _antiAliasing: 1
+    _useOutline: 1
+    _outlineWidth: 2
+    _useShadow: 1
+    _shadowOffset: {x: 2, y: -2}
+    _shadowBlur: 2
+    _defaultView:
+      _modelEulerAngles: {x: 0, y: 0, z: 0}
+      _modelScale: {x: 1, y: 1, z: 1}
+      _cameraEulerAngles: {x: 89, y: 180, z: 0}
+      _padding: 1.15
+      _useDirectionalLight: 1
+      _lightIntensity: 20
+    _useCustomSlotView: 0
+    _slotView:
+      _modelEulerAngles: {x: 0, y: 0, z: 0}
+      _modelScale: {x: 1, y: 1, z: 1}
+      _cameraEulerAngles: {x: 25, y: -135, z: 0}
+      _padding: 1.15
+      _useDirectionalLight: 1
+      _lightIntensity: 20
+  _components:
+  - rid: 3479885471900762402
+  - rid: 3479885471900762403
+  - rid: 3479885472039698577
+  - rid: 3479885488572596366
+  references:
+    version: 2
+    RefIds:
+    - rid: 3479885471900762402
+      type: {class: EquippableItemComponent, ns: Inventory, asm: Inventory}
+      data:
+        _preferredSlotIds:
+        - Outfit
+    - rid: 3479885471900762403
+      type: {class: EquipmentStatsComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      data:
+        _section: stalker_tigerstripe_outfit
+        _cost: 24110
+        _repairType: outfit_medium
+        _community: stalker
+        _communityIcon: {fileID: 164985583, guid: d56bb8268bdae76448be8781bc547c55, type: 3}
+        _communityIconSize: {x: 20, y: 20}
+        _burnProtection: 10
+        _shockProtection: 7
+        _chemicalBurnProtection: 19
+        _radiationProtection: 7
+        _telepaticProtection: 0
+        _woundProtection: 35
+        _strikeProtection: 29
+        _explosionProtection: 21
+        _fireWoundProtection: 24
+        _helmetFireWoundProtection: 0
+        _artefactCount: 3
+        _additionalWeight: 16
+        _powerLoss: 0.05
+        _helmetAvailable: 1
+        _sprintAllowed: 1
+        _nightVisionSection: 
+        _speed: 1.04
+        _physicalDurability: 68
+        _anomalyDurability: 63
+        _anomalyProtections:
+        - _type: 1
+          _values:
+            _weak: 13
+            _average: 10
+            _strong: 8
+        - _type: 2
+          _values:
+            _weak: 9
+            _average: 7
+            _strong: 6
+        - _type: 3
+          _values:
+            _weak: 32
+            _average: 19
+            _strong: 14
+        - _type: 4
+          _values:
+            _weak: 9
+            _average: 7
+            _strong: 5
+        - _type: 5
+          _values:
+            _weak: 0
+            _average: 0
+            _strong: 0
+        - _type: 6
+          _values:
+            _weak: 45
+            _average: 29
+            _strong: 19
+        - _type: 7
+          _values:
+            _weak: 42
+            _average: 35
+            _strong: 26
+        - _type: 8
+          _values:
+            _weak: 26
+            _average: 21
+            _strong: 15
+    - rid: 3479885472039698577
+      type: {class: WorldItemComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      data:
+        _prefab: {fileID: 2815065298167035788, guid: c0ff7b409460a984e8813a40d8f83384, type: 3}
+    - rid: 3479885488572596366
+      type: {class: ItemTakeSoundComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      data:
+        _category: mediumarmor
+        _clips:
+        - {fileID: 8300000, guid: bda8d791b5b5eda4599575cca3791cf9, type: 3}

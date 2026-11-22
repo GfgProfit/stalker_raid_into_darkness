@@ -48,9 +48,10 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
                 string modelFolder = Path.GetDirectoryName(AssetDatabase.GetAssetPath(definition.VisualPrefab)).Replace('\\', '/');
                 string folder = itemResource ? Path.GetDirectoryName(definitionPath).Replace('\\', '/') : Path.GetDirectoryName(modelFolder).Replace('\\', '/') + "/" + PREFABS_FOLDER;
                 InventoryDemoContentBuilder.EnsureFolder(folder);
-                string path = itemResource ? $"{folder}/{definition.name}_world.prefab" : $"{folder}/{definition.name}.prefab";
+                string itemName = itemResource ? InventoryDemoContentBuilder.GetItemResourceName(definition, definitionPath) : definition.name;
+                string path = itemResource ? $"{folder}/{itemName}_world.prefab" : $"{folder}/{itemName}.prefab";
                 WorldItem prefab = itemResource && !rebuild ? AssetDatabase.LoadAssetAtPath<GameObject>(path)?.GetComponent<WorldItem>() : null;
-                prefab = prefab != null && prefab.Definition == definition ? prefab : CreatePrefab(definition, path);
+                prefab = prefab != null && prefab.Definition == definition ? prefab : CreatePrefab(definition, itemName, path);
                 SetWorldComponent(definition, prefab);
                 prefabs.Add(prefab);
             }
@@ -263,9 +264,9 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
             return true;
         }
 
-        private static WorldItem CreatePrefab(ItemDefinition definition, string path)
+        private static WorldItem CreatePrefab(ItemDefinition definition, string itemName, string path)
         {
-            var root = new GameObject(definition.name);
+            var root = new GameObject(itemName);
 
             try
             {

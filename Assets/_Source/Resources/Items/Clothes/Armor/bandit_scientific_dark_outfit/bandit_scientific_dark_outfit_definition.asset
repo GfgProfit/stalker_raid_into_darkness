@@ -1,0 +1,145 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da0f90c2955673d46b25d465cbe44ed0, type: 3}
+  m_Name: bandit_scientific_dark_outfit_definition
+  m_EditorClassIdentifier: Inventory::Inventory.ItemDefinition
+  _definitionId: be7104b1484c7e84f98de2596cd045f1
+  _displayName: "\u041A\u0443\u0441\u0442\u0430\u0440\u043D\u044B\u0439 \u043A\u043E\u043C\u0431\u0438\u043D\u0435\u0437\u043E\u043D \u0441 \u0417\u0421\u0414"
+  _shortName: "\u041A\u0443\u0441\u0442\u0430\u0440\u043D\u044B\u0439 \u043A\u043E\u043C\u0431\u0438\u043D\u0435\u0437\u043E\u043D \u0441 \u0417\u0421\u0414"
+  _description: "\u041A\u043E\u043C\u0431\u0438\u043D\u0435\u0437\u043E\u043D, \u0441\u0445\u043E\u0436\u0438\u0439 \u0441 \u043E\u043D\u044B\u043C\u0438 \u043A\u043B\u0430\u0441\u0441\u0430 \xAB\u0421\u0415\u0412\u0410\xBB, \u043A\u043E\u0442\u043E\u0440\u044B\u0439 \u0431\u044B\u043B \u0441\u043E\u0437\u0434\u0430\u043D \u043F\u0440\u0430\u043A\u0442\u0438\u0447\u0435\u0441\u043A\u0438 \u0441 \u043D\u0443\u043B\u044F \u043E\u0434\u043D\u0438\u043C \u0438\u0437 \u0441\u0430\u043C\u044B\u0445 \u0442\u0430\u043B\u0430\u043D\u0442\u043B\u0438\u0432\u044B\u0445 \u0442\u0435\u0445\u043D\u0438\u043A\u043E\u0432 \u0431\u0430\u043D\u0434\u0438\u0442\u043E\u0432. \u041F\u043E \u0441\u0440\u0430\u0432\u043D\u0435\u043D\u0438\u044E \u0441 \u0442\u0440\u043E\u0444\u0435\u0439\u043D\u044B\u043C\u0438 \u043D\u0430\u0443\u0447\u043D\u044B\u043C\u0438 \u043A\u043E\u043C\u0431\u0438\u043D\u0435\u0437\u043E\u043D\u0430\u043C\u0438, \u043A\u043E\u0442\u043E\u0440\u044B\u0435 \u043F\u043E\u043F\u0430\u0434\u0430\u044E\u0442 \u043A \u0431\u0430\u043D\u0434\u0438\u0442\u0430\u043C \u0432 \u043F\u043E\u0431\u0438\u0442\u043E\u043C \u0432\u0438\u0434\u0435, \u0434\u0430\u043D\u043D\u044B\u0439 \u0432\u0430\u0440\u0438\u0430\u043D\u0442 \u043F\u0440\u0435\u0434\u043B\u0430\u0433\u0430\u0435\u0442 \u043E\u0442\u043B\u0438\u0447\u043D\u0443\u044E \u0437\u0430\u0449\u0438\u0442\u0443 \u043F\u0440\u043E\u0442\u0438\u0432 \u0442\u0435\u0440\u043C\u0438\u0447\u0435\u0441\u043A\u0438\u0445, \u0445\u0438\u043C\u0438\u0447\u0435\u0441\u043A\u0438\u0445, \u043F\u0441\u0438- \u0438 \u0440\u0430\u0434\u0438\u0430\u0446\u0438\u043E\u043D\u043D\u044B\u0445 \u0443\u0433\u0440\u043E\u0437. \u0422\u0435\u043C \u043D\u0435 \u043C\u0435\u043D\u0435\u0435, \u043A\u0443\u0441\u0442\u0430\u0440\u043D\u043E\u0441\u0442\u044C \u0440\u0430\u0431\u043E\u0442\u044B \u0432\u0441\u0451 \u0436\u0435 \u0434\u0430\u0451\u0442 \u043E \u0441\u0435\u0431\u0435 \u0437\u043D\u0430\u0442\u044C. \u0421\u0442\u0438\u043B\u044C\u043D\u044B\u0439 \u0438 \u043A\u043E\u043C\u0444\u043E\u0440\u0442\u043D\u044B\u0439 \u043A\u043E\u043C\u0431\u0438\u043D\u0435\u0437\u043E\u043D, \u043A\u043E\u0442\u043E\u0440\u044B\u0439 \u043E\u043F\u0440\u0435\u0434\u0435\u043B\u0451\u043D\u043D\u043E \u0437\u0430\u0438\u043D\u0442\u0435\u0440\u0435\u0441\u0443\u0435\u0442 \u043E\u0431\u0435\u0441\u043F\u0435\u0447\u0435\u043D\u043D\u044B\u0445 \u043F\u0440\u0435\u0434\u0441\u0442\u0430\u0432\u0438\u0442\u0435\u043B\u0435\u0439 \u043A\u0440\u0438\u043C\u0438\u043D\u0430\u043B\u044C\u043D\u043E\u0433\u043E \u043C\u0438\u0440\u0430."
+  _category: Armor
+  _tags: []
+  _size: {x: 3, y: 3}
+  _weight: 3.86
+  _maxStack: 1
+  _allowRotation: 1
+  _backgroundColor: {r: 1, g: 1, b: 1, a: 0.04}
+  _fallbackIcon: {fileID: 0}
+  _iconOverride: {fileID: 914995849, guid: 5bb3bcf1e5ed7dd438cdba2f9a1d7797, type: 3}
+  _visualPrefab: {fileID: 2298522159182748498, guid: 47c2a1789b8747c99ffd329107ce3848, type: 3}
+  _defaultIconVariant: []
+  _icon:
+    _generateIcon: 1
+    _pixelsPerCell: 64
+    _antiAliasing: 1
+    _useOutline: 1
+    _outlineWidth: 2
+    _useShadow: 1
+    _shadowOffset: {x: 2, y: -2}
+    _shadowBlur: 2
+    _defaultView:
+      _modelEulerAngles: {x: 0, y: 0, z: 0}
+      _modelScale: {x: 1, y: 1, z: 1}
+      _cameraEulerAngles: {x: 89, y: 180, z: 0}
+      _padding: 1.15
+      _useDirectionalLight: 1
+      _lightIntensity: 20
+    _useCustomSlotView: 0
+    _slotView:
+      _modelEulerAngles: {x: 0, y: 0, z: 0}
+      _modelScale: {x: 1, y: 1, z: 1}
+      _cameraEulerAngles: {x: 25, y: -135, z: 0}
+      _padding: 1.15
+      _useDirectionalLight: 1
+      _lightIntensity: 20
+  _components:
+  - rid: 3479885471900762128
+  - rid: 3479885471900762129
+  - rid: 3479885472039698440
+  - rid: 3479885488572596232
+  references:
+    version: 2
+    RefIds:
+    - rid: 3479885471900762128
+      type: {class: EquippableItemComponent, ns: Inventory, asm: Inventory}
+      data:
+        _preferredSlotIds:
+        - Outfit
+    - rid: 3479885471900762129
+      type: {class: EquipmentStatsComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      data:
+        _section: bandit_scientific_dark_outfit
+        _cost: 52130
+        _repairType: outfit_medium
+        _community: bandit
+        _communityIcon: {fileID: -452201656, guid: d56bb8268bdae76448be8781bc547c55, type: 3}
+        _communityIconSize: {x: 17, y: 20}
+        _burnProtection: 14
+        _shockProtection: 3
+        _chemicalBurnProtection: 48
+        _radiationProtection: 39
+        _telepaticProtection: 17
+        _woundProtection: 29
+        _strikeProtection: 19
+        _explosionProtection: 12
+        _fireWoundProtection: 37
+        _helmetFireWoundProtection: 14
+        _artefactCount: 3
+        _additionalWeight: 24
+        _powerLoss: 0.05
+        _helmetAvailable: 0
+        _sprintAllowed: 1
+        _nightVisionSection: 
+        _speed: 1.02
+        _physicalDurability: 80
+        _anomalyDurability: 97
+        _anomalyProtections:
+        - _type: 1
+          _values:
+            _weak: 18
+            _average: 14
+            _strong: 12
+        - _type: 2
+          _values:
+            _weak: 4
+            _average: 3
+            _strong: 2
+        - _type: 3
+          _values:
+            _weak: 65
+            _average: 48
+            _strong: 38
+        - _type: 4
+          _values:
+            _weak: 46
+            _average: 39
+            _strong: 30
+        - _type: 5
+          _values:
+            _weak: 29
+            _average: 17
+            _strong: 14
+        - _type: 6
+          _values:
+            _weak: 32
+            _average: 19
+            _strong: 12
+        - _type: 7
+          _values:
+            _weak: 35
+            _average: 29
+            _strong: 21
+        - _type: 8
+          _values:
+            _weak: 15
+            _average: 12
+            _strong: 8
+    - rid: 3479885472039698440
+      type: {class: WorldItemComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      data:
+        _prefab: {fileID: 7071484659651694248, guid: b0ab87a80202838448b65811a609b275, type: 3}
+    - rid: 3479885488572596232
+      type: {class: ItemTakeSoundComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      data:
+        _category: mediumarmor
+        _clips:
+        - {fileID: 8300000, guid: bda8d791b5b5eda4599575cca3791cf9, type: 3}

@@ -303,7 +303,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
 
             foreach (ItemDefinition definition in controller.Inventory.Database.Definitions)
             {
-                if (definition.name == "army_nosorog_outfit")
+                if (definition.GetComponent<EquipmentStatsComponent>()?.Section == "army_nosorog_outfit")
                 {
                     nosorog = definition;
                 }

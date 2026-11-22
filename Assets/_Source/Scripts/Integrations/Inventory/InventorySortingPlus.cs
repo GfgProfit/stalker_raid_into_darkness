@@ -215,7 +215,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
                 return height;
             }
 
-            int section = string.CompareOrdinal(left.Definition.name, right.Definition.name);
+            int section = string.CompareOrdinal(GetSortName(left.Definition), GetSortName(right.Definition));
 
             if (section != 0)
             {
@@ -224,6 +224,12 @@ namespace RaidIntoDarkness.Integrations.Inventory
 
             int amount = right.Amount.CompareTo(left.Amount);
             return amount != 0 ? amount : string.CompareOrdinal(left.InstanceId, right.InstanceId);
+        }
+
+        private static string GetSortName(ItemDefinition definition)
+        {
+            string section = definition.IsCategory(AnomalyEquipmentProtection.OUTFIT_CATEGORY) ? definition.GetComponent<EquipmentStatsComponent>()?.Section : null;
+            return string.IsNullOrEmpty(section) ? definition.name : section;
         }
 
         public void ArrangeAll()

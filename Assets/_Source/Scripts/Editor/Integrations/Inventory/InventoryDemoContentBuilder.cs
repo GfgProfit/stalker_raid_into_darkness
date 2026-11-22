@@ -38,6 +38,12 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
 
         internal static bool IsClothesResourcePath(string path) => path?.StartsWith(CLOTHES_FOLDER + "/", System.StringComparison.Ordinal) == true;
 
+        internal static string GetItemResourceName(ItemDefinition definition, string path)
+        {
+            EquipmentStatsComponent stats = IsClothesResourcePath(path) ? definition.GetComponent<EquipmentStatsComponent>() : null;
+            return stats != null && stats.Section.Length > 0 ? stats.Section : definition.name;
+        }
+
         public sealed class DemoContent
         {
             public readonly Dictionary<string, ItemDefinition> Items = new();
@@ -72,7 +78,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
                     continue;
                 }
 
-                string key = IsItemResourcePath(path) ? definition.name : Path.GetFileNameWithoutExtension(path);
+                string key = IsItemResourcePath(path) ? GetItemResourceName(definition, path) : Path.GetFileNameWithoutExtension(path);
                 content.Items[key] = definition;
 
                 if (definition.IsCategory(CONSUMABLE_CATEGORY) && definition.GetComponent<ConsumableItemComponent>() == null)

@@ -45,10 +45,23 @@ namespace XRay.Importer.Levels
 
         public Matrix4x4 Matrix(XRayDetailInstance instance, float scale, bool alignment)
         {
-            Vector3 right = Right * scale;
-            Vector3 up = alignment ? new Vector3(instance.NormalX, instance.NormalY, instance.NormalZ) * scale : Vector3.up * scale;
-            Vector3 forward = Forward * scale;
-            return new Matrix4x4(new Vector4(right.x, right.y, right.z, 0.0f), new Vector4(up.x, up.y, up.z, 0.0f), new Vector4(forward.x, forward.y, forward.z, 0.0f), new Vector4(instance.X, instance.Y, instance.Z, 1.0f));
+            Vector3 normal = alignment ? new Vector3(instance.NormalX, instance.NormalY, instance.NormalZ) : Vector3.up;
+            return new Matrix4x4
+            {
+                m00 = Right.x * scale,
+                m10 = Right.y * scale,
+                m20 = Right.z * scale,
+                m01 = normal.x * scale,
+                m11 = normal.y * scale,
+                m21 = normal.z * scale,
+                m02 = Forward.x * scale,
+                m12 = Forward.y * scale,
+                m22 = Forward.z * scale,
+                m03 = instance.X,
+                m13 = instance.Y,
+                m23 = instance.Z,
+                m33 = 1.0f
+            };
         }
     }
 

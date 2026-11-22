@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Unity.Collections;
 using UnityEngine;
 
 namespace XRay.Importer.Levels
@@ -36,6 +37,19 @@ namespace XRay.Importer.Levels
         public int VisitedNodes { get; private set; }
         public int SelectedCount { get; private set; }
         public long MemoryBytes => (long)_nodes.Length * NODE_DATA_BYTES + (long)_shadowPlanes.Length * SHADOW_PLANE_BYTES + (long)_windBounds.Length * 24L + (long)_windBoundsStamps.Length * sizeof(int) + _windBoundsInvalid.Length + (long)_order.Length * sizeof(int) + _selected.Length + (long)_selectedSources.Length * sizeof(int);
+
+        internal int PointShadowNodeCount => _nodeCount;
+
+        internal void CopyPointShadowGeometry(NativeArray<XRayPointShadowJob.Node> nodes, NativeArray<int> order)
+        {
+            if (nodes.Length != _nodeCount || order.Length != _order.Length) throw new ArgumentException("Point shadow buffers must match the active index geometry.");
+            for (int index = 0; index < _nodeCount; index++)
+            {
+                Node node = _nodes[index];
+                nodes[index] = new XRayPointShadowJob.Node { Bounds = node.Bounds, SourceHeight = node.SourceHeight, Left = node.Left, Right = node.Right, Start = node.Start, Count = node.Count, Invalid = node.Invalid };
+            }
+            NativeArray<int>.Copy(_order, order);
+        }
 
         public void Ensure(XRayInstanceBatchSet set)
         {

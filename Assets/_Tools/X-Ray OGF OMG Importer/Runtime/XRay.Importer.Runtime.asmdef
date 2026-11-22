@@ -4,6 +4,7 @@
     "references": [
         "XRay.Importer.Core",
         "Unity.Collections",
+        "Unity.Burst",
         "Unity.RenderPipelines.Core.Runtime",
         "Unity.RenderPipelines.HighDefinition.Runtime"
     ],

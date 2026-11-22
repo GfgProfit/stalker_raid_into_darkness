@@ -20,6 +20,22 @@ namespace XRay.Importer.Levels
         private const int MAX_REFLECTION_VIEWS = 64;
         private const int POINT_SHADOW_SPLITS = 6;
 
+#if RVM_PROMZONA_PROTOTYPE_BENCH
+        private static bool _pointJobsEnabled;
+#elif UNITY_EDITOR
+        private static bool _pointJobsEnabled = true;
+#else
+        private static readonly bool _pointJobsEnabled = true;
+#endif
+        private static bool _pointJobsBurstProbeEnabled;
+        private static int _pointScheduled;
+        private static int _pointCompleted;
+        private static int _pointBurst;
+        private static int _pointFallback;
+        private static long _pointPeakMemory;
+        private static readonly ProfilerMarker POINT_SCHEDULE_MARKER = new ProfilerMarker("XRay.PointJobs.Schedule");
+        private static readonly ProfilerMarker POINT_SOURCES_MARKER = new ProfilerMarker("XRay.PointJobs.RefreshSources");
+
         private static readonly ProfilerMarker CULLING_MARKER = new ProfilerMarker("XRay.NativeInstanceCulling");
         private static readonly ProfilerMarker SHADOW_SELECT_MARKER = new ProfilerMarker("XRay.NativeShadowSelection");
         private static readonly ProfilerMarker SHADOW_OUTPUT_MARKER = new ProfilerMarker("XRay.NativeShadowOutput");
@@ -87,16 +103,36 @@ namespace XRay.Importer.Levels
         private int _cullingStamp;
         private int _selectedCount;
         private bool _active;
+        private XRayPointShadowRequests _pointJobs;
+        private bool _pointSourcesDirty;
+        private int _pointEpoch;
+        private int _lastShadowCommands;
+        private int _lastShadowInstances;
+        private long _lastCullingOutputBytes;
 
         public static IReadOnlyList<string> UnsupportedShaderKeywords => UNSUPPORTED_SHADER_KEYWORDS;
 
         public bool Active => _active;
-        public long MemoryBytes => (_buffer != null ? (long)_buffer.count * _buffer.stride : 0L) + (_instanceBounds != null ? _instanceBounds.LongLength * 24L : 0L) + (_windBounds != null ? _windBounds.LongLength * 24L : 0L) + (_windBoundsStamps != null ? _windBoundsStamps.LongLength * sizeof(int) : 0L) + (_sourceWind != null ? _sourceWind.LongLength : 0L) + (_sourceBounds != null ? _sourceBounds.LongLength * 24L : 0L) + (_physicalSourceBounds != null ? _physicalSourceBounds.LongLength * 24L : 0L) + (_sourceSplitMasks != null ? _sourceSplitMasks.LongLength * 2L : 0L) + (_sourceShadowCounts != null ? _sourceShadowCounts.LongLength * sizeof(int) : 0L) + (_payload != null ? _payload.LongLength * VECTOR_BYTES : 0L) + (_instanceMasks != null ? _instanceMasks.LongLength * 2L : 0L) + (_sources != null ? _sources.LongLength * 120L : 0L) + (_draws != null ? _draws.LongLength * 32L : 0L) + (_plannedCommands != null ? _plannedCommands.LongLength * UnsafeUtility.SizeOf<BatchDrawCommand>() : 0L) + (_visibleIndices != null ? _visibleIndices.LongLength * sizeof(int) : 0L) + _planes.LongLength * VECTOR_BYTES + _index.MemoryBytes + (long)_reflectionViews.Capacity * UnsafeUtility.SizeOf<ReflectionView>();
+        public long MemoryBytes => (_buffer != null ? (long)_buffer.count * _buffer.stride : 0L) + (_instanceBounds != null ? _instanceBounds.LongLength * 24L : 0L) + (_windBounds != null ? _windBounds.LongLength * 24L : 0L) + (_windBoundsStamps != null ? _windBoundsStamps.LongLength * sizeof(int) : 0L) + (_sourceWind != null ? _sourceWind.LongLength : 0L) + (_sourceBounds != null ? _sourceBounds.LongLength * 24L : 0L) + (_physicalSourceBounds != null ? _physicalSourceBounds.LongLength * 24L : 0L) + (_sourceSplitMasks != null ? _sourceSplitMasks.LongLength * 2L : 0L) + (_sourceShadowCounts != null ? _sourceShadowCounts.LongLength * sizeof(int) : 0L) + (_payload != null ? _payload.LongLength * VECTOR_BYTES : 0L) + (_instanceMasks != null ? _instanceMasks.LongLength * 2L : 0L) + (_sources != null ? _sources.LongLength * 120L : 0L) + (_draws != null ? _draws.LongLength * 32L : 0L) + (_plannedCommands != null ? _plannedCommands.LongLength * UnsafeUtility.SizeOf<BatchDrawCommand>() : 0L) + (_visibleIndices != null ? _visibleIndices.LongLength * sizeof(int) : 0L) + _planes.LongLength * VECTOR_BYTES + _index.MemoryBytes + (_pointJobs?.MemoryBytes ?? 0L) + (long)_reflectionViews.Capacity * UnsafeUtility.SizeOf<ReflectionView>();
         public int LastCameraCommands { get; private set; }
         public int LastCameraInstances { get; private set; }
         public int LastCameraBatches { get; private set; }
-        public int LastShadowCommands { get; private set; }
-        public int LastShadowInstances { get; private set; }
+        public int LastShadowCommands
+        {
+            get
+            {
+                CollectPointJobs();
+                return _lastShadowCommands;
+            }
+        }
+        public int LastShadowInstances
+        {
+            get
+            {
+                CollectPointJobs();
+                return _lastShadowInstances;
+            }
+        }
         public int LastCulledBatches { get; private set; }
         public int LastCulledInstances { get; private set; }
         public int ShadowViews { get; private set; }
@@ -107,7 +143,14 @@ namespace XRay.Importer.Levels
         public int RegisteredReflectionViews => _reflectionViews.Count;
         public int CullingInvocations { get; private set; }
         public int VisitedNodes { get; private set; }
-        public long LastCullingOutputBytes { get; private set; }
+        public long LastCullingOutputBytes
+        {
+            get
+            {
+                CollectPointJobs();
+                return _lastCullingOutputBytes;
+            }
+        }
         public string FallbackReason { get; private set; }
 
         public bool Prepare(XRayInstanceBatchSet set, Camera camera, int layer, bool castShadows, XRayFloraWindState wind, Func<Material, Material> resolver = null)
@@ -186,10 +229,18 @@ namespace XRay.Importer.Levels
                 }
             }
             if (rebuild && !Build(set, instanceCount)) return false;
+            if (!_pointJobsEnabled && _pointJobs != null)
+            {
+                _pointJobs.Dispose();
+                _pointJobs = null;
+            }
+            bool trackPointSources = _pointJobs != null;
             for (int index = 0; index < _sources.Length; index++)
             {
                 Source source = _sources[index];
-                source.CastShadows = castShadows && source.Batch.CastShadows;
+                bool casts = castShadows && source.Batch.CastShadows;
+                if (trackPointSources && source.CastShadows != casts) _pointSourcesDirty = true;
+                source.CastShadows = casts;
                 source.Wind = false;
                 source.Flora = occlusion != null && source.DrawCount > 0;
                 bool reflectionWind = UsesReflectionWind(source.Batch.Materials, wind);
@@ -216,6 +267,7 @@ namespace XRay.Importer.Levels
                 {
                     Array.Clear(_windBoundsStamps, source.Start, source.Count);
                     _sourceWind[sourceIndex] = source.Wind;
+                    if (trackPointSources) _pointSourcesDirty = true;
                     _globalBoundsDirty = true;
                 }
                 Vector4[] data = source.Batch.Data;
@@ -250,6 +302,7 @@ namespace XRay.Importer.Levels
 
         public void Disable()
         {
+            CollectPointJobs();
             if (_active) _group?.SetEnabledViewTypes(DISABLED_VIEWS);
             _active = false;
             _cameraLodStates = null;
@@ -452,8 +505,9 @@ namespace XRay.Importer.Levels
             LastCameraCommands = 0;
             LastCameraInstances = 0;
             LastCameraBatches = 0;
-            LastShadowCommands = 0;
-            LastShadowInstances = 0;
+            _pointEpoch++;
+            _lastShadowCommands = 0;
+            _lastShadowInstances = 0;
             LastCulledBatches = 0;
             LastCulledInstances = 0;
             ShadowViews = 0;
@@ -463,12 +517,15 @@ namespace XRay.Importer.Levels
             ReflectionViews = 0;
             CullingInvocations = 0;
             VisitedNodes = 0;
-            LastCullingOutputBytes = 0;
+            _lastCullingOutputBytes = 0;
         }
 
         private void ReleaseGraphics()
         {
             Disable();
+            _pointJobs?.Dispose();
+            _pointJobs = null;
+            _pointSourcesDirty = false;
             _group?.Dispose();
             _group = null;
             _buffer?.Dispose();
@@ -700,6 +757,8 @@ namespace XRay.Importer.Levels
             if (owner == null || owner.GetEntityId() != _cameraId) return default;
             if ((context.cullingLayerMask & (1u << _layer)) == 0u) return default;
             ShadowViews++;
+            if (_pointJobsEnabled && TrySchedulePointShadow(context, output, out JobHandle fence)) return fence;
+            if (_pointJobsBurstProbeEnabled) _pointFallback++;
             using (SHADOW_SELECT_MARKER.Auto())
             {
                 PrepareShadowSources(context);
@@ -710,10 +769,124 @@ namespace XRay.Importer.Levels
             {
                 WriteCullingOutput(output, true, false, out commands, out submittedInstances, out _);
             }
-            LastShadowCommands += commands;
-            LastShadowInstances += submittedInstances;
+            _lastShadowCommands += commands;
+            _lastShadowInstances += submittedInstances;
             return default;
         }
+
+        private bool TrySchedulePointShadow(BatchCullingContext context, BatchCullingOutput output, out JobHandle fence)
+        {
+            fence = default;
+            if (!context.cullingSplits.IsCreated || context.cullingSplits.Length != POINT_SHADOW_SPLITS || !context.cullingPlanes.IsCreated || context.cullingPlanes.Length > XRayPointShadowJob.MAX_PLANES || !ValidShadowSplits(context)) return false;
+            using var scope = POINT_SCHEDULE_MARKER.Auto();
+            CollectPointJobs();
+            if (_pointJobs == null || _pointSourcesDirty)
+            {
+                using var refresh = POINT_SOURCES_MARKER.Auto();
+                var sources = new NativeArray<XRayPointShadowJob.Source>(_sources.Length, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
+                for (int index = 0; index < _sources.Length; index++)
+                {
+                    Source source = _sources[index];
+                    sources[index] = new XRayPointShadowJob.Source { Start = source.Start, Count = source.Count, DrawStart = source.DrawStart, DrawCount = source.DrawCount, Height = _sourceBounds[index].size.y, CastShadows = source.CastShadows, Wind = source.Wind };
+                }
+                if (_pointJobs == null)
+                {
+                    var draws = new NativeArray<XRayPointShadowJob.Draw>(_draws.Length, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
+                    for (int index = 0; index < _draws.Length; index++)
+                    {
+                        Draw draw = _draws[index];
+                        draws[index] = new XRayPointShadowJob.Draw { MeshId = draw.MeshId, MaterialId = draw.MaterialId, Submesh = (ushort)draw.Submesh };
+                    }
+                    _pointJobs = new XRayPointShadowRequests(_index, _instanceBounds, draws, sources);
+                }
+                else
+                {
+                    _pointJobs.ReplaceSources(sources);
+                }
+                _pointSourcesDirty = false;
+            }
+
+            if (!_pointJobs.TrySchedule(context, output, _batchId, (byte)_layer, _renderingLayerMask, new XRayPointShadowWind(_wind), _pointEpoch, _pointJobsBurstProbeEnabled, out fence)) return false;
+            if (_pointJobsBurstProbeEnabled)
+            {
+                _pointScheduled++;
+                _pointPeakMemory = Math.Max(_pointPeakMemory, _pointJobs.MemoryBytes);
+            }
+            return true;
+        }
+
+        private void CollectPointJobs()
+        {
+            if (_pointJobs == null) return;
+            _pointJobs.Collect(_pointEpoch, out XRayPointShadowJob.Result result, out int jobs, out int burst);
+            _lastShadowCommands += result.Commands;
+            _lastShadowInstances += result.Instances;
+            _lastCullingOutputBytes += result.Bytes;
+            VisitedNodes += result.Nodes;
+            if (_pointJobsBurstProbeEnabled)
+            {
+                _pointCompleted += jobs;
+                _pointBurst += burst;
+            }
+        }
+
+        private static string CapturePointJobsBurstEvidence()
+        {
+            return FormattableString.Invariant($"scheduled={_pointScheduled};completed={_pointCompleted};burstSse2={_pointBurst};fallback={_pointFallback};persistentBytes={_pointPeakMemory}");
+        }
+
+        private bool ValidShadowSplits(BatchCullingContext context)
+        {
+            bool valid = context.cullingSplits.IsCreated && context.cullingSplits.Length > 0 && context.cullingSplits.Length <= 16 && context.cullingPlanes.IsCreated && Finite(XRayFloraWindBounds.Expand(_globalBounds, _wind, _maximumHeight));
+            for (int splitIndex = 0; valid && splitIndex < context.cullingSplits.Length; splitIndex++)
+            {
+                CullingSplit split = context.cullingSplits[splitIndex];
+                valid = split.cullingPlaneOffset >= 0 && split.cullingPlaneCount > 0 && split.cullingPlaneOffset <= context.cullingPlanes.Length - split.cullingPlaneCount;
+                for (int planeIndex = 0; valid && planeIndex < split.cullingPlaneCount; planeIndex++)
+                {
+                    Plane plane = context.cullingPlanes[split.cullingPlaneOffset + planeIndex];
+                    float magnitude = plane.normal.sqrMagnitude;
+                    valid = Finite(plane.normal) && float.IsFinite(plane.distance) && float.IsFinite(magnitude) && magnitude > 0f;
+                }
+            }
+            return valid;
+        }
+
+#if UNITY_EDITOR
+        internal unsafe (BatchDrawCommand[] Commands, BatchDrawRange[] Ranges, int[] Visible, bool Scheduled) CapturePointShadowForTest(BatchCullingContext context, bool useJobs, Action beforeComplete = null)
+        {
+            using var descriptor = new NativeArray<BatchCullingOutputDrawCommands>(1, Allocator.TempJob);
+            var output = new BatchCullingOutput { drawCommands = descriptor };
+            JobHandle fence = default;
+            bool scheduled = useJobs && TrySchedulePointShadow(context, output, out fence);
+            if (!scheduled)
+            {
+                PrepareShadowSources(context);
+                WriteCullingOutput(output, true, false, out _, out _, out _);
+            }
+            try
+            {
+                beforeComplete?.Invoke();
+                fence.Complete();
+                var data = descriptor[0];
+                var commands = new BatchDrawCommand[data.drawCommandCount];
+                var ranges = new BatchDrawRange[data.drawRangeCount];
+                var visible = new int[data.visibleInstanceCount];
+                for (int index = 0; index < commands.Length; index++) commands[index] = data.drawCommands[index];
+                for (int index = 0; index < ranges.Length; index++) ranges[index] = data.drawRanges[index];
+                for (int index = 0; index < visible.Length; index++) visible[index] = data.visibleInstances[index];
+                return (commands, ranges, visible, scheduled);
+            }
+            finally
+            {
+                fence.Complete();
+                var data = descriptor[0];
+                if (data.drawCommands != null) UnsafeUtility.Free(data.drawCommands, Allocator.TempJob);
+                if (data.drawRanges != null) UnsafeUtility.Free(data.drawRanges, Allocator.TempJob);
+                if (data.visibleInstances != null) UnsafeUtility.Free(data.visibleInstances, Allocator.TempJob);
+            }
+        }
+#endif
 
         private unsafe void WriteCullingOutput(BatchCullingOutput output, bool shadows, bool reflection, out int commandCount, out int submittedInstances, out int survivingInstances)
         {
@@ -804,7 +977,7 @@ namespace XRay.Importer.Levels
             commands->drawCommandCount = commandCount;
             commands->visibleInstanceCount = visibleCount;
             commands->drawRangeCount = rangeCount;
-            LastCullingOutputBytes += commandBytes + indexBytes + rangeBytes;
+            _lastCullingOutputBytes += commandBytes + indexBytes + rangeBytes;
         }
 
         private void PrepareShadowSources(BatchCullingContext context)
@@ -812,18 +985,7 @@ namespace XRay.Importer.Levels
             _selectedCount = 0;
             Array.Clear(_sourceSplitMasks, 0, _sourceSplitMasks.Length);
             Array.Clear(_instanceMasks, 0, _instanceMasks.Length);
-            bool valid = context.cullingSplits.IsCreated && context.cullingSplits.Length > 0 && context.cullingSplits.Length <= 16 && context.cullingPlanes.IsCreated && Finite(XRayFloraWindBounds.Expand(_globalBounds, _wind, _maximumHeight));
-            for (int splitIndex = 0; valid && splitIndex < context.cullingSplits.Length; splitIndex++)
-            {
-                CullingSplit split = context.cullingSplits[splitIndex];
-                valid = split.cullingPlaneOffset >= 0 && split.cullingPlaneCount > 0 && split.cullingPlaneOffset <= context.cullingPlanes.Length - split.cullingPlaneCount;
-                for (int planeIndex = 0; valid && planeIndex < split.cullingPlaneCount; planeIndex++)
-                {
-                    Plane plane = context.cullingPlanes[split.cullingPlaneOffset + planeIndex];
-                    float magnitude = plane.normal.sqrMagnitude;
-                    valid = Finite(plane.normal) && float.IsFinite(plane.distance) && float.IsFinite(magnitude) && magnitude > 0f;
-                }
-            }
+            bool valid = ValidShadowSplits(context);
             bool useCombined = valid && context.cullingSplits.Length == POINT_SHADOW_SPLITS;
             if (useCombined)
             {

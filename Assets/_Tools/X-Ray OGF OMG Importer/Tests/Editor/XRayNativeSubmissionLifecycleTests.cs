@@ -73,6 +73,175 @@ namespace XRay.Importer.Tests
             _renderer = null;
         }
 
+        [TestCase(0)]
+        [TestCase(0b000010)]
+        public void PointShadowJobMatchesSynchronousCommandsRangesAndVisibleIndices(int excludedFaces)
+        {
+            Vector3 windCenter = new Vector3(-6f, 0f, 4f);
+            Vector3 missedCenter = new Vector3(0f, 0f, 4f);
+            Vector3 secondWindCenter = new Vector3(-10f, 0f, 4f);
+            Vector3 rightCenter = new Vector3(10f, 0f, 4f);
+            _camera.orthographicSize = 0.5f;
+            _camera.aspect = 1f;
+            _firstMaterial.SetFloat(XRayFloraWindBounds.MATERIAL_PROPERTY, (float)XRayFloraWindProfile.AnomalySsfx);
+            var batches = new List<XRayInstanceBatch>
+            {
+                new XRayInstanceBatch("Wind group", _mesh, new[] { _firstMaterial }, new Bounds((windCenter + missedCenter) * 0.5f, new Vector3(8f, 2f, 2f)), new[] { Matrix4x4.Translate(windCenter), Matrix4x4.Translate(missedCenter) }, new[] { Vector4.one, Vector4.one }, true),
+                new XRayInstanceBatch("Compatible wind command", _mesh, new[] { _firstMaterial }, new Bounds(secondWindCenter, Vector3.one * 2f), new[] { Matrix4x4.Translate(secondWindCenter) }, new[] { Vector4.one }, true),
+                new XRayInstanceBatch("Right caster", _mesh, new[] { _secondMaterial }, new Bounds(rightCenter, Vector3.one * 2f), new[] { Matrix4x4.Translate(rightCenter) }, new[] { Vector4.one }, true),
+                new XRayInstanceBatch("Skipped noncaster", _mesh, new[] { _secondMaterial }, new Bounds(rightCenter, Vector3.one * 2f), new[] { Matrix4x4.Translate(rightCenter) }, new[] { Vector4.one }, false)
+            };
+            var backend = new XRayInstanceNativeRenderer();
+            _backends.Add(backend);
+            var wind = new XRayFloraWindState { Profile = XRayFloraWindProfile.AnomalySsfx, TreesSetup = new Vector4(11f, 0.15f, 0.1f, 0f) };
+            wind.Reset(new XRayFloraWindWeather(0f, 1000f, 1f));
+            Assert.That(backend.Prepare(PreparedSet(batches), _camera, _root.layer, true, wind), Is.True, backend.FallbackReason);
+
+            Plane[] planes = { new Plane(Vector3.left, -8f), new Plane(Vector3.right, -8f) };
+            Bounds physical = BackendField<Bounds[]>(backend, "_instanceBounds")[0];
+            float sourceHeight = BackendField<Bounds[]>(backend, "_sourceBounds")[0].size.y;
+            Bounds expanded = XRayFloraWindBounds.Expand(physical, wind, sourceHeight);
+            Assert.That(GeometryUtility.TestPlanesAABB(new[] { planes[0] }, physical), Is.False);
+            Assert.That(GeometryUtility.TestPlanesAABB(new[] { planes[0] }, expanded), Is.True);
+            Assert.That(GeometryUtility.TestPlanesAABB(GeometryUtility.CalculateFrustumPlanes(_camera), expanded), Is.False);
+
+            CullingSplit[] splits = PointJobSplits(0);
+            splits[1] = new CullingSplit { cullingPlaneOffset = 1, cullingPlaneCount = 1 };
+            var expected = CapturePointJobOutput(backend, planes, splits, (byte)excludedFaces, false);
+            Assert.That(expected.Visible, Does.Contain(0));
+            Assert.That(expected.Commands, Is.Not.Empty);
+            Assert.That(Array.Exists(expected.Commands, command => command.visibleCount == 2u), Is.True);
+            Assert.That(expected.Ranges, Is.Not.Empty);
+            Assert.That(expected.Scheduled, Is.False);
+            var actual = CapturePointJobOutput(backend, planes, splits, (byte)excludedFaces, true);
+            Assert.That(actual.Scheduled, Is.True);
+            AssertPointJobOutput(actual, expected);
+        }
+
+        [Test]
+        public void PointShadowJobsKeepOutstandingOutputIndependentWhenRendererRetires()
+        {
+            _renderer.BatchSet = Set(_firstMaterial, _firstMaterial, _secondMaterial);
+            XRayInstanceNativeRenderer backend = ActivateNative();
+            Plane[] planes = { new Plane(Vector3.forward, 0f), new Plane(Vector3.right, -3f) };
+            CullingSplit[] firstSplits = PointJobSplits(0);
+            CullingSplit[] secondSplits = PointJobSplits(1);
+            var expectedFirst = CapturePointJobOutput(backend, planes, firstSplits, 0, false);
+            var expectedSecond = CapturePointJobOutput(backend, planes, secondSplits, 0, false);
+            Assert.That(expectedFirst.Visible, Is.Not.EqualTo(expectedSecond.Visible));
+            GraphicsBuffer buffer = Buffer(backend);
+            Plane[] cameraPlanes = { planes[1] };
+            var expectedCamera = CaptureNativeSelection(backend, cameraPlanes);
+            Assert.That(expectedCamera.Sources, Is.Not.Empty);
+            (BatchDrawCommand[] Commands, BatchDrawRange[] Ranges, int[] Visible, bool Scheduled) actualSecond = default;
+            var actualFirst = CapturePointJobOutput(backend, planes, firstSplits, 0, true, () =>
+            {
+                var actualCamera = CaptureNativeSelection(backend, cameraPlanes);
+                Assert.That(actualCamera.Masks, Is.EqualTo(expectedCamera.Masks));
+                Assert.That(actualCamera.Sources, Is.EqualTo(expectedCamera.Sources));
+                var synchronous = CapturePointJobOutput(backend, planes, secondSplits, 0, false);
+                Assert.That(synchronous.Scheduled, Is.False);
+                AssertPointJobOutput(synchronous, expectedSecond);
+                actualSecond = CapturePointJobOutput(backend, planes, secondSplits, 0, true);
+                Assert.That(Buffer(backend), Is.SameAs(buffer));
+                Assert.That(actualSecond.Scheduled, Is.True);
+                long bytes = backend.MemoryBytes;
+                _renderer.enabled = false;
+                Assert.That(Field<List<XRayInstanceNativeRenderer>>("_retiredNativeRenderers"), Has.Count.EqualTo(1));
+                Assert.That(backend.MemoryBytes, Is.EqualTo(bytes));
+                EndContext();
+                Assert.That(backend.MemoryBytes, Is.Zero);
+                Assert.That(Field<List<XRayInstanceNativeRenderer>>("_retiredNativeRenderers"), Is.Empty);
+            });
+
+            Assert.That(actualFirst.Scheduled, Is.True);
+            AssertPointJobOutput(actualFirst, expectedFirst);
+            AssertPointJobOutput(actualSecond, expectedSecond);
+        }
+
+        [Test]
+        public void PointShadowJobsPreserveScheduledWindAndGeometryAcrossPrepare()
+        {
+            FieldInfo enabled = typeof(XRayInstanceNativeRenderer).GetField("_pointJobsEnabled", BindingFlags.Static | BindingFlags.NonPublic);
+            Assert.That(enabled, Is.Not.Null);
+            bool previousMode = (bool)enabled.GetValue(null);
+            enabled.SetValue(null, true);
+            try
+            {
+                Vector3 near = new Vector3(-6f, 0f, 4f);
+                Vector3 far = new Vector3(0f, 0f, 4f);
+                Vector3 stable = new Vector3(-12f, 0f, 4f);
+                _firstMaterial.SetFloat(XRayFloraWindBounds.MATERIAL_PROPERTY, (float)XRayFloraWindProfile.AnomalySsfx);
+                var batches = new List<XRayInstanceBatch>
+                {
+                    new XRayInstanceBatch("Mutable wind bounds", _mesh, new[] { _firstMaterial }, new Bounds((near + far) * 0.5f, new Vector3(8f, 2f, 2f)), new[] { Matrix4x4.Translate(near), Matrix4x4.Translate(far) }, new[] { Vector4.one, Vector4.one }, true),
+                    new XRayInstanceBatch("Stable shadow caster", _mesh, new[] { _secondMaterial }, new Bounds(stable, Vector3.one * 2f), new[] { Matrix4x4.Translate(stable) }, new[] { Vector4.one }, true)
+                };
+                XRayInstanceBatchSet set = PreparedSet(batches);
+                var backend = new XRayInstanceNativeRenderer();
+                _backends.Add(backend);
+                var wind = new XRayFloraWindState { Profile = XRayFloraWindProfile.AnomalySsfx, TreesSetup = new Vector4(11f, 0.15f, 0.1f, 0f) };
+                var calm = new XRayFloraWindWeather(0f, 0f, 1f);
+                var strong = new XRayFloraWindWeather(0f, 1000f, 1f);
+                Plane[] planes = { new Plane(Vector3.left, -8f) };
+                CullingSplit[] splits = PointJobSplits(0);
+
+                wind.Reset(calm);
+                Assert.That(backend.Prepare(set, _camera, _root.layer, true, wind), Is.True, backend.FallbackReason);
+                GraphicsBuffer originalBuffer = Buffer(backend);
+                var expectedCalm = CapturePointJobOutput(backend, planes, splits, 0, false);
+                Assert.That(expectedCalm.Visible, Is.EqualTo(new[] { 2 }));
+                wind.Reset(strong);
+                Assert.That(backend.Prepare(set, _camera, _root.layer, true, wind), Is.True, backend.FallbackReason);
+                var expectedStrong = CapturePointJobOutput(backend, planes, splits, 0, false);
+                Assert.That(expectedStrong.Visible, Is.EqualTo(new[] { 0, 2 }));
+
+                wind.Reset(calm);
+                Assert.That(backend.Prepare(set, _camera, _root.layer, true, wind), Is.True, backend.FallbackReason);
+                var actualCalm = CapturePointJobOutput(backend, planes, splits, 0, true, () =>
+                {
+                    wind.Reset(strong);
+                    Assert.That(backend.Prepare(set, _camera, _root.layer, true, wind), Is.True, backend.FallbackReason);
+                    Assert.That(Buffer(backend), Is.SameAs(originalBuffer));
+                    var actualStrong = CapturePointJobOutput(backend, planes, splits, 0, true, () =>
+                    {
+                        set.Batches[0].Matrices[0] = Matrix4x4.Translate(new Vector3(6f, 0f, 4f));
+                        set.PrepareMatrices("Point shadow job geometry mutation");
+                        Assert.That(backend.Prepare(set, _camera, _root.layer, true, wind), Is.True, backend.FallbackReason);
+                        Assert.That(Buffer(backend), Is.Not.SameAs(originalBuffer));
+                        var expectedMoved = CapturePointJobOutput(backend, planes, splits, 0, false);
+                        Assert.That(expectedMoved.Visible, Is.EqualTo(new[] { 2 }));
+                        var actualMoved = CapturePointJobOutput(backend, planes, splits, 0, true);
+                        Assert.That(actualMoved.Scheduled, Is.True);
+                        AssertPointJobOutput(actualMoved, expectedMoved);
+                    });
+                    Assert.That(actualStrong.Scheduled, Is.True);
+                    AssertPointJobOutput(actualStrong, expectedStrong);
+                });
+                Assert.That(actualCalm.Scheduled, Is.True);
+                AssertPointJobOutput(actualCalm, expectedCalm);
+            }
+            finally
+            {
+                enabled.SetValue(null, previousMode);
+            }
+        }
+
+        [Test]
+        public void MalformedActivePointShadowUsesIdenticalSynchronousFallbackWhenJobsAreEnabled()
+        {
+            _renderer.BatchSet = Set(_firstMaterial, _secondMaterial);
+            XRayInstanceNativeRenderer backend = ActivateNative();
+            Plane[] planes = { new Plane(Vector3.forward, -100f) };
+            CullingSplit[] splits = PointJobSplits(0);
+            splits[4] = default;
+            var expected = CapturePointJobOutput(backend, planes, splits, 0, false);
+            Assert.That(expected.Visible, Is.EqualTo(new[] { 0, 1 }));
+            var actual = CapturePointJobOutput(backend, planes, splits, 0, true);
+            Assert.That(actual.Scheduled, Is.False);
+            AssertPointJobOutput(actual, expected);
+        }
+
         [Test]
         public void MultipleCamerasSelectLegacyBeforeTheFirstCameraCull()
         {
@@ -996,6 +1165,35 @@ namespace XRay.Importer.Tests
         private static int CacheStamp(object target)
         {
             return (int)target.GetType().GetField("_windBoundsStamp", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(target);
+        }
+
+        private static CullingSplit[] PointJobSplits(int planeOffset)
+        {
+            var result = new CullingSplit[6];
+            for (int index = 0; index < result.Length; index++)
+            {
+                result[index] = new CullingSplit { cullingPlaneOffset = planeOffset, cullingPlaneCount = 1 };
+            }
+            return result;
+        }
+
+        private static (BatchDrawCommand[] Commands, BatchDrawRange[] Ranges, int[] Visible, bool Scheduled) CapturePointJobOutput(XRayInstanceNativeRenderer backend, Plane[] planes, CullingSplit[] splits, byte exclusion, bool useJobs, Action beforeComplete = null)
+        {
+            using (var nativePlanes = new NativeArray<Plane>(planes, Allocator.TempJob))
+            using (var nativeSplits = new NativeArray<CullingSplit>(splits, Allocator.TempJob))
+            {
+                var context = (BatchCullingContext)Activator.CreateInstance(typeof(BatchCullingContext), BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, new object[] { nativePlanes, nativeSplits, default(LODParameters), Matrix4x4.identity, BatchCullingViewType.Light, BatchCullingProjectionType.Perspective, default(BatchCullingFlags), 0UL, uint.MaxValue, ulong.MaxValue, exclusion, 0, 0, IntPtr.Zero }, null);
+                MethodInfo capture = typeof(XRayInstanceNativeRenderer).GetMethod("CapturePointShadowForTest", BindingFlags.Instance | BindingFlags.NonPublic);
+                Assert.That(capture, Is.Not.Null);
+                return ((BatchDrawCommand[], BatchDrawRange[], int[], bool))capture.Invoke(backend, new object[] { context, useJobs, beforeComplete });
+            }
+        }
+
+        private static void AssertPointJobOutput((BatchDrawCommand[] Commands, BatchDrawRange[] Ranges, int[] Visible, bool Scheduled) actual, (BatchDrawCommand[] Commands, BatchDrawRange[] Ranges, int[] Visible, bool Scheduled) expected)
+        {
+            Assert.That(actual.Commands, Is.EqualTo(expected.Commands));
+            Assert.That(actual.Ranges, Is.EqualTo(expected.Ranges));
+            Assert.That(actual.Visible, Is.EqualTo(expected.Visible));
         }
 
         private static void SetWindVectors(XRayFloraWindState wind, Vector4 current, Vector4 previous)

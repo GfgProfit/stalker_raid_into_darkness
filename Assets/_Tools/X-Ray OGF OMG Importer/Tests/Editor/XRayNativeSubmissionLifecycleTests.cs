@@ -495,6 +495,63 @@ namespace XRay.Importer.Tests
             Assert.That((Bounds)currentBounds.Invoke(backend, null), Is.EqualTo(expanded));
         }
 
+        [Test]
+        public void NativeGlobalBoundsFollowWindOwnershipAndGeometryChanges()
+        {
+            var backend = new XRayInstanceNativeRenderer();
+            _backends.Add(backend);
+            XRayInstanceBatchSet set = _renderer.BatchSet;
+            Bounds physical = set.Batches[0].Bounds;
+            var wind = new XRayFloraWindState { Profile = XRayFloraWindProfile.AnomalySsfx };
+            wind.Reset(new XRayFloraWindWeather(0f, 0f, 1f));
+            Func<Material, Material> resolver = material => _secondMaterial;
+            MethodInfo reflectionSnapshot = typeof(XRayInstanceNativeRenderer).GetMethod("ReflectionSnapshotCurrent", BindingFlags.Instance | BindingFlags.NonPublic);
+            Assert.That(reflectionSnapshot, Is.Not.Null);
+
+            _secondMaterial.SetFloat(XRayFloraWindBounds.MATERIAL_PROPERTY, (float)wind.Profile);
+            Bounds initial = XRayFloraWindBounds.Expand(physical, wind, physical.size.y);
+            Assert.That(PrepareBounds(set), Is.EqualTo(initial));
+            GraphicsBuffer buffer = Buffer(backend);
+            Assert.That(PrepareBounds(set), Is.EqualTo(initial));
+            Assert.That((bool)reflectionSnapshot.Invoke(backend, null), Is.True);
+
+            wind.Reset(new XRayFloraWindWeather(0f, 1000f, 1f));
+            Bounds stronger = XRayFloraWindBounds.Expand(physical, wind, physical.size.y);
+            Assert.That(stronger.size.x, Is.GreaterThan(initial.size.x));
+            Assert.That((bool)reflectionSnapshot.Invoke(backend, null), Is.False);
+            Assert.That(PrepareBounds(set), Is.EqualTo(stronger));
+            Assert.That(Buffer(backend), Is.SameAs(buffer));
+
+            _secondMaterial.SetFloat(XRayFloraWindBounds.MATERIAL_PROPERTY, 0f);
+            Assert.That(PrepareBounds(set), Is.EqualTo(physical));
+            Assert.That(Buffer(backend), Is.SameAs(buffer));
+
+            _firstMaterial.SetFloat(XRayFloraWindBounds.MATERIAL_PROPERTY, (float)wind.Profile);
+            Assert.That(PrepareBounds(set), Is.EqualTo(stronger));
+            Assert.That(Buffer(backend), Is.SameAs(buffer));
+            _firstMaterial.SetFloat(XRayFloraWindBounds.MATERIAL_PROPERTY, 0f);
+            Assert.That(PrepareBounds(set), Is.EqualTo(physical));
+            Assert.That(Buffer(backend), Is.SameAs(buffer));
+
+            backend.Disable();
+            Assert.That(backend.Active, Is.False);
+            Assert.That(PrepareBounds(set), Is.EqualTo(physical));
+            Assert.That(Buffer(backend), Is.SameAs(buffer));
+
+            Vector3 center = physical.center + Vector3.right * 20f;
+            var movedBounds = new Bounds(center, physical.size);
+            var moved = new XRayInstanceBatch("Moved native bounds source", _mesh, new[] { _firstMaterial }, movedBounds, new[] { Matrix4x4.Translate(center) }, new[] { Vector4.one }, true);
+            XRayInstanceBatchSet movedSet = PreparedSet(new List<XRayInstanceBatch> { moved });
+            Assert.That(PrepareBounds(movedSet), Is.EqualTo(movedBounds));
+            Assert.That(Buffer(backend), Is.Not.SameAs(buffer));
+
+            Bounds PrepareBounds(XRayInstanceBatchSet batches)
+            {
+                Assert.That(backend.Prepare(batches, _camera, _root.layer, true, wind, resolver), Is.True, backend.FallbackReason);
+                return BackendField<Bounds>(backend, "_preparedGlobalBounds");
+            }
+        }
+
         [TestCase(XRayFloraWindProfile.AnomalySsfx)]
         [TestCase(XRayFloraWindProfile.TrueStalkerXRay)]
         public void VisibilityWindCacheMatchesFreshQueriesAcrossSameObjectMutations(XRayFloraWindProfile profile)

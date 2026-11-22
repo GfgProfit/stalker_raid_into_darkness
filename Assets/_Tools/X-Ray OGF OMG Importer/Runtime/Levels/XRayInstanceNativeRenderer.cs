@@ -18,8 +18,11 @@ namespace XRay.Importer.Levels
         private const int VECTOR_BYTES = 16;
         private const int MATRIX_START = 96;
         private const int MAX_REFLECTION_VIEWS = 64;
+        private const int POINT_SHADOW_SPLITS = 6;
 
         private static readonly ProfilerMarker CULLING_MARKER = new ProfilerMarker("XRay.NativeInstanceCulling");
+        private static readonly ProfilerMarker SHADOW_SELECT_MARKER = new ProfilerMarker("XRay.NativeShadowSelection");
+        private static readonly ProfilerMarker SHADOW_OUTPUT_MARKER = new ProfilerMarker("XRay.NativeShadowOutput");
         private static readonly int WIND_ID = Shader.PropertyToID("_MonolithFloraWind");
         private static readonly int DETAIL_ID = Shader.PropertyToID("_MonolithLevelDetail");
         private static readonly Func<Camera> SHADOW_CAMERA = CreateShadowCameraAccessor(typeof(HDRenderPipelineAsset).Assembly.GetType("UnityEngine.Rendering.HighDefinition.HDShadowCullingCameraScope"));
@@ -36,6 +39,9 @@ namespace XRay.Importer.Levels
         private readonly List<DrawSpec> _specifications = new List<DrawSpec>();
         private readonly List<ReflectionView> _reflectionViews = new List<ReflectionView>();
         private readonly XRayInstanceVisibilityIndex _index = new XRayInstanceVisibilityIndex();
+        private readonly int[] _pointShadowStarts = new int[POINT_SHADOW_SPLITS];
+        private readonly int[] _pointShadowCounts = new int[POINT_SHADOW_SPLITS];
+
         private BatchRendererGroup _group;
         private Shader _shader;
         private GraphicsBuffer _buffer;
@@ -68,6 +74,9 @@ namespace XRay.Importer.Levels
         private int _windBoundsStamp;
         private Bounds _globalBounds;
         private Bounds _preparedGlobalBounds;
+        private Bounds _cachedGlobalBounds;
+        private XRayFloraWindBounds.SnapshotKey _globalBoundsKey;
+        private bool _globalBoundsDirty = true;
         private float _maximumHeight;
         private BatchID _batchId;
         private EntityId _cameraId;
@@ -183,7 +192,9 @@ namespace XRay.Importer.Levels
                 source.CastShadows = castShadows && source.Batch.CastShadows;
                 source.Wind = false;
                 source.Flora = occlusion != null && source.DrawCount > 0;
-                source.ReflectionWind = UsesReflectionWind(source.Batch.Materials, wind);
+                bool reflectionWind = UsesReflectionWind(source.Batch.Materials, wind);
+                _globalBoundsDirty |= source.ReflectionWind != reflectionWind;
+                source.ReflectionWind = reflectionWind;
                 source.ReflectionBounds = source.ReflectionWind ? XRayFloraWindBounds.Expand(source.Batch.Bounds, wind) : source.Batch.Bounds;
                 _sources[index] = source;
             }
@@ -205,6 +216,7 @@ namespace XRay.Importer.Levels
                 {
                     Array.Clear(_windBoundsStamps, source.Start, source.Count);
                     _sourceWind[sourceIndex] = source.Wind;
+                    _globalBoundsDirty = true;
                 }
                 Vector4[] data = source.Batch.Data;
                 for (int index = 0; index < source.Count; index++)
@@ -474,6 +486,7 @@ namespace XRay.Importer.Levels
             _windBoundsKey = default;
             _sourceBounds = null;
             _physicalSourceBounds = null;
+            _globalBoundsDirty = true;
             _sourceSplitMasks = null;
             _sourceShadowCounts = null;
             _instanceMasks = null;
@@ -687,8 +700,16 @@ namespace XRay.Importer.Levels
             if (owner == null || owner.GetEntityId() != _cameraId) return default;
             if ((context.cullingLayerMask & (1u << _layer)) == 0u) return default;
             ShadowViews++;
-            PrepareShadowSources(context);
-            WriteCullingOutput(output, true, false, out int commands, out int submittedInstances, out _);
+            using (SHADOW_SELECT_MARKER.Auto())
+            {
+                PrepareShadowSources(context);
+            }
+            int commands;
+            int submittedInstances;
+            using (SHADOW_OUTPUT_MARKER.Auto())
+            {
+                WriteCullingOutput(output, true, false, out commands, out submittedInstances, out _);
+            }
             LastShadowCommands += commands;
             LastShadowInstances += submittedInstances;
             return default;
@@ -803,7 +824,12 @@ namespace XRay.Importer.Levels
                     valid = Finite(plane.normal) && float.IsFinite(plane.distance) && float.IsFinite(magnitude) && magnitude > 0f;
                 }
             }
-            if (valid)
+            bool useCombined = valid && context.cullingSplits.Length == POINT_SHADOW_SPLITS;
+            if (useCombined)
+            {
+                SelectPointShadowSources(context);
+            }
+            else if (valid)
             {
                 for (int splitIndex = 0; splitIndex < context.cullingSplits.Length; splitIndex++)
                 {
@@ -856,9 +882,72 @@ namespace XRay.Importer.Levels
             }
         }
 
+        private void SelectPointShadowSources(BatchCullingContext context)
+        {
+            int length = context.cullingPlanes.Length;
+            if (_planes.Length < length)
+            {
+                _planes = new Plane[Mathf.NextPowerOfTwo(length)];
+            }
+            NativeArray<Plane>.Copy(context.cullingPlanes, _planes, length);
+            for (int splitIndex = 0; splitIndex < POINT_SHADOW_SPLITS; splitIndex++)
+            {
+                CullingSplit split = context.cullingSplits[splitIndex];
+                _pointShadowStarts[splitIndex] = split.cullingPlaneOffset;
+                _pointShadowCounts[splitIndex] = split.cullingPlaneCount;
+            }
+
+            _index.SelectShadowSplits(_planes, _pointShadowStarts, _pointShadowCounts, _wind, _sourceSplitMasks);
+            VisitedNodes += _index.VisitedNodes;
+            for (int candidate = 0; candidate < _index.SelectedCount; candidate++)
+            {
+                int sourceIndex = _index.SelectedSource(candidate);
+                Source source = _sources[sourceIndex];
+                if (!source.CastShadows)
+                {
+                    _sourceSplitMasks[sourceIndex] = 0;
+                    continue;
+                }
+                if (source.Count == 1)
+                {
+                    _instanceMasks[source.Start] = 1;
+                    _sourceShadowCounts[sourceIndex] = 1;
+                    continue;
+                }
+
+                ushort mask = _sourceSplitMasks[sourceIndex];
+                float height = source.Wind ? _sourceBounds[sourceIndex].size.y : 0f;
+                int count = 0;
+                int end = source.Start + source.Count;
+                for (int index = source.Start; index < end; index++)
+                {
+                    Bounds bounds = _instanceBounds[index];
+                    if (source.Wind)
+                    {
+                        bounds = XRayFloraWindBounds.Expand(bounds, _wind, height);
+                    }
+                    Vector3 center = bounds.center;
+                    Vector3 extents = bounds.extents;
+                    for (int split = 0; split < POINT_SHADOW_SPLITS; split++)
+                    {
+                        if ((mask & (1 << split)) == 0 || !_index.IntersectsPreparedShadowSplit(center, extents, _pointShadowStarts[split], _pointShadowCounts[split]))
+                        {
+                            continue;
+                        }
+                        _instanceMasks[index] = 1;
+                        count++;
+                        break;
+                    }
+                }
+                _sourceShadowCounts[sourceIndex] = count;
+            }
+        }
+
         private Bounds CurrentGlobalBounds()
         {
             if (_wind == null) return _globalBounds;
+            var key = new XRayFloraWindBounds.SnapshotKey(_wind);
+            if (!_globalBoundsDirty && _globalBoundsKey.Equals(key)) return _cachedGlobalBounds;
             Bounds bounds = default;
             Vector3 minimum = Vector3.zero;
             Vector3 maximum = Vector3.zero;
@@ -877,6 +966,9 @@ namespace XRay.Importer.Levels
                 maximum = Vector3.Max(maximum, sourceBounds.max);
             }
             if (!TryEnclosePhysicalBounds(ref bounds, minimum, maximum)) return new Bounds(new Vector3(float.NaN, float.NaN, float.NaN), Vector3.zero);
+            _globalBoundsKey = key;
+            _cachedGlobalBounds = bounds;
+            _globalBoundsDirty = false;
             return bounds;
         }
 
@@ -985,9 +1077,10 @@ namespace XRay.Importer.Levels
             }
         }
 
-        private static bool Intersects(Plane[] planes, int count, Bounds bounds)
+        private static bool Intersects(Plane[] planes, int count, Bounds bounds, int start = 0)
         {
-            for (int index = 0; index < count; index++)
+            int end = start + count;
+            for (int index = start; index < end; index++)
             {
                 Plane plane = planes[index];
                 Vector3 normal = plane.normal;

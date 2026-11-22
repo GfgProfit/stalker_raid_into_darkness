@@ -7,6 +7,7 @@ namespace XRay.Importer.Levels
     public sealed class XRayInstanceVisibilityIndex
     {
         private const int NODE_DATA_BYTES = 48;
+        private const int SHADOW_PLANE_BYTES = 28;
         private const float PLANE_ROUNDING_MARGIN = 0.00001f;
         private const float BOUNDS_ROUNDING_MARGIN = 0.000002f;
 
@@ -15,6 +16,7 @@ namespace XRay.Importer.Levels
         private int _revision = -1;
         private Bounds[] _conservativeBounds;
         private int _boundsRevision;
+        private ShadowPlane[] _shadowPlanes = Array.Empty<ShadowPlane>();
         private Node[] _nodes = Array.Empty<Node>();
         private Bounds[] _windBounds = Array.Empty<Bounds>();
         private int[] _windBoundsStamps = Array.Empty<int>();
@@ -33,7 +35,7 @@ namespace XRay.Importer.Levels
 
         public int VisitedNodes { get; private set; }
         public int SelectedCount { get; private set; }
-        public long MemoryBytes => (long)_nodes.Length * NODE_DATA_BYTES + (long)_windBounds.Length * 24L + (long)_windBoundsStamps.Length * sizeof(int) + _windBoundsInvalid.Length + (long)_order.Length * sizeof(int) + _selected.Length + (long)_selectedSources.Length * sizeof(int);
+        public long MemoryBytes => (long)_nodes.Length * NODE_DATA_BYTES + (long)_shadowPlanes.Length * SHADOW_PLANE_BYTES + (long)_windBounds.Length * 24L + (long)_windBoundsStamps.Length * sizeof(int) + _windBoundsInvalid.Length + (long)_order.Length * sizeof(int) + _selected.Length + (long)_selectedSources.Length * sizeof(int);
 
         public void Ensure(XRayInstanceBatchSet set)
         {
@@ -51,6 +53,7 @@ namespace XRay.Importer.Levels
                 _conservativeBounds = null;
                 _boundsRevision = 0;
                 _nodes = Array.Empty<Node>();
+                _shadowPlanes = Array.Empty<ShadowPlane>();
                 _windBounds = Array.Empty<Bounds>();
                 _windBoundsStamps = Array.Empty<int>();
                 _windBoundsInvalid = Array.Empty<bool>();
@@ -104,6 +107,31 @@ namespace XRay.Importer.Levels
         {
             _planes = planes;
             _planeCount = planeCount;
+            PrepareWindBounds(wind);
+            _validPlanes = ValidPlanes(planes, planeCount);
+            _selectionValid = true;
+            VisitedNodes = 0;
+            SelectedCount = 0;
+            Array.Clear(_selected, 0, _selected.Length);
+            if (_nodeCount > 0) Visit(0);
+        }
+
+        internal void SelectShadowSplits(Plane[] planes, int[] starts, int[] counts, XRayFloraWindState wind, ushort[] masks)
+        {
+            PrepareWindBounds(wind);
+            _selectionValid = false;
+            VisitedNodes = 0;
+            SelectedCount = 0;
+            if (_nodeCount > 0)
+            {
+                ushort allSplits = (ushort)((1 << starts.Length) - 1);
+                PackShadowPlanes(planes, starts, counts);
+                VisitShadowSplits(0, allSplits, 0, starts, counts, masks);
+            }
+        }
+
+        private void PrepareWindBounds(XRayFloraWindState wind)
+        {
             _wind = wind;
             var key = new XRayFloraWindBounds.SnapshotKey(wind);
             if (_windBoundsStamp == 0 || !_windBoundsKey.Equals(key))
@@ -116,12 +144,6 @@ namespace XRay.Importer.Levels
                 else _windBoundsStamp++;
                 _windBoundsKey = key;
             }
-            _validPlanes = ValidPlanes(planes, planeCount);
-            _selectionValid = true;
-            VisitedNodes = 0;
-            SelectedCount = 0;
-            Array.Clear(_selected, 0, _selected.Length);
-            if (_nodeCount > 0) Visit(0);
         }
 
         public bool IsCandidate(int sourceIndex)
@@ -204,20 +226,12 @@ namespace XRay.Importer.Levels
         {
             VisitedNodes++;
             Node node = _nodes[index];
-            if (_windBoundsStamps[index] != _windBoundsStamp)
-            {
-                Bounds expanded = XRayFloraWindBounds.Expand(node.Bounds, _wind, node.SourceHeight);
-                _windBounds[index] = expanded;
-                _windBoundsInvalid[index] = node.Invalid || !FiniteBounds(expanded);
-                _windBoundsStamps[index] = _windBoundsStamp;
-            }
-            Bounds bounds = _windBounds[index];
-            if (_windBoundsInvalid[index])
+            if (!TryGetNodeBounds(index, node, out Bounds bounds))
             {
                 Mark(node);
                 return;
             }
-            int visibility = CameraVisibility(bounds);
+            int visibility = _validPlanes ? CameraVisibility(bounds, _planes, 0, _planeCount) : 1;
             if (visibility > 0)
             {
                 Mark(node);
@@ -233,6 +247,119 @@ namespace XRay.Importer.Levels
             Visit(node.Right);
         }
 
+        private void VisitShadowSplits(int index, ushort pending, ushort inside, int[] starts, int[] counts, ushort[] masks)
+        {
+            VisitedNodes++;
+            Node node = _nodes[index];
+            if (TryGetNodeBounds(index, node, out Bounds bounds))
+            {
+                Vector3 center = bounds.center;
+                Vector3 extent = bounds.extents;
+                for (int split = 0; split < starts.Length; split++)
+                {
+                    ushort bit = (ushort)(1 << split);
+                    if ((pending & bit) == 0)
+                    {
+                        continue;
+                    }
+                    int visibility = PackedShadowVisibility(center, extent, starts[split], counts[split]);
+                    if (visibility != 0)
+                    {
+                        pending &= (ushort)~bit;
+                        if (visibility > 0)
+                        {
+                            inside |= bit;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                inside |= pending;
+                pending = 0;
+            }
+
+            if (pending != 0 && node.Count > 1)
+            {
+                VisitShadowSplits(node.Left, pending, inside, starts, counts, masks);
+                VisitShadowSplits(node.Right, pending, inside, starts, counts, masks);
+                return;
+            }
+
+            ushort accepted = (ushort)(pending | inside);
+            if (accepted == 0)
+            {
+                return;
+            }
+            for (int offset = node.Start; offset < node.Start + node.Count; offset++)
+            {
+                int source = _order[offset];
+                masks[source] = accepted;
+                _selectedSources[SelectedCount++] = source;
+            }
+        }
+
+
+        private void PackShadowPlanes(Plane[] planes, int[] starts, int[] counts)
+        {
+            if (_shadowPlanes.Length < planes.Length)
+            {
+                _shadowPlanes = new ShadowPlane[planes.Length];
+            }
+            for (int split = 0; split < starts.Length; split++)
+            {
+                int end = starts[split] + counts[split];
+                for (int index = starts[split]; index < end; index++)
+                {
+                    _shadowPlanes[index] = new ShadowPlane(planes[index]);
+                }
+            }
+        }
+
+        internal bool IntersectsPreparedShadowSplit(Vector3 center, Vector3 extents, int start, int count)
+        {
+            int end = start + count;
+            for (int index = start; index < end; index++)
+            {
+                ref readonly ShadowPlane plane = ref _shadowPlanes[index];
+                float radius = plane.AbsoluteNormal.x * extents.x + plane.AbsoluteNormal.y * extents.y + plane.AbsoluteNormal.z * extents.z;
+                float distance = Vector3.Dot(plane.Normal, center) + plane.Distance + radius;
+                if (!float.IsFinite(distance)) return true;
+                if (distance < -0.00001f) return false;
+            }
+            return true;
+        }
+
+        private int PackedShadowVisibility(Vector3 center, Vector3 extent, int start, int count)
+        {
+            bool inside = true;
+            int end = start + count;
+            for (int index = start; index < end; index++)
+            {
+                ref readonly ShadowPlane plane = ref _shadowPlanes[index];
+                float distance = Vector3.Dot(plane.Normal, center) + plane.Distance;
+                float radius = plane.AbsoluteNormal.x * extent.x + plane.AbsoluteNormal.y * extent.y + plane.AbsoluteNormal.z * extent.z;
+                if (!float.IsFinite(distance) || !float.IsFinite(radius)) return 0;
+                float margin = PLANE_ROUNDING_MARGIN * (1f + Mathf.Abs(distance) + radius);
+                if (distance < -radius - margin) return -1;
+                if (distance < radius + margin) inside = false;
+            }
+            return inside ? 1 : 0;
+        }
+
+        private bool TryGetNodeBounds(int index, Node node, out Bounds bounds)
+        {
+            if (_windBoundsStamps[index] != _windBoundsStamp)
+            {
+                Bounds expanded = XRayFloraWindBounds.Expand(node.Bounds, _wind, node.SourceHeight);
+                _windBounds[index] = expanded;
+                _windBoundsInvalid[index] = node.Invalid || !FiniteBounds(expanded);
+                _windBoundsStamps[index] = _windBoundsStamp;
+            }
+            bounds = _windBounds[index];
+            return !_windBoundsInvalid[index];
+        }
+
         private void Mark(Node node)
         {
             for (int offset = node.Start; offset < node.Start + node.Count; offset++) SelectSource(_order[offset]);
@@ -245,15 +372,15 @@ namespace XRay.Importer.Levels
             _selectedSources[SelectedCount++] = sourceIndex;
         }
 
-        private int CameraVisibility(Bounds bounds)
+        private static int CameraVisibility(Bounds bounds, Plane[] planes, int start, int count)
         {
-            if (!_validPlanes) return 1;
             bool inside = true;
             Vector3 center = bounds.center;
             Vector3 extent = bounds.extents;
-            for (int index = 0; index < _planeCount; index++)
+            int end = start + count;
+            for (int index = start; index < end; index++)
             {
-                Plane plane = _planes[index];
+                Plane plane = planes[index];
                 Vector3 normal = plane.normal;
                 float distance = Vector3.Dot(normal, center) + plane.distance;
                 float radius = Mathf.Abs(normal.x) * extent.x + Mathf.Abs(normal.y) * extent.y + Mathf.Abs(normal.z) * extent.z;
@@ -285,6 +412,20 @@ namespace XRay.Importer.Levels
             Vector3 minimum = center - extent;
             Vector3 maximum = center + extent;
             return float.IsFinite(center.x) && float.IsFinite(center.y) && float.IsFinite(center.z) && float.IsFinite(extent.x) && float.IsFinite(extent.y) && float.IsFinite(extent.z) && extent.x >= 0f && extent.y >= 0f && extent.z >= 0f && float.IsFinite(minimum.x) && float.IsFinite(minimum.y) && float.IsFinite(minimum.z) && float.IsFinite(maximum.x) && float.IsFinite(maximum.y) && float.IsFinite(maximum.z);
+        }
+
+        private readonly struct ShadowPlane
+        {
+            public readonly Vector3 Normal;
+            public readonly Vector3 AbsoluteNormal;
+            public readonly float Distance;
+
+            public ShadowPlane(Plane plane)
+            {
+                Normal = plane.normal;
+                AbsoluteNormal = new Vector3(Mathf.Abs(Normal.x), Mathf.Abs(Normal.y), Mathf.Abs(Normal.z));
+                Distance = plane.distance;
+            }
         }
 
         private struct Node

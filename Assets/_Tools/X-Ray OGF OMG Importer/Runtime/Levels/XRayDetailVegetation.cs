@@ -663,8 +663,17 @@ namespace XRay.Importer.Levels
                 }
                 if (scale <= 0.0f) continue;
                 int index = _counts[model];
-                Matrix4x4 matrix = prepared != null ? _population.PreparedMatrix(instance, prepared[instanceIndex], scale) : _population.Matrix(instance, scale);
-                _sourceBuffers[model][index] = new SourceInstance(matrix, matrix);
+                if (prepared != null)
+                {
+                    ref SourceInstance source = ref _sourceBuffers[model][index];
+                    _population.WritePreparedMatrix(in instance, in prepared[instanceIndex], scale, ref source.objectToWorld);
+                    source.prevObjectToWorld = source.objectToWorld;
+                }
+                else
+                {
+                    Matrix4x4 matrix = _population.Matrix(instance, scale);
+                    _sourceBuffers[model][index] = new SourceInstance(matrix, matrix);
+                }
                 _dataBuffers[model][index] = new Vector4(instance.Hemi, _database.Models[model].InverseHeight, _wind ? instance.Wave : 0.0f, instance.Sun);
                 _extraBuffers[model][index] = new Vector4(instance.NormalX, instance.NormalY, instance.NormalZ, cell.Alpha);
                 visible++;
@@ -805,10 +814,10 @@ namespace XRay.Importer.Levels
         }
 
         [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
-        private readonly struct SourceInstance
+        private struct SourceInstance
         {
-            public readonly Matrix4x4 objectToWorld;
-            public readonly Matrix4x4 prevObjectToWorld;
+            public Matrix4x4 objectToWorld;
+            public Matrix4x4 prevObjectToWorld;
 
             public SourceInstance(Matrix4x4 current, Matrix4x4 previous)
             {

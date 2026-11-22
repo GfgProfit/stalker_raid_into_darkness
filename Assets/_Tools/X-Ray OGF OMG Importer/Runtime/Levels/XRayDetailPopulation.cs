@@ -43,25 +43,34 @@ namespace XRay.Importer.Levels
             Rank = rank;
         }
 
+        internal void WriteMatrix(in XRayDetailInstance instance, float scale, bool alignment, ref Matrix4x4 matrix)
+        {
+            Vector3 right = Right;
+            Vector3 forward = Forward;
+            Vector3 normal = alignment ? new Vector3(instance.NormalX, instance.NormalY, instance.NormalZ) : Vector3.up;
+            matrix.m00 = right.x * scale;
+            matrix.m10 = right.y * scale;
+            matrix.m20 = right.z * scale;
+            matrix.m30 = 0.0f;
+            matrix.m01 = normal.x * scale;
+            matrix.m11 = normal.y * scale;
+            matrix.m21 = normal.z * scale;
+            matrix.m31 = 0.0f;
+            matrix.m02 = forward.x * scale;
+            matrix.m12 = forward.y * scale;
+            matrix.m22 = forward.z * scale;
+            matrix.m32 = 0.0f;
+            matrix.m03 = instance.X;
+            matrix.m13 = instance.Y;
+            matrix.m23 = instance.Z;
+            matrix.m33 = 1.0f;
+        }
+
         public Matrix4x4 Matrix(XRayDetailInstance instance, float scale, bool alignment)
         {
-            Vector3 normal = alignment ? new Vector3(instance.NormalX, instance.NormalY, instance.NormalZ) : Vector3.up;
-            return new Matrix4x4
-            {
-                m00 = Right.x * scale,
-                m10 = Right.y * scale,
-                m20 = Right.z * scale,
-                m01 = normal.x * scale,
-                m11 = normal.y * scale,
-                m21 = normal.z * scale,
-                m02 = Forward.x * scale,
-                m12 = Forward.y * scale,
-                m22 = Forward.z * scale,
-                m03 = instance.X,
-                m13 = instance.Y,
-                m23 = instance.Z,
-                m33 = 1.0f
-            };
+            Matrix4x4 matrix = default;
+            WriteMatrix(in instance, scale, alignment, ref matrix);
+            return matrix;
         }
     }
 
@@ -467,6 +476,11 @@ namespace XRay.Importer.Levels
         public Matrix4x4 Matrix(XRayDetailInstance instance, float scale)
         {
             return MatrixFor(instance, scale, _alignment);
+        }
+
+        internal void WritePreparedMatrix(in XRayDetailInstance instance, in XRayPreparedDetail prepared, float scale, ref Matrix4x4 matrix)
+        {
+            prepared.WriteMatrix(in instance, scale, _alignment, ref matrix);
         }
 
         internal Matrix4x4 PreparedMatrix(XRayDetailInstance instance, XRayPreparedDetail prepared, float scale)

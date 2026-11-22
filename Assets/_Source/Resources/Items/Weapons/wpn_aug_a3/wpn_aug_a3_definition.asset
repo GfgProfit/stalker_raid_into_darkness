@@ -26,7 +26,7 @@ MonoBehaviour:
   _backgroundColor: {r: 1, g: 1, b: 1, a: 0.04}
   _fallbackIcon: {fileID: 0}
   _iconOverride: {fileID: 0}
-  _visualPrefab: {fileID: 4452049312883513666, guid: 261ddaccf4301cb4f89dc914f8ccbf26, type: 3}
+  _visualPrefab: {fileID: 4618218789475996202, guid: 85896390c81578542bb9ff5e65b122e1, type: 3}
   _defaultIconVariant: []
   _icon:
     _generateIcon: 1
@@ -142,7 +142,7 @@ MonoBehaviour:
     - rid: 3479885495948804098
       type: {class: WeaponHudComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
       data:
-        _hudModel: {fileID: 4618218789475996202, guid: 11c183dedd4743e4c994e0706a708472, type: 3}
+        _hudModel: {fileID: 4618218789475996202, guid: 85896390c81578542bb9ff5e65b122e1, type: 3}
         _weaponMotions: {fileID: 8815230551390286010, guid: de218cc4279183b42bbc34ce8ff53704, type: 3}
         _handsMotions: {fileID: 8815230551390286010, guid: 2ab83c2c707a9c24dbaeeadd5aae2a22, type: 3}
         _handsMotionPrefix: aug_

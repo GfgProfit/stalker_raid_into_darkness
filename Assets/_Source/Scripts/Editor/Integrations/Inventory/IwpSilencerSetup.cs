@@ -17,6 +17,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
     {
         private const string SOUND_FOLDER = IwpWeaponSetup.AUDIO_FOLDER + "/";
         private const string ITEM_SOUND_FOLDER = "Assets/_Source/Audio/Inventory/";
+        private const string SILENCER_COLLISION_NAME = "SilencerCollision";
 
         public static string LastResult { get; private set; }
         public static bool IsBaking { get; private set; }
@@ -38,8 +39,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
                 throw new InvalidOperationException("Missing NATO silencer definition: " + silencerPath);
             }
 
-            ConfigureVisual(IwpWeaponSetup.WORLD_VISUAL_PATH, silencer, false);
-            ConfigureVisual(IwpWeaponSetup.HUD_VISUAL_PATH, silencer, true);
+            ConfigureVisual(IwpWeaponSetup.PREFAB_PATH, silencer);
             Directory.CreateDirectory(SOUND_FOLDER);
             var clips = new List<AudioClip>();
 
@@ -93,13 +93,14 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
             }
         }
 
-        private static void ConfigureVisual(string path, ItemDefinition silencer, bool hud)
+        private static void ConfigureVisual(string path, ItemDefinition silencer)
         {
             GameObject root = PrefabUtility.LoadPrefabContents(path);
 
             try
             {
-                Transform visual = Array.Find(root.GetComponentsInChildren<Transform>(true), child => child.name == "silencer");
+                GameObject weaponVisual = WorldItemPrefabBuilder.GetWeaponVisual(root);
+                Transform visual = Array.Find(weaponVisual.GetComponentsInChildren<Transform>(true), child => child.name == "silencer");
 
                 if (visual == null || visual.parent == null || visual.parent.name != WeaponHudComponent.SILENCER_BONE)
                 {
@@ -124,20 +125,13 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
                     }
                 }
 
-                if (hud == false)
-                {
-                    Bounds bounds = VisualBounds(visual);
-                    BoxCollider collider = visual.gameObject.AddComponent<BoxCollider>();
-                    collider.center = bounds.center;
-                    collider.size = Vector3.Max(bounds.size, Vector3.one * 0.001f);
-                }
-
+                ConfigureWorldCollider(root, visual);
                 visual.gameObject.SetActive(false);
-                ItemIconVariantPart part = root.GetComponent<ItemIconVariantPart>();
+                ItemIconVariantPart part = Array.Find(weaponVisual.GetComponents<ItemIconVariantPart>(), variantPart => variantPart.Part == silencer);
 
                 if (part == null)
                 {
-                    part = root.AddComponent<ItemIconVariantPart>();
+                    part = weaponVisual.AddComponent<ItemIconVariantPart>();
                 }
 
                 part.SetData(silencer, "silencer", new[] { visual.gameObject }, Array.Empty<GameObject>());
@@ -145,20 +139,16 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
                 variant.FindProperty("_sizeDelta").vector2IntValue = Vector2Int.right;
                 variant.ApplyModifiedPropertiesWithoutUndo();
 
-                if (hud)
+                FirstPersonWeaponView view = weaponVisual.GetComponent<FirstPersonWeaponView>();
+
+                if (view == null)
                 {
-                    FirstPersonWeaponView view = root.GetComponent<FirstPersonWeaponView>();
-
-                    if (view == null)
-                    {
-                        throw new InvalidOperationException("Missing FirstPersonWeaponView in " + path);
-                    }
-
-                    var serialized = new SerializedObject(view);
-                    serialized.FindProperty("_silencerVisual").objectReferenceValue = visual.gameObject;
-
-                    serialized.ApplyModifiedPropertiesWithoutUndo();
+                    throw new InvalidOperationException("Missing FirstPersonWeaponView in " + path);
                 }
+
+                var serialized = new SerializedObject(view);
+                serialized.FindProperty("_silencerVisual").objectReferenceValue = visual.gameObject;
+                serialized.ApplyModifiedPropertiesWithoutUndo();
 
                 PrefabUtility.SaveAsPrefabAsset(root, path);
             }
@@ -166,6 +156,28 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
             {
                 PrefabUtility.UnloadPrefabContents(root);
             }
+        }
+
+        private static void ConfigureWorldCollider(GameObject root, Transform visual)
+        {
+            Transform existing = root.transform.Find(SILENCER_COLLISION_NAME);
+            GameObject collision = existing != null ? existing.gameObject : new GameObject(SILENCER_COLLISION_NAME);
+            collision.transform.SetParent(root.transform, false);
+            collision.SetActive(false);
+            BoxCollider collider = collision.GetComponent<BoxCollider>();
+
+            if (collider == null)
+            {
+                collider = collision.AddComponent<BoxCollider>();
+            }
+
+            Bounds bounds = VisualBounds(visual);
+            collider.center = bounds.center;
+            collider.size = Vector3.Max(bounds.size, Vector3.one * 0.001f);
+            var world = new SerializedObject(root.GetComponent<WorldItem>());
+            world.FindProperty("_silencerVisual").objectReferenceValue = visual.gameObject;
+            world.FindProperty("_silencerCollider").objectReferenceValue = collider;
+            world.ApplyModifiedPropertiesWithoutUndo();
         }
 
         private static Bounds VisualBounds(Transform visual)

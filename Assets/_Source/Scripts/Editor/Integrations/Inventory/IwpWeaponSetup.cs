@@ -32,13 +32,11 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
         public const string HANDS_MOTION_PREFIX = "aug_";
 
         internal const string WEAPON_FOLDER = WEAPONS_FOLDER + "/" + SECTION;
-        internal const string WORLD_VISUAL_PATH = WEAPON_FOLDER + "/" + SECTION + "_world_visual.prefab";
-        internal const string HUD_VISUAL_PATH = WEAPON_FOLDER + "/" + SECTION + "_hud_visual.prefab";
+        internal const string PREFAB_PATH = WEAPON_FOLDER + "/" + SECTION + ".prefab";
         internal const string WEAPON_MOTIONS_FOLDER = WEAPON_FOLDER + "/Animations/Weapon";
         internal const string AUDIO_FOLDER = WEAPON_FOLDER + "/Audio";
         internal const string SHARED_AUDIO_FOLDER = WEAPONS_FOLDER + "/_Shared Audio";
 
-        private const string WORLD_MODEL = "meshes/dynamics/weapons/wpn_aug/wpn_aug_a3.ogf";
         internal const string HUD_MODEL = "meshes/dynamics/weapons/wpn_aug/wpn_aug_a3_hud.ogf";
         internal const string WEAPON_MOTIONS = "meshes/dynamics/weapons/wpn_aug/wpn_aug_a3_hud_animation.omf";
         internal const string HANDS_MOTIONS = "meshes/dynamics/weapons/wpn_fn2000/wpn_hand_fn2000_hud_animation.omf";
@@ -102,27 +100,25 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
                 return null;
             }
 
-            string worldPath = WEAPON_FOLDER + "/" + Path.GetFileName(WORLD_MODEL);
             string hudPath = WEAPON_FOLDER + "/" + Path.GetFileName(HUD_MODEL);
             string weaponMotionsPath = WEAPON_MOTIONS_FOLDER + "/" + Path.GetFileName(WEAPON_MOTIONS);
             string handsMotionsPath = HANDS_MOTIONS_FOLDER + "/" + Path.GetFileName(HANDS_MOTIONS);
 
-            if (CopyFromIwp(new[] { WORLD_MODEL, HUD_MODEL, WEAPON_MOTIONS, HANDS_MOTIONS }, new[] { worldPath, hudPath, weaponMotionsPath, handsMotionsPath }) == false)
+            if (CopyFromIwp(new[] { HUD_MODEL, WEAPON_MOTIONS, HANDS_MOTIONS }, new[] { hudPath, weaponMotionsPath, handsMotionsPath }) == false)
             {
                 return null;
             }
 
             AssignRig(weaponMotionsPath, hudPath);
             AssignRig(handsMotionsPath, HANDS_RIG_PATH);
-            int textureErrors = GenerateIwpMaterials(new[] { worldPath, hudPath });
-            var worldModel = AssetDatabase.LoadAssetAtPath<GameObject>(worldPath);
+            int textureErrors = GenerateIwpMaterials(new[] { hudPath });
             var hudModel = AssetDatabase.LoadAssetAtPath<GameObject>(hudPath);
             var weaponMotions = AssetDatabase.LoadAssetAtPath<XRayMotionLibrary>(weaponMotionsPath);
             var handsMotions = AssetDatabase.LoadAssetAtPath<XRayMotionLibrary>(handsMotionsPath);
 
-            if (worldModel == null || hudModel == null || weaponMotions == null || handsMotions == null)
+            if (hudModel == null || weaponMotions == null || handsMotions == null)
             {
-                Debug.LogError($"{LOG}IWP assets were not imported: world={worldModel != null}, hud={hudModel != null}, weapon motions={weaponMotions != null}, hands motions={handsMotions != null}.");
+                Debug.LogError($"{LOG}IWP assets were not imported: hud={hudModel != null}, weapon motions={weaponMotions != null}, hands motions={handsMotions != null}.");
                 return null;
             }
 
@@ -131,13 +127,11 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
             failures += ValidateWeaponMotions(weaponMotions, hudModel, log);
             failures += ValidateHandsMotions(handsMotions, log);
             List<string> bones = FindAttachmentBones(hudModel, log);
-            GameObject worldVisual = CreateCleanVisual(worldModel, WORLD_VISUAL_PATH, log);
-            GameObject hudVisual = CreateCleanVisual(hudModel, HUD_VISUAL_PATH, log);
-            ItemDefinition definition = CreateDefinition(system, strings, GraTextFormatter.LoadColors(sources), worldVisual, hudVisual, weaponMotions, handsMotions, bones);
+            ItemDefinition definition = CreateDefinition(system, strings, GraTextFormatter.LoadColors(sources), weaponMotions, handsMotions, bones);
+            WorldItem prefab = WorldItemPrefabBuilder.BuildWeapon(definition, hudModel, visual => ConfigureWeaponVisual(visual, log));
             AddToDatabase(definition);
-            List<WorldItem> prefabs = WorldItemPrefabBuilder.Build(new[] { definition });
             GraInventorySoundSetup.SetupTakeSounds(sources, new[] { definition }, log);
-            bool placed = prefabs.Count == 1 && PlaceInScene(prefabs[0], log);
+            bool placed = PlaceInScene(prefab, log);
             AssetDatabase.SaveAssets();
             Debug.Log($"{LOG}{definition.name}: size {definition.Width}x{definition.Height}, weight {definition.Weight}, attachment bones [{string.Join(", ", bones)}], placed {placed}, failures {failures}.\n{log}");
             return failures == 0 && placed ? definition : null;
@@ -373,42 +367,20 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
             return found;
         }
 
-        private static GameObject CreateCleanVisual(GameObject model, string path, StringBuilder log)
+        private static void ConfigureWeaponVisual(GameObject visual, StringBuilder log)
         {
-            StalkerXRaySources.EnsureFolder(WEAPON_FOLDER);
-            var existing = AssetDatabase.LoadAssetAtPath<GameObject>(path);
-            FirstPersonWeaponView view = existing != null ? existing.GetComponent<FirstPersonWeaponView>() : null;
-            Transform muzzle = view != null ? view.Muzzle : null;
-            string muzzleParent = muzzle != null && muzzle.parent != null ? muzzle.parent.name : null;
-            Vector3 muzzlePosition = muzzle != null ? muzzle.localPosition : Vector3.zero;
-            Quaternion muzzleRotation = muzzle != null ? muzzle.localRotation : Quaternion.identity;
-            var root = (GameObject)PrefabUtility.InstantiatePrefab(model);
             var hidden = new List<string>();
 
-            try
+            foreach (SkinnedMeshRenderer renderer in visual.GetComponentsInChildren<SkinnedMeshRenderer>(true))
             {
-                foreach (SkinnedMeshRenderer renderer in root.GetComponentsInChildren<SkinnedMeshRenderer>(true))
+                if (IsAttachmentMesh(renderer))
                 {
-                    if (IsAttachmentMesh(renderer))
-                    {
-                        renderer.gameObject.SetActive(false);
-                        hidden.Add(renderer.name + " (" + (renderer.sharedMaterial != null ? renderer.sharedMaterial.name : "no material") + ")");
-                    }
+                    renderer.gameObject.SetActive(false);
+                    hidden.Add(renderer.name + " (" + (renderer.sharedMaterial != null ? renderer.sharedMaterial.name : "no material") + ")");
                 }
-
-                if (muzzleParent != null)
-                {
-                    IwpFirstPersonWeaponSetup.CreateMuzzle(root, muzzleParent, muzzlePosition, muzzleRotation);
-                }
-
-                GameObject prefab = PrefabUtility.SaveAsPrefabAsset(root, path);
-                log.AppendLine($"{path}: hidden built-in addon meshes [{string.Join(", ", hidden)}].");
-                return prefab;
             }
-            finally
-            {
-                UnityEngine.Object.DestroyImmediate(root);
-            }
+
+            log.AppendLine($"{visual.name}: hidden built-in addon meshes [{string.Join(", ", hidden)}].");
         }
 
         private static bool IsAttachmentMesh(SkinnedMeshRenderer renderer)
@@ -454,12 +426,14 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
             return false;
         }
 
-        private static ItemDefinition CreateDefinition(XRayLtxDatabase system, XRayStringTable strings, IReadOnlyDictionary<string, Color32> colors, GameObject worldModel, GameObject hudModel, XRayMotionLibrary weaponMotions, XRayMotionLibrary handsMotions, List<string> bones)
+        private static ItemDefinition CreateDefinition(XRayLtxDatabase system, XRayStringTable strings, IReadOnlyDictionary<string, Color32> colors, XRayMotionLibrary weaponMotions, XRayMotionLibrary handsMotions, List<string> bones)
         {
             StalkerXRaySources.EnsureFolder(WEAPON_FOLDER);
             var definition = AssetDatabase.LoadAssetAtPath<ItemDefinition>(DEFINITION_PATH);
 
-            if (definition == null)
+            bool create = definition == null;
+
+            if (create)
             {
                 definition = ScriptableObject.CreateInstance<ItemDefinition>();
                 AssetDatabase.CreateAsset(definition, DEFINITION_PATH);
@@ -480,15 +454,17 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
             serialized.FindProperty("_weight").floatValue = GetFloat(system, "inv_weight");
             serialized.FindProperty("_maxStack").intValue = 1;
             serialized.FindProperty("_allowRotation").boolValue = true;
-            serialized.FindProperty("_visualPrefab").objectReferenceValue = worldModel;
-            ItemIconDefaults.Apply(serialized, ItemIconDefaults.SIDE_VIEW_ANGLES);
+
+            if (create)
+            {
+                ItemIconDefaults.Apply(serialized, ItemIconDefaults.SIDE_VIEW_ANGLES);
+            }
+
             SerializedProperty components = serialized.FindProperty("_components");
-            components.ClearArray();
-            SerializedProperty equippable = AddComponent(components, new EquippableItemComponent());
+            SerializedProperty equippable = GetOrAddComponent<EquippableItemComponent>(components);
             SetStrings(equippable.FindPropertyRelative("_preferredSlotIds"), PREFERRED_SLOTS);
-            FillStats(AddComponent(components, new WeaponStatsComponent()), system);
-            SerializedProperty hud = AddComponent(components, new WeaponHudComponent());
-            hud.FindPropertyRelative("_hudModel").objectReferenceValue = hudModel;
+            FillStats(GetOrAddComponent<WeaponStatsComponent>(components), system);
+            SerializedProperty hud = GetOrAddComponent<WeaponHudComponent>(components);
             hud.FindPropertyRelative("_weaponMotions").objectReferenceValue = weaponMotions;
             hud.FindPropertyRelative("_handsMotions").objectReferenceValue = handsMotions;
             hud.FindPropertyRelative("_handsMotionPrefix").stringValue = HANDS_MOTION_PREFIX;
@@ -538,12 +514,22 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
             stats.FindPropertyRelative("_grenadeLauncherSection").stringValue = excludedLauncher ? string.Empty : launcher;
         }
 
-        private static SerializedProperty AddComponent(SerializedProperty components, ItemDefinitionComponent component)
+        private static SerializedProperty GetOrAddComponent<T>(SerializedProperty components) where T : ItemDefinitionComponent, new()
         {
+            for (int i = 0; i < components.arraySize; i++)
+            {
+                SerializedProperty component = components.GetArrayElementAtIndex(i);
+
+                if (component.managedReferenceValue is T)
+                {
+                    return component;
+                }
+            }
+
             int index = components.arraySize;
             components.arraySize++;
             SerializedProperty element = components.GetArrayElementAtIndex(index);
-            element.managedReferenceValue = component;
+            element.managedReferenceValue = new T();
             return element;
         }
 

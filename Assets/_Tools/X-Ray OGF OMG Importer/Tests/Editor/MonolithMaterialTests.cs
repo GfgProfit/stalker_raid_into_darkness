@@ -88,7 +88,7 @@ namespace XRay.Importer.Tests
         public void AugTestPreservesAtlasAndMaterialAssignments()
         {
             const string FIXTURE_FOLDER = "Assets/_Source/Tests/Weapons/Fixtures/MonolithHDRP";
-            const string MODEL_PATH = "Assets/_Source/Resources/Items/Weapons/wpn_aug_a3/wpn_aug_a3.ogf";
+            const string MODEL_PATH = "Assets/_Source/Tests/Weapons/Fixtures/MonolithHDRP/wpn_aug_a3.ogf";
             const string ALBEDO_PATH = "Assets/_Source/Resources/Items/Weapons/wpn_aug_a3/Textures/aug_a3.png";
             Shader shader = Shader.Find(MonolithMaterialConfigurator.SHADER_NAME);
             Assert.That(shader, Is.Not.Null);

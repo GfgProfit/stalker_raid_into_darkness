@@ -210,9 +210,10 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
                 XRayParticleImporter.Import();
             }
 
-            string hudVisualPath = IwpWeaponSetup.HUD_VISUAL_PATH;
-            ConfigureMuzzle(hudVisualPath, log);
-            var hudVisual = AssetDatabase.LoadAssetAtPath<GameObject>(hudVisualPath);
+            string prefabPath = IwpWeaponSetup.PREFAB_PATH;
+            ConfigureMuzzle(prefabPath, log);
+            var prefabRoot = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
+            GameObject hudVisual = prefabRoot != null ? WorldItemPrefabBuilder.GetWeaponVisual(prefabRoot) : null;
             var handsMotions = AssetDatabase.LoadAssetAtPath<XRayMotionLibrary>(IwpWeaponSetup.HANDS_MOTIONS_FOLDER + "/" + Path.GetFileName(IwpWeaponSetup.HANDS_MOTIONS));
             var a3Motions = AssetDatabase.LoadAssetAtPath<XRayMotionLibrary>(IwpWeaponSetup.WEAPON_MOTIONS_FOLDER + "/" + Path.GetFileName(IwpWeaponSetup.WEAPON_MOTIONS));
             var a1Motions = AssetDatabase.LoadAssetAtPath<XRayMotionLibrary>(a1MotionsPath);
@@ -415,7 +416,8 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
 
             try
             {
-                FirstPersonWeaponView view = root.GetComponent<FirstPersonWeaponView>();
+                GameObject visual = WorldItemPrefabBuilder.GetWeaponVisual(root);
+                FirstPersonWeaponView view = visual.GetComponent<FirstPersonWeaponView>();
 
                 if (view != null && view.Muzzle != null)
                 {
@@ -425,7 +427,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
 
                 Transform bone = null;
 
-                foreach (Transform child in root.GetComponentsInChildren<Transform>(true))
+                foreach (Transform child in visual.GetComponentsInChildren<Transform>(true))
                 {
                     if (child.name == WeaponHudComponent.SILENCER_BONE)
                     {
@@ -433,8 +435,8 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
                     }
                 }
 
-                Quaternion rotation = bone != null ? Quaternion.Inverse(bone.rotation) * root.transform.rotation : Quaternion.identity;
-                CreateMuzzle(root, WeaponHudComponent.SILENCER_BONE, Vector3.zero, rotation);
+                Quaternion rotation = bone != null ? Quaternion.Inverse(bone.rotation) * visual.transform.rotation : Quaternion.identity;
+                CreateMuzzle(visual, WeaponHudComponent.SILENCER_BONE, Vector3.zero, rotation);
                 PrefabUtility.SaveAsPrefabAsset(root, path);
                 log.AppendLine($"{path}: muzzle point created under '{WeaponHudComponent.SILENCER_BONE}'.");
             }

@@ -14,8 +14,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
     public static class IwpScopeSetup
     {
         public const string WEAPON_PATH = IwpWeaponSetup.DEFINITION_PATH;
-        public const string WORLD_VISUAL_PATH = IwpWeaponSetup.WORLD_VISUAL_PATH;
-        public const string HUD_VISUAL_PATH = IwpWeaponSetup.HUD_VISUAL_PATH;
+        public const string WEAPON_PREFAB_PATH = IwpWeaponSetup.PREFAB_PATH;
 
         private const string ARCHIVE_ROOT = "E:/Projects/stalker_raid_into_darkness_Archive";
 
@@ -30,7 +29,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
 
         public static string Inspect()
         {
-            GameObject root = AssetDatabase.LoadAssetAtPath<GameObject>(WORLD_VISUAL_PATH);
+            GameObject root = WorldItemPrefabBuilder.GetWeaponVisual(AssetDatabase.LoadAssetAtPath<GameObject>(WEAPON_PREFAB_PATH));
             Transform bone = FindBone(root, WeaponHudComponent.SCOPE_BONE);
             var result = new StringBuilder();
             PrefabStage stage = PrefabStageUtility.GetCurrentPrefabStage();
@@ -56,7 +55,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
 
             PrefabStage stage = PrefabStageUtility.GetCurrentPrefabStage();
 
-            if (stage != null && (stage.assetPath == WORLD_VISUAL_PATH || stage.assetPath == HUD_VISUAL_PATH))
+            if (stage != null && stage.assetPath == WEAPON_PREFAB_PATH)
             {
                 throw new InvalidOperationException("Close the AUG Prefab Stage before running scope setup. Unsaved changes are preserved.");
             }
@@ -64,21 +63,18 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
             Directory.CreateDirectory(report);
             ItemDefinition weapon = AssetDatabase.LoadAssetAtPath<ItemDefinition>(WEAPON_PATH);
             Backup(WEAPON_PATH, report);
-            Backup(WORLD_VISUAL_PATH, report);
-            Backup(HUD_VISUAL_PATH, report);
-            GameObject world = PrefabUtility.LoadPrefabContents(WORLD_VISUAL_PATH);
-            GameObject hud = null;
+            Backup(WEAPON_PREFAB_PATH, report);
+            GameObject root = PrefabUtility.LoadPrefabContents(WEAPON_PREFAB_PATH);
             var definitions = new List<ItemDefinition>();
             var log = new StringBuilder();
 
             try
             {
-                hud = PrefabUtility.LoadPrefabContents(HUD_VISUAL_PATH);
-                Transform worldBone = FindBone(world, WeaponHudComponent.SCOPE_BONE);
-                Transform hudBone = FindBone(hud, WeaponHudComponent.SCOPE_BONE);
+                GameObject visual = WorldItemPrefabBuilder.GetWeaponVisual(root);
+                Transform scopeBone = FindBone(visual, WeaponHudComponent.SCOPE_BONE);
                 var seen = new HashSet<ItemDefinition>();
 
-                foreach (Transform child in worldBone)
+                foreach (Transform child in scopeBone)
                 {
                     ItemDefinition scope = ResolveDefinition(child.gameObject);
 
@@ -95,37 +91,9 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
                     definitions.Add(scope);
                     Backup(AssetDatabase.GetAssetPath(scope), report);
                     ConfigureAim(scope);
-                    Transform hudScope = hudBone.Find(child.name);
-
-                    if (hudScope == null)
-                    {
-                        GameObject source = PrefabUtility.GetCorrespondingObjectFromSource(child.gameObject);
-
-                        if (source == null)
-                        {
-                            throw new InvalidOperationException("Scope is not a prefab instance: " + child.name);
-                        }
-
-                        hudScope = ((GameObject)PrefabUtility.InstantiatePrefab(source, hudBone)).transform;
-                        PropertyModification[] modifications = PrefabUtility.GetPropertyModifications(child.gameObject);
-
-                        if (modifications != null)
-                        {
-                            PrefabUtility.SetPropertyModifications(hudScope.gameObject, modifications);
-                        }
-
-                        hudScope.name = child.name;
-                        hudScope.localPosition = child.localPosition;
-                        hudScope.localRotation = child.localRotation;
-                        hudScope.localScale = child.localScale;
-                    }
-
                     StripMountedItem(child.gameObject);
-                    StripMountedItem(hudScope.gameObject);
-                    ConfigureVariant(world, scope, child.gameObject);
-                    ConfigureVariant(hud, scope, hudScope.gameObject);
+                    ConfigureVariant(visual, scope, child.gameObject);
                     child.gameObject.SetActive(false);
-                    hudScope.gameObject.SetActive(false);
                     log.AppendLine(scope.name);
                 }
 
@@ -134,24 +102,17 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
                     throw new InvalidOperationException("No scope prefabs found under AUG wpn_scope.");
                 }
 
-                ConfigureDefaults(world);
-                ConfigureDefaults(hud);
+                ConfigureDefaults(visual);
                 ConfigureCompatibility(weapon, definitions);
-                PrefabUtility.SaveAsPrefabAsset(world, WORLD_VISUAL_PATH);
-                PrefabUtility.SaveAsPrefabAsset(hud, HUD_VISUAL_PATH);
+                PrefabUtility.SaveAsPrefabAsset(root, WEAPON_PREFAB_PATH);
             }
             finally
             {
-                if (hud != null)
-                {
-                    PrefabUtility.UnloadPrefabContents(hud);
-                }
-
-                PrefabUtility.UnloadPrefabContents(world);
+                PrefabUtility.UnloadPrefabContents(root);
             }
 
             AssetDatabase.SaveAssets();
-            LastResult = $"Configured {definitions.Count} AUG scopes, world/HUD variants and zero aim offsets.\n{log}";
+            LastResult = $"Configured {definitions.Count} AUG scopes, shared visual variants and zero aim offsets.\n{log}";
             File.WriteAllText(Path.Combine(report, "setup.txt"), LastResult);
             return LastResult;
         }

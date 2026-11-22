@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using Inventory;
@@ -14,6 +15,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
         public const string WORLD_ITEMS_ROOT = "WorldItems";
         public const string PREFABS_FOLDER = "Prefabs";
 
+        private const string WEAPON_VISUAL_NAME = "Visual";
         private const int COLUMNS = 16;
         private const float SPACING = 1.25f;
         private const float FORWARD_OFFSET = 4f;
@@ -44,6 +46,13 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
             foreach (ItemDefinition definition in sorted)
             {
                 string definitionPath = AssetDatabase.GetAssetPath(definition);
+
+                if (IwpWeaponSetup.IsWeaponResourcePath(definitionPath))
+                {
+                    prefabs.Add(BuildWeapon(definition, null, null));
+                    continue;
+                }
+
                 bool itemResource = InventoryDemoContentBuilder.IsItemResourcePath(definitionPath);
                 string modelFolder = Path.GetDirectoryName(AssetDatabase.GetAssetPath(definition.VisualPrefab)).Replace('\\', '/');
                 string folder = itemResource ? Path.GetDirectoryName(definitionPath).Replace('\\', '/') : Path.GetDirectoryName(modelFolder).Replace('\\', '/') + "/" + PREFABS_FOLDER;
@@ -51,13 +60,53 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
                 string itemName = itemResource ? InventoryDemoContentBuilder.GetItemResourceName(definition, definitionPath) : definition.name;
                 string path = itemResource ? $"{folder}/{itemName}_world.prefab" : $"{folder}/{itemName}.prefab";
                 WorldItem prefab = itemResource && !rebuild ? AssetDatabase.LoadAssetAtPath<GameObject>(path)?.GetComponent<WorldItem>() : null;
-                prefab = prefab != null && prefab.Definition == definition ? prefab : CreatePrefab(definition, itemName, path);
+                prefab = prefab != null && prefab.Definition == definition ? prefab : CreatePrefab(definition, itemName, path, definition.VisualPrefab);
                 SetWorldComponent(definition, prefab);
                 prefabs.Add(prefab);
             }
 
             AssetDatabase.SaveAssets();
             return prefabs;
+        }
+
+        internal static WorldItem BuildWeapon(ItemDefinition definition, GameObject model, Action<GameObject> configureVisual)
+        {
+            string definitionPath = AssetDatabase.GetAssetPath(definition);
+            string itemName = InventoryDemoContentBuilder.GetItemResourceName(definition, definitionPath);
+            string folder = Path.GetDirectoryName(definitionPath).Replace('\\', '/');
+            string path = folder + "/" + itemName + ".prefab";
+            GameObject existing = AssetDatabase.LoadAssetAtPath<GameObject>(path);
+
+            if (existing == null && model == null)
+            {
+                throw new InvalidOperationException("Missing weapon prefab: " + path);
+            }
+
+            WorldItem world = existing != null ? existing.GetComponent<WorldItem>() : CreatePrefab(definition, itemName, path, model, visual =>
+            {
+                visual.name = WEAPON_VISUAL_NAME;
+                configureVisual?.Invoke(visual);
+            });
+
+            if (world == null || world.Definition != definition)
+            {
+                throw new InvalidOperationException("Invalid WorldItem in weapon prefab: " + path);
+            }
+
+            SetWorldComponent(definition, world, GetWeaponVisual(world.gameObject));
+            return world;
+        }
+
+        internal static GameObject GetWeaponVisual(GameObject root)
+        {
+            Transform visual = root.transform.Find(WEAPON_VISUAL_NAME);
+
+            if (visual == null)
+            {
+                throw new InvalidOperationException("Missing " + WEAPON_VISUAL_NAME + " in weapon prefab " + root.name);
+            }
+
+            return visual.gameObject;
         }
 
         public static void PlaceInScene(Scene scene, IReadOnlyList<WorldItem> prefabs, Transform anchor)
@@ -264,13 +313,14 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
             return true;
         }
 
-        private static WorldItem CreatePrefab(ItemDefinition definition, string itemName, string path)
+        private static WorldItem CreatePrefab(ItemDefinition definition, string itemName, string path, GameObject visualPrefab, Action<GameObject> configureVisual = null)
         {
             var root = new GameObject(itemName);
 
             try
             {
-                PrefabUtility.InstantiatePrefab(definition.VisualPrefab, root.transform);
+                var visual = (GameObject)PrefabUtility.InstantiatePrefab(visualPrefab, root.transform);
+                configureVisual?.Invoke(visual);
                 Bounds bounds = CalculateBounds(root);
                 var collider = root.AddComponent<BoxCollider>();
                 collider.center = bounds.center;
@@ -309,17 +359,29 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
             return bounds;
         }
 
-        private static void SetWorldComponent(ItemDefinition definition, WorldItem prefab)
+        private static void SetWorldComponent(ItemDefinition definition, WorldItem prefab, GameObject weaponVisual = null)
         {
             var serialized = new SerializedObject(definition);
             SerializedProperty list = serialized.FindProperty("_components");
+
+            if (weaponVisual != null)
+            {
+                serialized.FindProperty("_visualPrefab").objectReferenceValue = weaponVisual;
+            }
+
             int index = -1;
 
             for (int i = 0; i < list.arraySize; i++)
             {
-                if (list.GetArrayElementAtIndex(i).managedReferenceValue is WorldItemComponent)
+                SerializedProperty component = list.GetArrayElementAtIndex(i);
+
+                if (component.managedReferenceValue is WorldItemComponent)
                 {
                     index = i;
+                }
+                else if (weaponVisual != null && component.managedReferenceValue is WeaponHudComponent)
+                {
+                    component.FindPropertyRelative("_hudModel").objectReferenceValue = weaponVisual;
                 }
             }
 

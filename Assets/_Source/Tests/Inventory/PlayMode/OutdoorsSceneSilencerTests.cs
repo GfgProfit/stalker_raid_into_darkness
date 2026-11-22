@@ -128,8 +128,9 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
                 Transform visual = FindChild(dropped.transform, "silencer");
                 Assert.That(visual.gameObject.activeInHierarchy, Is.True);
                 Assert.That(visual.GetComponentsInChildren<MonoBehaviour>(true), Is.Empty);
-                Assert.That(visual.GetComponent<BoxCollider>(), Is.Not.Null);
-                Assert.That(visual.GetComponent<BoxCollider>().size.z, Is.GreaterThan(0.1f));
+                BoxCollider collider = visual.GetComponentInChildren<BoxCollider>();
+                Assert.That(collider, Is.Not.Null);
+                Assert.That(collider.size.z, Is.GreaterThan(0.1f));
                 Assert.That(Object.FindAnyObjectByType<WorldItemInteractor>().TryPickUp(dropped), Is.True);
                 Assert.That(controller.WeaponAttachments.Detach(weapon).Success, Is.True);
                 Assert.That(model.GetItem(silencer.InstanceId), Is.Not.Null);

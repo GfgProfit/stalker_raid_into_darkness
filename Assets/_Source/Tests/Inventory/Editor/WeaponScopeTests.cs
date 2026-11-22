@@ -186,7 +186,11 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
         [Test]
         public void AllCompatibleScopesAreExclusiveInHudWorldAndIconVisuals()
         {
-            GameObject[] prefabs = { _weapon.VisualPrefab, _weapon.GetComponent<WeaponHudComponent>().HudModel, _weapon.GetComponent<WorldItemComponent>().Prefab.gameObject };
+            GameObject visual = _weapon.VisualPrefab;
+            GameObject world = _weapon.GetComponent<WorldItemComponent>().Prefab.gameObject;
+            Assert.That(_weapon.GetComponent<WeaponHudComponent>().HudModel, Is.SameAs(visual));
+            Assert.That(visual.transform.parent.gameObject, Is.SameAs(world));
+            GameObject[] prefabs = { visual, world };
             WeaponStatsComponent stats = _weapon.GetComponent<WeaponStatsComponent>();
             Assert.That(stats.CompatibleScopes.Count, Is.EqualTo(41));
 

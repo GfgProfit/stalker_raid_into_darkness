@@ -1,0 +1,108 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da0f90c2955673d46b25d465cbe44ed0, type: 3}
+  m_Name: ammo_12x70_buck
+  m_EditorClassIdentifier: Inventory::Inventory.ItemDefinition
+  _definitionId: 7df1b314a51042f4686949594cf6b6e7
+  _displayName: "\u041F\u0430\u0442\u0440\u043E\u043D\u044B 12\xD770 \xAB\u041A\u0430\u0440\u0442\u0435\u0447\u044C\xBB"
+  _shortName: "\u041A\u0430\u0440\u0442\u0435\u0447\u044C"
+  _description: "\u0413\u043B\u0430\u0434\u043A\u043E\u0441\u0442\u0432\u043E\u043B\u044C\u043D\u044B\u0439 \u043F\u0430\u0442\u0440\u043E\u043D 12-\u0433\u043E \u043A\u0430\u043B\u0438\u0431\u0440\u0430 \u0441 \u043A\u0430\u0440\u0442\u0435\u0447\u043D\u044B\u043C \u0441\u043D\u0430\u0440\u044F\u0434\u043E\u043C, \u043F\u0440\u0435\u0434\u043D\u0430\u0437\u043D\u0430\u0447\u0435\u043D\u043D\u044B\u0439 \u0434\u043B\u044F \u043F\u043E\u0440\u0430\u0436\u0435\u043D\u0438\u044F \u0446\u0435\u043B\u0435\u0439 \u043D\u0430 \u0431\u043B\u0438\u0436\u043D\u0438\u0445 \u0434\u0438\u0441\u0442\u0430\u043D\u0446\u0438\u044F\u0445. \u0421\u043D\u0430\u0440\u044F\u0436\u0430\u0435\u0442\u0441\u044F \u043D\u0435\u0441\u043A\u043E\u043B\u044C\u043A\u0438\u043C\u0438 \u043A\u0440\u0443\u043F\u043D\u044B\u043C\u0438 \u043C\u0435\u0442\u0430\u043B\u043B\u0438\u0447\u0435\u0441\u043A\u0438\u043C\u0438 \u043A\u0430\u0440\u0442\u0435\u0447\u0438\u043D\u0430\u043C\u0438, \u0440\u0430\u0437\u043C\u0435\u0449\u0451\u043D\u043D\u044B\u043C\u0438 \u0432 \u043F\u043B\u0430\u0441\u0442\u0438\u043A\u043E\u0432\u043E\u0439 \u0433\u0438\u043B\u044C\u0437\u0435 \u0434\u043B\u0438\u043D\u043E\u0439 70 \u043C\u043C \u0441 \u0438\u0441\u043F\u043E\u043B\u044C\u0437\u043E\u0432\u0430\u043D\u0438\u0435\u043C \u043F\u044B\u0436\u0430 \u0438\u043B\u0438 \u043F\u044B\u0436\u0430-\u043A\u043E\u043D\u0442\u0435\u0439\u043D\u0435\u0440\u0430. \u0412 \u0437\u0430\u0432\u0438\u0441\u0438\u043C\u043E\u0441\u0442\u0438 \u043E\u0442 \u043F\u0440\u043E\u0438\u0437\u0432\u043E\u0434\u0438\u0442\u0435\u043B\u044F \u0438 \u0438\u0441\u043F\u043E\u043B\u043D\u0435\u043D\u0438\u044F \u0434\u0438\u0430\u043C\u0435\u0442\u0440 \u043A\u0430\u0440\u0442\u0435\u0447\u0438\u043D \u0441\u043E\u0441\u0442\u0430\u0432\u043B\u044F\u0435\u0442 \u043E\u0442 5,6 \u0434\u043E 8,6 \u043C\u043C, \u0430 \u043E\u0431\u0449\u0430\u044F \u043C\u0430\u0441\u0441\u0430 \u0441\u043D\u0430\u0440\u044F\u0434\u0430 \u2014 \u043F\u0440\u0438\u0431\u043B\u0438\u0437\u0438\u0442\u0435\u043B\u044C\u043D\u043E 28\u201336 \u0433\u0440\u0430\u043C\u043C\u043E\u0432. \u041D\u0430\u0447\u0430\u043B\u044C\u043D\u0430\u044F \u0441\u043A\u043E\u0440\u043E\u0441\u0442\u044C \u043A\u0430\u0440\u0442\u0435\u0447\u0438 \u043E\u0431\u044B\u0447\u043D\u043E \u0441\u043E\u0441\u0442\u0430\u0432\u043B\u044F\u0435\u0442 380\u2013430 \u043C/\u0441. \u041F\u0440\u0438 \u0432\u044B\u0441\u0442\u0440\u0435\u043B\u0435 \u043A\u0430\u0440\u0442\u0435\u0447\u0438\u043D\u044B \u0444\u043E\u0440\u043C\u0438\u0440\u0443\u044E\u0442 \u0440\u0430\u0441\u0445\u043E\u0434\u044F\u0449\u0438\u0439\u0441\u044F \u0441\u043D\u043E\u043F \u043F\u043E\u0440\u0430\u0436\u0430\u044E\u0449\u0438\u0445 \u044D\u043B\u0435\u043C\u0435\u043D\u0442\u043E\u0432, \u043F\u043E\u0437\u0432\u043E\u043B\u044F\u044E\u0449\u0438\u0439 \u043F\u043E\u0440\u0430\u0436\u0430\u0442\u044C \u0446\u0435\u043B\u044C \u043D\u0435\u0441\u043A\u043E\u043B\u044C\u043A\u0438\u043C\u0438 \u043F\u043E\u043F\u0430\u0434\u0430\u043D\u0438\u044F\u043C\u0438 \u043E\u0434\u043D\u043E\u0432\u0440\u0435\u043C\u0435\u043D\u043D\u043E. \u041D\u0430 \u043A\u043E\u0440\u043E\u0442\u043A\u0438\u0445 \u0434\u0438\u0441\u0442\u0430\u043D\u0446\u0438\u044F\u0445 \u043E\u0431\u043B\u0430\u0434\u0430\u0435\u0442 \u0432\u044B\u0441\u043E\u043A\u0438\u043C \u043E\u0441\u0442\u0430\u043D\u0430\u0432\u043B\u0438\u0432\u0430\u044E\u0449\u0438\u043C \u0434\u0435\u0439\u0441\u0442\u0432\u0438\u0435\u043C, \u043E\u0434\u043D\u0430\u043A\u043E \u043F\u043E \u043C\u0435\u0440\u0435 \u0443\u0432\u0435\u043B\u0438\u0447\u0435\u043D\u0438\u044F \u0440\u0430\u0441\u0441\u0442\u043E\u044F\u043D\u0438\u044F \u044D\u0444\u0444\u0435\u043A\u0442\u0438\u0432\u043D\u043E\u0441\u0442\u044C \u0441\u043D\u0438\u0436\u0430\u0435\u0442\u0441\u044F \u0438\u0437-\u0437\u0430 \u0440\u0430\u0441\u0441\u0435\u0438\u0432\u0430\u043D\u0438\u044F \u043A\u0430\u0440\u0442\u0435\u0447\u0438 \u0438 \u043F\u043E\u0442\u0435\u0440\u0438 \u0441\u043A\u043E\u0440\u043E\u0441\u0442\u0438 \u043E\u0442\u0434\u0435\u043B\u044C\u043D\u044B\u043C\u0438 \u044D\u043B\u0435\u043C\u0435\u043D\u0442\u0430\u043C\u0438. \u041F\u043E \u0441\u0440\u0430\u0432\u043D\u0435\u043D\u0438\u044E \u0441 \u043C\u0435\u043B\u043A\u043E\u0439 \u0434\u0440\u043E\u0431\u044C\u044E \u043E\u0442\u043B\u0438\u0447\u0430\u0435\u0442\u0441\u044F \u0431\u043E\u043B\u044C\u0448\u0435\u0439 \u043C\u0430\u0441\u0441\u043E\u0439 \u0438 \u043F\u0440\u043E\u0431\u0438\u0432\u043D\u043E\u0439 \u0441\u043F\u043E\u0441\u043E\u0431\u043D\u043E\u0441\u0442\u044C\u044E \u043E\u0442\u0434\u0435\u043B\u044C\u043D\u044B\u0445 \u043A\u0430\u0440\u0442\u0435\u0447\u0438\u043D, \u043D\u043E \u043C\u0435\u043D\u044C\u0448\u0438\u043C \u043A\u043E\u043B\u0438\u0447\u0435\u0441\u0442\u0432\u043E\u043C \u043F\u043E\u0440\u0430\u0436\u0430\u044E\u0449\u0438\u0445 \u044D\u043B\u0435\u043C\u0435\u043D\u0442\u043E\u0432. \u041F\u0440\u0438\u043C\u0435\u043D\u044F\u0435\u0442\u0441\u044F \u0432 \u043F\u043E\u043C\u043F\u043E\u0432\u044B\u0445, \u0441\u0430\u043C\u043E\u0437\u0430\u0440\u044F\u0434\u043D\u044B\u0445 \u0438 \u0434\u0432\u0443\u0441\u0442\u0432\u043E\u043B\u044C\u043D\u044B\u0445 \u0433\u043B\u0430\u0434\u043A\u043E\u0441\u0442\u0432\u043E\u043B\u044C\u043D\u044B\u0445 \u0440\u0443\u0436\u044C\u044F\u0445 12-\u0433\u043E \u043A\u0430\u043B\u0438\u0431\u0440\u0430 \u0441 \u043F\u0430\u0442\u0440\u043E\u043D\u043D\u0438\u043A\u043E\u043C, \u0440\u0430\u0441\u0441\u0447\u0438\u0442\u0430\u043D\u043D\u044B\u043C \u043D\u0430 \u0441\u043E\u043E\u0442\u0432\u0435\u0442\u0441\u0442\u0432\u0443\u044E\u0449\u0443\u044E \u0434\u043B\u0438\u043D\u0443 \u0433\u0438\u043B\u044C\u0437\u044B. \u041E\u0442\u043B\u0438\u0447\u0430\u0435\u0442\u0441\u044F \u0443\u043D\u0438\u0432\u0435\u0440\u0441\u0430\u043B\u044C\u043D\u043E\u0441\u0442\u044C\u044E, \u0448\u0438\u0440\u043E\u043A\u043E\u0439 \u0440\u0430\u0441\u043F\u0440\u043E\u0441\u0442\u0440\u0430\u043D\u0451\u043D\u043D\u043E\u0441\u0442\u044C\u044E \u0438 \u0432\u044B\u0441\u043E\u043A\u043E\u0439 \u044D\u0444\u0444\u0435\u043A\u0442\u0438\u0432\u043D\u043E\u0441\u0442\u044C\u044E \u043D\u0430 \u043A\u043E\u0440\u043E\u0442\u043A\u0438\u0445 \u0434\u0438\u0441\u0442\u0430\u043D\u0446\u0438\u044F\u0445."
+  _category: Ammo
+  _tags:
+  - Ammo
+  _size: {x: 2, y: 1}
+  _weight: 0.05625
+  _maxStack: 0
+  _allowRotation: 1
+  _backgroundColor: {r: 1, g: 1, b: 1, a: 0.04}
+  _fallbackIcon: {fileID: 0}
+  _iconOverride: {fileID: 520457991, guid: ffbb95c1826004343baca3d552702564, type: 3}
+  _visualPrefab: {fileID: -1598157824635426543, guid: d535259b03044f64f9660ba2ee2ebafe, type: 3}
+  _defaultIconVariant: []
+  _icon:
+    _generateIcon: 0
+    _pixelsPerCell: 64
+    _antiAliasing: 1
+    _useOutline: 0
+    _outlineWidth: 2
+    _useShadow: 1
+    _shadowOffset: {x: 2, y: -2}
+    _shadowBlur: 2
+    _defaultView:
+      _modelEulerAngles: {x: 0, y: 90, z: 0}
+      _modelScale: {x: 1, y: 1, z: 1}
+      _cameraEulerAngles: {x: 0, y: -90, z: 0}
+      _padding: 1.15
+      _useDirectionalLight: 1
+      _lightIntensity: 5
+    _useCustomSlotView: 0
+    _slotView:
+      _modelEulerAngles: {x: 0, y: 90, z: 0}
+      _modelScale: {x: 1, y: 1, z: 1}
+      _cameraEulerAngles: {x: 0, y: -90, z: 0}
+      _padding: 1.15
+      _useDirectionalLight: 1
+      _lightIntensity: 5
+  _components:
+  - rid: 115149063313948980
+  - rid: 115149063313948981
+  - rid: 115149063313949060
+  - rid: 115149063313949094
+  references:
+    version: 2
+    RefIds:
+    - rid: 115149063313948980
+      type: {class: AmmoStatsComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      data:
+        _section: ammo_12x70_buck
+        _boxSize: 8
+        _boxWeight: 0.45
+        _cost: 750
+        _armorPiercing: 0.33
+        _hitMultiplier: 0.25
+        _impulseMultiplier: 11.39
+        _speedMultiplier: 0.929
+        _dispersionMultiplier: 13.5
+        _airResistance: 3.65
+        _buckshot: 9
+        _averageWeaponHitPower: -1
+        _monsterDamageMultiplier: 1
+        _penetration: 22
+        _damagePerProjectile: -1
+        _hasTooltipParameters: 0
+    - rid: 115149063313948981
+      type: {class: ItemTakeSoundComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      data:
+        _category: ammoshell
+        _clips:
+        - {fileID: 8300000, guid: ee0cb86bc88924746a52c92420023b4f, type: 3}
+        - {fileID: 8300000, guid: 8b13077925cc62648b059690f63ffb70, type: 3}
+        - {fileID: 8300000, guid: a7827b06c953fc04cbb67911402fc8c8, type: 3}
+    - rid: 115149063313949060
+      type: {class: WorldItemComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      data:
+        _prefab: {fileID: 6406430477787436207, guid: 3804aee652bcd62408c47c308b834c37, type: 3}
+    - rid: 115149063313949094
+      type: {class: AmmoBallisticsComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      data:
+        _data:
+          _allowRicochet: 1
+          _distanceMultiplier: 0.27
+          _ammoTracerEnabled: 0
+          _ammoTracerMaterial: {fileID: 2100000, guid: 63245ef99c06fa845abd38f65c194c7c, type: 2}
+          _ammoTracerColor: {r: 1, g: 0.50980395, b: 0, a: 1}
+          _ammoTracerWidthMeters: 0.08
+          _ammoTracerTrailDurationSeconds: 0.02
+          _ammoTracerIgnitionDistanceMeters: 70
+          _ammoTracerBurnDurationSeconds: 3
+          _ammoTracerEmissionIntensity: 12
+          _projectileCount: 9

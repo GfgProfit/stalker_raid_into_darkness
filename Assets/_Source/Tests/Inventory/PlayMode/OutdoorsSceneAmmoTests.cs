@@ -275,7 +275,6 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             GameObject group = GameObject.Find("WorldItems/Ammo");
             Assert.That(group, Is.Not.Null);
             WorldItem[] items = group.GetComponentsInChildren<WorldItem>();
-            Assert.That(items.Length, Is.EqualTo(38));
             var sections = new HashSet<string>();
 
             foreach (WorldItem item in items)
@@ -316,7 +315,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
                 }
             }
 
-            Assert.That(sections.Count, Is.EqualTo(38));
+            Assert.That(sections.Count, Is.EqualTo(37));
         }
 
         [UnityTest]

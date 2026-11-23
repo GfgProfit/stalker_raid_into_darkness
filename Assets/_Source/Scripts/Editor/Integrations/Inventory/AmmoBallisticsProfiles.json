@@ -1189,43 +1189,6 @@
       }
     },
     {
-      "_section": "ammo_pkm_100",
-      "_reference": "IWP Standalone Final weapons_ammo.ltx:1039",
-      "_model": "meshes/dynamics/weapons/wpn_ammo/ammo_pkm.ogf",
-      "_displayName": "Короб патронов 7.62x54 мм БТ гж (7БT1)",
-      "_shortName": "7,62x54 БТ (короб)",
-      "_description": "Короб патронов БТ для пулемёта ПКМ.",
-      "_boxSize": 100,
-      "_boxWeight": 3.9,
-      "_gridWidth": 2,
-      "_gridHeight": 1,
-      "_cost": 3700,
-      "_takeSoundCategory": "ammolarge",
-      "_armorPiercing": 1.1,
-      "_hitMultiplier": 0.75,
-      "_impulseMultiplier": 20.0,
-      "_speedMultiplier": 1.006,
-      "_dispersionMultiplier": 1.0,
-      "_airResistance": 1.17,
-      "_data": {
-        "_allowRicochet": true,
-        "_distanceMultiplier": 1.0,
-        "_projectileCount": 1,
-        "_ammoTracerEnabled": true,
-        "_ammoTracerWidthMeters": 0.08,
-        "_ammoTracerTrailDurationSeconds": 0.02,
-        "_ammoTracerIgnitionDistanceMeters": 70,
-        "_ammoTracerBurnDurationSeconds": 3,
-        "_ammoTracerEmissionIntensity": 12,
-        "_ammoTracerColor": {
-          "r": 0.30196078431372547,
-          "g": 1.0,
-          "b": 0.30196078431372547,
-          "a": 1.0
-        }
-      }
-    },
-    {
       "_section": "ammo_og-7b",
       "_reference": "IWP Standalone Final weapons_ammo.ltx:1072",
       "_model": "meshes/dynamics/weapons/wpn_ammo/ammo_og_7b.ogf",

@@ -759,28 +759,6 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ammo_pkm_100
-      rect:
-        serializedVersion: 2
-        x: 600
-        y: 848
-        width: 200
-        height: 100
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 3980eeb9759e6f4419ad6f75d119ac32
-      internalID: -122860704
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
       name: ammo_7.62x54_7h1
       rect:
         serializedVersion: 2
@@ -1243,7 +1221,6 @@ TextureImporter:
       ammo_m397a1: -355704117
       ammo_magnum_300: 483909573
       ammo_og-7b: 1683349813
-      ammo_pkm_100: -122860704
       ammo_vog-25: -1192017093
       ammo_vog-25p: 86540644
   mipmapLimitGroupName: 

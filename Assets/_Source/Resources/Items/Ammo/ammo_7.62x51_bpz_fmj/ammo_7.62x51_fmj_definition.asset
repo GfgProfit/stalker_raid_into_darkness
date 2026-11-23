@@ -1,0 +1,108 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da0f90c2955673d46b25d465cbe44ed0, type: 3}
+  m_Name: ammo_7.62x51_fmj
+  m_EditorClassIdentifier: Inventory::Inventory.ItemDefinition
+  _definitionId: 9b3c2293430e50b4c9929088a3dad5b0
+  _displayName: "\u041F\u0430\u0442\u0440\u043E\u043D\u044B 7.62\xD751 \u043C\u043C \u0411\u041F\u0417 FMJ"
+  _shortName: "\u0411\u041F\u0417 FMJ"
+  _description: "\u0420\u043E\u0441\u0441\u0438\u0439\u0441\u043A\u0438\u0439 \u0432\u0438\u043D\u0442\u043E\u0432\u043E\u0447\u043D\u044B\u0439 \u043F\u0430\u0442\u0440\u043E\u043D \u043A\u0430\u043B\u0438\u0431\u0440\u0430 .308 Winchester (7,62\xD751 \u043C\u043C), \u0432\u044B\u043F\u0443\u0441\u043A\u0430\u0435\u043C\u044B\u0439 \u0411\u0430\u0440\u043D\u0430\u0443\u043B\u044C\u0441\u043A\u0438\u043C \u043F\u0430\u0442\u0440\u043E\u043D\u043D\u044B\u043C \u0437\u0430\u0432\u043E\u0434\u043E\u043C (\u0411\u041F\u0417) \u043F\u043E\u0434 \u0442\u043E\u0440\u0433\u043E\u0432\u043E\u0439 \u043C\u0430\u0440\u043A\u043E\u0439 Barnaul. \u041F\u0440\u0435\u0434\u043D\u0430\u0437\u043D\u0430\u0447\u0435\u043D \u0434\u043B\u044F \u0441\u043F\u043E\u0440\u0442\u0438\u0432\u043D\u043E\u0439, \u0442\u0440\u0435\u043D\u0438\u0440\u043E\u0432\u043E\u0447\u043D\u043E\u0439 \u0438 \u043E\u0445\u043E\u0442\u043D\u0438\u0447\u044C\u0435\u0439 \u0441\u0442\u0440\u0435\u043B\u044C\u0431\u044B \u0438\u0437 \u0441\u043E\u0432\u043C\u0435\u0441\u0442\u0438\u043C\u044B\u0445 \u0441\u0430\u043C\u043E\u0437\u0430\u0440\u044F\u0434\u043D\u044B\u0445 \u0438 \u043C\u0430\u0433\u0430\u0437\u0438\u043D\u043D\u044B\u0445 \u0432\u0438\u043D\u0442\u043E\u0432\u043E\u043A. \u041E\u0441\u043D\u0430\u0449\u0451\u043D \u043E\u0431\u043E\u043B\u043E\u0447\u0435\u0447\u043D\u043E\u0439 \u043F\u0443\u043B\u0435\u0439 FMJ \u043C\u0430\u0441\u0441\u043E\u0439 9,4 \u0433\u0440\u0430\u043C\u043C\u0430 (145 \u0433\u0440\u0430\u043D) \u0441 \u0431\u0438\u043C\u0435\u0442\u0430\u043B\u043B\u0438\u0447\u0435\u0441\u043A\u043E\u0439 \u043E\u0431\u043E\u043B\u043E\u0447\u043A\u043E\u0439 \u0438 \u0441\u0432\u0438\u043D\u0446\u043E\u0432\u044B\u043C \u0441\u0435\u0440\u0434\u0435\u0447\u043D\u0438\u043A\u043E\u043C. \u041D\u0430\u0447\u0430\u043B\u044C\u043D\u0430\u044F \u0441\u043A\u043E\u0440\u043E\u0441\u0442\u044C \u043F\u0443\u043B\u0438 \u0441\u043E\u0441\u0442\u0430\u0432\u043B\u044F\u0435\u0442 \u043E\u043A\u043E\u043B\u043E 815 \u043C/\u0441, \u0434\u0443\u043B\u044C\u043D\u0430\u044F \u044D\u043D\u0435\u0440\u0433\u0438\u044F \u2014 3122 \u0414\u0436 \u043F\u0440\u0438 \u0441\u0442\u0440\u0435\u043B\u044C\u0431\u0435 \u0438\u0437 \u0431\u0430\u043B\u043B\u0438\u0441\u0442\u0438\u0447\u0435\u0441\u043A\u043E\u0433\u043E \u0441\u0442\u0432\u043E\u043B\u0430 \u0434\u043B\u0438\u043D\u043E\u0439 600 \u043C\u043C. \u0421\u0442\u0430\u043B\u044C\u043D\u0430\u044F \u0433\u0438\u043B\u044C\u0437\u0430 \u0438\u043C\u0435\u0435\u0442 \u0437\u0430\u0449\u0438\u0442\u043D\u043E\u0435 \u043F\u043E\u043A\u0440\u044B\u0442\u0438\u0435, \u043F\u0440\u0435\u0434\u043E\u0442\u0432\u0440\u0430\u0449\u0430\u044E\u0449\u0435\u0435 \u043A\u043E\u0440\u0440\u043E\u0437\u0438\u044E \u043F\u0440\u0438 \u0445\u0440\u0430\u043D\u0435\u043D\u0438\u0438 \u0438 \u044D\u043A\u0441\u043F\u043B\u0443\u0430\u0442\u0430\u0446\u0438\u0438. \u0411\u043B\u0430\u0433\u043E\u0434\u0430\u0440\u044F \u043A\u043B\u0430\u0441\u0441\u0438\u0447\u0435\u0441\u043A\u043E\u0439 \u043A\u043E\u043D\u0441\u0442\u0440\u0443\u043A\u0446\u0438\u0438 \u043E\u0431\u043E\u043B\u043E\u0447\u0435\u0447\u043D\u043E\u0439 \u043F\u0443\u043B\u0438 \u043E\u0431\u043B\u0430\u0434\u0430\u0435\u0442 \u0441\u0442\u0430\u0431\u0438\u043B\u044C\u043D\u044B\u043C\u0438 \u0431\u0430\u043B\u043B\u0438\u0441\u0442\u0438\u0447\u0435\u0441\u043A\u0438\u043C\u0438 \u0445\u0430\u0440\u0430\u043A\u0442\u0435\u0440\u0438\u0441\u0442\u0438\u043A\u0430\u043C\u0438 \u0438 \u0445\u043E\u0440\u043E\u0448\u0438\u043C \u043F\u0440\u043E\u0431\u0438\u0432\u043D\u044B\u043C \u0434\u0435\u0439\u0441\u0442\u0432\u0438\u0435\u043C \u043F\u043E \u043B\u0451\u0433\u043A\u0438\u043C \u043F\u0440\u0435\u043F\u044F\u0442\u0441\u0442\u0432\u0438\u044F\u043C, \u043E\u0434\u043D\u0430\u043A\u043E \u043D\u0435 \u043E\u0442\u043D\u043E\u0441\u0438\u0442\u0441\u044F \u043A \u0441\u043F\u0435\u0446\u0438\u0430\u043B\u0438\u0437\u0438\u0440\u043E\u0432\u0430\u043D\u043D\u044B\u043C \u0431\u0440\u043E\u043D\u0435\u0431\u043E\u0439\u043D\u044B\u043C \u0431\u043E\u0435\u043F\u0440\u0438\u043F\u0430\u0441\u0430\u043C. \u041E\u0442\u043B\u0438\u0447\u0430\u0435\u0442\u0441\u044F \u0434\u043E\u0441\u0442\u0443\u043F\u043D\u043E\u0441\u0442\u044C\u044E, \u043F\u0440\u043E\u0441\u0442\u043E\u0439 \u043A\u043E\u043D\u0441\u0442\u0440\u0443\u043A\u0446\u0438\u0435\u0439 \u0438 \u043F\u0440\u0438\u0433\u043E\u0434\u043D\u043E\u0441\u0442\u044C\u044E \u0434\u043B\u044F \u043C\u0430\u0441\u0441\u043E\u0432\u043E\u0439 \u0442\u0440\u0435\u043D\u0438\u0440\u043E\u0432\u043E\u0447\u043D\u043E\u0439 \u0441\u0442\u0440\u0435\u043B\u044C\u0431\u044B."
+  _category: Ammo
+  _tags:
+  - Ammo
+  _size: {x: 2, y: 1}
+  _weight: 0.0255
+  _maxStack: 0
+  _allowRotation: 1
+  _backgroundColor: {r: 1, g: 1, b: 1, a: 0.04}
+  _fallbackIcon: {fileID: 0}
+  _iconOverride: {fileID: 955711474, guid: ffbb95c1826004343baca3d552702564, type: 3}
+  _visualPrefab: {fileID: -6243145352210617191, guid: 892e83b89cfe106408134e4b11ec0146, type: 3}
+  _defaultIconVariant: []
+  _icon:
+    _generateIcon: 0
+    _pixelsPerCell: 64
+    _antiAliasing: 1
+    _useOutline: 0
+    _outlineWidth: 2
+    _useShadow: 1
+    _shadowOffset: {x: 2, y: -2}
+    _shadowBlur: 2
+    _defaultView:
+      _modelEulerAngles: {x: 0, y: 90, z: 0}
+      _modelScale: {x: 1, y: 1, z: 1}
+      _cameraEulerAngles: {x: 0, y: -90, z: 0}
+      _padding: 1.15
+      _useDirectionalLight: 1
+      _lightIntensity: 5
+    _useCustomSlotView: 0
+    _slotView:
+      _modelEulerAngles: {x: 0, y: 90, z: 0}
+      _modelScale: {x: 1, y: 1, z: 1}
+      _cameraEulerAngles: {x: 0, y: -90, z: 0}
+      _padding: 1.15
+      _useDirectionalLight: 1
+      _lightIntensity: 5
+  _components:
+  - rid: 115149063313949028
+  - rid: 115149063313949029
+  - rid: 115149063313949076
+  - rid: 115149063313949118
+  references:
+    version: 2
+    RefIds:
+    - rid: 115149063313949028
+      type: {class: AmmoStatsComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      data:
+        _section: ammo_7.62x51_fmj
+        _boxSize: 20
+        _boxWeight: 0.51
+        _cost: 1000
+        _armorPiercing: 0.88
+        _hitMultiplier: 0.56
+        _impulseMultiplier: 15.75
+        _speedMultiplier: 0.905
+        _dispersionMultiplier: 1
+        _airResistance: 1.33
+        _buckshot: 1
+        _averageWeaponHitPower: -1
+        _monsterDamageMultiplier: 1
+        _penetration: 59
+        _damagePerProjectile: -1
+        _hasTooltipParameters: 0
+    - rid: 115149063313949029
+      type: {class: ItemTakeSoundComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      data:
+        _category: ammolarge
+        _clips:
+        - {fileID: 8300000, guid: ee0bff93b001d4a47b84688a3735b533, type: 3}
+        - {fileID: 8300000, guid: af16938bf1330cb488994004d4df86b1, type: 3}
+        - {fileID: 8300000, guid: db9d17fa52c8c16449a42dc3f0f089cd, type: 3}
+    - rid: 115149063313949076
+      type: {class: WorldItemComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      data:
+        _prefab: {fileID: 9184634806352820979, guid: b53e83758c447314b985361c5a2860ab, type: 3}
+    - rid: 115149063313949118
+      type: {class: AmmoBallisticsComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      data:
+        _data:
+          _allowRicochet: 1
+          _distanceMultiplier: 1
+          _ammoTracerEnabled: 1
+          _ammoTracerMaterial: {fileID: 2100000, guid: 63245ef99c06fa845abd38f65c194c7c, type: 2}
+          _ammoTracerColor: {r: 0.3019608, g: 1, b: 0.3019608, a: 1}
+          _ammoTracerWidthMeters: 0.08
+          _ammoTracerTrailDurationSeconds: 0.02
+          _ammoTracerIgnitionDistanceMeters: 70
+          _ammoTracerBurnDurationSeconds: 3
+          _ammoTracerEmissionIntensity: 12
+          _projectileCount: 1

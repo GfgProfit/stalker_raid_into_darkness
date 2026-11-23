@@ -732,7 +732,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
                 Assert.That(addons.ContainsKey(scope), Is.True, scope + " (optics / thermal) is missing");
             }
 
-            foreach (string scope in new[] { "0kp2", "rmr", "exps3" })
+            foreach (string scope in new[] { "rmr", "exps3" })
             {
                 foreach (Renderer renderer in addons[scope].VisualPrefab.GetComponentsInChildren<Renderer>(true))
                 {

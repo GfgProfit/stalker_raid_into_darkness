@@ -21,7 +21,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
 
         private const string SCENE_PATH = "Assets/TEST_SCENE.unity";
         private const string SCENE_GROUP = "Ammo";
-        private const string SCOPE_TEMPLATE = "Assets/_Source/Resources/Items/Addons/Scopes/0kp2/0kp2_definition.asset";
+        private const string SCOPE_TEMPLATE_GUID = "867a7f373388760469fc24ccebf9f005";
         private const string AUG_DEFINITION = IwpWeaponSetup.DEFINITION_PATH;
         private const string SHARED_AUDIO_FOLDER = AMMO_FOLDER + "/_Shared Audio";
         private const uint OGF_DESCRIPTION_CHUNK = 0x12;
@@ -103,7 +103,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
         public static int BuildItems()
         {
             Catalog catalog = LoadCatalog();
-            var scope = AssetDatabase.LoadAssetAtPath<ItemDefinition>(SCOPE_TEMPLATE);
+            var scope = AssetDatabase.LoadAssetAtPath<ItemDefinition>(AssetDatabase.GUIDToAssetPath(SCOPE_TEMPLATE_GUID));
             var database = AssetDatabase.LoadAssetAtPath<ItemDatabase>(InventoryDemoContentBuilder.DATABASE_PATH);
             var weapon = AssetDatabase.LoadAssetAtPath<ItemDefinition>(AUG_DEFINITION);
             if (scope == null || database == null || weapon == null)

@@ -192,9 +192,14 @@ MonoBehaviour:
   _aimIdle: {fileID: 4908183818744415850, guid: 72ac7377c6e3e204796c215d12d1686c, type: 3}
   _aimEnd: {fileID: 4908183818744415850, guid: 617291d402f16084697b43b8cc200f52, type: 3}
   _crossFade: 0.15
+  _grenadeAimOffsetPosition: {x: 0, y: 0, z: 0}
+  _grenadeAimOffsetRotation: {x: 0, y: 0, z: 0}
+  _grenadeAimStart: {fileID: 0}
+  _grenadeAimIdle: {fileID: 0}
+  _grenadeAimEnd: {fileID: 0}
   _roundsPerMinute: 680
   _emptyClicksPerMinute: 200
-  _fireModes: 01000000ffffffff
+  _fireModes: 01000000ffffffffi
   _magazineSize: 30
   _flameParticles: {fileID: 1638134696978131575, guid: 888c61a587273744db3b3f256cc07bf2, type: 3}
   _smokeParticles: {fileID: 0}

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Inventory;
 using Inventory.IconGeneration;
 using Inventory.UI;
@@ -192,7 +193,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             Assert.That(visual.transform.parent.gameObject, Is.SameAs(world));
             GameObject[] prefabs = { visual, world };
             WeaponStatsComponent stats = _weapon.GetComponent<WeaponStatsComponent>();
-            Assert.That(stats.CompatibleScopes.Count, Is.EqualTo(41));
+            Assert.That(stats.CompatibleScopes.Count, Is.EqualTo(37));
 
             foreach (GameObject prefab in prefabs)
             {
@@ -297,7 +298,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
         public void IconVariantsContainEveryScopeWithAndWithoutSilencer()
         {
             List<string[]> variants = ItemIconVariantEnumeration.EnumerateVariants(_weapon);
-            Assert.That(variants.Count, Is.EqualTo(84));
+            Assert.That(variants.Count, Is.EqualTo(76));
             string silencer = LoadSilencer().DefinitionId;
 
             foreach (ItemDefinition scope in _weapon.GetComponent<WeaponStatsComponent>().CompatibleScopes)
@@ -314,9 +315,9 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             return item;
         }
 
-        private static ItemDefinition LoadScope(string name) => Resources.Load<ItemDefinition>("Items/Addons/Scopes/" + name + "/" + name + "_definition");
+        private static ItemDefinition LoadScope(string name) => Resources.LoadAll<ItemDefinition>("Items/Addons/Scopes").Single(definition => definition.GetComponent<WeaponAddonComponent>()?.Section == name);
 
-        private static ItemDefinition LoadSilencer() => Resources.Load<ItemDefinition>("Items/Addons/Silencers/wpn_sil_nato/wpn_sil_nato_definition");
+        private static ItemDefinition LoadSilencer() => Resources.LoadAll<ItemDefinition>("Items/Addons/Silencers").Single(definition => definition.GetComponent<WeaponAddonComponent>()?.Section == "wpn_sil_nato");
 
         private sealed class Resolver : IItemDefinitionResolver
         {

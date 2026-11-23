@@ -92,7 +92,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             InventoryModel model = inventory.Inventory.Model;
             FirstPersonWeaponController controller = inventory.Player.GetComponentInChildren<FirstPersonWeaponController>();
             ItemInstance weapon = Add(inventory, "wpn_aug_a3");
-            ItemInstance scope = Add(inventory, "0kp2");
+            ItemInstance scope = Add(inventory, "exps3");
             Assert.That(model.TryEquip(weapon.InstanceId, inventory.Window.EquipmentContainerId).Success, Is.True);
             Assert.That(controller.Select(FirstPersonWeaponController.PRIMARY_SLOT), Is.True);
             float timeout = Time.time + 6f;

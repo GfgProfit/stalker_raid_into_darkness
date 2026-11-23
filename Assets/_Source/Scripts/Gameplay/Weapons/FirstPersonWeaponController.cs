@@ -939,6 +939,7 @@ namespace RaidIntoDarkness.Weapons
 
         private void FinishReload(FirstPersonWeaponAsset asset)
         {
+            _graph?.CompleteMagazineSwap();
             if (_ammoSource != null)
             {
                 _ammoSource.Reload(_slots[ActiveSlot].Key, asset.MagazineSize);
@@ -1450,7 +1451,7 @@ namespace RaidIntoDarkness.Weapons
             BindOptics();
             Animator handsAnimator = GetAnimator(hands);
             Animator weaponAnimator = GetAnimator(_model);
-            _graph = new FirstPersonWeaponGraph($"{name}.FirstPersonWeapon", handsAnimator, weaponAnimator, FirstPersonWeaponGraph.CreateMask(hands.transform, asset.OverlayBones));
+            _graph = new FirstPersonWeaponGraph($"{name}.FirstPersonWeapon", handsAnimator, weaponAnimator, FirstPersonWeaponGraph.CreateMask(hands.transform, asset.OverlayBones), _weaponView);
             _hasLoop = false;
         }
 

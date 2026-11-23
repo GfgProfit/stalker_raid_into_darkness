@@ -16,6 +16,7 @@ namespace RaidIntoDarkness.Weapons
         private readonly AnimationMixerPlayable _handsMotion;
         private readonly Channel _hands;
         private readonly Channel _weapon;
+        private readonly FirstPersonWeaponView _weaponView;
         private AnimationClipPlayable _emptyShot;
         private float _emptyShotTime;
         private float _emptyShotDuration;
@@ -24,9 +25,17 @@ namespace RaidIntoDarkness.Weapons
         private AnimationClipPlayable _overlay;
         private float _overlayWeight;
         private bool _overlayActive;
+        private bool _magazineSwapActive;
+        private bool _magazineSwapCompleted;
 
-        public FirstPersonWeaponGraph(string name, Animator hands, Animator weapon, AvatarMask overlayMask)
+        public FirstPersonWeaponGraph(string name, Animator hands, Animator weapon, AvatarMask overlayMask, FirstPersonWeaponView weaponView = null)
         {
+            _weaponView = weaponView;
+            if (_weaponView != null)
+            {
+                _weaponView.SetMagazineSwapObjectsVisible(false);
+            }
+
             _graph = PlayableGraph.Create(name);
             _graph.SetTimeUpdateMode(DirectorUpdateMode.Manual);
             _handsLayers = AnimationLayerMixerPlayable.Create(_graph, 2);
@@ -86,10 +95,30 @@ namespace RaidIntoDarkness.Weapons
 
         public void PlayWeapon(AnimationClip weapon, float speed, float fade, bool loop)
         {
-            if (_weapon != null)
+            if (_weapon == null || weapon == null)
             {
-                _weapon.Play(weapon, speed, fade, loop);
+                return;
             }
+
+            bool magazineSwap = _weaponView != null && _weaponView.UsesMagazineSwap(weapon);
+            _weapon.Play(weapon, speed, _magazineSwapActive || magazineSwap ? 0f : fade, loop);
+            bool completed = _magazineSwapCompleted;
+            if (completed)
+            {
+                _magazineSwapCompleted = false;
+                _weaponView.SwapMagazineRoles();
+            }
+
+            if (_magazineSwapActive != magazineSwap || completed)
+            {
+                _magazineSwapActive = magazineSwap;
+                _weaponView.SetMagazineSwapObjectsVisible(magazineSwap);
+            }
+        }
+
+        internal void CompleteMagazineSwap()
+        {
+            _magazineSwapCompleted = _magazineSwapActive;
         }
 
         public bool PlayOverlay(AnimationClip clip, float speed)

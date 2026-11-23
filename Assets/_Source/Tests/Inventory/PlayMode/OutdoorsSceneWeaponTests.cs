@@ -133,6 +133,99 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             }
         }
 
+        [Test]
+        public void MagazineSwapKeepsTheMagazineSeatedWhileHandsCrossFade()
+        {
+            var hands = new GameObject("Hands");
+            var handBone = new GameObject("HandBone");
+            handBone.transform.SetParent(hands.transform, false);
+            var weapon = new GameObject("Weapon");
+            var mainMagazine = new GameObject("MainMagazine");
+            mainMagazine.transform.SetParent(weapon.transform, false);
+            var extraMagazine = new GameObject("ExtraMagazine");
+            extraMagazine.transform.SetParent(weapon.transform, false);
+            var reloadObjects = new GameObject("ReloadObjects");
+            reloadObjects.transform.SetParent(weapon.transform, false);
+            var installedRenderer = weapon.AddComponent<SkinnedMeshRenderer>();
+            var replacementRenderer = reloadObjects.AddComponent<SkinnedMeshRenderer>();
+            installedRenderer.bones = new[] { mainMagazine.transform };
+            replacementRenderer.bones = new[] { extraMagazine.transform };
+            var idle = new AnimationClip();
+            var reload = new AnimationClip();
+            idle.SetCurve("HandBone", typeof(Transform), "m_LocalPosition.x", AnimationCurve.Constant(0f, 1f, 0f));
+            idle.SetCurve("MainMagazine", typeof(Transform), "m_LocalPosition.x", AnimationCurve.Constant(0f, 1f, 0f));
+            idle.SetCurve("ExtraMagazine", typeof(Transform), "m_LocalPosition.x", AnimationCurve.Constant(0f, 1f, 10f));
+            reload.SetCurve("HandBone", typeof(Transform), "m_LocalPosition.x", AnimationCurve.Constant(0f, 1f, 10f));
+            reload.SetCurve("MainMagazine", typeof(Transform), "m_LocalPosition.x", AnimationCurve.Constant(0f, 1f, 10f));
+            reload.SetCurve("ExtraMagazine", typeof(Transform), "m_LocalPosition.x", AnimationCurve.Constant(0f, 1f, 0f));
+            var view = weapon.AddComponent<FirstPersonWeaponView>();
+            const System.Reflection.BindingFlags FIELDS = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic;
+            typeof(FirstPersonWeaponView).GetField("_magazineSwapObjects", FIELDS).SetValue(view, reloadObjects);
+            typeof(FirstPersonWeaponView).GetField("_magazineSwapClips", FIELDS).SetValue(view, new[] { reload });
+            typeof(FirstPersonWeaponView).GetField("_installedMagazineRenderers", FIELDS).SetValue(view, new[] { installedRenderer });
+            typeof(FirstPersonWeaponView).GetField("_replacementMagazineRenderers", FIELDS).SetValue(view, new[] { replacementRenderer });
+            var pairsField = typeof(FirstPersonWeaponView).GetField("_magazineBonePairs", FIELDS);
+            var pairType = pairsField.FieldType.GetElementType();
+            var pairs = System.Array.CreateInstance(pairType, 1);
+            object pair = System.Activator.CreateInstance(pairType);
+            pairType.GetField("_installed", FIELDS).SetValue(pair, mainMagazine.transform);
+            pairType.GetField("_replacement", FIELDS).SetValue(pair, extraMagazine.transform);
+            pairs.SetValue(pair, 0);
+            pairsField.SetValue(view, pairs);
+            var graph = new FirstPersonWeaponGraph("MagazineSwap", hands.AddComponent<Animator>(), weapon.AddComponent<Animator>(), null, view);
+            var complete = typeof(FirstPersonWeaponGraph).GetMethod("CompleteMagazineSwap", FIELDS);
+
+            try
+            {
+                Assert.That(reloadObjects.activeSelf, Is.False);
+                graph.Play(idle, idle, 1f, 0f, true);
+                graph.Evaluate(0f);
+                graph.Play(reload, reload, 1f, 0.2f, false);
+                graph.Evaluate(0.1f);
+                Assert.That(reloadObjects.activeSelf, Is.True);
+                Assert.That(extraMagazine.transform.localPosition.x, Is.EqualTo(0f).Within(0.001f));
+                Assert.That(handBone.transform.localPosition.x, Is.EqualTo(5f).Within(0.001f));
+                graph.Evaluate(0.1f);
+
+                graph.Play(idle, idle, 1f, 0.2f, true);
+                graph.Evaluate(0.1f);
+                Assert.That(reloadObjects.activeSelf, Is.False);
+                Assert.That(handBone.transform.localPosition.x, Is.EqualTo(5f).Within(0.001f));
+                Assert.That(installedRenderer.bones[0], Is.SameAs(mainMagazine.transform));
+                graph.Evaluate(0.1f);
+
+                graph.Play(reload, reload, 1f, 0.2f, false);
+                graph.Evaluate(0.2f);
+                complete.Invoke(graph, null);
+                graph.Play(idle, idle, 1f, 0.2f, true);
+                graph.Evaluate(0.1f);
+                Assert.That(reloadObjects.activeSelf, Is.True);
+                Assert.That(installedRenderer.enabled, Is.False);
+                Assert.That(replacementRenderer.bones[0], Is.SameAs(mainMagazine.transform));
+                Assert.That(replacementRenderer.bones[0].localPosition.x, Is.EqualTo(0f).Within(0.001f));
+                Assert.That(handBone.transform.localPosition.x, Is.EqualTo(5f).Within(0.001f));
+
+                graph.Play(reload, reload, 1f, 0.2f, false);
+                graph.Evaluate(0.2f);
+                Assert.That(installedRenderer.enabled, Is.True);
+                Assert.That(installedRenderer.bones[0], Is.SameAs(extraMagazine.transform));
+                complete.Invoke(graph, null);
+                graph.Play(idle, idle, 1f, 0.2f, true);
+                graph.Evaluate(0.1f);
+                Assert.That(reloadObjects.activeSelf, Is.False);
+                Assert.That(installedRenderer.bones[0], Is.SameAs(mainMagazine.transform));
+                Assert.That(installedRenderer.bones[0].localPosition.x, Is.EqualTo(0f).Within(0.001f));
+            }
+            finally
+            {
+                graph.Destroy();
+                Object.DestroyImmediate(hands);
+                Object.DestroyImmediate(weapon);
+                Object.DestroyImmediate(idle);
+                Object.DestroyImmediate(reload);
+            }
+        }
+
         [UnityTest]
         public IEnumerator AimCameraPulseReturnsToNeutralWhileAimingAndAfterRelease()
         {

@@ -1,0 +1,60 @@
+fileFormatVersion: 2
+guid: 9fe75a44c36f2da488da420ff4611f03
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: crosshair\crosshair_pu|models_lense_scope
+    second: {fileID: 2100000, guid: fc4c0ba82c523ba46ac1a5b688e49013, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\ammo_9x39|models\weapons
+    second: {fileID: 2100000, guid: 561952a3425ad0241bbba6f3d3e5e555, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\dvl_10\scope_pso_1m2-1_lens_diff|models\model
+    second: {fileID: 2100000, guid: 4546f61768e51e74d8c2483f158f5082, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\dvl_10\scope_pso_1m2-1_lens_trans|models\window
+    second: {fileID: 2100000, guid: 5c38d0a76e90840439291735b99fad9d, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\wpn_ots14_addons|models\weapons
+    second: {fileID: 2100000, guid: 9e20358f56188c34bb5ac9c7e032e3d6, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\wpn_ots14_scope|models\weapons
+    second: {fileID: 2100000, guid: 253924cc04ffcd14b855290e2fc58d5b, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\wpn_ots14|models\weapons
+    second: {fileID: 2100000, guid: 022b0cdf90b24b9429f86848149043b1, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\wpn_vog|models\weapons
+    second: {fileID: 2100000, guid: ad39073e58415e34b918ee00714e480c, type: 2}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 61e536e21e96f284493f2969a9250cdf, type: 3}
+  _scale: 1
+  _importMaterials: 1
+  _texturesFolder: 
+  _searchTexturesByName: 1
+  _importEmbeddedMotions: 1
+  _embeddedLoopMode: 0
+  _addAnimator: 1
+  _readableMeshes: 0
+  _updateWhenOffscreen: 0
+  _autoResolveResources: 1

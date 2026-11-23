@@ -1,0 +1,879 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 14d88a9e75d60c249be9eadb7fbef0ec, type: 3}
+  m_Name: wpn_groza_first_person
+  m_EditorClassIdentifier: RaidIntoDarkness.Weapons::RaidIntoDarkness.Weapons.FirstPersonWeaponAsset
+  _hudModel: {fileID: 419035826927927232, guid: addd3f80a75b8ee4182a6ed75ee9e804, type: 3}
+  _handsPosition: {x: 0.011675, y: -0.0121, z: 0.0512}
+  _handsOrientation: {x: 0, y: 0, z: 0}
+  _aimOffsetPosition: {x: 0, y: 0, z: 0}
+  _aimOffsetRotation: {x: 0, y: 0, z: 0}
+  _aimTime: 0.15384616
+  _aimCameraRoll: 0
+  _aimCameraBlendTime: 0.15
+  _aimZoom: 1
+  _muzzleBone: wpn_body
+  _overlayBones:
+  - l_clavicle
+  - l_upperarm
+  - l_forearm
+  - l_forearm_twist
+  - l_hand
+  - l_finger0
+  - l_finger01
+  - l_finger02
+  _motions:
+  - _kind: 0
+    _handsName: groza_draw
+    _hands: {fileID: 7337881867568432843, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+    _weapon: {fileID: -1965084331185687820, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+    _emptyWeapon: {fileID: 0}
+    _cameraEffect: {fileID: 4908183818744415850, guid: 59b995b7054b60d47b84b347b3afb909, type: 3}
+    _sound: {fileID: 8300000, guid: 2456ab95ffe48b24f858c82ab77b353a, type: 3}
+    _speed: 1
+  - _kind: 1
+    _handsName: groza_holster
+    _hands: {fileID: 7741335699015086843, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+    _weapon: {fileID: -1965084331185687820, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+    _emptyWeapon: {fileID: 0}
+    _cameraEffect: {fileID: 0}
+    _sound: {fileID: 8300000, guid: f9b112f734b09a146b5de1ce8c5bed49, type: 3}
+    _speed: 1
+  - _kind: 2
+    _handsName: groza_idle
+    _hands: {fileID: -4670206327764012403, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+    _weapon: {fileID: -1965084331185687820, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+    _emptyWeapon: {fileID: 0}
+    _cameraEffect: {fileID: 0}
+    _sound: {fileID: 0}
+    _speed: 0.6
+  - _kind: 3
+    _handsName: groza_idle_aim
+    _hands: {fileID: -6806682734261250053, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+    _weapon: {fileID: -1965084331185687820, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+    _emptyWeapon: {fileID: 0}
+    _cameraEffect: {fileID: 0}
+    _sound: {fileID: 0}
+    _speed: 1
+  - _kind: 4
+    _handsName: groza_moving
+    _hands: {fileID: 900135734956141083, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+    _weapon: {fileID: -1965084331185687820, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+    _emptyWeapon: {fileID: 0}
+    _cameraEffect: {fileID: 0}
+    _sound: {fileID: 0}
+    _speed: 1.1
+  - _kind: 5
+    _handsName: groza_moving_aim
+    _hands: {fileID: 312464436568113102, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+    _weapon: {fileID: -1965084331185687820, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+    _emptyWeapon: {fileID: 0}
+    _cameraEffect: {fileID: 0}
+    _sound: {fileID: 0}
+    _speed: 0.8
+  - _kind: 6
+    _handsName: groza_moving_slow
+    _hands: {fileID: -8486880207828016836, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+    _weapon: {fileID: -1965084331185687820, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+    _emptyWeapon: {fileID: 0}
+    _cameraEffect: {fileID: 0}
+    _sound: {fileID: 0}
+    _speed: 0.7
+  - _kind: 7
+    _handsName: groza_crouch
+    _hands: {fileID: 2852130726220431099, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+    _weapon: {fileID: -1965084331185687820, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+    _emptyWeapon: {fileID: 0}
+    _cameraEffect: {fileID: 0}
+    _sound: {fileID: 0}
+    _speed: 0.5
+  - _kind: 8
+    _handsName: groza_sprint_start
+    _hands: {fileID: 3010477728098278035, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+    _weapon: {fileID: -1965084331185687820, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+    _emptyWeapon: {fileID: 0}
+    _cameraEffect: {fileID: 0}
+    _sound: {fileID: 0}
+    _speed: 1
+  - _kind: 9
+    _handsName: groza_sprint
+    _hands: {fileID: -7196545373458663636, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+    _weapon: {fileID: -1965084331185687820, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+    _emptyWeapon: {fileID: 0}
+    _cameraEffect: {fileID: 0}
+    _sound: {fileID: 0}
+    _speed: 1.2
+  - _kind: 10
+    _handsName: groza_sprint_end
+    _hands: {fileID: -7179474430820486942, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+    _weapon: {fileID: -1965084331185687820, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+    _emptyWeapon: {fileID: 0}
+    _cameraEffect: {fileID: 0}
+    _sound: {fileID: 0}
+    _speed: 1
+  - _kind: 11
+    _handsName: groza_shoot
+    _hands: {fileID: 8300859886149939094, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+    _weapon: {fileID: 4632084351945502156, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+    _emptyWeapon: {fileID: 0}
+    _cameraEffect: {fileID: 4908183818744415850, guid: 5c0b7a2bafb7e26409d96d74e6fd9941, type: 3}
+    _sound: {fileID: 0}
+    _speed: 1
+  - _kind: 11
+    _handsName: groza_shoot1
+    _hands: {fileID: -1844936114859937361, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+    _weapon: {fileID: 4632084351945502156, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+    _emptyWeapon: {fileID: 0}
+    _cameraEffect: {fileID: 4908183818744415850, guid: 9c27d6e5fe8ed274cb9402202a2d3e72, type: 3}
+    _sound: {fileID: 0}
+    _speed: 1
+  - _kind: 11
+    _handsName: groza_shoot2
+    _hands: {fileID: 1792552809880810529, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+    _weapon: {fileID: 4632084351945502156, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+    _emptyWeapon: {fileID: 0}
+    _cameraEffect: {fileID: 4908183818744415850, guid: 6478e59a75923794d8b1985355a9f3ae, type: 3}
+    _sound: {fileID: 0}
+    _speed: 1
+  - _kind: 12
+    _handsName: groza_shoot_aim
+    _hands: {fileID: -913531484952131107, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+    _weapon: {fileID: 4632084351945502156, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+    _emptyWeapon: {fileID: 0}
+    _cameraEffect: {fileID: 4908183818744415850, guid: 1f2011d97d721134280d30b38167cf04, type: 3}
+    _sound: {fileID: 0}
+    _speed: 1
+  - _kind: 12
+    _handsName: groza_shoot_aim1
+    _hands: {fileID: 1696054837607057135, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+    _weapon: {fileID: 4632084351945502156, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+    _emptyWeapon: {fileID: 0}
+    _cameraEffect: {fileID: 4908183818744415850, guid: 4bc495ea25e1d5f4a86fb1420538b56b, type: 3}
+    _sound: {fileID: 0}
+    _speed: 1
+  - _kind: 12
+    _handsName: groza_shoot_aim2
+    _hands: {fileID: 2422294444405776430, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+    _weapon: {fileID: 4632084351945502156, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+    _emptyWeapon: {fileID: 0}
+    _cameraEffect: {fileID: 4908183818744415850, guid: 0779c94f29b9fd34ba03ed6f5dbb3885, type: 3}
+    _sound: {fileID: 0}
+    _speed: 1
+  - _kind: 13
+    _handsName: groza_reload
+    _hands: {fileID: 7049784891147744344, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+    _weapon: {fileID: -5802557976399934464, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+    _emptyWeapon: {fileID: 0}
+    _cameraEffect: {fileID: 4908183818744415850, guid: 0c8b6c71a9398114fb77b0a9f700cd92, type: 3}
+    _sound: {fileID: 8300000, guid: 40aac2a05062f194cbb3e202f3c0028e, type: 3}
+    _speed: 1
+  - _kind: 14
+    _handsName: groza_reload_empty
+    _hands: {fileID: -5421526531592704567, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+    _weapon: {fileID: 6957653534862426902, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+    _emptyWeapon: {fileID: 0}
+    _cameraEffect: {fileID: 4908183818744415850, guid: 5facf789e6b7b8e469965b2cbba73b86, type: 3}
+    _sound: {fileID: 8300000, guid: 86a30a248cde1884cbafaf1ee1ac3c5e, type: 3}
+    _speed: 1
+  - _kind: 15
+    _handsName: groza_firemode
+    _hands: {fileID: -3517838574854380396, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+    _weapon: {fileID: -1965084331185687820, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+    _emptyWeapon: {fileID: 0}
+    _cameraEffect: {fileID: 0}
+    _sound: {fileID: 8300000, guid: f853ba804c3b6864d986ac6225d943db, type: 3}
+    _speed: 1
+  - _kind: 16
+    _handsName: groza_misfire
+    _hands: {fileID: -553662013107187106, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+    _weapon: {fileID: -3959954400985516057, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+    _emptyWeapon: {fileID: 0}
+    _cameraEffect: {fileID: 4908183818744415850, guid: cd5d5057f0557d045b0cdc69eb1eaf71, type: 3}
+    _sound: {fileID: 8300000, guid: 89968b28402fc244e9308cce9727725c, type: 3}
+    _speed: 1
+  - _kind: 18
+    _handsName: groza_gl_on
+    _hands: {fileID: 7029415589657354377, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+    _weapon: {fileID: -5416677980845562654, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+    _emptyWeapon: {fileID: 0}
+    _cameraEffect: {fileID: 4908183818744415850, guid: 1e1ed2785a7476e4fa801d6e5f6ff193, type: 3}
+    _sound: {fileID: 8300000, guid: a480ecddff269664c9096e2031522c2a, type: 3}
+    _speed: 0.9
+  - _kind: 19
+    _handsName: groza_gl_off
+    _hands: {fileID: -8638135337033427631, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+    _weapon: {fileID: -2195109347215635583, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+    _emptyWeapon: {fileID: 0}
+    _cameraEffect: {fileID: 4908183818744415850, guid: cad43d8cd9fc6034ab467c10b2a45271, type: 3}
+    _sound: {fileID: 8300000, guid: 48ea2fdf5153fea4e84f912dea38a3dc, type: 3}
+    _speed: 0.9
+  - _kind: 20
+    _handsName: groza_gl_reload
+    _hands: {fileID: -5481098692443620387, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+    _weapon: {fileID: -3779339303501838582, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+    _emptyWeapon: {fileID: 0}
+    _cameraEffect: {fileID: 4908183818744415850, guid: 8576278a3fcfebf41aed782cc8d3fb64, type: 3}
+    _sound: {fileID: 8300000, guid: b24d5f603d10e254b9348b6257552cb5, type: 3}
+    _speed: 1
+  _withGrenadeLauncherMotions:
+  - _kind: 0
+    _handsName: groza_draw_w_gl
+    _hands: {fileID: -8248419007207086977, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+    _weapon: {fileID: -1965084331185687820, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+    _emptyWeapon: {fileID: 0}
+    _cameraEffect: {fileID: 4908183818744415850, guid: 24354506846fed64eabe740958319c1a, type: 3}
+    _sound: {fileID: 8300000, guid: 2456ab95ffe48b24f858c82ab77b353a, type: 3}
+    _speed: 1
+  - _kind: 1
+    _handsName: groza_holster_w_gl
+    _hands: {fileID: 1158560951927209795, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+    _weapon: {fileID: -1965084331185687820, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+    _emptyWeapon: {fileID: 0}
+    _cameraEffect: {fileID: 0}
+    _sound: {fileID: 8300000, guid: f9b112f734b09a146b5de1ce8c5bed49, type: 3}
+    _speed: 1
+  - _kind: 2
+    _handsName: groza_idle_w_gl
+    _hands: {fileID: 3497538180254632146, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+    _weapon: {fileID: -1965084331185687820, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+    _emptyWeapon: {fileID: 0}
+    _cameraEffect: {fileID: 0}
+    _sound: {fileID: 0}
+    _speed: 0.6
+  - _kind: 3
+    _handsName: groza_idle_aim_w_gl
+    _hands: {fileID: 7901185716645634834, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+    _weapon: {fileID: -1965084331185687820, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+    _emptyWeapon: {fileID: 0}
+    _cameraEffect: {fileID: 0}
+    _sound: {fileID: 0}
+    _speed: 1
+  - _kind: 4
+    _handsName: groza_moving_w_gl
+    _hands: {fileID: 291932471551976837, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+    _weapon: {fileID: -1965084331185687820, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+    _emptyWeapon: {fileID: 0}
+    _cameraEffect: {fileID: 0}
+    _sound: {fileID: 0}
+    _speed: 1.1
+  - _kind: 5
+    _handsName: groza_moving_aim_w_gl
+    _hands: {fileID: 7788017361338095763, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+    _weapon: {fileID: -1965084331185687820, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+    _emptyWeapon: {fileID: 0}
+    _cameraEffect: {fileID: 0}
+    _sound: {fileID: 0}
+    _speed: 0.8
+  - _kind: 6
+    _handsName: groza_moving_slow_w_gl
+    _hands: {fileID: -6225169783334874364, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+    _weapon: {fileID: -1965084331185687820, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+    _emptyWeapon: {fileID: 0}
+    _cameraEffect: {fileID: 0}
+    _sound: {fileID: 0}
+    _speed: 0.7
+  - _kind: 7
+    _handsName: groza_crouch_w_gl
+    _hands: {fileID: 2935131170820160063, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+    _weapon: {fileID: -1965084331185687820, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+    _emptyWeapon: {fileID: 0}
+    _cameraEffect: {fileID: 0}
+    _sound: {fileID: 0}
+    _speed: 0.5
+  - _kind: 8
+    _handsName: groza_sprint_w_gl_start
+    _hands: {fileID: 6978706171852563900, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+    _weapon: {fileID: -1965084331185687820, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+    _emptyWeapon: {fileID: 0}
+    _cameraEffect: {fileID: 0}
+    _sound: {fileID: 0}
+    _speed: 1
+  - _kind: 9
+    _handsName: groza_sprint_w_gl
+    _hands: {fileID: 7370711297351804116, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+    _weapon: {fileID: -1965084331185687820, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+    _emptyWeapon: {fileID: 0}
+    _cameraEffect: {fileID: 0}
+    _sound: {fileID: 0}
+    _speed: 1.2
+  - _kind: 10
+    _handsName: groza_sprint_w_gl_end
+    _hands: {fileID: -6430606884620669021, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+    _weapon: {fileID: -1965084331185687820, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+    _emptyWeapon: {fileID: 0}
+    _cameraEffect: {fileID: 0}
+    _sound: {fileID: 0}
+    _speed: 1
+  - _kind: 11
+    _handsName: groza_w_gl_shoot
+    _hands: {fileID: -2254925110588628687, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+    _weapon: {fileID: 4632084351945502156, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+    _emptyWeapon: {fileID: 0}
+    _cameraEffect: {fileID: 4908183818744415850, guid: 3a5132accc8727f4bbcb5e500df59dc2, type: 3}
+    _sound: {fileID: 0}
+    _speed: 1
+  - _kind: 11
+    _handsName: groza_w_gl_shoot1
+    _hands: {fileID: -3190154009630701029, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+    _weapon: {fileID: 4632084351945502156, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+    _emptyWeapon: {fileID: 0}
+    _cameraEffect: {fileID: 4908183818744415850, guid: d81f4a26e7593f34ba9adb5b070ea8e6, type: 3}
+    _sound: {fileID: 0}
+    _speed: 1
+  - _kind: 11
+    _handsName: groza_w_gl_shoot2
+    _hands: {fileID: -3710320608545409856, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+    _weapon: {fileID: 4632084351945502156, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+    _emptyWeapon: {fileID: 0}
+    _cameraEffect: {fileID: 4908183818744415850, guid: 585a28be5b0fe3043aa202cb33287bcb, type: 3}
+    _sound: {fileID: 0}
+    _speed: 1
+  - _kind: 12
+    _handsName: groza_w_gl_shoot_aim
+    _hands: {fileID: 5128141454469989246, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+    _weapon: {fileID: 4632084351945502156, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+    _emptyWeapon: {fileID: 0}
+    _cameraEffect: {fileID: 4908183818744415850, guid: 566e9d70c2ad73d4aa213cb1bcfde91c, type: 3}
+    _sound: {fileID: 0}
+    _speed: 1
+  - _kind: 12
+    _handsName: groza_w_gl_shoot_aim1
+    _hands: {fileID: -6972629289232808301, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+    _weapon: {fileID: 4632084351945502156, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+    _emptyWeapon: {fileID: 0}
+    _cameraEffect: {fileID: 4908183818744415850, guid: 626d62db3b1c4b3409543453712d755a, type: 3}
+    _sound: {fileID: 0}
+    _speed: 1
+  - _kind: 12
+    _handsName: groza_w_gl_shoot_aim2
+    _hands: {fileID: -7782762607545995037, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+    _weapon: {fileID: 4632084351945502156, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+    _emptyWeapon: {fileID: 0}
+    _cameraEffect: {fileID: 4908183818744415850, guid: 4b1301b33c7248a4da6f23d7565f1821, type: 3}
+    _sound: {fileID: 0}
+    _speed: 1
+  - _kind: 13
+    _handsName: groza_reload_w_gl
+    _hands: {fileID: -8694804736211337552, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+    _weapon: {fileID: -5802557976399934464, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+    _emptyWeapon: {fileID: 0}
+    _cameraEffect: {fileID: 4908183818744415850, guid: 2d58dc217b25e304bb4c7ab4f019560a, type: 3}
+    _sound: {fileID: 8300000, guid: 40aac2a05062f194cbb3e202f3c0028e, type: 3}
+    _speed: 1
+  - _kind: 14
+    _handsName: groza_reload_empty_w_gl
+    _hands: {fileID: 7039507707063391501, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+    _weapon: {fileID: 6957653534862426902, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+    _emptyWeapon: {fileID: 0}
+    _cameraEffect: {fileID: 4908183818744415850, guid: 00d008bc5e8670e4aa46a0dd24d1c07e, type: 3}
+    _sound: {fileID: 8300000, guid: 86a30a248cde1884cbafaf1ee1ac3c5e, type: 3}
+    _speed: 1
+  - _kind: 15
+    _handsName: groza_firemode_w_gl
+    _hands: {fileID: -7014559230177372291, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+    _weapon: {fileID: -1965084331185687820, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+    _emptyWeapon: {fileID: 0}
+    _cameraEffect: {fileID: 0}
+    _sound: {fileID: 8300000, guid: f853ba804c3b6864d986ac6225d943db, type: 3}
+    _speed: 1
+  - _kind: 16
+    _handsName: groza_misfire_w_gl
+    _hands: {fileID: -7759935120197679897, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+    _weapon: {fileID: -3959954400985516057, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+    _emptyWeapon: {fileID: 0}
+    _cameraEffect: {fileID: 4908183818744415850, guid: 5737b5d1a3b53194ea87790327d5e1e6, type: 3}
+    _sound: {fileID: 8300000, guid: 89968b28402fc244e9308cce9727725c, type: 3}
+    _speed: 1
+  _grenadeModeMotions:
+  - _kind: 0
+    _handsName: groza_gl_draw
+    _hands: {fileID: 9025903117931873402, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+    _weapon: {fileID: 3762104396673564341, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+    _emptyWeapon: {fileID: 0}
+    _cameraEffect: {fileID: 4908183818744415850, guid: dbf105b6383b73d4aa074462ca109834, type: 3}
+    _sound: {fileID: 8300000, guid: 2456ab95ffe48b24f858c82ab77b353a, type: 3}
+    _speed: 1
+  - _kind: 1
+    _handsName: groza_gl_holster
+    _hands: {fileID: 7495527941803084459, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+    _weapon: {fileID: 3762104396673564341, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+    _emptyWeapon: {fileID: 0}
+    _cameraEffect: {fileID: 0}
+    _sound: {fileID: 8300000, guid: f9b112f734b09a146b5de1ce8c5bed49, type: 3}
+    _speed: 1
+  - _kind: 2
+    _handsName: groza_gl_idle
+    _hands: {fileID: 351419678293355235, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+    _weapon: {fileID: 3762104396673564341, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+    _emptyWeapon: {fileID: 0}
+    _cameraEffect: {fileID: 0}
+    _sound: {fileID: 0}
+    _speed: 0.6
+  - _kind: 3
+    _handsName: groza_gl_idle_aim
+    _hands: {fileID: 7920853186232168819, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+    _weapon: {fileID: 3762104396673564341, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+    _emptyWeapon: {fileID: 0}
+    _cameraEffect: {fileID: 0}
+    _sound: {fileID: 0}
+    _speed: 1
+  - _kind: 4
+    _handsName: groza_gl_moving
+    _hands: {fileID: -7066532615064410896, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+    _weapon: {fileID: 3762104396673564341, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+    _emptyWeapon: {fileID: 0}
+    _cameraEffect: {fileID: 0}
+    _sound: {fileID: 0}
+    _speed: 1.1
+  - _kind: 5
+    _handsName: groza_gl_moving_aim
+    _hands: {fileID: -7224659158430725856, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+    _weapon: {fileID: 3762104396673564341, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+    _emptyWeapon: {fileID: 0}
+    _cameraEffect: {fileID: 0}
+    _sound: {fileID: 0}
+    _speed: 0.8
+  - _kind: 6
+    _handsName: groza_gl_moving_slow
+    _hands: {fileID: -6055042657009544199, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+    _weapon: {fileID: 3762104396673564341, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+    _emptyWeapon: {fileID: 0}
+    _cameraEffect: {fileID: 0}
+    _sound: {fileID: 0}
+    _speed: 0.7
+  - _kind: 7
+    _handsName: groza_gl_crouch
+    _hands: {fileID: -3205200467289645771, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+    _weapon: {fileID: 3762104396673564341, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+    _emptyWeapon: {fileID: 0}
+    _cameraEffect: {fileID: 0}
+    _sound: {fileID: 0}
+    _speed: 0.5
+  - _kind: 8
+    _handsName: groza_sprint_g_start
+    _hands: {fileID: 5230521305794074072, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+    _weapon: {fileID: 3762104396673564341, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+    _emptyWeapon: {fileID: 0}
+    _cameraEffect: {fileID: 0}
+    _sound: {fileID: 0}
+    _speed: 1
+  - _kind: 9
+    _handsName: groza_sprint_g
+    _hands: {fileID: 8590057886758254091, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+    _weapon: {fileID: 3762104396673564341, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+    _emptyWeapon: {fileID: 0}
+    _cameraEffect: {fileID: 0}
+    _sound: {fileID: 0}
+    _speed: 1.2
+  - _kind: 10
+    _handsName: groza_sprint_g_end
+    _hands: {fileID: 8553299218984788589, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+    _weapon: {fileID: 3762104396673564341, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+    _emptyWeapon: {fileID: 0}
+    _cameraEffect: {fileID: 0}
+    _sound: {fileID: 0}
+    _speed: 1
+  _attachmentMotions:
+  - _mode: 1
+    _motions:
+    - _kind: 0
+      _handsName: groza_draw_sil
+      _hands: {fileID: -8271934618928029251, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+      _weapon: {fileID: -1965084331185687820, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+      _emptyWeapon: {fileID: 0}
+      _cameraEffect: {fileID: 4908183818744415850, guid: 014960e622d110f4eb9eeb3faf51fc78, type: 3}
+      _sound: {fileID: 8300000, guid: 2456ab95ffe48b24f858c82ab77b353a, type: 3}
+      _speed: 1
+    - _kind: 1
+      _handsName: groza_holster_sil
+      _hands: {fileID: 8155158083132630850, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+      _weapon: {fileID: -1965084331185687820, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+      _emptyWeapon: {fileID: 0}
+      _cameraEffect: {fileID: 0}
+      _sound: {fileID: 8300000, guid: f9b112f734b09a146b5de1ce8c5bed49, type: 3}
+      _speed: 1
+    - _kind: 2
+      _handsName: groza_idle_sil
+      _hands: {fileID: 4758004315145126255, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+      _weapon: {fileID: -1965084331185687820, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+      _emptyWeapon: {fileID: 0}
+      _cameraEffect: {fileID: 0}
+      _sound: {fileID: 0}
+      _speed: 0.6
+    - _kind: 3
+      _handsName: groza_idle_aim_sil
+      _hands: {fileID: 1918318039841105093, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+      _weapon: {fileID: -1965084331185687820, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+      _emptyWeapon: {fileID: 0}
+      _cameraEffect: {fileID: 0}
+      _sound: {fileID: 0}
+      _speed: 1
+    - _kind: 4
+      _handsName: groza_moving_sil
+      _hands: {fileID: -6774653439158793930, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+      _weapon: {fileID: -1965084331185687820, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+      _emptyWeapon: {fileID: 0}
+      _cameraEffect: {fileID: 0}
+      _sound: {fileID: 0}
+      _speed: 1.1
+    - _kind: 5
+      _handsName: groza_moving_aim_sil
+      _hands: {fileID: 376724602199965383, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+      _weapon: {fileID: -1965084331185687820, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+      _emptyWeapon: {fileID: 0}
+      _cameraEffect: {fileID: 0}
+      _sound: {fileID: 0}
+      _speed: 0.8
+    - _kind: 6
+      _handsName: groza_moving_slow_sil
+      _hands: {fileID: 5904459971922763172, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+      _weapon: {fileID: -1965084331185687820, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+      _emptyWeapon: {fileID: 0}
+      _cameraEffect: {fileID: 0}
+      _sound: {fileID: 0}
+      _speed: 0.7
+    - _kind: 7
+      _handsName: groza_crouch_sil
+      _hands: {fileID: 6122100754916848637, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+      _weapon: {fileID: -1965084331185687820, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+      _emptyWeapon: {fileID: 0}
+      _cameraEffect: {fileID: 0}
+      _sound: {fileID: 0}
+      _speed: 0.5
+    - _kind: 8
+      _handsName: groza_sprint_start_sil
+      _hands: {fileID: 3601342427894729355, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+      _weapon: {fileID: -1965084331185687820, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+      _emptyWeapon: {fileID: 0}
+      _cameraEffect: {fileID: 0}
+      _sound: {fileID: 0}
+      _speed: 1
+    - _kind: 9
+      _handsName: groza_sprint_sil
+      _hands: {fileID: 2714915302772320656, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+      _weapon: {fileID: -1965084331185687820, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+      _emptyWeapon: {fileID: 0}
+      _cameraEffect: {fileID: 0}
+      _sound: {fileID: 0}
+      _speed: 1.2
+    - _kind: 10
+      _handsName: groza_sprint_end_sil
+      _hands: {fileID: 1401959400927623811, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+      _weapon: {fileID: -1965084331185687820, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+      _emptyWeapon: {fileID: 0}
+      _cameraEffect: {fileID: 0}
+      _sound: {fileID: 0}
+      _speed: 1
+    - _kind: 11
+      _handsName: groza_shoot_sil
+      _hands: {fileID: 8037676332823341369, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+      _weapon: {fileID: 4632084351945502156, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+      _emptyWeapon: {fileID: 0}
+      _cameraEffect: {fileID: 4908183818744415850, guid: 21e5ced6c4e3bc14490f7da71e9d611e, type: 3}
+      _sound: {fileID: 0}
+      _speed: 1
+    - _kind: 11
+      _handsName: groza_shoot_sil1
+      _hands: {fileID: -7187385016294481529, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+      _weapon: {fileID: 4632084351945502156, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+      _emptyWeapon: {fileID: 0}
+      _cameraEffect: {fileID: 4908183818744415850, guid: e20d40c0acb6b4947bf14d88c1fb8b2c, type: 3}
+      _sound: {fileID: 0}
+      _speed: 1
+    - _kind: 11
+      _handsName: groza_shoot_sil2
+      _hands: {fileID: -7662753189514549718, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+      _weapon: {fileID: 4632084351945502156, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+      _emptyWeapon: {fileID: 0}
+      _cameraEffect: {fileID: 4908183818744415850, guid: 6980204566cedbd47acc232288f05368, type: 3}
+      _sound: {fileID: 0}
+      _speed: 1
+    - _kind: 12
+      _handsName: groza_shoot_aim_sil
+      _hands: {fileID: -6452289764928677745, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+      _weapon: {fileID: 4632084351945502156, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+      _emptyWeapon: {fileID: 0}
+      _cameraEffect: {fileID: 4908183818744415850, guid: 6d98a2e37ef83474caf37b49d904a6f2, type: 3}
+      _sound: {fileID: 0}
+      _speed: 1
+    - _kind: 12
+      _handsName: groza_shoot_aim_sil1
+      _hands: {fileID: -2160822520566418106, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+      _weapon: {fileID: 4632084351945502156, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+      _emptyWeapon: {fileID: 0}
+      _cameraEffect: {fileID: 4908183818744415850, guid: 7ec6619214edaa048bd59444fedef2d7, type: 3}
+      _sound: {fileID: 0}
+      _speed: 1
+    - _kind: 12
+      _handsName: groza_shoot_aim_sil2
+      _hands: {fileID: -6724380817586498879, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+      _weapon: {fileID: 4632084351945502156, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+      _emptyWeapon: {fileID: 0}
+      _cameraEffect: {fileID: 4908183818744415850, guid: 10b7de678b69dab47850db840224e24e, type: 3}
+      _sound: {fileID: 0}
+      _speed: 1
+    - _kind: 13
+      _handsName: groza_reload_sil
+      _hands: {fileID: 8652084987321775055, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+      _weapon: {fileID: -5802557976399934464, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+      _emptyWeapon: {fileID: 0}
+      _cameraEffect: {fileID: 4908183818744415850, guid: 37497fb4991cc564a87b5ce69495d565, type: 3}
+      _sound: {fileID: 8300000, guid: 40aac2a05062f194cbb3e202f3c0028e, type: 3}
+      _speed: 1
+    - _kind: 14
+      _handsName: groza_reload_empty_sil
+      _hands: {fileID: -7189494050857030020, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+      _weapon: {fileID: 6957653534862426902, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+      _emptyWeapon: {fileID: 0}
+      _cameraEffect: {fileID: 4908183818744415850, guid: 9ba81e70b41a846449dfbaea47915dbf, type: 3}
+      _sound: {fileID: 8300000, guid: 86a30a248cde1884cbafaf1ee1ac3c5e, type: 3}
+      _speed: 1
+    - _kind: 15
+      _handsName: groza_firemode_sil
+      _hands: {fileID: 7661850309275795523, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+      _weapon: {fileID: -1965084331185687820, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+      _emptyWeapon: {fileID: 0}
+      _cameraEffect: {fileID: 0}
+      _sound: {fileID: 8300000, guid: f853ba804c3b6864d986ac6225d943db, type: 3}
+      _speed: 1
+    - _kind: 16
+      _handsName: groza_misfire_sil
+      _hands: {fileID: 2922486722887323701, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+      _weapon: {fileID: -3959954400985516057, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+      _emptyWeapon: {fileID: 0}
+      _cameraEffect: {fileID: 4908183818744415850, guid: 8d331e8ab13a82943b2d466bebe917fc, type: 3}
+      _sound: {fileID: 8300000, guid: 89968b28402fc244e9308cce9727725c, type: 3}
+      _speed: 1
+  - _mode: 2
+    _motions:
+    - _kind: 12
+      _handsName: groza_shoot_scope
+      _hands: {fileID: -6577345590105205960, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+      _weapon: {fileID: 4632084351945502156, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+      _emptyWeapon: {fileID: 0}
+      _cameraEffect: {fileID: 4908183818744415850, guid: 5ba002b6ba2728c42bdead91d39e9223, type: 3}
+      _sound: {fileID: 0}
+      _speed: 1
+  - _mode: 3
+    _motions:
+    - _kind: 12
+      _handsName: groza_shoot_scope_sil
+      _hands: {fileID: -8534117490236382956, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+      _weapon: {fileID: 4632084351945502156, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+      _emptyWeapon: {fileID: 0}
+      _cameraEffect: {fileID: 4908183818744415850, guid: 1e315e9149aa86d45b3c57f82e90c595, type: 3}
+      _sound: {fileID: 0}
+      _speed: 1
+  - _mode: 6
+    _motions:
+    - _kind: 12
+      _handsName: groza_shoot_scope_w_gl
+      _hands: {fileID: 4116658755430158927, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+      _weapon: {fileID: 4632084351945502156, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+      _emptyWeapon: {fileID: 0}
+      _cameraEffect: {fileID: 4908183818744415850, guid: 3c70166ce7ac8f845a9aec8364d6cab0, type: 3}
+      _sound: {fileID: 0}
+      _speed: 1
+  - _mode: 10
+    _motions:
+    - _kind: 0
+      _handsName: groza_gl_draw
+      _hands: {fileID: 9025903117931873402, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+      _weapon: {fileID: 7248444595344404867, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+      _emptyWeapon: {fileID: 0}
+      _cameraEffect: {fileID: 4908183818744415850, guid: dbf105b6383b73d4aa074462ca109834, type: 3}
+      _sound: {fileID: 8300000, guid: 2456ab95ffe48b24f858c82ab77b353a, type: 3}
+      _speed: 1
+    - _kind: 1
+      _handsName: groza_gl_holster
+      _hands: {fileID: 7495527941803084459, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+      _weapon: {fileID: 7248444595344404867, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+      _emptyWeapon: {fileID: 0}
+      _cameraEffect: {fileID: 0}
+      _sound: {fileID: 8300000, guid: f9b112f734b09a146b5de1ce8c5bed49, type: 3}
+      _speed: 1
+    - _kind: 2
+      _handsName: groza_gl_idle
+      _hands: {fileID: 351419678293355235, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+      _weapon: {fileID: 7248444595344404867, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+      _emptyWeapon: {fileID: 0}
+      _cameraEffect: {fileID: 0}
+      _sound: {fileID: 0}
+      _speed: 0.6
+    - _kind: 3
+      _handsName: groza_gl_idle_aim
+      _hands: {fileID: 7920853186232168819, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+      _weapon: {fileID: 7248444595344404867, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+      _emptyWeapon: {fileID: 0}
+      _cameraEffect: {fileID: 0}
+      _sound: {fileID: 0}
+      _speed: 1
+    - _kind: 4
+      _handsName: groza_gl_moving
+      _hands: {fileID: -7066532615064410896, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+      _weapon: {fileID: 7248444595344404867, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+      _emptyWeapon: {fileID: 0}
+      _cameraEffect: {fileID: 0}
+      _sound: {fileID: 0}
+      _speed: 1.1
+    - _kind: 5
+      _handsName: groza_gl_moving_aim
+      _hands: {fileID: -7224659158430725856, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+      _weapon: {fileID: 7248444595344404867, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+      _emptyWeapon: {fileID: 0}
+      _cameraEffect: {fileID: 0}
+      _sound: {fileID: 0}
+      _speed: 0.8
+    - _kind: 6
+      _handsName: groza_gl_moving_slow
+      _hands: {fileID: -6055042657009544199, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+      _weapon: {fileID: 7248444595344404867, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+      _emptyWeapon: {fileID: 0}
+      _cameraEffect: {fileID: 0}
+      _sound: {fileID: 0}
+      _speed: 0.7
+    - _kind: 7
+      _handsName: groza_gl_crouch
+      _hands: {fileID: -3205200467289645771, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+      _weapon: {fileID: 7248444595344404867, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+      _emptyWeapon: {fileID: 0}
+      _cameraEffect: {fileID: 0}
+      _sound: {fileID: 0}
+      _speed: 0.5
+    - _kind: 8
+      _handsName: groza_sprint_g_start
+      _hands: {fileID: 5230521305794074072, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+      _weapon: {fileID: 7248444595344404867, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+      _emptyWeapon: {fileID: 0}
+      _cameraEffect: {fileID: 0}
+      _sound: {fileID: 0}
+      _speed: 1
+    - _kind: 9
+      _handsName: groza_sprint_g
+      _hands: {fileID: 8590057886758254091, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+      _weapon: {fileID: 7248444595344404867, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+      _emptyWeapon: {fileID: 0}
+      _cameraEffect: {fileID: 0}
+      _sound: {fileID: 0}
+      _speed: 1.2
+    - _kind: 10
+      _handsName: groza_sprint_g_end
+      _hands: {fileID: 8553299218984788589, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+      _weapon: {fileID: 7248444595344404867, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+      _emptyWeapon: {fileID: 0}
+      _cameraEffect: {fileID: 0}
+      _sound: {fileID: 0}
+      _speed: 1
+    - _kind: 18
+      _handsName: groza_gl_on_scope
+      _hands: {fileID: -1030259523637910298, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+      _weapon: {fileID: -8699092062713394032, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+      _emptyWeapon: {fileID: 0}
+      _cameraEffect: {fileID: 4908183818744415850, guid: 1e1ed2785a7476e4fa801d6e5f6ff193, type: 3}
+      _sound: {fileID: 8300000, guid: 6327309c5f136b6449551d1a941ad0ec, type: 3}
+      _speed: 0.9
+    - _kind: 19
+      _handsName: groza_gl_off_scope
+      _hands: {fileID: -1387955352976431577, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+      _weapon: {fileID: 3170478327713632808, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+      _emptyWeapon: {fileID: 0}
+      _cameraEffect: {fileID: 4908183818744415850, guid: cad43d8cd9fc6034ab467c10b2a45271, type: 3}
+      _sound: {fileID: 8300000, guid: 85dae9d953f532849b036e0296cc5afd, type: 3}
+      _speed: 0.9
+    - _kind: 20
+      _handsName: groza_gl_reload
+      _hands: {fileID: -5481098692443620387, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+      _weapon: {fileID: 7745799274428939161, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+      _emptyWeapon: {fileID: 0}
+      _cameraEffect: {fileID: 4908183818744415850, guid: 8576278a3fcfebf41aed782cc8d3fb64, type: 3}
+      _sound: {fileID: 8300000, guid: b24d5f603d10e254b9348b6257552cb5, type: 3}
+      _speed: 1
+  _aimStart: {fileID: 4908183818744415850, guid: 1f8893d0e3e5142458baeb24a0842909, type: 3}
+  _aimIdle: {fileID: 4908183818744415850, guid: 8cceaae1a626f7b4cbb44f68de81b9fe, type: 3}
+  _aimEnd: {fileID: 4908183818744415850, guid: 656ea6d86daf12a4588c20428be4ea8b, type: 3}
+  _crossFade: 0.15
+  _grenadeAimOffsetPosition: {x: 0.001, y: 0, z: 0}
+  _grenadeAimOffsetRotation: {x: 0, y: 0, z: 0}
+  _useScopedGrenadeAimOffset: 1
+  _scopedGrenadeAimOffsetPosition: {x: 0.0010179058, y: -0.002961836, z: -0.013962761}
+  _grenadeAimStart: {fileID: 4908183818744415850, guid: 9c82e48b974cba04e880a95d449dee55, type: 3}
+  _grenadeAimIdle: {fileID: 4908183818744415850, guid: 4ab2124232056984cbaaf1a7896938d8, type: 3}
+  _grenadeAimEnd: {fileID: 4908183818744415850, guid: 5deac7b501befed40926189a7c896775, type: 3}
+  _roundsPerMinute: 700
+  _twoRoundBurstRoundsPerMinute: 0
+  _emptyClicksPerMinute: 200
+  _fireModes: 01000000ffffffffi
+  _magazineSize: 20
+  _flameParticles: {fileID: 5431255677504748299, guid: e26cca81289bcb94ba785b83201e95ef, type: 3}
+  _smokeParticles: {fileID: 3969830359355939410, guid: 8f360db1ee2283943ad154c0a11d2262, type: 3}
+  _silencedFlameParticles: {fileID: 0}
+  _silencedSmokeParticles: {fileID: 3969830359355939410, guid: 8f360db1ee2283943ad154c0a11d2262, type: 3}
+  _lastShotHoldFrame: 0
+  _emptyShotStrength: 0.15
+  _ballistics:
+    _bulletPrefab: {fileID: 4022291978906581112, guid: 8899b2fbc46efff4389c602431eecefa, type: 3}
+    _ballisticHitMask:
+      serializedVersion: 2
+      m_Bits: 4294967291
+    _drawBallisticDebug: 0
+  _recoil: {x: 4.5, y: 6, z: 2}
+  _recoilSnappiness: 14
+  _recoilReturnSpeed: 10
+  _shotSounds:
+  - {fileID: 8300000, guid: aa2429f4468180943a14b5beb755ddd6, type: 3}
+  - {fileID: 8300000, guid: f5548c311baf75248ae0dd2d0808e195, type: 3}
+  - {fileID: 8300000, guid: 3794b97c67fb3144eb3c4d5943ce6a8f, type: 3}
+  - {fileID: 8300000, guid: 9bdfcd30c9efad24bb7aa14e043837a1, type: 3}
+  - {fileID: 8300000, guid: e69c0e63a72790f4b97dd57b8bad7a39, type: 3}
+  - {fileID: 8300000, guid: 0b43778c8dd386349b408e1274c28745, type: 3}
+  - {fileID: 8300000, guid: fb0cfb2347796fe4d830b4e6d86862ff, type: 3}
+  - {fileID: 8300000, guid: b71cea1eaf1568d4b919b7ab10ebca9a, type: 3}
+  - {fileID: 8300000, guid: 978884cc178182b4fb31be8ad02423fc, type: 3}
+  - {fileID: 8300000, guid: be6dcbe9cd12487449bfa8701d3ace05, type: 3}
+  _silencedShotSounds:
+  - {fileID: 8300000, guid: 70c8b75f1eec7ab4990779694fccebb2, type: 3}
+  - {fileID: 8300000, guid: 6db151ce5a39805449f2b986c1ff8395, type: 3}
+  - {fileID: 8300000, guid: 7d210c55915fa0a4c900db462e6a4433, type: 3}
+  - {fileID: 8300000, guid: 0cf83e27bfce74346b78605a7a59c410, type: 3}
+  - {fileID: 8300000, guid: 894b8aa150c49864b988891b73fa9878, type: 3}
+  - {fileID: 8300000, guid: 9c45562539c39cd4ba89c4cc459e2b17, type: 3}
+  - {fileID: 8300000, guid: 515cd0d9b8040ac4db25db08b38e5069, type: 3}
+  - {fileID: 8300000, guid: 6de853253b5f9804faa3245c9a315fad, type: 3}
+  - {fileID: 8300000, guid: 2bac184cadd818f40b38fdd803d25208, type: 3}
+  - {fileID: 8300000, guid: 8da7d5258c5bf4d4eaafbed409ffb672, type: 3}
+  - {fileID: 8300000, guid: 48b3f6e9feeff2947874b71e01af5ba5, type: 3}
+  _aimInSounds:
+  - {fileID: 8300000, guid: 3adc181589402d34da990f66a694f551, type: 3}
+  - {fileID: 8300000, guid: 489860fcc7dfdbb4b9c7d717b57ced0c, type: 3}
+  - {fileID: 8300000, guid: 210c195e0e94da64bab5c831526482d1, type: 3}
+  - {fileID: 8300000, guid: 2f7c4772bf30fff4ab5beeac0caf6953, type: 3}
+  - {fileID: 8300000, guid: 3735b4ee6da5c7a4cbeca3c1cedbde11, type: 3}
+  - {fileID: 8300000, guid: d335b48a29bd16a4ba4a4025527ce5f8, type: 3}
+  - {fileID: 8300000, guid: 645c26d6b23f4b74bb298e92781115fd, type: 3}
+  - {fileID: 8300000, guid: edfc78d0e8b92a041b8b3bfbfb91c7d8, type: 3}
+  - {fileID: 8300000, guid: 31d9852bb65416146ab40d41a876a31f, type: 3}
+  - {fileID: 8300000, guid: 87c446c45c54f554e98614297b661251, type: 3}
+  _aimOutSounds:
+  - {fileID: 8300000, guid: c32ecd92829f0364aa9d62c63201425a, type: 3}
+  - {fileID: 8300000, guid: b79c40a8e1c113846a29177ef59664f4, type: 3}
+  - {fileID: 8300000, guid: d00d1111a9740624ca3a5b65e2734ba8, type: 3}
+  - {fileID: 8300000, guid: 81c6ba29df9ec10428f25a0cbeb3c2ec, type: 3}
+  - {fileID: 8300000, guid: 5a5ff437c11eb9043af0b5f6f599ed57, type: 3}
+  - {fileID: 8300000, guid: 915a9dbd33738f64b8559edcd66fb8f5, type: 3}
+  - {fileID: 8300000, guid: 0a3fd8357db5f054bbe579cbc750d484, type: 3}
+  - {fileID: 8300000, guid: 22712efba62a5dc4aa7b755e35373b5c, type: 3}
+  - {fileID: 8300000, guid: c0251717b78577340ae21d59f0b3e686, type: 3}
+  - {fileID: 8300000, guid: d7e04e2b4bc590d4ea1cb86dbd830631, type: 3}
+  _emptySound: {fileID: 8300000, guid: 57fe4c6a2d07d734fb0ccfbebe2d1208, type: 3}
+  _lastShellSound: {fileID: 8300000, guid: d286791b4c88ef743b8c13eb99af7d1f, type: 3}
+  _lowAmmoSound: {fileID: 8300000, guid: f3393a0a5214d2e40803bde39b842922, type: 3}
+  _lowAmmoThreshold: 5

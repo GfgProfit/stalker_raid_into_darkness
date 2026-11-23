@@ -30,6 +30,7 @@ namespace RaidIntoDarkness.Weapons
         private const float MAX_FRAME_DELTA = 0.1f;
         private const float REDRAW_DELAY = 0.5f;
         private const float SHOT_FADE = 0.05f;
+        private const float FIRE_MODE_INPUT_RELEASE_RATIO = 0.85f;
         private const float SOUND_VOLUME = 1.0f;
 
         [SerializeField] private StalkerPlayerController _player;
@@ -957,7 +958,9 @@ namespace RaidIntoDarkness.Weapons
             }
 
             PlayMotion(motion, asset.CrossFade, false, true);
-            SetState(FirstPersonWeaponState.SwitchingMode, motion.Duration);
+            float duration = motion.Duration;
+            _actionUntil = Time.time + duration;
+            SetState(FirstPersonWeaponState.SwitchingMode, duration * FIRE_MODE_INPUT_RELEASE_RATIO);
         }
 
         private void TickState(float deltaTime)
@@ -998,7 +1001,11 @@ namespace RaidIntoDarkness.Weapons
             }
 
             _hasLoop = false;
-            _actionUntil = 0.0f;
+            if (State != FirstPersonWeaponState.SwitchingMode)
+            {
+                _actionUntil = 0.0f;
+            }
+
             SetState(FirstPersonWeaponState.Ready, 0.0f);
             TickReady(asset);
         }

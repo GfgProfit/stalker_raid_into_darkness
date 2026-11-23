@@ -71,8 +71,8 @@ namespace RaidIntoDarkness.Integrations.Inventory
             WeaponStatsComponent stats = item?.Definition.GetComponent<WeaponStatsComponent>();
             _controller.SetSlotSilencer(slot, stats != null && (stats.SilencerStatus == WeaponAddonStatus.Permanent || stats.GetSilencer(item, _model.Resolver) != null));
             _controller.SetSlotGrenadeLauncher(slot, stats?.GetGrenadeLauncher(item, _model.Resolver) != null);
-            WeaponAddonComponent scope = stats?.GetScope(item, _model.Resolver)?.GetComponent<WeaponAddonComponent>();
-            _controller.SetSlotAimOffset(slot, scope != null && scope.OverrideAimOffsetPosition ? scope.AimOffsetPosition : null);
+            ItemDefinition scope = stats?.GetScope(item, _model.Resolver);
+            _controller.SetSlotAimOffset(slot, hud?.GetScopeAimOffset(scope));
         }
 
         private void OnVisualCreated(GameObject visual) => ApplyActiveVisual();

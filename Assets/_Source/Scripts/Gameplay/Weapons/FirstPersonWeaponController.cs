@@ -710,7 +710,7 @@ namespace RaidIntoDarkness.Weapons
                 PlayMotion(motion, SHOT_FADE, false, false);
                 _actionUntil = Time.time + motion.Duration;
 
-                if (Magazine <= 0 && asset.Find(FirstPersonWeaponMotionKind.IdleEmpty, 0)?.Weapon != null)
+                if (Magazine <= 0 && FindMotion(asset, FirstPersonWeaponMotionKind.IdleEmpty)?.Weapon != null)
                 {
                     float holdTime = motion.Weapon != null && motion.Weapon.frameRate > 0f ? asset.LastShotHoldFrame / motion.Weapon.frameRate : 0f;
                     _emptyWeaponAt = Time.time + holdTime / motion.Speed;
@@ -1049,8 +1049,7 @@ namespace RaidIntoDarkness.Weapons
                 return;
             }
 
-            AnimationClip weaponClip = !IsGrenadeMode && Magazine <= 0 ? asset.Find(FirstPersonWeaponMotionKind.IdleEmpty, 0)?.Weapon : null;
-            weaponClip = weaponClip != null ? weaponClip : motion.Weapon;
+            AnimationClip weaponClip = FindEmptyWeaponClip(motion) ?? motion.Weapon;
 
             if (_hasLoop && _loopKind == kind && CurrentMotion == kind)
             {
@@ -1067,23 +1066,41 @@ namespace RaidIntoDarkness.Weapons
                 return;
             }
 
-            PlayMotion(motion, asset.CrossFade, true, false, weaponClip);
+            PlayMotion(motion, asset.CrossFade, true, false);
             _loopWeaponClip = weaponClip;
             _loopKind = kind;
             _hasLoop = true;
             CurrentMotion = kind;
         }
 
-        private void PlayMotion(FirstPersonWeaponMotion motion, float fade, bool loop, bool withEffects, AnimationClip weaponClip = null)
+        private AnimationClip FindEmptyWeaponClip(FirstPersonWeaponMotion motion)
+        {
+            if (Magazine > 0)
+            {
+                return null;
+            }
+
+            if (motion.EmptyWeapon != null)
+            {
+                return motion.EmptyWeapon;
+            }
+
+            if (IsGrenadeMode || motion.Kind is FirstPersonWeaponMotionKind.Shoot or FirstPersonWeaponMotionKind.ShootAim or FirstPersonWeaponMotionKind.Reload or FirstPersonWeaponMotionKind.ReloadEmpty or FirstPersonWeaponMotionKind.Misfire or FirstPersonWeaponMotionKind.GrenadeModeExit)
+            {
+                return null;
+            }
+
+            return FindMotion(ActiveWeapon, FirstPersonWeaponMotionKind.IdleEmpty)?.Weapon;
+        }
+
+        private void PlayMotion(FirstPersonWeaponMotion motion, float fade, bool loop, bool withEffects)
         {
             CurrentMotion = motion.Kind;
             _emptyWeaponAt = float.PositiveInfinity;
             if (_graph != null)
             {
-                AnimationClip emptyClip = !IsGrenadeMode && Magazine <= 0 ? ActiveWeapon.Find(FirstPersonWeaponMotionKind.IdleEmpty, 0)?.Weapon : null;
-                bool useEmptyPose = emptyClip != null && motion.Kind is not FirstPersonWeaponMotionKind.Shoot and not FirstPersonWeaponMotionKind.ShootAim and not FirstPersonWeaponMotionKind.Reload and not FirstPersonWeaponMotionKind.ReloadEmpty and not FirstPersonWeaponMotionKind.Misfire and not FirstPersonWeaponMotionKind.GrenadeModeExit;
-                AnimationClip clip = useEmptyPose ? emptyClip : weaponClip != null ? weaponClip : motion.Weapon;
-                _graph.Play(motion.Hands, clip, motion.Speed, fade, loop, useEmptyPose ? 0f : fade);
+                AnimationClip emptyClip = FindEmptyWeaponClip(motion);
+                _graph.Play(motion.Hands, emptyClip ?? motion.Weapon, motion.Speed, fade, loop, emptyClip != null ? 0f : fade);
             }
 
             if (motion.CameraEffect != null && _player.CameraEffects != null)
@@ -1121,7 +1138,7 @@ namespace RaidIntoDarkness.Weapons
                 return;
             }
 
-            FirstPersonWeaponMotion empty = ActiveWeapon.Find(FirstPersonWeaponMotionKind.IdleEmpty, 0);
+            FirstPersonWeaponMotion empty = FindMotion(ActiveWeapon, FirstPersonWeaponMotionKind.IdleEmpty);
 
             if (empty?.Weapon != null)
             {

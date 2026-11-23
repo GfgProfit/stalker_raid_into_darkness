@@ -1,0 +1,229 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da0f90c2955673d46b25d465cbe44ed0, type: 3}
+  m_Name: wpn_ak12_definition
+  m_EditorClassIdentifier: Inventory::Inventory.ItemDefinition
+  _definitionId: 00af6f0dfb5f4d5283839a51be3f6cff
+  _displayName: "\u0410\u041A-12"
+  _shortName: "\u0410\u041A-12"
+  _description: "\u0410\u041A-12 \u0438\u043B\u0438 6\u041F70 - \u0430\u0432\u0442\u043E\u043C\u0430\u0442 \u041A\u0430\u043B\u0430\u0448\u043D\u0438\u043A\u043E\u0432\u0430 \u043E\u0431\u0440\u0430\u0437\u0446\u0430 2012 \u0433\u043E\u0434\u0430. \u041F\u0435\u0440\u0432\u044B\u0439 \u043E\u043F\u044B\u0442\u043D\u044B\u0439 \u043E\u0431\u0440\u0430\u0437\u0435\u0446 \u0431\u044B\u043B \u0441\u043E\u0437\u0434\u0430\u043D \u043A\u043E\u043D\u0446\u0435\u0440\u043D\u043E\u043C \xAB\u041A\u0430\u043B\u0430\u0448\u043D\u0438\u043A\u043E\u0432\xBB \u0432 2011 \u0433\u043E\u0434\u0443 \u0438 \u043F\u0440\u0435\u0434\u0441\u0442\u0430\u0432\u043B\u0435\u043D \u043F\u0443\u0431\u043B\u0438\u043A\u0435 \u0432 \u044F\u043D\u0432\u0430\u0440\u0435 2012. \u041F\u0440\u0435\u0434\u0441\u0442\u0430\u0432\u043B\u044F\u043B \u0441\u043E\u0431\u043E\u0439 \u043F\u0440\u0438\u043D\u0446\u0438\u043F\u0438\u0430\u043B\u044C\u043D\u043E \u043D\u043E\u0432\u044B\u0439 \u0430\u0432\u0442\u043E\u043C\u0430\u0442, \u0440\u0435\u0430\u043B\u0438\u0437\u043E\u0432\u0430\u043D\u043D\u044B\u0439 \u0441 \u0438\u0441\u043F\u043E\u043B\u044C\u0437\u043E\u0432\u0430\u043D\u0438\u0435\u043C \u043E\u0431\u0449\u0435\u0439 \u0441\u0445\u0435\u043C\u044B \u0438 \u0442\u0435\u0445\u043D\u0438\u0447\u0435\u0441\u043A\u0438\u0445 \u0440\u0435\u0448\u0435\u043D\u0438\u0439 \u043F\u0440\u0435\u0436\u043D\u0438\u0445 \u0410\u041A. \u041D\u0430\u0438\u0431\u043E\u043B\u0435\u0435 \u0437\u0430\u043C\u0435\u0442\u043D\u044B\u043C \u0441 \u0442\u043E\u0447\u043A\u0438 \u0437\u0440\u0435\u043D\u0438\u044F \u043F\u043E\u043B\u044C\u0437\u043E\u0432\u0430\u0442\u0435\u043B\u044F \u0431\u044B\u043B\u043E \u0443\u043B\u0443\u0447\u0448\u0435\u043D\u0438\u0435 \u044D\u0440\u0433\u043E\u043D\u043E\u043C\u0438\u0447\u043D\u043E\u0441\u0442\u0438 - \u043F\u043E\u043B\u043D\u0430\u044F \u0441\u0438\u043C\u043C\u0435\u0442\u0440\u0438\u0447\u043D\u043E\u0441\u0442\u044C \u0430\u0432\u0442\u043E\u043C\u0430\u0442\u0430, \u0443\u0434\u043E\u0431\u043D\u044B\u0439 \u043F\u0440\u0435\u0434\u043E\u0445\u0440\u0430\u043D\u0438\u0442\u0435\u043B\u044C-\u043F\u0435\u0440\u0435\u043A\u043B\u044E\u0447\u0430\u0442\u0435\u043B\u044C, \u0432\u043D\u0435\u0434\u0440\u0435\u043D\u0438\u0435 \u0437\u0430\u0442\u0432\u043E\u0440\u043D\u043E\u0439 \u0437\u0430\u0434\u0435\u0440\u0436\u043A\u0438. \u042D\u0442\u043E \u043F\u043E\u0437\u0432\u043E\u043B\u044F\u043B\u043E \u043F\u043E\u043B\u043D\u043E\u0441\u0442\u044C\u044E \u043E\u043F\u0435\u0440\u0438\u0440\u043E\u0432\u0430\u0442\u044C \u0430\u0432\u0442\u043E\u043C\u0430\u0442\u043E\u043C \u0442\u043E\u043B\u044C\u043A\u043E \u043E\u0434\u043D\u043E\u0439 \u0440\u0443\u043A\u043E\u0439, \u043F\u0440\u0438\u0447\u0451\u043C \u043A\u0430\u043A \u0434\u043B\u044F \u043F\u0440\u0430\u0432\u0448\u0438, \u0442\u0430\u043A \u0438 \u043B\u0435\u0432\u0448\u0438. \u0412 \u043F\u0440\u043E\u0446\u0435\u0441\u0441\u0435 \u0434\u043E\u0440\u0430\u0431\u043E\u0442\u043E\u043A \u0438\u0437\u043C\u0435\u043D\u0438\u043B\u043E\u0441\u044C \u043A\u0440\u0435\u043F\u043B\u0435\u043D\u0438\u0435 \u043A\u0440\u044B\u0448\u043A\u0438 \u0441\u0442\u0432\u043E\u043B\u044C\u043D\u043E\u0439 \u043A\u043E\u0440\u043E\u0431\u043A\u0438, \u0434\u0440\u0443\u0433\u0438\u0435 \u0434\u0435\u0442\u0430\u043B\u0438, \u043D\u043E \u0445\u0430\u0440\u0430\u043A\u0442\u0435\u0440\u043D\u044B\u0435 \u043E\u0441\u043E\u0431\u0435\u043D\u043D\u043E\u0441\u0442\u0438 \u0430\u0432\u0442\u043E\u043C\u0430\u0442\u0430 \u043F\u043E\u0437\u0432\u043E\u043B\u044F\u044E\u0442 \u043B\u0435\u0433\u043A\u043E \u043E\u0442\u043B\u0438\u0447\u0438\u0442\u044C \u0435\u0433\u043E \u043E\u0442 \u0442\u0440\u0430\u0434\u0438\u0446\u0438\u043E\u043D\u043D\u044B\u0445 \u0410\u041A."
+  _category: Weapon
+  _tags:
+  - Rifle
+  _size: {x: 5, y: 2}
+  _weight: 3.4
+  _maxStack: 1
+  _allowRotation: 1
+  _backgroundColor: {r: 1, g: 1, b: 1, a: 0.04}
+  _fallbackIcon: {fileID: 0}
+  _iconOverride: {fileID: 0}
+  _visualPrefab: {fileID: 4635513672908284740, guid: 340ea9cc7e125484689521490c0db617, type: 3}
+  _defaultIconVariant: []
+  _icon:
+    _generateIcon: 1
+    _pixelsPerCell: 64
+    _antiAliasing: 1
+    _useOutline: 0
+    _outlineWidth: 2
+    _useShadow: 1
+    _shadowOffset: {x: 2, y: -2}
+    _shadowBlur: 2
+    _defaultView:
+      _modelEulerAngles: {x: 0, y: 0, z: 0}
+      _modelScale: {x: 1, y: 1, z: 1}
+      _cameraEulerAngles: {x: 0, y: -90, z: 0}
+      _padding: 1.15
+      _useDirectionalLight: 1
+      _lightIntensity: 10
+    _useCustomSlotView: 0
+    _slotView:
+      _modelEulerAngles: {x: 0, y: 0, z: 0}
+      _modelScale: {x: 1, y: 1, z: 1}
+      _cameraEulerAngles: {x: 0, y: -90, z: 0}
+      _padding: 1.15
+      _useDirectionalLight: 1
+      _lightIntensity: 10
+  _components:
+  - rid: 115149063313949397
+  - rid: 115149063313949398
+  - rid: 115149063313949399
+  - rid: 115149063313949400
+  - rid: 115149063313949401
+  references:
+    version: 2
+    RefIds:
+    - rid: 115149063313949397
+      type: {class: WeaponStatsComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      data:
+        _section: wpn_ak12
+        _weaponClass: assault_rifle
+        _cost: 95000
+        _repairType: 
+        _hitPower: 1
+        _hitImpulse: 10
+        _bulletSpeed: 900
+        _fireDistance: 650
+        _rpm: 700
+        _fireModes: 0200000001000000ffffffffi
+        _magazineSize: 45
+        _ammoClasses:
+        - ammo_5.45x39_fmj
+        - ammo_5.45x39_ap
+        _fireDispersionBase: 0.21
+        _camDispersion: 0.6
+        _camDispersionIncrement: 0.4
+        _conditionShotDecrement: 0.0005
+        _misfireProbability: 0.005
+        _silencerStatus: 2
+        _silencerSection: sil_tgp-a
+        _scopeStatus: 2
+        _scopes:
+        - ac10632
+        - acog
+        _compatibleScopes:
+        - {fileID: 11400000, guid: 867a7f373388760469fc24ccebf9f005, type: 2}
+        - {fileID: 11400000, guid: 47f9977e8eb796245ab8518ef902a33e, type: 2}
+        - {fileID: 11400000, guid: b8f7a32877cf9f944a197c0a2dea0985, type: 2}
+        - {fileID: 11400000, guid: 9f2fc43076f60a5459bd673f5547bd94, type: 2}
+        - {fileID: 11400000, guid: fc1a4cfb4771da944a45b0e79530107d, type: 2}
+        - {fileID: 11400000, guid: d855bb1f921169747b0732aaaa6a69a5, type: 2}
+        - {fileID: 11400000, guid: 1525e10127d18f242aba1fc3711ae389, type: 2}
+        - {fileID: 11400000, guid: 3f2facb1660da024baee567fb8ef6225, type: 2}
+        - {fileID: 11400000, guid: fda774a86032cfa49bb671d46146021c, type: 2}
+        - {fileID: 11400000, guid: 22cb15100d34bc845a2f8f79cdbf0e0a, type: 2}
+        - {fileID: 11400000, guid: f31be855ebfe15642a9e098be2a2bd71, type: 2}
+        - {fileID: 11400000, guid: 95347acdc8dd3584c9538dac3fa17378, type: 2}
+        - {fileID: 11400000, guid: 8181cebeead0e5340b5f73ba278b07f4, type: 2}
+        - {fileID: 11400000, guid: 221259caddfe3c842a416289d818380e, type: 2}
+        - {fileID: 11400000, guid: 43fb054a0e26ab0488efc9929d2c2d00, type: 2}
+        - {fileID: 11400000, guid: a0811b3d53d02aa4a8fd9b073b6e17d8, type: 2}
+        - {fileID: 11400000, guid: c7cb16990af3cc2419e8e6cf167b9836, type: 2}
+        - {fileID: 11400000, guid: 64e43c14e80127c4992bb32249221943, type: 2}
+        - {fileID: 11400000, guid: 2fb8162459955f041b6d7aa702b3cc65, type: 2}
+        - {fileID: 11400000, guid: 08d2445712ad56048aadf75a7e8f2979, type: 2}
+        - {fileID: 11400000, guid: d1f87ac9d7885eb42a25b190eb0bc0e8, type: 2}
+        - {fileID: 11400000, guid: 55b9e4df57ad16643ae21c0c2a23725e, type: 2}
+        - {fileID: 11400000, guid: c102ea3c0364621469b4fd611e1636ec, type: 2}
+        - {fileID: 11400000, guid: d9bd33fd398d5a4439fdf610f79bfd39, type: 2}
+        - {fileID: 11400000, guid: ab381d6cdabfee4499e0bb853e070ce2, type: 2}
+        - {fileID: 11400000, guid: 47a9dcca3036c484a875295e2c1a2df4, type: 2}
+        - {fileID: 11400000, guid: 2e7d984e83db37e4eb8aff33f32934a2, type: 2}
+        - {fileID: 11400000, guid: 09126018d7d4a9d4fa72717db2fd42aa, type: 2}
+        - {fileID: 11400000, guid: 0aea60fd72bbf20439531fbef8d7f762, type: 2}
+        - {fileID: 11400000, guid: 116d06cec93c73748938e8e7c294e0d0, type: 2}
+        - {fileID: 11400000, guid: 0e4b9929963f1a040b8db026e6921bbf, type: 2}
+        - {fileID: 11400000, guid: 0b165be4bec43654eaa5b3c10030535a, type: 2}
+        - {fileID: 11400000, guid: 3692a31afb1686341add931beeea3d2c, type: 2}
+        - {fileID: 11400000, guid: e95ace63b43e2ad478d34913a79b2c68, type: 2}
+        - {fileID: 11400000, guid: 890de65b739559841b6df555700037b5, type: 2}
+        _grenadeLauncherStatus: 2
+        _grenadeLauncherSection: wpn_addon_grenade_launcher
+    - rid: 115149063313949398
+      type: {class: EquippableItemComponent, ns: Inventory, asm: Inventory}
+      data:
+        _preferredSlotIds:
+        - Primary
+        - Secondary
+    - rid: 115149063313949399
+      type: {class: WeaponHudComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      data:
+        _hudModel: {fileID: 4635513672908284740, guid: 340ea9cc7e125484689521490c0db617, type: 3}
+        _weaponMotions: {fileID: 8815230551390286010, guid: 68720299cdd0826428a6359a1bbf3be7, type: 3}
+        _handsMotions: {fileID: 8815230551390286010, guid: 0dedd0517825fa149bd3697747e8abed, type: 3}
+        _handsMotionPrefix: ak12_
+        _attachmentBones:
+        - wpn_scope
+        - wpn_silencer
+        - wpn_launcher
+        _firstPersonWeapon: {fileID: 11400000, guid: a5ef703dab1c2ce47acaefef17e0d7ff, type: 2}
+        _scopeAimOffsets:
+        - _scope: {fileID: 11400000, guid: 867a7f373388760469fc24ccebf9f005, type: 2}
+          _position: {x: 0.0018352, y: -0.0083138, z: -0.06231132}
+        - _scope: {fileID: 11400000, guid: 47f9977e8eb796245ab8518ef902a33e, type: 2}
+          _position: {x: 0.0015847, y: -0.0133069, z: -0.05683396}
+        - _scope: {fileID: 11400000, guid: b8f7a32877cf9f944a197c0a2dea0985, type: 2}
+          _position: {x: 0.0016615, y: -0.0144123, z: -0.05069015}
+        - _scope: {fileID: 11400000, guid: 9f2fc43076f60a5459bd673f5547bd94, type: 2}
+          _position: {x: 0.0016837, y: 0.0006653, z: -0.06369483}
+        - _scope: {fileID: 11400000, guid: fc1a4cfb4771da944a45b0e79530107d, type: 2}
+          _position: {x: 0.0016897, y: -0.0146301, z: -0.06872257}
+        - _scope: {fileID: 11400000, guid: d855bb1f921169747b0732aaaa6a69a5, type: 2}
+          _position: {x: 0.0014038, y: -0.0206033, z: -0.0485554}
+        - _scope: {fileID: 11400000, guid: 1525e10127d18f242aba1fc3711ae389, type: 2}
+          _position: {x: 0.0016746, y: 0.0021633, z: -0.06519211}
+        - _scope: {fileID: 11400000, guid: 3f2facb1660da024baee567fb8ef6225, type: 2}
+          _position: {x: 0.001521, y: -0.0135518, z: -0.06522048}
+        - _scope: {fileID: 11400000, guid: fda774a86032cfa49bb671d46146021c, type: 2}
+          _position: {x: 0.0017632, y: -0.0033717, z: -0.06030229}
+        - _scope: {fileID: 11400000, guid: 22cb15100d34bc845a2f8f79cdbf0e0a, type: 2}
+          _position: {x: 0.0017378, y: -0.0113551, z: -0.0679166}
+        - _scope: {fileID: 11400000, guid: f31be855ebfe15642a9e098be2a2bd71, type: 2}
+          _position: {x: 0.0015361, y: -0.0220434, z: -0.07933587}
+        - _scope: {fileID: 11400000, guid: 95347acdc8dd3584c9538dac3fa17378, type: 2}
+          _position: {x: 0.0014221, y: -0.0166353, z: -0.07402604}
+        - _scope: {fileID: 11400000, guid: 8181cebeead0e5340b5f73ba278b07f4, type: 2}
+          _position: {x: 0.0009845, y: -0.0166538, z: -0.047552522}
+        - _scope: {fileID: 11400000, guid: 221259caddfe3c842a416289d818380e, type: 2}
+          _position: {x: 0.0016839, y: -0.0161126, z: -0.068825245}
+        - _scope: {fileID: 11400000, guid: 43fb054a0e26ab0488efc9929d2c2d00, type: 2}
+          _position: {x: 0.0017342, y: -0.0111122, z: -0.06081629}
+        - _scope: {fileID: 11400000, guid: a0811b3d53d02aa4a8fd9b073b6e17d8, type: 2}
+          _position: {x: 0.0016646, y: -0.0114924, z: -0.07751687}
+        - _scope: {fileID: 11400000, guid: c7cb16990af3cc2419e8e6cf167b9836, type: 2}
+          _position: {x: 0.0017101, y: -0.0147298, z: -0.06542277}
+        - _scope: {fileID: 11400000, guid: 64e43c14e80127c4992bb32249221943, type: 2}
+          _position: {x: 0.0008527, y: -0.0136175, z: -0.041331466}
+        - _scope: {fileID: 11400000, guid: 2fb8162459955f041b6d7aa702b3cc65, type: 2}
+          _position: {x: 0.0015694, y: -0.0185143, z: -0.04092711}
+        - _scope: {fileID: 11400000, guid: 08d2445712ad56048aadf75a7e8f2979, type: 2}
+          _position: {x: 0.000963, y: -0.0141993, z: -0.04208551}
+        - _scope: {fileID: 11400000, guid: d1f87ac9d7885eb42a25b190eb0bc0e8, type: 2}
+          _position: {x: 0.0017617, y: -0.0101986, z: -0.043934938}
+        - _scope: {fileID: 11400000, guid: 55b9e4df57ad16643ae21c0c2a23725e, type: 2}
+          _position: {x: 0.0018114, y: -0.009404, z: -0.0720132}
+        - _scope: {fileID: 11400000, guid: c102ea3c0364621469b4fd611e1636ec, type: 2}
+          _position: {x: 0.0017273, y: -0.0120863, z: -0.047645766}
+        - _scope: {fileID: 11400000, guid: d9bd33fd398d5a4439fdf610f79bfd39, type: 2}
+          _position: {x: 0.0010856, y: -0.0237428, z: -0.054938614}
+        - _scope: {fileID: 11400000, guid: ab381d6cdabfee4499e0bb853e070ce2, type: 2}
+          _position: {x: 0.0008976, y: -0.0141614, z: -0.045216408}
+        - _scope: {fileID: 11400000, guid: 47a9dcca3036c484a875295e2c1a2df4, type: 2}
+          _position: {x: 0.0018838, y: 0.0007553, z: -0.07379484}
+        - _scope: {fileID: 11400000, guid: 2e7d984e83db37e4eb8aff33f32934a2, type: 2}
+          _position: {x: 0.0015048, y: -0.0108882, z: -0.07241563}
+        - _scope: {fileID: 11400000, guid: 09126018d7d4a9d4fa72717db2fd42aa, type: 2}
+          _position: {x: 0.0016846, y: -0.011964, z: -0.06421771}
+        - _scope: {fileID: 11400000, guid: 0aea60fd72bbf20439531fbef8d7f762, type: 2}
+          _position: {x: 0.0012467, y: -0.0118186, z: -0.05924685}
+        - _scope: {fileID: 11400000, guid: 116d06cec93c73748938e8e7c294e0d0, type: 2}
+          _position: {x: 0.0014509, y: -0.0022736, z: -0.06320001}
+        - _scope: {fileID: 11400000, guid: 0e4b9929963f1a040b8db026e6921bbf, type: 2}
+          _position: {x: 0.0015287, y: -0.0174376, z: -0.0506371}
+        - _scope: {fileID: 11400000, guid: 0b165be4bec43654eaa5b3c10030535a, type: 2}
+          _position: {x: 0.0016616, y: -0.0149011, z: -0.050535947}
+        - _scope: {fileID: 11400000, guid: 3692a31afb1686341add931beeea3d2c, type: 2}
+          _position: {x: 0.0014876, y: -0.013971, z: -0.052021097}
+        - _scope: {fileID: 11400000, guid: e95ace63b43e2ad478d34913a79b2c68, type: 2}
+          _position: {x: 0.0008717, y: -0.0135321, z: -0.04708704}
+        - _scope: {fileID: 11400000, guid: 890de65b739559841b6df555700037b5, type: 2}
+          _position: {x: 0.0012874, y: -0.0183673, z: -0.05157731}
+    - rid: 115149063313949400
+      type: {class: ItemTakeSoundComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      data:
+        _category: weapon
+        _clips:
+        - {fileID: 8300000, guid: ffaa18b396584214484ce81b26793ce4, type: 3}
+        - {fileID: 8300000, guid: 5a49c4bfd5dafa843969f2f14f2bac47, type: 3}
+    - rid: 115149063313949401
+      type: {class: WorldItemComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      data:
+        _prefab: {fileID: 2574177964651876696, guid: 340ea9cc7e125484689521490c0db617, type: 3}

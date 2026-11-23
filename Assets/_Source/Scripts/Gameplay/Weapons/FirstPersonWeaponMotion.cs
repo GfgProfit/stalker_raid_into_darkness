@@ -38,6 +38,7 @@ namespace RaidIntoDarkness.Weapons
         [SerializeField] private string _handsName;
         [SerializeField] private AnimationClip _hands;
         [SerializeField] private AnimationClip _weapon;
+        [SerializeField] private AnimationClip _emptyWeapon;
         [SerializeField] private XRayAnmAsset _cameraEffect;
         [SerializeField] private AudioClip _sound;
         [SerializeField] private float _speed = 1.0f;
@@ -57,6 +58,7 @@ namespace RaidIntoDarkness.Weapons
         public string HandsName => _handsName;
         public AnimationClip Hands => _hands;
         public AnimationClip Weapon => _weapon;
+        public AnimationClip EmptyWeapon => _emptyWeapon;
         public XRayAnmAsset CameraEffect => _cameraEffect;
         public AudioClip Sound => _sound;
         public float Speed => Mathf.Max(MIN_SPEED, _speed);

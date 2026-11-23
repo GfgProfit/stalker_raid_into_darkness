@@ -1,0 +1,65 @@
+fileFormatVersion: 2
+guid: 2e219ff8488837440b34907b89a1b154
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\ak74m\gp25|models\weapons
+    second: {fileID: 2100000, guid: 8cf765d2c49bfc04ab81555309c1badc, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\ammo_5x45|models\weapons
+    second: {fileID: 2100000, guid: 72f6cd278280ad64693cac2c157a27ea, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\foregrip_afg|models\model
+    second: {fileID: 2100000, guid: 5bea53a993057a74c89369789de0ba56, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\sights|models\selflightl
+    second: {fileID: 2100000, guid: 58127d87951b89045a3f9fcbe386c95d, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\wpn_addon_sil_tgp-a|models\weapons
+    second: {fileID: 2100000, guid: 79c8eaa893375db41a106731bdaaf06c, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\wpn_ak12_part1|models\weapons
+    second: {fileID: 2100000, guid: 493bbc9da932104418f6868444f6166b, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\wpn_ak12_part2|models\weapons
+    second: {fileID: 2100000, guid: a880736090efd1149a7fb09e12c01294, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\wpn_mag_ak74_45_diff|models\weapons
+    second: {fileID: 2100000, guid: edc1b954138337a40b12cc67390cfe43, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\wpn_vog|models\weapons
+    second: {fileID: 2100000, guid: ad714c281ab5c034ba2600e4d53d3a28, type: 2}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 61e536e21e96f284493f2969a9250cdf, type: 3}
+  _scale: 1
+  _importMaterials: 1
+  _texturesFolder: 
+  _searchTexturesByName: 1
+  _importEmbeddedMotions: 1
+  _embeddedLoopMode: 0
+  _addAnimator: 1
+  _readableMeshes: 0
+  _updateWhenOffscreen: 0
+  _autoResolveResources: 1

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Inventory;
 using RaidIntoDarkness.Player;
@@ -17,6 +18,10 @@ namespace RaidIntoDarkness.Integrations.Inventory
         private InventoryModel _model;
         private AnomalyDamageReceiver _damageReceiver;
         private bool _seeded;
+
+        internal event Action InventoryRestored;
+
+        internal bool IsRestoring { get; private set; }
 
         public ItemDatabase Database => _database;
         public InventorySeed Seed => _seed;
@@ -150,6 +155,29 @@ namespace RaidIntoDarkness.Integrations.Inventory
 
         public string SaveJson() => InventorySerializer.ToJson(Model);
 
-        public InventoryLoadReport LoadJson(string json) => InventorySerializer.FromJson(Model, json);
+        public InventoryLoadReport LoadJson(string json)
+        {
+            InventorySaveData data = string.IsNullOrEmpty(json) ? null : JsonUtility.FromJson<InventorySaveData>(json);
+            if (data == null)
+            {
+                return new InventoryLoadReport();
+            }
+
+            IsRestoring = true;
+            try
+            {
+                if (Model.TryGetContainer(_equipmentContainerId, out SlottedContainer equipment) && equipment.IsSlotLocked(OutfitSlotRules.BACKPACK_SLOT))
+                {
+                    Model.TrySetSlotLocked(equipment.Id, OutfitSlotRules.BACKPACK_SLOT, false);
+                }
+
+                return InventorySerializer.Restore(Model, data);
+            }
+            finally
+            {
+                IsRestoring = false;
+                InventoryRestored?.Invoke();
+            }
+        }
     }
 }

@@ -52,7 +52,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
         private FirstPersonOutfitBinder _outfitBinder;
         private FirstPersonWeaponBinder _weaponBinder;
         private InventoryWeaponAttachments _weaponAttachments;
-        private OutfitHelmetRule _helmetRule;
+        private OutfitSlotRules _outfitSlotRules;
         private EquipmentAnimationQueue _equipmentAnimations;
         private InventoryItemSounds _itemSounds;
         private ItemInstance _statsHovered;
@@ -369,10 +369,10 @@ namespace RaidIntoDarkness.Integrations.Inventory
 
             _weaponAttachments?.Dispose();
 
-            if (_helmetRule != null)
+            if (_outfitSlotRules != null)
             {
-                _helmetRule.Dispose();
-                _helmetRule = null;
+                _outfitSlotRules.Dispose();
+                _outfitSlotRules = null;
             }
 
             if (_equipmentAnimations != null)
@@ -406,6 +406,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
             _bound = true;
             _window.ItemConditionProvider = GetItemCondition;
             _window.Bind(_inventory.Model, new ItemIconCacheProvider());
+            BindBackpackLockSprite();
             _inventory.SeedOnce();
             BindSorting();
             _statsFormatter = new EquipmentStatsFormatter(_window);
@@ -418,8 +419,8 @@ namespace RaidIntoDarkness.Integrations.Inventory
 
             _itemSounds = new InventoryItemSounds(_window);
             _weaponAttachments = new InventoryWeaponAttachments(_window);
-            _helmetRule = new OutfitHelmetRule(_window);
-            _helmetRule.Refresh();
+            _outfitSlotRules = new OutfitSlotRules(_window, _inventory);
+            _outfitSlotRules.Refresh();
 
             if (_player != null && _player.Rig != null)
             {
@@ -457,6 +458,18 @@ namespace RaidIntoDarkness.Integrations.Inventory
             _window.Actions.Unregister(InventoryBuiltInActions.INSPECT);
             _window.Actions.Register(new InventoryDelegateAction(FAVORITE_ACTION, 45, GetFavoriteLabel, context => _sorting.ToggleFavorite(context.Item.Definition), context => _sorting.IsSorted(context.Item.ContainerId)));
             _window.Actions.Register(new InventoryDelegateAction(JUNK_ACTION, 46, GetJunkLabel, context => _sorting.ToggleJunk(context.Item.Definition), context => _sorting.IsSorted(context.Item.ContainerId)));
+        }
+
+        private void BindBackpackLockSprite()
+        {
+            if (_window.FindGrid(_window.EquipmentContainerId) is InventoryEquipmentPanel panel)
+            {
+                InventoryEquipmentSlot backpack = panel.GetSlotView(OutfitSlotRules.BACKPACK_SLOT);
+                if (backpack != null && backpack.LockedSprite == null)
+                {
+                    backpack.SetLockedSprite(panel.GetSlotView(OutfitSlotRules.HELMET_SLOT)?.LockedSprite);
+                }
+            }
         }
 
         private string GetFavoriteLabel(InventoryActionContext context)

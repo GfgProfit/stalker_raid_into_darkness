@@ -315,14 +315,15 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
             Sprite weapon = LoadSprite("gra_hl_weapon");
             Sprite quick = LoadSprite("gra_hl_quick");
             Sprite blocker = LoadSprite("gra_blocker_small");
+            Sprite equipmentLock = LoadSprite(HELMET_BLOCKER_SPRITE);
             var visuals = new List<InventorySlotVisual>
             {
-                Slot("Head", 12f, 9f, 75f, 96f, "ШЛЕМ", helmet),
+                Slot(OutfitSlotRules.HELMET_SLOT, 12f, 9f, 75f, 96f, "ШЛЕМ", helmet, equipmentLock),
                 Slot("Device", 93f, 9f, 75f, 42f, "УСТРОЙСТВО", small),
                 Slot("Pda", 174f, 9f, 75f, 42f, "ПДА", small),
                 Slot("Outfit", 93f, 63f, 75f, 150f, "КОСТЮМ", armor),
                 Slot("Detector", 174f, 63f, 75f, 42f, "ДЕТЕКТОР", small),
-                Slot("Backpack", 12f, 117f, 75f, 96f, "РЮКЗАК", helmet),
+                Slot(OutfitSlotRules.BACKPACK_SLOT, 12f, 117f, 75f, 96f, "РЮКЗАК", helmet, equipmentLock),
                 Slot("Binocular", 174f, 117f, 75f, 42f, "БИНОКЛЬ", small),
                 Slot("Knife", 174f, 171f, 75f, 42f, "ХОЛОДНОЕ", small),
                 Slot("Primary", 12f, 225f, 237f, 96f, "ОСНОВНОЕ", weapon),
@@ -353,9 +354,9 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
             return grid;
         }
 
-        private static InventorySlotVisual Slot(string id, float x, float y, float width, float height, string label, Sprite highlight)
+        private static InventorySlotVisual Slot(string id, float x, float y, float width, float height, string label, Sprite highlight, Sprite lockedSprite = null)
         {
-            return new InventorySlotVisual(id, U(x, y, width, height), InventorySlotLabelAnchor.TopRight, label, highlight);
+            return new InventorySlotVisual(id, U(x, y, width, height), InventorySlotLabelAnchor.TopRight, label, highlight, lockedSprite);
         }
 
         private static InventoryGridView BagGrid(RectTransform panel, string name, string containerId, string ownerId, string displayName)
@@ -547,7 +548,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
                     EditorUtility.SetDirty(slot);
                 }
 
-                if (slot.SlotId == OutfitHelmetRule.HELMET_SLOT && slot.LockedSprite == null)
+                if ((slot.SlotId == OutfitSlotRules.HELMET_SLOT || slot.SlotId == OutfitSlotRules.BACKPACK_SLOT) && slot.LockedSprite == null)
                 {
                     slot.SetLockedSprite(LoadSprite(HELMET_BLOCKER_SPRITE));
                     EditorUtility.SetDirty(slot);

@@ -333,6 +333,12 @@ namespace RaidIntoDarkness.Integrations.Inventory
 
         private void ExpandBackpack(Request request)
         {
+            if (request.Kind == RequestKind.Equip && _window.CanEquipItem(request.Item) == false)
+            {
+                SetInUse(request.Item, false);
+                return;
+            }
+
             FirstPersonEquipmentAnimationLibrary library = Library;
             FirstPersonHudMotion equip = library.Find(library.GetBackpackSection(FirstPersonEquipmentAnimationLibrary.BACKPACK_EQUIP_PREFIX, _community), FirstPersonEquipmentAnimationLibrary.ANM_USE);
             FirstPersonHudMotion unequip = library.Find(library.GetBackpackSection(FirstPersonEquipmentAnimationLibrary.BACKPACK_UNEQUIP_PREFIX, _community), FirstPersonEquipmentAnimationLibrary.ANM_USE);

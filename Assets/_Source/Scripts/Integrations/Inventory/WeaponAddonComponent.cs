@@ -29,6 +29,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
         [SerializeField] private AudioClip _attachSound;
         [SerializeField] private AudioClip _detachSound;
         [SerializeField] private ItemDefinition _grenadeAmmo;
+        [SerializeField] private ItemDefinition _alternativeGrenadeAmmo;
 
         public string Section => _section ?? string.Empty;
         public WeaponAddonKind Kind => _kind;
@@ -45,9 +46,22 @@ namespace RaidIntoDarkness.Integrations.Inventory
         public AudioClip AttachSound => _attachSound;
         public AudioClip DetachSound => _detachSound;
         public ItemDefinition GrenadeAmmo => _grenadeAmmo;
+        public ItemDefinition AlternativeGrenadeAmmo => _alternativeGrenadeAmmo;
 
         public override float GetAdditionalWeight(ItemInstance item, IItemDefinitionResolver resolver) => GetLoadedGrenade(item)?.Weight ?? 0f;
 
-        public ItemDefinition GetLoadedGrenade(ItemInstance item) => _grenadeAmmo != null && item?.GetState(InventoryWeaponAttachments.GRENADE_ROUND_STATE) == _grenadeAmmo.DefinitionId ? _grenadeAmmo : null;
+        public bool SupportsGrenadeAmmo(ItemDefinition definition) => definition != null && (definition == _grenadeAmmo || definition == _alternativeGrenadeAmmo);
+
+        public ItemDefinition GetLoadedGrenade(ItemInstance item)
+        {
+            string roundId = item?.GetState(InventoryWeaponAttachments.GRENADE_ROUND_STATE);
+
+            if (_grenadeAmmo != null && roundId == _grenadeAmmo.DefinitionId)
+            {
+                return _grenadeAmmo;
+            }
+
+            return _alternativeGrenadeAmmo != null && roundId == _alternativeGrenadeAmmo.DefinitionId ? _alternativeGrenadeAmmo : null;
+        }
     }
 }

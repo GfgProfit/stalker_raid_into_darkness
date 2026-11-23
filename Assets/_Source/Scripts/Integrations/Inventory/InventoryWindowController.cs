@@ -588,7 +588,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
                 ammo = ammoDefinition.GetComponent<AmmoStatsComponent>();
             }
 
-            bool compatible = weapon != null && ammo != null && (weapon.SupportsAmmo(ammo.Section) || weapon.GetGrenadeLauncher(weaponItem, _window.Model.Resolver)?.GetComponent<WeaponAddonComponent>()?.GrenadeAmmo == ammoDefinition);
+            bool compatible = weapon != null && ammo != null && (weapon.SupportsAmmo(ammo.Section) || weapon.GetGrenadeLauncher(weaponItem, _window.Model.Resolver)?.GetComponent<WeaponAddonComponent>()?.SupportsGrenadeAmmo(ammoDefinition) == true);
             compatible |= _weaponAttachments != null && (_weaponAttachments.Handles(item, _compatibilityHovered) || _weaponAttachments.Handles(_compatibilityHovered, item));
             return compatible ? new InventoryItemDecoration(_compatibleAmmoTint, decoration.Badge, decoration.CommunityIcon, decoration.CommunityIconSize) : decoration;
         }

@@ -63,9 +63,22 @@ namespace RaidIntoDarkness.Integrations.Inventory
         {
             ItemInstance weapon = GetWeapon(weaponKey);
             WeaponAddonComponent launcher = GetGrenadeLauncher(weapon);
-            ItemDefinition grenade = launcher?.GrenadeAmmo;
-            loaded = launcher?.GetLoadedGrenade(weapon) != null ? 1 : 0;
+            ItemDefinition grenade = launcher?.GetLoadedGrenade(weapon);
+            loaded = grenade != null ? 1 : 0;
+            grenade ??= launcher?.GrenadeAmmo;
             reserve = Count(grenade?.GetComponent<AmmoStatsComponent>()?.Section);
+
+            if (loaded == 0 && reserve == 0 && launcher?.AlternativeGrenadeAmmo != null)
+            {
+                int alternativeReserve = Count(launcher.AlternativeGrenadeAmmo.GetComponent<AmmoStatsComponent>()?.Section);
+
+                if (alternativeReserve > 0)
+                {
+                    grenade = launcher.AlternativeGrenadeAmmo;
+                    reserve = alternativeReserve;
+                }
+            }
+
             name = grenade?.ShortName ?? string.Empty;
         }
 
@@ -233,13 +246,17 @@ namespace RaidIntoDarkness.Integrations.Inventory
         private ItemInstance FindGrenadeStack(ItemInstance weapon)
         {
             WeaponAddonComponent launcher = GetGrenadeLauncher(weapon);
-            ItemDefinition grenade = launcher?.GrenadeAmmo;
-            if (grenade == null || launcher.GetLoadedGrenade(weapon) != null)
+            if (launcher == null || launcher.GetLoadedGrenade(weapon) != null)
             {
                 return null;
             }
 
-            ItemInstance stack = FindStack(grenade.GetComponent<AmmoStatsComponent>()?.Section);
+            return FindGrenadeStack(launcher.GrenadeAmmo) ?? FindGrenadeStack(launcher.AlternativeGrenadeAmmo);
+        }
+
+        private ItemInstance FindGrenadeStack(ItemDefinition grenade)
+        {
+            ItemInstance stack = FindStack(grenade?.GetComponent<AmmoStatsComponent>()?.Section);
             return stack?.Definition == grenade ? stack : null;
         }
 

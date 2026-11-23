@@ -10,6 +10,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
+using UnityEngine.VFX;
 
 namespace RaidIntoDarkness.Integrations.Inventory.Tests
 {
@@ -291,6 +292,10 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             Assert.That(muzzleLight.type, Is.EqualTo(LightType.Point));
             Assert.That(muzzleLight.shadows, Is.EqualTo(LightShadows.None));
             Assert.That(muzzleLight.intensity, Is.GreaterThan(0f));
+            FirstPersonWeaponAsset asset = weapons.ActiveWeapon;
+            yield return WaitForShotEffect(asset.FlameParticles, weapons.Muzzle);
+            VisualEffect firstFlash = weapons.Muzzle.GetComponentInChildren<VisualEffect>();
+            AssertDavfxShot(firstFlash, weapons.Muzzle.TransformVector(Vector3.forward));
             yield return new WaitForSeconds(0.25f);
             Assert.That(muzzleLight.gameObject.activeSelf, Is.False);
 
@@ -304,12 +309,11 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             Assert.That(weapons.Model, Is.SameAs(originalModel));
             Assert.That(weapons.IsSilenced, Is.True);
             Assert.That(view.SilencerVisual.activeSelf, Is.True);
-            FirstPersonWeaponAsset asset = weapons.ActiveWeapon;
             Assert.That(asset.SilencedShotSounds.Count, Is.EqualTo(7));
             Assert.That(asset.SilencedShotSounds[0].name, Is.EqualTo("aug_silencer_stereo"));
             Assert.That(asset.SilencedFlameParticles, Is.Null);
-            Assert.That(asset.SilencedSmokeParticles.name, Is.EqualTo("generic_shoot_00"));
             float weightBeforeShot = weapon.TotalWeight;
+            Vector3 silencedDirection = weapons.Muzzle.TransformVector(Vector3.forward);
             Press(_mouse.leftButton, queueEventOnly: true);
             yield return null;
             Release(_mouse.leftButton, queueEventOnly: true);
@@ -317,19 +321,93 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             Assert.That(weapons.Magazine, Is.EqualTo(28));
             Assert.That(muzzleLight.gameObject.activeSelf, Is.False);
             Assert.That(weapon.TotalWeight, Is.EqualTo(weightBeforeShot - Find(controller, "ammo_5.56x45_ss190").Weight).Within(0.0001f));
-            bool smoke = false;
-
-            foreach (XRayParticleGroupPlayer effect in Object.FindObjectsByType<XRayParticleGroupPlayer>(FindObjectsSortMode.None))
-            {
-                Assert.That(effect.name == asset.FlameParticles.name && effect.IsPlaying, Is.False);
-                smoke |= effect.name == asset.SilencedSmokeParticles.name && effect.IsPlaying;
-            }
-
-            Assert.That(smoke, Is.True);
+            Assert.That(IsShotEffectPlaying(asset.FlameParticles), Is.False);
+            yield return WaitForShotEffect(asset.SilencedSmokeParticles, null);
+            VisualEffect smoke = FindShotVisualEffect(asset.SilencedSmokeParticles.name, null, true);
+            AssertDavfxShot(smoke, silencedDirection);
             Assert.That(controller.WeaponAttachments.Detach(weapon).Success, Is.True);
             Assert.That(weapons.IsSilenced, Is.False);
             Assert.That(view.SilencerVisual.activeSelf, Is.False);
             Assert.That(weapons.Muzzle, Is.SameAs(view.Muzzle));
+
+            Press(_mouse.leftButton, queueEventOnly: true);
+            yield return null;
+            Release(_mouse.leftButton, queueEventOnly: true);
+            Assert.That(weapons.Magazine, Is.EqualTo(27));
+            yield return WaitForShotEffect(asset.FlameParticles, weapons.Muzzle);
+            if (firstFlash != null)
+            {
+                Assert.That(weapons.Muzzle.GetComponentInChildren<VisualEffect>(), Is.SameAs(firstFlash));
+            }
+
+            yield return new WaitForSeconds(2f);
+            float deadline = Time.time + 0.65f;
+            while (Time.time < deadline)
+            {
+                Assert.That(firstFlash == null || firstFlash.aliveParticleCount == 0, Is.True);
+                Assert.That(smoke == null || smoke.aliveParticleCount == 0, Is.True);
+                yield return null;
+            }
+        }
+
+        private static IEnumerator WaitForShotEffect(GameObject prefab, Transform parent)
+        {
+            Assert.That(prefab, Is.Not.Null);
+            float deadline = Time.realtimeSinceStartup + 3f;
+            while (Time.realtimeSinceStartup < deadline)
+            {
+                if (IsShotEffectPlaying(prefab, parent, true))
+                {
+                    yield break;
+                }
+
+                yield return null;
+            }
+
+            Assert.Fail($"{prefab.name} did not emit at the expected transform.");
+        }
+
+        private static bool IsShotEffectPlaying(GameObject prefab, Transform parent = null, bool checkPlacement = false)
+        {
+            if (prefab.GetComponent<VisualEffect>() != null)
+            {
+                return FindShotVisualEffect(prefab.name, parent, checkPlacement) != null;
+            }
+
+            foreach (XRayParticleGroupPlayer effect in Object.FindObjectsByType<XRayParticleGroupPlayer>(FindObjectsSortMode.None))
+            {
+                if (effect.name == prefab.name && effect.IsPlaying && (!checkPlacement || effect.transform.parent == parent))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static VisualEffect FindShotVisualEffect(string effectName, Transform parent, bool checkPlacement)
+        {
+            foreach (VisualEffect effect in Object.FindObjectsByType<VisualEffect>(FindObjectsSortMode.None))
+            {
+                if (effect.name == effectName && effect.aliveParticleCount > 0 && (!checkPlacement || (!effect.culled && effect.transform.parent == parent)))
+                {
+                    return effect;
+                }
+            }
+
+            return null;
+        }
+
+        private static void AssertDavfxShot(VisualEffect effect, Vector3 muzzleDirection)
+        {
+            if (effect == null || !effect.HasBool("Single Burst Mode") || !effect.HasFloat("Burst Delay"))
+            {
+                return;
+            }
+
+            Assert.That(effect.GetBool("Single Burst Mode"), Is.True, effect.name);
+            Vector3 forward = effect.transform.TransformVector(Vector3.right).normalized;
+            Assert.That(Vector3.Dot(forward, muzzleDirection.normalized), Is.GreaterThan(0.98f), effect.name);
         }
 
         private static IEnumerator LoadScene()

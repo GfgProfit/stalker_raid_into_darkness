@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using RaidIntoDarkness.Effects;
 using RaidIntoDarkness.FirstPerson;
 using RaidIntoDarkness.Player;
 using UnityEngine;
@@ -52,7 +51,7 @@ namespace RaidIntoDarkness.Weapons
         private Transform _muzzle;
         private bool _muzzleFromView;
         private bool _ballisticsWarningLogged;
-        private XRayParticleGroupPlayer _flame;
+        private FirstPersonWeaponEffects.Instance _flame;
         private Vector3 _savedHandsPosition;
         private Quaternion _savedHandsRotation;
         private FirstPersonWeaponMotionKind _loopKind;
@@ -764,12 +763,12 @@ namespace RaidIntoDarkness.Weapons
 
         private void UpdateFlame()
         {
-            if (_flame == null || _muzzle == null || !_flame.IsPlaying || _flame.transform.parent != _muzzle)
+            if (_flame == null || _muzzle == null || !_flame.IsPlaying || _flame.Transform.parent != _muzzle)
             {
                 return;
             }
 
-            _flame.transform.SetPositionAndRotation(_muzzle.position, GetMuzzleRotation(_muzzle));
+            _flame.SetPose(_muzzle.position, GetMuzzleRotation(_muzzle));
         }
 
         private void StartReload(FirstPersonWeaponAsset asset)

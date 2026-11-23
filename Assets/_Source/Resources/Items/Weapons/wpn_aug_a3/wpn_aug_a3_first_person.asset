@@ -194,10 +194,10 @@ MonoBehaviour:
   _emptyClicksPerMinute: 200
   _fireModes: 01000000ffffffff
   _magazineSize: 30
-  _flameParticles: {fileID: 2515879888457937910, guid: 3a54de4ee2055394b86df40a9e566872, type: 3}
-  _smokeParticles: {fileID: 6292335335723028336, guid: 3e67f16876bef364ca7d91540a96b1ee, type: 3}
+  _flameParticles: {fileID: 1638134696978131575, guid: 888c61a587273744db3b3f256cc07bf2, type: 3}
+  _smokeParticles: {fileID: 0}
   _silencedFlameParticles: {fileID: 0}
-  _silencedSmokeParticles: {fileID: 6292335335723028336, guid: 3e67f16876bef364ca7d91540a96b1ee, type: 3}
+  _silencedSmokeParticles: {fileID: 5014066413768312356, guid: 661febcccf8a0aa4489000084bc1daed, type: 3}
   _lastShotHoldFrame: 1
   _emptyShotStrength: 0.15
   _ballistics:

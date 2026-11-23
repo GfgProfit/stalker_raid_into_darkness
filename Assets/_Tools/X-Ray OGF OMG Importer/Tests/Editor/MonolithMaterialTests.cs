@@ -85,6 +85,41 @@ namespace XRay.Importer.Tests
         }
 
         [Test]
+        public void PngBumpCompressedToBc7KeepsItsUvOrientation()
+        {
+            using (var scope = new XRayImportTestScope(null))
+            {
+                var source = new Texture2D(16, 16, TextureFormat.RGBA32, false, true);
+                var material = new Material(Shader.Find(MonolithMaterialConfigurator.SHADER_NAME));
+                try
+                {
+                    string path = scope.Folder + "/packed.png";
+                    System.IO.File.WriteAllBytes(path, source.EncodeToPNG());
+                    AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceSynchronousImport);
+                    var importer = (TextureImporter)AssetImporter.GetAtPath(path);
+                    importer.sRGBTexture = false;
+                    TextureImporterPlatformSettings standalone = importer.GetPlatformTextureSettings("Standalone");
+                    standalone.overridden = true;
+                    standalone.format = TextureImporterFormat.BC7;
+                    importer.SetPlatformTextureSettings(standalone);
+                    importer.SaveAndReimport();
+                    var bump = AssetDatabase.LoadAssetAtPath<Texture2D>(path);
+                    Assert.That(bump.format, Is.EqualTo(TextureFormat.BC7));
+
+                    MonolithMaterialConfigurator.Configure(material, null, Texture2D.whiteTexture, bump, bump, true);
+                    Assert.That(material.GetFloat("_MonolithBumpFlipV"), Is.Zero);
+                    MonolithMaterialInspector.UpdateTexturePresence(material);
+                    Assert.That(material.GetFloat("_MonolithHasBumpCorrection"), Is.EqualTo(1.0f));
+                }
+                finally
+                {
+                    Object.DestroyImmediate(material);
+                    Object.DestroyImmediate(source);
+                }
+            }
+        }
+
+        [Test]
         public void AugTestPreservesAtlasAndMaterialAssignments()
         {
             const string FIXTURE_FOLDER = "Assets/_Source/Tests/Weapons/Fixtures/MonolithHDRP";

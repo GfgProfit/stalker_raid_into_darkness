@@ -32,7 +32,7 @@ namespace XRay.Importer.Editor
             material.SetTexture("_MonolithBumpCorrection", correction);
             material.SetFloat("_MonolithHasBumpCorrection", bump != null && correction != null ? 1.0f : 0.0f);
             material.SetFloat("_MonolithHasBump", bump != null ? 1.0f : 0.0f);
-            material.SetFloat("_MonolithBumpFlipV", bump != null && (bump.format == TextureFormat.BC7 || bump.format == TextureFormat.BC6H) ? 1.0f : 0.0f);
+            material.SetFloat("_MonolithBumpFlipV", RequiresPackedTextureFlipV(bump) ? 1.0f : 0.0f);
             material.SetFloat("_MonolithMaterialId", description != null && description.HasMaterial ? description.MaterialId : 1);
             material.SetFloat("_MonolithMaterialWeight", description != null && description.HasMaterial ? (float)description.MaterialWeight : 0.0f);
             material.SetFloat("_MonolithFlipGreen", flipGreen ? 1.0f : 0.0f);
@@ -57,6 +57,11 @@ namespace XRay.Importer.Editor
             material.DisableKeyword("_NORMALMAP");
             material.renderQueue = 2000;
             EditorUtility.SetDirty(material);
+        }
+
+        internal static bool RequiresPackedTextureFlipV(Texture2D texture)
+        {
+            return texture != null && (texture.format == TextureFormat.BC7 || texture.format == TextureFormat.BC6H) && !AssetDatabase.GetAssetPath(texture).EndsWith(".png", StringComparison.OrdinalIgnoreCase);
         }
 
         public static void ConfigurePreservingSurface(Material material, XRayTextureDescription description, Texture2D albedo, Texture2D bump, Texture2D correction, bool flipGreen)

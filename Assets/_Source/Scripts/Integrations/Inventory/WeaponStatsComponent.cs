@@ -40,6 +40,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
         [SerializeField] private ItemDefinition[] _compatibleScopes = Array.Empty<ItemDefinition>();
         [SerializeField] private WeaponAddonStatus _grenadeLauncherStatus;
         [SerializeField] private string _grenadeLauncherSection;
+        [SerializeField] private bool _blockSilencerWithGrenadeLauncher;
 
         private ItemDatabase _ammoDatabase;
         private Dictionary<string, ItemDefinition> _ammoDefinitions;
@@ -68,6 +69,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
         public IReadOnlyList<ItemDefinition> CompatibleScopes => _compatibleScopes ?? Array.Empty<ItemDefinition>();
         public WeaponAddonStatus GrenadeLauncherStatus => _grenadeLauncherStatus;
         public string GrenadeLauncherSection => _grenadeLauncherSection ?? string.Empty;
+        public bool BlockSilencerWithGrenadeLauncher => _blockSilencerWithGrenadeLauncher;
 
         public override float GetAdditionalWeight(ItemInstance item, IItemDefinitionResolver resolver)
         {

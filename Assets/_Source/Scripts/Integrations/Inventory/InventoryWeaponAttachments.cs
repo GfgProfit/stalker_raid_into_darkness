@@ -84,6 +84,11 @@ namespace RaidIntoDarkness.Integrations.Inventory
                 return InventoryResult.Fail(InventoryFailure.InvalidItem);
             }
 
+            if (weapon.Definition.GetComponent<WeaponStatsComponent>().BlockSilencerWithGrenadeLauncher && GetGrenadeLauncher(weapon) != null)
+            {
+                return InventoryResult.Fail(InventoryFailure.InvalidItem);
+            }
+
             ItemInstance updated = Clone(weapon);
             InventoryItemData data = InventorySerializer.CaptureItem(silencer);
             data.Amount = 1;
@@ -236,7 +241,13 @@ namespace RaidIntoDarkness.Integrations.Inventory
 
         public InventoryResult InstallGrenadeLauncher(ItemInstance launcher, ItemInstance weapon, bool apply = true)
         {
-            if (launcher == null || weapon?.Definition.GetComponent<WeaponStatsComponent>()?.SupportsGrenadeLauncher(launcher.Definition) != true || _model.ContainsItem(launcher) == false || _model.ContainsItem(weapon) == false || GetGrenadeLauncher(weapon) != null)
+            WeaponStatsComponent stats = weapon?.Definition.GetComponent<WeaponStatsComponent>();
+            if (launcher == null || stats?.SupportsGrenadeLauncher(launcher.Definition) != true || _model.ContainsItem(launcher) == false || _model.ContainsItem(weapon) == false || GetGrenadeLauncher(weapon) != null)
+            {
+                return InventoryResult.Fail(InventoryFailure.InvalidItem);
+            }
+
+            if (stats.BlockSilencerWithGrenadeLauncher && GetSilencer(weapon) != null)
             {
                 return InventoryResult.Fail(InventoryFailure.InvalidItem);
             }

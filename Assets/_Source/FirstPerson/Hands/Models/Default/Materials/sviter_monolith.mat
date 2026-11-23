@@ -7,14 +7,13 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: act_arm_1
+  m_Name: sviter_monolith
   m_Shader: {fileID: 4800000, guid: 200cb2cfd61fa7748a0ee2925b2a29ff, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords:
   - _DISABLE_SSR_TRANSPARENT
   - _MATERIAL_FEATURE_SPECULAR_COLOR
-  - _NORMALMAP
   - _NORMALMAP_TANGENT_SPACE
   m_InvalidKeywords:
   - _MONOLITHENVCOMBINECLAMP_ON
@@ -38,7 +37,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _BaseColorMap:
-        m_Texture: {fileID: 2800000, guid: 17e40e9306eb1114394621114ac6cb1c, type: 3}
+        m_Texture: {fileID: 2800000, guid: 24debd6938b656945876bad2c42294bd, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _BentNormalMap:
@@ -74,7 +73,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: 17e40e9306eb1114394621114ac6cb1c, type: 3}
+        m_Texture: {fileID: 2800000, guid: 24debd6938b656945876bad2c42294bd, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MaskMap:
@@ -82,7 +81,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MonolithBump:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: 02b1ba38aaa9d17418bcf28cfcf069a1, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MonolithBumpCorrection:
@@ -202,7 +201,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _NormalMap:
-        m_Texture: {fileID: 2800000, guid: 306cb332de1e78342b84ca7d2bd16fc9, type: 3}
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _NormalMapOS:
@@ -324,7 +323,7 @@ Material:
     - _MonolithEnvHudHemi: 0
     - _MonolithEnvHudMask: 0
     - _MonolithEnvironmentMode: 0
-    - _MonolithFallbackGloss: 0.32215452
+    - _MonolithFallbackGloss: 0.1
     - _MonolithFlipGreen: 1
     - _MonolithFloraSource: 0
     - _MonolithFloraSubsurface: 1
@@ -338,7 +337,7 @@ Material:
     - _MonolithGrassHeightPrevious: 1
     - _MonolithGrassRuntime: 0
     - _MonolithGrassSource: 0
-    - _MonolithHasBump: 0
+    - _MonolithHasBump: 1
     - _MonolithHasBumpCorrection: 0
     - _MonolithHasDetail: 0
     - _MonolithHasDetailBump: 0
@@ -355,8 +354,8 @@ Material:
     - _MonolithLevelLod: 0
     - _MonolithLevelTerrain: 0
     - _MonolithLevelWind: 1
-    - _MonolithMaterialId: 1
-    - _MonolithMaterialWeight: 0
+    - _MonolithMaterialId: 0
+    - _MonolithMaterialWeight: 0.5
     - _MonolithOriginalTbn: 0
     - _MonolithParallaxHeight: 0.02
     - _MonolithPuddleMaskFlipV: 0
@@ -485,19 +484,3 @@ Material:
     - _UVMappingMaskEmissive: {r: 1, g: 0, b: 0, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
---- !u!114 &5130007636176651611
-MonoBehaviour:
-  m_ObjectHideFlags: 11
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: da692e001514ec24dbc4cca1949ff7e8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.RenderPipelines.HighDefinition.Editor::UnityEditor.Rendering.HighDefinition.AssetVersion
-  version: 13
-  hdPluginSubTargetMaterialVersions:
-    m_Keys: []
-    m_Values: 

@@ -16,9 +16,9 @@ MonoBehaviour:
   - _section: actor
     _displayName: "\u0411\u0435\u0437 \u043A\u043E\u0441\u0442\u044E\u043C\u0430"
     _hudSection: actor_hud
-    _handsVirtualPath: anomaly_weapons\hands\wpn_hand_01
-    _handsModel: {fileID: -271045869822288009, guid: 475a6b96ee587c842bb5357963a962aa, type: 3}
-    _handsSource: Base Anomaly
+    _handsVirtualPath: dynamics\weapons\wpn_hand\wpn_hand_no_outfit
+    _handsModel: {fileID: -4885292290061372632, guid: 475a6b96ee587c842bb5357963a962aa, type: 3}
+    _handsSource: I.W.P.
     _legsSection: actor_legs
     _bodyVirtualPath: sm\actor_legs\no_outfit
     _bodyModel: {fileID: 8558179593526729441, guid: 5dd07f9c4df451a4380ce5fb661a480f, type: 3}

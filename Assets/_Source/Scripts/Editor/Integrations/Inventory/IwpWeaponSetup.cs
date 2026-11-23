@@ -42,7 +42,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
         internal const string HANDS_MOTIONS = "meshes/dynamics/weapons/wpn_fn2000/wpn_hand_fn2000_hud_animation.omf";
         private const string MENU = "Tools/Inventory/Setup Test Weapon (AUG A3)";
         private const string LOG = "[IwpWeapon] ";
-        private const string HANDS_RIG_PATH = "Assets/_Source/FirstPerson/Hands/Models/wpn_hand_01.ogf";
+        private const string HANDS_RIG_PATH = "Assets/_Source/FirstPerson/Hands/Models/Default/wpn_hand_no_outfit.ogf";
         private const string OUTFIT_CATALOG_PATH = "Assets/_Source/FirstPerson/Outfits/OutfitCatalog.asset";
         private const string RIFLE_TAG = InventoryDemoContentBuilder.RIFLE_TAG;
         private const float PLACE_DISTANCE = 2.5f;

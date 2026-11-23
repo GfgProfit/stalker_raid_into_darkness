@@ -6,8 +6,13 @@ ScriptedImporter:
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
-      name: act\act_arm_1|models\model
-    second: {fileID: 2100000, guid: 4b7fb4afb3b8e1d49adf042f9f3798a7, type: 2}
+      name: act\New_hands\bare_hands\hand|models\model
+    second: {fileID: 2100000, guid: 14b718773166b90419b80a18aaf59a57, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: act\New_hands\sviter\sviter|models\model
+    second: {fileID: 2100000, guid: db85f671f34035044883698fb9407252, type: 2}
   serializedVersion: 2
   userData: 
   assetBundleName: 

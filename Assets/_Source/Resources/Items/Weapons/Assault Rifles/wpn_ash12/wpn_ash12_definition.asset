@@ -19,7 +19,7 @@ MonoBehaviour:
   _category: Weapon
   _tags:
   - Rifle
-  _size: {x: 5, y: 2}
+  _size: {x: 4, y: 2}
   _weight: 5.2
   _maxStack: 1
   _allowRotation: 1
@@ -164,6 +164,7 @@ MonoBehaviour:
         - {fileID: 11400000, guid: b9d1937130e564645a59b1fdb0588f4e, type: 2}
         _grenadeLauncherStatus: 0
         _grenadeLauncherSection: 
+        _blockSilencerWithGrenadeLauncher: 0
     - rid: 115149063313949398
       type: {class: EquippableItemComponent, ns: Inventory, asm: Inventory}
       data:

@@ -139,7 +139,7 @@ Camera:
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
   m_TargetEye: 3
-  m_HDR: 1
+  m_HDR: 0
   m_AllowMSAA: 0
   m_AllowDynamicResolution: 0
   m_ForceIntoRT: 0
@@ -362,7 +362,7 @@ Camera:
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
   m_TargetEye: 3
-  m_HDR: 1
+  m_HDR: 0
   m_AllowMSAA: 0
   m_AllowDynamicResolution: 0
   m_ForceIntoRT: 0
@@ -678,7 +678,7 @@ Camera:
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
   m_TargetEye: 3
-  m_HDR: 1
+  m_HDR: 0
   m_AllowMSAA: 0
   m_AllowDynamicResolution: 0
   m_ForceIntoRT: 0
@@ -994,7 +994,7 @@ Camera:
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
   m_TargetEye: 3
-  m_HDR: 1
+  m_HDR: 0
   m_AllowMSAA: 0
   m_AllowDynamicResolution: 0
   m_ForceIntoRT: 0
@@ -1217,7 +1217,7 @@ Camera:
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
   m_TargetEye: 3
-  m_HDR: 1
+  m_HDR: 0
   m_AllowMSAA: 0
   m_AllowDynamicResolution: 0
   m_ForceIntoRT: 0
@@ -1440,7 +1440,7 @@ Camera:
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
   m_TargetEye: 3
-  m_HDR: 1
+  m_HDR: 0
   m_AllowMSAA: 0
   m_AllowDynamicResolution: 0
   m_ForceIntoRT: 0
@@ -1778,7 +1778,7 @@ Camera:
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
   m_TargetEye: 3
-  m_HDR: 1
+  m_HDR: 0
   m_AllowMSAA: 0
   m_AllowDynamicResolution: 0
   m_ForceIntoRT: 0
@@ -2217,7 +2217,7 @@ Camera:
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
   m_TargetEye: 3
-  m_HDR: 1
+  m_HDR: 0
   m_AllowMSAA: 0
   m_AllowDynamicResolution: 0
   m_ForceIntoRT: 0
@@ -2945,6 +2945,7 @@ MonoBehaviour:
   _activationAimFactor: 0.95
   _magnification: 3.7
   _magnificationPerScrollNotch: 0.35
+  _aimInGrenadeMode: 0
 --- !u!137 &7349492823036725262 stripped
 SkinnedMeshRenderer:
   m_CorrespondingSourceObject: {fileID: 6172290965250737518, guid: d7cf6b7edded13f4dbf5fef655354d5a, type: 3}
@@ -3138,6 +3139,7 @@ MonoBehaviour:
   _activationAimFactor: 0.95
   _magnification: 4
   _magnificationPerScrollNotch: 0.35
+  _aimInGrenadeMode: 0
 --- !u!1 &7797825637517864196 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 6618186223956856477, guid: cb91600686638cd48826fd5ac0004c22, type: 3}
@@ -3672,6 +3674,7 @@ MonoBehaviour:
   _activationAimFactor: 0.95
   _magnification: 4
   _magnificationPerScrollNotch: 0.35
+  _aimInGrenadeMode: 0
 --- !u!1001 &5801501749297972199
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3836,6 +3839,7 @@ MonoBehaviour:
   _activationAimFactor: 0.95
   _magnification: 1
   _magnificationPerScrollNotch: 0.35
+  _aimInGrenadeMode: 0
 --- !u!137 &5478087133547993076 stripped
 SkinnedMeshRenderer:
   m_CorrespondingSourceObject: {fileID: 2055048956252165139, guid: 29e8ea99755bf4547806a30b8722df6e, type: 3}
@@ -4075,6 +4079,7 @@ MonoBehaviour:
   _activationAimFactor: 0.95
   _magnification: 3
   _magnificationPerScrollNotch: 0.35
+  _aimInGrenadeMode: 0
 --- !u!4 &7578541979312994660 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4174495868396938442, guid: aa9aa9bb2cd63274ba83bce24af8ec7f, type: 3}
@@ -4248,6 +4253,7 @@ MonoBehaviour:
   _activationAimFactor: 0.95
   _magnification: 4
   _magnificationPerScrollNotch: 0.35
+  _aimInGrenadeMode: 0
 --- !u!4 &2640552668949869508 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8144893366608282822, guid: acb2fd719dadc354b9b0cf6ae68780b9, type: 3}
@@ -4766,6 +4772,7 @@ MonoBehaviour:
   _activationAimFactor: 0.95
   _magnification: 4
   _magnificationPerScrollNotch: 0.35
+  _aimInGrenadeMode: 0
 --- !u!4 &5186048516692395859 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2033966151772191744, guid: ba9e5bca3c500c64c8b0c3bf35437bc8, type: 3}
@@ -4998,6 +5005,7 @@ MonoBehaviour:
   _activationAimFactor: 0.95
   _magnification: 2.8
   _magnificationPerScrollNotch: 0.35
+  _aimInGrenadeMode: 0
 --- !u!137 &8339913305944715424 stripped
 SkinnedMeshRenderer:
   m_CorrespondingSourceObject: {fileID: 605497402091762598, guid: e82cb918727d09c4da6753ae1fba0d2b, type: 3}

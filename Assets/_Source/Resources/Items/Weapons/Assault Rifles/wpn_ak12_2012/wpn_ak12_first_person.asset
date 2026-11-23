@@ -20,7 +20,7 @@ MonoBehaviour:
   _aimTime: 0.16666667
   _aimCameraRoll: 0
   _aimCameraBlendTime: 0.15
-  _aimZoom: 1
+  _aimZoom: 1.15
   _muzzleBone: wpn_body
   _overlayBones:
   - l_clavicle

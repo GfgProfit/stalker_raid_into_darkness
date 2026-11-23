@@ -20,7 +20,7 @@ MonoBehaviour:
   _aimTime: 0.15384616
   _aimCameraRoll: 0
   _aimCameraBlendTime: 0.15
-  _aimZoom: 1
+  _aimZoom: 1.15
   _muzzleBone: sight
   _overlayBones:
   - l_clavicle

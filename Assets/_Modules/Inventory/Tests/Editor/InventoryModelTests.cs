@@ -115,6 +115,43 @@ namespace Inventory.Tests
             Assert.That(_model.ItemCount, Is.EqualTo(2));
         }
 
+        [TestCase(59, 1, 0, true)]
+        [TestCase(58, 3, 0, false)]
+        [TestCase(58, 3, 1, true)]
+        [TestCase(60, 1, 1, true)]
+        public void ReconfigurationOnlyMergesWhenEveryReturnedItemFits(int existingAmount, int returnAmount, int extraCells, bool fits)
+        {
+            var destination = new GridContainer("Return", 1 + extraCells, 1);
+            _model.AddContainer(destination);
+            ItemInstance stack = _model.CreateItem(_ammo, existingAmount);
+            ItemInstance rifle = _model.CreateItem(_rifle);
+            Assert.That(_model.TryAdd(stack, destination.Id, Vector2Int.zero, false).Success, Is.True);
+            Assert.That(_model.TryAdd(rifle, "Backpack", Vector2Int.zero, false).Success, Is.True);
+            var updated = new ItemInstance(_rifle, rifle.Amount, rifle.InstanceId);
+            updated.SetState("test", "changed");
+            ItemInstance returned = _model.CreateItem(_ammo, returnAmount);
+            _changes.Clear();
+
+            InventoryResult preview = _model.TryReconfigureItem(rifle, updated, rifle.Location.Position, returned: returned, returnContainerId: destination.Id, apply: false, mergeReturned: true);
+            Assert.That(preview.Success, Is.EqualTo(fits));
+            Assert.That(stack.Amount, Is.EqualTo(existingAmount));
+            Assert.That(returned.Amount, Is.EqualTo(returnAmount));
+            Assert.That(rifle.GetState("test"), Is.Null);
+            Assert.That(_changes, Is.Empty);
+
+            InventoryResult result = _model.TryReconfigureItem(rifle, updated, rifle.Location.Position, returned: returned, returnContainerId: destination.Id, mergeReturned: true);
+            Assert.That(result.Success, Is.EqualTo(fits));
+            Assert.That(stack.Amount, Is.EqualTo(fits ? Mathf.Min(existingAmount + returnAmount, stack.MaxStack) : existingAmount));
+            Assert.That(rifle.GetState("test"), Is.EqualTo(fits ? "changed" : null));
+            Assert.That(_model.ContainsItem(returned), Is.EqualTo(fits && extraCells > 0));
+            if (_model.ContainsItem(returned))
+            {
+                Assert.That(returned.Amount, Is.EqualTo(existingAmount + returnAmount - stack.MaxStack));
+            }
+
+            Assert.That(_changes.Exists(change => change.Kind == InventoryChangeKind.AmountChanged && change.Item == stack), Is.EqualTo(fits && existingAmount < stack.MaxStack));
+        }
+
         [Test]
         public void FailedAutoPlaceLeavesModelUntouched()
         {

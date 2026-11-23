@@ -119,7 +119,7 @@ namespace Inventory
             }
         }
 
-        public InventoryResult TryReconfigureItem(ItemInstance item, ItemInstance updated, Vector2Int position, ItemInstance consumed = null, ItemInstance returned = null, string returnContainerId = null, bool apply = true)
+        public InventoryResult TryReconfigureItem(ItemInstance item, ItemInstance updated, Vector2Int position, ItemInstance consumed = null, ItemInstance returned = null, string returnContainerId = null, bool apply = true, bool mergeReturned = false)
         {
             if (ContainsItem(item) == false || updated == null || updated.Definition != item.Definition || updated.Amount != item.Amount || updated.InstanceId != item.InstanceId || consumed == item || (consumed != null && ContainsItem(consumed) == false) || (returned != null && (_items.ContainsKey(returned.InstanceId) || returned.Location.IsPlaced)))
             {
@@ -176,8 +176,16 @@ namespace Inventory
             ItemLocation consumedLocation = consumed?.Location ?? ItemLocation.None;
             ItemPlacement consumedPlacement = consumed != null ? new ItemPlacement(consumedLocation.Position, source.GetItemArea(consumed), consumedLocation.Rotated, consumedLocation.SlotId) : default;
             ItemPlacement returnedPlacement = default;
+            int returnedAmount = returned?.Amount ?? 0;
+            List<KeyValuePair<ItemInstance, int>> returnMerges = null;
 
-            if (returned != null)
+            if (mergeReturned && returned?.IsStackable == true)
+            {
+                returnMerges = PlanMerges(returned, returnedAmount, destination, item, consumed);
+                returnedAmount -= SumMerges(returnMerges);
+            }
+
+            if (returnedAmount > 0)
             {
                 bool found;
                 container.Release(item);
@@ -189,12 +197,15 @@ namespace Inventory
 
                 container.Occupy(updated, placement);
 
+                int originalAmount = returned.Amount;
                 try
                 {
+                    returned.Amount = returnedAmount;
                     found = destination.TryFindSpace(returned, true, out returnedPlacement);
                 }
                 finally
                 {
+                    returned.Amount = originalAmount;
                     container.Release(updated);
                     container.Occupy(item, original);
 
@@ -224,8 +235,14 @@ namespace Inventory
             item.CopyStateFrom(updated);
             container.Occupy(item, placement);
 
-            if (returned != null)
+            if (returnMerges != null)
             {
+                ApplyMerges(returnMerges);
+            }
+
+            if (returnedAmount > 0)
+            {
+                returned.Amount = returnedAmount;
                 _items.Add(returned.InstanceId, returned);
                 OccupyInternal(returned, destination, returnedPlacement);
                 Emit(new InventoryChange(InventoryChangeKind.ItemAdded, returned, destination.Id, ItemLocation.None, returnedPlacement.SlotId));
@@ -1040,7 +1057,7 @@ namespace Inventory
             return false;
         }
 
-        private List<KeyValuePair<ItemInstance, int>> PlanMerges(ItemInstance item, int amount, InventoryContainer container, ItemInstance exclude)
+        private List<KeyValuePair<ItemInstance, int>> PlanMerges(ItemInstance item, int amount, InventoryContainer container, ItemInstance exclude, ItemInstance consumed = null)
         {
             var merges = new List<KeyValuePair<ItemInstance, int>>();
             int remaining = amount;
@@ -1057,12 +1074,23 @@ namespace Inventory
                     break;
                 }
 
-                if (candidate == exclude || candidate.CanStackWith(item) == false || candidate.IsFullStack)
+                if (candidate == exclude || candidate.CanStackWith(item) == false)
                 {
                     continue;
                 }
 
-                int moved = Mathf.Min(remaining, candidate.FreeStackSpace);
+                int free = candidate.FreeStackSpace;
+                if (candidate == consumed)
+                {
+                    free = candidate.Amount > 1 ? free + 1 : 0;
+                }
+
+                if (free == 0)
+                {
+                    continue;
+                }
+
+                int moved = Mathf.Min(remaining, free);
                 merges.Add(new KeyValuePair<ItemInstance, int>(candidate, moved));
                 remaining -= moved;
             }

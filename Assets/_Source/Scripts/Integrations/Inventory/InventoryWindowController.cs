@@ -58,6 +58,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
         private InventoryItemSounds _itemSounds;
         private ItemInstance _statsHovered;
         private ItemInstance _compatibilityHovered;
+        private string _compatibilityLauncherId;
         private int _restoreFrame = -1;
         private bool _gameplayBlocked;
         private bool _bound;
@@ -564,16 +565,20 @@ namespace RaidIntoDarkness.Integrations.Inventory
                 return decoration;
             }
 
-            WeaponStatsComponent weapon = _compatibilityHovered.Definition.GetComponent<WeaponStatsComponent>();
-            AmmoStatsComponent ammo = item.Definition.GetComponent<AmmoStatsComponent>();
+            ItemInstance weaponItem = _compatibilityHovered;
+            ItemDefinition ammoDefinition = item.Definition;
+            WeaponStatsComponent weapon = weaponItem.Definition.GetComponent<WeaponStatsComponent>();
+            AmmoStatsComponent ammo = ammoDefinition.GetComponent<AmmoStatsComponent>();
 
             if (weapon == null || ammo == null)
             {
-                weapon = item.Definition.GetComponent<WeaponStatsComponent>();
-                ammo = _compatibilityHovered.Definition.GetComponent<AmmoStatsComponent>();
+                weaponItem = item;
+                ammoDefinition = _compatibilityHovered.Definition;
+                weapon = weaponItem.Definition.GetComponent<WeaponStatsComponent>();
+                ammo = ammoDefinition.GetComponent<AmmoStatsComponent>();
             }
 
-            bool compatible = weapon != null && ammo != null && weapon.SupportsAmmo(ammo.Section);
+            bool compatible = weapon != null && ammo != null && (weapon.SupportsAmmo(ammo.Section) || weapon.GetGrenadeLauncher(weaponItem, _window.Model.Resolver)?.GetComponent<WeaponAddonComponent>()?.GrenadeAmmo == ammoDefinition);
             compatible |= _weaponAttachments != null && (_weaponAttachments.Handles(item, _compatibilityHovered) || _weaponAttachments.Handles(_compatibilityHovered, item));
             return compatible ? new InventoryItemDecoration(_compatibleAmmoTint, decoration.Badge, decoration.CommunityIcon, decoration.CommunityIconSize) : decoration;
         }
@@ -593,12 +598,14 @@ namespace RaidIntoDarkness.Integrations.Inventory
                 }
             }
 
-            if (_compatibilityHovered == hovered)
+            string launcherId = hovered?.GetState(InventoryWeaponAttachments.GRENADE_LAUNCHER_STATE);
+            if (_compatibilityHovered == hovered && _compatibilityLauncherId == launcherId)
             {
                 return;
             }
 
             _compatibilityHovered = hovered;
+            _compatibilityLauncherId = launcherId;
             _window.RefreshItems();
         }
 

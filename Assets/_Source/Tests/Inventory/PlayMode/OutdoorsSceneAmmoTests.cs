@@ -213,6 +213,61 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
         }
 
         [UnityTest]
+        public IEnumerator LauncherAmmoHoverUpdatesWhenGp25IsInstalledOrDetached()
+        {
+            SceneManager.LoadScene("TEST_SCENE", LoadSceneMode.Single);
+            yield return new WaitForSeconds(0.5f);
+            InventoryWindowController controller = Object.FindAnyObjectByType<InventoryWindowController>();
+            InventoryWindow window = controller.Window;
+            InventoryModel model = window.Model;
+            ItemInstance weapon = AddItem(controller, "wpn_ak74", window.PrimaryContainerId);
+            ItemInstance bareWeapon = AddItem(controller, "wpn_ak74", window.PrimaryContainerId);
+            ItemInstance launcher = AddItem(controller, "wpn_addon_grenade_launcher_definition", window.PrimaryContainerId);
+            ItemInstance grenade = AddItem(controller, "ammo_vog-25", window.SecondaryContainerId);
+            ItemInstance incompatibleGrenade = AddItem(controller, "ammo_vog-25p", window.SecondaryContainerId);
+            ItemInstance rifleAmmo = AddItem(controller, "ammo_5.45x39_fmj", window.SecondaryContainerId);
+            Assert.That(model.TryEquip(weapon.InstanceId, window.EquipmentContainerId).Success, Is.True);
+
+            controller.Open(true);
+            yield return null;
+            yield return null;
+            InventoryItemView weaponView = window.FindGrid(weapon.ContainerId).GetItemView(weapon);
+            InventoryItemView bareWeaponView = window.FindGrid(bareWeapon.ContainerId).GetItemView(bareWeapon);
+            InventoryItemView grenadeView = window.FindGrid(grenade.ContainerId).GetItemView(grenade);
+            InventoryItemView incompatibleView = window.FindGrid(incompatibleGrenade.ContainerId).GetItemView(incompatibleGrenade);
+            InventoryItemView rifleAmmoView = window.FindGrid(rifleAmmo.ContainerId).GetItemView(rifleAmmo);
+            Color grenadeColor = grenadeView.Background.color;
+            Color incompatibleColor = incompatibleView.Background.color;
+            Color rifleAmmoColor = rifleAmmoView.Background.color;
+            Color bareWeaponColor = bareWeaponView.Background.color;
+
+            yield return Hover(weaponView);
+            Assert.That(grenadeView.Background.color, Is.EqualTo(grenadeColor));
+            Assert.That(rifleAmmoView.Background.color, Is.Not.EqualTo(rifleAmmoColor));
+            Assert.That(controller.WeaponAttachments.Install(launcher, weapon).Success, Is.True);
+            yield return null;
+            yield return null;
+            Assert.That(window.HoveredItem, Is.SameAs(weapon));
+            Assert.That(grenadeView.Background.color, Is.Not.EqualTo(grenadeColor));
+            Assert.That(incompatibleView.Background.color, Is.EqualTo(incompatibleColor));
+
+            yield return Hover(grenadeView);
+            Assert.That(weaponView.Background.enabled, Is.True);
+            Assert.That(bareWeaponView.Background.color, Is.EqualTo(bareWeaponColor));
+            yield return Hover(incompatibleView);
+            Assert.That(weaponView.Background.enabled, Is.False);
+
+            yield return Hover(weaponView);
+            Assert.That(controller.WeaponAttachments.DetachGrenadeLauncher(weapon).Success, Is.True);
+            yield return null;
+            yield return null;
+            Assert.That(window.HoveredItem, Is.SameAs(weapon));
+            Assert.That(grenadeView.Background.color, Is.EqualTo(grenadeColor));
+            Assert.That(rifleAmmoView.Background.color, Is.Not.EqualTo(rifleAmmoColor));
+            controller.Close();
+        }
+
+        [UnityTest]
         public IEnumerator ImportedIwpAmmoHasModelsAndConfigs()
         {
             SceneManager.LoadScene("TEST_SCENE", LoadSceneMode.Single);

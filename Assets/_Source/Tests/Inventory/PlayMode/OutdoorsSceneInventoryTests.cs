@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Inventory;
 using Inventory.UI;
 using NUnit.Framework;
@@ -29,6 +30,85 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             base.Setup();
             _keyboard = InputSystem.AddDevice<Keyboard>();
             _mouse = InputSystem.AddDevice<Mouse>();
+        }
+
+        [UnityTest]
+        public IEnumerator ExoskeletonShowsBackpackLockAndPatchRemovalJoinsExistingStack()
+        {
+            SceneManager.LoadScene(SCENE, LoadSceneMode.Single);
+            yield return new WaitForSeconds(0.6f);
+            InventoryWindowController controller = Object.FindAnyObjectByType<InventoryWindowController>();
+            InventoryWindow window = controller.Window;
+            InventoryModel model = controller.Inventory.Model;
+            ItemDefinition outfitDefinition = controller.Inventory.Database.Definitions.Single(definition => definition.GetComponent<EquipmentStatsComponent>()?.Section == "dolg_exo_outfit");
+            ItemDefinition patchDefinition = controller.Inventory.Database.Definitions.Single(definition => definition.name == "dolg_patch");
+            ItemInstance originalOutfit = EquipmentStatsFormatter.FindEquipped(window, EquipmentStatsFormatter.OUTFIT_CATEGORY);
+            if (originalOutfit != null)
+            {
+                Assert.That(model.TryRemove(originalOutfit.InstanceId).Success, Is.True);
+            }
+
+            ItemInstance outfit = model.CreateItem(outfitDefinition);
+            Assert.That(model.TryAddAuto(outfit, window.PrimaryContainerId).Success, Is.True);
+            Assert.That(model.TryEquip(outfit.InstanceId, window.EquipmentContainerId).Success, Is.True);
+            controller.Open();
+            yield return null;
+            var panel = (InventoryEquipmentPanel)window.FindGrid(EQUIPMENT);
+            InventoryEquipmentSlot backpackSlot = panel.GetSlotView(OutfitSlotRules.BACKPACK_SLOT);
+            Assert.That(backpackSlot.LockedSprite, Is.Not.Null);
+            Assert.That(backpackSlot.LockedSprite, Is.SameAs(panel.GetSlotView(OutfitSlotRules.HELMET_SLOT).LockedSprite));
+            Assert.That(backpackSlot.IsLockVisible, Is.True);
+
+            var context = new InventoryActionContext(window, outfit, panel);
+            IInventoryItemAction action = window.Actions.Find(InventoryWindowController.OUTFIT_PATCH_ACTION);
+            Assert.That(action.IsVisible(context), Is.True);
+            Assert.That(action.GetLabel(context), Is.EqualTo("Снять нашивку"));
+            Assert.That(window.ActionStyleProvider(context, action).Icon.name, Is.EqualTo("ui_cmo_patch"));
+            Assert.That(window.CollectDescription(outfit), Does.Not.Contain("Нашивка группировки отсутствует"));
+            InventoryContainer bag = model.GetContainer(window.PrimaryContainerId);
+            float capacity = bag.MaxWeight;
+            bag.MaxWeight = bag.TotalWeight;
+            action.Execute(context);
+            Assert.That(controller.IsOpen, Is.True);
+            Assert.That(controller.EquipmentAnimations.IsBusy, Is.False);
+            Assert.That(EquipmentAnimationQueue.IsPatchRemoved(outfit), Is.False);
+            Assert.That(bag.Items.Any(item => item.Definition == patchDefinition), Is.False);
+            bag.MaxWeight = capacity;
+
+            action.Execute(context);
+            Assert.That(controller.IsOpen, Is.False);
+            Assert.That(controller.Player.HudAnimator.Current, Is.SameAs(controller.Player.HudAnimator.Library.FindPatch("dolg", false, true)));
+            controller.Player.HudAnimator.Cancel();
+            yield return WaitForEquipmentAnimations(controller);
+            Assert.That(EquipmentAnimationQueue.IsPatchRemoved(outfit), Is.False);
+            Assert.That(bag.Items.Any(item => item.Definition == patchDefinition), Is.False);
+
+            ItemInstance patch = model.CreateItem(patchDefinition);
+            Assert.That(model.TryAddAuto(patch, bag.Id).Success, Is.True);
+            controller.Open();
+            action.Execute(context);
+            yield return WaitForEquipmentAnimations(controller);
+            Assert.That(EquipmentAnimationQueue.IsPatchRemoved(outfit), Is.True);
+            Assert.That(window.CollectDescription(outfit), Does.Contain("Нашивка группировки отсутствует"));
+            Assert.That(action.IsVisible(context), Is.False);
+            action.Execute(context);
+            Assert.That(bag.Items.Single(item => item.Definition == patchDefinition), Is.SameAs(patch));
+            Assert.That(patch.Amount, Is.EqualTo(2));
+            Assert.That(patch.Definition.FallbackIcon.name, Is.EqualTo("dolg_patch"));
+            Assert.That(patch.Definition.Description, Does.Not.Contain("ХАРАКТЕРИСТИКИ"));
+            Assert.That(patch.Definition.GetComponent<WorldItemComponent>().Prefab.Definition, Is.SameAs(patchDefinition));
+            ItemInstance loosePatch = model.CreateItem(patchDefinition);
+            Assert.That(model.TryAddAuto(loosePatch, bag.Id, false).Success, Is.True);
+            Assert.That(model.TryMove(loosePatch.InstanceId, bag.Id, patch.Location.Position, false).Success, Is.True);
+            Assert.That(bag.Items.Single(item => item.Definition == patchDefinition).Amount, Is.EqualTo(3));
+            Assert.That(model.TryTransfer(outfit.InstanceId, window.PrimaryContainerId).Success, Is.True);
+            controller.Open();
+            Assert.That(backpackSlot.IsLockVisible, Is.False);
+            Assert.That(controller.Inventory.LoadJson(controller.Inventory.SaveJson()).IsClean, Is.True);
+            Assert.That(EquipmentAnimationQueue.IsPatchRemoved(model.GetItem(outfit.InstanceId)), Is.True);
+            Assert.That(model.GetItem(patch.InstanceId).Definition, Is.SameAs(patchDefinition));
+            Assert.That(model.GetItem(patch.InstanceId).Amount, Is.EqualTo(3));
+            controller.Close();
         }
 
         [UnityTest]

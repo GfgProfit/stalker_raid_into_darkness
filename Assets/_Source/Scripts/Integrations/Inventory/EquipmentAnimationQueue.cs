@@ -16,6 +16,9 @@ namespace RaidIntoDarkness.Integrations.Inventory
         public const float EQUIP_FADE_STOP = 0.25f;
 
         private const int MAX_STEPS_PER_TICK = 64;
+        private const string PATCH_REMOVED_STATE = "outfit_patch_removed";
+        private const string PATCH_CATEGORY = "Patch";
+        private const string PATCH_SECTION_SUFFIX = "_patch";
 
         public static readonly Color IN_USE_TINT = new Color32(255, 159, 82, 100);
 
@@ -23,7 +26,8 @@ namespace RaidIntoDarkness.Integrations.Inventory
         {
             Equip,
             Unequip,
-            Drop
+            Drop,
+            Patch
         }
 
         private enum StepKind
@@ -52,6 +56,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
             public bool Started { get; set; }
             public bool FadeStarted { get; set; }
             public bool FadeStopped { get; set; }
+            public bool Completed { get; set; }
             public float Time { get; set; }
             public ItemInstance Item { get; set; }
         }
@@ -59,11 +64,13 @@ namespace RaidIntoDarkness.Integrations.Inventory
         private readonly InventoryWindow _window;
         private readonly StalkerPlayerController _player;
         private readonly FirstPersonWeaponController _weapons;
+        private readonly FirstPersonHudAnimator _animator;
         private readonly Func<ItemInstance, InventoryItemDecoration> _decorator;
         private readonly Queue<Request> _requests = new Queue<Request>();
         private readonly Queue<Step> _steps = new Queue<Step>();
         private readonly HashSet<ItemInstance> _inUse = new HashSet<ItemInstance>();
         private readonly List<string> _outfitMemory = new List<string>();
+        private readonly Dictionary<string, ItemDefinition> _patchDefinitions = new Dictionary<string, ItemDefinition>(StringComparer.OrdinalIgnoreCase);
         private string _community = FirstPersonEquipmentAnimationLibrary.DEFAULT_COMMUNITY;
 
         public EquipmentAnimationQueue(InventoryWindow window, StalkerPlayerController player, FirstPersonWeaponController weapons = null)
@@ -71,6 +78,23 @@ namespace RaidIntoDarkness.Integrations.Inventory
             _window = window;
             _player = player;
             _weapons = weapons;
+            _animator = player != null ? player.HudAnimator : null;
+            if (_animator != null)
+            {
+                _animator.Stopped += OnAnimationStopped;
+            }
+
+            if (window.Model?.Resolver is ItemDatabase database)
+            {
+                foreach (ItemDefinition definition in database.Definitions)
+                {
+                    if (definition != null && definition.IsCategory(PATCH_CATEGORY))
+                    {
+                        _patchDefinitions[definition.name] = definition;
+                    }
+                }
+            }
+
             _decorator = window.ItemDecorator;
             _window.ItemDecorator = Decorate;
             _window.EquipmentGate = this;
@@ -86,10 +110,31 @@ namespace RaidIntoDarkness.Integrations.Inventory
             set => _community = string.IsNullOrEmpty(value) ? FirstPersonEquipmentAnimationLibrary.DEFAULT_COMMUNITY : value;
         }
 
-        private FirstPersonHudAnimator Animator => _player != null ? _player.HudAnimator : null;
-        private FirstPersonEquipmentAnimationLibrary Library => Animator != null ? Animator.Library : null;
+        private FirstPersonEquipmentAnimationLibrary Library => _animator != null ? _animator.Library : null;
 
         public bool IsInUse(ItemInstance item) => item != null && _inUse.Contains(item);
+
+        public static bool IsPatchRemoved(ItemInstance item) => item?.GetState(PATCH_REMOVED_STATE) == "1";
+
+        public bool HasPatchMotion(ItemInstance item) => GetPatchMotion(item)?.Hands != null;
+
+        public bool TryQueuePatch(ItemInstance item)
+        {
+            if (IsInUse(item) || HasPatchMotion(item) == false)
+            {
+                return false;
+            }
+
+            InventoryResult placement = TryRemovePatch(item, false);
+            if (placement.Success == false)
+            {
+                _window.ShowStatus(_window.DescribeFailure(placement.Failure));
+                return false;
+            }
+
+            Enqueue(new Request { Kind = RequestKind.Patch, Item = item });
+            return true;
+        }
 
         public bool HandleEquip(ItemInstance item, SlotDefinition slot)
         {
@@ -171,6 +216,11 @@ namespace RaidIntoDarkness.Integrations.Inventory
 
         public void Dispose()
         {
+            if (_animator != null)
+            {
+                _animator.Stopped -= OnAnimationStopped;
+            }
+
             if (_window.EquipmentGate == this)
             {
                 _window.EquipmentGate = null;
@@ -185,8 +235,46 @@ namespace RaidIntoDarkness.Integrations.Inventory
         private InventoryItemDecoration Decorate(ItemInstance item)
         {
             InventoryItemDecoration inner = _decorator != null ? _decorator(item) : InventoryItemDecoration.None;
-            return item != null && _inUse.Contains(item) ? new InventoryItemDecoration(IN_USE_TINT, inner.Badge) : inner;
+            return item != null && _inUse.Contains(item) ? new InventoryItemDecoration(IN_USE_TINT, inner.Badge, inner.CommunityIcon, inner.CommunityIconSize) : inner;
         }
+
+        private FirstPersonHudMotion GetPatchMotion(ItemInstance item)
+        {
+            if (item == null || _window.Model == null || _window.Model.ContainsItem(item) == false || item.Definition.IsCategory(EquipmentStatsFormatter.OUTFIT_CATEGORY) == false || IsPatchRemoved(item))
+            {
+                return null;
+            }
+
+            bool equipped = _window.IsEquipped(item);
+            if (equipped == false && item.ContainerId != _window.PrimaryContainerId)
+            {
+                return null;
+            }
+
+            string community = GetPatchCommunity(item);
+            return _patchDefinitions.ContainsKey(community + PATCH_SECTION_SUFFIX) ? Library?.FindPatch(community, false, equipped) : null;
+        }
+
+        private InventoryResult TryRemovePatch(ItemInstance item, bool apply)
+        {
+            if (IsPatchRemoved(item) || _patchDefinitions.TryGetValue(GetPatchCommunity(item) + PATCH_SECTION_SUFFIX, out ItemDefinition patchDefinition) == false)
+            {
+                return InventoryResult.Fail(InventoryFailure.InvalidItem);
+            }
+
+            var updated = new ItemInstance(item.Definition, item.Amount, item.InstanceId);
+            updated.SetVisualVariant(item.VisualVariant);
+            foreach (KeyValuePair<string, string> entry in item.State)
+            {
+                updated.SetState(entry.Key, entry.Value);
+            }
+
+            updated.SetState(PATCH_REMOVED_STATE, "1");
+            ItemInstance patch = _window.Model.CreateItem(patchDefinition);
+            return _window.Model.TryReconfigureItem(item, updated, item.Location.Position, returned: patch, returnContainerId: _window.PrimaryContainerId, apply: apply, mergeReturned: true);
+        }
+
+        private static string GetPatchCommunity(ItemInstance item) => item.Definition.GetComponent<EquipmentStatsComponent>()?.Community ?? string.Empty;
 
         private bool IsAnimated(ItemInstance item)
         {
@@ -246,6 +334,21 @@ namespace RaidIntoDarkness.Integrations.Inventory
         private void Expand(Request request)
         {
             ItemInstance item = request.Item;
+            if (request.Kind == RequestKind.Patch)
+            {
+                FirstPersonHudMotion motion = GetPatchMotion(item);
+                if (motion?.Hands != null)
+                {
+                    _steps.Enqueue(new Step { Kind = StepKind.Animation, Motion = motion, Speed = 1.0f, Item = item });
+                }
+                else
+                {
+                    SetInUse(item, false);
+                }
+
+                return;
+            }
+
             bool equipped = _window.Model != null && _window.Model.ContainsItem(item) && _window.IsEquipped(item);
             bool valid = _window.Model != null && _window.Model.ContainsItem(item) && (request.Kind == RequestKind.Equip ? equipped == false : equipped);
             if (valid == false)
@@ -485,14 +588,19 @@ namespace RaidIntoDarkness.Integrations.Inventory
 
         private bool AdvanceAnimation(Step step, float deltaTime)
         {
-            FirstPersonHudAnimator animator = Animator;
+            FirstPersonHudAnimator animator = _animator;
             if (animator == null)
             {
-                return true;
+                return FinishAnimation(step);
             }
 
             if (step.Started == false)
             {
+                if (step.Item != null && GetPatchMotion(step.Item) != step.Motion)
+                {
+                    return FinishAnimation(step);
+                }
+
                 if (animator.Rig != null && animator.Rig.HandsBusy)
                 {
                     animator.Rig.RequestHands(animator);
@@ -501,7 +609,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
 
                 step.Started = true;
                 step.Time = 0.0f;
-                return animator.TryPlay(step.Motion, step.Speed) == false;
+                return animator.TryPlay(step.Motion, step.Speed) == false && FinishAnimation(step);
             }
 
             step.Time += deltaTime;
@@ -511,7 +619,35 @@ namespace RaidIntoDarkness.Integrations.Inventory
                 TickEquipFade(step, animator.Duration, playing);
             }
 
-            return playing == false;
+            return playing == false && FinishAnimation(step);
+        }
+
+        private void OnAnimationStopped(FirstPersonHudMotion motion, bool completed)
+        {
+            if (_steps.TryPeek(out Step step) && step.Kind == StepKind.Animation && step.Started && step.Item != null && step.Motion == motion)
+            {
+                step.Completed = completed;
+            }
+        }
+
+        private bool FinishAnimation(Step step)
+        {
+            ItemInstance item = step.Item;
+            if (item != null)
+            {
+                if (step.Completed && GetPatchMotion(item) == step.Motion)
+                {
+                    InventoryResult result = TryRemovePatch(item, true);
+                    if (result.Success == false)
+                    {
+                        _window.ShowStatus(_window.DescribeFailure(result.Failure));
+                    }
+                }
+
+                SetInUse(item, false);
+            }
+
+            return true;
         }
 
         private void TickEquipFade(Step step, float duration, bool playing)

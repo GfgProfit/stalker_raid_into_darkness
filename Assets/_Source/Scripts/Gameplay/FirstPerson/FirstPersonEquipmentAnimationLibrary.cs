@@ -13,6 +13,9 @@ namespace RaidIntoDarkness.FirstPerson
         public const string HEADGEAR_FALLBACK_SECTION = "gasmask_headgear_hud";
         public const string BACKPACK_EQUIP_PREFIX = "outfit_animation_backpack_equip_";
         public const string BACKPACK_UNEQUIP_PREFIX = "outfit_animation_backpack_unequip_";
+        public const string PATCH_APPLY_PREFIX = "outfit_animation_patch_apply_";
+        public const string PATCH_REMOVE_PREFIX = "outfit_animation_patch_remove_";
+        public const string PATCH_INVENTORY_PREFIX = "inventory_";
         public const string HUD_SUFFIX = "_hud";
         public const string DEFAULT_COMMUNITY = "stalker";
         public const string ANM_EQUIP = "anm_equip";
@@ -105,6 +108,12 @@ namespace RaidIntoDarkness.FirstPerson
         {
             string section = prefix + community + HUD_SUFFIX;
             return HasSection(section) ? section : prefix + DEFAULT_COMMUNITY + HUD_SUFFIX;
+        }
+
+        public FirstPersonHudMotion FindPatch(string community, bool apply, bool equipped)
+        {
+            string prefix = apply ? PATCH_APPLY_PREFIX : PATCH_REMOVE_PREFIX;
+            return Find(prefix + (equipped ? string.Empty : PATCH_INVENTORY_PREFIX) + community + HUD_SUFFIX, ANM_USE);
         }
 
         private static bool Contains(List<string> values, string value)

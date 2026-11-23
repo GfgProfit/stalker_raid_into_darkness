@@ -21,6 +21,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
         public const string STATUS_SLEEP = "sleep";
         public const string FAVORITE_ACTION = "favorite";
         public const string JUNK_ACTION = "junk";
+        public const string OUTFIT_PATCH_ACTION = "outfit_patch";
 
         private static readonly Color _compatibleAmmoTint = new(0f, 1f, 0.35f, 0.22f);
 
@@ -377,6 +378,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
 
             if (_equipmentAnimations != null)
             {
+                _window.Actions.Unregister(OUTFIT_PATCH_ACTION);
                 _equipmentAnimations.Dispose();
                 _equipmentAnimations = null;
             }
@@ -438,6 +440,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
             if (weapons != null || (_player != null && _player.HudAnimator != null && _player.HudAnimator.Library != null))
             {
                 _equipmentAnimations = new EquipmentAnimationQueue(_window, _player, weapons);
+                _window.Actions.Register(new InventoryDelegateAction(OUTFIT_PATCH_ACTION, 12, context => _window.Label("outfit_patch_remove", "Снять нашивку"), RemoveOutfitPatch, context => _equipmentAnimations.HasPatchMotion(context.Item), context => _equipmentAnimations.IsInUse(context.Item) == false));
             }
 
             if (_player != null && _player.Motor != null && _player.Motor.Condition != null)
@@ -469,6 +472,14 @@ namespace RaidIntoDarkness.Integrations.Inventory
                 {
                     backpack.SetLockedSprite(panel.GetSlotView(OutfitSlotRules.HELMET_SLOT)?.LockedSprite);
                 }
+            }
+        }
+
+        private void RemoveOutfitPatch(InventoryActionContext context)
+        {
+            if (_equipmentAnimations.TryQueuePatch(context.Item))
+            {
+                Close();
             }
         }
 
@@ -543,7 +554,10 @@ namespace RaidIntoDarkness.Integrations.Inventory
         {
             InventoryItemDecoration decoration = _sorting != null ? _sorting.Decorate(item) : InventoryItemDecoration.None;
             EquipmentStatsComponent equipment = item?.Definition.GetComponent<EquipmentStatsComponent>();
-            decoration = new InventoryItemDecoration(decoration.Tint, decoration.Badge, equipment?.CommunityIcon, equipment != null ? equipment.CommunityIconSize : Vector2.zero);
+            if (equipment != null && EquipmentAnimationQueue.IsPatchRemoved(item) == false)
+            {
+                decoration = new InventoryItemDecoration(decoration.Tint, decoration.Badge, equipment.CommunityIcon, equipment.CommunityIconSize);
+            }
 
             if (_compatibilityHovered == null || item == null || item == _compatibilityHovered)
             {

@@ -1,0 +1,69 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da0f90c2955673d46b25d465cbe44ed0, type: 3}
+  m_Name: csky_patch
+  m_EditorClassIdentifier: Inventory::Inventory.ItemDefinition
+  _definitionId: 09bc735509362dd4196601745af0c596
+  _displayName: "\u041D\u0430\u0448\u0438\u0432\u043A\u0430 \xAB\u0427\u0438\u0441\u0442\u043E\u0433\u043E \u043D\u0435\u0431\u0430\xBB"
+  _shortName: "\u041D\u0430\u0448\u0438\u0432\u043A\u0430 \xAB\u0427\u0438\u0441\u0442\u043E\u0433\u043E \u043D\u0435\u0431\u0430\xBB"
+  _description: "\u0414\u0430\u043D\u043D\u0430\u044F \u043D\u0430\u0448\u0438\u0432\u043A\u0430 \u0438\u0437\u043E\u0431\u0440\u0430\u0436\u0430\u0435\u0442 \u0440\u0430\u0441\u0441\u0432\u0435\u0442 \u043D\u0430 \u0444\u043E\u043D\u0435 \u0447\u0438\u0441\u0442\u043E\u0433\u043E \u043D\u0435\u0431\u0430 \u0438 \u043F\u0430\u0440\u044B \u043F\u0442\u0438\u0446. \u0415\u0451 \u0437\u0430\u0434\u0443\u043C\u043A\u0430 \u0441\u043E\u0441\u0442\u043E\u0438\u0442 \u0432 \u043E\u0441\u043D\u043E\u0432\u043D\u044B\u0445 \u0438\u0434\u0435\u044F\u0445 \u0433\u0440\u0443\u043F\u043F\u0438\u0440\u043E\u0432\u043A\u0438 - \u0438\u0441\u0446\u0435\u043B\u0435\u043D\u0438\u0435 \u0417\u043E\u043D\u0443 \u0438 \u0438\u0437\u0431\u0435\u0436\u0430\u043D\u0438\u0435 \u0432\u043E\u043E\u0440\u0443\u0436\u0451\u043D\u043D\u044B\u0445 \u043A\u043E\u043D\u0444\u043B\u0438\u043A\u0442\u043E\u0432. \xAB\u0427\u0438\u0441\u0442\u043E\u0435 \u043D\u0435\u0431\u043E\xBB \u0441\u0442\u0440\u0435\u043C\u0438\u0442\u0441\u044F \u0432 \u0437\u043D\u0430\u0447\u0438\u0442\u0435\u043B\u044C\u043D\u043E\u0439 \u043C\u0435\u0440\u0435 \u0441\u043D\u0438\u0437\u0438\u0442\u044C \u0447\u0430\u0441\u0442\u043E\u0442\u0443 \u0438 \u043C\u043E\u0449\u043D\u043E\u0441\u0442\u044C \u043A\u0430\u043A \u0432\u044B\u0431\u0440\u043E\u0441\u043E\u0432, \u0442\u0430\u043A \u0438 \u0434\u0440\u0443\u0433\u0438\u0445 \u0430\u043D\u043E\u043C\u0430\u043B\u044C\u043D\u044B\u0445 \u044F\u0432\u043B\u0435\u043D\u0438\u0439. \u041D\u043E \u043B\u0438\u0448\u044C \u043C\u0430\u043B\u0430\u044F \u0447\u0430\u0441\u0442\u044C \u0441\u0442\u0430\u043B\u043A\u0435\u0440\u043E\u0432 \u0432\u0435\u0440\u0438\u0442, \u0447\u0442\u043E \u043F\u043E\u0434\u043E\u0431\u043D\u043E\u0435 \u0432\u043E\u043E\u0431\u0449\u0435 \u0432\u043E\u0437\u043C\u043E\u0436\u043D\u043E."
+  _category: Patch
+  _tags: []
+  _size: {x: 1, y: 1}
+  _weight: 0.01
+  _maxStack: 0
+  _allowRotation: 0
+  _backgroundColor: {r: 1, g: 1, b: 1, a: 0.04}
+  _fallbackIcon: {fileID: 0}
+  _iconOverride: {fileID: 1401140458, guid: 6840a165a0de61b43820112ac4ea5080, type: 3}
+  _visualPrefab: {fileID: -1618557166783690077, guid: 791868fc701bc30479fdbe8b19ef56a5, type: 3}
+  _defaultIconVariant: []
+  _icon:
+    _generateIcon: 0
+    _pixelsPerCell: 64
+    _antiAliasing: 1
+    _useOutline: 1
+    _outlineWidth: 2
+    _useShadow: 1
+    _shadowOffset: {x: 2, y: -2}
+    _shadowBlur: 2
+    _defaultView:
+      _modelEulerAngles: {x: 0, y: 0, z: 0}
+      _modelScale: {x: 1, y: 1, z: 1}
+      _cameraEulerAngles: {x: 25, y: -135, z: 0}
+      _padding: 1.15
+      _useDirectionalLight: 1
+      _lightIntensity: 20
+    _useCustomSlotView: 0
+    _slotView:
+      _modelEulerAngles: {x: 0, y: 0, z: 0}
+      _modelScale: {x: 1, y: 1, z: 1}
+      _cameraEulerAngles: {x: 25, y: -135, z: 0}
+      _padding: 1.15
+      _useDirectionalLight: 1
+      _lightIntensity: 20
+  _components:
+  - rid: 115149081108283491
+  - rid: 115149081108283503
+  references:
+    version: 2
+    RefIds:
+    - rid: 115149081108283491
+      type: {class: ItemTakeSoundComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      data:
+        _category: patch
+        _clips:
+        - {fileID: 8300000, guid: 8d56aac9d6a494c49bb0c2030218fe61, type: 3}
+    - rid: 115149081108283503
+      type: {class: WorldItemComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      data:
+        _prefab: {fileID: 6183043970659588527, guid: 9f8a8b1b04e253c49a18b720f7a92d19, type: 3}

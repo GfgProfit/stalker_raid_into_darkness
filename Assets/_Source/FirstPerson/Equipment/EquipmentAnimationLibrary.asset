@@ -697,6 +697,438 @@ MonoBehaviour:
     _hudFieldOfView: 0
     _handsPosition: {x: 0, y: 0, z: 0}
     _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: outfit_animation_patch_apply_army_hud|anm_use
+    _hands: {fileID: -2484539193836659540, guid: 1143ec115c724a2b856fb8cb10fd77b7, type: 3}
+    _itemModel: {fileID: -366661654048836166, guid: 5ad11c227c8f46fdb7e3ba91710bd3e7, type: 3}
+    _item: {fileID: -4143681161488425515, guid: a1db07228a1f413e96a8ae9bd41bd311, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: 58808c2120d216b499e84f3cbc241f07, type: 3}
+    _sound: {fileID: 8300000, guid: a54d7fa891975ec4dbebd2755af53a24, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: outfit_animation_patch_remove_army_hud|anm_use
+    _hands: {fileID: 4861243696011684048, guid: 1143ec115c724a2b856fb8cb10fd77b7, type: 3}
+    _itemModel: {fileID: -366661654048836166, guid: 5ad11c227c8f46fdb7e3ba91710bd3e7, type: 3}
+    _item: {fileID: -2029953867110838812, guid: a1db07228a1f413e96a8ae9bd41bd311, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: 3914150735fe6c94fa27021d6dce3f66, type: 3}
+    _sound: {fileID: 8300000, guid: 118121fea7db7d746a4c92de8ab9f64e, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: outfit_animation_patch_apply_inventory_army_hud|anm_use
+    _hands: {fileID: 1000180552370539268, guid: 1143ec115c724a2b856fb8cb10fd77b7, type: 3}
+    _itemModel: {fileID: -366661654048836166, guid: 5ad11c227c8f46fdb7e3ba91710bd3e7, type: 3}
+    _item: {fileID: 7234272740390370960, guid: a1db07228a1f413e96a8ae9bd41bd311, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: ac9e0a83a17ad92448a28ed23d2aecbc, type: 3}
+    _sound: {fileID: 8300000, guid: a54d7fa891975ec4dbebd2755af53a24, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: outfit_animation_patch_remove_inventory_army_hud|anm_use
+    _hands: {fileID: 440498886863672953, guid: 1143ec115c724a2b856fb8cb10fd77b7, type: 3}
+    _itemModel: {fileID: -366661654048836166, guid: 5ad11c227c8f46fdb7e3ba91710bd3e7, type: 3}
+    _item: {fileID: -5955076600193935987, guid: a1db07228a1f413e96a8ae9bd41bd311, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: ff977a184838e024cb80d28462d866b9, type: 3}
+    _sound: {fileID: 8300000, guid: 118121fea7db7d746a4c92de8ab9f64e, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: outfit_animation_patch_apply_bandit_hud|anm_use
+    _hands: {fileID: -2484539193836659540, guid: 1143ec115c724a2b856fb8cb10fd77b7, type: 3}
+    _itemModel: {fileID: -132400784400630442, guid: 10b5e133cdd84c2c9d70e7da48dbc966, type: 3}
+    _item: {fileID: -4143681161488425515, guid: b6aed2f41dc74fb693a69c5137674b1d, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: 58808c2120d216b499e84f3cbc241f07, type: 3}
+    _sound: {fileID: 8300000, guid: a54d7fa891975ec4dbebd2755af53a24, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: outfit_animation_patch_remove_bandit_hud|anm_use
+    _hands: {fileID: 4861243696011684048, guid: 1143ec115c724a2b856fb8cb10fd77b7, type: 3}
+    _itemModel: {fileID: -132400784400630442, guid: 10b5e133cdd84c2c9d70e7da48dbc966, type: 3}
+    _item: {fileID: -2029953867110838812, guid: b6aed2f41dc74fb693a69c5137674b1d, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: 3914150735fe6c94fa27021d6dce3f66, type: 3}
+    _sound: {fileID: 8300000, guid: 118121fea7db7d746a4c92de8ab9f64e, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: outfit_animation_patch_apply_inventory_bandit_hud|anm_use
+    _hands: {fileID: 1000180552370539268, guid: 1143ec115c724a2b856fb8cb10fd77b7, type: 3}
+    _itemModel: {fileID: -132400784400630442, guid: 10b5e133cdd84c2c9d70e7da48dbc966, type: 3}
+    _item: {fileID: 7234272740390370960, guid: b6aed2f41dc74fb693a69c5137674b1d, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: ac9e0a83a17ad92448a28ed23d2aecbc, type: 3}
+    _sound: {fileID: 8300000, guid: a54d7fa891975ec4dbebd2755af53a24, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: outfit_animation_patch_remove_inventory_bandit_hud|anm_use
+    _hands: {fileID: 440498886863672953, guid: 1143ec115c724a2b856fb8cb10fd77b7, type: 3}
+    _itemModel: {fileID: -132400784400630442, guid: 10b5e133cdd84c2c9d70e7da48dbc966, type: 3}
+    _item: {fileID: -5955076600193935987, guid: b6aed2f41dc74fb693a69c5137674b1d, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: ff977a184838e024cb80d28462d866b9, type: 3}
+    _sound: {fileID: 8300000, guid: 118121fea7db7d746a4c92de8ab9f64e, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: outfit_animation_patch_apply_csky_hud|anm_use
+    _hands: {fileID: -2484539193836659540, guid: 1143ec115c724a2b856fb8cb10fd77b7, type: 3}
+    _itemModel: {fileID: 52041999110484865, guid: 5406871cb2ca40558d07e1bc3e87ea53, type: 3}
+    _item: {fileID: -4143681161488425515, guid: 3db629c7ed374d04a5186610e316da34, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: 58808c2120d216b499e84f3cbc241f07, type: 3}
+    _sound: {fileID: 8300000, guid: a54d7fa891975ec4dbebd2755af53a24, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: outfit_animation_patch_remove_csky_hud|anm_use
+    _hands: {fileID: 4861243696011684048, guid: 1143ec115c724a2b856fb8cb10fd77b7, type: 3}
+    _itemModel: {fileID: 52041999110484865, guid: 5406871cb2ca40558d07e1bc3e87ea53, type: 3}
+    _item: {fileID: -2029953867110838812, guid: 3db629c7ed374d04a5186610e316da34, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: 3914150735fe6c94fa27021d6dce3f66, type: 3}
+    _sound: {fileID: 8300000, guid: 118121fea7db7d746a4c92de8ab9f64e, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: outfit_animation_patch_apply_inventory_csky_hud|anm_use
+    _hands: {fileID: 1000180552370539268, guid: 1143ec115c724a2b856fb8cb10fd77b7, type: 3}
+    _itemModel: {fileID: 52041999110484865, guid: 5406871cb2ca40558d07e1bc3e87ea53, type: 3}
+    _item: {fileID: 7234272740390370960, guid: 3db629c7ed374d04a5186610e316da34, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: ac9e0a83a17ad92448a28ed23d2aecbc, type: 3}
+    _sound: {fileID: 8300000, guid: a54d7fa891975ec4dbebd2755af53a24, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: outfit_animation_patch_remove_inventory_csky_hud|anm_use
+    _hands: {fileID: 440498886863672953, guid: 1143ec115c724a2b856fb8cb10fd77b7, type: 3}
+    _itemModel: {fileID: 52041999110484865, guid: 5406871cb2ca40558d07e1bc3e87ea53, type: 3}
+    _item: {fileID: -5955076600193935987, guid: 3db629c7ed374d04a5186610e316da34, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: ff977a184838e024cb80d28462d866b9, type: 3}
+    _sound: {fileID: 8300000, guid: 118121fea7db7d746a4c92de8ab9f64e, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: outfit_animation_patch_apply_dolg_hud|anm_use
+    _hands: {fileID: -2484539193836659540, guid: 1143ec115c724a2b856fb8cb10fd77b7, type: 3}
+    _itemModel: {fileID: 1637198581861191788, guid: 160f19901d84472e97f73348718c39cb, type: 3}
+    _item: {fileID: -4143681161488425515, guid: b2e4ecc551584e57804522b61ebfbac4, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: 58808c2120d216b499e84f3cbc241f07, type: 3}
+    _sound: {fileID: 8300000, guid: a54d7fa891975ec4dbebd2755af53a24, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: outfit_animation_patch_remove_dolg_hud|anm_use
+    _hands: {fileID: 4861243696011684048, guid: 1143ec115c724a2b856fb8cb10fd77b7, type: 3}
+    _itemModel: {fileID: 1637198581861191788, guid: 160f19901d84472e97f73348718c39cb, type: 3}
+    _item: {fileID: -2029953867110838812, guid: b2e4ecc551584e57804522b61ebfbac4, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: 3914150735fe6c94fa27021d6dce3f66, type: 3}
+    _sound: {fileID: 8300000, guid: 118121fea7db7d746a4c92de8ab9f64e, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: outfit_animation_patch_apply_inventory_dolg_hud|anm_use
+    _hands: {fileID: 1000180552370539268, guid: 1143ec115c724a2b856fb8cb10fd77b7, type: 3}
+    _itemModel: {fileID: 1637198581861191788, guid: 160f19901d84472e97f73348718c39cb, type: 3}
+    _item: {fileID: 7234272740390370960, guid: b2e4ecc551584e57804522b61ebfbac4, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: ac9e0a83a17ad92448a28ed23d2aecbc, type: 3}
+    _sound: {fileID: 8300000, guid: a54d7fa891975ec4dbebd2755af53a24, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: outfit_animation_patch_remove_inventory_dolg_hud|anm_use
+    _hands: {fileID: 440498886863672953, guid: 1143ec115c724a2b856fb8cb10fd77b7, type: 3}
+    _itemModel: {fileID: 1637198581861191788, guid: 160f19901d84472e97f73348718c39cb, type: 3}
+    _item: {fileID: -5955076600193935987, guid: b2e4ecc551584e57804522b61ebfbac4, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: ff977a184838e024cb80d28462d866b9, type: 3}
+    _sound: {fileID: 8300000, guid: 118121fea7db7d746a4c92de8ab9f64e, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: outfit_animation_patch_apply_ecolog_hud|anm_use
+    _hands: {fileID: -2484539193836659540, guid: 1143ec115c724a2b856fb8cb10fd77b7, type: 3}
+    _itemModel: {fileID: -7377824831253574777, guid: 624d0c90a9f249878e6affce2c82ef58, type: 3}
+    _item: {fileID: -4143681161488425515, guid: d5cb4cc7cc5b4500920dbaaa6c0b91a8, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: 58808c2120d216b499e84f3cbc241f07, type: 3}
+    _sound: {fileID: 8300000, guid: a54d7fa891975ec4dbebd2755af53a24, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: outfit_animation_patch_remove_ecolog_hud|anm_use
+    _hands: {fileID: 4861243696011684048, guid: 1143ec115c724a2b856fb8cb10fd77b7, type: 3}
+    _itemModel: {fileID: -7377824831253574777, guid: 624d0c90a9f249878e6affce2c82ef58, type: 3}
+    _item: {fileID: -2029953867110838812, guid: d5cb4cc7cc5b4500920dbaaa6c0b91a8, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: 3914150735fe6c94fa27021d6dce3f66, type: 3}
+    _sound: {fileID: 8300000, guid: 118121fea7db7d746a4c92de8ab9f64e, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: outfit_animation_patch_apply_inventory_ecolog_hud|anm_use
+    _hands: {fileID: 1000180552370539268, guid: 1143ec115c724a2b856fb8cb10fd77b7, type: 3}
+    _itemModel: {fileID: -7377824831253574777, guid: 624d0c90a9f249878e6affce2c82ef58, type: 3}
+    _item: {fileID: 7234272740390370960, guid: d5cb4cc7cc5b4500920dbaaa6c0b91a8, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: ac9e0a83a17ad92448a28ed23d2aecbc, type: 3}
+    _sound: {fileID: 8300000, guid: a54d7fa891975ec4dbebd2755af53a24, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: outfit_animation_patch_remove_inventory_ecolog_hud|anm_use
+    _hands: {fileID: 440498886863672953, guid: 1143ec115c724a2b856fb8cb10fd77b7, type: 3}
+    _itemModel: {fileID: -7377824831253574777, guid: 624d0c90a9f249878e6affce2c82ef58, type: 3}
+    _item: {fileID: -5955076600193935987, guid: d5cb4cc7cc5b4500920dbaaa6c0b91a8, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: ff977a184838e024cb80d28462d866b9, type: 3}
+    _sound: {fileID: 8300000, guid: 118121fea7db7d746a4c92de8ab9f64e, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: outfit_animation_patch_apply_freedom_hud|anm_use
+    _hands: {fileID: -2484539193836659540, guid: 1143ec115c724a2b856fb8cb10fd77b7, type: 3}
+    _itemModel: {fileID: 9156459726623417999, guid: f13dec14cccf4678b7273b9467ba446c, type: 3}
+    _item: {fileID: -4143681161488425515, guid: 11ee5e20969d4e92b215cc32fbcbfd2f, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: 58808c2120d216b499e84f3cbc241f07, type: 3}
+    _sound: {fileID: 8300000, guid: a54d7fa891975ec4dbebd2755af53a24, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: outfit_animation_patch_remove_freedom_hud|anm_use
+    _hands: {fileID: 4861243696011684048, guid: 1143ec115c724a2b856fb8cb10fd77b7, type: 3}
+    _itemModel: {fileID: 9156459726623417999, guid: f13dec14cccf4678b7273b9467ba446c, type: 3}
+    _item: {fileID: -2029953867110838812, guid: 11ee5e20969d4e92b215cc32fbcbfd2f, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: 3914150735fe6c94fa27021d6dce3f66, type: 3}
+    _sound: {fileID: 8300000, guid: 118121fea7db7d746a4c92de8ab9f64e, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: outfit_animation_patch_apply_inventory_freedom_hud|anm_use
+    _hands: {fileID: 1000180552370539268, guid: 1143ec115c724a2b856fb8cb10fd77b7, type: 3}
+    _itemModel: {fileID: 9156459726623417999, guid: f13dec14cccf4678b7273b9467ba446c, type: 3}
+    _item: {fileID: 7234272740390370960, guid: 11ee5e20969d4e92b215cc32fbcbfd2f, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: ac9e0a83a17ad92448a28ed23d2aecbc, type: 3}
+    _sound: {fileID: 8300000, guid: a54d7fa891975ec4dbebd2755af53a24, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: outfit_animation_patch_remove_inventory_freedom_hud|anm_use
+    _hands: {fileID: 440498886863672953, guid: 1143ec115c724a2b856fb8cb10fd77b7, type: 3}
+    _itemModel: {fileID: 9156459726623417999, guid: f13dec14cccf4678b7273b9467ba446c, type: 3}
+    _item: {fileID: -5955076600193935987, guid: 11ee5e20969d4e92b215cc32fbcbfd2f, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: ff977a184838e024cb80d28462d866b9, type: 3}
+    _sound: {fileID: 8300000, guid: 118121fea7db7d746a4c92de8ab9f64e, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: outfit_animation_patch_apply_greh_hud|anm_use
+    _hands: {fileID: -2484539193836659540, guid: 1143ec115c724a2b856fb8cb10fd77b7, type: 3}
+    _itemModel: {fileID: 183031169969690872, guid: af9d5a993be842669e34d701c78c4ce2, type: 3}
+    _item: {fileID: -4143681161488425515, guid: c4bed008c079430b914641aab4fce189, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: 58808c2120d216b499e84f3cbc241f07, type: 3}
+    _sound: {fileID: 8300000, guid: a54d7fa891975ec4dbebd2755af53a24, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: outfit_animation_patch_remove_greh_hud|anm_use
+    _hands: {fileID: 4861243696011684048, guid: 1143ec115c724a2b856fb8cb10fd77b7, type: 3}
+    _itemModel: {fileID: 183031169969690872, guid: af9d5a993be842669e34d701c78c4ce2, type: 3}
+    _item: {fileID: -2029953867110838812, guid: c4bed008c079430b914641aab4fce189, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: 3914150735fe6c94fa27021d6dce3f66, type: 3}
+    _sound: {fileID: 8300000, guid: 118121fea7db7d746a4c92de8ab9f64e, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: outfit_animation_patch_apply_inventory_greh_hud|anm_use
+    _hands: {fileID: 1000180552370539268, guid: 1143ec115c724a2b856fb8cb10fd77b7, type: 3}
+    _itemModel: {fileID: 183031169969690872, guid: af9d5a993be842669e34d701c78c4ce2, type: 3}
+    _item: {fileID: 7234272740390370960, guid: c4bed008c079430b914641aab4fce189, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: ac9e0a83a17ad92448a28ed23d2aecbc, type: 3}
+    _sound: {fileID: 8300000, guid: a54d7fa891975ec4dbebd2755af53a24, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: outfit_animation_patch_remove_inventory_greh_hud|anm_use
+    _hands: {fileID: 440498886863672953, guid: 1143ec115c724a2b856fb8cb10fd77b7, type: 3}
+    _itemModel: {fileID: 183031169969690872, guid: af9d5a993be842669e34d701c78c4ce2, type: 3}
+    _item: {fileID: -5955076600193935987, guid: c4bed008c079430b914641aab4fce189, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: ff977a184838e024cb80d28462d866b9, type: 3}
+    _sound: {fileID: 8300000, guid: 118121fea7db7d746a4c92de8ab9f64e, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: outfit_animation_patch_apply_isg_hud|anm_use
+    _hands: {fileID: -2484539193836659540, guid: 1143ec115c724a2b856fb8cb10fd77b7, type: 3}
+    _itemModel: {fileID: 6389192143904586690, guid: 1b84ee3e6c0c4795a8658b1d67386f3f, type: 3}
+    _item: {fileID: -4143681161488425515, guid: c73aedece80e4ee3a91fe0d4865e20ab, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: 58808c2120d216b499e84f3cbc241f07, type: 3}
+    _sound: {fileID: 8300000, guid: a54d7fa891975ec4dbebd2755af53a24, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: outfit_animation_patch_remove_isg_hud|anm_use
+    _hands: {fileID: 4861243696011684048, guid: 1143ec115c724a2b856fb8cb10fd77b7, type: 3}
+    _itemModel: {fileID: 6389192143904586690, guid: 1b84ee3e6c0c4795a8658b1d67386f3f, type: 3}
+    _item: {fileID: -2029953867110838812, guid: c73aedece80e4ee3a91fe0d4865e20ab, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: 3914150735fe6c94fa27021d6dce3f66, type: 3}
+    _sound: {fileID: 8300000, guid: 118121fea7db7d746a4c92de8ab9f64e, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: outfit_animation_patch_apply_inventory_isg_hud|anm_use
+    _hands: {fileID: 1000180552370539268, guid: 1143ec115c724a2b856fb8cb10fd77b7, type: 3}
+    _itemModel: {fileID: 6389192143904586690, guid: 1b84ee3e6c0c4795a8658b1d67386f3f, type: 3}
+    _item: {fileID: 7234272740390370960, guid: c73aedece80e4ee3a91fe0d4865e20ab, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: ac9e0a83a17ad92448a28ed23d2aecbc, type: 3}
+    _sound: {fileID: 8300000, guid: a54d7fa891975ec4dbebd2755af53a24, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: outfit_animation_patch_remove_inventory_isg_hud|anm_use
+    _hands: {fileID: 440498886863672953, guid: 1143ec115c724a2b856fb8cb10fd77b7, type: 3}
+    _itemModel: {fileID: 6389192143904586690, guid: 1b84ee3e6c0c4795a8658b1d67386f3f, type: 3}
+    _item: {fileID: -5955076600193935987, guid: c73aedece80e4ee3a91fe0d4865e20ab, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: ff977a184838e024cb80d28462d866b9, type: 3}
+    _sound: {fileID: 8300000, guid: 118121fea7db7d746a4c92de8ab9f64e, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: outfit_animation_patch_apply_killer_hud|anm_use
+    _hands: {fileID: -2484539193836659540, guid: 1143ec115c724a2b856fb8cb10fd77b7, type: 3}
+    _itemModel: {fileID: 5042252061214135534, guid: 90a02ba097a048678830ccfa61350637, type: 3}
+    _item: {fileID: -4143681161488425515, guid: 4ea5dd10737540c9a25a2969e3ae1afa, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: 58808c2120d216b499e84f3cbc241f07, type: 3}
+    _sound: {fileID: 8300000, guid: a54d7fa891975ec4dbebd2755af53a24, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: outfit_animation_patch_remove_killer_hud|anm_use
+    _hands: {fileID: 4861243696011684048, guid: 1143ec115c724a2b856fb8cb10fd77b7, type: 3}
+    _itemModel: {fileID: 5042252061214135534, guid: 90a02ba097a048678830ccfa61350637, type: 3}
+    _item: {fileID: -2029953867110838812, guid: 4ea5dd10737540c9a25a2969e3ae1afa, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: 3914150735fe6c94fa27021d6dce3f66, type: 3}
+    _sound: {fileID: 8300000, guid: 118121fea7db7d746a4c92de8ab9f64e, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: outfit_animation_patch_apply_inventory_killer_hud|anm_use
+    _hands: {fileID: 1000180552370539268, guid: 1143ec115c724a2b856fb8cb10fd77b7, type: 3}
+    _itemModel: {fileID: 5042252061214135534, guid: 90a02ba097a048678830ccfa61350637, type: 3}
+    _item: {fileID: 7234272740390370960, guid: 4ea5dd10737540c9a25a2969e3ae1afa, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: ac9e0a83a17ad92448a28ed23d2aecbc, type: 3}
+    _sound: {fileID: 8300000, guid: a54d7fa891975ec4dbebd2755af53a24, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: outfit_animation_patch_remove_inventory_killer_hud|anm_use
+    _hands: {fileID: 440498886863672953, guid: 1143ec115c724a2b856fb8cb10fd77b7, type: 3}
+    _itemModel: {fileID: 5042252061214135534, guid: 90a02ba097a048678830ccfa61350637, type: 3}
+    _item: {fileID: -5955076600193935987, guid: 4ea5dd10737540c9a25a2969e3ae1afa, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: ff977a184838e024cb80d28462d866b9, type: 3}
+    _sound: {fileID: 8300000, guid: 118121fea7db7d746a4c92de8ab9f64e, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: outfit_animation_patch_apply_monolith_hud|anm_use
+    _hands: {fileID: -2484539193836659540, guid: 1143ec115c724a2b856fb8cb10fd77b7, type: 3}
+    _itemModel: {fileID: 2083954019658292574, guid: 569d2ddc6a834a4f9189d2dc1e834e0c, type: 3}
+    _item: {fileID: -4143681161488425515, guid: 3c07b5431edc492cb424a6b9a64ad6d9, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: 58808c2120d216b499e84f3cbc241f07, type: 3}
+    _sound: {fileID: 8300000, guid: a54d7fa891975ec4dbebd2755af53a24, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: outfit_animation_patch_remove_monolith_hud|anm_use
+    _hands: {fileID: 4861243696011684048, guid: 1143ec115c724a2b856fb8cb10fd77b7, type: 3}
+    _itemModel: {fileID: 2083954019658292574, guid: 569d2ddc6a834a4f9189d2dc1e834e0c, type: 3}
+    _item: {fileID: -2029953867110838812, guid: 3c07b5431edc492cb424a6b9a64ad6d9, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: 3914150735fe6c94fa27021d6dce3f66, type: 3}
+    _sound: {fileID: 8300000, guid: 118121fea7db7d746a4c92de8ab9f64e, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: outfit_animation_patch_apply_inventory_monolith_hud|anm_use
+    _hands: {fileID: 1000180552370539268, guid: 1143ec115c724a2b856fb8cb10fd77b7, type: 3}
+    _itemModel: {fileID: 2083954019658292574, guid: 569d2ddc6a834a4f9189d2dc1e834e0c, type: 3}
+    _item: {fileID: 7234272740390370960, guid: 3c07b5431edc492cb424a6b9a64ad6d9, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: ac9e0a83a17ad92448a28ed23d2aecbc, type: 3}
+    _sound: {fileID: 8300000, guid: a54d7fa891975ec4dbebd2755af53a24, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: outfit_animation_patch_remove_inventory_monolith_hud|anm_use
+    _hands: {fileID: 440498886863672953, guid: 1143ec115c724a2b856fb8cb10fd77b7, type: 3}
+    _itemModel: {fileID: 2083954019658292574, guid: 569d2ddc6a834a4f9189d2dc1e834e0c, type: 3}
+    _item: {fileID: -5955076600193935987, guid: 3c07b5431edc492cb424a6b9a64ad6d9, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: ff977a184838e024cb80d28462d866b9, type: 3}
+    _sound: {fileID: 8300000, guid: 118121fea7db7d746a4c92de8ab9f64e, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: outfit_animation_patch_apply_renegade_hud|anm_use
+    _hands: {fileID: -2484539193836659540, guid: 1143ec115c724a2b856fb8cb10fd77b7, type: 3}
+    _itemModel: {fileID: 9065634302517978736, guid: 0ee0c8b3b50147b4aa9117b62950243e, type: 3}
+    _item: {fileID: -4143681161488425515, guid: e17297d2fd724d50ba8825b28d5a0164, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: 58808c2120d216b499e84f3cbc241f07, type: 3}
+    _sound: {fileID: 8300000, guid: a54d7fa891975ec4dbebd2755af53a24, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: outfit_animation_patch_remove_renegade_hud|anm_use
+    _hands: {fileID: 4861243696011684048, guid: 1143ec115c724a2b856fb8cb10fd77b7, type: 3}
+    _itemModel: {fileID: 9065634302517978736, guid: 0ee0c8b3b50147b4aa9117b62950243e, type: 3}
+    _item: {fileID: -2029953867110838812, guid: e17297d2fd724d50ba8825b28d5a0164, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: 3914150735fe6c94fa27021d6dce3f66, type: 3}
+    _sound: {fileID: 8300000, guid: 118121fea7db7d746a4c92de8ab9f64e, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: outfit_animation_patch_apply_inventory_renegade_hud|anm_use
+    _hands: {fileID: 1000180552370539268, guid: 1143ec115c724a2b856fb8cb10fd77b7, type: 3}
+    _itemModel: {fileID: 9065634302517978736, guid: 0ee0c8b3b50147b4aa9117b62950243e, type: 3}
+    _item: {fileID: 7234272740390370960, guid: e17297d2fd724d50ba8825b28d5a0164, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: ac9e0a83a17ad92448a28ed23d2aecbc, type: 3}
+    _sound: {fileID: 8300000, guid: a54d7fa891975ec4dbebd2755af53a24, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: outfit_animation_patch_remove_inventory_renegade_hud|anm_use
+    _hands: {fileID: 440498886863672953, guid: 1143ec115c724a2b856fb8cb10fd77b7, type: 3}
+    _itemModel: {fileID: 9065634302517978736, guid: 0ee0c8b3b50147b4aa9117b62950243e, type: 3}
+    _item: {fileID: -5955076600193935987, guid: e17297d2fd724d50ba8825b28d5a0164, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: ff977a184838e024cb80d28462d866b9, type: 3}
+    _sound: {fileID: 8300000, guid: 118121fea7db7d746a4c92de8ab9f64e, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: outfit_animation_patch_apply_stalker_hud|anm_use
+    _hands: {fileID: -2484539193836659540, guid: 1143ec115c724a2b856fb8cb10fd77b7, type: 3}
+    _itemModel: {fileID: 2255480255726573584, guid: d041418da5734c428fdeafd3a2725fce, type: 3}
+    _item: {fileID: -4143681161488425515, guid: 1a748e22f5f24418bc93d71d5f1bbe15, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: 58808c2120d216b499e84f3cbc241f07, type: 3}
+    _sound: {fileID: 8300000, guid: a54d7fa891975ec4dbebd2755af53a24, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: outfit_animation_patch_remove_stalker_hud|anm_use
+    _hands: {fileID: 4861243696011684048, guid: 1143ec115c724a2b856fb8cb10fd77b7, type: 3}
+    _itemModel: {fileID: 2255480255726573584, guid: d041418da5734c428fdeafd3a2725fce, type: 3}
+    _item: {fileID: -2029953867110838812, guid: 1a748e22f5f24418bc93d71d5f1bbe15, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: 3914150735fe6c94fa27021d6dce3f66, type: 3}
+    _sound: {fileID: 8300000, guid: 118121fea7db7d746a4c92de8ab9f64e, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: outfit_animation_patch_apply_inventory_stalker_hud|anm_use
+    _hands: {fileID: 1000180552370539268, guid: 1143ec115c724a2b856fb8cb10fd77b7, type: 3}
+    _itemModel: {fileID: 2255480255726573584, guid: d041418da5734c428fdeafd3a2725fce, type: 3}
+    _item: {fileID: 7234272740390370960, guid: 1a748e22f5f24418bc93d71d5f1bbe15, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: ac9e0a83a17ad92448a28ed23d2aecbc, type: 3}
+    _sound: {fileID: 8300000, guid: a54d7fa891975ec4dbebd2755af53a24, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
+  - _id: outfit_animation_patch_remove_inventory_stalker_hud|anm_use
+    _hands: {fileID: 440498886863672953, guid: 1143ec115c724a2b856fb8cb10fd77b7, type: 3}
+    _itemModel: {fileID: 2255480255726573584, guid: d041418da5734c428fdeafd3a2725fce, type: 3}
+    _item: {fileID: -5955076600193935987, guid: 1a748e22f5f24418bc93d71d5f1bbe15, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: ff977a184838e024cb80d28462d866b9, type: 3}
+    _sound: {fileID: 8300000, guid: 118121fea7db7d746a4c92de8ab9f64e, type: 3}
+    _hudFieldOfView: 0
+    _handsPosition: {x: 0, y: 0, z: 0}
+    _handsOrientation: {x: 0, y: 0, z: 0}
   _fadeSections:
   - gasmask_headgear_hud
   - helm_ach7_headgear_hud

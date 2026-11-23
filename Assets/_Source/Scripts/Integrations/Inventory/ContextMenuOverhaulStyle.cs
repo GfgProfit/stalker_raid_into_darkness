@@ -27,6 +27,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
         private const string ICON_UNTRASHBIN = "ui_cmo_untrashbin";
         private const string ICON_SCOPE = "ui_cmo_scope";
         private const string ICON_SILENCER = "ui_cmo_silencer";
+        private const string ICON_PATCH = "ui_cmo_patch";
         private const string TAG_DRINK = "drink";
         private const string TAG_FOOD = "food";
         private const string TAG_MEDKIT = "medkit";
@@ -57,6 +58,8 @@ namespace RaidIntoDarkness.Integrations.Inventory
                     return Style(ICON_SILENCER, DEFAULT_GROUP);
                 case InventoryWeaponAttachments.DETACH_SCOPE_ACTION:
                     return Style(ICON_SCOPE, DEFAULT_GROUP);
+                case InventoryWindowController.OUTFIT_PATCH_ACTION:
+                    return Style(ICON_PATCH, DEFAULT_GROUP);
                 case InventoryBuiltInActions.MOVE:
                     return Style(ICON_ARROWS, DEFAULT_GROUP);
                 case InventoryBuiltInActions.SPLIT:

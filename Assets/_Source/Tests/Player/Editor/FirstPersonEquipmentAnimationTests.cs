@@ -226,6 +226,32 @@ namespace RaidIntoDarkness.Player.Tests
             }
         }
 
+        [Test]
+        public void ImportedPatchMotionsUseFactionModelsAndTheCorrectOutfitVariant()
+        {
+            var library = AssetDatabase.LoadAssetAtPath<FirstPersonEquipmentAnimationLibrary>(EQUIPMENT_LIBRARY_PATH);
+            foreach (string community in new[] { "army", "bandit", "csky", "dolg", "ecolog", "freedom", "greh", "isg", "killer", "monolith", "renegade", "stalker" })
+            {
+                foreach (bool equipped in new[] { true, false })
+                {
+                    foreach (bool apply in new[] { true, false })
+                    {
+                        FirstPersonHudMotion motion = library.FindPatch(community, apply, equipped);
+                        string action = apply ? "apply" : "remove";
+                        string suffix = equipped ? string.Empty : "_inventory";
+                        Assert.That(motion, Is.Not.Null);
+                        Assert.That(motion.Hands.name, Is.EqualTo("liz_patch_hands_" + action + suffix));
+                        Assert.That(motion.Item.name, Is.EqualTo("liz_patch_" + action + suffix));
+                        Assert.That(motion.ItemModel.name, Is.EqualTo("liz_patch_hud_" + community));
+                        Assert.That(motion.CameraEffect.HasCurves, Is.True);
+                        Assert.That(motion.Sound, Is.Not.Null);
+                    }
+                }
+            }
+
+            Assert.That(library.FindPatch("unknown", false, true), Is.Null);
+        }
+
         private static GameObject CreateItemModel()
         {
             var item = new GameObject("item");

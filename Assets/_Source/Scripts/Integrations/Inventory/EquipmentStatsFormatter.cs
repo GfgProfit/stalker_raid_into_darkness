@@ -204,13 +204,13 @@ namespace RaidIntoDarkness.Integrations.Inventory
 
             if (definition.IsCategory(OUTFIT_CATEGORY))
             {
-                AppendFeatures(component);
+                AppendFeatures(component, EquipmentAnimationQueue.IsPatchRemoved(item));
             }
 
             return _builder.ToString();
         }
 
-        private void AppendFeatures(EquipmentStatsComponent component)
+        private void AppendFeatures(EquipmentStatsComponent component, bool patchRemoved)
         {
             string community = component.Community.Length > 0 ? _window.Label("community_" + component.Community, component.Community) : _window.Label("community_unknown", "Unknown");
             _builder.Append("\n\n");
@@ -218,6 +218,12 @@ namespace RaidIntoDarkness.Integrations.Inventory
             AppendColor(YELLOW_COLOR).Append(FEATURE_BULLET);
             AppendColor(GRAY_2_COLOR).Append(_window.Label("feature_community", "faction")).Append(": ");
             AppendColor(GRAY_1_COLOR).Append(community).Append('\n');
+            if (patchRemoved)
+            {
+                AppendColor(PURPLE_COLOR).Append(FEATURE_BULLET);
+                AppendColor(GRAY_1_COLOR).Append(_window.Label("feature_patch_missing", "Нашивка группировки отсутствует")).Append('\n');
+            }
+
             AppendColor(PURPLE_COLOR).Append(FEATURE_BULLET);
             AppendColor(GRAY_2_COLOR).Append(_window.Label("feature_helmet", "headgear")).Append(": ");
             AppendColor(GRAY_1_COLOR).Append(component.HelmetAvailable ? _window.Label("feature_helmet_none", "none") : _window.Label("feature_helmet_builtin", "built-in")).Append('\n');

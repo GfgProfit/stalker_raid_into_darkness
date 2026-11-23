@@ -171,6 +171,54 @@ namespace Inventory.Tests
             Assert.That(_changes, Is.Empty);
         }
 
+        [TestCase(0, 2, false)]
+        [TestCase(0, 3, true)]
+        [TestCase(59, 0, true)]
+        [TestCase(60, 0, false)]
+        public void ReconfigurationReturnsAddonAndAmmoTogether(int existingAmount, int extraCells, bool fits)
+        {
+            int width = existingAmount == 0 ? extraCells : 3 + extraCells;
+            var destination = new GridContainer("Return", width, 2);
+            _model.AddContainer(destination);
+            ItemInstance stack = existingAmount > 0 ? _model.CreateItem(_ammo, existingAmount) : null;
+            ItemInstance blockedCell = existingAmount > 0 ? _model.CreateItem(_medkit) : null;
+            if (stack != null)
+            {
+                Assert.That(_model.TryAdd(stack, destination.Id, new Vector2Int(2, 0), false).Success, Is.True);
+                Assert.That(_model.TryAdd(blockedCell, destination.Id, new Vector2Int(2, 1), false).Success, Is.True);
+            }
+
+            ItemInstance rifle = _model.CreateItem(_rifle);
+            Assert.That(_model.TryAdd(rifle, "Backpack", Vector2Int.zero, false).Success, Is.True);
+            rifle.SetState("round", "loaded");
+            var updated = new ItemInstance(_rifle, rifle.Amount, rifle.InstanceId);
+            ItemInstance addon = _model.CreateItem(_square);
+            ItemInstance round = _model.CreateItem(_ammo);
+            _changes.Clear();
+
+            InventoryResult preview = _model.TryReconfigureItem(rifle, updated, rifle.Location.Position, returned: addon, returnContainerId: destination.Id, apply: false, returnedStack: round);
+            Assert.That(preview.Success, Is.EqualTo(fits));
+            Assert.That(rifle.GetState("round"), Is.EqualTo("loaded"));
+            Assert.That(addon.Location.IsPlaced, Is.False);
+            Assert.That(round.Location.IsPlaced, Is.False);
+            Assert.That(_changes, Is.Empty);
+
+            InventoryResult result = _model.TryReconfigureItem(rifle, updated, rifle.Location.Position, returned: addon, returnContainerId: destination.Id, returnedStack: round);
+            Assert.That(result.Success, Is.EqualTo(fits));
+            Assert.That(rifle.GetState("round"), Is.EqualTo(fits ? null : "loaded"));
+            Assert.That(_model.ContainsItem(addon), Is.EqualTo(fits));
+            Assert.That(_model.ContainsItem(round), Is.EqualTo(fits && stack == null));
+            if (stack != null)
+            {
+                Assert.That(stack.Amount, Is.EqualTo(fits ? existingAmount + 1 : existingAmount));
+            }
+
+            if (!fits)
+            {
+                Assert.That(_changes, Is.Empty);
+            }
+        }
+
         [Test]
         public void MoveBetweenContainersAndRotate()
         {

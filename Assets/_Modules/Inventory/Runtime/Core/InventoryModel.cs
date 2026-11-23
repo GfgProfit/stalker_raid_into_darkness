@@ -119,9 +119,14 @@ namespace Inventory
             }
         }
 
-        public InventoryResult TryReconfigureItem(ItemInstance item, ItemInstance updated, Vector2Int position, ItemInstance consumed = null, ItemInstance returned = null, string returnContainerId = null, bool apply = true, bool mergeReturned = false)
+        public InventoryResult TryReconfigureItem(ItemInstance item, ItemInstance updated, Vector2Int position, ItemInstance consumed = null, ItemInstance returned = null, string returnContainerId = null, bool apply = true, bool mergeReturned = false, ItemInstance returnedStack = null)
         {
             if (ContainsItem(item) == false || updated == null || updated.Definition != item.Definition || updated.Amount != item.Amount || updated.InstanceId != item.InstanceId || consumed == item || (consumed != null && ContainsItem(consumed) == false) || (returned != null && (_items.ContainsKey(returned.InstanceId) || returned.Location.IsPlaced)))
+            {
+                return InventoryResult.Fail(InventoryFailure.InvalidItem);
+            }
+
+            if (returnedStack != null && (returned == null || returned.DefinitionId == returnedStack.DefinitionId || returned.InstanceId == returnedStack.InstanceId || _items.ContainsKey(returnedStack.InstanceId) || returnedStack.Location.IsPlaced))
             {
                 return InventoryResult.Fail(InventoryFailure.InvalidItem);
             }
@@ -147,6 +152,11 @@ namespace Inventory
                 returned.Resolver = Resolver;
             }
 
+            if (returnedStack != null)
+            {
+                returnedStack.Resolver = Resolver;
+            }
+
             var ignored = new List<ItemInstance> { item };
 
             if (consumed != null && consumed.Amount == 1)
@@ -163,7 +173,7 @@ namespace Inventory
             {
                 float delta = candidate == container ? updated.TotalWeight - item.TotalWeight : 0f;
                 delta -= candidate == source ? consumed.UnitWeight : 0f;
-                delta += candidate == destination ? returned.TotalWeight : 0f;
+                delta += candidate == destination ? returned.TotalWeight + (returnedStack?.TotalWeight ?? 0f) : 0f;
 
                 if (delta > 0f && WeightAllows(candidate, delta) == false)
                 {
@@ -176,8 +186,11 @@ namespace Inventory
             ItemLocation consumedLocation = consumed?.Location ?? ItemLocation.None;
             ItemPlacement consumedPlacement = consumed != null ? new ItemPlacement(consumedLocation.Position, source.GetItemArea(consumed), consumedLocation.Rotated, consumedLocation.SlotId) : default;
             ItemPlacement returnedPlacement = default;
+            ItemPlacement stackPlacement = default;
             int returnedAmount = returned?.Amount ?? 0;
+            int stackAmount = returnedStack?.Amount ?? 0;
             List<KeyValuePair<ItemInstance, int>> returnMerges = null;
+            List<KeyValuePair<ItemInstance, int>> stackMerges = null;
 
             if (mergeReturned && returned?.IsStackable == true)
             {
@@ -185,7 +198,13 @@ namespace Inventory
                 returnedAmount -= SumMerges(returnMerges);
             }
 
-            if (returnedAmount > 0)
+            if (returnedStack?.IsStackable == true)
+            {
+                stackMerges = PlanMerges(returnedStack, stackAmount, destination, item, consumed);
+                stackAmount -= SumMerges(stackMerges);
+            }
+
+            if (returnedAmount > 0 || stackAmount > 0)
             {
                 bool found;
                 container.Release(item);
@@ -197,15 +216,12 @@ namespace Inventory
 
                 container.Occupy(updated, placement);
 
-                int originalAmount = returned.Amount;
                 try
                 {
-                    returned.Amount = returnedAmount;
-                    found = destination.TryFindSpace(returned, true, out returnedPlacement);
+                    found = TryPlaceReturns(destination, returned, returnedAmount, returnedStack, stackAmount, out returnedPlacement, out stackPlacement);
                 }
                 finally
                 {
-                    returned.Amount = originalAmount;
                     container.Release(updated);
                     container.Occupy(item, original);
 
@@ -235,22 +251,80 @@ namespace Inventory
             item.CopyStateFrom(updated);
             container.Occupy(item, placement);
 
-            if (returnMerges != null)
-            {
-                ApplyMerges(returnMerges);
-            }
-
-            if (returnedAmount > 0)
-            {
-                returned.Amount = returnedAmount;
-                _items.Add(returned.InstanceId, returned);
-                OccupyInternal(returned, destination, returnedPlacement);
-                Emit(new InventoryChange(InventoryChangeKind.ItemAdded, returned, destination.Id, ItemLocation.None, returnedPlacement.SlotId));
-            }
+            CommitReturn(returned, returnedAmount, returnMerges, destination, returnedPlacement);
+            CommitReturn(returnedStack, stackAmount, stackMerges, destination, stackPlacement);
 
             Emit(new InventoryChange(InventoryChangeKind.ItemStateChanged, item, container.Id, previous, placement.SlotId));
             Flush();
             return InventoryResult.Ok(item, 1);
+        }
+
+        private static bool TryPlaceReturns(InventoryContainer destination, ItemInstance first, int firstAmount, ItemInstance second, int secondAmount, out ItemPlacement firstPlacement, out ItemPlacement secondPlacement)
+        {
+            firstPlacement = default;
+            secondPlacement = default;
+            int originalFirstAmount = first?.Amount ?? 0;
+            int originalSecondAmount = second?.Amount ?? 0;
+            bool firstOccupied = false;
+
+            try
+            {
+                if (firstAmount > 0)
+                {
+                    first.Amount = firstAmount;
+                    if (!destination.TryFindSpace(first, true, out firstPlacement))
+                    {
+                        return false;
+                    }
+
+                    if (secondAmount > 0)
+                    {
+                        destination.Occupy(first, firstPlacement);
+                        firstOccupied = true;
+                    }
+                }
+
+                if (secondAmount == 0)
+                {
+                    return true;
+                }
+
+                second.Amount = secondAmount;
+                return destination.TryFindSpace(second, true, out secondPlacement);
+            }
+            finally
+            {
+                if (firstOccupied)
+                {
+                    destination.Release(first);
+                }
+
+                if (firstAmount > 0)
+                {
+                    first.Amount = originalFirstAmount;
+                }
+
+                if (secondAmount > 0)
+                {
+                    second.Amount = originalSecondAmount;
+                }
+            }
+        }
+
+        private void CommitReturn(ItemInstance item, int amount, List<KeyValuePair<ItemInstance, int>> merges, InventoryContainer destination, ItemPlacement placement)
+        {
+            if (merges != null)
+            {
+                ApplyMerges(merges);
+            }
+
+            if (amount > 0)
+            {
+                item.Amount = amount;
+                _items.Add(item.InstanceId, item);
+                OccupyInternal(item, destination, placement);
+                Emit(new InventoryChange(InventoryChangeKind.ItemAdded, item, destination.Id, ItemLocation.None, placement.SlotId));
+            }
         }
 
         public InventoryResult CanAdd(ItemInstance item, string containerId, Vector2Int position, bool rotated)

@@ -439,10 +439,10 @@ MonoBehaviour:
   _emptyClicksPerMinute: 200
   _fireModes: 01000000ffffffffi
   _magazineSize: 30
-  _flameParticles: {fileID: 9178496045011697607, guid: cf845d4b5aeb25c4a816a59bf57b8ea6, type: 3}
-  _smokeParticles: {fileID: 0}
+  _flameParticles: {fileID: 4298555564076427805, guid: 4e05b5c64b409cf488d94241d99328f3, type: 3}
+  _smokeParticles: {fileID: 1495478619395769424, guid: de82c5c52acfcb346a0a2951d67124a1, type: 3}
   _silencedFlameParticles: {fileID: 0}
-  _silencedSmokeParticles: {fileID: 3543277812213444982, guid: b060efeec0956c54089e2e7a195b90e3, type: 3}
+  _silencedSmokeParticles: {fileID: 3969830359355939410, guid: 8f360db1ee2283943ad154c0a11d2262, type: 3}
   _lastShotHoldFrame: 0
   _emptyShotStrength: 0.15
   _ballistics:

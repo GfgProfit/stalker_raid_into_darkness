@@ -330,6 +330,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             Assert.That(view.SilencerVisual.activeSelf, Is.False);
             Assert.That(weapons.Muzzle, Is.SameAs(view.Muzzle));
 
+            yield return new WaitForSeconds(asset.ShotInterval);
             Press(_mouse.leftButton, queueEventOnly: true);
             yield return null;
             Release(_mouse.leftButton, queueEventOnly: true);

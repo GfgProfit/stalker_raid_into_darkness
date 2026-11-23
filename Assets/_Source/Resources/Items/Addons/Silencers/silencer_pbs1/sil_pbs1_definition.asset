@@ -1,0 +1,91 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da0f90c2955673d46b25d465cbe44ed0, type: 3}
+  m_Name: sil_pbs1_definition
+  m_EditorClassIdentifier: Inventory::Inventory.ItemDefinition
+  _definitionId: dd4d444c34e34331b3d6146a88cf09ad
+  _displayName: "\u0413\u043B\u0443\u0448\u0438\u0442\u0435\u043B\u044C \u041F\u0411\u0421-1"
+  _shortName: "\u041F\u0411\u0421-1"
+  _description: 
+  _category: Attachment
+  _tags:
+  - Silencer
+  _size: {x: 2, y: 1}
+  _weight: 0.435
+  _maxStack: 1
+  _allowRotation: 1
+  _backgroundColor: {r: 1, g: 1, b: 1, a: 0.04}
+  _fallbackIcon: {fileID: 0}
+  _iconOverride: {fileID: 0}
+  _visualPrefab: {fileID: -5897587643759786666, guid: bf4eec5f9b6cbbe409811d2d8fdde3fe, type: 3}
+  _defaultIconVariant: []
+  _icon:
+    _generateIcon: 1
+    _pixelsPerCell: 64
+    _antiAliasing: 1
+    _useOutline: 0
+    _outlineWidth: 2
+    _useShadow: 1
+    _shadowOffset: {x: 2, y: -2}
+    _shadowBlur: 2
+    _defaultView:
+      _modelEulerAngles: {x: 0, y: 0, z: 0}
+      _modelScale: {x: 1, y: 1, z: 1}
+      _cameraEulerAngles: {x: 0, y: -90, z: 0}
+      _padding: 1.15
+      _useDirectionalLight: 1
+      _lightIntensity: 10
+    _useCustomSlotView: 0
+    _slotView:
+      _modelEulerAngles: {x: 0, y: 0, z: 0}
+      _modelScale: {x: 1, y: 1, z: 1}
+      _cameraEulerAngles: {x: 0, y: -90, z: 0}
+      _padding: 1.15
+      _useDirectionalLight: 1
+      _lightIntensity: 10
+  _components:
+  - rid: 115149063313949395
+  - rid: 115149063313949396
+  - rid: 115149063313949402
+  references:
+    version: 2
+    RefIds:
+    - rid: 115149063313949395
+      type: {class: WeaponAddonComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      data:
+        _section: sil_pbs1
+        _kind: 0
+        _cost: 2000
+        _bulletHitPowerFactor: 1.02
+        _bulletHitImpulseFactor: 1
+        _bulletSpeedFactor: 1.08
+        _fireDispersionBaseFactor: 0.96
+        _camDispersionFactor: 0.95
+        _camDispersionIncrementFactor: 0.95
+        _scopeZoomFactor: 0
+        _overrideAimOffsetPosition: 0
+        _aimOffsetPosition: {x: 0, y: 0, z: 0}
+        _attachSound: {fileID: 8300000, guid: 9675790cdb0a56e41b4f69fc4b2f9a3c, type: 3}
+        _detachSound: {fileID: 8300000, guid: 825ad3654f3c06f449923012ebf99008, type: 3}
+        _grenadeAmmo: {fileID: 0}
+        _alternativeGrenadeAmmo: {fileID: 0}
+    - rid: 115149063313949396
+      type: {class: ItemTakeSoundComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      data:
+        _category: attchsilen
+        _clips:
+        - {fileID: 8300000, guid: 651ca6a8a4ce61141bc8232419bc7edb, type: 3}
+        - {fileID: 8300000, guid: 02b396ea17161b74cab273d51371e909, type: 3}
+    - rid: 115149063313949402
+      type: {class: WorldItemComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      data:
+        _prefab: {fileID: 5184386657506378769, guid: 086a353f5851b4141ac869bdd4030784, type: 3}

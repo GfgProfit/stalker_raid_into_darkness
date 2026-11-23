@@ -164,6 +164,10 @@ namespace RaidIntoDarkness.Weapons
 
                 _flame = null;
                 ApplySilencerVisual();
+                if (_slots[slot].Asset?.HasAttachmentMotions == true)
+                {
+                    _hasLoop = false;
+                }
             }
         }
 
@@ -172,6 +176,20 @@ namespace RaidIntoDarkness.Weapons
             if (IsSlot(slot))
             {
                 _slots[slot].AimOffsetPosition = position;
+            }
+        }
+
+        public void SetSlotScope(int slot, bool installed)
+        {
+            if (!IsSlot(slot) || _slots[slot].HasScope == installed)
+            {
+                return;
+            }
+
+            _slots[slot].HasScope = installed;
+            if (ActiveSlot == slot && _slots[slot].Asset?.HasAttachmentMotions == true)
+            {
+                _hasLoop = false;
             }
         }
 
@@ -700,10 +718,11 @@ namespace RaidIntoDarkness.Weapons
             SpawnProjectiles(asset.Ballistics, ammo, launchPosition, launchRotation, bulletSpeed, fireDistance, dispersion);
             _burstLeft--;
             _nextShotTime = Time.time + asset.GetShotInterval(FireMode);
-            FirstPersonWeaponMotion motion = _aiming ? asset.FindRandom(FirstPersonWeaponMotionKind.ShootAim, HasGrenadeLauncher) : null;
+            FirstPersonWeaponMotionMode mode = GetMotionMode();
+            FirstPersonWeaponMotion motion = _aiming ? asset.FindRandom(FirstPersonWeaponMotionKind.ShootAim, mode) : null;
             if (motion == null)
             {
-                motion = asset.FindRandom(FirstPersonWeaponMotionKind.Shoot, HasGrenadeLauncher);
+                motion = asset.FindRandom(FirstPersonWeaponMotionKind.Shoot, mode);
             }
 
             if (motion != null)
@@ -782,7 +801,7 @@ namespace RaidIntoDarkness.Weapons
             }
 
             _nextEmptyClickTime = Time.time + asset.EmptyClickInterval;
-            FirstPersonWeaponMotion motion = asset.FindRandom(FirstPersonWeaponMotionKind.Shoot, HasGrenadeLauncher);
+            FirstPersonWeaponMotion motion = asset.FindRandom(FirstPersonWeaponMotionKind.Shoot, GetMotionMode());
 
             if (motion != null)
             {
@@ -846,7 +865,7 @@ namespace RaidIntoDarkness.Weapons
 
             bool entering = !IsGrenadeMode;
             FirstPersonWeaponMotionKind kind = entering ? FirstPersonWeaponMotionKind.GrenadeModeEnter : FirstPersonWeaponMotionKind.GrenadeModeExit;
-            FirstPersonWeaponMotion motion = ActiveWeapon.Find(kind, 0);
+            FirstPersonWeaponMotion motion = ActiveWeapon.Find(kind, 0, GetMotionMode(true));
             if (motion == null)
             {
                 return false;
@@ -867,7 +886,7 @@ namespace RaidIntoDarkness.Weapons
                 return false;
             }
 
-            FirstPersonWeaponMotion motion = ActiveWeapon.Find(FirstPersonWeaponMotionKind.GrenadeReload, 0);
+            FirstPersonWeaponMotion motion = FindMotion(ActiveWeapon, FirstPersonWeaponMotionKind.GrenadeReload);
             if (motion == null)
             {
                 return false;
@@ -879,7 +898,23 @@ namespace RaidIntoDarkness.Weapons
             return true;
         }
 
-        private FirstPersonWeaponMotion FindMotion(FirstPersonWeaponAsset asset, FirstPersonWeaponMotionKind kind) => asset.Find(kind, 0, HasGrenadeLauncher, IsGrenadeMode);
+        private FirstPersonWeaponMotion FindMotion(FirstPersonWeaponAsset asset, FirstPersonWeaponMotionKind kind) => asset.Find(kind, 0, GetMotionMode());
+
+        private FirstPersonWeaponMotionMode GetMotionMode(bool grenadeAction = false)
+        {
+            FirstPersonWeaponMotionMode mode = ActiveSlot >= 0 && _slots[ActiveSlot].HasScope ? FirstPersonWeaponMotionMode.Scoped : FirstPersonWeaponMotionMode.None;
+            if (grenadeAction || IsGrenadeMode)
+            {
+                return mode | FirstPersonWeaponMotionMode.GrenadeMode;
+            }
+
+            if (HasGrenadeLauncher)
+            {
+                return mode | FirstPersonWeaponMotionMode.WithGrenadeLauncher;
+            }
+
+            return IsSilenced ? mode | FirstPersonWeaponMotionMode.Silenced : mode;
+        }
 
         private void StartReload(FirstPersonWeaponAsset asset)
         {
@@ -1311,7 +1346,7 @@ namespace RaidIntoDarkness.Weapons
             }
 
             bool grenadeMode = IsGrenadeMode;
-            Vector3 aimPosition = grenadeMode ? asset.GrenadeAimOffsetPosition : AimOffsetPosition;
+            Vector3 aimPosition = grenadeMode ? asset.GetGrenadeAimOffset(_slots[ActiveSlot].HasScope) : AimOffsetPosition;
             Vector3 aimEuler = grenadeMode ? asset.GrenadeAimOffsetRotation : asset.AimOffsetRotation;
             Quaternion aimRotation = FirstPersonWeaponAsset.ToAimRotation(aimEuler * _aim);
             Vector3 position = aimPosition * _aim + aimRotation * asset.HandsPosition;
@@ -1615,6 +1650,7 @@ namespace RaidIntoDarkness.Weapons
             public object Key { get; set; }
             public WeaponState WeaponState { get; set; }
             public bool Silenced { get; set; }
+            public bool HasScope { get; set; }
             public bool HasGrenadeLauncher { get; set; }
             public bool GrenadeMode { get; set; }
             public Vector3? AimOffsetPosition { get; set; }

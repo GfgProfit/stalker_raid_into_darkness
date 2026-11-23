@@ -79,6 +79,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
             _controller.SetSlotSilencer(slot, stats != null && (stats.SilencerStatus == WeaponAddonStatus.Permanent || stats.GetSilencer(item, _model.Resolver) != null));
             _controller.SetSlotGrenadeLauncher(slot, stats?.GetGrenadeLauncher(item, _model.Resolver) != null);
             ItemDefinition scope = stats?.GetScope(item, _model.Resolver);
+            _controller.SetSlotScope(slot, scope != null);
             _controller.SetSlotAimOffset(slot, hud?.GetScopeAimOffset(scope));
         }
 

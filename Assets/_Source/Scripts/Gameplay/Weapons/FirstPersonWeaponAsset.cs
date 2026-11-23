@@ -5,6 +5,16 @@ using XRay.Importer;
 
 namespace RaidIntoDarkness.Weapons
 {
+    [Flags]
+    internal enum FirstPersonWeaponMotionMode
+    {
+        None = 0,
+        Silenced = 1,
+        Scoped = 2,
+        WithGrenadeLauncher = 4,
+        GrenadeMode = 8
+    }
+
     [CreateAssetMenu(menuName = "Raid Into Darkness/Weapons/First Person Weapon", fileName = "FirstPersonWeapon")]
     public sealed class FirstPersonWeaponAsset : ScriptableObject
     {
@@ -33,6 +43,7 @@ namespace RaidIntoDarkness.Weapons
         [SerializeField] private List<FirstPersonWeaponMotion> _motions = new List<FirstPersonWeaponMotion>();
         [SerializeField] private List<FirstPersonWeaponMotion> _withGrenadeLauncherMotions = new List<FirstPersonWeaponMotion>();
         [SerializeField] private List<FirstPersonWeaponMotion> _grenadeModeMotions = new List<FirstPersonWeaponMotion>();
+        [SerializeField] private List<AttachmentMotionSet> _attachmentMotions = new List<AttachmentMotionSet>();
         [SerializeField] private XRayAnmAsset _aimStart;
         [SerializeField] private XRayAnmAsset _aimIdle;
         [SerializeField] private XRayAnmAsset _aimEnd;
@@ -40,6 +51,8 @@ namespace RaidIntoDarkness.Weapons
         [Header("Grenade Launcher Aim")]
         [SerializeField] private Vector3 _grenadeAimOffsetPosition;
         [SerializeField] private Vector3 _grenadeAimOffsetRotation;
+        [SerializeField] private bool _useScopedGrenadeAimOffset;
+        [SerializeField] private Vector3 _scopedGrenadeAimOffsetPosition;
         [SerializeField] private XRayAnmAsset _grenadeAimStart;
         [SerializeField] private XRayAnmAsset _grenadeAimIdle;
         [SerializeField] private XRayAnmAsset _grenadeAimEnd;
@@ -113,6 +126,12 @@ namespace RaidIntoDarkness.Weapons
         public AudioClip LowAmmoSound => _lowAmmoSound;
         public int LowAmmoThreshold => _lowAmmoThreshold;
         internal bool HasFixedTwoRoundBurst => _twoRoundBurstRoundsPerMinute > 0;
+        internal bool HasAttachmentMotions => _attachmentMotions?.Count > 0;
+
+        internal Vector3 GetGrenadeAimOffset(bool scoped)
+        {
+            return scoped && _useScopedGrenadeAimOffset ? _scopedGrenadeAimOffsetPosition : _grenadeAimOffsetPosition;
+        }
 
         internal float GetShotInterval(int fireMode)
         {
@@ -139,18 +158,79 @@ namespace RaidIntoDarkness.Weapons
 
         public FirstPersonWeaponMotion Find(FirstPersonWeaponMotionKind kind, int variant, bool hasGrenadeLauncher = false, bool grenadeMode = false)
         {
-            List<FirstPersonWeaponMotion> alternate = grenadeMode ? _grenadeModeMotions : hasGrenadeLauncher ? _withGrenadeLauncherMotions : null;
-            return FindIn(alternate, kind, variant) ?? FindIn(_motions, kind, variant);
+            FirstPersonWeaponMotionMode mode = grenadeMode ? FirstPersonWeaponMotionMode.GrenadeMode : hasGrenadeLauncher ? FirstPersonWeaponMotionMode.WithGrenadeLauncher : FirstPersonWeaponMotionMode.None;
+            return Find(kind, variant, mode);
         }
 
         public FirstPersonWeaponMotion FindRandom(FirstPersonWeaponMotionKind kind, bool hasGrenadeLauncher = false)
         {
-            List<FirstPersonWeaponMotion> motions = hasGrenadeLauncher && CountIn(_withGrenadeLauncherMotions, kind) > 0 ? _withGrenadeLauncherMotions : _motions;
+            return FindRandom(kind, hasGrenadeLauncher ? FirstPersonWeaponMotionMode.WithGrenadeLauncher : FirstPersonWeaponMotionMode.None);
+        }
+
+        internal FirstPersonWeaponMotion Find(FirstPersonWeaponMotionKind kind, int variant, FirstPersonWeaponMotionMode mode)
+        {
+            return FindIn(GetAttachmentMotions(kind, mode), kind, variant) ?? FindIn(GetModeMotions(mode), kind, variant) ?? FindIn(_motions, kind, variant);
+        }
+
+        internal FirstPersonWeaponMotion FindRandom(FirstPersonWeaponMotionKind kind, FirstPersonWeaponMotionMode mode)
+        {
+            List<FirstPersonWeaponMotion> motions = GetAttachmentMotions(kind, mode) ?? GetModeMotions(mode);
             int count = CountIn(motions, kind);
+            if (count == 0)
+            {
+                motions = _motions;
+                count = CountIn(motions, kind);
+            }
+
             return count > 0 ? FindIn(motions, kind, UnityEngine.Random.Range(0, count)) : null;
         }
 
         public int CountMotions(FirstPersonWeaponMotionKind kind) => CountIn(_motions, kind);
+
+        private List<FirstPersonWeaponMotion> GetAttachmentMotions(FirstPersonWeaponMotionKind kind, FirstPersonWeaponMotionMode mode)
+        {
+            if (!HasAttachmentMotions || mode == FirstPersonWeaponMotionMode.None)
+            {
+                return null;
+            }
+
+            List<FirstPersonWeaponMotion> exact = FindAttachmentMotions(kind, mode);
+            FirstPersonWeaponMotionMode unscoped = mode & ~FirstPersonWeaponMotionMode.Scoped;
+            return exact ?? (unscoped != mode && unscoped != FirstPersonWeaponMotionMode.None ? FindAttachmentMotions(kind, unscoped) : null);
+        }
+
+        private List<FirstPersonWeaponMotion> FindAttachmentMotions(FirstPersonWeaponMotionKind kind, FirstPersonWeaponMotionMode mode)
+        {
+            foreach (AttachmentMotionSet set in _attachmentMotions)
+            {
+                if (set != null && set.Mode == mode && CountIn(set.Motions, kind) > 0)
+                {
+                    return set.Motions;
+                }
+            }
+
+            return null;
+        }
+
+        private List<FirstPersonWeaponMotion> GetModeMotions(FirstPersonWeaponMotionMode mode)
+        {
+            if ((mode & FirstPersonWeaponMotionMode.GrenadeMode) != 0)
+            {
+                return _grenadeModeMotions;
+            }
+
+            return (mode & FirstPersonWeaponMotionMode.WithGrenadeLauncher) != 0 ? _withGrenadeLauncherMotions : null;
+        }
+
+        [Serializable]
+        private sealed class AttachmentMotionSet
+        {
+            [SerializeField] private FirstPersonWeaponMotionMode _mode;
+            [SerializeField] private List<FirstPersonWeaponMotion> _motions = new List<FirstPersonWeaponMotion>();
+
+            public FirstPersonWeaponMotionMode Mode => _mode;
+            public List<FirstPersonWeaponMotion> Motions => _motions;
+        }
 
         private static FirstPersonWeaponMotion FindIn(List<FirstPersonWeaponMotion> motions, FirstPersonWeaponMotionKind kind, int variant)
         {

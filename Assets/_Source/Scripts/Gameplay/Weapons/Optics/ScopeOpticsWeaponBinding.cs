@@ -10,6 +10,7 @@ namespace RaidIntoDarkness.Weapons.Optics
         [SerializeField, Range(0f, 1f)] private float _activationAimFactor = 0.95f;
         [SerializeField, Min(0.1f)] private float _magnification = 8f;
         [SerializeField, Min(0.001f)] private float _magnificationPerScrollNotch = 0.35f;
+        [SerializeField] private bool _aimInGrenadeMode;
 
         private FirstPersonWeaponController _controller;
         private Camera _viewerCamera;
@@ -65,7 +66,7 @@ namespace RaidIntoDarkness.Weapons.Optics
                 return;
             }
 
-            if (!UsesOpticalMagnification || _controller.IsGrenadeMode)
+            if (!UsesOpticalMagnification || _controller.IsGrenadeMode && !_aimInGrenadeMode)
             {
                 _renderer.SetActive(false);
                 return;
@@ -83,7 +84,7 @@ namespace RaidIntoDarkness.Weapons.Optics
 
         public void ApplyMagnificationScroll(float scroll)
         {
-            if (!UsesOpticalMagnification || _controller.IsGrenadeMode || _controller.State != FirstPersonWeaponState.Ready || !_controller.IsAiming || _controller.AimFactor < ScopeOpticsMath.FiniteClamp(_activationAimFactor, 0f, 1f, 0.95f) || !float.IsFinite(scroll))
+            if (!UsesOpticalMagnification || _controller.IsGrenadeMode && !_aimInGrenadeMode || _controller.State != FirstPersonWeaponState.Ready || !_controller.IsAiming || _controller.AimFactor < ScopeOpticsMath.FiniteClamp(_activationAimFactor, 0f, 1f, 0.95f) || !float.IsFinite(scroll))
             {
                 return;
             }

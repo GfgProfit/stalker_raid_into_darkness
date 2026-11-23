@@ -6,7 +6,8 @@
         "RaidIntoDarkness.Player",
         "RaidIntoDarkness.Effects",
         "XRay.Importer.Runtime",
-        "Unity.TextMeshPro"
+        "Unity.TextMeshPro",
+        "Unity.RenderPipelines.HighDefinition.Runtime"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

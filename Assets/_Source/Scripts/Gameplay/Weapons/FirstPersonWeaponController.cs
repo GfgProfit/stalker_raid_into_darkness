@@ -140,12 +140,12 @@ namespace RaidIntoDarkness.Weapons
 
             if (ActiveSlot == slot && _model != null)
             {
-                if (_flame != null)
+                if (_muzzle != null)
                 {
-                    _flame.Stop(false);
-                    _flame = null;
+                    _effects.Detach(_muzzle);
                 }
 
+                _flame = null;
                 ApplySilencerVisual();
             }
         }
@@ -345,6 +345,7 @@ namespace RaidIntoDarkness.Weapons
         private void Update()
         {
             float deltaTime = Mathf.Min(Time.deltaTime, MAX_FRAME_DELTA);
+            _effects.TickMuzzleLight(Time.deltaTime);
             Subscribe();
             TickRecoil();
             bool inputAllowed = _input != null && _player != null && !_player.GameplayInputBlocked;
@@ -746,6 +747,11 @@ namespace RaidIntoDarkness.Weapons
 
             Quaternion rotation = GetMuzzleRotation(muzzle);
             _flame = _effects.Play(IsSilenced ? asset.SilencedFlameParticles : asset.FlameParticles, muzzle, muzzle.position, rotation);
+            if (_flame != null)
+            {
+                _effects.PlayMuzzleLight(muzzle);
+            }
+
             _effects.Play(IsSilenced ? asset.SilencedSmokeParticles : asset.SmokeParticles, null, muzzle.position, rotation);
         }
 

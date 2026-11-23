@@ -282,6 +282,18 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             }
 
             Assert.That(weapons.State, Is.EqualTo(FirstPersonWeaponState.Ready));
+            Press(_mouse.leftButton, queueEventOnly: true);
+            yield return null;
+            Release(_mouse.leftButton, queueEventOnly: true);
+            Assert.That(weapons.Magazine, Is.EqualTo(29));
+            Light muzzleLight = weapons.Muzzle.GetComponentInChildren<Light>();
+            Assert.That(muzzleLight, Is.Not.Null);
+            Assert.That(muzzleLight.type, Is.EqualTo(LightType.Point));
+            Assert.That(muzzleLight.shadows, Is.EqualTo(LightShadows.None));
+            Assert.That(muzzleLight.intensity, Is.GreaterThan(0f));
+            yield return new WaitForSeconds(0.25f);
+            Assert.That(muzzleLight.gameObject.activeSelf, Is.False);
+
             GameObject originalModel = weapons.Model;
             FirstPersonWeaponView view = originalModel.GetComponent<FirstPersonWeaponView>();
             Assert.That(view.SilencerVisual, Is.Not.Null);
@@ -302,7 +314,8 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             yield return null;
             Release(_mouse.leftButton, queueEventOnly: true);
             yield return null;
-            Assert.That(weapons.Magazine, Is.EqualTo(29));
+            Assert.That(weapons.Magazine, Is.EqualTo(28));
+            Assert.That(muzzleLight.gameObject.activeSelf, Is.False);
             Assert.That(weapon.TotalWeight, Is.EqualTo(weightBeforeShot - Find(controller, "ammo_5.56x45_ss190").Weight).Within(0.0001f));
             bool smoke = false;
 

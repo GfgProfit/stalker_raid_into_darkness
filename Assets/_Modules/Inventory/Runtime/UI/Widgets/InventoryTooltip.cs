@@ -51,9 +51,18 @@ namespace Inventory.UI
 
         public void Show(ItemInstance item, Vector2 screenPosition, Camera eventCamera, IReadOnlyList<InventoryItemStat> stats, string description)
         {
+            ShowItem(item.Definition, item.TotalWeight, screenPosition, eventCamera, stats, description);
+        }
+
+        public void ShowDefinition(ItemDefinition definition, Vector2 screenPosition, Camera eventCamera, IReadOnlyList<InventoryItemStat> stats, string description)
+        {
+            ShowItem(definition, definition.Weight, screenPosition, eventCamera, stats, description);
+        }
+
+        private void ShowItem(ItemDefinition definition, float weight, Vector2 screenPosition, Camera eventCamera, IReadOnlyList<InventoryItemStat> stats, string description)
+        {
             EnsureBuilt();
-            ItemDefinition definition = item.Definition;
-            _weight.text = InventoryUIFactory.FormatWeight(item.TotalWeight) + InventoryTheme.Resolve(Theme, "unit_kg", " kg");
+            _weight.text = InventoryUIFactory.FormatWeight(weight) + InventoryTheme.Resolve(Theme, "unit_kg", " kg");
             ShowContent(definition.DisplayName, description ?? definition.Description, stats, true, screenPosition, eventCamera);
         }
 

@@ -15,27 +15,28 @@ namespace Inventory.UI
         private const float INFO_BACKGROUND_PADDING_Y = 1f;
         private const float COMMUNITY_ICON_GAP = 5f;
 
+        [SerializeField] private RectTransform _content;
+        [SerializeField] private RectTransform _overlay;
+        [SerializeField] private Image _background;
+        [SerializeField] private Image _icon;
+        [SerializeField] private TextMeshProUGUI _countText;
+        [SerializeField] private TextMeshProUGUI _nameText;
+        [SerializeField] private TextMeshProUGUI _infoText;
+        [SerializeField] private TextMeshProUGUI _infoShadow;
+        [SerializeField] private TextMeshProUGUI _nameShadow;
+        [SerializeField] private TextMeshProUGUI _conditionText;
+        [SerializeField] private TextMeshProUGUI _conditionShadow;
+        [SerializeField] private Image[] _infoBackgrounds;
+        [SerializeField] private Image[] _nameBackgrounds;
+        [SerializeField] private Image[] _conditionBackgrounds;
+        [SerializeField] private Image _badge;
+        [SerializeField] private Image _communityIcon;
+
         private RectTransform _rectTransform;
-        private RectTransform _content;
-        private Image _background;
-        private Image _icon;
-        private TextMeshProUGUI _countText;
-        private TextMeshProUGUI _nameText;
-        private TextMeshProUGUI _infoText;
-        private TextMeshProUGUI _infoShadow;
-        private TextMeshProUGUI _nameShadow;
-        private TextMeshProUGUI _conditionText;
-        private TextMeshProUGUI _conditionShadow;
-        private Image[] _infoBackgrounds;
-        private Image[] _nameBackgrounds;
-        private Image[] _conditionBackgrounds;
         private InventoryTheme _appliedTheme;
         private Image _indicator;
-        private Image _badge;
-        private Image _communityIcon;
         private Image _iconTarget;
         private Image _backgroundTarget;
-        private RectTransform _overlay;
         private CanvasGroup _canvasGroup;
         private InventoryGridViewBase _grid;
         private CancellationTokenSource _iconCancellation;
@@ -81,6 +82,22 @@ namespace Inventory.UI
             _grid = grid;
             _canvasGroup.blocksRaycasts = true;
             Refresh();
+        }
+
+        public void BindDefinition(ItemDefinition definition, Image icon, IItemIconProvider provider)
+        {
+            _icon = icon;
+            RequestIcon(new ItemIconRequest(definition, null, definition.Width, definition.Height, ItemIconProfileType.Default), provider);
+        }
+
+        public void BindCatalogItem(ItemDefinition definition, InventoryWindow window, Vector2 size, string shortName, InventoryItemDecoration decoration)
+        {
+            _rectTransform = (RectTransform)transform;
+            _content.sizeDelta = size;
+            ApplyTheme(window.Theme);
+            ApplyDecoration(definition, decoration);
+            ApplyTexts(definition, 1, shortName, false, definition.Weight, null);
+            RequestIcon(new ItemIconRequest(definition, null, definition.Width, definition.Height, ItemIconProfileType.Default), window.IconProvider);
         }
 
         public void BindGhost(ItemInstance item, InventoryGridViewBase grid, Vector2 cellSize, bool rotated, int amount)
@@ -232,6 +249,13 @@ namespace Inventory.UI
 
         private void OnDisable()
         {
+            if (_grid == null && _hasRequest)
+            {
+                CancelIcon();
+                _hasRequest = false;
+                SetIcon(null);
+            }
+
             SetHovered(false);
             _grid?.Window?.HandleItemPointerExit(this, null);
 
@@ -253,10 +277,30 @@ namespace Inventory.UI
         private void ApplyTexts(int amount)
         {
             ItemDefinition definition = Item.Definition;
+            InventoryWindow window = _grid != null ? _grid.Window : null;
+            string customName = window != null && window.ItemShortNameProvider != null ? window.ItemShortNameProvider(Item) : null;
+            bool inSlot = _ghost == false && _grid != null && _grid.UsesSlotIcon(Item, out _);
+            float weight = _appliedTheme != null && _appliedTheme.ShowItemWeight ? Item.UnitWeight * amount : 0f;
+            ApplyTexts(definition, amount, customName, inSlot, weight, _appliedTheme != null ? GetCondition(window) : null);
+        }
+
+        private float? GetCondition(InventoryWindow window)
+        {
+            float? conditionValue = window != null && window.ItemConditionProvider != null ? window.ItemConditionProvider(Item) : null;
+            string condition = Item.GetState("condition");
+
+            if (!conditionValue.HasValue && !string.IsNullOrEmpty(condition) && float.TryParse(condition, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out float value))
+            {
+                return value;
+            }
+
+            return conditionValue;
+        }
+
+        private void ApplyTexts(ItemDefinition definition, int amount, string customName, bool inSlot, float totalWeight, float? conditionValue)
+        {
             InventoryTheme theme = _appliedTheme;
             bool showCount = definition.IsStackable && amount > 1;
-            string customName = _grid != null && _grid.Window != null && _grid.Window.ItemShortNameProvider != null ? _grid.Window.ItemShortNameProvider(Item) : null;
-            bool inSlot = _ghost == false && _grid != null && _grid.UsesSlotIcon(Item, out _);
             _nameText.alignment = inSlot && customName == null ? TextAlignmentOptions.Top : TextAlignmentOptions.BottomRight;
             _nameShadow.alignment = _nameText.alignment;
 
@@ -277,18 +321,11 @@ namespace Inventory.UI
 
             _countText.enabled = false;
             string count = showCount && theme.ShowItemCount ? theme.FormatCount(amount) : string.Empty;
-            string weight = theme.ShowItemWeight ? theme.FormatItemWeight(Item.UnitWeight * amount) : string.Empty;
+            string weight = theme.ShowItemWeight ? theme.FormatItemWeight(totalWeight) : string.Empty;
             string info = count.Length > 0 && weight.Length > 0 ? count + "\n" + weight : count + weight;
             SetLabel(_infoText, _infoShadow, info);
             SetLabel(_nameText, _nameShadow, customName ?? (theme.ShowsShortName(definition) ? definition.ShortName : string.Empty));
-            float? conditionValue = _grid != null && _grid.Window != null && _grid.Window.ItemConditionProvider != null ? _grid.Window.ItemConditionProvider(Item) : null;
-            string condition = Item.GetState("condition");
             string conditionText = string.Empty;
-
-            if (conditionValue.HasValue == false && string.IsNullOrEmpty(condition) == false && float.TryParse(condition, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out float value))
-            {
-                conditionValue = value;
-            }
 
             if (conditionValue.HasValue && float.IsFinite(conditionValue.Value))
             {
@@ -438,10 +475,15 @@ namespace Inventory.UI
         {
             InventoryWindow window = _grid != null ? _grid.Window : null;
             InventoryItemDecoration decoration = _ghost == false && window != null && window.ItemDecorator != null ? window.ItemDecorator(Item) : InventoryItemDecoration.None;
+            ApplyDecoration(Item.Definition, decoration);
+        }
+
+        private void ApplyDecoration(ItemDefinition definition, InventoryItemDecoration decoration)
+        {
             _communityIcon.sprite = decoration.CommunityIcon;
             _communityIcon.rectTransform.sizeDelta = decoration.CommunityIconSize;
             _communityIcon.enabled = decoration.CommunityIcon != null;
-            Color background = decoration.HasTint ? decoration.Tint : BackgroundColor(Item.Definition);
+            Color background = decoration.HasTint ? decoration.Tint : BackgroundColor(definition);
             _background.color = _hovered && _ghost == false ? HoverColor(background, decoration.HasTint) : background;
             _background.enabled = _iconTarget == null;
 
@@ -500,7 +542,7 @@ namespace Inventory.UI
             }
         }
 
-        private void RequestIcon(ItemIconRequest request)
+        private void RequestIcon(ItemIconRequest request, IItemIconProvider provider = null)
         {
             if (_hasRequest && SameRequest(request, _currentRequest) && (_icon.sprite != null || IsIconLoading))
             {
@@ -518,7 +560,7 @@ namespace Inventory.UI
             request = new ItemIconRequest(request.Definition, variantIds, request.Width, request.Height, request.ProfileType);
             _currentRequest = request;
             _hasRequest = true;
-            IItemIconProvider provider = _grid != null && _grid.Window != null ? _grid.Window.IconProvider : null;
+            provider ??= _grid != null && _grid.Window != null ? _grid.Window.IconProvider : null;
 
             if (provider == null)
             {
@@ -598,7 +640,10 @@ namespace Inventory.UI
         {
             _rectTransform = (RectTransform)transform;
             _canvasGroup = gameObject.AddComponent<CanvasGroup>();
-            Image hitArea = gameObject.AddComponent<Image>();
+            if (!TryGetComponent(out Image hitArea))
+            {
+                hitArea = gameObject.AddComponent<Image>();
+            }
             hitArea.color = new Color(0f, 0f, 0f, 0f);
             hitArea.raycastTarget = true;
             _content = CreateChild("Content", hideFlags, _rectTransform, true);

@@ -13,12 +13,14 @@ namespace RaidIntoDarkness.UI
     public sealed class PlayerPauseMenu : MonoBehaviour
     {
         private const string PAUSE_ACTION = "Player/ReleaseCursor";
+        private const string SPAWN_MENU_ACTION = "Player/ToggleSpawnMenu";
         private const string MAIN_MENU_SCENE = "Assets/MainMenu.unity";
 
         [SerializeField] private StalkerPlayerController _player;
         [SerializeField] private StalkerPlayerInput _input;
         [SerializeField] private GameObject _pauseMenu;
         [SerializeField] private GraphicsMenu _graphics;
+        [SerializeField] private SpawnMenuView _spawnMenu;
         [SerializeField] private Button _continue;
         [SerializeField] private Button _save;
         [SerializeField] private Button _load;
@@ -26,7 +28,9 @@ namespace RaidIntoDarkness.UI
         [SerializeField] private Button _quit;
 
         private InputAction _pauseAction;
+        private InputAction _spawnMenuAction;
         private GameObject _ownedEventSystem;
+        private GameObject _selectionBeforeSpawnMenu;
         private float _previousTimeScale;
         private bool _previousAudioPause;
         private bool _restoreCursorLock;
@@ -40,6 +44,11 @@ namespace RaidIntoDarkness.UI
             if (_pauseAction != null)
             {
                 _pauseAction.performed += OnPauseInput;
+            }
+            _spawnMenuAction = _input.Actions?.FindAction(SPAWN_MENU_ACTION);
+            if (_spawnMenuAction != null)
+            {
+                _spawnMenuAction.performed += OnSpawnMenuInput;
             }
             _continue.onClick.AddListener(Resume);
             _stopGame.onClick.AddListener(ReturnToMainMenu);
@@ -55,6 +64,11 @@ namespace RaidIntoDarkness.UI
             {
                 _pauseAction.performed -= OnPauseInput;
                 _pauseAction = null;
+            }
+            if (_spawnMenuAction != null)
+            {
+                _spawnMenuAction.performed -= OnSpawnMenuInput;
+                _spawnMenuAction = null;
             }
             _continue.onClick.RemoveListener(Resume);
             _stopGame.onClick.RemoveListener(ReturnToMainMenu);
@@ -78,7 +92,7 @@ namespace RaidIntoDarkness.UI
             }
             if (IsPaused)
             {
-                if (!_graphics.HandleCancel())
+                if (!CloseSpawnMenu(true) && !_graphics.HandleCancel())
                 {
                     Resume();
                 }
@@ -88,6 +102,44 @@ namespace RaidIntoDarkness.UI
             {
                 BeginPause();
             }
+        }
+
+        private void OnSpawnMenuInput(InputAction.CallbackContext context)
+        {
+            if (!IsPaused || _returningToMainMenu || _spawnMenu == null)
+            {
+                return;
+            }
+            if (CloseSpawnMenu(true) || !_pauseMenu.activeInHierarchy)
+            {
+                return;
+            }
+
+            var eventSystem = EventSystem.current;
+            _selectionBeforeSpawnMenu = eventSystem != null ? eventSystem.currentSelectedGameObject : null;
+            eventSystem?.SetSelectedGameObject(null);
+            _spawnMenu.gameObject.SetActive(true);
+        }
+
+        private bool CloseSpawnMenu(bool restoreSelection)
+        {
+            if (_spawnMenu == null || !_spawnMenu.gameObject.activeSelf)
+            {
+                return false;
+            }
+
+            var eventSystem = EventSystem.current;
+            if (eventSystem != null && eventSystem.currentSelectedGameObject != null && eventSystem.currentSelectedGameObject.transform.IsChildOf(_spawnMenu.transform))
+            {
+                eventSystem.SetSelectedGameObject(null);
+            }
+            _spawnMenu.gameObject.SetActive(false);
+            if (restoreSelection && eventSystem != null)
+            {
+                eventSystem.SetSelectedGameObject(_selectionBeforeSpawnMenu != null && _selectionBeforeSpawnMenu.activeInHierarchy ? _selectionBeforeSpawnMenu : _continue.gameObject);
+            }
+            _selectionBeforeSpawnMenu = null;
+            return true;
         }
 
         private void BeginPause()
@@ -151,6 +203,7 @@ namespace RaidIntoDarkness.UI
             {
                 controls = _pauseMenu.AddComponent<CanvasGroup>();
             }
+            CloseSpawnMenu(false);
             bool wasInteractable = controls.interactable;
             _returningToMainMenu = true;
             controls.interactable = false;
@@ -175,6 +228,7 @@ namespace RaidIntoDarkness.UI
                 return;
             }
             IsPaused = false;
+            CloseSpawnMenu(false);
             if (_graphics != null)
             {
                 _graphics.CloseForOwner();

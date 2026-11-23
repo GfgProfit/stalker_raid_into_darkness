@@ -78,6 +78,15 @@
                     "initialStateCheck": false
                 },
                 {
+                    "name": "ToggleSpawnMenu",
+                    "type": "Button",
+                    "id": "57a810b7-c6cb-4971-8fb6-c203452d2705",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
                     "name": "CaptureCursor",
                     "type": "Button",
                     "id": "1d4a6b0e-7c3a-4c55-8a14-5e1a8b3c2d09",
@@ -307,6 +316,17 @@
                     "processors": "",
                     "groups": "Keyboard&Mouse",
                     "action": "ReleaseCursor",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "5a0a1f1c-f872-4c5d-b683-dc25a733e98f",
+                    "path": "<Keyboard>/f7",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "ToggleSpawnMenu",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },

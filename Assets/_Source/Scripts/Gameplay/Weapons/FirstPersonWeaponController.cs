@@ -639,7 +639,8 @@ namespace RaidIntoDarkness.Weapons
                 return;
             }
 
-            if (_input.FirePressed && !sprinting)
+            bool fixedBurst = asset.HasFixedTwoRoundBurst && FireMode == 2;
+            if (_input.FirePressed && !sprinting && (!fixedBurst || _burstLeft <= 0))
             {
                 int mode = FireMode;
                 _burstLeft = mode == FirstPersonWeaponAsset.AUTO_FIRE_MODE ? int.MaxValue : Mathf.Max(1, mode);
@@ -650,7 +651,7 @@ namespace RaidIntoDarkness.Weapons
                 }
             }
 
-            if (!_input.FireHeld || sprinting)
+            if (sprinting || (!_input.FireHeld && !fixedBurst))
             {
                 _burstLeft = 0;
             }
@@ -698,7 +699,7 @@ namespace RaidIntoDarkness.Weapons
 
             SpawnProjectiles(asset.Ballistics, ammo, launchPosition, launchRotation, bulletSpeed, fireDistance, dispersion);
             _burstLeft--;
-            _nextShotTime = Time.time + asset.ShotInterval;
+            _nextShotTime = Time.time + asset.GetShotInterval(FireMode);
             FirstPersonWeaponMotion motion = _aiming ? asset.FindRandom(FirstPersonWeaponMotionKind.ShootAim, HasGrenadeLauncher) : null;
             if (motion == null)
             {

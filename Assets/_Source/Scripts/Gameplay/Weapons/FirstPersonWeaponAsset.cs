@@ -45,6 +45,7 @@ namespace RaidIntoDarkness.Weapons
         [SerializeField] private XRayAnmAsset _grenadeAimEnd;
         [Header("Fire")]
         [SerializeField] [Min(1)] private int _roundsPerMinute = 600;
+        [SerializeField] [Min(0)] private int _twoRoundBurstRoundsPerMinute;
         [SerializeField] [Min(1)] private int _emptyClicksPerMinute = 200;
         [SerializeField] private int[] _fireModes = { 1, AUTO_FIRE_MODE };
         [SerializeField] [Min(1)] private int _magazineSize = 30;
@@ -111,6 +112,12 @@ namespace RaidIntoDarkness.Weapons
         public AudioClip LastShellSound => _lastShellSound;
         public AudioClip LowAmmoSound => _lowAmmoSound;
         public int LowAmmoThreshold => _lowAmmoThreshold;
+        internal bool HasFixedTwoRoundBurst => _twoRoundBurstRoundsPerMinute > 0;
+
+        internal float GetShotInterval(int fireMode)
+        {
+            return fireMode == 2 && HasFixedTwoRoundBurst ? 60.0f / _twoRoundBurstRoundsPerMinute : ShotInterval;
+        }
 
         public static Quaternion ToAimRotation(Vector3 radians)
         {

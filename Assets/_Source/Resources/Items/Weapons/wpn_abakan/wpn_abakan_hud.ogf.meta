@@ -1,0 +1,70 @@
+fileFormatVersion: 2
+guid: ab64bd2815df4bc40ab8da04997ae4d5
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\abakan|models\weapons
+    second: {fileID: 2100000, guid: 4ee3ec419b531c748b871a492040420b, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\ak74m\gp25|models\weapons
+    second: {fileID: 2100000, guid: 8cf765d2c49bfc04ab81555309c1badc, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\ak74m\mag_ak74m|models\weapons
+    second: {fileID: 2100000, guid: 05de2acb4701fb74d8df88df3d7a4a92, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\ammo_5x45|models\weapons
+    second: {fileID: 2100000, guid: 3dbb770c1c54b144e8fbfb4e41b7ab7b, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\dvl_10\scope_pso_1m2-1_lens_diff|models\model
+    second: {fileID: 2100000, guid: ebfa519526c07fe4693b5d3303aa61cb, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\dvl_10\scope_pso_1m2-1_lens_trans|models\window
+    second: {fileID: 2100000, guid: 37f723b1b129ff743879c40fdf182fdd, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\pso-1\pso-1|models\weapons
+    second: {fileID: 2100000, guid: 8801078f9f104f043bc8df403fadcae1, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\pso-1\rezinka_pso1|models\model
+    second: {fileID: 2100000, guid: c386739a16f664d4a950bd9c44ea9e9d, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\wpn_addon_scope_pso1m2_lens|models_lense_scope
+    second: {fileID: 2100000, guid: 19c5b32f89856a048950e0cf6770787d, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\wpn_vog|models\weapons
+    second: {fileID: 2100000, guid: a00dda37442c7d640844f163ddfc8f50, type: 2}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 61e536e21e96f284493f2969a9250cdf, type: 3}
+  _scale: 1
+  _importMaterials: 1
+  _texturesFolder: 
+  _searchTexturesByName: 1
+  _importEmbeddedMotions: 1
+  _embeddedLoopMode: 0
+  _addAnimator: 1
+  _readableMeshes: 0
+  _updateWhenOffscreen: 0
+  _autoResolveResources: 1

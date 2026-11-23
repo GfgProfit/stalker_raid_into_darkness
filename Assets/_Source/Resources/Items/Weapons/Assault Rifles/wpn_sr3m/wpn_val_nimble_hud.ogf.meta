@@ -1,0 +1,65 @@
+fileFormatVersion: 2
+guid: 44743cbce4c93174f83d41629e11bb3f
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\ammo_9x39|models\weapons
+    second: {fileID: 2100000, guid: 344739445a272ab4d9c0d0c4963793f0, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\dvl_10\scope_pso_1m2-1_lens_diff|models\model
+    second: {fileID: 2100000, guid: 1b175307730f18d4d89782b87d219bdb, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\dvl_10\scope_pso_1m2-1_lens_trans|models\window
+    second: {fileID: 2100000, guid: ae86ad4dbc4764946a98def36b7ba4dd, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\mount_vihr|models\weapons
+    second: {fileID: 2100000, guid: b8a71e92fcf50d845ab0548ffe3b2f99, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\pso-1\rezinka_pso1|models\model
+    second: {fileID: 2100000, guid: 0ddc9aaf57431f14e92d61dba4e3e1ad, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\pso1m2\pso1m2|models\weapons
+    second: {fileID: 2100000, guid: db39005f1ad283146885d9bef48c978c, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\wpn_addon_scope_pso-1m2-1_lens|models_lense_scope
+    second: {fileID: 2100000, guid: b16cc30e697483b478d4e97157232340, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\wpn_addon_sil_vihr|models\weapons
+    second: {fileID: 2100000, guid: b718c20333ac57545af47e78225d5ba0, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\wpn_vihr|models\weapons
+    second: {fileID: 2100000, guid: 1897668be446fb142ad9f80d78f14f8e, type: 2}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 61e536e21e96f284493f2969a9250cdf, type: 3}
+  _scale: 1
+  _importMaterials: 1
+  _texturesFolder: 
+  _searchTexturesByName: 1
+  _importEmbeddedMotions: 1
+  _embeddedLoopMode: 0
+  _addAnimator: 1
+  _readableMeshes: 0
+  _updateWhenOffscreen: 0
+  _autoResolveResources: 1

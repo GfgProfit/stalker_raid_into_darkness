@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
@@ -34,6 +35,7 @@ namespace XRay.Importer.Editor
     public static class XRayTextureImportQueue
     {
         private const int MAX_TEXTURE_SIZE = 2048;
+        private const string ITEM_ASSET_ROOT = "Assets/_Source/Resources/Items/";
 
         private static readonly Dictionary<string, XRayTextureImportRequest> _requests = new Dictionary<string, XRayTextureImportRequest>();
 
@@ -79,12 +81,37 @@ namespace XRay.Importer.Editor
                     textureImporter.alphaTestReferenceValue = Levels.XRayFloraSourceBinding.AREF;
                 }
             }
-            else
+            else if (!UpgradeItemAlbedoCompression(textureImporter, request.Role))
             {
                 RestorePngAlpha(textureImporter, true);
             }
 
             ApplyPngMipPolicy(textureImporter, request.Header.Width, request.Header.Height);
+        }
+
+        internal static bool UpgradeItemAlbedoCompression(TextureImporter importer, XRayTextureRole role)
+        {
+            if (importer == null || !IsItemAlbedo(importer, role))
+            {
+                return false;
+            }
+
+            TextureImporterPlatformSettings standalone = importer.GetPlatformTextureSettings("Standalone");
+            if (!standalone.overridden)
+            {
+                return false;
+            }
+
+            TextureImporterFormat format = standalone.format == TextureImporterFormat.Automatic ? importer.GetAutomaticFormat("Standalone") : standalone.format;
+            if (format != TextureImporterFormat.DXT1 && format != TextureImporterFormat.DXT5)
+            {
+                return false;
+            }
+
+            standalone.format = TextureImporterFormat.BC7;
+            standalone.crunchedCompression = false;
+            importer.SetPlatformTextureSettings(standalone);
+            return true;
         }
 
         public static bool RestorePngAlpha(TextureImporter importer, bool sourceBeingImported = false)
@@ -158,14 +185,15 @@ namespace XRay.Importer.Editor
                 return;
             }
 
+            bool useItemAlbedoCompression = IsItemAlbedo(importer, request.Role);
             TextureImporterFormat format;
             switch (request.Header.Format)
             {
                 case DdsFormat.BC1:
-                    format = TextureImporterFormat.Automatic;
+                    format = useItemAlbedoCompression ? TextureImporterFormat.BC7 : TextureImporterFormat.Automatic;
                     break;
                 case DdsFormat.BC3:
-                    format = TextureImporterFormat.DXT5;
+                    format = useItemAlbedoCompression ? TextureImporterFormat.BC7 : TextureImporterFormat.DXT5;
                     break;
                 case DdsFormat.BC7:
                     format = TextureImporterFormat.BC7;
@@ -181,6 +209,11 @@ namespace XRay.Importer.Editor
             standalone.crunchedCompression = false;
             standalone.compressionQuality = 100;
             importer.SetPlatformTextureSettings(standalone);
+        }
+
+        private static bool IsItemAlbedo(TextureImporter importer, XRayTextureRole role)
+        {
+            return role == XRayTextureRole.Albedo && importer.textureShape == TextureImporterShape.Texture2D && importer.textureType == TextureImporterType.Default && importer.sRGBTexture && importer.assetPath.StartsWith(ITEM_ASSET_ROOT, StringComparison.OrdinalIgnoreCase);
         }
     }
 }

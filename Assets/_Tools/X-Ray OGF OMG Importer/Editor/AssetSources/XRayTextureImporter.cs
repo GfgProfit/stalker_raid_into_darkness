@@ -559,7 +559,7 @@ namespace XRay.Importer.Editor
                 if (!invalidShape && (sameSource || (!_options.OverwriteExistingTextures && !_forceUpdate)))
                 {
                     result.Status = XRayResourceStatus.Reused;
-                    if (XRayTextureImportQueue.RestorePngAlpha(importer))
+                    if (XRayTextureImportQueue.UpgradeItemAlbedoCompression(importer, role) || XRayTextureImportQueue.RestorePngAlpha(importer))
                     {
                         AssetDatabase.WriteImportSettingsIfDirty(assetPath);
                         SchedulePngImport(assetPath);

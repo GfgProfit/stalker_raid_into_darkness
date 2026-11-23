@@ -1,0 +1,75 @@
+fileFormatVersion: 2
+guid: 49ad4a4f77c55fb4487b22abe46f1db7
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\ak74u\mag_30rnd_diff|models\weapons
+    second: {fileID: 2100000, guid: 2742b76c068d3e541a4a849e2696265f, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\ak74u\mount_dovetail_diff|models\weapons
+    second: {fileID: 2100000, guid: a34ab904c0d4d9544a7c87007095c0c9, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\ak74u\wpn_aks74u_bolt|models\weapons
+    second: {fileID: 2100000, guid: 31bc6390a6b08f74b97f148f670a82af, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\ak74u\wpn_aks74u|models\weapons
+    second: {fileID: 2100000, guid: fe57e55e417d13340af0df9b1729ed61, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\ak74u\wpn_handguard_aks74u|models\model
+    second: {fileID: 2100000, guid: 923cc0d629481ab4eaf7f908c989301f, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\ak74u\wpn_muzzle_aks74u|models\weapons
+    second: {fileID: 2100000, guid: 7da63162ae18a4848930dcd2aa0b0428, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\ak74u\wpn_pistolgrip_ak_bakeli|models\model
+    second: {fileID: 2100000, guid: a4e0e840b0c5eab4cb4fe13cf9052b68, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\ak74u\wpn_reciever_aks74u|models\weapons
+    second: {fileID: 2100000, guid: 0d4e3c4a12c0da240b1f9c721b46b39b, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\ak74u\wpn_sil_pbs4|models\weapons
+    second: {fileID: 2100000, guid: fd7dd27aaf0f23e4dabda909565240d7, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\ak74u\wpn_stock_aks74u|models\weapons
+    second: {fileID: 2100000, guid: cb3527cf5d8b6904d95da8ec9844d9a4, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\ammo_5x45|models\weapons
+    second: {fileID: 2100000, guid: fee6a3b7685068e4e93e02b43235735a, type: 2}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 61e536e21e96f284493f2969a9250cdf, type: 3}
+  _scale: 1
+  _importMaterials: 1
+  _texturesFolder: 
+  _searchTexturesByName: 1
+  _importEmbeddedMotions: 1
+  _embeddedLoopMode: 0
+  _addAnimator: 1
+  _readableMeshes: 0
+  _updateWhenOffscreen: 0
+  _autoResolveResources: 1

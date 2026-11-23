@@ -312,7 +312,7 @@ Material:
     - _MetallicRemapMin: 0
     - _MonolithAlbedoSrgb: 1
     - _MonolithBoneCount: 0
-    - _MonolithBumpFlipV: 1
+    - _MonolithBumpFlipV: 0
     - _MonolithDebug: 0
     - _MonolithDetailFlipV: 0
     - _MonolithDetailScale: 1

@@ -1,0 +1,85 @@
+fileFormatVersion: 2
+guid: 34c3b2ebac1094947964363d485b3cc9
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\ammo_762x51_diff|models\weapons
+    second: {fileID: 2100000, guid: f54adc689b2d2f54eb4ea243be1b6a73, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\sa58\handguard_fal_ds_arms_belgian_style|models\model
+    second: {fileID: 2100000, guid: a73cf679d99a76448ba53e27a83a688b, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\sa58\sa58_aac_blackout_51t_flash_hider_diff|models\weapons
+    second: {fileID: 2100000, guid: d7126ed1c0d55954888363bf7539a8c6, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\sa58\sa58_barrel_533mm|models\weapons
+    second: {fileID: 2100000, guid: 217e2519e626d66469c40004107da006, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\sa58\sa58_charginghandle|models\model
+    second: {fileID: 2100000, guid: 0d47c4f6f7b8f5346811664732bb42d6, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\sa58\sa58_lower|models\weapons
+    second: {fileID: 2100000, guid: 5d244da325c7b124386cad28680cdeac, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\sa58\sa58_mag_20rnd|models\weapons
+    second: {fileID: 2100000, guid: 9ee4245020957d344aab67ba306fb0f8, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\sa58\sa58_pistolgrip_ds_arms_saw_style|models\model
+    second: {fileID: 2100000, guid: 0cff9e8d0ee0b7b449d2532763e6d031, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\sa58\sa58_reciever_extreme_duty|models\weapons
+    second: {fileID: 2100000, guid: 495589f4cda1bc64fa39ee7b84bb68f9, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\sa58\sa58_sight_rear|models\weapons
+    second: {fileID: 2100000, guid: 7f4d1789775010c4390031bdef2ec2f1, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\sa58\sa58_stock_humpback|models\model
+    second: {fileID: 2100000, guid: 0f8b587d447a70a4eb40066a8871e0ee, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\sa58\sa58_upper|models\weapons
+    second: {fileID: 2100000, guid: ae054e419be005e46ac6b64018c0aedc, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\sil_nato_762|models\weapons
+    second: {fileID: 2100000, guid: af6c5104673fe87419049c538a32e108, type: 2}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 61e536e21e96f284493f2969a9250cdf, type: 3}
+  _scale: 1
+  _importMaterials: 1
+  _texturesFolder: 
+  _searchTexturesByName: 1
+  _importEmbeddedMotions: 1
+  _embeddedLoopMode: 0
+  _addAnimator: 1
+  _readableMeshes: 0
+  _updateWhenOffscreen: 0
+  _autoResolveResources: 1

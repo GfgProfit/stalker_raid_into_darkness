@@ -92,12 +92,28 @@ MonoBehaviour:
         - okp
         - pso1m21
         - 1p76
+        - 1p29
+        - 1p59
+        - ps01
+        - pka
+        - kobra
+        - 1pn93n2_1gs
+        - 1pn93
+        - 1p63
         _compatibleScopes:
         - {fileID: 11400000, guid: 101eee143b83c0144a7a1d6a672fbc8a, type: 2}
         - {fileID: 11400000, guid: 2183aad17ad3305499c981375cd92cb3, type: 2}
         - {fileID: 11400000, guid: 0b93f4aac0bbd7944b0047106f240e27, type: 2}
         - {fileID: 11400000, guid: 6e7cc0c05a37df24abfa823d367bb86f, type: 2}
         - {fileID: 11400000, guid: 94ac679431fcc2a48b2a24eeb4b81580, type: 2}
+        - {fileID: 11400000, guid: b2160470b0f80c6469c672ec17e100b5, type: 2}
+        - {fileID: 11400000, guid: bc51d0c36a074b842b48c995f834c171, type: 2}
+        - {fileID: 11400000, guid: 141ad6a26409c1440ae80f784d023420, type: 2}
+        - {fileID: 11400000, guid: a81ed245a31667c438ad7bafda8e0e8e, type: 2}
+        - {fileID: 11400000, guid: f4aeb693dd011044bb3f07fba5b1ace4, type: 2}
+        - {fileID: 11400000, guid: bb42dc9b48c7cee4e82a8b3b37f82fe9, type: 2}
+        - {fileID: 11400000, guid: a08c4da657995d74489000a84549d9b9, type: 2}
+        - {fileID: 11400000, guid: e860adc23efd2e540911e3efa1c65bf2, type: 2}
         _grenadeLauncherStatus: 0
         _grenadeLauncherSection: 
     - rid: 115149063313949398
@@ -127,6 +143,22 @@ MonoBehaviour:
           _position: {x: 0.008436371, y: -0.027359974, z: 0.049239308}
         - _scope: {fileID: 11400000, guid: 94ac679431fcc2a48b2a24eeb4b81580, type: 2}
           _position: {x: -0.00089535856, y: -0.03570365, z: 0.0074}
+        - _scope: {fileID: 11400000, guid: b2160470b0f80c6469c672ec17e100b5, type: 2}
+          _position: {x: -0.0070588435, y: -0.050874744, z: 0.02546686}
+        - _scope: {fileID: 11400000, guid: bc51d0c36a074b842b48c995f834c171, type: 2}
+          _position: {x: 0.011008758, y: -0.035806086, z: -0.0010020435}
+        - _scope: {fileID: 11400000, guid: 141ad6a26409c1440ae80f784d023420, type: 2}
+          _position: {x: 0.008402631, y: -0.02732752, z: 0.056271046}
+        - _scope: {fileID: 11400000, guid: a81ed245a31667c438ad7bafda8e0e8e, type: 2}
+          _position: {x: 0.0047861747, y: -0.02917439, z: -0.013398513}
+        - _scope: {fileID: 11400000, guid: f4aeb693dd011044bb3f07fba5b1ace4, type: 2}
+          _position: {x: -0.0027497336, y: -0.034505192, z: -0.013398558}
+        - _scope: {fileID: 11400000, guid: bb42dc9b48c7cee4e82a8b3b37f82fe9, type: 2}
+          _position: {x: 0.010568429, y: -0.03686837, z: 0.017636806}
+        - _scope: {fileID: 11400000, guid: a08c4da657995d74489000a84549d9b9, type: 2}
+          _position: {x: 0.0058468617, y: -0.05207613, z: 0.022864908}
+        - _scope: {fileID: 11400000, guid: e860adc23efd2e540911e3efa1c65bf2, type: 2}
+          _position: {x: -0.0025677457, y: -0.04420702, z: -0.013398483}
     - rid: 115149063313949400
       type: {class: ItemTakeSoundComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
       data:

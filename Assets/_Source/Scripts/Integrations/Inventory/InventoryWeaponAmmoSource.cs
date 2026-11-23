@@ -22,17 +22,42 @@ namespace RaidIntoDarkness.Integrations.Inventory
 
         public event Action Changed;
 
-        public int GetMagazine(object weaponKey)
-        {
-            ItemInstance weapon = GetWeapon(weaponKey);
-            WeaponStatsComponent stats = weapon?.Definition.GetComponent<WeaponStatsComponent>();
+        public int GetMagazine(object weaponKey) => GetLoadedMagazine(GetWeapon(weaponKey));
 
-            if (stats == null || stats.SupportsAmmo(weapon.GetState(AMMO_SECTION_STATE)) == false)
+        public bool HasLoadedAmmo(ItemInstance weapon) => GetLoadedMagazine(weapon) > 0 || GetGrenadeLauncher(weapon)?.GetLoadedGrenade(weapon) != null;
+
+        public InventoryResult Unload(ItemInstance weapon, bool apply = true)
+        {
+            if (!_model.ContainsItem(weapon))
             {
-                return 0;
+                return InventoryResult.Fail(InventoryFailure.InvalidItem);
             }
 
-            return int.TryParse(weapon.GetState(MAGAZINE_STATE), NumberStyles.Integer, CultureInfo.InvariantCulture, out int magazine) ? Math.Clamp(magazine, 0, stats.MagazineSize) : 0;
+            int magazine = GetLoadedMagazine(weapon);
+            ItemDefinition ammo = magazine > 0 ? FindDefinition(weapon.GetState(AMMO_SECTION_STATE)) : null;
+            ItemDefinition grenade = GetGrenadeLauncher(weapon)?.GetLoadedGrenade(weapon);
+
+            if ((magazine == 0 && grenade == null) || (magazine > 0 && (ammo == null || magazine > ammo.MaxStack)))
+            {
+                return InventoryResult.Fail(InventoryFailure.InvalidItem);
+            }
+
+            ItemInstance returnedAmmo = ammo != null ? _model.CreateItem(ammo, magazine) : null;
+            ItemInstance returnedGrenade = grenade != null ? _model.CreateItem(grenade) : null;
+            ItemInstance updated = InventoryWeaponAttachments.Clone(weapon);
+
+            if (returnedAmmo != null)
+            {
+                updated.SetState(MAGAZINE_STATE, "0");
+            }
+
+            if (returnedGrenade != null)
+            {
+                updated.SetState(InventoryWeaponAttachments.GRENADE_ROUND_STATE, null);
+            }
+
+            string destination = _model.GetContainer(weapon.ContainerId) is SlottedContainer ? _containerId : weapon.ContainerId;
+            return _model.TryReconfigureItem(weapon, updated, weapon.Location.Position, returned: returnedAmmo ?? returnedGrenade, returnContainerId: destination, apply: apply, mergeReturned: true, returnedStack: returnedAmmo != null ? returnedGrenade : null);
         }
 
         public int GetReserve(object weaponKey) => Count(GetAmmoSection(weaponKey));
@@ -237,6 +262,18 @@ namespace RaidIntoDarkness.Integrations.Inventory
         public void Dispose()
         {
             _model.Changed -= OnInventoryChanged;
+        }
+
+        private static int GetLoadedMagazine(ItemInstance weapon)
+        {
+            WeaponStatsComponent stats = weapon?.Definition.GetComponent<WeaponStatsComponent>();
+
+            if (stats == null || stats.SupportsAmmo(weapon.GetState(AMMO_SECTION_STATE)) == false)
+            {
+                return 0;
+            }
+
+            return int.TryParse(weapon.GetState(MAGAZINE_STATE), NumberStyles.Integer, CultureInfo.InvariantCulture, out int magazine) ? Math.Clamp(magazine, 0, stats.MagazineSize) : 0;
         }
 
         private ItemInstance GetWeapon(object weaponKey) => _model.GetItem(weaponKey as string);

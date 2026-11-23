@@ -16,19 +16,17 @@ namespace RaidIntoDarkness.Integrations.Inventory
         private readonly InventoryWindow _window;
         private readonly InventoryModel _model;
         private readonly FirstPersonWeaponController _controller;
-        private readonly InventoryWeaponAmmoSource _ammo;
         private readonly List<string> _configuredVariant = new();
 
         private GameObject _configuredModel;
         private ItemDefinition _configuredDefinition;
 
-        public FirstPersonWeaponBinder(InventoryWindow window, FirstPersonWeaponController controller)
+        public FirstPersonWeaponBinder(InventoryWindow window, FirstPersonWeaponController controller, InventoryWeaponAmmoSource ammo)
         {
             _window = window;
             _controller = controller;
             _model = window.Model;
-            _ammo = new InventoryWeaponAmmoSource(_model, window.PrimaryContainerId);
-            _controller.SetAmmoSource(_ammo);
+            _controller.SetAmmoSource(ammo);
             _controller.VisualCreated += OnVisualCreated;
             _model.ItemEquipped += OnEquipmentChanged;
             _model.ItemUnequipped += OnEquipmentChanged;
@@ -58,8 +56,17 @@ namespace RaidIntoDarkness.Integrations.Inventory
                 _controller.VisualCreated -= OnVisualCreated;
                 _controller.SetAmmoSource(null);
             }
+        }
 
-            _ammo.Dispose();
+        public bool IsReloading(ItemInstance item)
+        {
+            if (_controller == null || _controller.State is not (FirstPersonWeaponState.Reloading or FirstPersonWeaponState.LoadingGrenade) || _window.IsEquipped(item) == false)
+            {
+                return false;
+            }
+
+            string slot = _controller.ActiveSlot == FirstPersonWeaponController.PRIMARY_SLOT ? PRIMARY_SLOT : SECONDARY_SLOT;
+            return item.Location.SlotId == slot;
         }
 
         private void Bind(SlottedContainer equipment, string slotId, int slot)

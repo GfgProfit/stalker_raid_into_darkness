@@ -22,6 +22,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
         public const string FAVORITE_ACTION = "favorite";
         public const string JUNK_ACTION = "junk";
         public const string OUTFIT_PATCH_ACTION = "outfit_patch";
+        public const string UNLOAD_WEAPON_ACTION = "unload_weapon";
 
         private static readonly Color _compatibleAmmoTint = new(0f, 1f, 0.35f, 0.22f);
 
@@ -52,6 +53,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
         private InventoryStatusPanel _hoverStatusPanel;
         private FirstPersonOutfitBinder _outfitBinder;
         private FirstPersonWeaponBinder _weaponBinder;
+        private InventoryWeaponAmmoSource _weaponAmmo;
         private InventoryWeaponAttachments _weaponAttachments;
         private OutfitSlotRules _outfitSlotRules;
         private EquipmentAnimationQueue _equipmentAnimations;
@@ -378,6 +380,13 @@ namespace RaidIntoDarkness.Integrations.Inventory
                 _weaponBinder = null;
             }
 
+            if (_weaponAmmo != null)
+            {
+                _window.Actions.Unregister(UNLOAD_WEAPON_ACTION);
+                _weaponAmmo.Dispose();
+                _weaponAmmo = null;
+            }
+
             _weaponAttachments?.Dispose();
 
             if (_outfitSlotRules != null)
@@ -430,6 +439,8 @@ namespace RaidIntoDarkness.Integrations.Inventory
             _inventory.Model.Changed += OnModelChanged;
 
             _itemSounds = new InventoryItemSounds(_window);
+            _weaponAmmo = new InventoryWeaponAmmoSource(_inventory.Model, _window.PrimaryContainerId);
+            _window.Actions.Register(new InventoryDelegateAction(UNLOAD_WEAPON_ACTION, 24, context => _window.Label(UNLOAD_WEAPON_ACTION, "Разрядить"), UnloadWeapon, context => _weaponAmmo.HasLoadedAmmo(context.Item), CanUnloadWeapon));
             _weaponAttachments = new InventoryWeaponAttachments(_window);
             _outfitSlotRules = new OutfitSlotRules(_window, _inventory);
             _outfitSlotRules.Refresh();
@@ -443,7 +454,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
             FirstPersonWeaponController weapons = _player != null ? _player.GetComponentInChildren<FirstPersonWeaponController>() : null;
             if (weapons != null)
             {
-                _weaponBinder = new FirstPersonWeaponBinder(_window, weapons);
+                _weaponBinder = new FirstPersonWeaponBinder(_window, weapons, _weaponAmmo);
                 _weaponBinder.Refresh();
             }
 
@@ -460,6 +471,22 @@ namespace RaidIntoDarkness.Integrations.Inventory
             }
 
             UpdateMaxCarryWeight();
+        }
+
+        private bool CanUnloadWeapon(InventoryActionContext context) => _weaponBinder?.IsReloading(context.Item) != true && _weaponAmmo.Unload(context.Item, false).Success;
+
+        private void UnloadWeapon(InventoryActionContext context)
+        {
+            if (_weaponBinder?.IsReloading(context.Item) == true)
+            {
+                return;
+            }
+
+            InventoryResult result = _weaponAmmo.Unload(context.Item);
+            if (!result.Success)
+            {
+                _window.ShowStatus(_window.DescribeFailure(result.Failure));
+            }
         }
 
         private void BindSorting()

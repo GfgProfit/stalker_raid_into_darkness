@@ -28,6 +28,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
         private const string ICON_SCOPE = "ui_cmo_scope";
         private const string ICON_SILENCER = "ui_cmo_silencer";
         private const string ICON_GRENADE_LAUNCHER = "ui_cmo_gl";
+        private const string ICON_UNLOAD = "ui_cmo_bullets";
         private const string ICON_PATCH = "ui_cmo_patch";
         private const string TAG_DRINK = "drink";
         private const string TAG_FOOD = "food";
@@ -61,6 +62,8 @@ namespace RaidIntoDarkness.Integrations.Inventory
                     return Style(ICON_SCOPE, DEFAULT_GROUP);
                 case InventoryWeaponAttachments.DETACH_GRENADE_LAUNCHER_ACTION:
                     return Style(ICON_GRENADE_LAUNCHER, DEFAULT_GROUP);
+                case InventoryWindowController.UNLOAD_WEAPON_ACTION:
+                    return Style(ICON_UNLOAD, DEFAULT_GROUP);
                 case InventoryWindowController.OUTFIT_PATCH_ACTION:
                     return Style(ICON_PATCH, DEFAULT_GROUP);
                 case InventoryBuiltInActions.MOVE:

@@ -65,7 +65,7 @@ namespace RaidIntoDarkness.Weapons.Optics
                 return;
             }
 
-            if (!UsesOpticalMagnification)
+            if (!UsesOpticalMagnification || _controller.IsGrenadeMode)
             {
                 _renderer.SetActive(false);
                 return;
@@ -83,7 +83,7 @@ namespace RaidIntoDarkness.Weapons.Optics
 
         public void ApplyMagnificationScroll(float scroll)
         {
-            if (!UsesOpticalMagnification || _controller.State != FirstPersonWeaponState.Ready || !_controller.IsAiming || _controller.AimFactor < ScopeOpticsMath.FiniteClamp(_activationAimFactor, 0f, 1f, 0.95f) || !float.IsFinite(scroll))
+            if (!UsesOpticalMagnification || _controller.IsGrenadeMode || _controller.State != FirstPersonWeaponState.Ready || !_controller.IsAiming || _controller.AimFactor < ScopeOpticsMath.FiniteClamp(_activationAimFactor, 0f, 1f, 0.95f) || !float.IsFinite(scroll))
             {
                 return;
             }

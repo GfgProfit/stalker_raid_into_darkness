@@ -9,6 +9,7 @@ namespace RaidIntoDarkness.Weapons
         [SerializeField] private Transform _muzzle;
         [SerializeField] private GameObject _silencerVisual;
         [SerializeField] private Transform _silencedMuzzle;
+        [SerializeField] private GameObject _launcherRound;
 
         public Transform Muzzle => _muzzle;
         public GameObject SilencerVisual => _silencerVisual;
@@ -24,6 +25,14 @@ namespace RaidIntoDarkness.Weapons
             if (_silencerVisual != null)
             {
                 _silencerVisual.SetActive(installed);
+            }
+        }
+
+        public void SetLauncherRoundVisible(bool visible)
+        {
+            if (_launcherRound != null)
+            {
+                _launcherRound.SetActive(visible);
             }
         }
     }

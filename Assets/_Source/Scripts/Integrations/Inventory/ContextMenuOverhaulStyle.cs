@@ -27,6 +27,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
         private const string ICON_UNTRASHBIN = "ui_cmo_untrashbin";
         private const string ICON_SCOPE = "ui_cmo_scope";
         private const string ICON_SILENCER = "ui_cmo_silencer";
+        private const string ICON_GRENADE_LAUNCHER = "ui_cmo_gl";
         private const string ICON_PATCH = "ui_cmo_patch";
         private const string TAG_DRINK = "drink";
         private const string TAG_FOOD = "food";
@@ -58,6 +59,8 @@ namespace RaidIntoDarkness.Integrations.Inventory
                     return Style(ICON_SILENCER, DEFAULT_GROUP);
                 case InventoryWeaponAttachments.DETACH_SCOPE_ACTION:
                     return Style(ICON_SCOPE, DEFAULT_GROUP);
+                case InventoryWeaponAttachments.DETACH_GRENADE_LAUNCHER_ACTION:
+                    return Style(ICON_GRENADE_LAUNCHER, DEFAULT_GROUP);
                 case InventoryWindowController.OUTFIT_PATCH_ACTION:
                     return Style(ICON_PATCH, DEFAULT_GROUP);
                 case InventoryBuiltInActions.MOVE:
@@ -71,8 +74,18 @@ namespace RaidIntoDarkness.Integrations.Inventory
                 case InventoryWindowController.JUNK_ACTION:
                     return Style(_sorting != null && _sorting.IsJunk(definition) ? ICON_UNTRASHBIN : ICON_TRASHBIN, MARK_GROUP);
                 default:
-                    return Style(action.Id.StartsWith(InventoryWeaponAttachments.ATTACH_ACTION, System.StringComparison.Ordinal) ? definition.GetComponent<WeaponAddonComponent>()?.Kind == WeaponAddonKind.Scope ? ICON_SCOPE : ICON_SILENCER : null, DEFAULT_GROUP);
+                    return Style(action.Id.StartsWith(InventoryWeaponAttachments.ATTACH_ACTION, System.StringComparison.Ordinal) ? AddonIcon(definition) : null, DEFAULT_GROUP);
             }
+        }
+
+        private static string AddonIcon(ItemDefinition definition)
+        {
+            return definition.GetComponent<WeaponAddonComponent>()?.Kind switch
+            {
+                WeaponAddonKind.Scope => ICON_SCOPE,
+                WeaponAddonKind.GrenadeLauncher => ICON_GRENADE_LAUNCHER,
+                _ => ICON_SILENCER
+            };
         }
 
         private static string UseIcon(ItemDefinition definition)

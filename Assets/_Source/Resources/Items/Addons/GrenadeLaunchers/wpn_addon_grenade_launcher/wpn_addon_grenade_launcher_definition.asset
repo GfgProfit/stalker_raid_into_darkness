@@ -75,6 +75,7 @@ MonoBehaviour:
         _aimOffsetPosition: {x: 0, y: 0, z: 0}
         _attachSound: {fileID: 0}
         _detachSound: {fileID: 0}
+        _grenadeAmmo: {fileID: 11400000, guid: 8d3e86aebb7d31c4394703c0a952bee5, type: 2}
     - rid: 115149081108283535
       type: {class: WorldItemComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
       data:

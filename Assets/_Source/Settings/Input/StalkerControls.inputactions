@@ -123,6 +123,15 @@
                     "initialStateCheck": false
                 },
                 {
+                    "name": "GrenadeMode",
+                    "type": "Button",
+                    "id": "ad747915-90a6-4495-973b-281cd9bde854",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
                     "name": "NextReticle",
                     "type": "Button",
                     "id": "c9d79485-88c3-4dc3-8db6-dddc28b68052",
@@ -353,6 +362,17 @@
                     "processors": "",
                     "groups": "Keyboard&Mouse",
                     "action": "FireMode",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "53db7b63-75b8-4772-a1b0-717768ef4685",
+                    "path": "<Keyboard>/v",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "GrenadeMode",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },

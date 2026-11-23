@@ -31,10 +31,18 @@ namespace RaidIntoDarkness.Weapons
         [SerializeField] private string[] _overlayBones = Array.Empty<string>();
         [Header("Animations")]
         [SerializeField] private List<FirstPersonWeaponMotion> _motions = new List<FirstPersonWeaponMotion>();
+        [SerializeField] private List<FirstPersonWeaponMotion> _withGrenadeLauncherMotions = new List<FirstPersonWeaponMotion>();
+        [SerializeField] private List<FirstPersonWeaponMotion> _grenadeModeMotions = new List<FirstPersonWeaponMotion>();
         [SerializeField] private XRayAnmAsset _aimStart;
         [SerializeField] private XRayAnmAsset _aimIdle;
         [SerializeField] private XRayAnmAsset _aimEnd;
         [SerializeField] [Min(0.0f)] private float _crossFade = 0.15f;
+        [Header("Grenade Launcher Aim")]
+        [SerializeField] private Vector3 _grenadeAimOffsetPosition;
+        [SerializeField] private Vector3 _grenadeAimOffsetRotation;
+        [SerializeField] private XRayAnmAsset _grenadeAimStart;
+        [SerializeField] private XRayAnmAsset _grenadeAimIdle;
+        [SerializeField] private XRayAnmAsset _grenadeAimEnd;
         [Header("Fire")]
         [SerializeField] [Min(1)] private int _roundsPerMinute = 600;
         [SerializeField] [Min(1)] private int _emptyClicksPerMinute = 200;
@@ -77,6 +85,8 @@ namespace RaidIntoDarkness.Weapons
         public XRayAnmAsset AimStart => _aimStart;
         public XRayAnmAsset AimIdle => _aimIdle;
         public XRayAnmAsset AimEnd => _aimEnd;
+        public Vector3 GrenadeAimOffsetPosition => _grenadeAimOffsetPosition;
+        public Vector3 GrenadeAimOffsetRotation => _grenadeAimOffsetRotation;
         public float CrossFade => _crossFade;
         public int RoundsPerMinute => _roundsPerMinute;
         public float ShotInterval => 60.0f / Mathf.Max(1, _roundsPerMinute);
@@ -108,21 +118,43 @@ namespace RaidIntoDarkness.Weapons
             return Quaternion.AngleAxis(degrees.z, Vector3.forward) * Quaternion.AngleAxis(degrees.y, Vector3.up) * Quaternion.AngleAxis(degrees.x, Vector3.right);
         }
 
+        internal void GetAimClips(bool grenadeMode, out XRayAnmAsset start, out XRayAnmAsset idle, out XRayAnmAsset end)
+        {
+            start = grenadeMode ? _grenadeAimStart : _aimStart;
+            idle = grenadeMode ? _grenadeAimIdle : _aimIdle;
+            end = grenadeMode ? _grenadeAimEnd : _aimEnd;
+        }
+
         public bool HasMotion(FirstPersonWeaponMotionKind kind)
         {
             return Find(kind, 0) != null;
         }
 
-        public FirstPersonWeaponMotion Find(FirstPersonWeaponMotionKind kind, int variant)
+        public FirstPersonWeaponMotion Find(FirstPersonWeaponMotionKind kind, int variant, bool hasGrenadeLauncher = false, bool grenadeMode = false)
+        {
+            List<FirstPersonWeaponMotion> alternate = grenadeMode ? _grenadeModeMotions : hasGrenadeLauncher ? _withGrenadeLauncherMotions : null;
+            return FindIn(alternate, kind, variant) ?? FindIn(_motions, kind, variant);
+        }
+
+        public FirstPersonWeaponMotion FindRandom(FirstPersonWeaponMotionKind kind, bool hasGrenadeLauncher = false)
+        {
+            List<FirstPersonWeaponMotion> motions = hasGrenadeLauncher && CountIn(_withGrenadeLauncherMotions, kind) > 0 ? _withGrenadeLauncherMotions : _motions;
+            int count = CountIn(motions, kind);
+            return count > 0 ? FindIn(motions, kind, UnityEngine.Random.Range(0, count)) : null;
+        }
+
+        public int CountMotions(FirstPersonWeaponMotionKind kind) => CountIn(_motions, kind);
+
+        private static FirstPersonWeaponMotion FindIn(List<FirstPersonWeaponMotion> motions, FirstPersonWeaponMotionKind kind, int variant)
         {
             int index = 0;
-            for (int i = 0; i < _motions.Count; i++)
+            for (int i = 0; motions != null && i < motions.Count; i++)
             {
-                if (_motions[i] != null && _motions[i].Kind == kind && _motions[i].Hands != null)
+                if (motions[i] != null && motions[i].Kind == kind && motions[i].Hands != null)
                 {
                     if (index == variant)
                     {
-                        return _motions[i];
+                        return motions[i];
                     }
 
                     index++;
@@ -132,18 +164,12 @@ namespace RaidIntoDarkness.Weapons
             return null;
         }
 
-        public FirstPersonWeaponMotion FindRandom(FirstPersonWeaponMotionKind kind)
-        {
-            int count = CountMotions(kind);
-            return count > 0 ? Find(kind, UnityEngine.Random.Range(0, count)) : null;
-        }
-
-        public int CountMotions(FirstPersonWeaponMotionKind kind)
+        private static int CountIn(List<FirstPersonWeaponMotion> motions, FirstPersonWeaponMotionKind kind)
         {
             int count = 0;
-            for (int i = 0; i < _motions.Count; i++)
+            for (int i = 0; motions != null && i < motions.Count; i++)
             {
-                if (_motions[i] != null && _motions[i].Kind == kind && _motions[i].Hands != null)
+                if (motions[i] != null && motions[i].Kind == kind && motions[i].Hands != null)
                 {
                     count++;
                 }

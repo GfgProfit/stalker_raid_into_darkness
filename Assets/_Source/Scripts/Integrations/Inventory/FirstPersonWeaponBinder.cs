@@ -70,6 +70,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
             _controller.SetSlotWeapon(slot, weapon, weapon != null ? item.InstanceId : null);
             WeaponStatsComponent stats = item?.Definition.GetComponent<WeaponStatsComponent>();
             _controller.SetSlotSilencer(slot, stats != null && (stats.SilencerStatus == WeaponAddonStatus.Permanent || stats.GetSilencer(item, _model.Resolver) != null));
+            _controller.SetSlotGrenadeLauncher(slot, stats?.GetGrenadeLauncher(item, _model.Resolver) != null);
             WeaponAddonComponent scope = stats?.GetScope(item, _model.Resolver)?.GetComponent<WeaponAddonComponent>();
             _controller.SetSlotAimOffset(slot, scope != null && scope.OverrideAimOffsetPosition ? scope.AimOffsetPosition : null);
         }

@@ -960,6 +960,140 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             Release(_mouse.rightButton, queueEventOnly: true);
         }
 
+        [UnityTest]
+        public IEnumerator Aks74nLoadsAndDetachesGp25ThroughTheInventory()
+        {
+            SceneManager.LoadScene(SCENE, LoadSceneMode.Single);
+            yield return new WaitForSeconds(0.6f);
+            InventoryWindowController controller = Object.FindAnyObjectByType<InventoryWindowController>();
+            InventoryWindow window = controller.Window;
+            InventoryModel model = window.Model;
+            StalkerPlayerController player = controller.Player;
+            FirstPersonWeaponController weapons = player.GetComponentInChildren<FirstPersonWeaponController>();
+            ItemDefinition weaponDefinition = Resources.Load<ItemDefinition>("Items/Weapons/wpn_ak74/wpn_ak74_definition");
+            ItemDefinition launcherDefinition = Resources.Load<ItemDefinition>("Items/Addons/GrenadeLaunchers/wpn_addon_grenade_launcher/wpn_addon_grenade_launcher_definition");
+            ItemDefinition otherLauncher = Resources.Load<ItemDefinition>("Items/Addons/GrenadeLaunchers/wpn_addon_grenade_launcher_ag36/wpn_addon_grenade_launcher_ag36_definition");
+            ItemDefinition grenade = Resources.Load<ItemDefinition>("Items/Ammo/ammo_vog-25/ammo_vog-25_definition");
+            ItemDefinition otherGrenade = Resources.Load<ItemDefinition>("Items/Ammo/ammo_vog-25p/ammo_vog-25p_definition");
+            FirstPersonWeaponAmmoView ammoView = player.GetComponentInChildren<FirstPersonWeaponAmmoView>(true);
+            var actionAudio = (AudioSource)typeof(FirstPersonWeaponController).GetField("_audio", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic).GetValue(weapons);
+            WeaponStatsComponent stats = weaponDefinition.GetComponent<WeaponStatsComponent>();
+            Assert.That(stats.SupportsGrenadeLauncher(otherLauncher), Is.False);
+
+            ItemInstance weapon = AddItem(model, weaponDefinition, window.PrimaryContainerId, 1);
+            ItemInstance launcher = AddItem(model, launcherDefinition, window.PrimaryContainerId, 1);
+            launcher.SetState("condition", "0.63");
+            weapon.SetState(InventoryWeaponAmmoSource.AMMO_SECTION_STATE, stats.AmmoClasses[0]);
+            weapon.SetState(InventoryWeaponAmmoSource.MAGAZINE_STATE, "3");
+            float weaponWeight = weapon.UnitWeight;
+            Assert.That(model.TryEquip(weapon.InstanceId, window.EquipmentContainerId).Success, Is.True);
+            player.CameraController.SetCursorLocked(true);
+            yield return Tap(weapon.Location.SlotId == FirstPersonWeaponBinder.PRIMARY_SLOT ? _keyboard.digit3Key : _keyboard.digit2Key);
+            yield return WaitWhile(() => weapons.State != FirstPersonWeaponState.Ready);
+            Assert.That(weapons.ActiveWeapon, Is.SameAs(weaponDefinition.GetComponent<WeaponHudComponent>().FirstPersonWeapon));
+            Assert.That(weapons.TrySwitchGrenadeMode(), Is.False);
+            string rifleHud = ammoView.Text.text;
+            Assert.That(FindChild(weapons.Model.transform, "mesh_03_gp25").gameObject.activeSelf, Is.False);
+
+            var weaponContext = new InventoryActionContext(window, weapon, null);
+            var addonContext = new InventoryActionContext(window, launcher, null);
+            IInventoryItemAction install = window.Actions.Find(InventoryWeaponAttachments.ATTACH_ACTION + weapon.Location.SlotId);
+            IInventoryItemAction detach = window.Actions.Find(InventoryWeaponAttachments.DETACH_GRENADE_LAUNCHER_ACTION);
+            var style = new ContextMenuOverhaulStyle(window, null);
+            Sprite icon = window.Theme.Icon("ui_cmo_gl");
+            Assert.That(icon, Is.Not.Null);
+            Assert.That(style.Resolve(addonContext, install).Icon, Is.SameAs(icon));
+            Assert.That(style.Resolve(weaponContext, detach).Icon, Is.SameAs(icon));
+            Assert.That(controller.WeaponAttachments.Preview(launcher, weapon).Success, Is.True);
+            Assert.That(install.IsEnabled(addonContext), Is.True);
+            install.Execute(addonContext);
+            Assert.That(weapons.HasGrenadeLauncher, Is.True);
+            Assert.That(FindChild(weapons.Model.transform, "mesh_03_gp25").gameObject.activeSelf, Is.True);
+            Assert.That(weapon.UnitWeight, Is.EqualTo(weaponWeight + launcherDefinition.Weight).Within(0.0001f));
+            Assert.That(weapons.ActiveWeapon.Find(FirstPersonWeaponMotionKind.Idle, 0, true).HandsName, Is.EqualTo("ak74_idle_w_gl"));
+
+            yield return Tap(_keyboard.vKey);
+            Assert.That(weapons.CurrentMotion, Is.EqualTo(FirstPersonWeaponMotionKind.GrenadeModeEnter));
+            Assert.That(actionAudio.clip.name, Is.EqualTo("abakan_gl_activate"));
+            Assert.That(ammoView.Text.text, Does.StartWith("0/0 ").And.Contain(grenade.ShortName));
+            yield return WaitWhile(() => actionAudio.timeSamples <= 0 && weapons.State == FirstPersonWeaponState.SwitchingGrenadeMode);
+            Assert.That(actionAudio.timeSamples, Is.GreaterThan(0));
+            yield return WaitWhile(() => weapons.State != FirstPersonWeaponState.Ready);
+            Assert.That(weapons.IsGrenadeMode, Is.True);
+            Assert.That(weapons.ActiveWeapon.Find(FirstPersonWeaponMotionKind.Idle, 0, true, true).HandsName, Is.EqualTo("ak74_idle_g"));
+            float launcherFieldOfView = player.CameraController.Camera.fieldOfView;
+            FirstPersonWeaponAsset asset = weapons.ActiveWeapon;
+            Transform hands = weapons.HandsModel.transform;
+            Vector3 iwpAimPosition = new(-0.0034f, 0.0066f, 0f);
+            Vector3 iwpAimRotation = new(-0.00016f, 0.00139f, 0f);
+            Assert.That(asset.GrenadeAimOffsetPosition, Is.EqualTo(iwpAimPosition));
+            Assert.That(asset.GrenadeAimOffsetRotation, Is.EqualTo(iwpAimRotation));
+            var aimIdle = Resources.Load<XRayAnmAsset>("Items/Weapons/wpn_ak74/Animations/Blend/aim_idle_abakan_gl");
+            Assert.That(aimIdle.Evaluate(0f, out Vector3 blendPosition, out Quaternion blendRotation), Is.True);
+            Quaternion aimRotation = FirstPersonWeaponAsset.ToAimRotation(iwpAimRotation);
+            Quaternion aimBasis = aimRotation * asset.HandsRotation;
+            Vector3 expectedAimPosition = iwpAimPosition + aimRotation * asset.HandsPosition + aimBasis * blendPosition;
+            Quaternion expectedAimRotation = aimBasis * blendRotation;
+            Press(_mouse.rightButton, queueEventOnly: true);
+            yield return WaitWhile(() => weapons.CurrentMotion != FirstPersonWeaponMotionKind.IdleAim || weapons.AimFactor < 1f);
+            yield return WaitWhile(() => Quaternion.Angle(hands.localRotation, expectedAimRotation) > 0.05f || Vector3.Distance(hands.localPosition, expectedAimPosition) > 0.0001f);
+            Assert.That(weapons.IsAiming, Is.True);
+            Assert.That(weapons.ActiveWeapon.Find(FirstPersonWeaponMotionKind.IdleAim, 0, true, true).HandsName, Is.EqualTo("ak74_idle_aim_g"));
+            Assert.That(player.CameraController.Camera.fieldOfView, Is.EqualTo(launcherFieldOfView).Within(0.001f));
+            Release(_mouse.rightButton, queueEventOnly: true);
+            yield return WaitWhile(() => weapons.IsAiming);
+            yield return WaitWhile(() => Quaternion.Angle(hands.localRotation, asset.HandsRotation) > 0.05f || Vector3.Distance(hands.localPosition, asset.HandsPosition) > 0.0001f);
+            AddItem(model, otherGrenade, window.PrimaryContainerId, 1);
+            yield return Tap(_keyboard.rKey);
+            Assert.That(weapons.State, Is.EqualTo(FirstPersonWeaponState.Ready));
+            Assert.That(weapon.GetState(InventoryWeaponAttachments.GRENADE_ROUND_STATE), Is.Null);
+
+            ItemInstance stack = AddItem(model, grenade, window.PrimaryContainerId, 2);
+            Assert.That(ammoView.Text.text, Does.StartWith("0/2 ").And.Contain(grenade.ShortName));
+            yield return Tap(_keyboard.rKey);
+            Assert.That(weapons.CurrentMotion, Is.EqualTo(FirstPersonWeaponMotionKind.GrenadeReload));
+            Assert.That(actionAudio.clip.name, Is.EqualTo("gp25_grenload"));
+            Assert.That(weapons.State, Is.EqualTo(FirstPersonWeaponState.LoadingGrenade));
+            Assert.That(FindChild(weapons.Model.transform, "mesh_19_wpn_vog").gameObject.activeSelf, Is.True);
+            Assert.That(stack.Amount, Is.EqualTo(2));
+            yield return WaitWhile(() => actionAudio.timeSamples <= 0 && weapons.State == FirstPersonWeaponState.LoadingGrenade);
+            Assert.That(actionAudio.timeSamples, Is.GreaterThan(0));
+            yield return WaitWhile(() => weapons.State != FirstPersonWeaponState.Ready);
+            Assert.That(FindChild(weapons.Model.transform, "mesh_19_wpn_vog").gameObject.activeSelf, Is.False);
+            Assert.That(stack.Amount, Is.EqualTo(1));
+            Assert.That(ammoView.Text.text, Does.StartWith("1/1 ").And.Contain(grenade.ShortName));
+            Assert.That(weapon.GetState(InventoryWeaponAttachments.GRENADE_ROUND_STATE), Is.EqualTo(grenade.DefinitionId));
+            Assert.That(weapon.UnitWeight, Is.EqualTo(weaponWeight + launcherDefinition.Weight + grenade.Weight).Within(0.0001f));
+            yield return Tap(_keyboard.rKey);
+            yield return Tap(_mouse.leftButton);
+            Assert.That(weapons.Magazine, Is.EqualTo(3));
+            Assert.That(stack.Amount, Is.EqualTo(1));
+            Assert.That(weapon.GetState(InventoryWeaponAttachments.GRENADE_ROUND_STATE), Is.EqualTo(grenade.DefinitionId));
+
+            yield return Tap(_keyboard.vKey);
+            Assert.That(weapons.CurrentMotion, Is.EqualTo(FirstPersonWeaponMotionKind.GrenadeModeExit));
+            Assert.That(actionAudio.clip.name, Is.EqualTo("abakan_gl_deactivate"));
+            Assert.That(ammoView.Text.text, Is.EqualTo(rifleHud));
+            yield return WaitWhile(() => actionAudio.timeSamples <= 0 && weapons.State == FirstPersonWeaponState.SwitchingGrenadeMode);
+            Assert.That(actionAudio.timeSamples, Is.GreaterThan(0));
+            yield return WaitWhile(() => weapons.State != FirstPersonWeaponState.Ready);
+            Assert.That(weapons.IsGrenadeMode, Is.False);
+            Assert.That(detach.GetLabel(weaponContext), Is.EqualTo("Снять подствольник"));
+            Assert.That(detach.IsEnabled(weaponContext), Is.True);
+            detach.Execute(weaponContext);
+            ItemInstance returned = model.GetItem(launcher.InstanceId);
+            Assert.That(returned.Definition, Is.SameAs(launcherDefinition));
+            Assert.That(returned.GetState("condition"), Is.EqualTo("0.63"));
+            Assert.That(returned.GetState(InventoryWeaponAttachments.GRENADE_ROUND_STATE), Is.Null);
+            Assert.That(returned.UnitWeight, Is.EqualTo(launcherDefinition.Weight).Within(0.0001f));
+            Assert.That(stack.Amount, Is.EqualTo(2));
+            Assert.That(weapon.GetState(InventoryWeaponAttachments.GRENADE_ROUND_STATE), Is.Null);
+            Assert.That(weapons.HasGrenadeLauncher, Is.False);
+            Assert.That(FindChild(weapons.Model.transform, "mesh_03_gp25").gameObject.activeSelf, Is.False);
+            Assert.That(controller.WeaponAttachments.Install(returned, weapon).Success, Is.True);
+            Assert.That(weapon.GetState(InventoryWeaponAttachments.GRENADE_ROUND_STATE), Is.Null);
+        }
+
         private static void AssertBoltPose(Transform bolt, Vector3 position, Quaternion rotation)
         {
             Assert.That(Vector3.Distance(bolt.localPosition, position), Is.LessThan(0.001f));

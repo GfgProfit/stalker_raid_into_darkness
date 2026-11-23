@@ -56,7 +56,8 @@ namespace RaidIntoDarkness.Weapons
 
             if (visible && _text != null)
             {
-                _text.text = $"{_controller.Magazine}/{_controller.Reserve} <size=65%>{_controller.AmmoName}</size>";
+                _controller.GetHudAmmo(out int loaded, out int reserve, out string name);
+                _text.text = $"{loaded}/{reserve} <size=65%>{name}</size>";
             }
         }
     }

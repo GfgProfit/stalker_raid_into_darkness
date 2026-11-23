@@ -120,8 +120,8 @@ MonoBehaviour:
         - {fileID: 11400000, guid: 101eee143b83c0144a7a1d6a672fbc8a, type: 2}
         - {fileID: 11400000, guid: 94ac679431fcc2a48b2a24eeb4b81580, type: 2}
         - {fileID: 11400000, guid: e860adc23efd2e540911e3efa1c65bf2, type: 2}
-        _grenadeLauncherStatus: 0
-        _grenadeLauncherSection: 
+        _grenadeLauncherStatus: 2
+        _grenadeLauncherSection: wpn_addon_grenade_launcher
     - rid: 115149063313949398
       type: {class: EquippableItemComponent, ns: Inventory, asm: Inventory}
       data:

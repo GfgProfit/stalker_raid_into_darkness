@@ -5898,6 +5898,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 6631535841320698105}
     m_Modifications:
+    - target: {fileID: -8299150625333387596, guid: 4b9b5c7f258c9284485c1d436e0d7e91, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 8cf765d2c49bfc04ab81555309c1badc, type: 2}
     - target: {fileID: -7987573236814490448, guid: 4b9b5c7f258c9284485c1d436e0d7e91, type: 3}
       propertyPath: m_IsActive
       value: 0
@@ -6046,6 +6050,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: -6449135054404520263, guid: 4b9b5c7f258c9284485c1d436e0d7e91, type: 3}
       insertIndex: -1
       addedObject: {fileID: 6278730120648990418}
+    - targetCorrespondingSourceObject: {fileID: 2468979504113616205, guid: 4b9b5c7f258c9284485c1d436e0d7e91, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1312897375983406787}
   m_SourcePrefab: {fileID: -9137962142385034750, guid: 4b9b5c7f258c9284485c1d436e0d7e91, type: 3}
 --- !u!4 &1484134664780265641 stripped
 Transform:
@@ -6062,6 +6069,36 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 8353643778696417828, guid: 4b9b5c7f258c9284485c1d436e0d7e91, type: 3}
   m_PrefabInstance: {fileID: 6359339594882091800}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &5686306772089803754 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -7590473802899154702, guid: 4b9b5c7f258c9284485c1d436e0d7e91, type: 3}
+  m_PrefabInstance: {fileID: 6359339594882091800}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &8792005502024257109 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2468979504113616205, guid: 4b9b5c7f258c9284485c1d436e0d7e91, type: 3}
+  m_PrefabInstance: {fileID: 6359339594882091800}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1312897375983406787
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8792005502024257109}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9c9757ce76109a545a89455546c23e0a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Inventory.IconGeneration::Inventory.IconGeneration.ItemIconVariantPart
+  _part: {fileID: 11400000, guid: b1767a124f1103b4cb887f0942147804, type: 2}
+  _group: grenade_launcher
+  _installedObjects:
+  - {fileID: 8792005502024257109}
+  _defaultObjects: []
+  _requiredParts: []
+  _incompatibleParts: []
+  _sizeDelta: {x: 0, y: 0}
 --- !u!4 &8792011936219825188 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -6754438549356507332, guid: 4b9b5c7f258c9284485c1d436e0d7e91, type: 3}
@@ -6087,6 +6124,7 @@ MonoBehaviour:
   _muzzle: {fileID: 2698534864811410219}
   _silencerVisual: {fileID: 3441944724376412887}
   _silencedMuzzle: {fileID: 6635041266428814938}
+  _launcherRound: {fileID: 5686306772089803754}
 --- !u!114 &6278730120648990418
 MonoBehaviour:
   m_ObjectHideFlags: 0

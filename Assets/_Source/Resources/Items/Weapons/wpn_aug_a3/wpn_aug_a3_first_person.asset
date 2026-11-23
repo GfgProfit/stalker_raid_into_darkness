@@ -186,6 +186,8 @@ MonoBehaviour:
     _cameraEffect: {fileID: 4908183818744415850, guid: a1290b1392e311743ab8194b9e856845, type: 3}
     _sound: {fileID: 8300000, guid: 2195510a3272ed342ab1d66e1d4fced3, type: 3}
     _speed: 1
+  _withGrenadeLauncherMotions: []
+  _grenadeModeMotions: []
   _aimStart: {fileID: 4908183818744415850, guid: 18d7bb999d1d21a41babebef28990fb2, type: 3}
   _aimIdle: {fileID: 4908183818744415850, guid: 72ac7377c6e3e204796c215d12d1686c, type: 3}
   _aimEnd: {fileID: 4908183818744415850, guid: 617291d402f16084697b43b8cc200f52, type: 3}

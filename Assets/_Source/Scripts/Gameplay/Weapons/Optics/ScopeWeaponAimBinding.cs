@@ -40,7 +40,7 @@ namespace RaidIntoDarkness.Weapons.Optics
                 return;
             }
 
-            bool aiming = _weaponController.isActiveAndEnabled && _weaponController.Model != null && _weaponController.State == FirstPersonWeaponState.Ready && _weaponController.IsAiming && _weaponController.AimFactor >= _activationAimFactor;
+            bool aiming = _weaponController.isActiveAndEnabled && _weaponController.Model != null && _weaponController.State == FirstPersonWeaponState.Ready && !_weaponController.IsGrenadeMode && _weaponController.IsAiming && _weaponController.AimFactor >= _activationAimFactor;
             for (int i = 0; i < _scopes.Length; i++)
             {
                 ScopeOpticsRenderer scope = _scopes[i];

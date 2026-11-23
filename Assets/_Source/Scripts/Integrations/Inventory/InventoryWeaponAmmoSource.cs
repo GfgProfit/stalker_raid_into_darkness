@@ -59,6 +59,16 @@ namespace RaidIntoDarkness.Integrations.Inventory
 
         public string GetAmmoName(object weaponKey) => FindDefinition(GetAmmoSection(weaponKey))?.ShortName ?? string.Empty;
 
+        public void GetGrenadeAmmo(object weaponKey, out int loaded, out int reserve, out string name)
+        {
+            ItemInstance weapon = GetWeapon(weaponKey);
+            WeaponAddonComponent launcher = GetGrenadeLauncher(weapon);
+            ItemDefinition grenade = launcher?.GrenadeAmmo;
+            loaded = launcher?.GetLoadedGrenade(weapon) != null ? 1 : 0;
+            reserve = Count(grenade?.GetComponent<AmmoStatsComponent>()?.Section);
+            name = grenade?.ShortName ?? string.Empty;
+        }
+
         public BallisticAmmoData GetBallistics(object weaponKey) => FindDefinition(GetAmmoSection(weaponKey))?.GetComponent<AmmoBallisticsComponent>()?.Data;
 
         public float GetBulletSpeed(object weaponKey)
@@ -152,6 +162,23 @@ namespace RaidIntoDarkness.Integrations.Inventory
             return true;
         }
 
+        public bool CanReloadGrenade(object weaponKey) => FindGrenadeStack(GetWeapon(weaponKey)) != null;
+
+        public bool ReloadGrenade(object weaponKey)
+        {
+            ItemInstance weapon = GetWeapon(weaponKey);
+            ItemInstance grenade = FindGrenadeStack(weapon);
+
+            if (grenade == null)
+            {
+                return false;
+            }
+
+            ItemInstance updated = InventoryWeaponAttachments.Clone(weapon);
+            updated.SetState(InventoryWeaponAttachments.GRENADE_ROUND_STATE, grenade.DefinitionId);
+            return _model.TryReconfigureItem(weapon, updated, weapon.Location.Position, consumed: grenade).Success;
+        }
+
         public void Reload(object weaponKey, int capacity)
         {
             ItemInstance weapon = GetWeapon(weaponKey);
@@ -200,6 +227,21 @@ namespace RaidIntoDarkness.Integrations.Inventory
         }
 
         private ItemInstance GetWeapon(object weaponKey) => _model.GetItem(weaponKey as string);
+
+        private WeaponAddonComponent GetGrenadeLauncher(ItemInstance weapon) => weapon?.Definition.GetComponent<WeaponStatsComponent>()?.GetGrenadeLauncher(weapon, _model.Resolver)?.GetComponent<WeaponAddonComponent>();
+
+        private ItemInstance FindGrenadeStack(ItemInstance weapon)
+        {
+            WeaponAddonComponent launcher = GetGrenadeLauncher(weapon);
+            ItemDefinition grenade = launcher?.GrenadeAmmo;
+            if (grenade == null || launcher.GetLoadedGrenade(weapon) != null)
+            {
+                return null;
+            }
+
+            ItemInstance stack = FindStack(grenade.GetComponent<AmmoStatsComponent>()?.Section);
+            return stack?.Definition == grenade ? stack : null;
+        }
 
         private string GetReloadSection(object weaponKey, WeaponStatsComponent stats)
         {

@@ -10,6 +10,7 @@ namespace RaidIntoDarkness.Weapons
         int GetReserve(object weaponKey);
         string GetAmmoSection(object weaponKey);
         string GetAmmoName(object weaponKey);
+        void GetGrenadeAmmo(object weaponKey, out int loaded, out int reserve, out string name);
         BallisticAmmoData GetBallistics(object weaponKey);
         float GetBulletSpeed(object weaponKey);
         float GetFireDistance(object weaponKey);
@@ -17,6 +18,8 @@ namespace RaidIntoDarkness.Weapons
         bool TryShoot(object weaponKey);
         bool TryStartReload(object weaponKey);
         bool TrySwitchAmmo(object weaponKey);
+        bool CanReloadGrenade(object weaponKey);
+        bool ReloadGrenade(object weaponKey);
         void Reload(object weaponKey, int capacity);
     }
 }

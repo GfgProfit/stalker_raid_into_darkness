@@ -28,6 +28,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
         [SerializeField] private Vector3 _aimOffsetPosition;
         [SerializeField] private AudioClip _attachSound;
         [SerializeField] private AudioClip _detachSound;
+        [SerializeField] private ItemDefinition _grenadeAmmo;
 
         public string Section => _section ?? string.Empty;
         public WeaponAddonKind Kind => _kind;
@@ -43,5 +44,10 @@ namespace RaidIntoDarkness.Integrations.Inventory
         public Vector3 AimOffsetPosition => _aimOffsetPosition;
         public AudioClip AttachSound => _attachSound;
         public AudioClip DetachSound => _detachSound;
+        public ItemDefinition GrenadeAmmo => _grenadeAmmo;
+
+        public override float GetAdditionalWeight(ItemInstance item, IItemDefinitionResolver resolver) => GetLoadedGrenade(item)?.Weight ?? 0f;
+
+        public ItemDefinition GetLoadedGrenade(ItemInstance item) => _grenadeAmmo != null && item?.GetState(InventoryWeaponAttachments.GRENADE_ROUND_STATE) == _grenadeAmmo.DefinitionId ? _grenadeAmmo : null;
     }
 }

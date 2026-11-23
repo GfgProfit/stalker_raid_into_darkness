@@ -16,6 +16,10 @@ namespace RaidIntoDarkness.Integrations.Inventory
         public const string SCOPE_STATE = "weapon.scope";
         public const string SCOPE_ITEM_STATE = "weapon.scope.item";
         public const string DETACH_SCOPE_ACTION = "detach_scope";
+        public const string GRENADE_LAUNCHER_STATE = "weapon.grenade_launcher";
+        public const string GRENADE_LAUNCHER_ITEM_STATE = "weapon.grenade_launcher.item";
+        public const string GRENADE_ROUND_STATE = "weapon.grenade_launcher.round";
+        public const string DETACH_GRENADE_LAUNCHER_ACTION = "detach_grenade_launcher";
 
         private readonly InventoryWindow _window;
         private readonly InventoryModel _model;
@@ -30,6 +34,8 @@ namespace RaidIntoDarkness.Integrations.Inventory
             _actions.Add(DETACH_ACTION);
             _window.Actions.Register(new InventoryDelegateAction(DETACH_SCOPE_ACTION, 22, context => "Снять прицел", context => Report(DetachScope(context.Item), null), context => GetScope(context.Item) != null, context => DetachScope(context.Item, false).Success));
             _actions.Add(DETACH_SCOPE_ACTION);
+            _window.Actions.Register(new InventoryDelegateAction(DETACH_GRENADE_LAUNCHER_ACTION, 23, context => "Снять подствольник", context => Report(DetachGrenadeLauncher(context.Item), null), context => GetGrenadeLauncher(context.Item) != null, context => DetachGrenadeLauncher(context.Item, false).Success));
+            _actions.Add(DETACH_GRENADE_LAUNCHER_ACTION);
             SlottedContainer equipment = _model.GetContainer(window.EquipmentContainerId) as SlottedContainer;
 
             if (equipment == null)
@@ -41,15 +47,16 @@ namespace RaidIntoDarkness.Integrations.Inventory
             {
                 string slotId = slot.Id;
                 string actionId = ATTACH_ACTION + slotId;
-                _window.Actions.Register(new InventoryDelegateAction(actionId, 20, context => "Поставить на: " + equipment.GetSlotOccupant(slotId)?.Definition.ShortName, context => Report(Install(context.Item, equipment.GetSlotOccupant(slotId)), context.Item), context => Handles(context.Item, equipment.GetSlotOccupant(slotId)) && (context.Item.Definition.GetComponent<WeaponAddonComponent>().Kind == WeaponAddonKind.Scope || GetSilencer(equipment.GetSlotOccupant(slotId)) == null), context => Install(context.Item, equipment.GetSlotOccupant(slotId), false).Success));
+                _window.Actions.Register(new InventoryDelegateAction(actionId, 20, context => "Поставить на: " + equipment.GetSlotOccupant(slotId)?.Definition.ShortName, context => Report(Install(context.Item, equipment.GetSlotOccupant(slotId)), context.Item), context => CanOfferInstall(context.Item, equipment.GetSlotOccupant(slotId)), context => Install(context.Item, equipment.GetSlotOccupant(slotId), false).Success));
                 _actions.Add(actionId);
             }
         }
 
         public ItemDefinition GetSilencer(ItemInstance weapon) => weapon?.Definition.GetComponent<WeaponStatsComponent>()?.GetSilencer(weapon, _model.Resolver);
         public ItemDefinition GetScope(ItemInstance weapon) => weapon?.Definition.GetComponent<WeaponStatsComponent>()?.GetScope(weapon, _model.Resolver);
+        public ItemDefinition GetGrenadeLauncher(ItemInstance weapon) => weapon?.Definition.GetComponent<WeaponStatsComponent>()?.GetGrenadeLauncher(weapon, _model.Resolver);
 
-        public bool Handles(ItemInstance source, ItemInstance target) => source != null && target != null && source != target && target.Definition.GetComponent<WeaponStatsComponent>() is WeaponStatsComponent stats && (stats.SupportsSilencer(source.Definition) || stats.SupportsScope(source.Definition));
+        public bool Handles(ItemInstance source, ItemInstance target) => source != null && target != null && source != target && target.Definition.GetComponent<WeaponStatsComponent>() is WeaponStatsComponent stats && (stats.SupportsSilencer(source.Definition) || stats.SupportsScope(source.Definition) || stats.SupportsGrenadeLauncher(source.Definition));
 
         public InventoryResult Preview(ItemInstance source, ItemInstance target) => Install(source, target, false);
 
@@ -65,6 +72,11 @@ namespace RaidIntoDarkness.Integrations.Inventory
             if (silencer?.Definition.GetComponent<WeaponAddonComponent>()?.Kind == WeaponAddonKind.Scope)
             {
                 return InstallScope(silencer, weapon, apply);
+            }
+
+            if (silencer?.Definition.GetComponent<WeaponAddonComponent>()?.Kind == WeaponAddonKind.GrenadeLauncher)
+            {
+                return InstallGrenadeLauncher(silencer, weapon, apply);
             }
 
             if (Handles(silencer, weapon) == false || _model.ContainsItem(silencer) == false || _model.ContainsItem(weapon) == false || GetSilencer(weapon) != null)
@@ -222,6 +234,78 @@ namespace RaidIntoDarkness.Integrations.Inventory
             return result;
         }
 
+        public InventoryResult InstallGrenadeLauncher(ItemInstance launcher, ItemInstance weapon, bool apply = true)
+        {
+            if (launcher == null || weapon?.Definition.GetComponent<WeaponStatsComponent>()?.SupportsGrenadeLauncher(launcher.Definition) != true || _model.ContainsItem(launcher) == false || _model.ContainsItem(weapon) == false || GetGrenadeLauncher(weapon) != null)
+            {
+                return InventoryResult.Fail(InventoryFailure.InvalidItem);
+            }
+
+            InventoryItemData data = InventorySerializer.CaptureItem(launcher);
+            data.Amount = 1;
+
+            if (launcher.Amount > 1)
+            {
+                data.InstanceId = Guid.NewGuid().ToString("N");
+            }
+
+            ItemInstance updated = Clone(weapon);
+            updated.SetState(GRENADE_ROUND_STATE, launcher.Definition.GetComponent<WeaponAddonComponent>().GetLoadedGrenade(launcher)?.DefinitionId);
+            data.State.RemoveAll(entry => entry.Key == GRENADE_ROUND_STATE);
+            updated.SetState(GRENADE_LAUNCHER_STATE, launcher.DefinitionId);
+            updated.SetState(GRENADE_LAUNCHER_ITEM_STATE, JsonUtility.ToJson(data));
+            updated.SetVisualVariant(new List<string>(weapon.VisualVariant) { launcher.DefinitionId });
+            return _model.TryReconfigureItem(weapon, updated, weapon.Location.Position, consumed: launcher, apply: apply);
+        }
+
+        public InventoryResult DetachGrenadeLauncher(ItemInstance weapon, bool apply = true)
+        {
+            ItemDefinition definition = GetGrenadeLauncher(weapon);
+            string json = weapon?.GetState(GRENADE_LAUNCHER_ITEM_STATE);
+
+            if (definition == null || string.IsNullOrEmpty(json) || _model.ContainsItem(weapon) == false)
+            {
+                return InventoryResult.Fail(InventoryFailure.InvalidItem);
+            }
+
+            WeaponAddonComponent addon = definition.GetComponent<WeaponAddonComponent>();
+            ItemInstance launcher = Restore(definition, JsonUtility.FromJson<InventoryItemData>(json));
+            ItemDefinition loadedGrenade = addon.GetLoadedGrenade(weapon);
+            ItemInstance returnedGrenade = loadedGrenade != null ? _model.CreateItem(loadedGrenade, 1) : null;
+            launcher.SetState(GRENADE_ROUND_STATE, null);
+            ItemInstance updated = Clone(weapon);
+            updated.SetState(GRENADE_LAUNCHER_STATE, null);
+            updated.SetState(GRENADE_LAUNCHER_ITEM_STATE, null);
+            updated.SetState(GRENADE_ROUND_STATE, null);
+            var variants = new List<string>(weapon.VisualVariant);
+            variants.Remove(definition.DefinitionId);
+            updated.SetVisualVariant(variants);
+            string destination = _model.GetContainer(weapon.ContainerId) is SlottedContainer ? _window.PrimaryContainerId : weapon.ContainerId;
+            InventoryResult result = _model.TryReconfigureItem(weapon, updated, weapon.Location.Position, returned: launcher, returnContainerId: destination, apply: apply, returnedStack: returnedGrenade);
+
+            if (apply && result.Success)
+            {
+                _window.PlayClip(addon.DetachSound, 1f);
+            }
+
+            return result;
+        }
+
+        private bool CanOfferInstall(ItemInstance addon, ItemInstance weapon)
+        {
+            if (Handles(addon, weapon) == false)
+            {
+                return false;
+            }
+
+            return addon.Definition.GetComponent<WeaponAddonComponent>().Kind switch
+            {
+                WeaponAddonKind.Scope => true,
+                WeaponAddonKind.GrenadeLauncher => GetGrenadeLauncher(weapon) == null,
+                _ => GetSilencer(weapon) == null
+            };
+        }
+
         private void Report(InventoryResult result, ItemInstance silencer)
         {
             if (result.Success == false)
@@ -234,7 +318,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
             }
         }
 
-        private static ItemInstance Clone(ItemInstance item) => Restore(item.Definition, InventorySerializer.CaptureItem(item));
+        internal static ItemInstance Clone(ItemInstance item) => Restore(item.Definition, InventorySerializer.CaptureItem(item));
 
         private static ItemInstance Restore(ItemDefinition definition, InventoryItemData data)
         {

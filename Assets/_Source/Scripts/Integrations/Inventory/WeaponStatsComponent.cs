@@ -71,12 +71,13 @@ namespace RaidIntoDarkness.Integrations.Inventory
 
         public override float GetAdditionalWeight(ItemInstance item, IItemDefinitionResolver resolver)
         {
-            float silencerWeight = (GetSilencer(item, resolver)?.Weight ?? 0f) + (GetScope(item, resolver)?.Weight ?? 0f);
+            ItemDefinition launcher = GetGrenadeLauncher(item, resolver);
+            float attachmentWeight = (GetSilencer(item, resolver)?.Weight ?? 0f) + (GetScope(item, resolver)?.Weight ?? 0f) + (launcher?.Weight ?? 0f) + (launcher?.GetComponent<WeaponAddonComponent>()?.GetAdditionalWeight(item, resolver) ?? 0f);
             string section = item.GetState(InventoryWeaponAmmoSource.AMMO_SECTION_STATE);
 
             if (SupportsAmmo(section) == false || int.TryParse(item.GetState(InventoryWeaponAmmoSource.MAGAZINE_STATE), NumberStyles.Integer, CultureInfo.InvariantCulture, out int magazine) == false || resolver is not ItemDatabase database)
             {
-                return silencerWeight;
+                return attachmentWeight;
             }
 
             if (_ammoDatabase != database || _ammoDefinitions == null)
@@ -96,7 +97,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
                 }
             }
 
-            return silencerWeight + (_ammoDefinitions.TryGetValue(section, out ItemDefinition loaded) ? loaded.Weight * Math.Clamp(magazine, 0, MagazineSize) : 0f);
+            return attachmentWeight + (_ammoDefinitions.TryGetValue(section, out ItemDefinition loaded) ? loaded.Weight * Math.Clamp(magazine, 0, MagazineSize) : 0f);
         }
 
         public override Vector2Int GetSizeDelta(ItemInstance item, IItemDefinitionResolver resolver) => GetSilencer(item, resolver) != null ? Vector2Int.right : Vector2Int.zero;
@@ -137,6 +138,18 @@ namespace RaidIntoDarkness.Integrations.Inventory
         {
             string id = item?.GetState(InventoryWeaponAttachments.SCOPE_STATE);
             return resolver != null && string.IsNullOrEmpty(id) == false && resolver.TryResolve(id, out ItemDefinition definition) && SupportsScope(definition) ? definition : null;
+        }
+
+        public bool SupportsGrenadeLauncher(ItemDefinition definition)
+        {
+            WeaponAddonComponent addon = definition?.GetComponent<WeaponAddonComponent>();
+            return GrenadeLauncherStatus == WeaponAddonStatus.Attachable && addon != null && addon.Kind == WeaponAddonKind.GrenadeLauncher && GrenadeLauncherSection.Length > 0 && addon.Section == GrenadeLauncherSection;
+        }
+
+        public ItemDefinition GetGrenadeLauncher(ItemInstance item, IItemDefinitionResolver resolver)
+        {
+            string id = item?.GetState(InventoryWeaponAttachments.GRENADE_LAUNCHER_STATE);
+            return resolver != null && string.IsNullOrEmpty(id) == false && resolver.TryResolve(id, out ItemDefinition definition) && SupportsGrenadeLauncher(definition) ? definition : null;
         }
 
         public bool SupportsAmmo(string section)

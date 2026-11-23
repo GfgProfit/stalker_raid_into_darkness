@@ -9443,59 +9443,6 @@
       ]
     },
     {
-      "assetPath": "Assets/_Source/Resources/Items/Clothes/Backpacks/equ_small_pack/equ_small_pack_definition.asset",
-      "entries": [
-        {
-          "type": "Burn",
-          "weak": 0,
-          "average": 0,
-          "strong": 0
-        },
-        {
-          "type": "Shock",
-          "weak": 0,
-          "average": 0,
-          "strong": 0
-        },
-        {
-          "type": "ChemicalBurn",
-          "weak": 0,
-          "average": 0,
-          "strong": 0
-        },
-        {
-          "type": "Radiation",
-          "weak": 0,
-          "average": 0,
-          "strong": 0
-        },
-        {
-          "type": "Telepatic",
-          "weak": 0,
-          "average": 0,
-          "strong": 0
-        },
-        {
-          "type": "Strike",
-          "weak": 0,
-          "average": 0,
-          "strong": 0
-        },
-        {
-          "type": "Wound",
-          "weak": 0,
-          "average": 0,
-          "strong": 0
-        },
-        {
-          "type": "Explosion",
-          "weak": 0,
-          "average": 0,
-          "strong": 0
-        }
-      ]
-    },
-    {
       "assetPath": "Assets/_Source/Resources/Items/Clothes/Backpacks/equ_tourist_pack/equ_tourist_pack_definition.asset",
       "entries": [
         {

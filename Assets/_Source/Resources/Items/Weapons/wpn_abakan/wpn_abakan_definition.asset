@@ -87,16 +87,32 @@ MonoBehaviour:
         _silencerSection: 
         _scopeStatus: 2
         _scopes:
-        - 1p78gs
-        - okp
+        - 1p29
+        - 1p59
+        - pso1m21
         - ps01
+        - pka
+        - okp
+        - kobra
         - ekp8_02
+        - 1pn93n2_1gs
+        - 1pn93
+        - 1p78gs
+        - 1p76
         - 1p63
         _compatibleScopes:
-        - {fileID: 11400000, guid: 101eee143b83c0144a7a1d6a672fbc8a, type: 2}
-        - {fileID: 11400000, guid: 0b93f4aac0bbd7944b0047106f240e27, type: 2}
+        - {fileID: 11400000, guid: b2160470b0f80c6469c672ec17e100b5, type: 2}
+        - {fileID: 11400000, guid: bc51d0c36a074b842b48c995f834c171, type: 2}
+        - {fileID: 11400000, guid: 6e7cc0c05a37df24abfa823d367bb86f, type: 2}
         - {fileID: 11400000, guid: 141ad6a26409c1440ae80f784d023420, type: 2}
+        - {fileID: 11400000, guid: a81ed245a31667c438ad7bafda8e0e8e, type: 2}
+        - {fileID: 11400000, guid: 0b93f4aac0bbd7944b0047106f240e27, type: 2}
+        - {fileID: 11400000, guid: f4aeb693dd011044bb3f07fba5b1ace4, type: 2}
         - {fileID: 11400000, guid: 2183aad17ad3305499c981375cd92cb3, type: 2}
+        - {fileID: 11400000, guid: bb42dc9b48c7cee4e82a8b3b37f82fe9, type: 2}
+        - {fileID: 11400000, guid: a08c4da657995d74489000a84549d9b9, type: 2}
+        - {fileID: 11400000, guid: 101eee143b83c0144a7a1d6a672fbc8a, type: 2}
+        - {fileID: 11400000, guid: 94ac679431fcc2a48b2a24eeb4b81580, type: 2}
         - {fileID: 11400000, guid: e860adc23efd2e540911e3efa1c65bf2, type: 2}
         _grenadeLauncherStatus: 2
         _grenadeLauncherSection: wpn_addon_grenade_launcher
@@ -118,14 +134,30 @@ MonoBehaviour:
         - wpn_launcher
         _firstPersonWeapon: {fileID: 11400000, guid: 9700786e77a1bca4aa25574dcf5921bc, type: 2}
         _scopeAimOffsets:
-        - _scope: {fileID: 11400000, guid: 101eee143b83c0144a7a1d6a672fbc8a, type: 2}
-          _position: {x: -0.0026955, y: -0.0307945, z: -0.0290225}
-        - _scope: {fileID: 11400000, guid: 0b93f4aac0bbd7944b0047106f240e27, type: 2}
-          _position: {x: 0.0050933, y: -0.0150136, z: -0.048442}
+        - _scope: {fileID: 11400000, guid: b2160470b0f80c6469c672ec17e100b5, type: 2}
+          _position: {x: -0.004380519, y: -0.042160153, z: -0.019576618}
+        - _scope: {fileID: 11400000, guid: bc51d0c36a074b842b48c995f834c171, type: 2}
+          _position: {x: 0.013687221, y: -0.027091714, z: -0.04604549}
+        - _scope: {fileID: 11400000, guid: 6e7cc0c05a37df24abfa823d367bb86f, type: 2}
+          _position: {x: 0.011114912, y: -0.01864553, z: 0.0041958597}
         - _scope: {fileID: 11400000, guid: 141ad6a26409c1440ae80f784d023420, type: 2}
           _position: {x: 0.0110812, y: -0.0186131, z: 0.0112276}
+        - _scope: {fileID: 11400000, guid: a81ed245a31667c438ad7bafda8e0e8e, type: 2}
+          _position: {x: 0.0074646934, y: -0.020459944, z: -0.048441917}
+        - _scope: {fileID: 11400000, guid: 0b93f4aac0bbd7944b0047106f240e27, type: 2}
+          _position: {x: 0.0050933, y: -0.0150136, z: -0.048442}
+        - _scope: {fileID: 11400000, guid: f4aeb693dd011044bb3f07fba5b1ace4, type: 2}
+          _position: {x: -0.00007126713, y: -0.025790678, z: -0.048441947}
         - _scope: {fileID: 11400000, guid: 2183aad17ad3305499c981375cd92cb3, type: 2}
           _position: {x: 0.0000517, y: -0.0342691, z: -0.0484419}
+        - _scope: {fileID: 11400000, guid: bb42dc9b48c7cee4e82a8b3b37f82fe9, type: 2}
+          _position: {x: 0.013246877, y: -0.028153928, z: -0.027406642}
+        - _scope: {fileID: 11400000, guid: a08c4da657995d74489000a84549d9b9, type: 2}
+          _position: {x: 0.008525174, y: -0.043361686, z: -0.022178555}
+        - _scope: {fileID: 11400000, guid: 101eee143b83c0144a7a1d6a672fbc8a, type: 2}
+          _position: {x: -0.0026955, y: -0.0307945, z: -0.0290225}
+        - _scope: {fileID: 11400000, guid: 94ac679431fcc2a48b2a24eeb4b81580, type: 2}
+          _position: {x: 0.001783093, y: -0.026989209, z: -0.06592307}
         - _scope: {fileID: 11400000, guid: e860adc23efd2e540911e3efa1c65bf2, type: 2}
           _position: {x: 0.0001106, y: -0.0354925, z: -0.0484419}
     - rid: 115149063313949400

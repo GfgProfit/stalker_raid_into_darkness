@@ -150,6 +150,15 @@
                     "initialStateCheck": false
                 },
                 {
+                    "name": "KnifeWeapon",
+                    "type": "Button",
+                    "id": "c02ca24a-271d-4c4d-8d77-5066c94399bc",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
                     "name": "SecondaryWeapon",
                     "type": "Button",
                     "id": "1d4a6b0e-7c3a-4c55-8a14-5e1a8b3c2d14",
@@ -404,6 +413,17 @@
                     "processors": "",
                     "groups": "Keyboard&Mouse",
                     "action": "NextReticle",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "14971c4b-bfe6-4693-b144-481561d6424c",
+                    "path": "<Keyboard>/1",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "KnifeWeapon",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },

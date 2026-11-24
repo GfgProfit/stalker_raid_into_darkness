@@ -47,7 +47,7 @@ namespace RaidIntoDarkness.Weapons
 
         private void Refresh()
         {
-            bool visible = _controller.State != FirstPersonWeaponState.Hidden && _controller.ActiveWeapon != null;
+            bool visible = _controller.State != FirstPersonWeaponState.Hidden && _controller.ActiveWeapon is { IsMelee: false };
             GameObject root = _root != null ? _root : _text != null ? _text.gameObject : null;
             if (root != null && root != gameObject && root.activeSelf != visible)
             {

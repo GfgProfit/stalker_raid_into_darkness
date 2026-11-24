@@ -25,7 +25,8 @@ namespace RaidIntoDarkness.Weapons
     {
         public const int PRIMARY_SLOT = 0;
         public const int SECONDARY_SLOT = 1;
-        public const int SLOT_COUNT = 2;
+        public const int KNIFE_SLOT = 2;
+        public const int SLOT_COUNT = 3;
 
         private const float MAX_FRAME_DELTA = 0.1f;
         private const float REDRAW_DELAY = 0.5f;
@@ -39,7 +40,7 @@ namespace RaidIntoDarkness.Weapons
         [SerializeField] private AudioSource _shotAudio;
         [SerializeField] private string _itemAnchorBone = FirstPersonHudAnimator.ITEM_ANCHOR_BONE;
 
-        private readonly Slot[] _slots = { new Slot(), new Slot() };
+        private readonly Slot[] _slots = { new Slot(), new Slot(), new Slot() };
         private readonly Dictionary<object, WeaponState> _weaponStates = new Dictionary<object, WeaponState>();
         private readonly List<MonoBehaviour> _opticsBindings = new List<MonoBehaviour>();
         private readonly List<WeaponReticleCycle> _reticleBindings = new List<WeaponReticleCycle>();
@@ -457,7 +458,7 @@ namespace RaidIntoDarkness.Weapons
             else
             {
                 _burstLeft = 0;
-                SetAiming(DevelopmentAimOverride && State == FirstPersonWeaponState.Ready && !IsGrenadeMode);
+                SetAiming(DevelopmentAimOverride && State == FirstPersonWeaponState.Ready && !IsGrenadeMode && ActiveWeapon?.IsMelee != true);
             }
 
             TickState(deltaTime);
@@ -532,6 +533,10 @@ namespace RaidIntoDarkness.Weapons
             else if (_input.SecondaryWeaponPressed)
             {
                 Select(SECONDARY_SLOT);
+            }
+            else if (_input.KnifeWeaponPressed)
+            {
+                Select(KNIFE_SLOT);
             }
         }
 
@@ -618,6 +623,17 @@ namespace RaidIntoDarkness.Weapons
             FirstPersonWeaponAsset asset = ActiveWeapon;
             bool ready = State == FirstPersonWeaponState.Ready;
             bool sprinting = _player.State.IsSprinting;
+            if (asset.IsMelee)
+            {
+                SetAiming(false);
+                if (ready && !sprinting && Time.time >= _actionUntil && (_input.FirePressed || _input.AimPressed))
+                {
+                    PlayMeleeAttack(asset, _input.FirePressed ? FirstPersonWeaponMotionKind.MeleePrimary : FirstPersonWeaponMotionKind.MeleeSecondary);
+                }
+
+                return;
+            }
+
             SetAiming((_input.AimHeld || DevelopmentAimOverride) && ready && (DevelopmentAimOverride || !sprinting));
             if (!ready)
             {
@@ -705,6 +721,19 @@ namespace RaidIntoDarkness.Weapons
 
                 Shoot(asset);
             }
+        }
+
+        private void PlayMeleeAttack(FirstPersonWeaponAsset asset, FirstPersonWeaponMotionKind kind)
+        {
+            FirstPersonWeaponMotion motion = FindMotion(asset, kind);
+            if (motion == null)
+            {
+                return;
+            }
+
+            PlayMotion(motion, SHOT_FADE, false, true);
+            _hasLoop = false;
+            _actionUntil = Time.time + motion.Duration;
         }
 
         private void ShootGrenade(FirstPersonWeaponAsset asset)

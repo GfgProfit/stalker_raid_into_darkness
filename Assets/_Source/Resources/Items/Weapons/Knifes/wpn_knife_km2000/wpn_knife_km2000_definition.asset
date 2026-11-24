@@ -1,0 +1,109 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da0f90c2955673d46b25d465cbe44ed0, type: 3}
+  m_Name: wpn_knife_km2000_definition
+  m_EditorClassIdentifier: Inventory::Inventory.ItemDefinition
+  _definitionId: 9316eaeff48f8c640b50a91114cfd4a4
+  _displayName: "\u0411\u043E\u0435\u0432\u043E\u0439 \u043D\u043E\u0436 Eickhorn KM2000"
+  _shortName: KM2000
+  _description: "\u041D\u0435\u043C\u0435\u0446\u043A\u0438\u0439 \u043C\u043D\u043E\u0433\u043E\u0446\u0435\u043B\u0435\u0432\u043E\u0439 \u0431\u043E\u0435\u0432\u043E\u0439 \u043D\u043E\u0436 (Kampfmesser 2000), \u0440\u0430\u0437\u0440\u0430\u0431\u043E\u0442\u0430\u043D\u043D\u044B\u0439 \u043A\u043E\u043C\u043F\u0430\u043D\u0438\u0435\u0439 Eickhorn-Solingen \u0438 \u043F\u0440\u0438\u043D\u044F\u0442\u044B\u0439 \u043D\u0430 \u0432\u043E\u043E\u0440\u0443\u0436\u0435\u043D\u0438\u0435 \u0411\u0443\u043D\u0434\u0435\u0441\u0432\u0435\u0440\u0430 \u0432 2003 \u0433\u043E\u0434\u0443 \u0432 \u043A\u0430\u0447\u0435\u0441\u0442\u0432\u0435 \u0437\u0430\u043C\u0435\u043D\u044B \u0430\u0440\u043C\u0435\u0439\u0441\u043A\u043E\u0433\u043E \u043F\u043E\u043B\u0435\u0432\u043E\u0433\u043E \u043D\u043E\u0436\u0430 \u043E\u0431\u0440\u0430\u0437\u0446\u0430 1968 \u0433\u043E\u0434\u0430. \u041E\u0441\u043D\u0430\u0449\u0451\u043D \u0444\u0438\u043A\u0441\u0438\u0440\u043E\u0432\u0430\u043D\u043D\u044B\u043C \u043E\u0434\u043D\u043E\u043B\u0435\u0437\u0432\u0438\u0439\u043D\u044B\u043C \u043A\u043B\u0438\u043D\u043A\u043E\u043C \u043F\u0440\u043E\u0444\u0438\u043B\u044F American Tanto \u0441 \u0447\u0430\u0441\u0442\u0438\u0447\u043D\u043E\u0439 \u0441\u0435\u0440\u0440\u0435\u0439\u0442\u043E\u0440\u043D\u043E\u0439 \u0437\u0430\u0442\u043E\u0447\u043A\u043E\u0439 \u0432\u0431\u043B\u0438\u0437\u0438 \u0440\u0443\u043A\u043E\u044F\u0442\u0438, \u043F\u0440\u0435\u0434\u043D\u0430\u0437\u043D\u0430\u0447\u0435\u043D\u043D\u043E\u0439 \u0434\u043B\u044F \u0440\u0430\u0437\u0440\u0435\u0437\u0430\u043D\u0438\u044F \u043A\u0430\u043D\u0430\u0442\u043E\u0432, \u0440\u0435\u043C\u043D\u0435\u0439 \u0438 \u043F\u043B\u043E\u0442\u043D\u044B\u0445 \u0442\u043A\u0430\u043D\u0435\u0439. \u041A\u043B\u0438\u043D\u043E\u043A \u0440\u0430\u043D\u043D\u0438\u0445 \u043E\u0431\u0440\u0430\u0437\u0446\u043E\u0432 \u0438\u0437\u0433\u043E\u0442\u043E\u0432\u043B\u0435\u043D \u0438\u0437 \u043A\u043E\u0440\u0440\u043E\u0437\u0438\u043E\u043D\u043D\u043E\u0441\u0442\u043E\u0439\u043A\u043E\u0439 \u0441\u0442\u0430\u043B\u0438 X55CrMo14 (DIN 1.4110) \u0441 \u0447\u0451\u0440\u043D\u044B\u043C \u0430\u043D\u0442\u0438\u0431\u043B\u0438\u043A\u043E\u0432\u044B\u043C \u043F\u043E\u043A\u0440\u044B\u0442\u0438\u0435\u043C Kalgard. \u041E\u0431\u0449\u0430\u044F \u0434\u043B\u0438\u043D\u0430 \u043D\u043E\u0436\u0430 \u0441\u043E\u0441\u0442\u0430\u0432\u043B\u044F\u0435\u0442 \u043E\u043A\u043E\u043B\u043E 305 \u043C\u043C, \u0434\u043B\u0438\u043D\u0430 \u043A\u043B\u0438\u043D\u043A\u0430 \u2014 172 \u043C\u043C, \u0442\u043E\u043B\u0449\u0438\u043D\u0430 \u043E\u0431\u0443\u0445\u0430 \u2014 5 \u043C\u043C, \u043C\u0430\u0441\u0441\u0430 \u0431\u0435\u0437 \u043D\u043E\u0436\u0435\u043D \u2014 \u043F\u0440\u0438\u0431\u043B\u0438\u0437\u0438\u0442\u0435\u043B\u044C\u043D\u043E 320 \u0433. \u042D\u0440\u0433\u043E\u043D\u043E\u043C\u0438\u0447\u043D\u0430\u044F \u0440\u0443\u043A\u043E\u044F\u0442\u044C \u0438\u0437\u0433\u043E\u0442\u043E\u0432\u043B\u0435\u043D\u0430 \u0438\u0437 \u043F\u043E\u043B\u0438\u0430\u043C\u0438\u0434\u0430, \u0430\u0440\u043C\u0438\u0440\u043E\u0432\u0430\u043D\u043D\u043E\u0433\u043E \u0441\u0442\u0435\u043A\u043B\u043E\u0432\u043E\u043B\u043E\u043A\u043D\u043E\u043C, \u0438 \u043E\u0441\u043D\u0430\u0449\u0435\u043D\u0430 \u0437\u0430\u0449\u0438\u0442\u043D\u043E\u0439 \u0433\u0430\u0440\u0434\u043E\u0439, \u043E\u0442\u0432\u0435\u0440\u0441\u0442\u0438\u0435\u043C \u0434\u043B\u044F \u0442\u0435\u043C\u043B\u044F\u043A\u0430 \u0438 \u0441\u0442\u0435\u043A\u043B\u043E\u0431\u043E\u0435\u043C \u0432 \u043D\u0430\u0432\u0435\u0440\u0448\u0438\u0438. \u041A\u043E\u043C\u043F\u043B\u0435\u043A\u0442\u0443\u0435\u0442\u0441\u044F \u043F\u043E\u043B\u0438\u043C\u0435\u0440\u043D\u044B\u043C\u0438 \u043D\u043E\u0436\u043D\u0430\u043C\u0438 \u0441 \u0430\u043B\u043C\u0430\u0437\u043D\u044B\u043C \u0430\u0431\u0440\u0430\u0437\u0438\u0432\u043E\u043C \u0434\u043B\u044F \u043F\u0440\u0430\u0432\u043A\u0438 \u0440\u0435\u0436\u0443\u0449\u0435\u0439 \u043A\u0440\u043E\u043C\u043A\u0438 \u0438 \u0441\u0438\u0441\u0442\u0435\u043C\u043E\u0439 \u043A\u0440\u0435\u043F\u043B\u0435\u043D\u0438\u044F, \u0441\u043E\u0432\u043C\u0435\u0441\u0442\u0438\u043C\u043E\u0439 \u0441\u043E \u0441\u043D\u0430\u0440\u044F\u0436\u0435\u043D\u0438\u0435\u043C \u0441\u0442\u0430\u043D\u0434\u0430\u0440\u0442\u0430 MOLLE. \u041F\u0440\u0435\u0434\u043D\u0430\u0437\u043D\u0430\u0447\u0435\u043D \u0434\u043B\u044F \u0431\u043B\u0438\u0436\u043D\u0435\u0433\u043E \u0431\u043E\u044F, \u0432\u044B\u043F\u043E\u043B\u043D\u0435\u043D\u0438\u044F \u0445\u043E\u0437\u044F\u0439\u0441\u0442\u0432\u0435\u043D\u043D\u044B\u0445 \u0438 \u0432\u0441\u043F\u043E\u043C\u043E\u0433\u0430\u0442\u0435\u043B\u044C\u043D\u044B\u0445 \u0437\u0430\u0434\u0430\u0447 \u0432 \u043F\u043E\u043B\u0435\u0432\u044B\u0445 \u0443\u0441\u043B\u043E\u0432\u0438\u044F\u0445."
+  _category: Weapon
+  _tags:
+  - Knife
+  _size: {x: 2, y: 1}
+  _weight: 0.35
+  _maxStack: 1
+  _allowRotation: 1
+  _backgroundColor: {r: 1, g: 1, b: 1, a: 0.04}
+  _fallbackIcon: {fileID: 0}
+  _iconOverride: {fileID: 0}
+  _visualPrefab: {fileID: 6842020903880514565, guid: 33763143cf99bf04fbc517b342864d66, type: 3}
+  _defaultIconVariant: []
+  _icon:
+    _generateIcon: 1
+    _pixelsPerCell: 64
+    _antiAliasing: 1
+    _useOutline: 0
+    _outlineWidth: 2
+    _useShadow: 1
+    _shadowOffset: {x: 2, y: -2}
+    _shadowBlur: 2
+    _defaultView:
+      _modelEulerAngles: {x: 0, y: 0, z: 0}
+      _modelScale: {x: 1, y: 1, z: 1}
+      _cameraEulerAngles: {x: 0, y: -90, z: 0}
+      _padding: 1.15
+      _useDirectionalLight: 1
+      _lightIntensity: 5
+    _useCustomSlotView: 0
+    _slotView:
+      _modelEulerAngles: {x: 0, y: 0, z: 0}
+      _modelScale: {x: 1, y: 1, z: 1}
+      _cameraEulerAngles: {x: 0, y: -90, z: 0}
+      _padding: 1.15
+      _useDirectionalLight: 1
+      _lightIntensity: 5
+  _components:
+  - rid: 115149112346673311
+  - rid: 115149112346673312
+  - rid: 115149112346673313
+  - rid: 115149112346673314
+  references:
+    version: 2
+    RefIds:
+    - rid: 115149112346673311
+      type: {class: EquippableItemComponent, ns: Inventory, asm: Inventory}
+      data:
+        _preferredSlotIds:
+        - Knife
+    - rid: 115149112346673312
+      type: {class: WeaponStatsComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      data:
+        _section: wpn_knife_km2000
+        _weaponClass: knife
+        _cost: 10000
+        _repairType: 
+        _hitPower: 1.3
+        _hitImpulse: 0
+        _bulletSpeed: 0
+        _fireDistance: 0
+        _rpm: 0
+        _fireModes: 
+        _magazineSize: 0
+        _ammoClasses: []
+        _fireDispersionBase: 0
+        _camDispersion: 0
+        _camDispersionIncrement: 0
+        _conditionShotDecrement: 0
+        _misfireProbability: 0
+        _silencerStatus: 0
+        _silencerSection: 
+        _scopeStatus: 0
+        _scopes: []
+        _compatibleScopes: []
+        _grenadeLauncherStatus: 0
+        _grenadeLauncherSection: 
+        _blockSilencerWithGrenadeLauncher: 0
+    - rid: 115149112346673313
+      type: {class: WeaponHudComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      data:
+        _hudModel: {fileID: -8567561574010839822, guid: 6e28ca685e6d62a498c8dd7fa37a8d09, type: 3}
+        _weaponMotions: {fileID: 0}
+        _handsMotions: {fileID: 8815230551390286010, guid: 1eff26e33961bc449b0e8ffb3ae4bc3e, type: 3}
+        _handsMotionPrefix: knife_
+        _attachmentBones: []
+        _firstPersonWeapon: {fileID: 11400000, guid: 7211b76996b2a17418bbc237e82c99d6, type: 2}
+        _scopeAimOffsets: []
+    - rid: 115149112346673314
+      type: {class: WorldItemComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      data:
+        _prefab: {fileID: 5425683211952397703, guid: 33763143cf99bf04fbc517b342864d66, type: 3}

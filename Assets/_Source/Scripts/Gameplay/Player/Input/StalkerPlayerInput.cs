@@ -29,6 +29,7 @@ namespace RaidIntoDarkness.Player
         private InputAction _nextReticle;
         private InputAction _primaryWeapon;
         private InputAction _secondaryWeapon;
+        private InputAction _knifeWeapon;
         private InputAction _bolt;
 
         public Vector2 LookDelta => _look != null ? _look.ReadValue<Vector2>() : Vector2.zero;
@@ -48,6 +49,7 @@ namespace RaidIntoDarkness.Player
         public bool NextReticlePressed => WasPressed(_nextReticle);
         public bool PrimaryWeaponPressed => WasPressed(_primaryWeapon);
         public bool SecondaryWeaponPressed => WasPressed(_secondaryWeapon);
+        public bool KnifeWeaponPressed => WasPressed(_knifeWeapon);
         public bool BoltPressed => WasPressed(_bolt);
         public bool CrouchKeyPressed => WasPressed(_crouch) || WasPressed(_lowCrouch);
         public bool CrouchKeyReleased => WasReleased(_crouch) || WasReleased(_lowCrouch);
@@ -80,6 +82,7 @@ namespace RaidIntoDarkness.Player
             _nextReticle = player.FindAction("NextReticle", false);
             _primaryWeapon = player.FindAction("PrimaryWeapon", true);
             _secondaryWeapon = player.FindAction("SecondaryWeapon", true);
+            _knifeWeapon = player.FindAction("KnifeWeapon", false);
             _bolt = player.FindAction("Bolt", false);
 
             player.Enable();

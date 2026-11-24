@@ -37,7 +37,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
                 return;
             }
 
-            string slot = weapons.ActiveSlot == FirstPersonWeaponController.PRIMARY_SLOT ? FirstPersonWeaponBinder.PRIMARY_SLOT : FirstPersonWeaponBinder.SECONDARY_SLOT;
+            string slot = FirstPersonWeaponBinder.GetEquipmentSlotId(weapons.ActiveSlot);
             SlottedContainer equipment = inventory.Window.Model.GetContainer(inventory.Window.EquipmentContainerId) as SlottedContainer;
             ItemDefinition held = equipment?.GetSlotOccupant(slot)?.Definition;
             WeaponStatsComponent stats = held != null ? held.GetComponent<WeaponStatsComponent>() : null;

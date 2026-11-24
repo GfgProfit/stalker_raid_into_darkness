@@ -12,6 +12,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
     {
         public const string PRIMARY_SLOT = "Primary";
         public const string SECONDARY_SLOT = "Secondary";
+        public const string KNIFE_SLOT = "Knife";
 
         private readonly InventoryWindow _window;
         private readonly InventoryModel _model;
@@ -43,6 +44,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
             SlottedContainer equipment = _model != null ? _model.GetContainer(_window.EquipmentContainerId) as SlottedContainer : null;
             Bind(equipment, PRIMARY_SLOT, FirstPersonWeaponController.PRIMARY_SLOT);
             Bind(equipment, SECONDARY_SLOT, FirstPersonWeaponController.SECONDARY_SLOT);
+            Bind(equipment, KNIFE_SLOT, FirstPersonWeaponController.KNIFE_SLOT);
             ApplyActiveVisual();
         }
 
@@ -65,8 +67,18 @@ namespace RaidIntoDarkness.Integrations.Inventory
                 return false;
             }
 
-            string slot = _controller.ActiveSlot == FirstPersonWeaponController.PRIMARY_SLOT ? PRIMARY_SLOT : SECONDARY_SLOT;
-            return item.Location.SlotId == slot;
+            return item.Location.SlotId == GetEquipmentSlotId(_controller.ActiveSlot);
+        }
+
+        internal static string GetEquipmentSlotId(int slot)
+        {
+            return slot switch
+            {
+                FirstPersonWeaponController.PRIMARY_SLOT => PRIMARY_SLOT,
+                FirstPersonWeaponController.SECONDARY_SLOT => SECONDARY_SLOT,
+                FirstPersonWeaponController.KNIFE_SLOT => KNIFE_SLOT,
+                _ => string.Empty
+            };
         }
 
         private void Bind(SlottedContainer equipment, string slotId, int slot)
@@ -93,7 +105,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
                 return;
             }
 
-            string slotId = _controller.ActiveSlot == FirstPersonWeaponController.PRIMARY_SLOT ? PRIMARY_SLOT : SECONDARY_SLOT;
+            string slotId = GetEquipmentSlotId(_controller.ActiveSlot);
             ItemInstance item = equipment.GetSlotOccupant(slotId);
 
             if (item == null || model == _configuredModel && item.Definition == _configuredDefinition && HasConfiguredVariant(item.VisualVariant))
@@ -136,7 +148,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
 
         private void OnEquipmentChanged(ItemInstance item, SlottedContainer container, SlotDefinition slot)
         {
-            if (slot != null && (slot.Id == PRIMARY_SLOT || slot.Id == SECONDARY_SLOT))
+            if (slot != null && (slot.Id == PRIMARY_SLOT || slot.Id == SECONDARY_SLOT || slot.Id == KNIFE_SLOT))
             {
                 Refresh();
             }

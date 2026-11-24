@@ -26,7 +26,9 @@ namespace RaidIntoDarkness.Weapons
         IdleEmpty = 17,
         GrenadeModeEnter = 18,
         GrenadeModeExit = 19,
-        GrenadeReload = 20
+        GrenadeReload = 20,
+        MeleePrimary = 21,
+        MeleeSecondary = 22
     }
 
     [Serializable]

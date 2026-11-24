@@ -23,6 +23,7 @@ namespace RaidIntoDarkness.Weapons
 
         [Header("Model")]
         [SerializeField] private GameObject _hudModel;
+        [SerializeField] private bool _isMelee;
         [Tooltip("Hud section 'hands_position_16x9'.")]
         [SerializeField] private Vector3 _handsPosition;
         [Tooltip("Hud section 'hands_orientation_16x9': heading, pitch, bank in degrees.")]
@@ -85,6 +86,7 @@ namespace RaidIntoDarkness.Weapons
         [SerializeField] [Min(0)] private int _lowAmmoThreshold = 5;
 
         public GameObject HudModel => _hudModel;
+        public bool IsMelee => _isMelee;
         public Vector3 HandsPosition => _handsPosition;
         public Vector3 HandsOrientation => _handsOrientation;
         public Quaternion HandsRotation => Quaternion.Euler(_handsOrientation.y, _handsOrientation.x, _handsOrientation.z);

@@ -244,7 +244,7 @@ namespace RaidIntoDarkness.Weapons
 
         private bool HasWeaponSelection()
         {
-            return _weapons != null && ((_input.PrimaryWeaponPressed && _weapons.GetSlotWeapon(FirstPersonWeaponController.PRIMARY_SLOT) != null) || (_input.SecondaryWeaponPressed && _weapons.GetSlotWeapon(FirstPersonWeaponController.SECONDARY_SLOT) != null));
+            return _weapons != null && ((_input.PrimaryWeaponPressed && _weapons.GetSlotWeapon(FirstPersonWeaponController.PRIMARY_SLOT) != null) || (_input.SecondaryWeaponPressed && _weapons.GetSlotWeapon(FirstPersonWeaponController.SECONDARY_SLOT) != null) || (_input.KnifeWeaponPressed && _weapons.GetSlotWeapon(FirstPersonWeaponController.KNIFE_SLOT) != null));
         }
 
         private void TickIdle(float deltaTime)

@@ -36,6 +36,7 @@ namespace RaidIntoDarkness.Weapons
         public Ray Muzzle { get; }
         public Vector3 AimPoint { get; }
         public bool AimHasSurface { get; }
+        public bool IsHandThrow { get; }
         public IReadOnlyList<Vector3> Planned { get; }
         public IReadOnlyList<Vector3> Flown => _flown;
         public IReadOnlyList<GrenadeFragmentTrace> Fragments => _fragments;
@@ -51,16 +52,17 @@ namespace RaidIntoDarkness.Weapons
         public bool HasSurfaceNormal => SurfaceHit || Finished && BouncePoint.HasValue;
         public int DamagedEntities { get; private set; }
 
-        internal GrenadeShotDebug(string ammoName, GrenadeAmmoData ammo, Ray muzzle, Vector3 aimPoint, bool aimHasSurface, Vector3[] planned)
+        internal GrenadeShotDebug(string ammoName, GrenadeAmmoData ammo, Ray muzzle, Vector3 aimPoint, bool aimHasSurface, Vector3[] planned, bool isHandThrow = false)
         {
             AmmoName = ammoName;
             Ammo = ammo;
             Muzzle = muzzle;
             AimPoint = aimPoint;
             AimHasSurface = aimHasSurface;
+            IsHandThrow = isHandThrow;
             Planned = planned;
             Position = muzzle.origin;
-            ArmingPoint = ammo.ArmingDistance <= 0f ? muzzle.origin : null;
+            ArmingPoint = ammo.ArmingDistance <= 0f && ammo.ArmingSeconds <= 0f ? muzzle.origin : null;
             _flown.Add(muzzle.origin);
             Latest = this;
         }
@@ -72,9 +74,11 @@ namespace RaidIntoDarkness.Weapons
 
         internal void Advance(Vector3 from, Vector3 to, float elapsed, float travelled, float stepDistance, bool record)
         {
-            if (!ArmingPoint.HasValue && travelled >= Ammo.ArmingDistance && stepDistance > 0f)
+            if (!ArmingPoint.HasValue && travelled >= Ammo.ArmingDistance && elapsed >= Ammo.ArmingSeconds)
             {
-                ArmingPoint = Vector3.LerpUnclamped(from, to, 1f - (travelled - Ammo.ArmingDistance) / stepDistance);
+                float distanceFraction = stepDistance > 0f ? 1f - (travelled - Ammo.ArmingDistance) / stepDistance : 0f;
+                float timeFraction = elapsed > Elapsed ? (Ammo.ArmingSeconds - Elapsed) / (elapsed - Elapsed) : 0f;
+                ArmingPoint = Vector3.Lerp(from, to, Mathf.Max(distanceFraction, timeFraction));
             }
 
             Position = to;

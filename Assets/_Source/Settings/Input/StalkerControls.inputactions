@@ -150,6 +150,15 @@
                     "initialStateCheck": false
                 },
                 {
+                    "name": "HandGrenade",
+                    "type": "Button",
+                    "id": "9db06cab-cf97-4b8a-ba20-30921543801d",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
                     "name": "KnifeWeapon",
                     "type": "Button",
                     "id": "c02ca24a-271d-4c4d-8d77-5066c94399bc",
@@ -413,6 +422,17 @@
                     "processors": "",
                     "groups": "Keyboard&Mouse",
                     "action": "NextReticle",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "6e6b0d98-645f-412a-b084-4485a2c49c66",
+                    "path": "<Keyboard>/4",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "HandGrenade",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },

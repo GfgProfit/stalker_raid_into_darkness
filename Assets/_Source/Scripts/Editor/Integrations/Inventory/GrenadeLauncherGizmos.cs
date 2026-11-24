@@ -195,7 +195,11 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
                 GrenadeShotDebug shot = GrenadeShotDebug.Latest;
                 if (shot == null)
                 {
-                    if (controller.IsGrenadeMode && controller.Model != null && controller.Model.TryGetComponent(out FirstPersonWeaponView view) && view.GrenadeMuzzle != null)
+                    if (controller.TryGetHandGrenadeThrowRay(out Ray hand))
+                    {
+                        DrawGameMuzzle(hand);
+                    }
+                    else if (controller.IsGrenadeMode && controller.Model != null && controller.Model.TryGetComponent(out FirstPersonWeaponView view) && view.GrenadeMuzzle != null)
                     {
                         Transform muzzle = view.GrenadeMuzzle;
                         DrawGameMuzzle(new Ray(muzzle.position, muzzle.TransformVector(Vector3.forward).normalized));
@@ -355,7 +359,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
                 Rect line = new Rect(panel.x + 12f, panel.y + 7f, panel.width - 24f, 18f);
                 if (shot == null)
                 {
-                    GUI.Label(line, "Подствольник · ожидание выстрела", EditorStyles.boldLabel);
+                    GUI.Label(line, "Гранаты · ожидание выстрела или броска", EditorStyles.boldLabel);
                     return;
                 }
 
@@ -364,7 +368,8 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
                 line.y += 19f;
                 GUI.Label(line, $"Путь {shot.Travelled:F2} м  ·  {shot.Elapsed:F2} с  ·  Таймер {shot.Ammo.SelfDestructSeconds:F1} с", _caption);
                 line.y += 17f;
-                GUI.Label(line, $"Взведение {shot.Ammo.ArmingDistance:F1} м  ·  Радиус {shot.Ammo.BlastRadius:F1} м  ·  Целей {shot.DamagedEntities}", _caption);
+                string arming = shot.IsHandThrow ? $"{shot.Ammo.ArmingSeconds:F2} с" : $"{shot.Ammo.ArmingDistance:F1} м";
+                GUI.Label(line, $"Взведение {arming}  ·  Радиус {shot.Ammo.BlastRadius:F1} м  ·  Целей {shot.DamagedEntities}", _caption);
                 line.y += 17f;
                 GUI.Label(line, $"Взрыв до {shot.Ammo.BlastDamage:F0} HP  ·  Осколки {shot.Fragments.Count}/{shot.Ammo.FragmentCount} по {shot.Ammo.FragmentDamage:F0} HP", _caption);
                 line.y += 20f;
@@ -382,12 +387,17 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
         {
             if (!shot.Finished)
             {
-                return shot.BouncePoint.HasValue ? "Подскок" : "В полёте";
+                return shot.BouncePoint.HasValue ? shot.IsHandThrow ? "После отскока" : "Подскок" : "В полёте";
             }
 
             if (!shot.Detonated)
             {
                 return "Без взрыва";
+            }
+
+            if (shot.IsHandThrow)
+            {
+                return shot.Ammo.ExplodeOnImpact && shot.SurfaceHit ? "Взрыв при попадании" : "Взрыв по таймеру";
             }
 
             if (shot.SurfaceHit)

@@ -90,6 +90,11 @@ namespace RaidIntoDarkness.Integrations.Inventory
             return AnomalyEquipmentProtection.GetCondition(item);
         }
 
+        public static bool SupportsCondition(ItemDefinition definition)
+        {
+            return definition != null && !definition.IsCategory("Grenade") && (definition.GetComponent<EquipmentStatsComponent>() != null || definition.GetComponent<WeaponStatsComponent>() != null);
+        }
+
         public static string GetEquipmentCategory(ItemDefinition definition)
         {
             if (definition == null)

@@ -18,9 +18,11 @@ namespace RaidIntoDarkness.Integrations.Inventory
         private readonly InventoryModel _model;
         private readonly FirstPersonWeaponController _controller;
         private readonly List<string> _configuredVariant = new();
+        private readonly HashSet<ItemDefinition> _grenadeTypes = new();
 
         private GameObject _configuredModel;
         private ItemDefinition _configuredDefinition;
+        private ItemInstance _handGrenade;
 
         public FirstPersonWeaponBinder(InventoryWindow window, FirstPersonWeaponController controller, InventoryWeaponAmmoSource ammo)
         {
@@ -29,6 +31,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
             _model = window.Model;
             _controller.SetAmmoSource(ammo);
             _controller.VisualCreated += OnVisualCreated;
+            _controller.HandGrenadeSelectionRequested += SelectHandGrenade;
             _model.ItemEquipped += OnEquipmentChanged;
             _model.ItemUnequipped += OnEquipmentChanged;
             _model.Changed += OnItemChanged;
@@ -45,6 +48,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
             Bind(equipment, PRIMARY_SLOT, FirstPersonWeaponController.PRIMARY_SLOT);
             Bind(equipment, SECONDARY_SLOT, FirstPersonWeaponController.SECONDARY_SLOT);
             Bind(equipment, KNIFE_SLOT, FirstPersonWeaponController.KNIFE_SLOT);
+            RefreshHandGrenade();
             ApplyActiveVisual();
         }
 
@@ -56,6 +60,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
             if (_controller != null)
             {
                 _controller.VisualCreated -= OnVisualCreated;
+                _controller.HandGrenadeSelectionRequested -= SelectHandGrenade;
                 _controller.SetAmmoSource(null);
             }
         }
@@ -97,6 +102,75 @@ namespace RaidIntoDarkness.Integrations.Inventory
 
         private void OnVisualCreated(GameObject visual) => ApplyActiveVisual();
 
+        private void RefreshHandGrenade()
+        {
+            if (_handGrenade == null || _handGrenade.ContainerId != _window.PrimaryContainerId || _model.GetItem(_handGrenade.InstanceId) != _handGrenade)
+            {
+                SetHandGrenade(FindHandGrenade(_handGrenade?.Definition, false));
+            }
+        }
+
+        private void SelectHandGrenade()
+        {
+            RefreshHandGrenade();
+            if (_controller.ActiveSlot != FirstPersonWeaponController.HAND_GRENADE_SELECTION)
+            {
+                _controller.Select(FirstPersonWeaponController.HAND_GRENADE_SELECTION);
+                return;
+            }
+
+            if (_controller.State is FirstPersonWeaponState.Ready or FirstPersonWeaponState.Drawing or FirstPersonWeaponState.Holstering)
+            {
+                ItemInstance next = FindHandGrenade(_handGrenade?.Definition, true);
+                if (next != null && next.Definition != _handGrenade?.Definition)
+                {
+                    SetHandGrenade(next);
+                }
+            }
+        }
+
+        private void SetHandGrenade(ItemInstance item)
+        {
+            _handGrenade = item;
+            FirstPersonWeaponAsset weapon = item?.Definition.GetComponent<WeaponHudComponent>()?.FirstPersonWeapon;
+            _controller.SetSlotWeapon(FirstPersonWeaponController.HAND_GRENADE_SELECTION, weapon, item?.InstanceId);
+        }
+
+        private ItemInstance FindHandGrenade(ItemDefinition selected, bool cycle)
+        {
+            InventoryContainer backpack = _model.GetContainer(_window.PrimaryContainerId);
+            _grenadeTypes.Clear();
+            ItemInstance first = null;
+            bool found = selected == null;
+            if (backpack != null)
+            {
+                foreach (ItemInstance item in backpack.Items)
+                {
+                    if (!item.Definition.IsCategory("Grenade") || item.Definition.GetComponent<WeaponHudComponent>()?.FirstPersonWeapon?.IsHandGrenade != true || !_grenadeTypes.Add(item.Definition))
+                    {
+                        continue;
+                    }
+
+                    first ??= item;
+                    if (item.Definition == selected)
+                    {
+                        if (!cycle)
+                        {
+                            return item;
+                        }
+
+                        found = true;
+                    }
+                    else if (cycle && found)
+                    {
+                        return item;
+                    }
+                }
+            }
+
+            return first;
+        }
+
         private void ApplyActiveVisual()
         {
             GameObject model = _controller.Model;
@@ -106,7 +180,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
             }
 
             string slotId = GetEquipmentSlotId(_controller.ActiveSlot);
-            ItemInstance item = equipment.GetSlotOccupant(slotId);
+            ItemInstance item = _controller.ActiveSlot == FirstPersonWeaponController.HAND_GRENADE_SELECTION ? _handGrenade : equipment.GetSlotOccupant(slotId);
 
             if (item == null || model == _configuredModel && item.Definition == _configuredDefinition && HasConfiguredVariant(item.VisualVariant))
             {
@@ -140,6 +214,11 @@ namespace RaidIntoDarkness.Integrations.Inventory
 
         private void OnItemChanged(InventoryChange change)
         {
+            if (_controller != null && (change.Affects(_window.PrimaryContainerId) || change.Kind == InventoryChangeKind.Cleared))
+            {
+                RefreshHandGrenade();
+            }
+
             if (change.Kind == InventoryChangeKind.ItemStateChanged && change.ContainerId == _window.EquipmentContainerId)
             {
                 Refresh();

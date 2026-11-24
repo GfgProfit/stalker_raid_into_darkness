@@ -586,7 +586,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
 
         private static float? GetItemCondition(ItemInstance item)
         {
-            return item != null && (item.Definition.GetComponent<EquipmentStatsComponent>() != null || item.Definition.GetComponent<WeaponStatsComponent>() != null) ? EquipmentStatsFormatter.GetCondition(item) : null;
+            return EquipmentStatsFormatter.SupportsCondition(item?.Definition) ? EquipmentStatsFormatter.GetCondition(item) : null;
         }
 
         private InventoryItemDecoration DecorateItem(ItemInstance item)

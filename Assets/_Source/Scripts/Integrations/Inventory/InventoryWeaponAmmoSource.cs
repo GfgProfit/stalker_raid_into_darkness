@@ -298,6 +298,36 @@ namespace RaidIntoDarkness.Integrations.Inventory
             return int.TryParse(weapon.GetState(MAGAZINE_STATE), NumberStyles.Integer, CultureInfo.InvariantCulture, out int magazine) ? Math.Clamp(magazine, 0, stats.MagazineSize) : 0;
         }
 
+        public void GetHandGrenadeStock(object weaponKey, out int count, out string name)
+        {
+            count = 0;
+            name = string.Empty;
+            ItemInstance selected = GetWeapon(weaponKey);
+            InventoryContainer backpack = _model.GetContainer(_containerId);
+            if (selected == null || selected.ContainerId != _containerId || backpack == null)
+            {
+                return;
+            }
+
+            long total = 0;
+            foreach (ItemInstance item in backpack.Items)
+            {
+                if (item.Definition == selected.Definition)
+                {
+                    total += item.Amount;
+                }
+            }
+
+            count = (int)Math.Min(total, int.MaxValue);
+            name = selected.Definition.ShortName;
+        }
+
+        public bool TryConsumeHandGrenade(object weaponKey)
+        {
+            ItemInstance item = GetWeapon(weaponKey);
+            return item != null && item.ContainerId == _containerId && item.Definition.IsCategory("Grenade") && _model.TryRemove(item.InstanceId, 1).Success;
+        }
+
         private ItemInstance GetWeapon(object weaponKey) => _model.GetItem(weaponKey as string);
 
         private WeaponAddonComponent GetGrenadeLauncher(ItemInstance weapon) => weapon?.Definition.GetComponent<WeaponStatsComponent>()?.GetGrenadeLauncher(weapon, _model.Resolver)?.GetComponent<WeaponAddonComponent>();

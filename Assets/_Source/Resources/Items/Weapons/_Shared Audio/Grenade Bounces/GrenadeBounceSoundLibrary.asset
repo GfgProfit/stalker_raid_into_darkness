@@ -1,0 +1,193 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b5046bbd246df943b778a5cacf8a9c6a, type: 3}
+  m_Name: GrenadeBounceSoundLibrary
+  m_EditorClassIdentifier: RaidIntoDarkness.Player::RaidIntoDarkness.Player.StalkerCollideSoundLibrary
+  _velocityCriterion: 10
+  _minVolume: 0.1
+  _maxVolume: 200
+  _maxDistance: 70
+  _entries:
+  - _objectMaterial: objects\grenade
+    _surface: 0
+    _origin: "GRA: [\u0417\u0432\u0443\u043A] Grenade_collision_sounds / material_pairs_grenade.ltx"
+    _clips:
+    - {fileID: 8300000, guid: 8712649ffcb8d514fb1cb7c33b6e612b, type: 3}
+    - {fileID: 8300000, guid: 3583799bbe9eb9843a66e2abb7f6f308, type: 3}
+    - {fileID: 8300000, guid: 262a35f2944940d4db2641c758743dc5, type: 3}
+  - _objectMaterial: objects\grenade
+    _surface: 6
+    _origin: "GRA: [\u0417\u0432\u0443\u043A] Grenade_collision_sounds / material_pairs_grenade.ltx"
+    _clips:
+    - {fileID: 8300000, guid: a921ee0fab62d464fb4e2945c97441b5, type: 3}
+    - {fileID: 8300000, guid: ca7e3fe83eeec2448ac8d56f79f13e00, type: 3}
+    - {fileID: 8300000, guid: a493cfbf0a6f44f449d3db08b75da2f3, type: 3}
+  - _objectMaterial: objects\grenade
+    _surface: 8
+    _origin: "GRA: [\u0417\u0432\u0443\u043A] Grenade_collision_sounds / material_pairs_grenade.ltx"
+    _clips:
+    - {fileID: 8300000, guid: a921ee0fab62d464fb4e2945c97441b5, type: 3}
+    - {fileID: 8300000, guid: ca7e3fe83eeec2448ac8d56f79f13e00, type: 3}
+    - {fileID: 8300000, guid: a493cfbf0a6f44f449d3db08b75da2f3, type: 3}
+  - _objectMaterial: objects\grenade
+    _surface: 19
+    _origin: "GRA: [\u0417\u0432\u0443\u043A] Grenade_collision_sounds / material_pairs_grenade.ltx"
+    _clips:
+    - {fileID: 8300000, guid: 3aebfa8082c204d458cf45b2b1575208, type: 3}
+    - {fileID: 8300000, guid: 413113388f70997498bc357da105c0ec, type: 3}
+  - _objectMaterial: objects\grenade
+    _surface: 24
+    _origin: "GRA: [\u0417\u0432\u0443\u043A] Grenade_collision_sounds / material_pairs_grenade.ltx"
+    _clips:
+    - {fileID: 8300000, guid: 3aebfa8082c204d458cf45b2b1575208, type: 3}
+    - {fileID: 8300000, guid: 413113388f70997498bc357da105c0ec, type: 3}
+  - _objectMaterial: objects\grenade
+    _surface: 5
+    _origin: "GRA: [\u0417\u0432\u0443\u043A] Grenade_collision_sounds / material_pairs_grenade.ltx"
+    _clips:
+    - {fileID: 8300000, guid: 8712649ffcb8d514fb1cb7c33b6e612b, type: 3}
+    - {fileID: 8300000, guid: 3583799bbe9eb9843a66e2abb7f6f308, type: 3}
+    - {fileID: 8300000, guid: 262a35f2944940d4db2641c758743dc5, type: 3}
+  - _objectMaterial: objects\grenade
+    _surface: 20
+    _origin: "GRA: [\u0417\u0432\u0443\u043A] Grenade_collision_sounds / material_pairs_grenade.ltx"
+    _clips:
+    - {fileID: 8300000, guid: 8712649ffcb8d514fb1cb7c33b6e612b, type: 3}
+    - {fileID: 8300000, guid: 3583799bbe9eb9843a66e2abb7f6f308, type: 3}
+    - {fileID: 8300000, guid: 262a35f2944940d4db2641c758743dc5, type: 3}
+  - _objectMaterial: objects\grenade
+    _surface: 7
+    _origin: "GRA: [\u0417\u0432\u0443\u043A] Grenade_collision_sounds / material_pairs_grenade.ltx"
+    _clips:
+    - {fileID: 8300000, guid: a921ee0fab62d464fb4e2945c97441b5, type: 3}
+    - {fileID: 8300000, guid: ca7e3fe83eeec2448ac8d56f79f13e00, type: 3}
+    - {fileID: 8300000, guid: a493cfbf0a6f44f449d3db08b75da2f3, type: 3}
+  - _objectMaterial: objects\grenade
+    _surface: 1
+    _origin: "GRA: [\u0417\u0432\u0443\u043A] Grenade_collision_sounds / material_pairs_grenade.ltx"
+    _clips:
+    - {fileID: 8300000, guid: 8712649ffcb8d514fb1cb7c33b6e612b, type: 3}
+    - {fileID: 8300000, guid: 3583799bbe9eb9843a66e2abb7f6f308, type: 3}
+    - {fileID: 8300000, guid: 262a35f2944940d4db2641c758743dc5, type: 3}
+  - _objectMaterial: objects\grenade
+    _surface: 10
+    _origin: "GRA: [\u0417\u0432\u0443\u043A] Grenade_collision_sounds / material_pairs_grenade.ltx"
+    _clips:
+    - {fileID: 8300000, guid: a921ee0fab62d464fb4e2945c97441b5, type: 3}
+    - {fileID: 8300000, guid: ca7e3fe83eeec2448ac8d56f79f13e00, type: 3}
+    - {fileID: 8300000, guid: a493cfbf0a6f44f449d3db08b75da2f3, type: 3}
+  - _objectMaterial: objects\grenade
+    _surface: 22
+    _origin: "GRA: [\u0417\u0432\u0443\u043A] Grenade_collision_sounds / material_pairs_grenade.ltx"
+    _clips:
+    - {fileID: 8300000, guid: e43eb786005f1424590c7bc70605801b, type: 3}
+    - {fileID: 8300000, guid: 1c1edd5e3f84a2f4c8ff203c09a64455, type: 3}
+    - {fileID: 8300000, guid: 7b3476ba5c6c98143ae223499c56bca7, type: 3}
+  - _objectMaterial: objects\grenade
+    _surface: 2
+    _origin: "GRA: [\u0417\u0432\u0443\u043A] Grenade_collision_sounds / material_pairs_grenade.ltx"
+    _clips:
+    - {fileID: 8300000, guid: 7a2270e54ee984d428da3aa15adf0948, type: 3}
+    - {fileID: 8300000, guid: 8b6d4b3f3bbb88f4f8f27d7c2c177a66, type: 3}
+    - {fileID: 8300000, guid: 26f1bf07543032c4786d60ea302304d3, type: 3}
+  - _objectMaterial: objects\grenade
+    _surface: 3
+    _origin: "GRA: [\u0417\u0432\u0443\u043A] Grenade_collision_sounds / material_pairs_grenade.ltx"
+    _clips:
+    - {fileID: 8300000, guid: 85795806fa859b54f805d1139d049530, type: 3}
+    - {fileID: 8300000, guid: 8bfeafe459f8012468837ba24bdf2ec3, type: 3}
+    - {fileID: 8300000, guid: f1bff69f78f67e7448ce162e717980b8, type: 3}
+  - _objectMaterial: objects\grenade
+    _surface: 11
+    _origin: "GRA: [\u0417\u0432\u0443\u043A] Grenade_collision_sounds / material_pairs_grenade.ltx"
+    _clips:
+    - {fileID: 8300000, guid: 4562d81ef636a5f40b843f5ffc55c182, type: 3}
+    - {fileID: 8300000, guid: 286243bdc1ab89149adde3fc8ec394f8, type: 3}
+    - {fileID: 8300000, guid: 3abe37ba0ca49ff40bbd935d57e7233b, type: 3}
+  - _objectMaterial: objects\grenade
+    _surface: 12
+    _origin: "GRA: [\u0417\u0432\u0443\u043A] Grenade_collision_sounds / material_pairs_grenade.ltx"
+    _clips:
+    - {fileID: 8300000, guid: 4562d81ef636a5f40b843f5ffc55c182, type: 3}
+    - {fileID: 8300000, guid: 286243bdc1ab89149adde3fc8ec394f8, type: 3}
+    - {fileID: 8300000, guid: 3abe37ba0ca49ff40bbd935d57e7233b, type: 3}
+  - _objectMaterial: objects\grenade
+    _surface: 13
+    _origin: "GRA: [\u0417\u0432\u0443\u043A] Grenade_collision_sounds / material_pairs_grenade.ltx"
+    _clips:
+    - {fileID: 8300000, guid: 4562d81ef636a5f40b843f5ffc55c182, type: 3}
+    - {fileID: 8300000, guid: 286243bdc1ab89149adde3fc8ec394f8, type: 3}
+    - {fileID: 8300000, guid: 3abe37ba0ca49ff40bbd935d57e7233b, type: 3}
+  - _objectMaterial: objects\grenade
+    _surface: 4
+    _origin: "GRA: [\u0417\u0432\u0443\u043A] Grenade_collision_sounds / material_pairs_grenade.ltx"
+    _clips:
+    - {fileID: 8300000, guid: 85795806fa859b54f805d1139d049530, type: 3}
+    - {fileID: 8300000, guid: 8bfeafe459f8012468837ba24bdf2ec3, type: 3}
+    - {fileID: 8300000, guid: f1bff69f78f67e7448ce162e717980b8, type: 3}
+  - _objectMaterial: objects\grenade
+    _surface: 21
+    _origin: "GRA: [\u0417\u0432\u0443\u043A] Grenade_collision_sounds / material_pairs_grenade.ltx"
+    _clips:
+    - {fileID: 8300000, guid: 963a304840e00124ebbecec391874f3a, type: 3}
+    - {fileID: 8300000, guid: 534f5c76c43b9794ab751eda693c4d76, type: 3}
+    - {fileID: 8300000, guid: a650bcba113b0b2409309014cb5bddc6, type: 3}
+  - _objectMaterial: objects\grenade
+    _surface: 15
+    _origin: "GRA: [\u0417\u0432\u0443\u043A] Grenade_collision_sounds / material_pairs_grenade.ltx"
+    _clips:
+    - {fileID: 8300000, guid: a921ee0fab62d464fb4e2945c97441b5, type: 3}
+    - {fileID: 8300000, guid: ca7e3fe83eeec2448ac8d56f79f13e00, type: 3}
+    - {fileID: 8300000, guid: a493cfbf0a6f44f449d3db08b75da2f3, type: 3}
+  - _objectMaterial: objects\grenade
+    _surface: 9
+    _origin: "GRA: [\u0417\u0432\u0443\u043A] Grenade_collision_sounds / material_pairs_grenade.ltx"
+    _clips:
+    - {fileID: 8300000, guid: a921ee0fab62d464fb4e2945c97441b5, type: 3}
+    - {fileID: 8300000, guid: ca7e3fe83eeec2448ac8d56f79f13e00, type: 3}
+    - {fileID: 8300000, guid: a493cfbf0a6f44f449d3db08b75da2f3, type: 3}
+  - _objectMaterial: objects\grenade
+    _surface: 14
+    _origin: "GRA: [\u0417\u0432\u0443\u043A] Grenade_collision_sounds / material_pairs_grenade.ltx"
+    _clips:
+    - {fileID: 8300000, guid: 4562d81ef636a5f40b843f5ffc55c182, type: 3}
+    - {fileID: 8300000, guid: 286243bdc1ab89149adde3fc8ec394f8, type: 3}
+    - {fileID: 8300000, guid: 3abe37ba0ca49ff40bbd935d57e7233b, type: 3}
+  - _objectMaterial: objects\grenade
+    _surface: 18
+    _origin: "GRA: [\u0417\u0432\u0443\u043A] Grenade_collision_sounds / material_pairs_grenade.ltx"
+    _clips:
+    - {fileID: 8300000, guid: 6b090da62adb0404da5261f22e80a6df, type: 3}
+    - {fileID: 8300000, guid: 56bbcf92d109036488174348fb84d0fb, type: 3}
+    - {fileID: 8300000, guid: 86eddf286b8e0624eacec96eea0ee280, type: 3}
+  - _objectMaterial: objects\grenade
+    _surface: 23
+    _origin: "GRA: [\u0417\u0432\u0443\u043A] Grenade_collision_sounds / material_pairs_grenade.ltx"
+    _clips:
+    - {fileID: 8300000, guid: a1d9866950516fd40b55410ad78219c7, type: 3}
+    - {fileID: 8300000, guid: 6c3efcbd00c02e34ab9d469bfff60d0a, type: 3}
+    - {fileID: 8300000, guid: 46eb1bb11acbfb2408c0220e5d59b3d2, type: 3}
+  - _objectMaterial: objects\grenade
+    _surface: 16
+    _origin: "GRA: [\u0417\u0432\u0443\u043A] Grenade_collision_sounds / material_pairs_grenade.ltx"
+    _clips:
+    - {fileID: 8300000, guid: 6b090da62adb0404da5261f22e80a6df, type: 3}
+    - {fileID: 8300000, guid: 56bbcf92d109036488174348fb84d0fb, type: 3}
+    - {fileID: 8300000, guid: 86eddf286b8e0624eacec96eea0ee280, type: 3}
+  - _objectMaterial: objects\grenade
+    _surface: 17
+    _origin: "GRA: [\u0417\u0432\u0443\u043A] Grenade_collision_sounds / material_pairs_grenade.ltx"
+    _clips:
+    - {fileID: 8300000, guid: 6b090da62adb0404da5261f22e80a6df, type: 3}
+    - {fileID: 8300000, guid: 56bbcf92d109036488174348fb84d0fb, type: 3}
+    - {fileID: 8300000, guid: 86eddf286b8e0624eacec96eea0ee280, type: 3}
+  _sourceReport: "GRA MO2 winner: [\u0417\u0432\u0443\u043A] Grenade_collision_sounds / material_pairs_grenade.ltx"

@@ -29,7 +29,10 @@ namespace RaidIntoDarkness.Weapons
         GrenadeModeExit = 19,
         GrenadeReload = 20,
         MeleePrimary = 21,
-        MeleeSecondary = 22
+        MeleeSecondary = 22,
+        HandGrenadePrepare = 23,
+        HandGrenadeHold = 24,
+        HandGrenadeThrow = 25
     }
 
     [Serializable]

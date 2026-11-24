@@ -17,7 +17,10 @@ namespace RaidIntoDarkness.Weapons
         SwitchingMode = 4,
         Holstering = 5,
         SwitchingGrenadeMode = 6,
-        LoadingGrenade = 7
+        LoadingGrenade = 7,
+        PreparingHandGrenade = 8,
+        HoldingHandGrenade = 9,
+        ThrowingHandGrenade = 10
     }
 
     [DisallowMultipleComponent]
@@ -26,7 +29,8 @@ namespace RaidIntoDarkness.Weapons
         public const int PRIMARY_SLOT = 0;
         public const int SECONDARY_SLOT = 1;
         public const int KNIFE_SLOT = 2;
-        public const int SLOT_COUNT = 3;
+        public const int HAND_GRENADE_SELECTION = 3;
+        public const int SLOT_COUNT = 4;
 
         private const float MAX_FRAME_DELTA = 0.1f;
         private const float REDRAW_DELAY = 0.5f;
@@ -41,7 +45,7 @@ namespace RaidIntoDarkness.Weapons
         [SerializeField] private AudioSource _shotAudio;
         [SerializeField] private string _itemAnchorBone = FirstPersonHudAnimator.ITEM_ANCHOR_BONE;
 
-        private readonly Slot[] _slots = { new Slot(), new Slot(), new Slot() };
+        private readonly Slot[] _slots = { new Slot(), new Slot(), new Slot(), new Slot() };
         private readonly Dictionary<object, WeaponState> _weaponStates = new Dictionary<object, WeaponState>();
         private readonly List<MonoBehaviour> _opticsBindings = new List<MonoBehaviour>();
         private readonly List<WeaponReticleCycle> _reticleBindings = new List<WeaponReticleCycle>();
@@ -51,6 +55,13 @@ namespace RaidIntoDarkness.Weapons
         private FirstPersonWeaponMotion _activeMeleeAttack;
         private RaycastHit[] _meleeHits;
         private bool _meleeContactPending;
+        private bool _handGrenadeReleaseRequested;
+        private bool _handGrenadeReleased;
+        private bool _handGrenadeVisible;
+        private (FirstPersonWeaponAsset Asset, object Key)? _handGrenadeAfterThrow;
+        private Transform _handGrenadeAnchor;
+        private Transform _handGrenadeThrowHand;
+        private Renderer[] _handGrenadeRenderers;
         private WeaponWorldCrosshair _worldCrosshair;
         private FirstPersonRig _subscribedRig;
         private GameObject _boundHands;
@@ -89,6 +100,7 @@ namespace RaidIntoDarkness.Weapons
         public event Action<int, int> AmmoChanged;
         public event Action<FirstPersonWeaponState> StateChanged;
         public event Action<GameObject> VisualCreated;
+        public event Action HandGrenadeSelectionRequested;
 
         public FirstPersonWeaponState State { get; private set; }
         public int ActiveSlot { get; private set; } = -1;
@@ -119,6 +131,13 @@ namespace RaidIntoDarkness.Weapons
 
         public void GetHudAmmo(out int loaded, out int reserve, out string name)
         {
+            if (ActiveWeapon?.IsHandGrenade == true && _ammoSource != null)
+            {
+                _ammoSource.GetHandGrenadeStock(_slots[ActiveSlot].Key, out loaded, out name);
+                reserve = 0;
+                return;
+            }
+
             if (IsGrenadeMode && _ammoSource != null)
             {
                 _ammoSource.GetGrenadeAmmo(_slots[ActiveSlot].Key, out loaded, out reserve, out name);
@@ -237,6 +256,12 @@ namespace RaidIntoDarkness.Weapons
 
             Slot target = _slots[slot];
             object ammoKey = key ?? asset;
+            if (slot == HAND_GRENADE_SELECTION && ActiveSlot == slot && State == FirstPersonWeaponState.ThrowingHandGrenade && _handGrenadeReleased)
+            {
+                _handGrenadeAfterThrow = (asset, ammoKey);
+                return;
+            }
+
             if (target.Asset == asset && Equals(target.Key, ammoKey))
             {
                 return;
@@ -304,6 +329,11 @@ namespace RaidIntoDarkness.Weapons
             }
 
             StopGrenadeActionSound();
+            if (State == FirstPersonWeaponState.ThrowingHandGrenade)
+            {
+                RestoreHandGrenadeModelAnchor();
+            }
+
             SetAiming(false);
             _burstLeft = 0;
             FirstPersonWeaponMotion motion = ActiveWeapon != null ? FindMotion(ActiveWeapon, FirstPersonWeaponMotionKind.Holster) : null;
@@ -336,6 +366,12 @@ namespace RaidIntoDarkness.Weapons
             }
 
             ActiveSlot = -1;
+            if (_handGrenadeAfterThrow is { } next)
+            {
+                _handGrenadeAfterThrow = null;
+                SetSlotWeapon(HAND_GRENADE_SELECTION, next.Asset, next.Key);
+            }
+
             SetState(FirstPersonWeaponState.Hidden, 0.0f);
             NotifyAmmo();
         }
@@ -450,6 +486,10 @@ namespace RaidIntoDarkness.Weapons
             if (rig.Hands != _boundHands)
             {
                 RebuildVisuals();
+                if (State == FirstPersonWeaponState.Hidden)
+                {
+                    return;
+                }
             }
 
             StalkerCameraController camera = _player.CameraController;
@@ -462,7 +502,7 @@ namespace RaidIntoDarkness.Weapons
             else
             {
                 _burstLeft = 0;
-                SetAiming(DevelopmentAimOverride && State == FirstPersonWeaponState.Ready && !IsGrenadeMode && ActiveWeapon?.IsMelee != true);
+                SetAiming(DevelopmentAimOverride && State == FirstPersonWeaponState.Ready && !IsGrenadeMode && ActiveWeapon is { IsMelee: false, IsHandGrenade: false });
             }
 
             TickState(deltaTime);
@@ -481,6 +521,7 @@ namespace RaidIntoDarkness.Weapons
             TickMeleeAttack();
             ResetModelRoot();
             ApplyHandsOffset();
+            TickHandGrenade();
             UpdateFlame();
             if (fireGrenade)
             {
@@ -542,6 +583,10 @@ namespace RaidIntoDarkness.Weapons
             else if (_input.KnifeWeaponPressed)
             {
                 Select(KNIFE_SLOT);
+            }
+            else if (_input.HandGrenadePressed)
+            {
+                HandGrenadeSelectionRequested?.Invoke();
             }
         }
 
@@ -628,6 +673,24 @@ namespace RaidIntoDarkness.Weapons
             FirstPersonWeaponAsset asset = ActiveWeapon;
             bool ready = State == FirstPersonWeaponState.Ready;
             bool sprinting = _player.State.IsSprinting;
+            if (asset.IsHandGrenade)
+            {
+                SetAiming(false);
+                if (ready && !sprinting && _input.FirePressed)
+                {
+                    _handGrenadeReleaseRequested = false;
+                    _handGrenadeReleased = false;
+                    PlayHandGrenadeMotion(asset, FirstPersonWeaponMotionKind.HandGrenadePrepare, FirstPersonWeaponState.PreparingHandGrenade, false);
+                }
+
+                if (State is (FirstPersonWeaponState.PreparingHandGrenade or FirstPersonWeaponState.HoldingHandGrenade) && !_input.FireHeld)
+                {
+                    _handGrenadeReleaseRequested = true;
+                }
+
+                return;
+            }
+
             if (asset.IsMelee)
             {
                 SetAiming(false);
@@ -725,6 +788,167 @@ namespace RaidIntoDarkness.Weapons
                 }
 
                 Shoot(asset);
+            }
+        }
+
+        public bool TryGetHandGrenadeThrowRay(out Ray ray)
+        {
+            ray = default;
+            Camera camera = _player != null && _player.CameraController != null ? _player.CameraController.Camera : null;
+            if (camera == null || ActiveWeapon?.IsHandGrenade != true || _model == null || !_handGrenadeVisible)
+            {
+                return false;
+            }
+
+            ray = new Ray(_model.transform.position, camera.transform.forward);
+            return true;
+        }
+
+        private void PlayHandGrenadeMotion(FirstPersonWeaponAsset asset, FirstPersonWeaponMotionKind kind, FirstPersonWeaponState state, bool loop)
+        {
+            FirstPersonWeaponMotion motion = FindMotion(asset, kind);
+            if (motion?.Hands == null)
+            {
+                SetState(FirstPersonWeaponState.Ready, 0f);
+                return;
+            }
+
+            _hasLoop = false;
+            PlayMotion(motion, kind == FirstPersonWeaponMotionKind.Draw ? 0f : asset.CrossFade, loop, true);
+            SetState(state, motion.Duration);
+        }
+
+        private void TickHandGrenade()
+        {
+            if (State is (FirstPersonWeaponState.Drawing or FirstPersonWeaponState.Ready) && ActiveWeapon?.IsHandGrenade == true && !_handGrenadeVisible)
+            {
+                SetHandGrenadeVisible(true);
+            }
+
+            if (State is not (FirstPersonWeaponState.PreparingHandGrenade or FirstPersonWeaponState.HoldingHandGrenade or FirstPersonWeaponState.ThrowingHandGrenade))
+            {
+                return;
+            }
+
+            FirstPersonWeaponAsset asset = ActiveWeapon;
+            FirstPersonWeaponMotion motion = FindMotion(asset, CurrentMotion);
+            double clipTime = _graph.HandsClipTime;
+            if (State == FirstPersonWeaponState.HoldingHandGrenade || State == FirstPersonWeaponState.PreparingHandGrenade && clipTime >= motion.Hands.length)
+            {
+                if (_handGrenadeReleaseRequested)
+                {
+                    if (_handGrenadeThrowHand != null)
+                    {
+                        _model.transform.SetParent(_handGrenadeThrowHand, true);
+                    }
+
+                    PlayHandGrenadeMotion(asset, FirstPersonWeaponMotionKind.HandGrenadeThrow, FirstPersonWeaponState.ThrowingHandGrenade, false);
+                }
+                else if (State == FirstPersonWeaponState.PreparingHandGrenade)
+                {
+                    PlayHandGrenadeMotion(asset, FirstPersonWeaponMotionKind.HandGrenadeHold, FirstPersonWeaponState.HoldingHandGrenade, true);
+                }
+
+                return;
+            }
+
+            if (State != FirstPersonWeaponState.ThrowingHandGrenade)
+            {
+                return;
+            }
+
+            float releaseTime = Mathf.Min(asset.HandGrenadeReleaseFrame / motion.Hands.frameRate, motion.Hands.length);
+            if (!_handGrenadeReleased && clipTime >= releaseTime)
+            {
+                _handGrenadeReleased = true;
+                ReleaseHandGrenade(asset);
+            }
+
+            if (State == FirstPersonWeaponState.ThrowingHandGrenade && clipTime >= motion.Hands.length)
+            {
+                if (TryFinishHandGrenadeSwitch())
+                {
+                    return;
+                }
+
+                RestoreHandGrenadeModelAnchor();
+                PlayHandGrenadeMotion(asset, FirstPersonWeaponMotionKind.Draw, FirstPersonWeaponState.Drawing, false);
+            }
+        }
+
+        private bool TryFinishHandGrenadeSwitch()
+        {
+            if (!_handGrenadeAfterThrow.HasValue)
+            {
+                return false;
+            }
+
+            Hide();
+            if (_pendingSlot < 0 && _redrawSlot < 0 && Draw(HAND_GRENADE_SELECTION))
+            {
+                _graph.Evaluate(0f);
+                ResetModelRoot();
+                ApplyHandsOffset();
+                SetHandGrenadeVisible(true);
+            }
+
+            return true;
+        }
+
+        private void RestoreHandGrenadeModelAnchor()
+        {
+            if (_model == null || _handGrenadeAnchor == null)
+            {
+                return;
+            }
+
+            Transform visual = _model.transform;
+            visual.SetParent(_handGrenadeAnchor, false);
+            visual.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
+            visual.localScale = ActiveWeapon.HudModel.transform.localScale;
+        }
+
+        private void ReleaseHandGrenade(FirstPersonWeaponAsset asset)
+        {
+            if (asset.HandGrenade?.IsConfigured != true || !TryGetHandGrenadeThrowRay(out Ray release) || _ammoSource == null)
+            {
+                return;
+            }
+
+            GameObject held = _model;
+            if (!_ammoSource.TryConsumeHandGrenade(_slots[ActiveSlot].Key))
+            {
+                return;
+            }
+
+            int mask = asset.Ballistics != null ? asset.Ballistics.BallisticHitMask.value : Physics.DefaultRaycastLayers;
+            GrenadeProjectile.LaunchThrown(asset.HandGrenadeVisual, asset.HandGrenade, release, asset.HandGrenadeThrowSpeed, mask, _player.transform.root, held.transform, _audio != null ? _audio.outputAudioMixerGroup : null);
+            if (_model == held)
+            {
+                SetHandGrenadeVisible(false);
+            }
+            else
+            {
+                held.SetActive(false);
+            }
+
+            NotifyAmmo();
+        }
+
+        private void SetHandGrenadeVisible(bool visible)
+        {
+            _handGrenadeVisible = visible;
+            if (_handGrenadeRenderers == null)
+            {
+                return;
+            }
+
+            foreach (Renderer renderer in _handGrenadeRenderers)
+            {
+                if (renderer != null)
+                {
+                    renderer.forceRenderingOff = !visible;
+                }
             }
         }
 
@@ -1150,6 +1374,9 @@ namespace RaidIntoDarkness.Weapons
                     TickReady(asset);
                     return;
                 case FirstPersonWeaponState.Hidden:
+                case FirstPersonWeaponState.PreparingHandGrenade:
+                case FirstPersonWeaponState.HoldingHandGrenade:
+                case FirstPersonWeaponState.ThrowingHandGrenade:
                     return;
             }
 
@@ -1603,11 +1830,24 @@ namespace RaidIntoDarkness.Weapons
             _savedHandsPosition = hands.transform.localPosition;
             _savedHandsRotation = hands.transform.localRotation;
             Transform anchor = FindBone(hands, _itemAnchorBone);
+            if (asset.IsHandGrenade)
+            {
+                _handGrenadeAnchor = anchor != null ? anchor : hands.transform;
+                _handGrenadeThrowHand = FindBone(hands, "r_hand");
+            }
+
             _model = Instantiate(asset.HudModel, anchor != null ? anchor : hands.transform, false);
             _weaponView = _model.GetComponent<FirstPersonWeaponView>();
             _model.transform.localPosition = Vector3.zero;
             _model.transform.localRotation = Quaternion.identity;
-            foreach (Renderer renderer in _model.GetComponentsInChildren<Renderer>(true))
+            Renderer[] renderers = _model.GetComponentsInChildren<Renderer>(true);
+            if (asset.IsHandGrenade)
+            {
+                _handGrenadeRenderers = renderers;
+                SetHandGrenadeVisible(false);
+            }
+
+            foreach (Renderer renderer in renderers)
             {
                 renderer.shadowCastingMode = ShadowCastingMode.Off;
 
@@ -1656,6 +1896,11 @@ namespace RaidIntoDarkness.Weapons
 
         private void RebuildVisuals()
         {
+            if (TryFinishHandGrenadeSwitch())
+            {
+                return;
+            }
+
             FirstPersonWeaponAsset asset = ActiveWeapon;
             FirstPersonRig rig = _player.Rig;
             if (asset == null || rig.Hands == null || rig.HandsOwner != (object)this)
@@ -1701,6 +1946,10 @@ namespace RaidIntoDarkness.Weapons
             }
 
             _model = null;
+            _handGrenadeAnchor = null;
+            _handGrenadeThrowHand = null;
+            _handGrenadeRenderers = null;
+            _handGrenadeVisible = false;
             _weaponView = null;
             _modelRoot = null;
             _muzzle = null;

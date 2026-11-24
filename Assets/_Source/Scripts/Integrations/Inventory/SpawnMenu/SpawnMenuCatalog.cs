@@ -44,7 +44,7 @@ namespace RaidIntoDarkness.UI
             }
 
             int? price = weapon?.Cost ?? equipment?.Cost ?? ammo?.Cost ?? addon?.Cost;
-            _entries.Add(new Entry(definition, category, price, weapon != null || equipment != null, Math.Max(1, ammo?.BoxSize ?? 1)));
+            _entries.Add(new Entry(definition, category, price, EquipmentStatsFormatter.SupportsCondition(definition), Math.Max(1, ammo?.BoxSize ?? 1)));
             MaxWidth = Math.Max(MaxWidth, definition.Width);
         }
 
@@ -102,6 +102,7 @@ namespace RaidIntoDarkness.UI
                     "sniper_rifle" => "Снайперские винтовки",
                     "machine_gun" => "Пулемёты",
                     "knife" => "Холодное оружие",
+                    "grenade" => "Ручные гранаты",
                     "grenade_launcher" => "Гранатомёты",
                     _ => definition.HasTag("Rifle") ? "Винтовки" : null
                 });

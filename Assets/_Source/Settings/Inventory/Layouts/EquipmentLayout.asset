@@ -28,7 +28,7 @@ MonoBehaviour:
 
     SSSSS.
 
-    1234bg
+    1234b.
 
     avwxy.'
   _bindings:
@@ -184,20 +184,6 @@ MonoBehaviour:
     _rule:
       _acceptedCategories:
       - Bolt
-      _requiredTags: []
-      _forbiddenTags: []
-      _validatorId: 
-      _requiresOccupiedSlots: []
-      _blockedByOccupiedSlots: []
-      _startsLocked: 0
-  - _key: g
-    _slotId: Grenade
-    _displayName: "\u0413\u0440\u0430\u043D\u0430\u0442\u0430"
-    _group: Quick
-    _mode: 1
-    _rule:
-      _acceptedCategories:
-      - Grenade
       _requiredTags: []
       _forbiddenTags: []
       _validatorId: 

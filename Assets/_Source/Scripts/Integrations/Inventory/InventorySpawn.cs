@@ -22,7 +22,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
                 return 0;
             }
 
-            string conditionState = condition < 100 ? (Math.Clamp(condition, 0, 100) / 100f).ToString("R", CultureInfo.InvariantCulture) : null;
+            string conditionState = condition < 100 && !definition.IsCategory("Grenade") ? (Math.Clamp(condition, 0, 100) / 100f).ToString("R", CultureInfo.InvariantCulture) : null;
             int added = 0;
             failure = InventoryFailure.None;
             while (added < quantity)

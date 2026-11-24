@@ -78,7 +78,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
                     item.SetVisualVariant(variant);
                 }
 
-                if (entry.Condition < 1f)
+                if (entry.Condition < 1f && !entry.Definition.IsCategory("Grenade"))
                 {
                     item.SetState(EquipmentStatsFormatter.CONDITION_STATE, entry.Condition.ToString(System.Globalization.CultureInfo.InvariantCulture));
                 }

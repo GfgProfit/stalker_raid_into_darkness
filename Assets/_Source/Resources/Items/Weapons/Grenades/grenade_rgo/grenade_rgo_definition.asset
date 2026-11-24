@@ -1,0 +1,102 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da0f90c2955673d46b25d465cbe44ed0, type: 3}
+  m_Name: grenade_rgo_definition
+  m_EditorClassIdentifier: Inventory::Inventory.ItemDefinition
+  _definitionId: 0cb36e84d68e52945a05bfd7f37211ae
+  _displayName: "\u0420\u0443\u0447\u043D\u0430\u044F \u043E\u0441\u043A\u043E\u043B\u043E\u0447\u043D\u0430\u044F \u043E\u0431\u043E\u0440\u043E\u043D\u0438\u0442\u0435\u043B\u044C\u043D\u0430\u044F \u0433\u0440\u0430\u043D\u0430\u0442\u0430 \u0420\u0413\u041E"
+  _shortName: "\u0420\u0413\u041E"
+  _description: "\u0421\u043E\u0432\u0435\u0442\u0441\u043A\u0430\u044F \u0440\u0443\u0447\u043D\u0430\u044F \u043F\u0440\u043E\u0442\u0438\u0432\u043E\u043F\u0435\u0445\u043E\u0442\u043D\u0430\u044F \u043E\u0441\u043A\u043E\u043B\u043E\u0447\u043D\u0430\u044F \u0433\u0440\u0430\u043D\u0430\u0442\u0430 \u0443\u0434\u0430\u0440\u043D\u043E-\u0434\u0438\u0441\u0442\u0430\u043D\u0446\u0438\u043E\u043D\u043D\u043E\u0433\u043E \u0434\u0435\u0439\u0441\u0442\u0432\u0438\u044F, \u0440\u0430\u0437\u0440\u0430\u0431\u043E\u0442\u0430\u043D\u043D\u0430\u044F \u043D\u0430\u0443\u0447\u043D\u043E-\u043F\u0440\u043E\u0438\u0437\u0432\u043E\u0434\u0441\u0442\u0432\u0435\u043D\u043D\u044B\u043C \u043F\u0440\u0435\u0434\u043F\u0440\u0438\u044F\u0442\u0438\u0435\u043C \xAB\u0411\u0430\u0437\u0430\u043B\u044C\u0442\xBB \u0438 \u043F\u0440\u0438\u043D\u044F\u0442\u0430\u044F \u043D\u0430 \u0432\u043E\u043E\u0440\u0443\u0436\u0435\u043D\u0438\u0435 \u0421\u043E\u0432\u0435\u0442\u0441\u043A\u043E\u0439 \u0430\u0440\u043C\u0438\u0438 \u0432 1981 \u0433\u043E\u0434\u0443. \u0421\u043E\u0437\u0434\u0430\u0432\u0430\u043B\u0430\u0441\u044C \u0432 \u043A\u0430\u0447\u0435\u0441\u0442\u0432\u0435 \u0431\u043E\u043B\u0435\u0435 \u0441\u043E\u0432\u0440\u0435\u043C\u0435\u043D\u043D\u043E\u0439 \u0430\u043B\u044C\u0442\u0435\u0440\u043D\u0430\u0442\u0438\u0432\u044B \u043E\u0431\u043E\u0440\u043E\u043D\u0438\u0442\u0435\u043B\u044C\u043D\u043E\u0439 \u0433\u0440\u0430\u043D\u0430\u0442\u0435 \u0424-1. \u0418\u043C\u0435\u0435\u0442 \u0441\u0444\u0435\u0440\u0438\u0447\u0435\u0441\u043A\u0438\u0439 \u0441\u0442\u0430\u043B\u044C\u043D\u043E\u0439 \u043A\u043E\u0440\u043F\u0443\u0441 \u0441 \u0445\u0430\u0440\u0430\u043A\u0442\u0435\u0440\u043D\u044B\u043C \u0440\u0438\u0444\u043B\u0435\u043D\u0438\u0435\u043C \u043D\u0438\u0436\u043D\u0435\u0439 \u043F\u043E\u043B\u0443\u0441\u0444\u0435\u0440\u044B, \u043F\u043E\u0437\u0432\u043E\u043B\u044F\u044E\u0449\u0438\u043C \u0432\u0438\u0437\u0443\u0430\u043B\u044C\u043D\u043E \u0438 \u0442\u0430\u043A\u0442\u0438\u043B\u044C\u043D\u043E \u043E\u0442\u043B\u0438\u0447\u0430\u0442\u044C \u0435\u0451 \u043E\u0442 \u043D\u0430\u0441\u0442\u0443\u043F\u0430\u0442\u0435\u043B\u044C\u043D\u043E\u0439 \u0433\u0440\u0430\u043D\u0430\u0442\u044B \u0420\u0413\u041D. \u041C\u0430\u0441\u0441\u0430 \u0441\u043D\u0430\u0440\u044F\u0436\u0451\u043D\u043D\u043E\u0439 \u0433\u0440\u0430\u043D\u0430\u0442\u044B \u0441\u043E\u0441\u0442\u0430\u0432\u043B\u044F\u0435\u0442 530 \u0433, \u0434\u0438\u0430\u043C\u0435\u0442\u0440 \u043A\u043E\u0440\u043F\u0443\u0441\u0430 \u2014 \u043E\u043A\u043E\u043B\u043E 60 \u043C\u043C. \u041E\u0441\u043D\u043E\u0432\u043D\u044B\u043C \u043F\u043E\u0440\u0430\u0436\u0430\u044E\u0449\u0438\u043C \u0444\u0430\u043A\u0442\u043E\u0440\u043E\u043C \u044F\u0432\u043B\u044F\u044E\u0442\u0441\u044F \u043C\u0435\u0442\u0430\u043B\u043B\u0438\u0447\u0435\u0441\u043A\u0438\u0435 \u043E\u0441\u043A\u043E\u043B\u043A\u0438, \u043E\u0431\u0440\u0430\u0437\u0443\u044E\u0449\u0438\u0435\u0441\u044F \u043F\u0440\u0438 \u0440\u0430\u0437\u0440\u0443\u0448\u0435\u043D\u0438\u0438 \u043A\u043E\u0440\u043F\u0443\u0441\u0430. \u041A\u043E\u043C\u043F\u043B\u0435\u043A\u0442\u0443\u0435\u0442\u0441\u044F \u0443\u043D\u0438\u0444\u0438\u0446\u0438\u0440\u043E\u0432\u0430\u043D\u043D\u044B\u043C \u0443\u0434\u0430\u0440\u043D\u043E-\u0434\u0438\u0441\u0442\u0430\u043D\u0446\u0438\u043E\u043D\u043D\u044B\u043C \u0437\u0430\u043F\u0430\u043B\u043E\u043C \u0423\u0414\u0417, \u043E\u0431\u0449\u0438\u043C \u0441 \u0433\u0440\u0430\u043D\u0430\u0442\u043E\u0439 \u0420\u0413\u041D. \u0412 \u043E\u0442\u043B\u0438\u0447\u0438\u0435 \u043E\u0442 \u043D\u0430\u0441\u0442\u0443\u043F\u0430\u0442\u0435\u043B\u044C\u043D\u043E\u0439 \u0420\u0413\u041D, \u043E\u0431\u043B\u0430\u0434\u0430\u0435\u0442 \u0431\u043E\u043B\u044C\u0448\u0435\u0439 \u043C\u0430\u0441\u0441\u043E\u0439 \u0438 \u0431\u043E\u043B\u0435\u0435 \u0432\u044B\u0440\u0430\u0436\u0435\u043D\u043D\u044B\u043C \u043E\u0441\u043A\u043E\u043B\u043E\u0447\u043D\u044B\u043C \u0434\u0435\u0439\u0441\u0442\u0432\u0438\u0435\u043C \u0437\u0430 \u0441\u0447\u0451\u0442 \u043F\u0440\u0438\u043C\u0435\u043D\u0435\u043D\u0438\u044F \u0441\u0442\u0430\u043B\u044C\u043D\u043E\u0433\u043E \u043A\u043E\u0440\u043F\u0443\u0441\u0430. \u041F\u043E \u0441\u0440\u0430\u0432\u043D\u0435\u043D\u0438\u044E \u0441 \u0424-1 \u043E\u0442\u043B\u0438\u0447\u0430\u0435\u0442\u0441\u044F \u0431\u043E\u043B\u0435\u0435 \u0441\u043E\u0432\u0440\u0435\u043C\u0435\u043D\u043D\u043E\u0439 \u043A\u043E\u043D\u0441\u0442\u0440\u0443\u043A\u0446\u0438\u0435\u0439 \u0438 \u0440\u0430\u0432\u043D\u043E\u043C\u0435\u0440\u043D\u044B\u043C \u0445\u0430\u0440\u0430\u043A\u0442\u0435\u0440\u043E\u043C \u0434\u0440\u043E\u0431\u043B\u0435\u043D\u0438\u044F \u043A\u043E\u0440\u043F\u0443\u0441\u0430. \u0421\u043E\u0441\u0442\u043E\u0438\u0442 \u043D\u0430 \u0432\u043E\u043E\u0440\u0443\u0436\u0435\u043D\u0438\u0438 \u0420\u043E\u0441\u0441\u0438\u0438 \u0438 \u0440\u044F\u0434\u0430 \u0434\u0440\u0443\u0433\u0438\u0445 \u0433\u043E\u0441\u0443\u0434\u0430\u0440\u0441\u0442\u0432 \u043F\u043E\u0441\u0442\u0441\u043E\u0432\u0435\u0442\u0441\u043A\u043E\u0433\u043E \u043F\u0440\u043E\u0441\u0442\u0440\u0430\u043D\u0441\u0442\u0432\u0430."
+  _category: Grenade
+  _tags: []
+  _size: {x: 1, y: 1}
+  _weight: 0.53
+  _maxStack: 0
+  _allowRotation: 0
+  _backgroundColor: {r: 1, g: 1, b: 1, a: 0.04}
+  _fallbackIcon: {fileID: 0}
+  _iconOverride: {fileID: 0}
+  _visualPrefab: {fileID: 1888247382131789993, guid: 6c5195de1e2495141bf6bb6e4a3aa0a1, type: 3}
+  _defaultIconVariant: []
+  _icon:
+    _generateIcon: 1
+    _pixelsPerCell: 64
+    _antiAliasing: 1
+    _useOutline: 0
+    _outlineWidth: 2
+    _useShadow: 1
+    _shadowOffset: {x: 2, y: -2}
+    _shadowBlur: 2
+    _defaultView:
+      _modelEulerAngles: {x: 0, y: 0, z: 0}
+      _modelScale: {x: 1, y: 1, z: 1}
+      _cameraEulerAngles: {x: 0, y: -90, z: 45}
+      _padding: 1
+      _useDirectionalLight: 1
+      _lightIntensity: 6.5
+    _useCustomSlotView: 0
+    _slotView:
+      _modelEulerAngles: {x: 0, y: 0, z: 0}
+      _modelScale: {x: 1, y: 1, z: 1}
+      _cameraEulerAngles: {x: 0, y: -90, z: 45}
+      _padding: 1
+      _useDirectionalLight: 1
+      _lightIntensity: 6.5
+  _components:
+  - rid: 115149112346673356
+  - rid: 115149112346673357
+  - rid: 115149112346673358
+  references:
+    version: 2
+    RefIds:
+    - rid: 115149112346673356
+      type: {class: WeaponStatsComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      data:
+        _section: grenade_rgo
+        _weaponClass: grenade
+        _cost: 2100
+        _repairType: 
+        _hitPower: 0
+        _hitImpulse: 0
+        _bulletSpeed: 0
+        _fireDistance: 0
+        _rpm: 0
+        _fireModes: 
+        _magazineSize: 0
+        _ammoClasses: []
+        _fireDispersionBase: 0
+        _camDispersion: 0
+        _camDispersionIncrement: 0
+        _conditionShotDecrement: 0
+        _misfireProbability: 0
+        _silencerStatus: 0
+        _silencerSection: 
+        _scopeStatus: 0
+        _scopes: []
+        _compatibleScopes: []
+        _grenadeLauncherStatus: 0
+        _grenadeLauncherSection: 
+        _blockSilencerWithGrenadeLauncher: 0
+    - rid: 115149112346673357
+      type: {class: WeaponHudComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      data:
+        _hudModel: {fileID: -6129208653667386632, guid: a28e772692d1ee14b82ed85a578b0317, type: 3}
+        _weaponMotions: {fileID: 8815230551390286010, guid: 6e3f8a85ea241f241950d2d37a316fce, type: 3}
+        _handsMotions: {fileID: 8815230551390286010, guid: e0e7cd6cd258ecb47b69af8c69d0fe04, type: 3}
+        _handsMotionPrefix: 
+        _attachmentBones: []
+        _firstPersonWeapon: {fileID: 11400000, guid: 87257d49d2e33e34389d71f6ae41a42f, type: 2}
+        _scopeAimOffsets: []
+    - rid: 115149112346673358
+      type: {class: WorldItemComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      data:
+        _prefab: {fileID: 3691213580489019094, guid: 6c5195de1e2495141bf6bb6e4a3aa0a1, type: 3}

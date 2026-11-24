@@ -47,7 +47,8 @@ namespace RaidIntoDarkness.Weapons
 
         private void Refresh()
         {
-            bool visible = _controller.State != FirstPersonWeaponState.Hidden && _controller.ActiveWeapon is { IsMelee: false };
+            FirstPersonWeaponAsset weapon = _controller.ActiveWeapon;
+            bool visible = _controller.State != FirstPersonWeaponState.Hidden && weapon is { IsMelee: false } && (!weapon.IsHandGrenade || _controller.State != FirstPersonWeaponState.Holstering);
             GameObject root = _root != null ? _root : _text != null ? _text.gameObject : null;
             if (root != null && root != gameObject && root.activeSelf != visible)
             {
@@ -57,7 +58,7 @@ namespace RaidIntoDarkness.Weapons
             if (visible && _text != null)
             {
                 _controller.GetHudAmmo(out int loaded, out int reserve, out string name);
-                _text.text = $"{loaded}/{reserve} <size=65%>{name}</size>";
+                _text.text = weapon.IsHandGrenade ? $"{loaded} · <size=65%>{name}</size>" : $"{loaded}/{reserve} <size=65%>{name}</size>";
             }
         }
     }

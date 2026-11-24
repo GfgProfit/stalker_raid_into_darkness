@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using RaidIntoDarkness.Player;
 using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.SceneManagement;
@@ -21,10 +23,15 @@ namespace RaidIntoDarkness.Weapons
         private const float BOUNCE_SURFACE_OFFSET = 0.005f;
         private const float EXPLOSION_LIFETIME = 11f;
         private const float SOUND_MAX_DISTANCE = 160f;
+        private const float THROW_RESTITUTION = 0.34f;
+        private const float THROW_REST_SPEED_SQUARED = 1f;
+        private const float BOUNCE_SOUND_INTERVAL = 0.08f;
+        private const string BOUNCE_MATERIAL = "objects\\grenade";
 
         private RaycastHit[] _hits = new RaycastHit[HIT_BUFFER_SIZE];
         private PhysicsScene _physicsScene;
         private GrenadeAmmoData _ammo;
+        private StalkerSurfaceResolver _bounceResolver;
         private AudioMixerGroup _audioMixerGroup;
         private Transform _owner;
         private Transform _weapon;
@@ -43,7 +50,10 @@ namespace RaidIntoDarkness.Weapons
         private float _travelled;
         private float _bounceStartTime;
         private float _detonationTime;
+        private float _nextBounceSoundTime;
         private bool _hasBounced;
+        private bool _isThrown;
+        private bool _resting;
 #if UNITY_EDITOR
         private GrenadeShotDebug _debug;
 #endif
@@ -56,7 +66,21 @@ namespace RaidIntoDarkness.Weapons
             projectile.Initialize(ammo, muzzle, aim, hitMask, owner, weapon, audioMixerGroup);
         }
 
-        private void Initialize(GrenadeAmmoData ammo, Ray muzzle, Ray aim, int hitMask, Transform owner, Transform weapon, AudioMixerGroup audioMixerGroup)
+        internal static void LaunchThrown(GameObject visual, GrenadeAmmoData ammo, Ray release, float speed, int hitMask, Transform owner, Transform weapon, AudioMixerGroup audioMixerGroup)
+        {
+            GameObject instance = Instantiate(visual, release.origin, Quaternion.FromToRotation(Vector3.forward, release.direction));
+            GrenadeProjectile projectile = instance.AddComponent<GrenadeProjectile>();
+            projectile.BeginFlight(ammo, release, speed, hitMask, owner, weapon, audioMixerGroup);
+            projectile._isThrown = true;
+#if UNITY_EDITOR
+            if (GrenadeShotDebug.Enabled)
+            {
+                projectile.CreateThrowDebug(release);
+            }
+#endif
+        }
+
+        private void BeginFlight(GrenadeAmmoData ammo, Ray launch, float speed, int hitMask, Transform owner, Transform weapon, AudioMixerGroup audioMixerGroup)
         {
             _ammo = ammo;
             _audioMixerGroup = audioMixerGroup;
@@ -64,11 +88,15 @@ namespace RaidIntoDarkness.Weapons
             _weapon = weapon;
             _hitMask = hitMask;
             _physicsScene = gameObject.scene.GetPhysicsScene();
-            _origin = muzzle.origin;
-            _launchVelocity = muzzle.direction * LAUNCH_SPEED;
+            _origin = launch.origin;
+            _launchVelocity = launch.direction * speed;
             _gravity = Physics.gravity;
             _detonationTime = ammo.SelfDestructSeconds;
+        }
 
+        private void Initialize(GrenadeAmmoData ammo, Ray muzzle, Ray aim, int hitMask, Transform owner, Transform weapon, AudioMixerGroup audioMixerGroup)
+        {
+            BeginFlight(ammo, muzzle, LAUNCH_SPEED, hitMask, owner, weapon, audioMixerGroup);
             Vector3 cameraToMuzzle = muzzle.origin - aim.origin;
             if (TryHit(new Ray(aim.origin, cameraToMuzzle), cameraToMuzzle.magnitude, out RaycastHit obstruction))
             {
@@ -128,6 +156,14 @@ namespace RaidIntoDarkness.Weapons
         private void FixedUpdate()
         {
             float end = Mathf.Min(_elapsed + Time.fixedDeltaTime, _detonationTime);
+            if (_resting)
+            {
+                _elapsed = end;
+#if UNITY_EDITOR
+                _debug?.Advance(transform.position, transform.position, _elapsed, _travelled, 0f, false);
+#endif
+            }
+
             while (_elapsed < end)
             {
                 float step = !_hasBounced && _elapsed >= _clearanceTime && _elapsed < _steeringEndTime ? _steeringStep : MAX_SIMULATION_STEP;
@@ -161,6 +197,29 @@ namespace RaidIntoDarkness.Weapons
 #if UNITY_EDITOR
                     _debug?.Advance(position, hit.point, hitTime, _travelled, hit.distance, false);
 #endif
+                    if (_isThrown)
+                    {
+                        if (_ammo.ExplodeOnImpact)
+                        {
+                            _elapsed = hitTime;
+                            if (_elapsed < _ammo.ArmingSeconds || _travelled < _ammo.ArmingDistance)
+                            {
+                                PlayBounceSound(hit, hitTime);
+                            }
+
+                            FinishFlight(hit.point, hit.normal);
+                            return;
+                        }
+
+                        BounceThrow(hit, hitTime, nextTime);
+                        if (_resting)
+                        {
+                            break;
+                        }
+
+                        continue;
+                    }
+
                     if (TryBeginBounce(hit, hitTime))
                     {
                         end = Mathf.Min(end, _detonationTime);
@@ -188,8 +247,29 @@ namespace RaidIntoDarkness.Weapons
 
             if (_elapsed >= _detonationTime)
             {
-                FinishFlight(transform.position, _hasBounced ? _bounceNormal : Vector3.up, false);
+                Vector3 point = _resting ? _origin - _bounceNormal * (COLLISION_RADIUS + BOUNCE_SURFACE_OFFSET) : transform.position;
+                FinishFlight(point, _hasBounced || _resting ? _bounceNormal : Vector3.up, _resting);
             }
+        }
+
+        private void BounceThrow(RaycastHit hit, float hitTime, float nextTime)
+        {
+            Vector3 velocity = _launchVelocity + _gravity * (hitTime - _bounceStartTime);
+            if (Mathf.Abs(Vector3.Dot(velocity, hit.normal)) > 1f)
+            {
+                PlayBounceSound(hit, hitTime);
+            }
+
+            _launchVelocity = Vector3.Reflect(velocity, hit.normal) * THROW_RESTITUTION;
+            _bounceNormal = hit.normal;
+            _bounceStartTime = nextTime;
+            _elapsed = nextTime;
+            _origin = hit.point + hit.normal * (COLLISION_RADIUS + BOUNCE_SURFACE_OFFSET);
+            transform.position = _origin;
+            _resting = hit.normal.y > 0.5f && _launchVelocity.sqrMagnitude <= THROW_REST_SPEED_SQUARED;
+#if UNITY_EDITOR
+            _debug?.MarkBounce(hit.point);
+#endif
         }
 
         private bool TryBeginBounce(RaycastHit hit, float hitTime)
@@ -214,6 +294,7 @@ namespace RaidIntoDarkness.Weapons
             }
 
             _hasBounced = true;
+            PlayBounceSound(hit, hitTime);
             _bounceNormal = hit.normal;
             _bounceStartTime = hitTime;
             _elapsed = hitTime;
@@ -229,7 +310,7 @@ namespace RaidIntoDarkness.Weapons
 
         private Vector3 GetPosition(float time)
         {
-            if (_hasBounced)
+            if (_hasBounced || _isThrown)
             {
                 float riseTime = time - _bounceStartTime;
                 return _origin + _launchVelocity * riseTime + _gravity * (0.5f * riseTime * riseTime);
@@ -347,7 +428,7 @@ namespace RaidIntoDarkness.Weapons
         {
             enabled = false;
             Destroy(gameObject);
-            bool armed = _travelled >= _ammo.ArmingDistance;
+            bool armed = _travelled >= _ammo.ArmingDistance && _elapsed >= _ammo.ArmingSeconds;
 #if UNITY_EDITOR
             _debug?.Finish(point, normal, armed, surfaceHit);
 #endif
@@ -358,14 +439,10 @@ namespace RaidIntoDarkness.Weapons
 
             Quaternion rotation = Quaternion.FromToRotation(Vector3.up, normal) * _ammo.ExplosionPrefab.transform.rotation;
             GameObject explosion = Instantiate(_ammo.ExplosionPrefab, point, rotation);
-            AudioSource source = explosion.AddComponent<AudioSource>();
-            source.playOnAwake = false;
-            source.spatialBlend = 1f;
-            source.rolloffMode = AudioRolloffMode.Linear;
-            source.maxDistance = SOUND_MAX_DISTANCE;
-            source.outputAudioMixerGroup = _audioMixerGroup;
-            source.PlayOneShot(_ammo.ExplosionSound);
-            Destroy(explosion, Mathf.Max(EXPLOSION_LIFETIME, _ammo.ExplosionSound.length));
+            Destroy(explosion, EXPLOSION_LIFETIME);
+            AudioClip transient = _ammo.SelectExplosionSound();
+            AudioClip body = _ammo.SelectExplosionBodySound();
+            PlayWorldSound("Grenade Explosion Audio", body != null ? body : transient, point, SOUND_MAX_DISTANCE, body != null ? transient : null);
             var damage = new GrenadeExplosionDamage(_ammo, point, surfaceHit ? normal : Vector3.zero, _hitMask, _weapon);
 #if UNITY_EDITOR
             damage.DebugShot = _debug;
@@ -373,7 +450,64 @@ namespace RaidIntoDarkness.Weapons
             damage.Apply();
         }
 
+        private void PlayBounceSound(RaycastHit hit, float hitTime)
+        {
+            StalkerCollideSoundLibrary library = _ammo.BounceSounds;
+            if (library == null || hitTime < _nextBounceSoundTime)
+            {
+                return;
+            }
+
+            _bounceResolver ??= new StalkerSurfaceResolver(_ammo.BounceSurfaces);
+            StalkerSurfaceType surface = _bounceResolver.Resolve(hit, out _);
+            IReadOnlyList<AudioClip> clips = library.Find(BOUNCE_MATERIAL, surface) ?? library.Find(BOUNCE_MATERIAL, StalkerSurfaceType.Default);
+            if (clips == null || clips.Count == 0)
+            {
+                return;
+            }
+
+            _nextBounceSoundTime = hitTime + BOUNCE_SOUND_INTERVAL;
+            PlayWorldSound("Grenade Bounce Audio", clips[UnityEngine.Random.Range(0, clips.Count)], hit.point, library.MaxDistance);
+        }
+
+        private void PlayWorldSound(string objectName, AudioClip clip, Vector3 point, float maxDistance, AudioClip layer = null)
+        {
+            if (clip == null)
+            {
+                return;
+            }
+
+            var emitter = new GameObject(objectName);
+            emitter.transform.position = point;
+            AudioSource source = emitter.AddComponent<AudioSource>();
+            source.playOnAwake = false;
+            source.spatialBlend = 1f;
+            source.rolloffMode = AudioRolloffMode.Linear;
+            source.maxDistance = maxDistance;
+            source.outputAudioMixerGroup = _audioMixerGroup;
+            source.clip = clip;
+            source.Play();
+            if (layer != null)
+            {
+                source.PlayOneShot(layer);
+            }
+
+            Destroy(emitter, Mathf.Max(clip.length, layer != null ? layer.length : 0f) + 0.1f);
+        }
+
 #if UNITY_EDITOR
+        private void CreateThrowDebug(Ray release)
+        {
+            const int THROW_SAMPLES = 72;
+            var points = new Vector3[THROW_SAMPLES + 1];
+            for (int i = 0; i <= THROW_SAMPLES; i++)
+            {
+                points[i] = GetPosition(_detonationTime * i / THROW_SAMPLES);
+            }
+
+            _debug = new GrenadeShotDebug(AmmoName, _ammo, release, points[points.Length - 1], false, points, true);
+        }
+
         private string AmmoName => gameObject.name.Replace("(Clone)", string.Empty);
 #endif
     }

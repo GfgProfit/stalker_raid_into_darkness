@@ -6,7 +6,6 @@ namespace RaidIntoDarkness.Weapons
 {
     internal sealed class GrenadeExplosionDamage
     {
-        private const float FRAGMENT_RANGE = 100f;
         private const float SURFACE_OFFSET = 0.002f;
         private const float MAX_COVER_ENTRY_DISTANCE = 0.025f;
         private const float MAX_COVER_THICKNESS = 0.06f;
@@ -105,13 +104,14 @@ namespace RaidIntoDarkness.Weapons
                 return;
             }
 
+            float range = _ammo.FragmentRange;
             for (int i = 0; i < _ammo.FragmentCount; i++)
             {
                 Vector3 direction = Random.onUnitSphere;
-                if (!TryHit(direction, FRAGMENT_RANGE, null, out RaycastHit hit))
+                if (!TryHit(direction, range, null, out RaycastHit hit))
                 {
 #if UNITY_EDITOR
-                    DebugShot?.AddFragment(_origin + direction * FRAGMENT_RANGE, GrenadeFragmentResult.Miss);
+                    DebugShot?.AddFragment(_origin + direction * range, GrenadeFragmentResult.Miss);
 #endif
                     continue;
                 }
@@ -126,7 +126,7 @@ namespace RaidIntoDarkness.Weapons
                 if (target != null)
                 {
                     _damage.TryGetValue(target, out float existing);
-                    _damage[target] = existing + GetDamageAtDistance(_ammo.FragmentDamage, Vector3.Distance(_center, hit.point), FRAGMENT_RANGE);
+                    _damage[target] = existing + GetDamageAtDistance(_ammo.FragmentDamage, Vector3.Distance(_center, hit.point), range);
                 }
 #if UNITY_EDITOR
                 DebugShot?.AddFragment(hit.point, target != null ? GrenadeFragmentResult.Target : GrenadeFragmentResult.Cover);

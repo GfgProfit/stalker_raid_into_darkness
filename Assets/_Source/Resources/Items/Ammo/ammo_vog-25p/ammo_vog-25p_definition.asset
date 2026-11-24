@@ -110,6 +110,9 @@ MonoBehaviour:
           _explosionPrefab: {fileID: 997800592706299742, guid: bdcb59d2420ead34d86d2cc58e1f2e4a, type: 3}
           _explosionSound: {fileID: 8300000, guid: d081c4e7e899be144a9b6bc1d36b008e, type: 3}
           _launchSound: {fileID: 8300000, guid: 6b83da2e420e7a84e9bf33483ea0d056, type: 3}
+          _explosionVariants: []
+          _bounceSounds: {fileID: 11400000, guid: ec6bd0eebfc08f3498433572470a8c32, type: 2}
+          _bounceSurfaces: {fileID: 11400000, guid: 1737dfeac290608458356e19a4b264cd, type: 2}
           _blastRadius: 10.5
           _blastDamage: 480
           _fragmentCount: 120
@@ -117,3 +120,6 @@ MonoBehaviour:
           _selfDestructSeconds: 10
           _armingDistance: 2.5
           _impactBounceHeight: 1.2
+          _fragmentRange: 100
+          _armingSeconds: 0
+          _explodeOnImpact: 0

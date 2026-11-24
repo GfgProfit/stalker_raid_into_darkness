@@ -1,0 +1,50 @@
+fileFormatVersion: 2
+guid: 3426f6f7d7027fe4485d199c23f9ad1d
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\galil\galil31|models\weapons
+    second: {fileID: 2100000, guid: 798af448e70f654418a407588166c2b4, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\galil\mag_magpul|models\weapons
+    second: {fileID: 2100000, guid: cc033ef21cb97e441b37ffa5236fa864, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\galil\muzzle|models\weapons
+    second: {fileID: 2100000, guid: c12c2e152cde8714d84c265257a64e50, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\sa58\sa58_aac_blackout_51t_flash_hider_diff|models\weapons
+    second: {fileID: 2100000, guid: 147f0d7175f4be64e81aad84dce377e9, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\sil_nato_762|models\weapons
+    second: {fileID: 2100000, guid: 755b92785ba000c4f9e7c4ec83880a18, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\wpn_bullet1_762|models\weapons
+    second: {fileID: 2100000, guid: 6db9a120c126a7a439fe7826b930860c, type: 2}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 61e536e21e96f284493f2969a9250cdf, type: 3}
+  _scale: 1
+  _importMaterials: 1
+  _texturesFolder: 
+  _searchTexturesByName: 1
+  _importEmbeddedMotions: 1
+  _embeddedLoopMode: 0
+  _addAnimator: 1
+  _readableMeshes: 0
+  _updateWhenOffscreen: 0
+  _autoResolveResources: 1

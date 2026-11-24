@@ -118,6 +118,14 @@ namespace RaidIntoDarkness.Integrations.Inventory
             return grenade?.GetComponent<AmmoBallisticsComponent>()?.Grenade;
         }
 
+        public GrenadeAmmoData GetLauncherShot(object weaponKey, out GameObject visual)
+        {
+            ItemDefinition definition = GetMagazine(weaponKey) > 0 ? FindDefinition(GetAmmoSection(weaponKey)) : null;
+            GrenadeAmmoData ammo = definition?.GetComponent<AmmoBallisticsComponent>()?.Grenade;
+            visual = ammo?.ProjectileVisual != null ? ammo.ProjectileVisual : definition?.VisualPrefab;
+            return ammo;
+        }
+
         public float GetBulletSpeed(object weaponKey)
         {
             ItemInstance weapon = GetWeapon(weaponKey);

@@ -12,6 +12,11 @@ namespace RaidIntoDarkness.Weapons
         [SerializeField] private Transform _silencedMuzzle;
         [SerializeField] private Transform _grenadeMuzzle;
         [SerializeField] private GameObject _launcherRound;
+        [SerializeField] private Transform[] _launcherChambers = Array.Empty<Transform>();
+        [SerializeField] private Transform[] _launcherReloadRounds = Array.Empty<Transform>();
+        [SerializeField] private Transform[] _unfoldedLauncherSights = Array.Empty<Transform>();
+        [SerializeField] private Transform _fixedLauncherPart;
+        [SerializeField] private Quaternion _fixedLauncherPartRotation = Quaternion.identity;
         [SerializeField] private GameObject _magazineSwapObjects;
         [SerializeField] private AnimationClip[] _magazineSwapClips = Array.Empty<AnimationClip>();
         [SerializeField] private SkinnedMeshRenderer[] _installedMagazineRenderers = Array.Empty<SkinnedMeshRenderer>();
@@ -122,9 +127,38 @@ namespace RaidIntoDarkness.Weapons
 
         public void SetLauncherRoundVisible(bool visible)
         {
-            if (_launcherRound != null)
+            if (_launcherRound != null && _launcherRound.activeSelf != visible)
             {
                 _launcherRound.SetActive(visible);
+            }
+        }
+
+        internal void UpdateLauncherChambers(int loaded, bool inserting)
+        {
+            for (int i = 0; i < _launcherChambers.Length; i++)
+            {
+                _launcherChambers[i].localScale = i < loaded ? Vector3.one : Vector3.zero;
+            }
+
+            foreach (Transform round in _launcherReloadRounds)
+            {
+                round.localScale = inserting ? Vector3.one : Vector3.zero;
+            }
+        }
+
+        internal void ApplyLauncherBoneOverrides()
+        {
+            foreach (Transform sight in _unfoldedLauncherSights)
+            {
+                if (sight != null)
+                {
+                    sight.localRotation = Quaternion.identity;
+                }
+            }
+
+            if (_fixedLauncherPart != null)
+            {
+                _fixedLauncherPart.localRotation = _fixedLauncherPartRotation;
             }
         }
 

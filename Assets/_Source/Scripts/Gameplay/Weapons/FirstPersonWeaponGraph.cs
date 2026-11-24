@@ -61,17 +61,18 @@ namespace RaidIntoDarkness.Weapons
             }
 
             _graph.Play();
+            _weaponView?.ApplyLauncherBoneOverrides();
         }
 
         public bool IsValid => _graph.IsValid();
         public bool OverlayActive => _overlayActive;
         internal double HandsClipTime => _hands.ClipTime;
 
-        public void Play(AnimationClip hands, AnimationClip weapon, float speed, float fade, bool loop, float weaponFade = -1f)
+        public void Play(AnimationClip hands, AnimationClip weapon, float speed, float fade, bool loop, float weaponFade = -1f, float weaponSpeed = -1f)
         {
             StopEmptyShot();
             _hands.Play(hands, speed, fade, loop);
-            PlayWeapon(weapon, speed, weaponFade >= 0f ? weaponFade : fade, loop);
+            PlayWeapon(weapon, weaponSpeed > 0f ? weaponSpeed : speed, weaponFade >= 0f ? weaponFade : fade, loop);
         }
 
         public void PlayEmptyShot(AnimationClip hands, float speed, float fade, float strength)
@@ -175,6 +176,7 @@ namespace RaidIntoDarkness.Weapons
             }
 
             _graph.Evaluate(deltaTime);
+            _weaponView?.ApplyLauncherBoneOverrides();
         }
 
         public void Destroy()

@@ -19,6 +19,12 @@ namespace RaidIntoDarkness.Weapons
         }
 
         GrenadeAmmoData GetGrenadeShot(object weaponKey, out GameObject visual);
+        GrenadeAmmoData GetLauncherShot(object weaponKey, out GameObject visual)
+        {
+            visual = null;
+            return null;
+        }
+
         BallisticAmmoData GetBallistics(object weaponKey);
         float GetBulletSpeed(object weaponKey);
         float GetFireDistance(object weaponKey);

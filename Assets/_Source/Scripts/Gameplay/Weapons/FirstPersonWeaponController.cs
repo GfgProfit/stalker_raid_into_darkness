@@ -35,6 +35,8 @@ namespace RaidIntoDarkness.Weapons
         private const float MAX_FRAME_DELTA = 0.1f;
         private const float REDRAW_DELAY = 0.5f;
         private const float SHOT_FADE = 0.05f;
+        private const float LAUNCHER_AIM_SHOT_BLEND_TIME = 0.22f;
+        private const float RELOAD_HUD_FOV_BLEND_TIME = 0.25f;
         private const float FIRE_MODE_INPUT_RELEASE_RATIO = 0.85f;
         private const float SOUND_VOLUME = 1.0f;
         private const int MELEE_HIT_BUFFER_SIZE = 16;
@@ -91,7 +93,9 @@ namespace RaidIntoDarkness.Weapons
         private float _aim;
         private float _aimCameraRoll;
         private float _aimCameraVelocity;
+        private float _reloadHudFovBlend;
         private bool _aiming;
+        private bool _aimedLauncherShot;
         private bool _developmentAimOverride;
         private AimPhase _aimPhase;
         private float _aimBlendTime;
@@ -518,6 +522,16 @@ namespace RaidIntoDarkness.Weapons
                 _graph.Evaluate(deltaTime);
             }
 
+            if (ActiveWeapon?.IsStandaloneLauncher == true)
+            {
+                bool reloading = State == FirstPersonWeaponState.Reloading;
+                _weaponView?.UpdateLauncherChambers(Magazine, reloading && CurrentMotion == FirstPersonWeaponMotionKind.LauncherReloadInsert);
+                if (reloading)
+                {
+                    _weaponView?.SetLauncherRoundVisible(true);
+                }
+            }
+
             TickMeleeAttack();
             ResetModelRoot();
             ApplyHandsOffset();
@@ -702,7 +716,9 @@ namespace RaidIntoDarkness.Weapons
                 return;
             }
 
-            SetAiming((_input.AimHeld || DevelopmentAimOverride) && ready && (DevelopmentAimOverride || !sprinting));
+            bool holdShotAim = _aimedLauncherShot && Time.time < _actionUntil;
+            bool aimRequested = (_input.AimHeld || DevelopmentAimOverride) && (DevelopmentAimOverride || !sprinting);
+            SetAiming(ready && (holdShotAim || aimRequested));
             if (!ready)
             {
                 _burstLeft = 0;
@@ -1083,34 +1099,13 @@ namespace RaidIntoDarkness.Weapons
 
         private void Shoot(FirstPersonWeaponAsset asset)
         {
-            BallisticAmmoData ammo = _ammoSource != null ? _ammoSource.GetBallistics(_slots[ActiveSlot].Key) : null;
-            float bulletSpeed = _ammoSource?.GetBulletSpeed(_slots[ActiveSlot].Key) ?? 0f;
-            float fireDistance = _ammoSource?.GetFireDistance(_slots[ActiveSlot].Key) ?? 0f;
-            float dispersion = _ammoSource?.GetDispersionDegrees(_slots[ActiveSlot].Key) ?? 0f;
-
-            if (!TryGetMuzzleRay(out Ray muzzleRay) || ammo == null || !ammo.IsConfigured || bulletSpeed <= 0f || fireDistance <= 0f || asset.Ballistics == null || asset.Ballistics.BulletPrefab == null)
-            {
-                _burstLeft = 0;
-
-                if (!_ballisticsWarningLogged)
-                {
-                    _ballisticsWarningLogged = true;
-                    Debug.LogError($"{asset.name}: configure loaded ammo ballistics, bullet prefab and {(IsSilenced ? "SilencedMuzzlePoint" : "MuzzlePoint")} before firing.", this);
-                }
-
-                return;
-            }
-
-            Vector3 launchPosition = muzzleRay.origin;
-            Quaternion launchRotation = Quaternion.LookRotation(muzzleRay.direction, Vector3.up);
-
-            if (_ammoSource == null || _ammoSource.TryShoot(_slots[ActiveSlot].Key) == false)
+            bool fired = asset.IsStandaloneLauncher ? TryShootStandaloneLauncher(asset) : TryShootBallistic(asset);
+            if (!fired)
             {
                 _burstLeft = 0;
                 return;
             }
 
-            SpawnProjectiles(asset.Ballistics, ammo, launchPosition, launchRotation, bulletSpeed, fireDistance, dispersion);
             _burstLeft--;
             _nextShotTime = Time.time + asset.GetShotInterval(FireMode);
             FirstPersonWeaponMotionMode mode = GetMotionMode();
@@ -1124,6 +1119,7 @@ namespace RaidIntoDarkness.Weapons
             {
                 PlayMotion(motion, SHOT_FADE, false, false);
                 _actionUntil = Time.time + motion.Duration;
+                _aimedLauncherShot = asset.IsStandaloneLauncher && _aiming;
 
                 if (Magazine <= 0 && FindMotion(asset, FirstPersonWeaponMotionKind.IdleEmpty)?.Weapon != null)
                 {
@@ -1141,6 +1137,65 @@ namespace RaidIntoDarkness.Weapons
 
             SpawnShotEffects(asset);
             NotifyAmmo();
+        }
+
+        private bool TryShootBallistic(FirstPersonWeaponAsset asset)
+        {
+            BallisticAmmoData ammo = _ammoSource != null ? _ammoSource.GetBallistics(_slots[ActiveSlot].Key) : null;
+            float bulletSpeed = _ammoSource?.GetBulletSpeed(_slots[ActiveSlot].Key) ?? 0f;
+            float fireDistance = _ammoSource?.GetFireDistance(_slots[ActiveSlot].Key) ?? 0f;
+            float dispersion = _ammoSource?.GetDispersionDegrees(_slots[ActiveSlot].Key) ?? 0f;
+
+            if (!TryGetMuzzleRay(out Ray muzzleRay) || ammo == null || !ammo.IsConfigured || bulletSpeed <= 0f || fireDistance <= 0f || asset.Ballistics == null || asset.Ballistics.BulletPrefab == null)
+            {
+                if (!_ballisticsWarningLogged)
+                {
+                    _ballisticsWarningLogged = true;
+                    Debug.LogError($"{asset.name}: configure loaded ammo ballistics, bullet prefab and {(IsSilenced ? "SilencedMuzzlePoint" : "MuzzlePoint")} before firing.", this);
+                }
+
+                return false;
+            }
+
+            Vector3 launchPosition = muzzleRay.origin;
+            Quaternion launchRotation = Quaternion.LookRotation(muzzleRay.direction, Vector3.up);
+
+            if (_ammoSource == null || _ammoSource.TryShoot(_slots[ActiveSlot].Key) == false)
+            {
+                return false;
+            }
+
+            SpawnProjectiles(asset.Ballistics, ammo, launchPosition, launchRotation, bulletSpeed, fireDistance, dispersion);
+            return true;
+        }
+
+        private bool TryShootStandaloneLauncher(FirstPersonWeaponAsset asset)
+        {
+            object key = _slots[ActiveSlot].Key;
+            GameObject visual = null;
+            GrenadeAmmoData ammo = _ammoSource?.GetLauncherShot(key, out visual);
+            float speed = _ammoSource?.GetBulletSpeed(key) ?? 0f;
+            if (!TryGetMuzzleRay(out Ray muzzle) || ammo?.IsConfigured != true || visual == null || speed <= 0f || !float.IsFinite(speed))
+            {
+                if (!_ballisticsWarningLogged)
+                {
+                    _ballisticsWarningLogged = true;
+                    Debug.LogError($"{asset.name}: configure the launcher muzzle and loaded explosive ammunition before firing.", this);
+                }
+
+                return false;
+            }
+
+            Ray aim = muzzle;
+            if ((!ammo.FliesStraight && _aiming && !TryGetGrenadeAimRay(out aim)) || !_ammoSource.TryShoot(key))
+            {
+                return false;
+            }
+
+            int mask = asset.Ballistics != null ? asset.Ballistics.BallisticHitMask.value : Physics.DefaultRaycastLayers;
+            AudioSource sound = _shotAudio != null ? _shotAudio : _audio;
+            GrenadeProjectile.LaunchStandalone(visual, ammo, muzzle, aim, speed, mask, _player.transform.root, _model.transform, sound != null ? sound.outputAudioMixerGroup : null);
+            return true;
         }
 
         private void SpawnProjectiles(WeaponBallisticsSettings settings, BallisticAmmoData ammo, Vector3 position, Quaternion rotation, float speed, float distance, float dispersionDegrees)
@@ -1196,6 +1251,15 @@ namespace RaidIntoDarkness.Weapons
             }
 
             _nextEmptyClickTime = Time.time + asset.EmptyClickInterval;
+            FirstPersonWeaponMotion emptyClick = animate ? FindMotion(asset, FirstPersonWeaponMotionKind.EmptyClick) : null;
+            if (emptyClick != null)
+            {
+                PlayMotion(emptyClick, SHOT_FADE, false, false);
+                _actionUntil = Time.time + emptyClick.Duration;
+                PlayOneShot(_shotAudio != null ? _shotAudio : _audio, asset.EmptySound);
+                return;
+            }
+
             FirstPersonWeaponMotion motion = animate ? asset.FindRandom(FirstPersonWeaponMotionKind.Shoot, GetMotionMode()) : null;
 
             if (motion != null)
@@ -1313,7 +1377,8 @@ namespace RaidIntoDarkness.Weapons
 
         private void StartReload(FirstPersonWeaponAsset asset)
         {
-            FirstPersonWeaponMotion motion = Magazine <= 0 ? FindMotion(asset, FirstPersonWeaponMotionKind.ReloadEmpty) : null;
+            FirstPersonWeaponMotion motion = FindMotion(asset, FirstPersonWeaponMotionKind.LauncherReloadOpen);
+            motion ??= Magazine <= 0 ? FindMotion(asset, FirstPersonWeaponMotionKind.ReloadEmpty) : null;
             if (motion == null)
             {
                 motion = FindMotion(asset, FirstPersonWeaponMotionKind.Reload);
@@ -1340,6 +1405,32 @@ namespace RaidIntoDarkness.Weapons
             }
 
             NotifyAmmo();
+        }
+
+        private bool AdvanceLauncherReload(FirstPersonWeaponAsset asset)
+        {
+            if (_ammoSource == null)
+            {
+                return false;
+            }
+
+            object key = _slots[ActiveSlot].Key;
+            if (CurrentMotion == FirstPersonWeaponMotionKind.LauncherReloadInsert)
+            {
+                _ammoSource.Reload(key, Magazine + 1);
+                NotifyAmmo();
+            }
+
+            FirstPersonWeaponMotion next = Magazine < asset.MagazineSize && _ammoSource.GetReserve(key) > 0 ? asset.Find(FirstPersonWeaponMotionKind.LauncherReloadInsert, Magazine) : null;
+            next ??= FindMotion(asset, FirstPersonWeaponMotionKind.LauncherReloadClose);
+            if (next == null)
+            {
+                return false;
+            }
+
+            PlayMotion(next, asset.CrossFade, false, true);
+            SetState(FirstPersonWeaponState.Reloading, next.Duration);
+            return true;
         }
 
         private void StartFireModeSwitch(FirstPersonWeaponAsset asset, WeaponState weaponState)
@@ -1391,7 +1482,18 @@ namespace RaidIntoDarkness.Weapons
                     Hide();
                     return;
                 case FirstPersonWeaponState.Reloading:
-                    FinishReload(asset);
+                    if (CurrentMotion is FirstPersonWeaponMotionKind.LauncherReloadOpen or FirstPersonWeaponMotionKind.LauncherReloadInsert)
+                    {
+                        if (AdvanceLauncherReload(asset))
+                        {
+                            return;
+                        }
+                    }
+                    else if (CurrentMotion != FirstPersonWeaponMotionKind.LauncherReloadClose)
+                    {
+                        FinishReload(asset);
+                    }
+
                     break;
                 case FirstPersonWeaponState.LoadingGrenade:
                     _ammoSource?.ReloadGrenade(_slots[ActiveSlot].Key);
@@ -1500,14 +1602,15 @@ namespace RaidIntoDarkness.Weapons
 
                     if (_graph != null)
                     {
-                        _graph.PlayWeapon(weaponClip, motion.Speed, Magazine <= 0 ? 0f : asset.CrossFade, true);
+                        _graph.PlayWeapon(weaponClip, motion.WeaponSpeed, Magazine <= 0 ? 0f : asset.CrossFade, true);
                     }
                 }
 
                 return;
             }
 
-            PlayMotion(motion, asset.CrossFade, true, false);
+            float fade = _aimedLauncherShot ? Mathf.Max(asset.CrossFade, LAUNCHER_AIM_SHOT_BLEND_TIME) : asset.CrossFade;
+            PlayMotion(motion, fade, true, false);
             _loopWeaponClip = weaponClip;
             _loopKind = kind;
             _hasLoop = true;
@@ -1536,13 +1639,17 @@ namespace RaidIntoDarkness.Weapons
 
         private void PlayMotion(FirstPersonWeaponMotion motion, float fade, bool loop, bool withEffects)
         {
+            bool leavingReload = CurrentMotion is FirstPersonWeaponMotionKind.Reload or FirstPersonWeaponMotionKind.ReloadEmpty;
+            bool startingReload = motion.Kind is FirstPersonWeaponMotionKind.Reload or FirstPersonWeaponMotionKind.ReloadEmpty;
+            bool replaceLauncherPose = ActiveWeapon?.IsStandaloneLauncher == true && (startingReload || leavingReload);
             _activeMeleeAttack = null;
+            _aimedLauncherShot = false;
             CurrentMotion = motion.Kind;
             _emptyWeaponAt = float.PositiveInfinity;
             if (_graph != null)
             {
                 AnimationClip emptyClip = FindEmptyWeaponClip(motion);
-                _graph.Play(motion.Hands, emptyClip ?? motion.Weapon, motion.Speed, fade, loop, emptyClip != null ? 0f : fade);
+                _graph.Play(motion.Hands, emptyClip ?? motion.Weapon, motion.Speed, fade, loop, emptyClip != null || replaceLauncherPose ? 0f : fade, motion.WeaponSpeed);
             }
 
             if (motion.CameraEffect != null && _player.CameraEffects != null)
@@ -1600,6 +1707,11 @@ namespace RaidIntoDarkness.Weapons
             if (State == FirstPersonWeaponState.LoadingGrenade || state == FirstPersonWeaponState.LoadingGrenade)
             {
                 _weaponView?.SetLauncherRoundVisible(state == FirstPersonWeaponState.LoadingGrenade);
+            }
+
+            if (state != FirstPersonWeaponState.Reloading && ActiveWeapon?.IsStandaloneLauncher == true)
+            {
+                _weaponView?.SetLauncherRoundVisible(Magazine > 0);
             }
 
             State = state;
@@ -1688,7 +1800,7 @@ namespace RaidIntoDarkness.Weapons
             {
                 float zoom = asset != null ? asset.AimZoom : 1f;
                 _player.CameraController.SetWeaponZoom(Mathf.Lerp(1f, zoom, _aim));
-                float hudFieldOfView = 0f;
+                float hudFieldOfView = asset != null ? asset.IronSightHudFieldOfView : 0f;
                 foreach (MonoBehaviour behaviour in _opticsBindings)
                 {
                     if (behaviour != null && behaviour is IFirstPersonWeaponOptics optics && optics.UsesOpticalMagnification)
@@ -1698,7 +1810,16 @@ namespace RaidIntoDarkness.Weapons
                     }
                 }
 
-                _player.CameraController.SetWeaponHudFieldOfView(hudFieldOfView, _aim);
+                float reloadHudFovScale = 1f;
+                float reduction = asset != null ? asset.ReloadHudFovReduction : 0f;
+                if (reduction > 0f)
+                {
+                    float targetBlend = State == FirstPersonWeaponState.Reloading ? 1f : 0f;
+                    _reloadHudFovBlend = Mathf.MoveTowards(_reloadHudFovBlend, targetBlend, deltaTime / RELOAD_HUD_FOV_BLEND_TIME);
+                    reloadHudFovScale = 1f - reduction * Mathf.SmoothStep(0f, 1f, _reloadHudFovBlend);
+                }
+
+                _player.CameraController.SetWeaponHudFieldOfView(hudFieldOfView, _aim, reloadHudFovScale);
             }
 
             float target = asset != null ? asset.AimCameraRoll * 4f * _aim * (1f - _aim) * (_aiming ? 1f : -1f) : 0f;
@@ -1730,6 +1851,8 @@ namespace RaidIntoDarkness.Weapons
         {
             _aimCameraRoll = 0f;
             _aimCameraVelocity = 0f;
+            _reloadHudFovBlend = 0f;
+            _aimedLauncherShot = false;
 
             if (_player != null && _player.CameraController != null)
             {
@@ -1764,8 +1887,32 @@ namespace RaidIntoDarkness.Weapons
                 rotation *= blendRotation;
             }
 
-            _boundHands.transform.localPosition = position;
-            _boundHands.transform.localRotation = rotation;
+            Transform hands = _boundHands.transform;
+            Vector2 idleSway = asset.AimIdleSwayDegrees;
+            if (idleSway != Vector2.zero && !grenadeMode && _aimPhase == AimPhase.Aimed && CurrentMotion == FirstPersonWeaponMotionKind.IdleAim)
+            {
+                float phase = _aimBlendTime * Mathf.PI * 0.5f;
+                float recovery = (Time.time - _actionUntil) / LAUNCHER_AIM_SHOT_BLEND_TIME;
+                float strength = _aim * Mathf.Clamp01(Mathf.Min(_aimBlendTime / asset.AimTime, recovery));
+                float pitch = Mathf.Sin(phase) * idleSway.x * strength;
+                float yaw = Mathf.Sin(phase * 0.75f) * idleSway.y * strength;
+                Camera camera = _player != null && _player.CameraController != null ? _player.CameraController.Camera : null;
+                Transform parent = hands.parent;
+                if (asset.IsStandaloneLauncher && !scoped && asset.IronSightHudFieldOfView > 0f && camera != null && parent != null)
+                {
+                    Vector3 pivot = parent.InverseTransformPoint(camera.transform.position);
+                    Vector3 axis = parent.InverseTransformVector(camera.transform.forward).normalized;
+                    Quaternion roll = Quaternion.AngleAxis(pitch + yaw, axis);
+                    position = pivot + roll * (position - pivot);
+                    rotation = roll * rotation;
+                }
+                else
+                {
+                    rotation *= Quaternion.Euler(pitch, yaw, 0f);
+                }
+            }
+
+            hands.SetLocalPositionAndRotation(position, rotation);
         }
 
         private bool EvaluateAimBlend(FirstPersonWeaponAsset asset, bool grenadeMode, out Vector3 position, out Quaternion rotation)
@@ -1982,6 +2129,11 @@ namespace RaidIntoDarkness.Weapons
 
         private void NotifyAmmo()
         {
+            if (State != FirstPersonWeaponState.Reloading && ActiveWeapon?.IsStandaloneLauncher == true)
+            {
+                _weaponView?.SetLauncherRoundVisible(Magazine > 0);
+            }
+
             AmmoChanged?.Invoke(Magazine, Reserve);
         }
 

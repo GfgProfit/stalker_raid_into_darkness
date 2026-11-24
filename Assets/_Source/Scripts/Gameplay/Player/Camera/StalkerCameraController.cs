@@ -18,6 +18,7 @@ namespace RaidIntoDarkness.Player
         private float _hudFieldOfView;
         private float _weaponHudFieldOfView;
         private float _weaponHudAimFactor;
+        private float _weaponHudFovScale = 1f;
         private float _yaw;
         private float _pitch;
         private bool _ladderClamp;
@@ -73,10 +74,11 @@ namespace RaidIntoDarkness.Player
             }
         }
 
-        public void SetWeaponHudFieldOfView(float fieldOfView, float aimFactor)
+        public void SetWeaponHudFieldOfView(float fieldOfView, float aimFactor, float scale = 1f)
         {
             _weaponHudFieldOfView = float.IsFinite(fieldOfView) && fieldOfView > 0f ? Mathf.Clamp(fieldOfView, MIN_HUD_FIELD_OF_VIEW, MAX_HUD_FIELD_OF_VIEW) : 0f;
             _weaponHudAimFactor = float.IsFinite(aimFactor) ? Mathf.Clamp01(aimFactor) : 0f;
+            _weaponHudFovScale = float.IsFinite(scale) ? Mathf.Clamp(scale, 0.5f, 1f) : 1f;
             ApplyHudFieldOfView();
         }
 
@@ -143,10 +145,11 @@ namespace RaidIntoDarkness.Player
                 return;
             }
 
-            float hudHalfTangent = Mathf.Tan(_hudFieldOfView * _profile.Camera.HudFieldOfViewScale * 0.5f * Mathf.Deg2Rad);
+            float hudAngleScale = _profile.Camera.HudFieldOfViewScale * _weaponHudFovScale * 0.5f * Mathf.Deg2Rad;
+            float hudHalfTangent = Mathf.Tan(_hudFieldOfView * hudAngleScale);
             if (_weaponHudFieldOfView > 0f)
             {
-                float targetHalfTangent = Mathf.Tan(_weaponHudFieldOfView * _profile.Camera.HudFieldOfViewScale * 0.5f * Mathf.Deg2Rad);
+                float targetHalfTangent = Mathf.Tan(_weaponHudFieldOfView * hudAngleScale);
                 hudHalfTangent = Mathf.Lerp(hudHalfTangent, targetHalfTangent, _weaponHudAimFactor);
             }
 

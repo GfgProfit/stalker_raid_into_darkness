@@ -24,6 +24,7 @@ namespace RaidIntoDarkness.Weapons
         [Header("Model")]
         [SerializeField] private GameObject _hudModel;
         [SerializeField] private bool _isMelee;
+        [SerializeField] private bool _isStandaloneLauncher;
         [SerializeField] private GameObject _handGrenadeVisual;
         [SerializeField] private GrenadeAmmoData _handGrenade;
         [SerializeField] [Min(1)] private int _handGrenadeReleaseFrame = 1;
@@ -42,6 +43,8 @@ namespace RaidIntoDarkness.Weapons
         [SerializeField] [Range(-10f, 10f)] private float _aimCameraRoll = 1f;
         [SerializeField] [Min(0.01f)] private float _aimCameraBlendTime = 0.15f;
         [SerializeField] [Range(1f, 2f)] private float _aimZoom = 1.15f;
+        [SerializeField] [Range(0f, 1f)] private float _ironSightHudFieldOfView;
+        [SerializeField] [Range(0f, 0.5f)] private float _reloadHudFovReduction;
         [SerializeField] private string _muzzleBone = DEFAULT_MUZZLE_BONE;
         [Tooltip("Hands bones animated by the left-hand pickup overlay.")]
         [SerializeField] private string[] _overlayBones = Array.Empty<string>();
@@ -52,6 +55,7 @@ namespace RaidIntoDarkness.Weapons
         [SerializeField] private List<AttachmentMotionSet> _attachmentMotions = new List<AttachmentMotionSet>();
         [SerializeField] private XRayAnmAsset _aimStart;
         [SerializeField] private XRayAnmAsset _aimIdle;
+        [SerializeField] private Vector2 _aimIdleSwayDegrees;
         [SerializeField] private XRayAnmAsset _aimEnd;
         [SerializeField] [Min(0.0f)] private float _crossFade = 0.15f;
         [Header("Grenade Launcher Aim")]
@@ -91,6 +95,7 @@ namespace RaidIntoDarkness.Weapons
 
         public GameObject HudModel => _hudModel;
         public bool IsMelee => _isMelee;
+        public bool IsStandaloneLauncher => _isStandaloneLauncher;
         public bool IsHandGrenade => _handGrenadeVisual != null;
         public GameObject HandGrenadeVisual => _handGrenadeVisual;
         public GrenadeAmmoData HandGrenade => _handGrenade;
@@ -105,11 +110,14 @@ namespace RaidIntoDarkness.Weapons
         public float AimCameraRoll => _aimCameraRoll;
         public float AimCameraBlendTime => Mathf.Max(0.01f, _aimCameraBlendTime);
         public float AimZoom => Mathf.Clamp(_aimZoom, 1f, 2f);
+        public float IronSightHudFieldOfView => _ironSightHudFieldOfView;
+        public float ReloadHudFovReduction => Mathf.Clamp(_reloadHudFovReduction, 0f, 0.5f);
         public string MuzzleBone => _muzzleBone;
         public IReadOnlyList<string> OverlayBones => _overlayBones ?? Array.Empty<string>();
         public IReadOnlyList<FirstPersonWeaponMotion> Motions => _motions;
         public XRayAnmAsset AimStart => _aimStart;
         public XRayAnmAsset AimIdle => _aimIdle;
+        public Vector2 AimIdleSwayDegrees => _aimIdleSwayDegrees;
         public XRayAnmAsset AimEnd => _aimEnd;
         public Vector3 GrenadeAimOffsetPosition => _grenadeAimOffsetPosition;
         public Vector3 GrenadeAimOffsetRotation => _grenadeAimOffsetRotation;

@@ -199,6 +199,10 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
                     {
                         DrawGameMuzzle(hand);
                     }
+                    else if (controller.ActiveWeapon?.IsStandaloneLauncher == true && controller.TryGetMuzzleRay(out Ray launcher))
+                    {
+                        DrawGameMuzzle(launcher);
+                    }
                     else if (controller.IsGrenadeMode && controller.Model != null && controller.Model.TryGetComponent(out FirstPersonWeaponView view) && view.GrenadeMuzzle != null)
                     {
                         Transform muzzle = view.GrenadeMuzzle;

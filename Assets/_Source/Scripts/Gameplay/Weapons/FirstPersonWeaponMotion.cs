@@ -32,7 +32,11 @@ namespace RaidIntoDarkness.Weapons
         MeleeSecondary = 22,
         HandGrenadePrepare = 23,
         HandGrenadeHold = 24,
-        HandGrenadeThrow = 25
+        HandGrenadeThrow = 25,
+        LauncherReloadOpen = 26,
+        LauncherReloadInsert = 27,
+        LauncherReloadClose = 28,
+        EmptyClick = 29
     }
 
     [Serializable]
@@ -48,6 +52,7 @@ namespace RaidIntoDarkness.Weapons
         [SerializeField] private XRayAnmAsset _cameraEffect;
         [SerializeField] private AudioClip _sound;
         [SerializeField] private float _speed = 1.0f;
+        [SerializeField] [Min(MIN_SPEED)] private float _weaponSpeedMultiplier = 1.0f;
         [SerializeField] [Min(0f)] private float _meleeHitPower;
         [SerializeField] [Min(0f)] private float _meleeReach;
         [SerializeField] [Min(0)] private int _meleeContactFrame;
@@ -71,6 +76,7 @@ namespace RaidIntoDarkness.Weapons
         public XRayAnmAsset CameraEffect => _cameraEffect;
         public AudioClip Sound => _sound;
         public float Speed => Mathf.Max(MIN_SPEED, _speed);
+        public float WeaponSpeed => Speed * (_weaponSpeedMultiplier > 0f ? _weaponSpeedMultiplier : 1.0f);
         public float Duration => _hands != null ? _hands.length / Speed : 0.0f;
         public float MeleeDamageHp => _meleeHitPower * GameConfig.DEFAULT_PLAYER_STAT_CAPACITY;
         public float MeleeReach => _meleeReach;

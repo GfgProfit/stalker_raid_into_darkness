@@ -1354,8 +1354,9 @@ namespace RaidIntoDarkness.Weapons
             }
 
             bool grenadeMode = IsGrenadeMode;
-            Vector3 aimPosition = grenadeMode ? asset.GetGrenadeAimOffset(_slots[ActiveSlot].HasScope) : AimOffsetPosition;
-            Vector3 aimEuler = grenadeMode ? asset.GrenadeAimOffsetRotation : asset.AimOffsetRotation;
+            bool scoped = _slots[ActiveSlot].HasScope;
+            Vector3 aimPosition = grenadeMode ? asset.GetGrenadeAimOffset(scoped) : AimOffsetPosition;
+            Vector3 aimEuler = grenadeMode ? asset.GrenadeAimOffsetRotation : asset.GetRifleAimRotation(scoped);
             Quaternion aimRotation = FirstPersonWeaponAsset.ToAimRotation(aimEuler * _aim);
             Vector3 position = aimPosition * _aim + aimRotation * asset.HandsPosition;
             Quaternion rotation = aimRotation * asset.HandsRotation;

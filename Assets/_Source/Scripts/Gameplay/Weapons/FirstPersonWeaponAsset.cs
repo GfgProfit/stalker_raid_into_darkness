@@ -31,6 +31,7 @@ namespace RaidIntoDarkness.Weapons
         [SerializeField] private Vector3 _aimOffsetPosition;
         [Tooltip("Hud section 'aim_hud_offset_rot_16x9' in radians.")]
         [SerializeField] private Vector3 _aimOffsetRotation;
+        [SerializeField] private Vector3 _ironSightAimRotationOffset;
         [Tooltip("Weapon section 'zoom_rotate_time'.")]
         [SerializeField] [Min(0.01f)] private float _aimTime = 0.25f;
         [SerializeField] [Range(-10f, 10f)] private float _aimCameraRoll = 1f;
@@ -127,6 +128,11 @@ namespace RaidIntoDarkness.Weapons
         public int LowAmmoThreshold => _lowAmmoThreshold;
         internal bool HasFixedTwoRoundBurst => _twoRoundBurstRoundsPerMinute > 0;
         internal bool HasAttachmentMotions => _attachmentMotions?.Count > 0;
+
+        internal Vector3 GetRifleAimRotation(bool scoped)
+        {
+            return scoped ? _aimOffsetRotation : _aimOffsetRotation + _ironSightAimRotationOffset;
+        }
 
         internal Vector3 GetGrenadeAimOffset(bool scoped)
         {

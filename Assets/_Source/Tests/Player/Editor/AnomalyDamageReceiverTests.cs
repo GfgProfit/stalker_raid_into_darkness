@@ -14,10 +14,12 @@ namespace RaidIntoDarkness.Player.Tests
     {
         public float Protection { get; set; }
         public int Calls { get; private set; }
+        public AnomalyDamageType LastDamageType { get; private set; }
 
         public float GetAnomalyProtection(AnomalyDamageType type, AnomalyStrength strength, AnomalyBalanceConfig config)
         {
             Calls++;
+            LastDamageType = type;
             return Protection;
         }
     }
@@ -133,6 +135,46 @@ namespace RaidIntoDarkness.Player.Tests
                 Assert.That(result.Protection, Is.EqualTo(0.6f).Within(0.0001f));
                 Assert.That(result.AppliedDamage, Is.EqualTo(8f).Within(0.0001f));
                 Assert.That(result.InputDamage, Is.EqualTo(20f));
+            }
+        }
+
+        [Test]
+        public void ExplosionDamageUsesRegisteredProtectionAndCanBeAppliedRepeatedly()
+        {
+            using (var rig = new Rig())
+            {
+                var armor = rig.Root.AddComponent<AnomalyTestProtectionSource>();
+                var helmet = rig.Root.AddComponent<AnomalyTestProtectionSource>();
+                armor.Protection = 0.25f;
+                helmet.Protection = 0.2f;
+                rig.Receiver.Initialize(rig.Condition, armor);
+                rig.Receiver.RegisterProtectionSource(helmet);
+
+                Assert.That(rig.Receiver.TryApplyExplosionDamage(50f), Is.True);
+                Assert.That(rig.Condition.Health, Is.EqualTo(70f).Within(0.0001f));
+                Assert.That(armor.LastDamageType, Is.EqualTo(AnomalyDamageType.Explosion));
+                Assert.That(helmet.LastDamageType, Is.EqualTo(AnomalyDamageType.Explosion));
+                Assert.That(armor.Calls, Is.EqualTo(1));
+                Assert.That(helmet.Calls, Is.EqualTo(1));
+
+                rig.Receiver.UnregisterProtectionSource(helmet);
+                Assert.That(rig.Receiver.TryApplyExplosionDamage(40f), Is.True);
+                Assert.That(rig.Condition.Health, Is.EqualTo(40f).Within(0.0001f));
+                Assert.That(helmet.Calls, Is.EqualTo(1));
+            }
+        }
+
+        [Test]
+        public void FullyProtectedExplosionDoesNotChangeHealth()
+        {
+            using (var rig = new Rig())
+            {
+                var source = rig.Root.AddComponent<AnomalyTestProtectionSource>();
+                source.Protection = 1f;
+                rig.Receiver.RegisterProtectionSource(source);
+
+                Assert.That(rig.Receiver.TryApplyExplosionDamage(200f), Is.False);
+                Assert.That(rig.Condition.Health, Is.EqualTo(100f));
             }
         }
 

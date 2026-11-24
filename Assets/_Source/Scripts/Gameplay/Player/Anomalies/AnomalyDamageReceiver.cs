@@ -103,6 +103,19 @@ namespace RaidIntoDarkness.Player
             _authoritySource = source;
         }
 
+        public bool TryApplyExplosionDamage(float absoluteHp)
+        {
+            if (!CanApplyDamage() || !float.IsFinite(absoluteHp) || absoluteHp <= 0f)
+            {
+                return false;
+            }
+
+            AnomalyBalanceConfig balance = _configuration != null ? _configuration.AnomalyBalance : _balance;
+            float protection = GetProtection(AnomalyDamageType.Explosion, AnomalyStrength.Average, balance);
+            float damage = absoluteHp * (1f - protection);
+            return damage > 0f && _condition != null && CanApplyDamage() && _condition.TryApplyHealthDamage(damage);
+        }
+
         public bool ApplyHit(AnomalyHitEvent hit, AnomalyVariantConfig profile, AnomalyBalanceConfig config)
         {
             EnsureInitialized();

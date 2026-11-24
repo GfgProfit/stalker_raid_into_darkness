@@ -42,7 +42,13 @@ namespace RaidIntoDarkness.Weapons
             CollectFragmentDamage();
             foreach (KeyValuePair<IHealthDamageReceiver, float> hit in _damage)
             {
-                if (hit.Key is not Component receiver || receiver == null || hit.Value <= 0f || !hit.Key.TryApplyHealthDamage(hit.Value))
+                if (hit.Key is not Component receiver || receiver == null || hit.Value <= 0f)
+                {
+                    continue;
+                }
+
+                bool applied = receiver is StalkerActorCondition && receiver.TryGetComponent(out AnomalyDamageReceiver protectedReceiver) ? protectedReceiver.TryApplyExplosionDamage(hit.Value) : hit.Key.TryApplyHealthDamage(hit.Value);
+                if (!applied)
                 {
                     continue;
                 }

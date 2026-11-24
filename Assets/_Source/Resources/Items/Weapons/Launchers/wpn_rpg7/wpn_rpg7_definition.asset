@@ -95,6 +95,7 @@ MonoBehaviour:
         _grenadeLauncherStatus: 0
         _grenadeLauncherSection: 
         _blockSilencerWithGrenadeLauncher: 0
+        _exposedRound: {fileID: 11400000, guid: 8a330cc03a190084c9e3608c101260eb, type: 2}
     - rid: 115149112346673464
       type: {class: WeaponHudComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
       data:

@@ -41,6 +41,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
         [SerializeField] private WeaponAddonStatus _grenadeLauncherStatus;
         [SerializeField] private string _grenadeLauncherSection;
         [SerializeField] private bool _blockSilencerWithGrenadeLauncher;
+        [SerializeField] private ItemDefinition _exposedRound;
 
         private ItemDatabase _ammoDatabase;
         private Dictionary<string, ItemDefinition> _ammoDefinitions;
@@ -70,6 +71,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
         public WeaponAddonStatus GrenadeLauncherStatus => _grenadeLauncherStatus;
         public string GrenadeLauncherSection => _grenadeLauncherSection ?? string.Empty;
         public bool BlockSilencerWithGrenadeLauncher => _blockSilencerWithGrenadeLauncher;
+        public bool HasExposedRound => _exposedRound != null;
 
         public override float GetAdditionalWeight(ItemInstance item, IItemDefinitionResolver resolver)
         {
@@ -102,7 +104,21 @@ namespace RaidIntoDarkness.Integrations.Inventory
             return attachmentWeight + (_ammoDefinitions.TryGetValue(section, out ItemDefinition loaded) ? loaded.Weight * Math.Clamp(magazine, 0, MagazineSize) : 0f);
         }
 
-        public override Vector2Int GetSizeDelta(ItemInstance item, IItemDefinitionResolver resolver) => GetSilencer(item, resolver) != null ? Vector2Int.right : Vector2Int.zero;
+        public override Vector2Int GetSizeDelta(ItemInstance item, IItemDefinitionResolver resolver)
+        {
+            int width = GetSilencer(item, resolver) != null ? 1 : 0;
+            return new Vector2Int(width + (GetIconVariantId(item) != null ? 1 : 0), 0);
+        }
+
+        public override string GetIconVariantId(ItemInstance item)
+        {
+            if (!HasExposedRound || _exposedRound.GetComponent<AmmoStatsComponent>()?.Section != item.GetState(InventoryWeaponAmmoSource.AMMO_SECTION_STATE) || InventoryWeaponAmmoSource.GetLoadedMagazine(item) == 0)
+            {
+                return null;
+            }
+
+            return _exposedRound.DefinitionId;
+        }
 
         public bool SupportsSilencer(ItemDefinition definition)
         {

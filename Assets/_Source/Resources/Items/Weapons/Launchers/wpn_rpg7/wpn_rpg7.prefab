@@ -328,6 +328,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 5481093539325624750, guid: f3fd1c29250f42f4d93f97ad28d66efc, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2487678252724273006}
+    - targetCorrespondingSourceObject: {fileID: 5481093539325624750, guid: f3fd1c29250f42f4d93f97ad28d66efc, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5649803130838127580}
   m_SourcePrefab: {fileID: -9137962142385034750, guid: f3fd1c29250f42f4d93f97ad28d66efc, type: 3}
 --- !u!1 &2189347407890933927 stripped
 GameObject:
@@ -358,6 +361,26 @@ MonoBehaviour:
   _installedMagazineRenderers: []
   _replacementMagazineRenderers: []
   _magazineBonePairs: []
+--- !u!114 &5649803130838127580
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2189347407890933927}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9c9757ce76109a545a89455546c23e0a, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Inventory.IconGeneration::Inventory.IconGeneration.ItemIconVariantPart
+  _part: {fileID: 11400000, guid: 8a330cc03a190084c9e3608c101260eb, type: 2}
+  _group: LoadedRound
+  _installedObjects:
+  - {fileID: 9115806902631218671}
+  _defaultObjects: []
+  _requiredParts: []
+  _incompatibleParts: []
+  _sizeDelta: {x: 1, y: 0}
 --- !u!4 &8718158296643773911 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -6156490435677123362, guid: f3fd1c29250f42f4d93f97ad28d66efc, type: 3}

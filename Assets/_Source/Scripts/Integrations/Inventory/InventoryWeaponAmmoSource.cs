@@ -212,7 +212,16 @@ namespace RaidIntoDarkness.Integrations.Inventory
                 return false;
             }
 
-            weapon.SetState(MAGAZINE_STATE, (magazine - 1).ToString(CultureInfo.InvariantCulture));
+            string remaining = (magazine - 1).ToString(CultureInfo.InvariantCulture);
+
+            if (weapon.Definition.GetComponent<WeaponStatsComponent>()?.GetIconVariantId(weapon) != null && magazine == 1)
+            {
+                ItemInstance updated = InventoryWeaponAttachments.Clone(weapon);
+                updated.SetState(MAGAZINE_STATE, remaining);
+                return _model.TryReconfigureItem(weapon, updated, weapon.Location.Position).Success;
+            }
+
+            weapon.SetState(MAGAZINE_STATE, remaining);
             _model.NotifyItemChanged(weapon);
             return true;
         }
@@ -260,6 +269,22 @@ namespace RaidIntoDarkness.Integrations.Inventory
             int magazine = GetMagazine(weaponKey);
             int missing = Math.Max(0, Math.Min(capacity, stats.MagazineSize) - magazine);
             string section = GetReloadSection(weaponKey, stats);
+
+            if (stats.HasExposedRound)
+            {
+                ItemInstance round = missing > 0 ? FindStack(section) : null;
+
+                if (round != null)
+                {
+                    ItemInstance updated = InventoryWeaponAttachments.Clone(weapon);
+                    updated.SetState(AMMO_SECTION_STATE, section);
+                    updated.SetState(MAGAZINE_STATE, (magazine + 1).ToString(CultureInfo.InvariantCulture));
+                    _model.TryReconfigureItem(weapon, updated, weapon.Location.Position, consumed: round);
+                }
+
+                return;
+            }
+
             int taken = 0;
 
             while (taken < missing)
@@ -294,7 +319,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
             _model.Changed -= OnInventoryChanged;
         }
 
-        private static int GetLoadedMagazine(ItemInstance weapon)
+        internal static int GetLoadedMagazine(ItemInstance weapon)
         {
             WeaponStatsComponent stats = weapon?.Definition.GetComponent<WeaponStatsComponent>();
 

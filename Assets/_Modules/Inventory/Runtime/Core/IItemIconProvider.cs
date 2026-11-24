@@ -28,8 +28,31 @@ namespace Inventory
         public int Height { get; }
         public ItemIconProfileType ProfileType { get; }
 
-        public static ItemIconRequest ForItem(ItemInstance item) => new(item.Definition, item.VisualVariant, item.GetSize(false).x, item.GetSize(false).y, ItemIconProfileType.Default);
-        public static ItemIconRequest ForSlot(ItemInstance item, int slotWidth, int slotHeight) => new(item.Definition, item.VisualVariant, slotWidth, slotHeight, ItemIconProfileType.Slot);
+        public static ItemIconRequest ForItem(ItemInstance item)
+        {
+            Vector2Int size = item.GetSize(false);
+            return new ItemIconRequest(item.Definition, GetVariantIds(item), size.x, size.y, ItemIconProfileType.Default);
+        }
+
+        public static ItemIconRequest ForSlot(ItemInstance item, int slotWidth, int slotHeight) => new(item.Definition, GetVariantIds(item), slotWidth, slotHeight, ItemIconProfileType.Slot);
+
+        private static IReadOnlyList<string> GetVariantIds(ItemInstance item)
+        {
+            List<string> variants = null;
+
+            foreach (ItemDefinitionComponent component in item.Definition.Components)
+            {
+                string id = component?.GetIconVariantId(item);
+
+                if (!string.IsNullOrEmpty(id))
+                {
+                    variants ??= new List<string>(item.VisualVariant);
+                    variants.Add(id);
+                }
+            }
+
+            return variants != null ? variants : item.VisualVariant;
+        }
     }
 
     public interface IItemIconProvider

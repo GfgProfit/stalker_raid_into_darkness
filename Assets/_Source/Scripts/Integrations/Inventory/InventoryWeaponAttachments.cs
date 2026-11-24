@@ -143,7 +143,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
                 position += weapon.Location.Rotated ? Vector2Int.up : Vector2Int.right;
             }
 
-            InventoryResult result = _model.TryReconfigureItem(weapon, updated, position, returned: silencer, returnContainerId: equipped ? _window.PrimaryContainerId : weapon.ContainerId, apply: apply);
+            InventoryResult result = _model.TryReconfigureItem(weapon, updated, position, returned: silencer, returnContainerId: equipped ? _window.PrimaryContainerId : weapon.ContainerId, apply: apply, mergeReturned: true);
 
             if (apply && result.Success)
             {
@@ -208,7 +208,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
 
             variants.Add(scope.DefinitionId);
             updated.SetVisualVariant(variants);
-            return _model.TryReconfigureItem(weapon, updated, weapon.Location.Position, consumed: scope, returned: returned, returnContainerId: scope.ContainerId, apply: apply);
+            return _model.TryReconfigureItem(weapon, updated, weapon.Location.Position, consumed: scope, returned: returned, returnContainerId: scope.ContainerId, apply: apply, mergeReturned: true);
         }
 
         public InventoryResult DetachScope(ItemInstance weapon, bool apply = true)
@@ -229,7 +229,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
             variants.Remove(definition.DefinitionId);
             updated.SetVisualVariant(variants);
             bool equipped = _model.GetContainer(weapon.ContainerId) is SlottedContainer;
-            InventoryResult result = _model.TryReconfigureItem(weapon, updated, weapon.Location.Position, returned: scope, returnContainerId: equipped ? _window.PrimaryContainerId : weapon.ContainerId, apply: apply);
+            InventoryResult result = _model.TryReconfigureItem(weapon, updated, weapon.Location.Position, returned: scope, returnContainerId: equipped ? _window.PrimaryContainerId : weapon.ContainerId, apply: apply, mergeReturned: true);
 
             if (apply && result.Success)
             {
@@ -292,7 +292,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
             variants.Remove(definition.DefinitionId);
             updated.SetVisualVariant(variants);
             string destination = _model.GetContainer(weapon.ContainerId) is SlottedContainer ? _window.PrimaryContainerId : weapon.ContainerId;
-            InventoryResult result = _model.TryReconfigureItem(weapon, updated, weapon.Location.Position, returned: launcher, returnContainerId: destination, apply: apply, returnedStack: returnedGrenade);
+            InventoryResult result = _model.TryReconfigureItem(weapon, updated, weapon.Location.Position, returned: launcher, returnContainerId: destination, apply: apply, mergeReturned: true, returnedStack: returnedGrenade);
 
             if (apply && result.Success)
             {

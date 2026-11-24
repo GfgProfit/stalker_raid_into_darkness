@@ -21,7 +21,7 @@ MonoBehaviour:
   - Scope
   _size: {x: 2, y: 1}
   _weight: 0.5
-  _maxStack: 1
+  _maxStack: 0
   _allowRotation: 1
   _backgroundColor: {r: 1, g: 1, b: 1, a: 0.04}
   _fallbackIcon: {fileID: 0}

@@ -385,7 +385,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
             tags.GetArrayElementAtIndex(0).stringValue = kind == WeaponAddonKind.Silencer ? SILENCER_TAG : kind == WeaponAddonKind.Scope ? SCOPE_TAG : GRENADE_LAUNCHER_TAG;
             serialized.FindProperty("_size").vector2IntValue = ToProjectSize(GetInt(system, section, "inv_grid_width"), GetInt(system, section, "inv_grid_height"));
             serialized.FindProperty("_weight").floatValue = GetFloat(system, section, "inv_weight", 0f);
-            serialized.FindProperty("_maxStack").intValue = 1;
+            serialized.FindProperty("_maxStack").intValue = 0;
             serialized.FindProperty("_allowRotation").boolValue = true;
             serialized.FindProperty("_visualPrefab").objectReferenceValue = model;
             if (!preserveAddon)

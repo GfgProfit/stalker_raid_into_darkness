@@ -97,7 +97,8 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
                     component = components.GetArrayElementAtIndex(index);
                 }
 
-                component.managedReferenceValue = new AmmoBallisticsComponent(profile.Data);
+                GrenadeAmmoData grenade = (component.managedReferenceValue as AmmoBallisticsComponent)?.Grenade;
+                component.managedReferenceValue = new AmmoBallisticsComponent(profile.Data, grenade);
                 component.FindPropertyRelative("_data").FindPropertyRelative("_ammoTracerMaterial").objectReferenceValue = material;
                 serialized.ApplyModifiedPropertiesWithoutUndo();
                 EditorUtility.SetDirty(definition);

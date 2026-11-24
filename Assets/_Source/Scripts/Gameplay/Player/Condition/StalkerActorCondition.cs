@@ -6,7 +6,7 @@ using XRay.Importer.Levels;
 namespace RaidIntoDarkness.Player
 {
     [DisallowMultipleComponent]
-    public sealed class StalkerActorCondition : MonoBehaviour
+    public sealed class StalkerActorCondition : MonoBehaviour, IHealthDamageReceiver
     {
         private const float EPS = 0.0000001f;
         private const string STAMINA_SPEED_KEY = "ASS_speed_stamina";

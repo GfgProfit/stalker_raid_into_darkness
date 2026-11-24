@@ -10,6 +10,7 @@ namespace RaidIntoDarkness.Weapons
         [SerializeField] private Transform _muzzle;
         [SerializeField] private GameObject _silencerVisual;
         [SerializeField] private Transform _silencedMuzzle;
+        [SerializeField] private Transform _grenadeMuzzle;
         [SerializeField] private GameObject _launcherRound;
         [SerializeField] private GameObject _magazineSwapObjects;
         [SerializeField] private AnimationClip[] _magazineSwapClips = Array.Empty<AnimationClip>();
@@ -22,6 +23,7 @@ namespace RaidIntoDarkness.Weapons
         public Transform Muzzle => _muzzle;
         public GameObject SilencerVisual => _silencerVisual;
         public Transform SilencedMuzzle => _silencedMuzzle;
+        public Transform GrenadeMuzzle => _grenadeMuzzle;
 
         public void SetMuzzle(Transform muzzle)
         {

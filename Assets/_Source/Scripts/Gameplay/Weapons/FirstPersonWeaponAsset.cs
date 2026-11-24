@@ -178,6 +178,12 @@ namespace RaidIntoDarkness.Weapons
             return FindIn(GetAttachmentMotions(kind, mode), kind, variant) ?? FindIn(GetModeMotions(mode), kind, variant) ?? FindIn(_motions, kind, variant);
         }
 
+        internal FirstPersonWeaponMotion FindGrenadeShot(bool aiming, FirstPersonWeaponMotionMode mode)
+        {
+            FirstPersonWeaponMotion aimedShot = aiming ? FindIn(GetAttachmentMotions(FirstPersonWeaponMotionKind.ShootAim, mode), FirstPersonWeaponMotionKind.ShootAim, 0) ?? FindIn(_grenadeModeMotions, FirstPersonWeaponMotionKind.ShootAim, 0) : null;
+            return aimedShot ?? FindIn(GetAttachmentMotions(FirstPersonWeaponMotionKind.Shoot, mode), FirstPersonWeaponMotionKind.Shoot, 0) ?? FindIn(_grenadeModeMotions, FirstPersonWeaponMotionKind.Shoot, 0);
+        }
+
         internal FirstPersonWeaponMotion FindRandom(FirstPersonWeaponMotionKind kind, FirstPersonWeaponMotionMode mode)
         {
             List<FirstPersonWeaponMotion> motions = GetAttachmentMotions(kind, mode) ?? GetModeMotions(mode);

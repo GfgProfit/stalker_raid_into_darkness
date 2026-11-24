@@ -2,6 +2,7 @@ using System;
 using System.Globalization;
 using Inventory;
 using RaidIntoDarkness.Weapons;
+using UnityEngine;
 
 namespace RaidIntoDarkness.Integrations.Inventory
 {
@@ -109,6 +110,14 @@ namespace RaidIntoDarkness.Integrations.Inventory
 
         public BallisticAmmoData GetBallistics(object weaponKey) => FindDefinition(GetAmmoSection(weaponKey))?.GetComponent<AmmoBallisticsComponent>()?.Data;
 
+        public GrenadeAmmoData GetGrenadeShot(object weaponKey, out GameObject visual)
+        {
+            ItemInstance weapon = GetWeapon(weaponKey);
+            ItemDefinition grenade = GetGrenadeLauncher(weapon)?.GetLoadedGrenade(weapon);
+            visual = grenade != null ? grenade.VisualPrefab : null;
+            return grenade?.GetComponent<AmmoBallisticsComponent>()?.Grenade;
+        }
+
         public float GetBulletSpeed(object weaponKey)
         {
             ItemInstance weapon = GetWeapon(weaponKey);
@@ -201,6 +210,19 @@ namespace RaidIntoDarkness.Integrations.Inventory
         }
 
         public bool CanReloadGrenade(object weaponKey) => FindGrenadeStack(GetWeapon(weaponKey)) != null;
+
+        public bool TryShootGrenade(object weaponKey)
+        {
+            ItemInstance weapon = GetWeapon(weaponKey);
+            if (GetGrenadeLauncher(weapon)?.GetLoadedGrenade(weapon) == null)
+            {
+                return false;
+            }
+
+            weapon.SetState(InventoryWeaponAttachments.GRENADE_ROUND_STATE, null);
+            _model.NotifyItemChanged(weapon);
+            return true;
+        }
 
         public bool ReloadGrenade(object weaponKey)
         {

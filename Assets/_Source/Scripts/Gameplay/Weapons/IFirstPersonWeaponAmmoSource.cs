@@ -1,4 +1,5 @@
 using System;
+using UnityEngine;
 
 namespace RaidIntoDarkness.Weapons
 {
@@ -11,11 +12,13 @@ namespace RaidIntoDarkness.Weapons
         string GetAmmoSection(object weaponKey);
         string GetAmmoName(object weaponKey);
         void GetGrenadeAmmo(object weaponKey, out int loaded, out int reserve, out string name);
+        GrenadeAmmoData GetGrenadeShot(object weaponKey, out GameObject visual);
         BallisticAmmoData GetBallistics(object weaponKey);
         float GetBulletSpeed(object weaponKey);
         float GetFireDistance(object weaponKey);
         float GetDispersionDegrees(object weaponKey);
         bool TryShoot(object weaponKey);
+        bool TryShootGrenade(object weaponKey);
         bool TryStartReload(object weaponKey);
         bool TrySwitchAmmo(object weaponKey);
         bool CanReloadGrenade(object weaponKey);

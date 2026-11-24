@@ -482,6 +482,14 @@ MonoBehaviour:
     _cameraEffect: {fileID: 0}
     _sound: {fileID: 0}
     _speed: 1
+  - _kind: 11
+    _handsName: groza_gl_shoot
+    _hands: {fileID: -558453935416437491, guid: 60d6daade6054d4419e2f08c89ca983f, type: 3}
+    _weapon: {fileID: 2311523035756880660, guid: eb31372441d42e047879c0f2e72ab57d, type: 3}
+    _emptyWeapon: {fileID: 0}
+    _cameraEffect: {fileID: 0}
+    _sound: {fileID: 0}
+    _speed: 1
   _aimStart: {fileID: 4908183818744415850, guid: 1f8893d0e3e5142458baeb24a0842909, type: 3}
   _aimIdle: {fileID: 4908183818744415850, guid: 8cceaae1a626f7b4cbb44f68de81b9fe, type: 3}
   _aimEnd: {fileID: 4908183818744415850, guid: 656ea6d86daf12a4588c20428be4ea8b, type: 3}

@@ -539,6 +539,37 @@ Transform:
   m_Children: []
   m_Father: {fileID: 7578541979312994660}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &2020969391439109920
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6049429702899506472}
+  m_Layer: 0
+  m_Name: GrenadeMuzzlePoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6049429702899506472
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2020969391439109920}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 0.00000002980233, z: -0, w: 1}
+  m_LocalPosition: {x: 0.00034616797, y: -0.0021826327, z: 0.11606139}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2207559618535298272}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &3010787964879433186
 GameObject:
   m_ObjectHideFlags: 0
@@ -2453,6 +2484,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 5414602591281056066, guid: 08853ca0055860d4f9c5a89bd4642c3e, type: 3}
       insertIndex: -1
       addedObject: {fileID: 5294366989322286794}
+    - targetCorrespondingSourceObject: {fileID: 2036924833132793853, guid: 08853ca0055860d4f9c5a89bd4642c3e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6049429702899506472}
     - targetCorrespondingSourceObject: {fileID: 514679753279156612, guid: 08853ca0055860d4f9c5a89bd4642c3e, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2021399130636584396}
@@ -2541,6 +2575,11 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: -7945707644251980307, guid: 08853ca0055860d4f9c5a89bd4642c3e, type: 3}
   m_PrefabInstance: {fileID: 208941917348977437}
   m_PrefabAsset: {fileID: 0}
+--- !u!4 &2207559618535298272 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2036924833132793853, guid: 08853ca0055860d4f9c5a89bd4642c3e, type: 3}
+  m_PrefabInstance: {fileID: 208941917348977437}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &2638360226673462930 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 2772837710432458127, guid: 08853ca0055860d4f9c5a89bd4642c3e, type: 3}
@@ -2581,6 +2620,7 @@ MonoBehaviour:
   _muzzle: {fileID: 5294366989322286794}
   _silencerVisual: {fileID: 1395380792192362224}
   _silencedMuzzle: {fileID: 7716323363081822107}
+  _grenadeMuzzle: {fileID: 6049429702899506472}
   _launcherRound: {fileID: 4592600224082114112}
 --- !u!4 &3505246951881716454 stripped
 Transform:

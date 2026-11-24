@@ -367,6 +367,13 @@ namespace RaidIntoDarkness.Weapons
             return true;
         }
 
+        internal bool TryGetGrenadeAimRay(out Ray ray)
+        {
+            Camera camera = _player.CameraController != null ? _player.CameraController.Camera : null;
+            ray = camera != null ? camera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f)) : default;
+            return camera != null;
+        }
+
         private void Awake()
         {
             _effects = new FirstPersonWeaponEffects(null);
@@ -442,9 +449,10 @@ namespace RaidIntoDarkness.Weapons
 
             StalkerCameraController camera = _player.CameraController;
             bool cursorLocked = camera == null || (!camera.CursorReleased && camera.CursorLockFrame != Time.frameCount);
+            bool fireGrenade = false;
             if (inputAllowed && cursorLocked)
             {
-                HandleWeaponInput();
+                HandleWeaponInput(out fireGrenade);
             }
             else
             {
@@ -468,6 +476,10 @@ namespace RaidIntoDarkness.Weapons
             ResetModelRoot();
             ApplyHandsOffset();
             UpdateFlame();
+            if (fireGrenade)
+            {
+                ShootGrenade(ActiveWeapon);
+            }
         }
 
         private void Subscribe()
@@ -600,8 +612,9 @@ namespace RaidIntoDarkness.Weapons
             return true;
         }
 
-        private void HandleWeaponInput()
+        private void HandleWeaponInput(out bool fireGrenade)
         {
+            fireGrenade = false;
             FirstPersonWeaponAsset asset = ActiveWeapon;
             bool ready = State == FirstPersonWeaponState.Ready;
             bool sprinting = _player.State.IsSprinting;
@@ -619,9 +632,16 @@ namespace RaidIntoDarkness.Weapons
 
             if (IsGrenadeMode)
             {
-                if (_input.ReloadPressed)
+                if (Time.time >= _actionUntil)
                 {
-                    TryStartGrenadeReload();
+                    if (_input.ReloadPressed)
+                    {
+                        TryStartGrenadeReload();
+                    }
+                    else
+                    {
+                        fireGrenade = _input.FirePressed && !sprinting;
+                    }
                 }
 
                 return;
@@ -685,6 +705,60 @@ namespace RaidIntoDarkness.Weapons
 
                 Shoot(asset);
             }
+        }
+
+        private void ShootGrenade(FirstPersonWeaponAsset asset)
+        {
+            if (_ammoSource == null || !IsGrenadeMode)
+            {
+                return;
+            }
+
+            object weaponKey = _slots[ActiveSlot].Key;
+            GrenadeAmmoData ammo = _ammoSource.GetGrenadeShot(weaponKey, out GameObject visual);
+            if (visual == null && ammo == null)
+            {
+                _ammoSource.GetGrenadeAmmo(weaponKey, out int loaded, out _, out _);
+                if (loaded == 0)
+                {
+                    PlayEmptyClick(asset, false);
+                    return;
+                }
+            }
+
+            Transform muzzle = _weaponView != null ? _weaponView.GrenadeMuzzle : null;
+            if (muzzle == null || visual == null || ammo == null || !ammo.IsConfigured || !TryGetGrenadeAimRay(out Ray aimRay))
+            {
+                Debug.LogError($"{asset.name}: grenade firing requires a launcher muzzle, camera, and configured grenade ammo.", this);
+                return;
+            }
+
+            Vector3 muzzleDirection = muzzle.TransformVector(Vector3.forward).normalized;
+            if (!float.IsFinite(muzzleDirection.sqrMagnitude) || muzzleDirection.sqrMagnitude < 0.5f)
+            {
+                Debug.LogError($"{asset.name}: grenade muzzle direction is invalid.", this);
+                return;
+            }
+
+            Ray muzzleRay = new Ray(muzzle.position, muzzleDirection);
+            Transform weapon = _model.transform;
+            if (!_ammoSource.TryShootGrenade(weaponKey))
+            {
+                return;
+            }
+
+            NotifyAmmo();
+            int mask = asset.Ballistics != null ? asset.Ballistics.BallisticHitMask.value : Physics.DefaultRaycastLayers;
+            AudioSource source = _shotAudio != null ? _shotAudio : _audio;
+            GrenadeProjectile.Launch(visual, ammo, muzzleRay, aimRay, mask, _player.transform.root, weapon, source != null ? source.outputAudioMixerGroup : null);
+            FirstPersonWeaponMotion motion = asset.FindGrenadeShot(_aiming, GetMotionMode());
+            if (motion != null)
+            {
+                PlayMotion(motion, SHOT_FADE, false, false);
+                _actionUntil = Time.time + motion.Duration;
+            }
+
+            PlayOneShot(source, motion?.Sound != null ? motion.Sound : ammo.LaunchSound);
         }
 
         private void Shoot(FirstPersonWeaponAsset asset)
@@ -794,7 +868,7 @@ namespace RaidIntoDarkness.Weapons
             }
         }
 
-        private void PlayEmptyClick(FirstPersonWeaponAsset asset)
+        private void PlayEmptyClick(FirstPersonWeaponAsset asset, bool animate = true)
         {
             if (Time.time < _nextEmptyClickTime)
             {
@@ -802,7 +876,7 @@ namespace RaidIntoDarkness.Weapons
             }
 
             _nextEmptyClickTime = Time.time + asset.EmptyClickInterval;
-            FirstPersonWeaponMotion motion = asset.FindRandom(FirstPersonWeaponMotionKind.Shoot, GetMotionMode());
+            FirstPersonWeaponMotion motion = animate ? asset.FindRandom(FirstPersonWeaponMotionKind.Shoot, GetMotionMode()) : null;
 
             if (motion != null)
             {

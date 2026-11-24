@@ -482,6 +482,14 @@ MonoBehaviour:
     _cameraEffect: {fileID: 0}
     _sound: {fileID: 0}
     _speed: 1
+  - _kind: 11
+    _handsName: ak74_shoot_g
+    _hands: {fileID: -2488036556042812800, guid: 9201d7f65b253ac4583dfd40feae65b4, type: 3}
+    _weapon: {fileID: -5062515174552234437, guid: 519434e8b2c13904ea893418645b3c04, type: 3}
+    _emptyWeapon: {fileID: 0}
+    _cameraEffect: {fileID: 0}
+    _sound: {fileID: 0}
+    _speed: 1
   _aimStart: {fileID: 4908183818744415850, guid: ec92eb8f5f9bbff47aa79d0fea1b1cc8, type: 3}
   _aimIdle: {fileID: 4908183818744415850, guid: 56f878b1de6abfd48b9ff8d4ca22cdbb, type: 3}
   _aimEnd: {fileID: 4908183818744415850, guid: b6d5a536c807e0f42a03194a86cb203c, type: 3}

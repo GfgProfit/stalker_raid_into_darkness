@@ -15425,6 +15425,37 @@ SkinnedMeshRenderer:
     m_Center: {x: 0.000776032, y: 0.032324176, z: -0.03668074}
     m_Extent: {x: 0.0117349755, y: 0.011734974, z: 0}
   m_DirtyAABB: 0
+--- !u!1 &6676923914766228448
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 756647036510423698}
+  m_Layer: 0
+  m_Name: GrenadeMuzzlePoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &756647036510423698
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6676923914766228448}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 0.00000002980233, z: -0, w: 1}
+  m_LocalPosition: {x: -0.00004051424, y: -0.033696488, z: 0.22443672}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 223993806456451470}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &6743609227359872859
 GameObject:
   m_ObjectHideFlags: 0
@@ -21657,6 +21688,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 7804531868809182578, guid: 2990295d96d65fb4c8d8449565d62485, type: 3}
       insertIndex: -1
       addedObject: {fileID: 4895575585957893037}
+    - targetCorrespondingSourceObject: {fileID: 7941349685545928768, guid: 2990295d96d65fb4c8d8449565d62485, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 756647036510423698}
     - targetCorrespondingSourceObject: {fileID: -1388109136345426965, guid: 2990295d96d65fb4c8d8449565d62485, type: 3}
       insertIndex: -1
       addedObject: {fileID: 8553057154870639263}
@@ -21865,6 +21899,7 @@ MonoBehaviour:
   _muzzle: {fileID: 4895575585957893037}
   _silencerVisual: {fileID: 0}
   _silencedMuzzle: {fileID: 0}
+  _grenadeMuzzle: {fileID: 756647036510423698}
   _launcherRound: {fileID: 6914321042744224533}
 --- !u!1 &3051261254213616476 stripped
 GameObject:

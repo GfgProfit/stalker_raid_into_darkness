@@ -41,7 +41,14 @@ namespace RaidIntoDarkness.Weapons
         private void LateUpdate()
         {
             _settings = _gameConfig != null ? _gameConfig.WeaponCrosshair : null;
-            if (_controller == null || !_controller.isActiveAndEnabled || _player == null || _settings == null || !_settings.Enabled || _controller.ActiveWeapon == null || !_controller.TryGetMuzzleRay(out Ray ray))
+            if (_controller == null || !_controller.isActiveAndEnabled || _player == null || _settings == null || !_settings.Enabled || _controller.ActiveWeapon == null)
+            {
+                _opacity = 0f;
+                return;
+            }
+
+            bool grenadeMode = _controller.IsGrenadeMode;
+            if (!(grenadeMode ? _controller.TryGetGrenadeAimRay(out Ray ray) : _controller.TryGetMuzzleRay(out ray)))
             {
                 _opacity = 0f;
                 return;
@@ -61,7 +68,7 @@ namespace RaidIntoDarkness.Weapons
             }
 
             float distance = Mathf.Min(_settings.MaximumDistanceMeters, viewer.farClipPlane * 0.95f);
-            float shotDistance = _controller.ShotMaximumDistance;
+            float shotDistance = grenadeMode ? GrenadeProjectile.MAXIMUM_AIM_DISTANCE : _controller.ShotMaximumDistance;
             if (float.IsFinite(shotDistance) && shotDistance > 0f)
             {
                 distance = Mathf.Min(distance, shotDistance);
@@ -105,7 +112,7 @@ namespace RaidIntoDarkness.Weapons
             }
 
             float unitsPerPixel = 2f * depth * Mathf.Tan(viewer.fieldOfView * 0.5f * Mathf.Deg2Rad) / viewer.pixelHeight;
-            float dispersion = _controller.ShotDispersionDegrees;
+            float dispersion = grenadeMode ? 0f : _controller.ShotDispersionDegrees;
             dispersion = float.IsFinite(dispersion) ? Mathf.Clamp(dispersion, 0f, 89f) : 0f;
             float spreadPixels = Mathf.Tan(dispersion * Mathf.Deg2Rad) * distance / unitsPerPixel;
             float targetGap = Mathf.Clamp(spreadPixels, _settings.MinimumGapPixels, _settings.MaximumGapPixels);

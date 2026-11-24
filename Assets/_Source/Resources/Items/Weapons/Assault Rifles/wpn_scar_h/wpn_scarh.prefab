@@ -712,6 +712,7 @@ MonoBehaviour:
   _muzzle: {fileID: 7742575510054928960}
   _silencerVisual: {fileID: 3308085671753584207}
   _silencedMuzzle: {fileID: 6418067467814137092}
+  _grenadeMuzzle: {fileID: 7337233042876566924}
   _launcherRound: {fileID: 8379195647707995023}
   _magazineSwapObjects: {fileID: 421033143027635163}
   _magazineSwapClips:
@@ -3012,6 +3013,37 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 539911338892732605}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &845608659755171514
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7337233042876566924}
+  m_Layer: 0
+  m_Name: GrenadeMuzzlePoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7337233042876566924
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 845608659755171514}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -1, z: -0, w: 0.00000008189929}
+  m_LocalPosition: {x: -0.001011777, y: 0.000057458878, z: -0.12218541}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4547211646935239518}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &866685659865997727
 GameObject:
@@ -13687,7 +13719,8 @@ Transform:
   m_LocalPosition: {x: 0.00006925605, y: 0.000022858381, z: 0.09471965}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 7337233042876566924}
   m_Father: {fileID: 7353911842069489564}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &4065294192924043048

@@ -106,3 +106,14 @@ MonoBehaviour:
           _ammoTracerBurnDurationSeconds: 3
           _ammoTracerEmissionIntensity: 12
           _projectileCount: 1
+        _grenade:
+          _explosionPrefab: {fileID: 6092638448448281887, guid: a129b9ed1135181428196aa016c37eab, type: 3}
+          _explosionSound: {fileID: 8300000, guid: d081c4e7e899be144a9b6bc1d36b008e, type: 3}
+          _launchSound: {fileID: 8300000, guid: c5080b8333f598448b214417acabdbb9, type: 3}
+          _blastRadius: 7.5
+          _blastDamage: 288
+          _fragmentCount: 80
+          _fragmentDamage: 60
+          _selfDestructSeconds: 10
+          _armingDistance: 2.5
+          _impactBounceHeight: 0

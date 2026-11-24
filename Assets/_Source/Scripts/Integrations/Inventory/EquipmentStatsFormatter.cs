@@ -48,6 +48,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
         private static readonly Color YELLOW_COLOR = new(1f, 1f, 0f, 1f);
         private static readonly Color GREEN_COLOR = new(51f / 255f, 1f, 102f / 255f, 1f);
         private static readonly Color PURPLE_COLOR = new(93f / 255f, 0f, 116f / 255f, 1f);
+        private static readonly string STAT_MARKER = $"<color={Utils.ToHexRGB(PURPLE_COLOR)}>•</color> ";
 
         private static readonly StatRow[] OUTFIT_ROWS =
         {
@@ -155,6 +156,18 @@ namespace RaidIntoDarkness.Integrations.Inventory
                 return;
             }
 
+            if (definition.IsCategory("Grenade") && definition.GetComponent<WeaponHudComponent>()?.FirstPersonWeapon is { IsHandGrenade: true, HandGrenade: { } handGrenade })
+            {
+                AddGrenadeStats(stats, handGrenade, true);
+                return;
+            }
+
+            if (definition.GetComponent<AmmoBallisticsComponent>()?.Grenade is { IsConfigured: true } launcherGrenade)
+            {
+                AddGrenadeStats(stats, launcherGrenade, false);
+                return;
+            }
+
             EquipmentStatsComponent component = definition.GetComponent<EquipmentStatsComponent>();
             string category = GetEquipmentCategory(definition);
 
@@ -237,16 +250,43 @@ namespace RaidIntoDarkness.Integrations.Inventory
                 return;
             }
 
-            string marker = $"<color={Utils.ToHexRGB(PURPLE_COLOR)}>•</color> ";
-            stats.Add(new InventoryItemStat(marker + _window.Label("stat_knife_weak_damage", "Weak attack damage"), weak.MeleeDamageHp.ToString("0.##", CultureInfo.InvariantCulture) + " HP"));
-            stats.Add(new InventoryItemStat(marker + _window.Label("stat_knife_strong_damage", "Strong attack damage"), strong.MeleeDamageHp.ToString("0.##", CultureInfo.InvariantCulture) + " HP"));
+            stats.Add(new InventoryItemStat(STAT_MARKER + _window.Label("stat_knife_weak_damage", "Weak attack damage"), weak.MeleeDamageHp.ToString("0.##", CultureInfo.InvariantCulture) + " HP"));
+            stats.Add(new InventoryItemStat(STAT_MARKER + _window.Label("stat_knife_strong_damage", "Strong attack damage"), strong.MeleeDamageHp.ToString("0.##", CultureInfo.InvariantCulture) + " HP"));
             string reach = weak.MeleeReach.ToString("0.##", CultureInfo.InvariantCulture);
             if (!Mathf.Approximately(weak.MeleeReach, strong.MeleeReach))
             {
                 reach += " / " + strong.MeleeReach.ToString("0.##", CultureInfo.InvariantCulture);
             }
 
-            stats.Add(new InventoryItemStat(marker + _window.Label("stat_knife_reach", "Attack reach"), reach + " " + _window.Label("stat_unit_m", "m")));
+            stats.Add(new InventoryItemStat(STAT_MARKER + _window.Label("stat_knife_reach", "Attack reach"), reach + " " + _window.Label("stat_unit_m", "m")));
+        }
+
+        private void AddGrenadeStats(List<InventoryItemStat> stats, GrenadeAmmoData grenade, bool handThrown)
+        {
+            string type = _window.Label("grenade_type_launcher", "Underbarrel");
+            if (handThrown)
+            {
+                type = grenade.ExplodeOnImpact ? _window.Label("grenade_type_hand_impact", "Impact hand grenade") : _window.Label("grenade_type_hand", "Hand grenade");
+            }
+            else if (grenade.ImpactBounceHeight > 0f)
+            {
+                type = _window.Label("grenade_type_launcher_bounce", "Bouncing underbarrel");
+            }
+
+            string meters = _window.Label("stat_unit_m", "m");
+            string detonation = grenade.SelfDestructSeconds.ToString("0.##", CultureInfo.InvariantCulture) + " " + _window.Label("stat_unit_s", "s");
+            if (!handThrown || grenade.ExplodeOnImpact)
+            {
+                detonation = string.Format(CultureInfo.InvariantCulture, _window.Label("grenade_detonation_limit", "Up to {0}"), detonation);
+            }
+
+            stats.Add(new InventoryItemStat(STAT_MARKER + _window.Label("stat_grenade_type", "Grenade type"), type));
+            stats.Add(new InventoryItemStat(STAT_MARKER + _window.Label("stat_grenade_blast_radius", "Blast radius"), grenade.BlastRadius.ToString("0.##", CultureInfo.InvariantCulture) + " " + meters));
+            stats.Add(new InventoryItemStat(STAT_MARKER + _window.Label("stat_grenade_blast_damage", "Blast damage"), grenade.BlastDamage.ToString("0.##", CultureInfo.InvariantCulture) + " HP"));
+            stats.Add(new InventoryItemStat(STAT_MARKER + _window.Label("stat_grenade_fragment_count", "Fragment count"), grenade.FragmentCount.ToString(CultureInfo.InvariantCulture)));
+            stats.Add(new InventoryItemStat(STAT_MARKER + _window.Label("stat_grenade_fragment_damage", "Fragment damage"), grenade.FragmentDamage.ToString("0.##", CultureInfo.InvariantCulture) + " HP"));
+            stats.Add(new InventoryItemStat(STAT_MARKER + _window.Label("stat_grenade_fragment_range", "Fragment range"), grenade.FragmentRange.ToString("0.##", CultureInfo.InvariantCulture) + " " + meters));
+            stats.Add(new InventoryItemStat(STAT_MARKER + _window.Label("stat_grenade_detonation", "Detonation time"), detonation));
         }
 
         private void AppendFeatures(EquipmentStatsComponent component, bool patchRemoved)

@@ -209,7 +209,7 @@ namespace Inventory.UI
             float labelStart = anyIcon ? STAT_ICON_SIZE + STAT_ICON_GAP : 0f;
             float contentWidth = WIDTH - PADDING * 2f - labelStart;
             float comparisonGap = comparisonWidth > 0f ? STAT_VALUE_GAP : 0f;
-            valueWidth = Mathf.Min(valueWidth, contentWidth * 0.35f);
+            valueWidth = Mathf.Min(valueWidth, contentWidth * (anyIcon || anyBar ? 0.35f : 0.5f));
             comparisonWidth = Mathf.Min(comparisonWidth, contentWidth * 0.25f);
             float remainingWidth = contentWidth - valueWidth - comparisonWidth - STAT_VALUE_GAP - comparisonGap;
             float barWidth = anyBar ? Mathf.Min(STAT_BAR_WIDTH, remainingWidth * 0.4f) : 0f;

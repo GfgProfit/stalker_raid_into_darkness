@@ -238,3 +238,29 @@ MonoBehaviour:
     _text: "\u0414\u0430\u043B\u044C\u043D\u043E\u0441\u0442\u044C \u0443\u0434\u0430\u0440\u0430"
   - _key: stat_unit_m
     _text: "\u043C"
+  - _key: stat_grenade_type
+    _text: "\u0422\u0438\u043F \u0433\u0440\u0430\u043D\u0430\u0442\u044B"
+  - _key: stat_grenade_blast_radius
+    _text: "\u0420\u0430\u0434\u0438\u0443\u0441 \u0432\u0437\u0440\u044B\u0432\u0430"
+  - _key: stat_grenade_blast_damage
+    _text: "\u0423\u0440\u043E\u043D \u0432\u0437\u0440\u044B\u0432\u0430"
+  - _key: stat_grenade_fragment_count
+    _text: "\u041A\u043E\u043B\u0438\u0447\u0435\u0441\u0442\u0432\u043E \u043E\u0441\u043A\u043E\u043B\u043A\u043E\u0432"
+  - _key: stat_grenade_fragment_damage
+    _text: "\u0423\u0440\u043E\u043D \u043E\u0441\u043A\u043E\u043B\u043A\u0430"
+  - _key: stat_grenade_fragment_range
+    _text: "\u0414\u0430\u043B\u044C\u043D\u043E\u0441\u0442\u044C \u043E\u0441\u043A\u043E\u043B\u043A\u043E\u0432"
+  - _key: stat_grenade_detonation
+    _text: "\u0412\u0440\u0435\u043C\u044F \u0434\u0435\u0442\u043E\u043D\u0430\u0446\u0438\u0438"
+  - _key: grenade_type_hand
+    _text: "\u0420\u0443\u0447\u043D\u0430\u044F"
+  - _key: grenade_type_hand_impact
+    _text: "\u0420\u0443\u0447\u043D\u0430\u044F \u043A\u043E\u043D\u0442\u0430\u043A\u0442\u043D\u0430\u044F"
+  - _key: grenade_type_launcher
+    _text: "\u041F\u043E\u0434\u0441\u0442\u0432\u043E\u043B\u044C\u043D\u0430\u044F"
+  - _key: grenade_type_launcher_bounce
+    _text: "\u041F\u043E\u0434\u0441\u0442\u0432\u043E\u043B\u044C\u043D\u0430\u044F \u0441 \u043F\u043E\u0434\u0441\u043A\u043E\u043A\u043E\u043C"
+  - _key: grenade_detonation_limit
+    _text: "\u0414\u043E {0}"
+  - _key: stat_unit_s
+    _text: "\u0441"

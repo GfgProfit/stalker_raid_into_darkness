@@ -507,9 +507,9 @@ MonoBehaviour:
       serializedVersion: 2
       m_Bits: 4294967291
     _drawBallisticDebug: 0
-  _recoil: {x: 4.5, y: 6, z: 2}
-  _recoilSnappiness: 14
-  _recoilReturnSpeed: 10
+  _recoil: {x: 3.65, y: 1.4, z: 0.5}
+  _recoilSnappiness: 17
+  _recoilReturnSpeed: 12
   _shotSounds:
   - {fileID: 8300000, guid: 2d8a12f6f9c2c374190c2528a84d47b1, type: 3}
   - {fileID: 8300000, guid: d6a51c6f1d9ce524fa3e906f2f2c887c, type: 3}

@@ -1,0 +1,135 @@
+fileFormatVersion: 2
+guid: fb1c40afd2ed67140a3860d9e741fbf2
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\ammo_762x51_diff|models\weapons
+    second: {fileID: 2100000, guid: db983c37a380e8e4abee5011c0d8c9bd, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\scar-h\barrel|models\weapons
+    second: {fileID: 2100000, guid: 65795e348856a7e4cbe8785f2cbbc227, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\scar-h\body|models\weapons
+    second: {fileID: 2100000, guid: 09bcb168f9916684aba15d03765291a1, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\scar-h\bolt|models\weapons
+    second: {fileID: 2100000, guid: efa28151f09f7fb4299bb5a0ac8fe97d, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\scar-h\charge|models\weapons
+    second: {fileID: 2100000, guid: 9e715f0fa6c12ec41889ac74443b44e3, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\scar-h\gas_block|models\weapons
+    second: {fileID: 2100000, guid: ddd851c6d5fd7e64db36f1b3815379e5, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\scar-h\internals|models\weapons
+    second: {fileID: 2100000, guid: 440ff1a31a18d8c438a75481e3ce77f5, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\scar-h\mag|models\weapons
+    second: {fileID: 2100000, guid: 634949af9eef4954d9980d01434c928a, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\scar-h\mount_bottom|models\weapons
+    second: {fileID: 2100000, guid: 71c21e57e67560949b7a5f72b71433b9, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\scar-h\mount_side|models\weapons
+    second: {fileID: 2100000, guid: 9e68fdb928c510e4f84f1edae0e8f3a6, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\scar-h\muzzle|models\weapons
+    second: {fileID: 2100000, guid: 2327ecdd2f4cd0d44bb2f90f16aea522, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\scar-h\pistolgrip|models\weapons
+    second: {fileID: 2100000, guid: 0f31237f9513288499c6eae92050dbf6, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\scar-h\reciever|models\weapons
+    second: {fileID: 2100000, guid: 94df5d42d5a9e7d4d8336bb85c277d34, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\scar-h\sight_front|models\weapons
+    second: {fileID: 2100000, guid: a00ea986a1f2ba7468c682059723c064, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\scar-h\sight_rear|models\weapons
+    second: {fileID: 2100000, guid: f0420cca7a8bf5b4db4b263de32de363, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\scar-h\stock_base|models\model
+    second: {fileID: 2100000, guid: c73a2c7b186b7b549a53671898d4956e, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\scar-h\stock_cheek|models\model
+    second: {fileID: 2100000, guid: a37ca9abdac3f224980c941645ed0569, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\scar-h\stock_extension|models\model
+    second: {fileID: 2100000, guid: dc4b2b7b910bc824286198f47189a8d0, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\scar-h\stock_pad|models\model
+    second: {fileID: 2100000, guid: 5fef4f4b8c75784498f8e6a565367cbc, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\sil_nato_762|models\weapons
+    second: {fileID: 2100000, guid: c88313405e20bae41a2884efaa543db7, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\wpn_m203_ironsight|models\weapons
+    second: {fileID: 2100000, guid: aebb92c93b5df684f84dcbbb3685ddda, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\wpn_m203|models\weapons
+    second: {fileID: 2100000, guid: 97d5a4ea0722fa0468ebe7ddf0db08f5, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\wpn_m433hedp|models\weapons
+    second: {fileID: 2100000, guid: 13d6236e373b16345b31678aa0b3eddd, type: 2}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 61e536e21e96f284493f2969a9250cdf, type: 3}
+  _scale: 1
+  _importMaterials: 1
+  _texturesFolder: 
+  _searchTexturesByName: 1
+  _importEmbeddedMotions: 1
+  _embeddedLoopMode: 0
+  _addAnimator: 1
+  _readableMeshes: 0
+  _updateWhenOffscreen: 0
+  _autoResolveResources: 1

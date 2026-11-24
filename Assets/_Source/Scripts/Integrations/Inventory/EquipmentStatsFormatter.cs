@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Text;
 using Inventory;
 using Inventory.UI;
+using RaidIntoDarkness.Weapons;
 using UnityEngine;
 using XRay.Importer.Levels;
 
@@ -143,6 +144,12 @@ namespace RaidIntoDarkness.Integrations.Inventory
 
         internal void CollectDefinition(ItemDefinition definition, float condition, bool fullCondition, List<InventoryItemStat> stats)
         {
+            if (definition.HasTag("Knife") && definition.GetComponent<WeaponHudComponent>()?.FirstPersonWeapon is { IsMelee: true } knife)
+            {
+                AddKnifeStats(stats, knife);
+                return;
+            }
+
             EquipmentStatsComponent component = definition.GetComponent<EquipmentStatsComponent>();
             string category = GetEquipmentCategory(definition);
 
@@ -214,6 +221,27 @@ namespace RaidIntoDarkness.Integrations.Inventory
             }
 
             return _builder.ToString();
+        }
+
+        private void AddKnifeStats(List<InventoryItemStat> stats, FirstPersonWeaponAsset weapon)
+        {
+            FirstPersonWeaponMotion weak = weapon.Find(FirstPersonWeaponMotionKind.MeleePrimary, 0);
+            FirstPersonWeaponMotion strong = weapon.Find(FirstPersonWeaponMotionKind.MeleeSecondary, 0);
+            if (weak == null || strong == null)
+            {
+                return;
+            }
+
+            string marker = $"<color={Utils.ToHexRGB(PURPLE_COLOR)}>•</color> ";
+            stats.Add(new InventoryItemStat(marker + _window.Label("stat_knife_weak_damage", "Weak attack damage"), weak.MeleeDamageHp.ToString("0.##", CultureInfo.InvariantCulture) + " HP"));
+            stats.Add(new InventoryItemStat(marker + _window.Label("stat_knife_strong_damage", "Strong attack damage"), strong.MeleeDamageHp.ToString("0.##", CultureInfo.InvariantCulture) + " HP"));
+            string reach = weak.MeleeReach.ToString("0.##", CultureInfo.InvariantCulture);
+            if (!Mathf.Approximately(weak.MeleeReach, strong.MeleeReach))
+            {
+                reach += " / " + strong.MeleeReach.ToString("0.##", CultureInfo.InvariantCulture);
+            }
+
+            stats.Add(new InventoryItemStat(marker + _window.Label("stat_knife_reach", "Attack reach"), reach + " " + _window.Label("stat_unit_m", "m")));
         }
 
         private void AppendFeatures(EquipmentStatsComponent component, bool patchRemoved)

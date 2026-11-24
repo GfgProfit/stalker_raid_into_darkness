@@ -1,0 +1,21 @@
+fileFormatVersion: 2
+guid: 0b21719e47016e24d8f57fd41319d0ca
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects: {}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 3fd51306eaa99214fa9264e2a1169012, type: 3}
+  _importAnimation: 1
+  _createPreviewObject: 1
+  _scale: 1
+  _preserveOriginalCurves: 1
+  _generateAnimationClip: 1
+  _samplingMode: 0
+  _semantics: 0
+  _loop: 0
+  _loopPose: 0
+  _createCameraPreview: 0
+  _previewFieldOfView: 67.5

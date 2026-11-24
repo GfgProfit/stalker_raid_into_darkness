@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 335ab8779db4fc317dd646dd295ff541, type: 3}
+  m_Name: l85
+  m_EditorClassIdentifier: RaidIntoDarkness.Effects::RaidIntoDarkness.Effects.XRayParticleGroupAsset
+  _groupName: weapons\new_effects\l85
+  _timeLimit: 2
+  _entries:
+  - _effect: {fileID: 11400000, guid: fcf3865d7e279be4d9ee2c9ed4df784f, type: 2}
+    _time0: 0
+    _time1: 1
+    _flags: 4
+  - _effect: {fileID: 11400000, guid: 81004549a87bd5c429761b384448d9da, type: 2}
+    _time0: 0
+    _time1: 1
+    _flags: 4
+  - _effect: {fileID: 11400000, guid: 7f099df3922829e489aba69c568ac872, type: 2}
+    _time0: 0
+    _time1: 0.1
+    _flags: 4
+  - _effect: {fileID: 11400000, guid: 4d7f4188d2e34b544b9b7e8e13eaeb84, type: 2}
+    _time0: 0
+    _time1: 0.3
+    _flags: 4

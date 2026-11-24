@@ -33,6 +33,7 @@ namespace RaidIntoDarkness.Weapons
         private const float SHOT_FADE = 0.05f;
         private const float FIRE_MODE_INPUT_RELEASE_RATIO = 0.85f;
         private const float SOUND_VOLUME = 1.0f;
+        private const int MELEE_HIT_BUFFER_SIZE = 16;
 
         [SerializeField] private StalkerPlayerController _player;
         [SerializeField] private StalkerPlayerInput _input;
@@ -47,6 +48,9 @@ namespace RaidIntoDarkness.Weapons
         private IFirstPersonWeaponAmmoSource _ammoSource;
         private FirstPersonWeaponGraph _graph;
         private FirstPersonWeaponEffects _effects;
+        private FirstPersonWeaponMotion _activeMeleeAttack;
+        private RaycastHit[] _meleeHits;
+        private bool _meleeContactPending;
         private WeaponWorldCrosshair _worldCrosshair;
         private FirstPersonRig _subscribedRig;
         private GameObject _boundHands;
@@ -474,6 +478,7 @@ namespace RaidIntoDarkness.Weapons
                 _graph.Evaluate(deltaTime);
             }
 
+            TickMeleeAttack();
             ResetModelRoot();
             ApplyHandsOffset();
             UpdateFlame();
@@ -626,7 +631,7 @@ namespace RaidIntoDarkness.Weapons
             if (asset.IsMelee)
             {
                 SetAiming(false);
-                if (ready && !sprinting && Time.time >= _actionUntil && (_input.FirePressed || _input.AimPressed))
+                if (ready && !sprinting && _activeMeleeAttack == null && Time.time >= _actionUntil && (_input.FirePressed || _input.AimPressed))
                 {
                     PlayMeleeAttack(asset, _input.FirePressed ? FirstPersonWeaponMotionKind.MeleePrimary : FirstPersonWeaponMotionKind.MeleeSecondary);
                 }
@@ -726,14 +731,76 @@ namespace RaidIntoDarkness.Weapons
         private void PlayMeleeAttack(FirstPersonWeaponAsset asset, FirstPersonWeaponMotionKind kind)
         {
             FirstPersonWeaponMotion motion = FindMotion(asset, kind);
-            if (motion == null)
+            if (motion?.Hands == null || _graph == null)
             {
                 return;
             }
 
             PlayMotion(motion, SHOT_FADE, false, true);
             _hasLoop = false;
-            _actionUntil = Time.time + motion.Duration;
+            _activeMeleeAttack = motion;
+            _meleeContactPending = motion.MeleeDamageHp > 0f && motion.MeleeReach > 0f && motion.MeleeContactTime > 0f && motion.MeleeContactTime <= motion.Hands.length;
+        }
+
+        private void TickMeleeAttack()
+        {
+            FirstPersonWeaponMotion motion = _activeMeleeAttack;
+            if (motion == null)
+            {
+                return;
+            }
+
+            double clipTime = _graph.HandsClipTime;
+            if (_meleeContactPending && clipTime >= motion.MeleeContactTime)
+            {
+                _meleeContactPending = false;
+                ApplyMeleeHit(motion);
+            }
+
+            if (clipTime >= motion.Hands.length)
+            {
+                _activeMeleeAttack = null;
+            }
+        }
+
+        private void ApplyMeleeHit(FirstPersonWeaponMotion motion)
+        {
+            Camera camera = _player.CameraController != null ? _player.CameraController.Camera : null;
+            if (camera == null)
+            {
+                return;
+            }
+
+            Ray ray = new Ray(camera.transform.position, camera.transform.forward);
+            int mask = ActiveWeapon.Ballistics != null ? ActiveWeapon.Ballistics.BallisticHitMask.value : Physics.DefaultRaycastLayers;
+            _meleeHits ??= new RaycastHit[MELEE_HIT_BUFFER_SIZE];
+            RaycastHit[] hits = _meleeHits;
+            int count = Physics.RaycastNonAlloc(ray, hits, motion.MeleeReach, mask, QueryTriggerInteraction.Ignore);
+            if (count == hits.Length)
+            {
+                hits = Physics.RaycastAll(ray, motion.MeleeReach, mask, QueryTriggerInteraction.Ignore);
+                count = hits.Length;
+            }
+
+            Transform owner = _player.transform.root;
+            Collider closest = null;
+            float closestDistance = float.PositiveInfinity;
+            for (int i = 0; i < count; i++)
+            {
+                RaycastHit hit = hits[i];
+                if (hit.collider == null || hit.distance >= closestDistance || hit.collider.transform.IsChildOf(owner))
+                {
+                    continue;
+                }
+
+                closest = hit.collider;
+                closestDistance = hit.distance;
+            }
+
+            if (closest != null)
+            {
+                closest.GetComponentInParent<IHealthDamageReceiver>()?.TryApplyHealthDamage(motion.MeleeDamageHp);
+            }
         }
 
         private void ShootGrenade(FirstPersonWeaponAsset asset)
@@ -1116,7 +1183,7 @@ namespace RaidIntoDarkness.Weapons
 
         private void TickReady(FirstPersonWeaponAsset asset)
         {
-            if (Time.time < _actionUntil)
+            if (_activeMeleeAttack != null || Time.time < _actionUntil)
             {
                 return;
             }
@@ -1242,6 +1309,7 @@ namespace RaidIntoDarkness.Weapons
 
         private void PlayMotion(FirstPersonWeaponMotion motion, float fade, bool loop, bool withEffects)
         {
+            _activeMeleeAttack = null;
             CurrentMotion = motion.Kind;
             _emptyWeaponAt = float.PositiveInfinity;
             if (_graph != null)
@@ -1605,6 +1673,7 @@ namespace RaidIntoDarkness.Weapons
 
         private void DestroyVisuals(bool releaseHands)
         {
+            _activeMeleeAttack = null;
             foreach (MonoBehaviour behaviour in _opticsBindings)
             {
                 if (behaviour != null && behaviour is IFirstPersonWeaponOptics optics)

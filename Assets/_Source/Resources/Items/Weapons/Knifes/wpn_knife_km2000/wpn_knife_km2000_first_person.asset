@@ -35,6 +35,9 @@ MonoBehaviour:
     _cameraEffect: {fileID: 0}
     _sound: {fileID: 8300000, guid: 55abec37c986bb347aef3c8f432d9790, type: 3}
     _speed: 1
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
   - _kind: 1
     _handsName: knife_holster
     _hands: {fileID: -612159074767767521, guid: 1eff26e33961bc449b0e8ffb3ae4bc3e, type: 3}
@@ -43,6 +46,9 @@ MonoBehaviour:
     _cameraEffect: {fileID: 0}
     _sound: {fileID: 8300000, guid: 30fd92d86d1f7f147a3a644229b5e0c7, type: 3}
     _speed: 1
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
   - _kind: 2
     _handsName: knife_idle
     _hands: {fileID: 5530142228361515337, guid: 1eff26e33961bc449b0e8ffb3ae4bc3e, type: 3}
@@ -51,6 +57,9 @@ MonoBehaviour:
     _cameraEffect: {fileID: 0}
     _sound: {fileID: 0}
     _speed: 1
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
   - _kind: 4
     _handsName: knife_moving
     _hands: {fileID: -9099430161400980768, guid: 1eff26e33961bc449b0e8ffb3ae4bc3e, type: 3}
@@ -59,6 +68,9 @@ MonoBehaviour:
     _cameraEffect: {fileID: 0}
     _sound: {fileID: 0}
     _speed: 1.1
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
   - _kind: 6
     _handsName: knife_moving_slow
     _hands: {fileID: 6859195062807984519, guid: 1eff26e33961bc449b0e8ffb3ae4bc3e, type: 3}
@@ -67,6 +79,9 @@ MonoBehaviour:
     _cameraEffect: {fileID: 0}
     _sound: {fileID: 0}
     _speed: 0.7
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
   - _kind: 7
     _handsName: knife_crouch
     _hands: {fileID: 8891651429918712059, guid: 1eff26e33961bc449b0e8ffb3ae4bc3e, type: 3}
@@ -75,6 +90,9 @@ MonoBehaviour:
     _cameraEffect: {fileID: 0}
     _sound: {fileID: 0}
     _speed: 0.5
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
   - _kind: 8
     _handsName: knife_sprint_start
     _hands: {fileID: 1330071861553339868, guid: 1eff26e33961bc449b0e8ffb3ae4bc3e, type: 3}
@@ -83,6 +101,9 @@ MonoBehaviour:
     _cameraEffect: {fileID: 0}
     _sound: {fileID: 0}
     _speed: 1
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
   - _kind: 9
     _handsName: knife_sprint
     _hands: {fileID: -7733440707266014054, guid: 1eff26e33961bc449b0e8ffb3ae4bc3e, type: 3}
@@ -91,6 +112,9 @@ MonoBehaviour:
     _cameraEffect: {fileID: 0}
     _sound: {fileID: 0}
     _speed: 1.2
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
   - _kind: 10
     _handsName: knife_sprint_end
     _hands: {fileID: -6676408687583261027, guid: 1eff26e33961bc449b0e8ffb3ae4bc3e, type: 3}
@@ -99,6 +123,9 @@ MonoBehaviour:
     _cameraEffect: {fileID: 0}
     _sound: {fileID: 0}
     _speed: 1
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
   - _kind: 21
     _handsName: knife_kick1
     _hands: {fileID: 5616496496753366654, guid: 1eff26e33961bc449b0e8ffb3ae4bc3e, type: 3}
@@ -107,6 +134,9 @@ MonoBehaviour:
     _cameraEffect: {fileID: 0}
     _sound: {fileID: 8300000, guid: c314f27f3b9b3954a8f00f29821b161f, type: 3}
     _speed: 1.1
+    _meleeHitPower: 1.3
+    _meleeReach: 1.35
+    _meleeContactFrame: 9
   - _kind: 22
     _handsName: knife_kick2
     _hands: {fileID: -7223169665633094415, guid: 1eff26e33961bc449b0e8ffb3ae4bc3e, type: 3}
@@ -115,6 +145,9 @@ MonoBehaviour:
     _cameraEffect: {fileID: 0}
     _sound: {fileID: 8300000, guid: 8532c093c5e5ec347b319dd33b47e864, type: 3}
     _speed: 1.1
+    _meleeHitPower: 2.11
+    _meleeReach: 1.35
+    _meleeContactFrame: 15
   _withGrenadeLauncherMotions: []
   _grenadeModeMotions: []
   _attachmentMotions: []

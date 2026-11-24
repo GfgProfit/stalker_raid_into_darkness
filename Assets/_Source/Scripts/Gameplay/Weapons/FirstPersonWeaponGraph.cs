@@ -65,6 +65,7 @@ namespace RaidIntoDarkness.Weapons
 
         public bool IsValid => _graph.IsValid();
         public bool OverlayActive => _overlayActive;
+        internal double HandsClipTime => _hands.ClipTime;
 
         public void Play(AnimationClip hands, AnimationClip weapon, float speed, float fade, bool loop, float weaponFade = -1f)
         {
@@ -272,6 +273,7 @@ namespace RaidIntoDarkness.Weapons
             }
 
             public AnimationMixerPlayable Mixer { get; }
+            public double ClipTime => _clips.Count > 0 ? _clips[_clips.Count - 1].Playable.GetTime() : 0.0;
 
             public void Play(AnimationClip clip, float speed, float fade, bool loop)
             {

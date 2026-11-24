@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using XRay.Importer;
+using XRay.Importer.Levels;
 
 namespace RaidIntoDarkness.Weapons
 {
@@ -44,6 +45,9 @@ namespace RaidIntoDarkness.Weapons
         [SerializeField] private XRayAnmAsset _cameraEffect;
         [SerializeField] private AudioClip _sound;
         [SerializeField] private float _speed = 1.0f;
+        [SerializeField] [Min(0f)] private float _meleeHitPower;
+        [SerializeField] [Min(0f)] private float _meleeReach;
+        [SerializeField] [Min(0)] private int _meleeContactFrame;
 
         public FirstPersonWeaponMotion(FirstPersonWeaponMotionKind kind, string handsName, AnimationClip hands, AnimationClip weapon, XRayAnmAsset cameraEffect, AudioClip sound, float speed)
         {
@@ -65,5 +69,8 @@ namespace RaidIntoDarkness.Weapons
         public AudioClip Sound => _sound;
         public float Speed => Mathf.Max(MIN_SPEED, _speed);
         public float Duration => _hands != null ? _hands.length / Speed : 0.0f;
+        public float MeleeDamageHp => _meleeHitPower * GameConfig.DEFAULT_PLAYER_STAT_CAPACITY;
+        public float MeleeReach => _meleeReach;
+        public float MeleeContactTime => _hands != null && _hands.frameRate > 0f ? _meleeContactFrame / _hands.frameRate : 0f;
     }
 }

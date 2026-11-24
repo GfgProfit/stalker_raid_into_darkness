@@ -106,3 +106,28 @@ MonoBehaviour:
           _ammoTracerBurnDurationSeconds: 3
           _ammoTracerEmissionIntensity: 12
           _projectileCount: 1
+        _grenade:
+          _explosionPrefab: {fileID: 7742516759915961025, guid: 2da0b1026c34fe24590f0cf83e4aae40, type: 3}
+          _explosionSound: {fileID: 8300000, guid: 5d5408f65d4ef9043a4e3cb2ac70eb8a, type: 3}
+          _launchSound: {fileID: 0}
+          _explosionVariants: []
+          _explosionBodyVariants:
+          - {fileID: 8300000, guid: 3360b026f3c3fbb4d9355c13ec2c2a1d, type: 3}
+          - {fileID: 8300000, guid: 827aab41ba836fd4da273a06073b2d89, type: 3}
+          - {fileID: 8300000, guid: cdaa6502c34856d48b7801f527bf6eef, type: 3}
+          - {fileID: 8300000, guid: 3fe93bd932acfab43bc5edd26ea91c1e, type: 3}
+          _bounceSounds: {fileID: 0}
+          _bounceSurfaces: {fileID: 0}
+          _blastRadius: 15
+          _blastDamage: 1344
+          _fragmentCount: 200
+          _fragmentDamage: 100
+          _selfDestructSeconds: 30
+          _armingDistance: 0
+          _impactBounceHeight: 0
+          _fragmentRange: 80.44
+          _armingSeconds: 0
+          _explodeOnImpact: 1
+          _fliesStraight: 1
+          _projectileVisual: {fileID: 3046316049332442400, guid: 5b96df4fb8aa83b42932f4de996f2d70, type: 3}
+          _flightTrail: {fileID: 290969141218624543, guid: 225a7924664a10144b0fd9770ec2066d, type: 3}

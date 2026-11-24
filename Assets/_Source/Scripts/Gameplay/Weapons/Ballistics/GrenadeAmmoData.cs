@@ -24,6 +24,9 @@ namespace RaidIntoDarkness.Weapons
         [SerializeField, Min(0.01f)] private float _fragmentRange = 100f;
         [SerializeField, Min(0f)] private float _armingSeconds;
         [SerializeField] private bool _explodeOnImpact;
+        [SerializeField] private bool _fliesStraight;
+        [SerializeField] private GameObject _projectileVisual;
+        [SerializeField] private GameObject _flightTrail;
 
         public GameObject ExplosionPrefab => _explosionPrefab;
         public AudioClip ExplosionSound => _explosionSound;
@@ -40,6 +43,9 @@ namespace RaidIntoDarkness.Weapons
         public float FragmentRange => _fragmentRange > 0f ? _fragmentRange : 100f;
         public float ArmingSeconds => Mathf.Max(0f, _armingSeconds);
         public bool ExplodeOnImpact => _explodeOnImpact;
+        public bool FliesStraight => _fliesStraight;
+        public GameObject ProjectileVisual => _projectileVisual;
+        public GameObject FlightTrail => _flightTrail;
         public bool IsConfigured => _explosionPrefab != null && _explosionSound != null;
 
         public AudioClip SelectExplosionSound()

@@ -83,6 +83,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
             ("grenade_type_hand_impact", "Ручная контактная"),
             ("grenade_type_launcher", "Подствольная"),
             ("grenade_type_launcher_bounce", "Подствольная с подскоком"),
+            ("grenade_type_rocket", "Выстрел для РПГ"),
             ("grenade_detonation_limit", "До {0}"),
             ("stat_unit_s", "с"),
             ("stat_burn", "Термозащита"),

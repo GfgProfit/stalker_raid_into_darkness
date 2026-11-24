@@ -272,6 +272,10 @@ namespace RaidIntoDarkness.Integrations.Inventory
             {
                 type = _window.Label("grenade_type_launcher_bounce", "Bouncing underbarrel");
             }
+            else if (grenade.FliesStraight)
+            {
+                type = _window.Label("grenade_type_rocket", "Rocket launcher round");
+            }
 
             string meters = _window.Label("stat_unit_m", "m");
             string detonation = grenade.SelfDestructSeconds.ToString("0.##", CultureInfo.InvariantCulture) + " " + _window.Label("stat_unit_s", "s");

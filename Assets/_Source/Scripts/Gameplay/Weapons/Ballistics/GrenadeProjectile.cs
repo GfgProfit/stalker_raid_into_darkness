@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using RaidIntoDarkness.Effects;
 using RaidIntoDarkness.Player;
 using UnityEngine;
 using UnityEngine.Audio;
@@ -60,10 +61,36 @@ namespace RaidIntoDarkness.Weapons
 
         internal static void Launch(GameObject visual, GrenadeAmmoData ammo, Ray muzzle, Ray aim, int hitMask, Transform owner, Transform weapon, AudioMixerGroup audioMixerGroup)
         {
+            LaunchStandalone(visual, ammo, muzzle, aim, LAUNCH_SPEED, hitMask, owner, weapon, audioMixerGroup);
+        }
+
+        internal static void LaunchStandalone(GameObject visual, GrenadeAmmoData ammo, Ray muzzle, Ray aim, float speed, int hitMask, Transform owner, Transform weapon, AudioMixerGroup audioMixerGroup)
+        {
             Quaternion rotation = Quaternion.FromToRotation(Vector3.forward, muzzle.direction);
             GameObject instance = Instantiate(visual, muzzle.origin, rotation);
             GrenadeProjectile projectile = instance.AddComponent<GrenadeProjectile>();
-            projectile.Initialize(ammo, muzzle, aim, hitMask, owner, weapon, audioMixerGroup);
+            projectile.BeginFlight(ammo, muzzle, speed, hitMask, owner, weapon, audioMixerGroup);
+            if (ammo.FlightTrail != null)
+            {
+                GameObject trail = Instantiate(ammo.FlightTrail, instance.transform, false);
+                if (trail.TryGetComponent(out XRayParticleGroupPlayer group))
+                {
+                    group.Play(true);
+                }
+            }
+
+            if (!ammo.FliesStraight)
+            {
+                projectile.InitializeAimedFlight(muzzle, aim, speed);
+                return;
+            }
+
+#if UNITY_EDITOR
+            if (GrenadeShotDebug.Enabled)
+            {
+                projectile.CreateStraightDebug(muzzle, speed);
+            }
+#endif
         }
 
         internal static void LaunchThrown(GameObject visual, GrenadeAmmoData ammo, Ray release, float speed, int hitMask, Transform owner, Transform weapon, AudioMixerGroup audioMixerGroup)
@@ -94,9 +121,8 @@ namespace RaidIntoDarkness.Weapons
             _detonationTime = ammo.SelfDestructSeconds;
         }
 
-        private void Initialize(GrenadeAmmoData ammo, Ray muzzle, Ray aim, int hitMask, Transform owner, Transform weapon, AudioMixerGroup audioMixerGroup)
+        private void InitializeAimedFlight(Ray muzzle, Ray aim, float speed)
         {
-            BeginFlight(ammo, muzzle, LAUNCH_SPEED, hitMask, owner, weapon, audioMixerGroup);
             Vector3 cameraToMuzzle = muzzle.origin - aim.origin;
             if (TryHit(new Ray(aim.origin, cameraToMuzzle), cameraToMuzzle.magnitude, out RaycastHit obstruction))
             {
@@ -115,14 +141,14 @@ namespace RaidIntoDarkness.Weapons
             Vector3 offset = target - muzzle.origin;
             if (Vector3.Dot(offset, muzzle.direction) <= 0f)
             {
-                _clearanceTime = BARREL_CLEARANCE / LAUNCH_SPEED;
+                _clearanceTime = BARREL_CLEARANCE / speed;
                 _aimTime = _clearanceTime;
             }
             else
             {
                 float distance = offset.magnitude;
-                _aimTime = Mathf.Max(MIN_FLIGHT_TIME, distance / LAUNCH_SPEED);
-                _clearanceTime = Mathf.Min(BARREL_CLEARANCE, distance * 0.25f) / LAUNCH_SPEED;
+                _aimTime = Mathf.Max(MIN_FLIGHT_TIME, distance / speed);
+                _clearanceTime = Mathf.Min(BARREL_CLEARANCE, distance * 0.25f) / speed;
                 float timeAfterClearance = _aimTime - _clearanceTime;
                 _steeringTime = Mathf.Min(MAX_STEERING_TIME, timeAfterClearance * 0.5f);
                 float steeringDisplacement = _steeringTime * (timeAfterClearance - 0.5f * _steeringTime);
@@ -310,6 +336,11 @@ namespace RaidIntoDarkness.Weapons
 
         private Vector3 GetPosition(float time)
         {
+            if (_ammo.FliesStraight)
+            {
+                return _origin + _launchVelocity * time;
+            }
+
             if (_hasBounced || _isThrown)
             {
                 float riseTime = time - _bounceStartTime;
@@ -496,6 +527,14 @@ namespace RaidIntoDarkness.Weapons
         }
 
 #if UNITY_EDITOR
+        private void CreateStraightDebug(Ray muzzle, float speed)
+        {
+            float distance = speed * _detonationTime;
+            bool hasSurface = TryHit(muzzle, distance, out RaycastHit hit, sweepProjectile: true);
+            Vector3 target = hasSurface ? hit.point : muzzle.GetPoint(distance);
+            _debug = new GrenadeShotDebug(AmmoName, _ammo, muzzle, target, hasSurface, new[] { muzzle.origin, target });
+        }
+
         private void CreateThrowDebug(Ray release)
         {
             const int THROW_SAMPLES = 72;

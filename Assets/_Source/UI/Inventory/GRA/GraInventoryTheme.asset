@@ -262,5 +262,7 @@ MonoBehaviour:
     _text: "\u041F\u043E\u0434\u0441\u0442\u0432\u043E\u043B\u044C\u043D\u0430\u044F \u0441 \u043F\u043E\u0434\u0441\u043A\u043E\u043A\u043E\u043C"
   - _key: grenade_detonation_limit
     _text: "\u0414\u043E {0}"
+  - _key: grenade_type_rocket
+    _text: "\u0412\u044B\u0441\u0442\u0440\u0435\u043B \u0434\u043B\u044F \u0420\u041F\u0413"
   - _key: stat_unit_s
     _text: "\u0441"

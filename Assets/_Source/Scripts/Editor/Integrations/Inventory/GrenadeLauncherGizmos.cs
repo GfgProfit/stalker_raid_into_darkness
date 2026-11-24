@@ -387,6 +387,11 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
         {
             if (!shot.Finished)
             {
+                if (shot.Ammo.FliesStraight)
+                {
+                    return "Полёт по оси ствола";
+                }
+
                 return shot.BouncePoint.HasValue ? shot.IsHandThrow ? "После отскока" : "Подскок" : "В полёте";
             }
 

@@ -331,8 +331,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
                 Slot("Binocular", 174f, 117f, 75f, 42f, "БИНОКЛЬ", small),
                 Slot("Knife", 174f, 171f, 75f, 42f, "ХОЛОДНОЕ", small),
                 Slot("Primary", 12f, 225f, 237f, 96f, "ОСНОВНОЕ", weapon),
-                Slot("Secondary", 12f, 333f, 237f, 96f, "ВТОРИЧНОЕ", weapon),
-                Slot("Bolt", 174f, 441f, 34.5f, 46f, "Б6", quick),
+                Slot("Secondary", 12f, 333f, 237f, 96f, "ВТОРИЧНОЕ", weapon)
             };
 
             float[] quickX = { 2f, 42f, 83f, 123f };

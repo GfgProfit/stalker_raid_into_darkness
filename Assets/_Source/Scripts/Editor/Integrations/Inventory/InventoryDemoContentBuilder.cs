@@ -28,7 +28,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
         public const string RIFLE_TAG = "Rifle";
         public const string PISTOL_TAG = "Pistol";
         public const string KNIFE_TAG = "Knife";
-        public const string EQUIPMENT_MASK = "HHTTDD\nHHOORR\nKKOOBB\nKKOONN\nPPPPP.\nPPPPP.\nSSSSS.\nSSSSS.\n1234b.\navwxy.";
+        public const string EQUIPMENT_MASK = "HHTTDD\nHHOORR\nKKOOBB\nKKOONN\nPPPPP.\nPPPPP.\nSSSSS.\nSSSSS.\n1234..\navwxy.";
 
         internal const string CLOTHES_FOLDER = "Assets/_Source/Resources/Items/Clothes";
 
@@ -132,8 +132,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
                 new('B', "Binocular", "Бинокль", SlotMode.Single, SlotRule.Create(categories: new[] { "Binocular" }), "Equipment"),
                 new('N', "Knife", "Холодное", SlotMode.Single, SlotRule.Create(categories: new[] { WEAPON_CATEGORY }, requiredTags: new[] { KNIFE_TAG, PISTOL_TAG }), "Weapons"),
                 new('P', "Primary", "Основное", SlotMode.Single, SlotRule.Create(categories: new[] { WEAPON_CATEGORY }, forbiddenTags: new[] { KNIFE_TAG }), "Weapons"),
-                new('S', "Secondary", "Вторичное", SlotMode.Single, SlotRule.Create(categories: new[] { WEAPON_CATEGORY }, forbiddenTags: new[] { KNIFE_TAG }), "Weapons"),
-                new('b', "Bolt", "Болт", SlotMode.Single, SlotRule.Create(categories: new[] { "Bolt" }), "Quick"),
+                new('S', "Secondary", "Вторичное", SlotMode.Single, SlotRule.Create(categories: new[] { WEAPON_CATEGORY }, forbiddenTags: new[] { KNIFE_TAG }), "Weapons")
             };
 
             char[] quickKeys = { '1', '2', '3', '4' };

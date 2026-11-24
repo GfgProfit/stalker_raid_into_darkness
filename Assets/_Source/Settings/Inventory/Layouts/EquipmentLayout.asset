@@ -28,7 +28,7 @@ MonoBehaviour:
 
     SSSSS.
 
-    1234b.
+    1234..
 
     avwxy.'
   _bindings:
@@ -172,20 +172,6 @@ MonoBehaviour:
       _requiredTags: []
       _forbiddenTags:
       - Knife
-      _validatorId: 
-      _requiresOccupiedSlots: []
-      _blockedByOccupiedSlots: []
-      _startsLocked: 0
-  - _key: b
-    _slotId: Bolt
-    _displayName: "\u0411\u043E\u043B\u0442"
-    _group: Quick
-    _mode: 1
-    _rule:
-      _acceptedCategories:
-      - Bolt
-      _requiredTags: []
-      _forbiddenTags: []
       _validatorId: 
       _requiresOccupiedSlots: []
       _blockedByOccupiedSlots: []

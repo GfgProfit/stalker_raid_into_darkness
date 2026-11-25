@@ -212,7 +212,7 @@ namespace RaidIntoDarkness.Player
             }
 
             StalkerVisibleBodyValues values = _profile.VisibleBody;
-            Vector3 camera = view.CameraRoot.position;
+            Vector3 camera = view.CenteredPosition;
             Vector3 feet = transform.position;
             Vector3 position = camera;
             _positionTimer = Mathf.Max(0.0f, _positionTimer - deltaTime);

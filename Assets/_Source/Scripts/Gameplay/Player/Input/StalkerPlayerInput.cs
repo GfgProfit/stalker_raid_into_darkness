@@ -13,6 +13,7 @@ namespace RaidIntoDarkness.Player
 
         private InputAction _move;
         private InputAction _look;
+        private InputAction _lean;
         private InputAction _jump;
         private InputAction _sprint;
         private InputAction _walk;
@@ -34,6 +35,7 @@ namespace RaidIntoDarkness.Player
         private InputAction _bolt;
 
         public Vector2 LookDelta => _look != null ? _look.ReadValue<Vector2>() : Vector2.zero;
+        public float Lean => _lean != null ? _lean.ReadValue<float>() : 0.0f;
         public float ScopeZoomScroll => isActiveAndEnabled && Cursor.lockState == CursorLockMode.Locked && Mouse.current != null ? Mouse.current.scroll.ReadValue().y : 0f;
         public bool ReleaseCursorPressed => WasPressed(_releaseCursor);
         public bool CaptureCursorPressed => WasPressed(_captureCursor);
@@ -68,6 +70,7 @@ namespace RaidIntoDarkness.Player
             InputActionMap player = _actions.FindActionMap(PLAYER_MAP, true);
             _move = player.FindAction("Move", true);
             _look = player.FindAction("Look", true);
+            _lean = player.FindAction("Lean", false);
             _jump = player.FindAction("Jump", true);
             _sprint = player.FindAction("Sprint", true);
             _walk = player.FindAction("Walk", true);

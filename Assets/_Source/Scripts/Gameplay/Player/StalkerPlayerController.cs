@@ -51,6 +51,7 @@ namespace RaidIntoDarkness.Player
 
         public StalkerMoveFlags ScriptedWish { get; set; }
         public bool SimulationPaused { get; private set; }
+        public float LeanIntent { get; private set; }
 
         public bool GameplayInputBlocked
         {
@@ -184,6 +185,7 @@ namespace RaidIntoDarkness.Player
                 ApplyOutfit(_outfitSection);
             }
 
+            float leanInput = 0.0f;
             if (_input != null && GameplayInputBlocked)
             {
                 _motor.Wish = _input.ApplyBlocked(_motor.Wish, _profile.Input);
@@ -200,18 +202,20 @@ namespace RaidIntoDarkness.Player
                 }
 
                 _camera.Look(_input.LookDelta);
+                leanInput = _camera.CursorLocked ? _input.Lean : 0.0f;
                 HandleCrouchKey();
                 _motor.Wish = _input.Apply(_motor.Wish, _profile.Input);
             }
 
             _motor.Wish |= ScriptedWish;
             _camera.SetLadder(_motor.RealFlags.Has(StalkerMoveFlags.Climb) ? _motor.Ladder : null);
-            _camera.Apply(_motor.Stance.CameraHeight);
+            _camera.ApplyLook();
             _motor.SetView(_camera.YawDegrees, _camera.Direction);
             _motor.Tick(deltaTime);
             _vegetationAudio?.Tick(_characterController, _motor.Velocity);
             _motor.ClearHeldCommands();
-            _camera.Apply(_motor.Stance.CameraHeight);
+            LeanIntent = _motor.RealFlags.Has(StalkerMoveFlags.Climb) ? 0.0f : leanInput;
+            _camera.ApplyLean(_motor.Stance.CameraHeight, LeanIntent, deltaTime);
             _visibleBody.Tick(_motor.State, _camera, deltaTime);
             if (_footsteps != null)
             {

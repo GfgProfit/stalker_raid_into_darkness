@@ -67,6 +67,7 @@ namespace RaidIntoDarkness.UI
         private Vector2 _hoverPosition;
         private float _hoverStart;
         private int _tooltipCondition;
+        private int _tooltipAmount;
         private double _lastClick;
         private int _lastPointer;
         private bool _descending;
@@ -127,19 +128,21 @@ namespace RaidIntoDarkness.UI
             Vector2 pointer = Pointer.current != null ? Pointer.current.position.ReadValue() : _hoverPosition;
             bool fullCondition = _fullStatsModifier != null && _fullStatsModifier.action != null && _fullStatsModifier.action.IsPressed();
             int condition = _hoveredEntry.Condition;
-            if (_tooltip.IsVisible && condition == _tooltipCondition && fullCondition == _tooltipFullCondition)
+            int amount = _hoveredEntry.GetUnitCount(_hoveredEntry.Quantity);
+            if (_tooltip.IsVisible && condition == _tooltipCondition && fullCondition == _tooltipFullCondition && amount == _tooltipAmount)
             {
                 _tooltip.Follow(pointer, _hoverCamera);
                 return;
             }
 
             _tooltipCondition = condition;
+            _tooltipAmount = amount;
             _tooltipFullCondition = fullCondition;
             ItemDefinition definition = _hoveredEntry.Definition;
             float normalizedCondition = condition / 100f;
             _tooltipStats.Clear();
             _statsFormatter.CollectDefinition(definition, normalizedCondition, fullCondition, _tooltipStats);
-            _tooltip.ShowDefinition(definition, pointer, _hoverCamera, _tooltipStats, _statsFormatter.DescribeDefinition(definition, normalizedCondition));
+            _tooltip.ShowDefinition(definition, pointer, _hoverCamera, _tooltipStats, _statsFormatter.DescribeDefinition(definition, normalizedCondition, amount));
         }
 
         internal void SelectCategory(SpawnMenuCatalog.Category category)

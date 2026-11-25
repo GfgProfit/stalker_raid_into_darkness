@@ -33,7 +33,6 @@ namespace RaidIntoDarkness.UI
             }
 
             WeaponStatsComponent weapon = definition.GetComponent<WeaponStatsComponent>();
-            EquipmentStatsComponent equipment = definition.GetComponent<EquipmentStatsComponent>();
             AmmoStatsComponent ammo = definition.GetComponent<AmmoStatsComponent>();
             WeaponAddonComponent addon = definition.GetComponent<WeaponAddonComponent>();
             var (group, subgroup) = Classify(definition, weapon, ammo, addon);
@@ -43,7 +42,7 @@ namespace RaidIntoDarkness.UI
                 category = category.GetOrAdd(subgroup, ++_nextCategoryOrder);
             }
 
-            int? price = weapon?.Cost ?? equipment?.Cost ?? ammo?.Cost ?? addon?.Cost;
+            int? price = ItemCostComponent.GetBaseCost(definition);
             _entries.Add(new Entry(definition, category, price, EquipmentStatsFormatter.SupportsCondition(definition), Math.Max(1, ammo?.BoxSize ?? 1)));
             MaxWidth = Math.Max(MaxWidth, definition.Width);
         }

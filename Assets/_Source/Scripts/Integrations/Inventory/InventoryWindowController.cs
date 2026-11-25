@@ -430,7 +430,9 @@ namespace RaidIntoDarkness.Integrations.Inventory
             BindBackpackLockSprite();
             _inventory.SeedOnce();
             BindSorting();
-            _statsFormatter = new EquipmentStatsFormatter(_window);
+            FirstPersonWeaponController weapons = _player != null ? _player.GetComponentInChildren<FirstPersonWeaponController>() : null;
+            _weaponAmmo = new InventoryWeaponAmmoSource(_inventory.Model, _window.PrimaryContainerId);
+            _statsFormatter = new EquipmentStatsFormatter(_window, weaponAmmo: _weaponAmmo, weapons: weapons);
             _window.ItemStatsProvider = _statsFormatter.Collect;
             _window.ItemDescriptionProvider = _statsFormatter.Describe;
             _window.ItemShortNameProvider = FormatItemShortName;
@@ -439,7 +441,6 @@ namespace RaidIntoDarkness.Integrations.Inventory
             _inventory.Model.Changed += OnModelChanged;
 
             _itemSounds = new InventoryItemSounds(_window);
-            _weaponAmmo = new InventoryWeaponAmmoSource(_inventory.Model, _window.PrimaryContainerId);
             _window.Actions.Register(new InventoryDelegateAction(UNLOAD_WEAPON_ACTION, 24, context => _window.Label(UNLOAD_WEAPON_ACTION, "Разрядить"), UnloadWeapon, context => _weaponAmmo.HasLoadedAmmo(context.Item), CanUnloadWeapon));
             _weaponAttachments = new InventoryWeaponAttachments(_window);
             _outfitSlotRules = new OutfitSlotRules(_window, _inventory);
@@ -451,7 +452,6 @@ namespace RaidIntoDarkness.Integrations.Inventory
                 _outfitBinder.Refresh();
             }
 
-            FirstPersonWeaponController weapons = _player != null ? _player.GetComponentInChildren<FirstPersonWeaponController>() : null;
             if (weapons != null)
             {
                 _weaponBinder = new FirstPersonWeaponBinder(_window, weapons, _weaponAmmo);

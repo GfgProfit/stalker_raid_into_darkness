@@ -10,6 +10,9 @@ namespace Inventory.UI
     [CreateAssetMenu(menuName = "Inventory/UI Theme", fileName = "InventoryTheme")]
     public sealed class InventoryTheme : ScriptableObject
     {
+        internal static readonly Color DEFAULT_TOOLTIP_STAT_BAR_BACKGROUND_COLOR = new(98f / 255f, 98f / 255f, 98f / 255f, 1f);
+        internal static readonly Color DEFAULT_TOOLTIP_STAT_WORSE_COLOR = new(240f / 255f, 116f / 255f, 108f / 255f, 1f);
+
         [SerializeField] private TMP_FontAsset _bodyFont;
         [SerializeField] private TMP_FontAsset _headerFont;
         [SerializeField] private TMP_FontAsset _accentFont;
@@ -26,6 +29,8 @@ namespace Inventory.UI
         [SerializeField] private Sprite _contextMenuDivider;
         [SerializeField] private Color _panelColor = Color.white;
         [SerializeField] private Color _tooltipBackgroundColor = InventoryUIFactory.TooltipBackgroundColor;
+        [SerializeField] private Color _tooltipStatBarBackgroundColor = DEFAULT_TOOLTIP_STAT_BAR_BACKGROUND_COLOR;
+        [SerializeField] private Color _tooltipStatWorseColor = DEFAULT_TOOLTIP_STAT_WORSE_COLOR;
         [SerializeField] private Vector4 _panelPadding = new(18f, 18f, 18f, 18f);
         [SerializeField] private bool _showItemBackground = true;
         [SerializeField] private bool _showItemWeight;
@@ -60,6 +65,8 @@ namespace Inventory.UI
         public Sprite ContextMenuDivider => _contextMenuDivider;
         public Color PanelColor => _panelColor;
         public Color TooltipBackgroundColor => _tooltipBackgroundColor;
+        public Color TooltipStatBarBackgroundColor => _tooltipStatBarBackgroundColor;
+        public Color TooltipStatWorseColor => _tooltipStatWorseColor;
         public Vector4 PanelPadding => _panelPadding;
         public bool ShowItemBackground => _showItemBackground;
         public bool ShowItemWeight => _showItemWeight;

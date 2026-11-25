@@ -28,6 +28,8 @@ MonoBehaviour:
   _contextMenuDivider: {fileID: 21300000, guid: 07e4de91f88a6bbf1bb20468060918c0, type: 3}
   _panelColor: {r: 1, g: 1, b: 1, a: 1}
   _tooltipBackgroundColor: {r: 0.15686275, g: 0.15686275, b: 0.15686275, a: 0.98039216}
+  _tooltipStatBarBackgroundColor: {r: 0.38431373, g: 0.38431373, b: 0.38431373, a: 1}
+  _tooltipStatWorseColor: {r: 0.9411765, g: 0.45490196, b: 0.42352942, a: 1}
   _panelPadding: {x: 18, y: 18, z: 18, w: 18}
   _showItemBackground: 0
   _showItemWeight: 1
@@ -184,10 +186,54 @@ MonoBehaviour:
     _text: "\u043A\u0433"
   - _key: tooltip_cost
     _text: "\u0421\u0442\u043E\u0438\u043C\u043E\u0441\u0442\u044C:"
+  - _key: tooltip_unit_cost
+    _text: "\u0417\u0430 1 \u0448\u0442.:"
   - _key: unit_currency
     _text: "\u0440\u0443\u0431."
   - _key: tooltip_condition
     _text: "\u0421\u043E\u0441\u0442\u043E\u044F\u043D\u0438\u0435"
+  - _key: stat_weapon_caliber
+    _text: "\u041A\u0430\u043B\u0438\u0431\u0440"
+  - _key: stat_weapon_ammo
+    _text: "\u0417\u0430\u0440\u044F\u0436\u0435\u043D\u043D\u044B\u0439 \u043F\u0430\u0442\u0440\u043E\u043D"
+  - _key: stat_weapon_magazine
+    _text: "\u041C\u0430\u0433\u0430\u0437\u0438\u043D"
+  - _key: stat_weapon_loaded
+    _text: "\u0417\u0430\u0440\u044F\u0436\u0435\u043D\u043E"
+  - _key: stat_weapon_fire_modes
+    _text: "\u0420\u0435\u0436\u0438\u043C\u044B \u043E\u0433\u043D\u044F (\u0432\u044B\u0441\u0442\u0440./\u043C\u0438\u043D)"
+  - _key: stat_weapon_mode_auto
+    _text: "\u0410\u0432\u0442\u043E"
+  - _key: stat_weapon_mode_single
+    _text: "\u041E\u0434\u0438\u043D\u043E\u0447\u043D\u044B\u0439"
+  - _key: stat_weapon_mode_burst
+    _text: "\u041E\u0447\u0435\u0440\u0435\u0434\u044C \u043F\u043E {0}"
+  - _key: stat_weapon_flatness
+    _text: "\u041D\u0430\u0441\u0442\u0438\u043B\u044C\u043D\u043E\u0441\u0442\u044C"
+  - _key: stat_weapon_handling
+    _text: "\u0423\u0434\u043E\u0431\u043D\u043E\u0441\u0442\u044C (\u0432\u0445\u043E\u0434 \u0432 \u043F\u0440\u0438\u0446\u0435\u043B)"
+  - _key: stat_unit_mps
+    _text: "\u043C/\u0441"
+  - _key: stat_weapon_dispersion
+    _text: "\u0420\u0430\u0437\u0431\u0440\u043E\u0441 (\u043F\u0440\u0438\u0446\u0435\u043B / \u0431\u0435\u0434\u0440\u043E)"
+  - _key: stat_weapon_recoil_vertical
+    _text: "\u0412\u0435\u0440\u0442\u0438\u043A\u0430\u043B\u044C\u043D\u0430\u044F \u043E\u0442\u0434\u0430\u0447\u0430"
+  - _key: stat_weapon_recoil_horizontal
+    _text: "\u0413\u043E\u0440\u0438\u0437\u043E\u043D\u0442\u0430\u043B\u044C\u043D\u0430\u044F \u043E\u0442\u0434\u0430\u0447\u0430"
+  - _key: stat_weapon_recoil_roll
+    _text: "\u041A\u0440\u0435\u043D \u043E\u0442 \u043E\u0442\u0434\u0430\u0447\u0438"
+  - _key: stat_weapon_recoil_snappiness
+    _text: "\u0420\u0435\u0437\u043A\u043E\u0441\u0442\u044C \u043E\u0442\u0434\u0430\u0447\u0438"
+  - _key: stat_weapon_recoil_damping
+    _text: "\u0413\u0430\u0448\u0435\u043D\u0438\u0435 \u043E\u0442\u0434\u0430\u0447\u0438"
+  - _key: stat_weapon_scope
+    _text: "\u041F\u0440\u0438\u0446\u0435\u043B"
+  - _key: stat_weapon_silencer
+    _text: "\u0413\u043B\u0443\u0448\u0438\u0442\u0435\u043B\u044C"
+  - _key: stat_weapon_launcher
+    _text: "\u041F\u043E\u0434\u0441\u0442\u0432\u043E\u043B\u044C\u043D\u0438\u043A"
+  - _key: stat_weapon_builtin
+    _text: "\u0412\u0441\u0442\u0440\u043E\u0435\u043D\u043D\u044B\u0439"
   - _key: tooltip_features
     _text: "\u041E\u0421\u041E\u0411\u0415\u041D\u041D\u041E\u0421\u0422\u0418"
   - _key: feature_community

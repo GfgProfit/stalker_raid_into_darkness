@@ -38,8 +38,11 @@ namespace RaidIntoDarkness.Integrations.Inventory
         private const string ICON_ANOMALY = "ui_am_prop_Vibros";
         private const string BULLET = " • ";
         private const string FEATURE_BULLET = "  • ";
+        private const string COLOR_END = "</color>";
         private const int CONDITION_RED_THRESHOLD = 60;
         private const int CONDITION_YELLOW_THRESHOLD = 85;
+        private const float RECOIL_SCALE_DEGREES = 10f;
+        private const float FLATNESS_SCALE_METERS_PER_SECOND = 1300f;
 
         private static readonly Color GRAY_1_COLOR = new(170f / 255f, 170f / 255f, 170f / 255f, 1f);
         private static readonly Color GRAY_2_COLOR = new(140f / 255f, 140f / 255f, 140f / 255f, 1f);
@@ -49,6 +52,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
         private static readonly Color GREEN_COLOR = new(51f / 255f, 1f, 102f / 255f, 1f);
         private static readonly Color PURPLE_COLOR = new(93f / 255f, 0f, 116f / 255f, 1f);
         private static readonly string STAT_MARKER = $"<color={Utils.ToHexRGB(PURPLE_COLOR)}>•</color> ";
+        private static readonly NumberFormatInfo PRICE_NUMBER_FORMAT = new() { NumberGroupSeparator = NUMBER_SEPARATOR.ToString(), NumberDecimalSeparator = "," };
 
         private static readonly StatRow[] OUTFIT_ROWS =
         {
@@ -76,12 +80,23 @@ namespace RaidIntoDarkness.Integrations.Inventory
 
         private readonly InventoryWindow _window;
         private readonly AnomalyBalanceConfig _anomalyConfig;
+        private readonly InventoryWeaponAmmoSource _weaponAmmo;
+        private readonly FirstPersonWeaponController _weapons;
+        private readonly float _hipFireDispersionMultiplier;
         private readonly StringBuilder _builder = new(1024);
 
-        public EquipmentStatsFormatter(InventoryWindow window, AnomalyBalanceConfig anomalyConfig = null)
+        public EquipmentStatsFormatter(InventoryWindow window, AnomalyBalanceConfig anomalyConfig = null) : this(window, null, null, anomalyConfig)
+        {
+        }
+
+        internal EquipmentStatsFormatter(InventoryWindow window, InventoryWeaponAmmoSource weaponAmmo, FirstPersonWeaponController weapons, AnomalyBalanceConfig anomalyConfig = null)
         {
             _window = window;
-            _anomalyConfig = anomalyConfig != null ? anomalyConfig : GameConfig.Load()?.AnomalyBalance;
+            GameConfig gameConfig = GameConfig.Load();
+            _anomalyConfig = anomalyConfig != null ? anomalyConfig : gameConfig?.AnomalyBalance;
+            _hipFireDispersionMultiplier = gameConfig != null ? gameConfig.HipFireDispersionMultiplier : GameConfig.DEFAULT_HIP_FIRE_DISPERSION_MULTIPLIER;
+            _weaponAmmo = weaponAmmo;
+            _weapons = weapons;
         }
 
         public bool FullCondition { get; set; }
@@ -145,10 +160,10 @@ namespace RaidIntoDarkness.Integrations.Inventory
 
         public void Collect(ItemInstance item, List<InventoryItemStat> stats)
         {
-            CollectDefinition(item.Definition, GetCondition(item), FullCondition, stats);
+            CollectDefinition(item.Definition, GetCondition(item), FullCondition, stats, item);
         }
 
-        internal void CollectDefinition(ItemDefinition definition, float condition, bool fullCondition, List<InventoryItemStat> stats)
+        internal void CollectDefinition(ItemDefinition definition, float condition, bool fullCondition, List<InventoryItemStat> stats, ItemInstance item = null)
         {
             if (definition.HasTag("Knife") && definition.GetComponent<WeaponHudComponent>()?.FirstPersonWeapon is { IsMelee: true } knife)
             {
@@ -165,6 +180,20 @@ namespace RaidIntoDarkness.Integrations.Inventory
             if (definition.GetComponent<AmmoBallisticsComponent>()?.Grenade is { IsConfigured: true } launcherGrenade)
             {
                 AddGrenadeStats(stats, launcherGrenade, false);
+                return;
+            }
+
+            WeaponAddonComponent addon = definition.GetComponent<WeaponAddonComponent>();
+            if (addon != null && addon.Kind != WeaponAddonKind.Scope)
+            {
+                AddAddonStats(stats, addon);
+                return;
+            }
+
+            FirstPersonWeaponAsset firearm = GetFirearmProfile(definition);
+            if (firearm != null)
+            {
+                AddWeaponStats(stats, firearm, definition.GetComponent<WeaponStatsComponent>(), item);
                 return;
             }
 
@@ -204,41 +233,232 @@ namespace RaidIntoDarkness.Integrations.Inventory
 
         public string Describe(ItemInstance item)
         {
-            return DescribeDefinition(item.Definition, GetCondition(item), EquipmentAnimationQueue.IsPatchRemoved(item));
+            return DescribeDefinition(item.Definition, GetCondition(item), item.Amount, EquipmentAnimationQueue.IsPatchRemoved(item));
         }
 
-        internal string DescribeDefinition(ItemDefinition definition, float condition, bool patchRemoved = false)
+        internal string DescribeDefinition(ItemDefinition definition, float condition, int amount, bool patchRemoved = false)
         {
-            EquipmentStatsComponent component = definition.GetComponent<EquipmentStatsComponent>();
-
-            if (component == null || GetEquipmentCategory(definition) == null)
+            int? baseCost = ItemCostComponent.GetBaseCost(definition);
+            if (!baseCost.HasValue)
             {
                 return null;
             }
 
-            long cost = (long)Math.Ceiling(component.Cost * (double)(decimal)condition);
-            double percent = (double)(decimal)condition * PERCENT;
-            Color conditionColor = percent < CONDITION_RED_THRESHOLD ? RED_COLOR : percent < CONDITION_YELLOW_THRESHOLD ? YELLOW_COLOR : GREEN_COLOR;
+            int boxSize = Math.Max(1, definition.GetComponent<AmmoStatsComponent>()?.BoxSize ?? 1);
+            decimal unitCost = (decimal)baseCost.Value / boxSize;
+            if (SupportsCondition(definition))
+            {
+                unitCost *= (decimal)condition;
+            }
+
             _builder.Clear();
-            AppendColor(GRAY_1_COLOR).Append(_window.Label("tooltip_cost", "Cost:")).Append(' ');
-            AppendColor(ORANGE_COLOR).Append(Utils.FormatNumber(cost, NUMBER_SEPARATOR)).Append(' ');
-            AppendColor(GRAY_1_COLOR).Append(_window.Label("unit_currency", "RU")).Append("\n\n");
-            AppendColor(conditionColor).Append(BULLET);
-            AppendColor(GRAY_1_COLOR).Append(_window.Label("tooltip_condition", "Condition")).Append(": ");
-            AppendColor(conditionColor).Append(percent.ToString("0.#", CultureInfo.InvariantCulture)).Append('%');
+            AppendCost("tooltip_cost", "Cost:", definition.IsStackable ? unitCost * amount : Math.Ceiling(unitCost));
+            if (definition.IsStackable)
+            {
+                _builder.Append('\n');
+                AppendCost("tooltip_unit_cost", "Per item:", unitCost);
+            }
+
+            EquipmentStatsComponent component = definition.GetComponent<EquipmentStatsComponent>();
+            FirstPersonWeaponAsset firearm = GetFirearmProfile(definition);
+            if (firearm != null || (component != null && GetEquipmentCategory(definition) != null))
+            {
+                double percent = (double)(decimal)condition * PERCENT;
+                Color fullConditionColor = _window.Theme != null ? _window.Theme.ConditionColor : GREEN_COLOR;
+                Color conditionColor = percent < CONDITION_RED_THRESHOLD ? RED_COLOR : percent < CONDITION_YELLOW_THRESHOLD ? YELLOW_COLOR : fullConditionColor;
+                _builder.Append("\n\n");
+                AppendColor(conditionColor).Append(BULLET).Append(COLOR_END);
+                AppendColor(GRAY_1_COLOR).Append(_window.Label("tooltip_condition", "Condition")).Append(": ").Append(COLOR_END);
+                AppendColor(conditionColor).Append(percent.ToString("0.#", CultureInfo.InvariantCulture)).Append('%').Append(COLOR_END);
+            }
 
             if (definition.Description.Length > 0)
             {
                 _builder.Append("\n\n");
-                AppendColor(GRAY_1_COLOR).Append(definition.Description);
+                AppendColor(GRAY_1_COLOR).Append(definition.Description).Append(COLOR_END);
             }
 
-            if (definition.IsCategory(OUTFIT_CATEGORY))
+            if (component != null && definition.IsCategory(OUTFIT_CATEGORY))
             {
                 AppendFeatures(component, patchRemoved);
             }
 
             return _builder.ToString();
+        }
+
+        private void AppendCost(string key, string fallback, decimal cost)
+        {
+            AppendColor(ORANGE_COLOR).Append(BULLET).Append(COLOR_END);
+            AppendColor(GRAY_1_COLOR).Append(_window.Label(key, fallback)).Append(' ').Append(COLOR_END);
+            AppendColor(ORANGE_COLOR).Append(Math.Round(cost, 2, MidpointRounding.AwayFromZero).ToString("#,0.##", PRICE_NUMBER_FORMAT)).Append(' ').Append(COLOR_END);
+            AppendColor(GRAY_1_COLOR).Append(_window.Label("unit_currency", "RU")).Append(COLOR_END);
+        }
+
+        private static FirstPersonWeaponAsset GetFirearmProfile(ItemDefinition definition)
+        {
+            return definition.IsCategory("Weapon") && definition.GetComponent<WeaponStatsComponent>() != null && definition.GetComponent<WeaponHudComponent>()?.FirstPersonWeapon is { IsMelee: false, IsHandGrenade: false } profile ? profile : null;
+        }
+
+        private void AddWeaponStats(List<InventoryItemStat> rows, FirstPersonWeaponAsset profile, WeaponStatsComponent stats, ItemInstance item)
+        {
+            IItemDefinitionResolver resolver = item?.Resolver ?? _window.Model?.Resolver;
+            string section = InventoryWeaponAmmoSource.ResolveAmmoSection(item, stats);
+            ItemDefinition ammo = _weaponAmmo?.FindDefinition(section);
+            AmmoStatsComponent ammoStats = ammo?.GetComponent<AmmoStatsComponent>();
+            int loaded = InventoryWeaponAmmoSource.GetLoadedMagazine(item);
+            ItemDefinition silencer = item != null ? stats.GetSilencer(item, resolver) : null;
+            WeaponAddonComponent silencerStats = silencer?.GetComponent<WeaponAddonComponent>();
+            ItemDefinition scope = stats.GetScope(item, resolver);
+            ItemDefinition launcher = stats.GetGrenadeLauncher(item, resolver);
+            WeaponAddonComponent launcherStats = launcher?.GetComponent<WeaponAddonComponent>();
+            string caliber = GetCaliber(section);
+            if (!string.IsNullOrEmpty(caliber))
+            {
+                AddWeaponStat(rows, "stat_weapon_caliber", "Caliber", caliber);
+            }
+
+            if (loaded > 0 && ammo != null)
+            {
+                AddWeaponStat(rows, "stat_weapon_ammo", "Loaded ammunition", ShortDisplayName(ammo));
+            }
+
+            AddWeaponStat(rows, profile.IsStandaloneLauncher ? "stat_weapon_loaded" : "stat_weapon_magazine", profile.IsStandaloneLauncher ? "Loaded" : "Magazine", $"{loaded} / {profile.MagazineSize}");
+            AddFireModes(rows, profile, item);
+            float baseSpeed = InventoryWeaponAmmoSource.GetBulletSpeed(stats, ammoStats, null);
+            float speed = InventoryWeaponAmmoSource.GetBulletSpeed(stats, ammoStats, silencerStats);
+            AddWeaponBar(rows, "stat_weapon_flatness", "Flatness", FormatNumber(speed, false) + " " + _window.Label("stat_unit_mps", "m/s"), baseSpeed, speed, FLATNESS_SCALE_METERS_PER_SECOND, higherIsBetter: true);
+            float aimTime = Mathf.Max(profile.AimTime, (profile.AimStart ?? profile.AimEnd)?.Duration ?? 0f);
+            AddWeaponStat(rows, "stat_weapon_handling", "Handling (aim-in)", aimTime.ToString("0.##", PRICE_NUMBER_FORMAT) + " " + _window.Label("stat_unit_s", "s"));
+            if (!profile.IsStandaloneLauncher || profile.UsesStandaloneHipDispersion)
+            {
+                float dispersion = InventoryWeaponAmmoSource.GetDispersionDegrees(stats, ammoStats, silencerStats);
+                float aimed = profile.GetShotDispersionDegrees(dispersion, true, _hipFireDispersionMultiplier);
+                float hip = profile.GetShotDispersionDegrees(dispersion, false, _hipFireDispersionMultiplier);
+                AddWeaponStat(rows, "stat_weapon_dispersion", "Spread (aim / hip)", FormatAngle(aimed) + " / " + FormatAngle(hip));
+            }
+
+            if (scope != null || stats.ScopeStatus == WeaponAddonStatus.Permanent)
+            {
+                AddWeaponStat(rows, "stat_weapon_scope", "Sight", scope != null ? ShortDisplayName(scope) : _window.Label("stat_weapon_builtin", "Built-in"));
+            }
+
+            if (silencer != null || stats.SilencerStatus == WeaponAddonStatus.Permanent)
+            {
+                AddWeaponStat(rows, "stat_weapon_silencer", "Suppressor", silencer != null ? ShortDisplayName(silencer) : _window.Label("stat_weapon_builtin", "Built-in"));
+            }
+
+            if (launcher != null)
+            {
+                ItemDefinition round = launcherStats?.GetLoadedGrenade(item);
+                string launcherValue = round != null ? $"{ShortDisplayName(launcher)} · {ShortDisplayName(round)} · 1 / 1" : $"{ShortDisplayName(launcher)} · 0 / 1";
+                AddWeaponStat(rows, "stat_weapon_launcher", "Underbarrel launcher", launcherValue);
+            }
+
+            var (recoilMultiplier, _) = WeaponAddonComponent.GetEquippedRecoilMultipliers(silencerStats, launcherStats);
+            Vector3 currentRecoil = Vector3.Scale(profile.Recoil, recoilMultiplier);
+            AddWeaponBar(rows, "stat_weapon_recoil_vertical", "Vertical recoil", FormatAngle(currentRecoil.x), profile.Recoil.x, currentRecoil.x, RECOIL_SCALE_DEGREES, higherIsBetter: false);
+            AddWeaponBar(rows, "stat_weapon_recoil_horizontal", "Horizontal recoil", FormatAngle(currentRecoil.y), profile.Recoil.y, currentRecoil.y, RECOIL_SCALE_DEGREES, higherIsBetter: false);
+        }
+
+        private void AddFireModes(List<InventoryItemStat> rows, FirstPersonWeaponAsset profile, ItemInstance item)
+        {
+            IReadOnlyList<int> modes = profile.FireModes;
+            int active = Mathf.Clamp(_weapons?.GetSelectedFireModeIndex(item?.InstanceId) ?? 0, 0, modes.Count - 1);
+            _builder.Clear();
+            for (int i = 0; i < modes.Count; i++)
+            {
+                if (i > 0)
+                {
+                    _builder.Append('\n');
+                }
+
+                int mode = modes[i];
+                string label = mode switch
+                {
+                    FirstPersonWeaponAsset.AUTO_FIRE_MODE => _window.Label("stat_weapon_mode_auto", "Auto"),
+                    1 => _window.Label("stat_weapon_mode_single", "Single"),
+                    _ => _window.FormatLabel("stat_weapon_mode_burst", "{0}-round burst", mode)
+                };
+                string rate = FormatNumber(profile.GetRoundsPerMinute(mode), false);
+                if (i == active)
+                {
+                    AppendColor(ORANGE_COLOR);
+                }
+
+                _builder.Append(label).Append(" (").Append(rate).Append(')');
+                if (i == active)
+                {
+                    _builder.Append(COLOR_END);
+                }
+            }
+
+            AddWeaponStat(rows, "stat_weapon_fire_modes", "Fire modes (rpm)", _builder.ToString());
+        }
+
+        private void AddWeaponStat(List<InventoryItemStat> rows, string key, string fallback, string value)
+        {
+            rows.Add(new InventoryItemStat(STAT_MARKER + _window.Label(key, fallback), value));
+        }
+
+        private void AddWeaponBar(List<InventoryItemStat> rows, string key, string fallback, string value, float baseline, float current, float scale, bool higherIsBetter)
+        {
+            bool changed = !Mathf.Approximately(baseline, current);
+            InventoryStatTone tone = InventoryStatTone.Normal;
+            if (changed)
+            {
+                tone = (current > baseline) == higherIsBetter ? InventoryStatTone.Better : InventoryStatTone.Worse;
+            }
+
+            rows.Add(new InventoryItemStat(STAT_MARKER + _window.Label(key, fallback), value, tone: tone, fill: Mathf.Clamp01(baseline / scale), currentFill: changed ? Mathf.Clamp01(current / scale) : -1f));
+        }
+
+        private void AddAddonStats(List<InventoryItemStat> rows, WeaponAddonComponent addon)
+        {
+            if (addon.Kind == WeaponAddonKind.Silencer)
+            {
+                AddWeaponStat(rows, "stat_weapon_flatness", "Flatness", FormatAddonPercent((addon.BulletSpeedFactor - 1f) * 100f));
+                AddWeaponStat(rows, "stat_weapon_recoil_damping", "Recoil damping", addon.RecoilDampingPercent.ToString("0.##", PRICE_NUMBER_FORMAT) + PERCENT_UNIT);
+                return;
+            }
+
+            if (addon.Kind == WeaponAddonKind.GrenadeLauncher)
+            {
+                Vector3 recoil = addon.RecoilIncreasePercent;
+                AddWeaponStat(rows, "stat_weapon_recoil_vertical", "Vertical recoil", FormatAddonPercent(recoil.x));
+                AddWeaponStat(rows, "stat_weapon_recoil_horizontal", "Horizontal recoil", FormatAddonPercent(recoil.y));
+                AddWeaponStat(rows, "stat_weapon_recoil_roll", "Recoil roll", FormatAddonPercent(recoil.z));
+                AddWeaponStat(rows, "stat_weapon_recoil_snappiness", "Recoil snappiness", FormatAddonPercent(addon.RecoilSnappinessIncreasePercent));
+            }
+        }
+
+        private static string FormatAddonPercent(float value) => value.ToString("+0.##;-0.##;0", PRICE_NUMBER_FORMAT) + PERCENT_UNIT;
+
+        private static string FormatAngle(float angle) => angle.ToString("0.##", PRICE_NUMBER_FORMAT) + "°";
+
+        private static string ShortDisplayName(ItemDefinition definition) => string.IsNullOrWhiteSpace(definition.ShortName) ? definition.DisplayName : definition.ShortName;
+
+        private static string GetCaliber(string section)
+        {
+            const string AMMO_PREFIX = "ammo_";
+            switch (section)
+            {
+                case "ammo_m209":
+                case "ammo_m397a1":
+                    return "40x46 мм";
+                case "ammo_vog-25":
+                case "ammo_vog-25p":
+                case "ammo_og-7b":
+                    return "40 мм";
+            }
+
+            if (string.IsNullOrEmpty(section) || !section.StartsWith(AMMO_PREFIX, StringComparison.Ordinal))
+            {
+                return null;
+            }
+
+            int end = section.IndexOf('_', AMMO_PREFIX.Length);
+            string caliber = end >= 0 ? section[AMMO_PREFIX.Length..end] : section[AMMO_PREFIX.Length..];
+            return caliber.Length > 0 && char.IsDigit(caliber[0]) && caliber.Contains('x') ? caliber + " мм" : null;
         }
 
         private void AddKnifeStats(List<InventoryItemStat> stats, FirstPersonWeaponAsset weapon)

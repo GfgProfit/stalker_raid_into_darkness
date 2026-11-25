@@ -54,6 +54,7 @@ MonoBehaviour:
   _components:
   - rid: 115149081108283492
   - rid: 115149081108283504
+  - rid: 115149129516056675
   references:
     version: 2
     RefIds:
@@ -67,3 +68,7 @@ MonoBehaviour:
       type: {class: WorldItemComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
       data:
         _prefab: {fileID: 4446527027819858161, guid: 3b41dbd50d3d7a94ea147f87c0d3fd95, type: 3}
+    - rid: 115149129516056675
+      type: {class: ItemCostComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      data:
+        _cost: 650

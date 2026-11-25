@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using RaidIntoDarkness.Settings;
 using UnityEngine;
 using XRay.Importer.Levels;
 
@@ -24,11 +25,7 @@ namespace RaidIntoDarkness.GraphicsOptions
 
         public static string ResolvePath(bool editor, string dataPath, string persistentDataPath, string productName)
         {
-            if (editor)
-            {
-                return Path.Combine(Path.GetDirectoryName(persistentDataPath), productName, FILE_NAME);
-            }
-            return Path.Combine(Path.GetDirectoryName(dataPath), "appdata", "settings", FILE_NAME);
+            return SettingsFile.ResolvePath(editor, dataPath, persistentDataPath, productName, FILE_NAME);
         }
 
         public bool TryLoad(out VideoSettings settings, bool upgradeFile = false, float fallbackGrassHeight = XRayGrassValues.DEFAULT_HEIGHT)
@@ -90,19 +87,9 @@ namespace RaidIntoDarkness.GraphicsOptions
 
         public bool TrySave(VideoSettings settings)
         {
-            string temporaryPath = _path + ".tmp";
             try
             {
-                Directory.CreateDirectory(Path.GetDirectoryName(_path));
-                File.WriteAllText(temporaryPath, JsonUtility.ToJson(settings, true));
-                if (File.Exists(_path))
-                {
-                    File.Replace(temporaryPath, _path, null);
-                }
-                else
-                {
-                    File.Move(temporaryPath, _path);
-                }
+                SettingsFile.Write(_path, JsonUtility.ToJson(settings, true));
                 return true;
             }
             catch (Exception exception) when (exception is IOException || exception is UnauthorizedAccessException)

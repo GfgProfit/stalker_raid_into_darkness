@@ -5,6 +5,7 @@
         "Inventory",
         "Inventory.UI",
         "Inventory.IconGeneration",
+        "RaidIntoDarkness.DI",
         "RaidIntoDarkness.FirstPerson",
         "RaidIntoDarkness.Player",
         "RaidIntoDarkness.Weapons",

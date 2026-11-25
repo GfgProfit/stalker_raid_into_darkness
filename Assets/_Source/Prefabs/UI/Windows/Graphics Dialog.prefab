@@ -422,6 +422,7 @@ GameObject:
   - component: {fileID: 149324970167881826}
   - component: {fileID: 1855438734230701493}
   - component: {fileID: 6216374146117424435}
+  - component: {fileID: 7064638213170574218}
   m_Layer: 5
   m_Name: Graphics Dialog
   m_TagString: Untagged
@@ -429,6 +430,18 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 0
+--- !u!225 &7064638213170574218
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4924401604126838165}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 1
 --- !u!224 &149324970167881826
 RectTransform:
   m_ObjectHideFlags: 0

@@ -233,15 +233,20 @@ namespace RaidIntoDarkness.Integrations.Inventory
 
         public string Describe(ItemInstance item)
         {
-            return DescribeDefinition(item.Definition, GetCondition(item), item.Amount, EquipmentAnimationQueue.IsPatchRemoved(item));
+            return Describe(item, true);
         }
 
-        internal string DescribeDefinition(ItemDefinition definition, float condition, int amount, bool patchRemoved = false)
+        internal string Describe(ItemInstance item, bool showDescription)
+        {
+            return DescribeDefinition(item.Definition, GetCondition(item), item.Amount, EquipmentAnimationQueue.IsPatchRemoved(item), showDescription);
+        }
+
+        internal string DescribeDefinition(ItemDefinition definition, float condition, int amount, bool patchRemoved = false, bool showDescription = true)
         {
             int? baseCost = ItemCostComponent.GetBaseCost(definition);
             if (!baseCost.HasValue)
             {
-                return null;
+                return showDescription ? null : string.Empty;
             }
 
             int boxSize = Math.Max(1, definition.GetComponent<AmmoStatsComponent>()?.BoxSize ?? 1);
@@ -272,7 +277,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
                 AppendColor(conditionColor).Append(percent.ToString("0.#", CultureInfo.InvariantCulture)).Append('%').Append(COLOR_END);
             }
 
-            if (definition.Description.Length > 0)
+            if (showDescription && definition.Description.Length > 0)
             {
                 _builder.Append("\n\n");
                 AppendColor(GRAY_1_COLOR).Append(definition.Description).Append(COLOR_END);

@@ -4,6 +4,7 @@
     "references": [
         "XRay.Importer.Runtime",
         "RaidIntoDarkness.Effects",
+        "RaidIntoDarkness.Utils",
         "Unity.RenderPipelines.Core.Runtime",
         "Unity.RenderPipelines.HighDefinition.Runtime"
     ],

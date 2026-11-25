@@ -1,9 +1,13 @@
+using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Inventory;
 using Inventory.IconGeneration;
 using Inventory.UI;
+using R3;
+using RaidIntoDarkness.DI;
 using RaidIntoDarkness.Player;
+using RaidIntoDarkness.Settings;
 using RaidIntoDarkness.Weapons;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -46,8 +50,10 @@ namespace RaidIntoDarkness.Integrations.Inventory
         [SerializeField] private bool _prewarmIcons = true;
         [SerializeField] private InputActionReference _fullStatsModifier;
 
+        [Inject] private IGameSettings _gameSettings;
         private InventorySortingPlus _sorting;
         private EquipmentStatsFormatter _statsFormatter;
+        private IDisposable _descriptionBinding;
         private EquipmentStatusPresenter _statusPresenter;
         private EquipmentStatusDetailsFormatter _statusDetails;
         private InventoryStatusPanel _hoverStatusPanel;
@@ -64,6 +70,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
         private int _restoreFrame = -1;
         private bool _gameplayBlocked;
         private bool _bound;
+        private bool _showItemDescriptions = GameSettingsStore.DEFAULT_SHOW_ITEM_DESCRIPTIONS;
         private bool _fullCondition;
         private bool _statsDirty = true;
         private string _statusHovered;
@@ -199,7 +206,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
                 var spawnMenu = _player.GetComponentInChildren<RaidIntoDarkness.UI.SpawnMenuView>(true);
                 if (spawnMenu != null)
                 {
-                    spawnMenu.Bind(_inventory, _window, _statsFormatter, _fullStatsModifier);
+                    spawnMenu.Bind(_inventory, _window, _statsFormatter, _fullStatsModifier, _gameSettings);
                 }
             }
 
@@ -351,6 +358,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
 
         private void OnDestroy()
         {
+            _descriptionBinding?.Dispose();
             UnbindStatusHover();
             if (_gameplayBlocked)
             {
@@ -434,7 +442,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
             _weaponAmmo = new InventoryWeaponAmmoSource(_inventory.Model, _window.PrimaryContainerId);
             _statsFormatter = new EquipmentStatsFormatter(_window, weaponAmmo: _weaponAmmo, weapons: weapons);
             _window.ItemStatsProvider = _statsFormatter.Collect;
-            _window.ItemDescriptionProvider = _statsFormatter.Describe;
+            BindItemDescriptions();
             _window.ItemShortNameProvider = FormatItemShortName;
             _statusPresenter = _status != null ? new EquipmentStatusPresenter(_window, _status) : null;
             _statusDetails = new EquipmentStatusDetailsFormatter(_window);
@@ -471,6 +479,18 @@ namespace RaidIntoDarkness.Integrations.Inventory
             }
 
             UpdateMaxCarryWeight();
+        }
+
+        private void BindItemDescriptions()
+        {
+            _window.ItemDescriptionProvider = item => _statsFormatter.Describe(item, _showItemDescriptions);
+            _descriptionBinding = _gameSettings?.ShowItemDescriptions.Subscribe(SetItemDescriptions);
+        }
+
+        private void SetItemDescriptions(bool value)
+        {
+            _showItemDescriptions = value;
+            _window.RefreshTooltip();
         }
 
         private bool CanUnloadWeapon(InventoryActionContext context) => _weaponBinder?.IsReloading(context.Item) != true && _weaponAmmo.Unload(context.Item, false).Success;

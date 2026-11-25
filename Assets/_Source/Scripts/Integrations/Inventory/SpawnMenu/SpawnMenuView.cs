@@ -4,7 +4,9 @@ using System.Collections.Generic;
 using System.Globalization;
 using Inventory;
 using Inventory.UI;
+using R3;
 using RaidIntoDarkness.Integrations.Inventory;
+using RaidIntoDarkness.Settings;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -53,6 +55,8 @@ namespace RaidIntoDarkness.UI
         private PlayerInventoryRuntime _inventory;
         private InventoryWindow _inventoryWindow;
         private EquipmentStatsFormatter _statsFormatter;
+        private IGameSettings _gameSettings;
+        private IDisposable _descriptionBinding;
         private InputActionReference _fullStatsModifier;
         private IReadOnlyList<ItemDefinition> _definitions;
         private SpawnMenuCatalog _catalog;
@@ -72,15 +76,19 @@ namespace RaidIntoDarkness.UI
         private int _lastPointer;
         private bool _descending;
         private bool _tooltipFullCondition;
+        private bool _tooltipNeedsRefresh;
+        private bool _showItemDescriptions = GameSettingsStore.DEFAULT_SHOW_ITEM_DESCRIPTIONS;
 
-        internal void Bind(PlayerInventoryRuntime inventory, InventoryWindow window, EquipmentStatsFormatter statsFormatter, InputActionReference fullStatsModifier)
+        internal void Bind(PlayerInventoryRuntime inventory, InventoryWindow window, EquipmentStatsFormatter statsFormatter, InputActionReference fullStatsModifier, IGameSettings gameSettings)
         {
             _inventory = inventory;
             _inventoryWindow = window;
             _statsFormatter = statsFormatter;
             _fullStatsModifier = fullStatsModifier;
+            _gameSettings = gameSettings;
             if (isActiveAndEnabled)
             {
+                BindDescriptionSetting();
                 EnsureCatalog();
             }
         }
@@ -102,6 +110,7 @@ namespace RaidIntoDarkness.UI
 
         private void OnEnable()
         {
+            BindDescriptionSetting();
             RefreshSort();
             RefreshDetails();
             EnsureCatalog();
@@ -109,6 +118,8 @@ namespace RaidIntoDarkness.UI
 
         private void OnDisable()
         {
+            _descriptionBinding?.Dispose();
+            _descriptionBinding = null;
             if (_load != null)
             {
                 StopCoroutine(_load);
@@ -129,7 +140,7 @@ namespace RaidIntoDarkness.UI
             bool fullCondition = _fullStatsModifier != null && _fullStatsModifier.action != null && _fullStatsModifier.action.IsPressed();
             int condition = _hoveredEntry.Condition;
             int amount = _hoveredEntry.GetUnitCount(_hoveredEntry.Quantity);
-            if (_tooltip.IsVisible && condition == _tooltipCondition && fullCondition == _tooltipFullCondition && amount == _tooltipAmount)
+            if (_tooltip.IsVisible && !_tooltipNeedsRefresh && condition == _tooltipCondition && fullCondition == _tooltipFullCondition && amount == _tooltipAmount)
             {
                 _tooltip.Follow(pointer, _hoverCamera);
                 return;
@@ -138,11 +149,24 @@ namespace RaidIntoDarkness.UI
             _tooltipCondition = condition;
             _tooltipAmount = amount;
             _tooltipFullCondition = fullCondition;
+            _tooltipNeedsRefresh = false;
             ItemDefinition definition = _hoveredEntry.Definition;
             float normalizedCondition = condition / 100f;
             _tooltipStats.Clear();
             _statsFormatter.CollectDefinition(definition, normalizedCondition, fullCondition, _tooltipStats);
-            _tooltip.ShowDefinition(definition, pointer, _hoverCamera, _tooltipStats, _statsFormatter.DescribeDefinition(definition, normalizedCondition, amount));
+            _tooltip.ShowDefinition(definition, pointer, _hoverCamera, _tooltipStats, _statsFormatter.DescribeDefinition(definition, normalizedCondition, amount, showDescription: _showItemDescriptions));
+        }
+
+        private void BindDescriptionSetting()
+        {
+            _descriptionBinding?.Dispose();
+            _descriptionBinding = _gameSettings?.ShowItemDescriptions.Subscribe(SetItemDescriptions);
+        }
+
+        private void SetItemDescriptions(bool value)
+        {
+            _showItemDescriptions = value;
+            _tooltipNeedsRefresh = true;
         }
 
         internal void SelectCategory(SpawnMenuCatalog.Category category)

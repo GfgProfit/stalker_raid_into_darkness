@@ -39,10 +39,8 @@ namespace RaidIntoDarkness.GraphicsOptions
 
         [SerializeField] private GameObject _mainMenu;
         [SerializeField] private CanvasGroup _options;
-        [SerializeField] private ScrollRect _scroll;
         [SerializeField] private Button _open;
         [SerializeField] private Button _back;
-        [SerializeField] private Button _graphics;
         [SerializeField] private Button _playMilitary;
         [FormerlySerializedAs("_play")]
         [SerializeField] private Button _playDemo;
@@ -73,6 +71,9 @@ namespace RaidIntoDarkness.GraphicsOptions
         private readonly List<string> _labels = new();
         private VideoSettingsRuntime _runtime;
         private VideoSettingsSession _session;
+        private SettingsMenuPages _pages;
+        private VideoSettingsPage _videoPage;
+        private SettingsPageView _lastPage;
         private IReadOnlyList<VideoDisplay> _sizeOptions;
         private IReadOnlyList<VideoDisplay> _rateOptions;
         private GameObject _lastSelection;
@@ -80,11 +81,15 @@ namespace RaidIntoDarkness.GraphicsOptions
         private InputAction _cancelAction;
         private MenuDialog _menuDialog;
 
+        private bool CanEdit => _session is { State: VideoApplyState.Idle } && _pages.IsOpen && _menuDialog == MenuDialog.None;
+        private bool CanEditVideo => CanEdit && _pages.ActivePage == _videoPage && !CanvasUpdateRegistry.IsRebuildingLayout();
+
         private enum MenuDialog
         {
             None,
             Reset,
-            Exit
+            Exit,
+            SaveFailed
         }
 
         private enum Selector
@@ -145,7 +150,8 @@ namespace RaidIntoDarkness.GraphicsOptions
         {
             _open.onClick.AddListener(Open);
             _back.onClick.AddListener(RequestClose);
-            _graphics.onClick.AddListener(FocusGraphics);
+            _pages = _options.GetComponent<SettingsMenuPages>();
+            _videoPage = _pages != null && _pages.IsConfigured() ? _pages.FindPage<VideoSettingsPage>() : null;
             if (_playMilitary != null)
             {
                 _playMilitary.onClick.AddListener(PlayMilitary);
@@ -158,13 +164,17 @@ namespace RaidIntoDarkness.GraphicsOptions
             {
                 _quit.onClick.AddListener(Application.Quit);
             }
-            _apply.onClick.AddListener(() => _session.Apply(Time.realtimeSinceStartupAsDouble));
-            _cancel.onClick.AddListener(() => _session.Cancel(Time.realtimeSinceStartupAsDouble));
+            _apply.onClick.AddListener(ApplySettings);
+            _cancel.onClick.AddListener(CancelSettings);
             _defaults.onClick.AddListener(OpenReset);
             _dialogPrimary.onClick.AddListener(ConfirmPrimary);
             _dialogSecondary.onClick.AddListener(ConfirmSecondary);
 
-            _selectors[(int)Selector.Preset].IndexChanged += value => _session.SelectPreset(value);
+            int presetIndex = (int)Selector.Preset;
+            if (presetIndex < _selectors.Length && _selectors[presetIndex] != null)
+            {
+                _selectors[presetIndex].IndexChanged += SelectPreset;
+            }
             Bind(Selector.Mode, SelectMode);
             Bind(Selector.Resolution, SelectResolution);
             Bind(Selector.RefreshRate, (ref VideoSettings settings, int value) => settings.display = _rateOptions[value]);
@@ -210,7 +220,11 @@ namespace RaidIntoDarkness.GraphicsOptions
 
         private void Start()
         {
-            _open.interactable = VideoSettingsRuntime.Instance != null;
+            _open.interactable = VideoSettingsRuntime.Instance != null && _videoPage != null;
+            if (_videoPage == null)
+            {
+                Debug.LogError("Options Menu requires configured settings pages, including the video settings page.", this);
+            }
             if (_playMilitary != null)
             {
                 _playMilitary.interactable &= SceneLoader.CanLoad(MILITARY_SCENE);
@@ -237,18 +251,19 @@ namespace RaidIntoDarkness.GraphicsOptions
                 return;
             }
             _lastSelection = selected;
-            if (selected == null || !selected.transform.IsChildOf(_scroll.content))
+            ScrollRect scroll = _pages.ActivePage?.Scroll;
+            if (scroll == null || selected == null || !selected.transform.IsChildOf(scroll.content))
             {
                 return;
             }
-            Bounds bounds = RectTransformUtility.CalculateRelativeRectTransformBounds(_scroll.viewport, (RectTransform)selected.transform);
-            Rect viewport = _scroll.viewport.rect;
+            Bounds bounds = RectTransformUtility.CalculateRelativeRectTransformBounds(scroll.viewport, (RectTransform)selected.transform);
+            Rect viewport = scroll.viewport.rect;
             float offset = bounds.max.y > viewport.yMax ? viewport.yMax - bounds.max.y : Mathf.Max(0.0f, viewport.yMin - bounds.min.y);
             if (!Mathf.Approximately(offset, 0.0f))
             {
-                _scroll.StopMovement();
-                _scroll.content.anchoredPosition += Vector2.up * offset;
-                _scroll.verticalNormalizedPosition = Mathf.Clamp01(_scroll.verticalNormalizedPosition);
+                scroll.StopMovement();
+                scroll.content.anchoredPosition += Vector2.up * offset;
+                scroll.verticalNormalizedPosition = Mathf.Clamp01(scroll.verticalNormalizedPosition);
             }
         }
 
@@ -260,14 +275,14 @@ namespace RaidIntoDarkness.GraphicsOptions
         private void Open()
         {
             _runtime = VideoSettingsRuntime.Instance;
-            if (_runtime == null || _session != null || SceneLoader.IsLoading)
+            if (_runtime == null || _videoPage == null || _session != null || SceneLoader.IsLoading)
             {
                 return;
             }
             _session = _runtime.Session;
             _runtime.Display.Refresh();
             _session.SyncDisplay();
-            _session.Changed += Refresh;
+            _videoPage.Bind(_session);
             if (!_externalCancelInput)
             {
                 var module = EventSystem.current?.GetComponent<InputSystemUIInputModule>();
@@ -279,13 +294,19 @@ namespace RaidIntoDarkness.GraphicsOptions
             }
             _mainMenu.SetActive(false);
             _options.gameObject.SetActive(true);
+            _pages.Changed += OnPageChanged;
+            _pages.Open();
+            _session.Changed += Refresh;
             Canvas.ForceUpdateCanvases();
-            _scroll.StopMovement();
-            _scroll.verticalNormalizedPosition = 1.0f;
-            Refresh();
+            ScrollRect scroll = _pages.ActivePage.Scroll;
+            if (scroll != null)
+            {
+                scroll.StopMovement();
+                scroll.verticalNormalizedPosition = 1.0f;
+            }
             if (!_dialog.activeSelf)
             {
-                Select(_graphics.gameObject);
+                Select(_pages.ActivePage.TabButton.gameObject);
             }
         }
 
@@ -295,7 +316,7 @@ namespace RaidIntoDarkness.GraphicsOptions
             {
                 return;
             }
-            if (!_session.Dirty)
+            if (!_pages.HasPendingChanges)
             {
                 Close();
                 return;
@@ -355,26 +376,60 @@ namespace RaidIntoDarkness.GraphicsOptions
                 _cancelAction = null;
             }
             _session.Changed -= Refresh;
+            _pages.Changed -= OnPageChanged;
+            _pages.Close();
             _session.Cancel(Time.realtimeSinceStartupAsDouble);
             _session = null;
+            _lastPage = null;
             _menuDialog = MenuDialog.None;
             _preDialogSelection = null;
         }
 
-        private void FocusGraphics()
+        private void OnPageChanged()
         {
-            _scroll.verticalNormalizedPosition = 1.0f;
-            CustomArrowButton arrow = _selectors[(int)Selector.Preset].GetComponentInChildren<CustomArrowButton>();
-            if (arrow != null)
+            if (_lastPage != _pages.ActivePage)
             {
-                Select(arrow.gameObject);
+                _lastPage = _pages.ActivePage;
+                Refresh();
+            }
+            else
+            {
+                RefreshActions();
             }
         }
 
         private void OpenReset()
         {
-            _menuDialog = MenuDialog.Reset;
-            Refresh();
+            if (CanEdit)
+            {
+                _menuDialog = MenuDialog.Reset;
+                Refresh();
+            }
+        }
+
+        private void ApplySettings()
+        {
+            if (CanEdit && !_pages.Apply(Time.realtimeSinceStartupAsDouble))
+            {
+                _menuDialog = MenuDialog.SaveFailed;
+                Refresh();
+            }
+        }
+
+        private void CancelSettings()
+        {
+            if (CanEdit)
+            {
+                _pages.Cancel(Time.realtimeSinceStartupAsDouble);
+            }
+        }
+
+        private void SelectPreset(int preset)
+        {
+            if (CanEditVideo)
+            {
+                _session.SelectPreset(preset);
+            }
         }
 
         private void ConfirmPrimary()
@@ -383,11 +438,15 @@ namespace RaidIntoDarkness.GraphicsOptions
             {
                 case MenuDialog.Reset:
                     _menuDialog = MenuDialog.None;
-                    _session.Reset(VideoCategory.All);
+                    _pages.ResetSelected();
                     Refresh();
                     break;
                 case MenuDialog.Exit:
                     Close();
+                    break;
+                case MenuDialog.SaveFailed:
+                    _menuDialog = MenuDialog.None;
+                    Refresh();
                     break;
                 default:
                     _session.Keep(Time.realtimeSinceStartupAsDouble);
@@ -431,12 +490,16 @@ namespace RaidIntoDarkness.GraphicsOptions
 
         private void Bind(Switch toggle, EditValue action)
         {
-            _toggles[(int)toggle].onValueChanged.AddListener(value => Edit(action, value ? 1 : 0));
+            int index = (int)toggle;
+            if (index < _toggles.Length && _toggles[index] != null)
+            {
+                _toggles[index].onValueChanged.AddListener(value => Edit(action, value ? 1 : 0));
+            }
         }
 
         private void Edit(EditValue action, int value)
         {
-            if (_session == null || _session.State != VideoApplyState.Idle)
+            if (!CanEditVideo)
             {
                 return;
             }
@@ -478,14 +541,13 @@ namespace RaidIntoDarkness.GraphicsOptions
         private void Refresh()
         {
             RefreshDialog();
-            if (_session.State != VideoApplyState.Idle)
+            RefreshActions();
+            if (_session.State != VideoApplyState.Idle || _pages.ActivePage != _videoPage)
             {
                 return;
             }
             VideoSettings draft = _session.Draft;
             VideoQuality quality = draft.quality;
-            _apply.interactable = _session.Dirty;
-            _cancel.interactable = _session.Dirty;
             int upscaler = _runtime.ResolveUpscalingMethod(quality.upscalingMethod);
             _status.text = _session.Error ?? (upscaler == quality.upscalingMethod ? "" : UPSCALERS[quality.upscalingMethod] + " недоступен · " + UPSCALERS[upscaler]);
             _customLabel.gameObject.SetActive(_runtime.Presets.IsCustom(draft));
@@ -525,6 +587,13 @@ namespace RaidIntoDarkness.GraphicsOptions
                 }
                 _calibration[i].color = new Color(level, level, level);
             }
+        }
+
+        private void RefreshActions()
+        {
+            bool canApply = _session.State == VideoApplyState.Idle && _pages.SelectedPageIsDirty;
+            _apply.interactable = canApply;
+            _cancel.interactable = canApply;
         }
 
         private void RefreshAdvancedQuality(VideoQuality quality, int upscaler)
@@ -658,6 +727,7 @@ namespace RaidIntoDarkness.GraphicsOptions
             }
             _options.interactable = !open;
             _options.blocksRaycasts = !open;
+            _pages.SetBlocked(open);
             _dialog.SetActive(open);
             if (!open)
             {
@@ -666,7 +736,7 @@ namespace RaidIntoDarkness.GraphicsOptions
                     GameObject selection = _preDialogSelection;
                     if (selection == null || !selection.activeInHierarchy || selection.TryGetComponent(out Selectable control) && !control.IsInteractable())
                     {
-                        selection = _graphics.gameObject;
+                        selection = _pages.ActivePage.TabButton.gameObject;
                     }
                     _preDialogSelection = null;
                     Select(selection);
@@ -674,11 +744,12 @@ namespace RaidIntoDarkness.GraphicsOptions
                 return;
             }
             _dialogPrimary.gameObject.SetActive(menuDialog || confirming);
-            _dialogSecondary.gameObject.SetActive(menuDialog || confirming);
+            bool saveFailed = _menuDialog == MenuDialog.SaveFailed;
+            _dialogSecondary.gameObject.SetActive((menuDialog || confirming) && !saveFailed);
             if (_menuDialog == MenuDialog.Reset)
             {
-                _dialogTitle.text = "Сброс настроек видео";
-                _dialogBody.text = "Вернуть все настройки видео к значениям по умолчанию?";
+                _dialogTitle.text = "Сброс настроек";
+                _dialogBody.text = "Вернуть настройки раздела «" + _pages.ActivePage.Title + "» к значениям по умолчанию?";
                 _primaryLabel.text = "Сбросить";
                 _secondaryLabel.text = "Отмена";
             }
@@ -688,6 +759,12 @@ namespace RaidIntoDarkness.GraphicsOptions
                 _dialogBody.text = "Выйти из настроек без сохранения изменений?";
                 _primaryLabel.text = "Выйти";
                 _secondaryLabel.text = "Остаться";
+            }
+            else if (saveFailed)
+            {
+                _dialogTitle.text = _pages.ActivePage.Title;
+                _dialogBody.text = "Не удалось сохранить настройки.";
+                _primaryLabel.text = "Закрыть";
             }
             else if (confirming)
             {
@@ -703,7 +780,7 @@ namespace RaidIntoDarkness.GraphicsOptions
             }
             if ((menuDialog || confirming) && EventSystem.current != null && EventSystem.current.currentSelectedGameObject != _dialogPrimary.gameObject && EventSystem.current.currentSelectedGameObject != _dialogSecondary.gameObject)
             {
-                Select(_dialogSecondary.gameObject);
+                Select(saveFailed ? _dialogPrimary.gameObject : _dialogSecondary.gameObject);
             }
         }
 
@@ -736,7 +813,13 @@ namespace RaidIntoDarkness.GraphicsOptions
 
         private void Set(Switch toggle, bool value, bool supported = true)
         {
-            Toggle control = _toggles[(int)toggle];
+            int index = (int)toggle;
+            if (index >= _toggles.Length || _toggles[index] == null)
+            {
+                return;
+            }
+
+            Toggle control = _toggles[index];
             control.interactable = supported;
             control.SetIsOnWithoutNotify(value);
         }

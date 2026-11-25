@@ -46,7 +46,7 @@ Material:
     - _OpticalSdf: 0
     - _RedDotDist: 8.739713
     - _RedDotIntensity: 5.4262543
-    - _RedDotSize: 0.0178468
+    - _RedDotSize: 0.0115
     - _ReticleCull: 0
     - _ReticleFlickerIntensity: 0
     - _ReticleFringeIntensity: 0

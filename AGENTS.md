@@ -10,7 +10,7 @@ Primary stack:
 - HDRP 17.6.0 (Production)
 - TextMeshPro
 - DOTween, only if already present in the project
-- R3, only if already present in the project
+- R3, mandatory for new UI (use the existing package; see Dependency Rules)
 - UniTask, only if already present in the project
 - Custom DI container under `Assets/_Source/Scripts/DI`
 
@@ -26,15 +26,13 @@ Work narrowly.
 
 ## Instruction Priority
 
-Follow instructions in this priority order:
+1. Higher-priority platform, system, developer, and tool instructions.
+2. Explicit user instructions for the current task.
+3. Project-specific rules in this file.
+4. Existing project patterns, where compatible with these rules.
+5. General best practices.
 
-3. Project-specific rules in this file
-4. Existing project patterns
-5. General best practices
-
-If a rule conflicts with a generic best practice, personal preference, or default agent behavior, follow the higher-priority rule.
-
-If the user explicitly asks for something that conflicts with this file, follow the explicit user request.
+Explicit user instructions override conflicting project rules within higher-priority constraints. Existing code, personal preference, generic best practices, and ordinary implementation requests do not authorize exceptions to mandatory standards.
 
 ## Hard Constraints
 
@@ -52,7 +50,69 @@ REQUIRED:
 - Use Russian in user-facing responses unless the user explicitly requests another language
 - Preserve existing code style
 - Minimize unnecessary context and tool output without reducing the completeness of the final response
-- Implement the smallest safe change that solves the task
+- Implement the smallest safe change that solves the task and complies with the mandatory architecture rules
+- Enforce the One Type per C# File rule for all new and directly modified handwritten C# source files; forbid handwritten partial-class fragmentation and responsibility-based file suffixes used to split a type
+
+## Mandatory Architecture Rules
+
+SOLID, DRY, KISS, YAGNI, DI for application-level services, MVVM + R3 for new UI, reactive UI updates, separation of simulation/state/visualization, and Single Source of Truth (SSOT) are mandatory, not preferences. Apply them to new code and changed responsibilities within scope. Existing patterns cannot override them. Only the legacy-maintenance boundaries in Existing Code First / Change Scope Control and the justified low-level exceptions below apply.
+
+### One Type per C# File (Mandatory)
+
+**Exactly one declared type per handwritten `.cs` type-definition file, and exactly one handwritten source file per type.** This is a hard source-organization rule, not a naming preference. It applies to Runtime, Editor, tests, networking, persistence, rendering, importers, Burst/Jobs, and all other project-owned C# code.
+
+- Every class (including static, abstract, sealed, generic, and attribute classes), struct (including readonly, ref, and generic structs), interface, enum, record class, record struct, and delegate declaration must have its own dedicated `.cs` file, regardless of accessibility or size.
+- DTOs, request/response contracts, serializable wrappers, save models, configuration types, event payloads, helper types, job structs, and private implementation types are not exceptions. Never collect multiple related types in one file merely because they belong to the same feature or protocol.
+- Nested type declarations are forbidden, including nested private classes, structs, interfaces, enums, records, delegates, and generic types. Extract them as separate namespace-level types with the narrowest compatible accessibility. Do not work around the rule by nesting types, using multiple namespaces, or placing additional declarations in conditional compilation branches.
+- The file name must match the declared type name, e.g. `ServerResponse.cs`, `InventoryResponse.cs`, `IInventoryService.cs`, `ItemCategory.cs`, and `Result.cs` for `Result<T>`. If existing contracts require different types with the same simple name in the same directory, use distinct subdirectories or an explicit generic arity suffix (e.g. `Result.Generic1.cs`); do not combine declarations or rename public contracts unnecessarily. Unity script assets must retain their required type/file-name matching.
+- **No partial-type fragmentation or cosmetic decomposition.** A handwritten type must have exactly one complete handwritten declaration in exactly one `.cs` file. Do not use `partial` classes, structs, interfaces, or records to distribute fields, methods, Unity lifecycle callbacks, input, movement, state, or other responsibilities across handwritten files. This prohibition applies even if every individual file contains only one declaration.
+- FORBIDDEN: `PlayerController.Input.cs`, `PlayerController.Lifecycle.cs`, `PlayerController.Movement.cs`, `PlayerController.State.cs`, `PlayerController.Core.cs`, `PlayerController.Part1.cs`, and any equivalent naming scheme that stores fragments of `PlayerController` in separate files. Using folders, regions, conditional compilation, or different file names does not make fragments separate types or satisfy SRP. Regions may organize a cohesive type within its single file, but do not count as architectural decomposition. The generic arity suffix exception above is only for genuinely distinct types, never fragments of the same type.
+- When a type genuinely has multiple independent responsibilities, decompose it architecturally into cohesive, separately declared types with explicit dependencies, ownership, and composition. For example, `PlayerInputHandler.cs`, `PlayerMovement.cs`, and `PlayerController.cs` must declare genuinely distinct types with meaningful responsibilities, not partial declarations, forwarding-only wrappers, or extensions that merely conceal the original god object. Keep lifecycle coordination with its appropriate owner. Do not create one class per method or extract cohesive behavior merely to reduce line count; apply SOLID, DRY, KISS, YAGNI, DI, and SSOT together.
+- For an existing fragmented handwritten type directly modified by the task, inspect all its partial declarations and resolve the violation within the authorized scope: consolidate a cohesive type into its canonical file, or perform real responsibility-based decomposition when required. Preserve behavior, Unity bindings and GUIDs, accessibility, serialization, save/network contracts, and assembly boundaries. Do not rename or delete existing script assets blindly. If safe remediation requires a broader migration or authorization, report the blocker; do not add another fragment or claim compliance. Do not migrate unrelated legacy partial types without explicit authorization.
+- The only allowed `partial` use for project-owned handwritten code is a single handwritten declaration required by an existing compiler/source-generator/tooling contract with generated counterparts. Do not add handwritten fragments to such a type or introduce code generation to evade this rule. Do not hand-edit generated or third-party files to impose this standard. Files containing only assembly/module attributes, global usings, or other legitimate non-type compilation directives do not require an artificial type declaration.
+- Keep related files together in their owning feature/domain folder; no unnecessary global DTO/helper folders or additional wrappers. Members, constructors, properties, fields, methods, events using existing delegate types, and local functions remain inside their owning type. Generic parameters are part of a type declaration, not additional types.
+- Enforce the rule when creating or editing project-owned handwritten C# files. If a directly edited file already contains multiple or nested types, perform the smallest safe extraction of those existing types, rather than adding to or perpetuating the violation. Preserve behavior, namespaces where compatible, assembly boundaries, accessibility constraints, serialization, Unity `.meta` GUIDs, MonoBehaviour/ScriptableObject bindings, `[SerializeReference]` identities, save compatibility, and network contracts. If safe extraction requires a broader migration or approval, report the blocker instead of silently waiving the rule or breaking compatibility.
+- Do not conduct an unrelated repository-wide file-splitting migration without explicit authorization. Existing violations outside the current task scope may remain temporarily; they are legacy debt, not valid patterns for new or directly edited files.
+- No low-level, performance, SOLID, DRY, KISS, YAGNI, or existing-pattern exception authorizes multiple handwritten type declarations in one file or fragmentation of a handwritten type across files. Separate file placement alone does not require runtime indirection, allocations, or additional architectural layers.
+
+### SOLID, DRY, KISS, YAGNI
+
+- **SRP:** Each class/module/service must have a cohesive responsibility. Do not mix unrelated simulation, presentation, persistence, and orchestration in god objects.
+- **OCP:** Preserve stable behavior; use composition and meaningful extension points for real requirements.
+- **LSP:** Implementations must honor contract behavior, invariants, and lifecycle guarantees.
+- **ISP:** Expose focused consumer contracts, not oversized interfaces.
+- **DIP:** High-level policy depends on appropriate abstractions and explicit dependencies, not concrete infrastructure/presentation where a meaningful boundary exists. Use existing DI at application boundaries.
+- **DRY:** Maintain one implementation of shared rules, formulas, transitions, and configuration values. Similar code with different semantics need not share an abstraction.
+- **KISS:** Prefer the simplest correct, maintainable, performant design. Avoid unnecessary wrappers, factories, layers, and indirection.
+- **YAGNI:** Implement actual requirements and requested extension points, not speculative features or frameworks.
+
+Prefer composition, focused services, and clear dependency direction. Use interfaces for real boundaries, substitution, DI, or testing, not for every class. Do not mechanically split responsibilities or create abstractions merely to satisfy SOLID. Moving existing type declarations into dedicated files to satisfy One Type per C# File is mandatory source organization, not a responsibility split. KISS/YAGNI do not excuse bypassing mandatory DI, ownership, or UI rules.
+
+### Simulation, State, and Visualization
+
+- **Simulation:** Gameplay rules, calculations, validation, transitions. Independent of UI, cameras, renderers, audio, and VFX; prefer plain C# or data-oriented code where Unity APIs are unnecessary.
+- **State:** Authoritative mutable runtime data belongs to its owning system, separate from read-only config, save snapshots, and UI-local state. Expose controlled writes and explicit reads.
+- **Visualization:** Consume state, notifications, or snapshots; own only presentation behavior and visual state. Unity adapters may forward engine/physics/input signals to the owning system.
+
+Flow: input/command -> simulation/owner -> committed state -> notification/snapshot -> visualization.
+
+Visual culling, disabling visuals, closing UI, or streaming out presentation must not implicitly alter unrelated simulation. Intentional activation/sleep/scheduling belongs to the simulation/lifecycle owner. Keep save/load and potential networking at explicit state/command boundaries; do not implement unrequested networking. Separate responsibilities logically without forcing managed abstractions or allocations into data-oriented code.
+
+### Single Source of Truth (SSOT)
+
+- Each gameplay fact has exactly one authoritative owner at a time, not one global god manager. Identify the owner before changing state. Route writes through its operations/commands/controlled simulation path; expose read-only queries, contracts, snapshots, or notifications.
+- UI, Views, ViewModels, visuals, and other services must not maintain competing writable copies. ViewModels own only UI-local state and derived projections.
+- Save DTOs, caches, reactive projections, spatial indices, render/native buffers, and snapshots are allowed, not authoritative copies. Define owner, synchronization direction, update/invalidation, and lifetime. Restore snapshots through the owner or controlled initialization; config assets remain read-only.
+- For inventory membership, quantities, equipment assignments, item durability, ammo and other mutable facts, identify and reuse the authoritative owner established by the actual architecture. Coordinate through explicit boundaries; never duplicate writes or rules. Do not invent a competing owner or change an existing ownership contract without a task-specific reason.
+
+### Low-Level and Performance-Critical Exceptions
+
+Burst, Jobs, native containers, BRG/culling, shaders, rendering, import pipelines, and measured hot paths may use specialized designs only when application patterns conflict with concrete execution/API constraints or cause measured overhead.
+
+- Allow structs, contiguous buffers, explicit memory ownership, batching, static pure helpers, direct data access, explicit loops, fused operations, specialized algorithms, fixed-step simulation, and frame-driven rendering. Do not force R3/managed abstractions into inner loops or resolve DI per entity/job/frame/kernel. Owning application services still use DI.
+- Allow data-oriented projections/buffers/duplication for locality with explicit ownership and synchronization. Keep correctness, state ownership, simulation/visual separation, thread safety, JobHandle/native-memory and resource lifetimes, and dependency direction intact. Never trade correctness or determinism required by the mechanic for an unverified optimization.
+- Localize exceptions; apply `rvm-performance`. Require concrete technical constraints or profiler/benchmark evidence; measure claimed improvements and regressions. Report scope, justification, evidence, and validation limits; diagnostics in Archive, never source comments.
+- No exemption for unnecessary UI polling, unowned global mutable state, application-level DI, dependency restrictions, or unrelated redesign. DRY/KISS/YAGNI apply except for justified local trade-offs.
 
 ## Misc
 
@@ -226,23 +286,24 @@ Never silently merge experimental changes into Production or present a change th
 
 ## Existing Code First
 
-Before introducing a new pattern, inspect nearby relevant code.
+Before introducing a new pattern, inspect nearby relevant code and identify existing state owners, contracts, composition roots, DI registrations, ViewModels, and configuration assets.
 
-Prefer consistency with existing project code over theoretical improvements.
+Prefer consistency with existing project code over theoretical improvements only when the existing pattern satisfies the mandatory architecture rules.
 
 When modifying an existing feature:
-- Follow surrounding architecture
+- Follow surrounding architecture where compliant
 - Follow surrounding naming
 - Follow surrounding folder structure
-- Follow surrounding dependency patterns
+- Follow surrounding dependency patterns where compliant
 - Follow surrounding formatting
 - Follow existing serialization patterns
+- Preserve GUIDs, serialized references, public contracts, and save compatibility unless the task requires a change
 
-Do not rewrite working code to match a preferred pattern.
+New features, new application-level services, new UI functionality, and changed responsibilities must meet mandatory architecture standards even when adjacent legacy code does not. All new and directly edited handwritten C# files must also satisfy One Type per C# File. Do not use legacy architecture as a justification for introducing new violations.
 
-Do not introduce a new architectural style if the nearby code already has a clear pattern.
+Do not rewrite working code solely to match a preferred pattern. Existing unrelated legacy code may remain unchanged. Fix architectural violations directly causing the issue or blocking compliant integration; use the smallest suitable adapter or targeted refactor. Do not create competing state owners, parallel DI containers, or parallel architectural layers.
 
-If the project already uses R3, UniTask, MVVM, DOTween, or the custom DI container in the affected area, continue using the same approach.
+If the project already uses R3, UniTask, MVVM, DOTween, or the custom DI container in the affected area, continue using the same approach, subject to the mandatory architecture and dependency rules.
 
 ## Scope Discipline
 
@@ -254,20 +315,22 @@ Expand scope only when a discovered dependency requires it.
 
 ## Change Scope Control
 
-Implement the smallest change that solves the requested task.
+Implement the smallest safe, architecturally compliant change that solves the requested task.
 
 Do not:
-- Rewrite working code
-- Split classes without explicit request
-- Merge classes without explicit request
+- Rewrite working code unrelated to the task
+- Split or merge type responsibilities merely to satisfy an abstract design preference; mandatory extraction of existing type declarations and remediation of directly modified fragmented types under One Type per C# File are not prohibited
+- Use handwritten partial declarations, responsibility-suffixed fragment files, or cosmetic decomposition as a substitute for actual architectural boundaries
 - Create new architecture layers without direct need
 - Convert code to another paradigm without direct need
 - Change public APIs unless required by the task
 - Change behavior outside the requested scope
 
-Bug fixes must be surgical.
+Bug fixes must be surgical. Preserve existing behavior and contracts unless changing them is part of the task.
 
-Feature additions must integrate with existing patterns.
+Focused structural changes, including splitting responsibilities, introducing an explicit dependency, or adapting legacy UI/state boundaries, are permitted when necessary to implement the requested feature or fix in compliance with the mandatory architecture rules. Keep them inside the discovered dependency scope. A broad legacy migration or project-wide architectural rewrite requires explicit authorization.
+
+Feature additions must integrate with existing compliant patterns. If an existing architecture violates a mandatory rule, do not copy the violation into new code. Report relevant legacy limitations that remain outside the task scope.
 
 ## Token Discipline
 
@@ -281,6 +344,8 @@ Avoid:
 Use task-relevant information without repetition, while preserving complete explanations and verification results in the final response.
 
 ## C# Code Style
+
+Apply One Type per C# File before all formatting and naming rules below. Never use nearby multi-type, nested-type, or fragmented partial-type files as a precedent. A type and its canonical file must match; responsibility suffixes must not be used for fragments of a type.
 
 Private fields must start with `_`.
 
@@ -433,7 +498,7 @@ Custom DI container folder:
 Assets/_Source/Scripts/DI
 ```
 
-The DI folder contains a custom dependency injection container. Use it when it improves architecture, but do not refactor or replace it unless explicitly requested.
+The DI folder contains the existing custom dependency injection container. Its use is mandatory for application-level services under the Dependency Injection Rules. Do not refactor or replace it unless explicitly requested.
 
 Preferred folders:
 
@@ -472,7 +537,7 @@ Prefer dependencies already present in the project.
 
 Use DOTween only if already present in the project.
 
-Use R3 only if already present in the project.
+R3 is mandatory for new UI. Verify that the existing R3 package and relevant assembly references are available before implementation. If R3 is missing or inaccessible, do not install it without explicit authorization, substitute another reactive framework, or fall back to polling. Report the blocker and request authorization where needed.
 
 Use UniTask only if already present in the project.
 
@@ -480,48 +545,9 @@ Do not replace existing project dependencies with alternatives.
 
 ## Dependency Injection Rules
 
-Use the existing DI container when introducing application-level services.
+Mandatory for new application-level services (gameplay orchestration, inventory, equipment, persistence, session/config/resource management, shared services). Use `Assets/_Source/Scripts/DI` and existing composition root/registration patterns. Declare dependencies explicitly; prefer constructor injection for plain C#, existing injection/initialization for Unity objects. Assign appropriate lifetimes, not all singletons; dispose owned resources. Resolve at composition boundaries only.
 
-Do not replace the DI container.
-
-Do not introduce another DI framework.
-
-Do not refactor the DI container unless explicitly requested.
-
-Prefer existing registration patterns.
-
-Prefer constructor injection where supported by the project.
-
-Do not instantiate application services inside MonoBehaviours when they are expected to be injected.
-
-Do not introduce static service locators for gameplay state.
-
-Do not bypass DI with global singletons unless the surrounding code already uses that pattern and changing it is outside the task scope.
-
-## Architecture Rules
-
-Follow SOLID pragmatically.
-
-Prefer:
-- Small focused services
-- Clear responsibilities
-- Explicit dependencies
-- Composition over inheritance
-- ScriptableObjects for configs and item data
-- Separate runtime logic from editor tooling
-- Separate gameplay logic from UI
-- Separate data/configs from behavior
-- Interfaces only when they reduce coupling, support DI, enable testing, or define architectural boundaries
-
-Avoid:
-- Overengineering
-- Abstract factories for simple object creation
-- Interfaces with only one implementation unless useful for DI, testing, or boundaries
-- Static global access for gameplay state
-- Hidden scene dependencies
-- Large god objects
-- Runtime code depending directly on editor-only APIs
-- Large architectural rewrites for small bug fixes
+No new service locators, global singletons, scene searches, or ad hoc service construction in MonoBehaviours/Views/ViewModels to bypass DI. Do not replace, duplicate, refactor the container, or add DI frameworks without explicit authorization. Value objects, DTOs, pure/local helpers, short-lived domain objects, and low-level implementation objects need no registration; pass them explicitly. Do not extend legacy service-location patterns.
 
 ## Global Game Configuration Policy
 
@@ -580,37 +606,17 @@ Do not put persistence, inventory rules, equipment rules, or business logic dire
 
 Do not introduce hidden scene dependencies.
 
-Prefer explicit serialized references or injected dependencies according to nearby project patterns.
+Use explicit serialized references for Unity objects and injected dependencies for application-level services according to the Dependency Injection Rules.
+
+Unity-dependent systems may use MonoBehaviour adapters while preserving the simulation, state, and visualization boundaries. Do not move authoritative gameplay state into a presentation component.
 
 ## R3 Rules
 
-Use R3 only if it is already present in the project.
+R3 is mandatory for new UI; retain existing R3 usage. Use `ReactiveProperty`, read-only properties, streams, `CompositeDisposable` or equivalent. Domain systems may use explicit events/query contracts adapted at presentation boundary; no R3 in native hot loops.
 
-If surrounding code uses R3, continue using R3.
-
-Prefer:
-- `ReactiveProperty`
-- Observable streams
-- Explicit ownership
-- `CompositeDisposable` or equivalent lifetime ownership
-- Disposal tied to object, service, or MonoBehaviour lifetime
-
-Every subscription must have a clear lifetime.
-
-Every subscription must be disposed.
-
-Do not leak subscriptions from MonoBehaviours.
-
-Do not store reactive state statically unless ownership and lifetime are explicit.
-
-FORBIDDEN:
-- Orphan subscriptions
-- Static reactive state without ownership
-- Mixing R3 and UniRx in new code
-- Introducing UniRx if R3 is used
-- Introducing alternative reactive frameworks
-- Subscribing without disposal
-- Capturing destroyed Unity objects in long-lived subscriptions
+- Private writable state; read-only projections for consumers; publish meaningful committed changes and initial state. Filter/batch redundant emissions without losing required events; avoid feedback loops/allocations.
+- Every subscription has explicit ownership and disposal tied to actual View/ViewModel/service/operation lifetime; no duplicates on reopen/re-enable/pooling/rebind. Unity object callbacks on main thread.
+- No orphan subscriptions, unowned static reactive state, destroyed Unity object captures in long-lived subscriptions, mixing R3/UniRx, alternative reactive frameworks, per-frame polling streams, or competing mutable gameplay copies.
 
 ## UniTask Rules
 
@@ -637,53 +643,21 @@ FORBIDDEN:
 
 ## MVVM Rules
 
-If a UI feature already follows MVVM, continue using MVVM.
+MVVM + R3 is mandatory for new UI features, screens, windows, menus, interactive widgets with state/commands, and new functionality in legacy UI. Existing MVVM features retain MVVM + R3 for new bindings. Pure stateless visual controls can remain View-only under the feature; no ViewModel per label/icon.
 
-For new UI features, prefer MVVM when it reduces coupling and matches nearby UI architecture.
+- **View:** Unity references, TMP, visuals, layout, animation, pooling, lifecycle; R3 bindings; forwards input to ViewModel commands.
+- **ViewModel:** Presentation logic, UI-local state, commands, formatting, read-only reactive projections; prefer plain C#; explicit dependencies via DI/feature composition; delegates gameplay operations/validation; owns subscriptions/cancellable work.
+- **Model/services:** Gameplay, inventory, equipment, persistence, rules, validation, authoritative state; queries/commands/notifications; independent of UI/visibility.
 
-View responsibilities:
-- Unity references
-- Visual updates
-- Animations
-- Binding to ViewModel
-- Forwarding user input to ViewModel commands
-
-ViewModel responsibilities:
-- Presentation logic
-- UI state
-- Commands
-- Reactive state
-- Formatting display data when appropriate
-
-Model and service responsibilities:
-- Gameplay logic
-- Inventory logic
-- Equipment logic
-- Persistence
-- Business rules
-- Data ownership
-
-FORBIDDEN:
-- Gameplay logic inside View
-- Inventory rules inside UI components
-- Equipment rules inside UI components
-- Direct scene dependencies inside ViewModel
-- Direct Unity object manipulation inside ViewModel unless the surrounding project pattern already does it
-- UI components directly mutating gameplay state when a ViewModel or service exists
+No gameplay rules in Views/ViewModels, direct scene dependencies or visual object manipulation in new ViewModels, direct gameplay-state mutation from UI, duplicate writable domain state, or polling controller replacing MVVM. No unrelated legacy migration.
 
 ## UI Rules
 
-Separate UI view logic from gameplay state.
+New UI and new bindings in existing UI must update reactively on relevant changes, not poll. When maintaining existing bindings, eliminate polling that directly causes the issue or is replaced within the task scope; do not migrate unrelated legacy screens. Bind current and changed gameplay values (inventory, equipment, health, ammo, settings) through R3 projections from owner. Add minimal notification/adapter if legacy owner lacks it. Input -> ViewModel command -> service; display committed result/errors. Update affected controls only; avoid full rebuilds, repeated formatting, unchanged assignments. Reopen/rebind must reflect current state without duplicate subscriptions.
 
-Use TMP components explicitly.
+FORBIDDEN: constant gameplay-state polling from UI via `Update`, `LateUpdate`, `FixedUpdate`, coroutines, repeating timers, or per-frame observables. Genuine frame-dependent animation, interpolation, drag, input, and visuals are allowed. If an external/engine API only exposes sampled data, sample in owner/adapter at justified cadence; publish changes reactively.
 
-Avoid runtime string allocations in hot paths where practical.
-
-UI components should not own gameplay rules.
-
-UI should communicate through ViewModels, services, commands, or existing project patterns.
-
-Do not mix UI rendering concerns with inventory, equipment, persistence, or item config rules.
+Follow the TextMeshPro Rules. Avoid repeated string allocations in hot paths. Do not mix UI rendering concerns with inventory, equipment, persistence, or item configuration rules.
 
 ## TextMeshPro Rules
 
@@ -727,17 +701,19 @@ Prefer ScriptableObjects for static item data and configs.
 
 Do not put inventory or equipment rules directly into UI components.
 
-Do not duplicate item state between systems unless required by existing architecture.
+Each mutable item fact must have exactly one authoritative owner. Do not introduce competing writable item state between systems. Derived read-only projections, caches, save snapshots, and native buffers are allowed only with defined synchronization, invalidation, and lifetime under the Single Source of Truth rules.
 
 Do not introduce hidden dependencies between item configs and scene objects.
 
-Use existing item and inventory patterns before adding new abstractions.
+Use existing compliant item and inventory patterns before adding new abstractions. Route mutations through the authoritative owner or its explicit commands; UI and visualization consume the committed state.
 
 ## Services and Persistence Rules
 
-Services should have clear ownership and lifetime.
+Services must have clear ownership and lifetime. Application-level services must use the existing DI container.
 
-Do not use static services for mutable gameplay state unless the surrounding project already does.
+Do not introduce static services or global singletons for mutable gameplay state. Do not extend legacy static-access patterns; leave unrelated existing code unchanged.
+
+Persistence reads and restores authoritative state through explicit owner contracts or controlled initialization. Save DTOs are snapshots, not competing runtime state.
 
 Persistence code must be explicit and isolated.
 
@@ -766,7 +742,7 @@ Use `Debug.LogError`, `Debug.LogWarning`, or exceptions according to nearby proj
 
 Avoid allocations in hot paths.
 
-Avoid LINQ in hot paths unless surrounding code already uses it and performance is irrelevant.
+Avoid LINQ in hot paths. Existing use is not justification for introducing additional allocations or overhead.
 
 Avoid repeated `GetComponent` calls in update loops.
 
@@ -775,6 +751,8 @@ Avoid unnecessary `FindObjectOfType`, `FindObjectsOfType`, `GameObject.Find`, or
 Cache references when appropriate.
 
 Do not optimize prematurely outside the task scope.
+
+Apply the Low-Level and Performance-Critical Exceptions rules and the `rvm-performance` skill. Do not introduce managed reactive subscriptions, per-frame DI resolution, unnecessary virtual dispatch, or transient allocations into measured hot paths merely to satisfy an application-level pattern. Preserve explicit data ownership and validate the claimed improvement against a suitable baseline.
 
 ## Forbidden Unless Explicitly Requested
 
@@ -788,21 +766,31 @@ Do not:
 ## Final Verification
 
 Before completing the task, verify:
-- Code style matches surrounding files
-- Code contains no comments or summaries
+- Code style matches surrounding files where compliant with mandatory rules
+- Every new or directly edited handwritten C# type-definition file contains exactly one type declaration, including declarations nested inside other types and in conditional compilation branches; the filename matches the type under One Type per C# File
+- Verify affected types across their compilation scope, not only within changed files: no type has multiple handwritten partial declarations, no responsibility-suffixed fragment files remain for directly modified types, and any generated partial counterpart is required by an existing tooling contract. Any decomposition creates genuinely distinct cohesive types rather than cosmetic file splits or forwarding-only wrappers
+- Type extraction preserves relevant namespaces, assembly boundaries, accessibility, Unity asset GUIDs and serialized bindings, save compatibility, and network contracts; any blocking legacy violation or required broader migration is explicitly reported
+- No new code comments or summaries were added; existing comments remain untouched unless changing them is required by the task
 - Private fields use `_`
 - Interfaces use `I` prefix
 - Constants use UPPER_CASE
 - Method parameters are not split across multiple lines
 - Conditions are not split across multiple lines
-- R3 subscriptions have valid lifetimes if R3 was used
+- New and changed responsibilities comply with SOLID, DRY, KISS, and YAGNI
+- Application-level services use the existing DI container, with explicit dependencies, appropriate lifetimes, and no service locator or singleton bypass
+- Simulation, authoritative state, configuration, persistence, and visualization are separated; each mutable gameplay fact has a single owner and controlled write paths
+- Caches, snapshots, reactive projections, and native buffers have defined ownership, synchronization, invalidation, and lifetimes
+- New UI and new UI functionality follow MVVM + R3; gameplay state is updated reactively, not by constant polling; commands delegate to authoritative services
+- R3 subscriptions have valid lifetimes, initial state is correct, reopening/rebinding does not create stale or duplicate subscriptions, and Unity visual callbacks run on the main thread
+- Any low-level architecture exception is localized, technically justified, and validated or explicitly reported as unverified
+- Legacy changes are limited to the task scope; no unrelated migrations or competing state owners were introduced
 - UniTask cancellation is propagated if UniTask was used
 - Editor/runtime separation is preserved
 - Generated artifacts were reviewed, disposable outputs were removed under Section F, and required evidence and deliverables were preserved
 - Tasks that generated artifacts include retained output size, actual reclaimed space, and cleanup record paths in the final response
 - Final response is substantive, self-contained, sufficiently detailed, and uses the required format
 
-If any item fails, revise the implementation before responding.
+If any applicable item fails, revise the implementation within the authorized task scope before responding. If missing dependencies, tools, or authorization block completion or validation, report the exact blocker and remaining work. Do not silently waive mandatory standards, claim unverified success, or expand into unrelated legacy migration. Documentation-only tasks require consistency checks, not Unity execution.
 
 ## graphify
 

@@ -167,7 +167,7 @@ Run `node .agents/skills/weapon-iwp/scripts/iwp.js <command>` from the project r
 - You MUST run setups and tests through Unity Open MCP. For batch mode, follow `unity-batch-mirror`.
 - Weapon and attachment data MUST live in `ItemDefinition` and its components, as with equipment. Weapon rules MUST NOT live in the UI.
 - Attachment compatibility MUST come from GRA sections. You MUST NOT infer it from filenames.
-- Any new folders MUST be beside existing items: `Assets/_Source/Items/Weapons`, `Assets/_Source/Items/Addons`, and `Assets/_Source/Items/Definitions/{Weapons,Addons}`.
+- New weapons and attachments MUST use the item layout in [Game Assets](../../../AGENTS.md#game-assets). The reference setups may still use legacy paths under `Assets/_Source/Items/`. Verify the setup destinations before running it and change those destinations only within the authorized task scope.
 
 ## GRA attachments
 
@@ -181,9 +181,9 @@ Setup: `Assets/_Source/Scripts/Editor/Integrations/Inventory/GraWeaponAddonSetup
   - Conversion kits (`II_FOOD`, including `archangel`, `pn23fore`, and `susatov`) in `scopes` lists do not qualify as attachments. You MUST report them in the log.
   - A previous scan found 146 attachments, including standard, night-vision, and thermal scopes, suppressors, and underbarrel launchers.
 - You MUST use the model that mounts to the weapon: `hud = <section>_hud` → `item_visual` (`attachments\scopes\<name>`, Pizza's Ultimate Sight / MAS). Use `visual` only when that file is absent. Some scopes use `visual` for a box (`wpn_case_*`) or a different model. For example, `ekp8_18` uses the ЕКП-8-02 model, and `0kp2` / `rmr` use an untextured box.
-- Correct source model defects via the setup's `MESH_ONLY` table, which maps the section to the material to keep. Disable other meshes in `Items/Addons/Visuals/<section>.prefab`. For example, Boomsticks gives `wpn_sil_spec_isg` a full AK world model. Keep only its `wpn_silencer_hexagon12` suppressor mesh. You MUST check every attachment for which `ogftex` shows weapon textures such as `receiver`, `stock`, `magazine`, or `handguard`.
-- Attachment textures are generated normally by the importer through GRA MO2. Files live in `Assets/_Source/Items/Addons/{Models,Prefabs}` (approximately 1.1 GB, including approximately 540 MB of normal maps stored by the importer as uncompressed PNG).
-- Definitions live at `Assets/_Source/Items/Definitions/Addons/<section>.asset` and include:
+- Correct source model defects via the setup's `MESH_ONLY` table, which maps the section to the material to keep. Disable other meshes in the attachment visual prefab. The legacy setup uses `Items/Addons/Visuals/<section>.prefab`. For example, Boomsticks gives `wpn_sil_spec_isg` a full AK world model. Keep only its `wpn_silencer_hexagon12` suppressor mesh. You MUST check every attachment for which `ogftex` shows weapon textures such as `receiver`, `stock`, `magazine`, or `handguard`.
+- Attachment textures are generated normally by the importer through GRA MO2. The legacy layout uses `Assets/_Source/Items/Addons/{Models,Prefabs}` (approximately 1.1 GB, including approximately 540 MB of normal maps stored by the importer as uncompressed PNG).
+- Definitions in the legacy layout use `Assets/_Source/Items/Definitions/Addons/<section>.asset`. Each definition includes:
   - `Attachment` category and `Silencer`, `Scope`, or `GrenadeLauncher` tag.
   - `WeaponAddonComponent` with type, price, `*_k` multipliers, and `scope_zoom_factor`.
   - `snd_on_take` sound (`attchsilen`, `attchscope`, `attchscopenv`, `attchgl`, and others).

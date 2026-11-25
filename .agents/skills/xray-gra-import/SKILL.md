@@ -15,6 +15,8 @@ You MUST NOT change these parts of the importer unless the task directly require
 
 ## Project asset locations
 
+> New items MUST use the item layout in [Game Assets](../../../AGENTS.md#game-assets). The two rows marked legacy describe older setup destinations. Verify destinations before running a setup.
+
 | Asset | Path |
 |---|---|
 | Hands (158 OGF models sharing a rig) | `Assets/_Source/FirstPerson/Hands/Models/` |
@@ -24,12 +26,12 @@ You MUST NOT change these parts of the importer unless the task directly require
 | Hand HUD motions (pickup and equip) | `Assets/_Source/FirstPerson/Animations/Hands/` |
 | Equipment animations | `Assets/_Source/FirstPerson/Equipment/` (HUD models, item OMF, `.anm`, sounds, and `EquipmentAnimationLibrary.asset`) |
 | Outfit-to-hands/body catalog | `Assets/_Source/FirstPerson/Outfits/OutfitCatalog.asset` |
-| World item models and prefabs | `Assets/_Source/Items/{Outfits,Helmets,Backpacks}/{Models,Prefabs}` |
-| Item definitions | `Assets/_Source/Items/Definitions/{Armor,Head,Backpack}` |
+| World item models and prefabs (legacy) | `Assets/_Source/Items/{Outfits,Helmets,Backpacks}/{Models,Prefabs}` |
+| Item definitions (legacy) | `Assets/_Source/Items/Definitions/{Armor,Head,Backpack}` |
 | Icons (weapons and attachments follow `weapon-iwp`) | `Assets/_Source/Items/Icons` uses 2D Sprite slices from `[Интерфейс] HD GRA Иконки`. `ItemDefinition` has an icon override field |
 | Camera `.anm` motions | `Assets/_Source/Settings/Player/Camera/Anm/` |
 
-The importer generates `Textures/` and `Materials/` beside the model. You MUST NOT duplicate them manually.
+The importer generates `Textures/` and `Materials/` beside the model. You MUST reuse those assets or keep an item-local copy when independent edits are required under [Game Assets](../../../AGENTS.md#game-assets).
 
 ## REQUIRED Editor setup workflow
 
@@ -56,6 +58,6 @@ Follow these steps for a setup in scope.
 
 - Importing weapons or their animations is FORBIDDEN unless requested. The weapon route in [AGENTS.md](../../../AGENTS.md) governs weapon asset and icon sources.
 - You MUST NOT delete bones, retarget, or change the hand rig.
-- You MUST NOT duplicate textures, materials, meshes, or clips. Separate OMF copies for distinct rigs are permitted.
+- You MUST NOT create redundant copies of textures, materials, meshes, or clips. Item-specific material and texture copies follow [Game Assets](../../../AGENTS.md#game-assets). Separate OMF copies for distinct rigs are permitted.
 - You MUST NOT overwrite the user's manual material and prefab settings.
 - You MUST NOT change files in `D:\GRA2.5`.

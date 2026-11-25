@@ -66,14 +66,17 @@ namespace RaidIntoDarkness.Integrations.Inventory
         public string GetAmmoSection(object weaponKey)
         {
             ItemInstance weapon = GetWeapon(weaponKey);
-            WeaponStatsComponent stats = weapon?.Definition.GetComponent<WeaponStatsComponent>();
+            return ResolveAmmoSection(weapon, weapon?.Definition.GetComponent<WeaponStatsComponent>());
+        }
 
+        internal static string ResolveAmmoSection(ItemInstance weapon, WeaponStatsComponent stats)
+        {
             if (stats == null)
             {
                 return string.Empty;
             }
 
-            string loaded = weapon.GetState(AMMO_SECTION_STATE);
+            string loaded = weapon?.GetState(AMMO_SECTION_STATE);
 
             if (stats.SupportsAmmo(loaded))
             {
@@ -132,6 +135,11 @@ namespace RaidIntoDarkness.Integrations.Inventory
             WeaponStatsComponent stats = weapon?.Definition.GetComponent<WeaponStatsComponent>();
             AmmoStatsComponent ammo = FindDefinition(GetAmmoSection(weaponKey))?.GetComponent<AmmoStatsComponent>();
             WeaponAddonComponent silencer = stats?.GetSilencer(weapon, _model.Resolver)?.GetComponent<WeaponAddonComponent>();
+            return GetBulletSpeed(stats, ammo, silencer);
+        }
+
+        internal static float GetBulletSpeed(WeaponStatsComponent stats, AmmoStatsComponent ammo, WeaponAddonComponent silencer)
+        {
             return (stats?.BulletSpeed ?? 0f) * (ammo?.SpeedMultiplier ?? 1f) * (silencer?.BulletSpeedFactor ?? 1f);
         }
 
@@ -143,6 +151,11 @@ namespace RaidIntoDarkness.Integrations.Inventory
             WeaponStatsComponent stats = weapon?.Definition.GetComponent<WeaponStatsComponent>();
             AmmoStatsComponent ammo = FindDefinition(GetAmmoSection(weaponKey))?.GetComponent<AmmoStatsComponent>();
             WeaponAddonComponent silencer = stats?.GetSilencer(weapon, _model.Resolver)?.GetComponent<WeaponAddonComponent>();
+            return GetDispersionDegrees(stats, ammo, silencer);
+        }
+
+        internal static float GetDispersionDegrees(WeaponStatsComponent stats, AmmoStatsComponent ammo, WeaponAddonComponent silencer)
+        {
             return (stats?.FireDispersionBase ?? 0f) * (ammo?.DispersionMultiplier ?? 1f) * (silencer?.FireDispersionBaseFactor ?? 1f);
         }
 
@@ -463,7 +476,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
             return returned;
         }
 
-        private ItemDefinition FindDefinition(string section)
+        internal ItemDefinition FindDefinition(string section)
         {
             if (_model.Resolver is ItemDatabase database)
             {

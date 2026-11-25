@@ -51,3 +51,4 @@ MonoBehaviour:
     _spreadResponse: 16
     _surfaceOffsetMeters: 0.015
     _barrelOffsetMeters: 1
+  _hipFireDispersionMultiplier: 3

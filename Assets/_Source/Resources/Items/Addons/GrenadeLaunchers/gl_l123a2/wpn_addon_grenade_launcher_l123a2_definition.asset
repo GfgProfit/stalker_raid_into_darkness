@@ -77,6 +77,9 @@ MonoBehaviour:
         _detachSound: {fileID: 0}
         _grenadeAmmo: {fileID: 11400000, guid: 1c042c1da4d1ccf409566d75019fe278, type: 2}
         _alternativeGrenadeAmmo: {fileID: 11400000, guid: d1e1244809ca465478aa29a1feb2d98b, type: 2}
+        _recoilIncreasePercent: {x: 9, y: 11, z: 7}
+        _recoilSnappinessIncreasePercent: 5
+        _recoilDampingPercent: 0
     - rid: 115149081108283538
       type: {class: WorldItemComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
       data:

@@ -10,6 +10,7 @@ namespace XRay.Importer.Levels
         public const float DEFAULT_GRASS_SHADOW_DISTANCE = 25.0f;
         public const float DEFAULT_GRASS_SHADOW_FADE_DISTANCE = 7.0f;
         public const float DEFAULT_GRASS_THINNING_START_DISTANCE = 36.0f;
+        public const float DEFAULT_HIP_FIRE_DISPERSION_MULTIPLIER = 3f;
 
         private const string RESOURCE_PATH = "GameConfig";
 
@@ -40,6 +41,7 @@ namespace XRay.Importer.Levels
         [SerializeField, Min(0.0001f)] private float _defaultPlayerStatCapacity = DEFAULT_PLAYER_STAT_CAPACITY;
         [SerializeField] private AnomalyBalanceConfig _anomalyBalance;
         [SerializeField] private WeaponCrosshairSettings _weaponCrosshair = new WeaponCrosshairSettings();
+        [SerializeField, Min(1f)] private float _hipFireDispersionMultiplier = DEFAULT_HIP_FIRE_DISPERSION_MULTIPLIER;
 
         public float DefaultTimeScale => _defaultTimeScale;
         public float DefaultTimeOfDay => _defaultTimeOfDay;
@@ -68,6 +70,7 @@ namespace XRay.Importer.Levels
         public float DefaultPlayerStatCapacity => _defaultPlayerStatCapacity;
         public AnomalyBalanceConfig AnomalyBalance => _anomalyBalance;
         public WeaponCrosshairSettings WeaponCrosshair => _weaponCrosshair;
+        public float HipFireDispersionMultiplier => _hipFireDispersionMultiplier;
         public int Revision { get; private set; }
 
         public event Action Changed;
@@ -97,6 +100,7 @@ namespace XRay.Importer.Levels
             else if (!float.IsFinite(_expressiveFlareIntensity) || _expressiveFlareIntensity < 0.0f) diagnostic = "GameConfig ExpressiveFlareIntensity must be finite and non-negative.";
             else if (!float.IsFinite(_fxLightingAdaptation) || _fxLightingAdaptation < 0.0f || _fxLightingAdaptation > MAX_FX_LIGHTING_ADAPTATION) diagnostic = "GameConfig FxLightingAdaptation must be within its supported range.";
             else if (!float.IsFinite(_defaultPlayerStatCapacity) || _defaultPlayerStatCapacity <= 0.0f) diagnostic = "GameConfig DefaultPlayerStatCapacity must be finite and positive.";
+            else if (!float.IsFinite(_hipFireDispersionMultiplier) || _hipFireDispersionMultiplier < 1f) diagnostic = "GameConfig HipFireDispersionMultiplier must be finite and at least 1.";
             else if (_anomalyBalance != null && !_anomalyBalance.TryValidate(out string anomalyDiagnostic)) diagnostic = anomalyDiagnostic;
             return diagnostic == null;
         }

@@ -25,6 +25,7 @@ namespace RaidIntoDarkness.Weapons
         [SerializeField] private GameObject _hudModel;
         [SerializeField] private bool _isMelee;
         [SerializeField] private bool _isStandaloneLauncher;
+        [SerializeField] private bool _useStandaloneHipDispersion;
         [SerializeField] private GameObject _handGrenadeVisual;
         [SerializeField] private GrenadeAmmoData _handGrenade;
         [SerializeField] [Min(1)] private int _handGrenadeReleaseFrame = 1;
@@ -96,6 +97,7 @@ namespace RaidIntoDarkness.Weapons
         public GameObject HudModel => _hudModel;
         public bool IsMelee => _isMelee;
         public bool IsStandaloneLauncher => _isStandaloneLauncher;
+        public bool UsesStandaloneHipDispersion => _isStandaloneLauncher && _useStandaloneHipDispersion;
         public bool IsHandGrenade => _handGrenadeVisual != null;
         public GameObject HandGrenadeVisual => _handGrenadeVisual;
         public GrenadeAmmoData HandGrenade => _handGrenade;
@@ -123,7 +125,7 @@ namespace RaidIntoDarkness.Weapons
         public Vector3 GrenadeAimOffsetRotation => _grenadeAimOffsetRotation;
         public float CrossFade => _crossFade;
         public int RoundsPerMinute => _roundsPerMinute;
-        public float ShotInterval => 60.0f / Mathf.Max(1, _roundsPerMinute);
+        public float ShotInterval => GetShotInterval(1);
         public float EmptyClickInterval => 60.0f / Mathf.Max(1, _emptyClicksPerMinute);
         public IReadOnlyList<int> FireModes => _fireModes != null && _fireModes.Length > 0 ? _fireModes : new[] { 1 };
         public int MagazineSize => _magazineSize;
@@ -148,6 +150,16 @@ namespace RaidIntoDarkness.Weapons
         internal bool HasFixedTwoRoundBurst => _twoRoundBurstRoundsPerMinute > 0;
         internal bool HasAttachmentMotions => _attachmentMotions?.Count > 0;
 
+        public float GetShotDispersionDegrees(float baseDispersion, bool aiming, float hipFireMultiplier)
+        {
+            if (IsMelee || IsHandGrenade || IsStandaloneLauncher && (aiming || !UsesStandaloneHipDispersion))
+            {
+                return 0f;
+            }
+
+            return aiming ? baseDispersion : baseDispersion * hipFireMultiplier;
+        }
+
         internal Vector3 GetRifleAimRotation(bool scoped)
         {
             return scoped ? _aimOffsetRotation : _aimOffsetRotation + _ironSightAimRotationOffset;
@@ -158,10 +170,9 @@ namespace RaidIntoDarkness.Weapons
             return scoped && _useScopedGrenadeAimOffset ? _scopedGrenadeAimOffsetPosition : _grenadeAimOffsetPosition;
         }
 
-        internal float GetShotInterval(int fireMode)
-        {
-            return fireMode == 2 && HasFixedTwoRoundBurst ? 60.0f / _twoRoundBurstRoundsPerMinute : ShotInterval;
-        }
+        public int GetRoundsPerMinute(int fireMode) => fireMode == 2 && HasFixedTwoRoundBurst ? _twoRoundBurstRoundsPerMinute : Mathf.Max(1, RoundsPerMinute);
+
+        internal float GetShotInterval(int fireMode) => 60.0f / GetRoundsPerMinute(fireMode);
 
         public static Quaternion ToAimRotation(Vector3 radians)
         {

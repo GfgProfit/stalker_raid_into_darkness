@@ -76,6 +76,10 @@ MonoBehaviour:
         _attachSound: {fileID: 0}
         _detachSound: {fileID: 0}
         _grenadeAmmo: {fileID: 0}
+        _alternativeGrenadeAmmo: {fileID: 0}
+        _recoilIncreasePercent: {x: 14, y: 15, z: 11}
+        _recoilSnappinessIncreasePercent: 9
+        _recoilDampingPercent: 0
     - rid: 115149081108283536
       type: {class: WorldItemComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
       data:

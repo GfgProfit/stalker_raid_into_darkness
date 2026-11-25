@@ -15,6 +15,7 @@ MonoBehaviour:
   _hudModel: {fileID: 4167472720972581360, guid: 0d7e4d46abe929c4f8c25db2fc8f179d, type: 3}
   _isMelee: 0
   _isStandaloneLauncher: 1
+  _useStandaloneHipDispersion: 1
   _handGrenadeVisual: {fileID: 0}
   _handGrenade:
     _explosionPrefab: {fileID: 0}
@@ -48,7 +49,7 @@ MonoBehaviour:
   _aimCameraRoll: 0.5
   _aimCameraBlendTime: 0.15
   _aimZoom: 1.15
-  _ironSightHudFieldOfView: 0.69070419
+  _ironSightHudFieldOfView: 0.69070417
   _reloadHudFovReduction: 0
   _muzzleBone: wpn_body
   _overlayBones:
@@ -254,7 +255,7 @@ MonoBehaviour:
       serializedVersion: 2
       m_Bits: 4294967291
     _drawBallisticDebug: 0
-  _recoil: {x: 3, y: 0.55, z: 0.7}
+  _recoil: {x: 6, y: 1.1, z: 1.4}
   _recoilSnappiness: 13
   _recoilReturnSpeed: 7
   _shotSounds:

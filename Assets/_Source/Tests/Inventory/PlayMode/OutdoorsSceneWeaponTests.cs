@@ -13,6 +13,7 @@ using UnityEngine.InputSystem.Controls;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
 using XRay.Importer;
+using XRay.Importer.Levels;
 
 namespace RaidIntoDarkness.Integrations.Inventory.Tests
 {
@@ -1000,7 +1001,8 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             yield return WaitWhile(() => weapons.State != FirstPersonWeaponState.Ready);
             using var source = new InventoryWeaponAmmoSource(model, controller.Window.PrimaryContainerId);
             source.Reload(weapon.InstanceId, 30);
-            Assert.That(source.GetBulletSpeed(weapon.InstanceId), Is.EqualTo(1488f).Within(0.01f));
+            float expectedSpeed = weapon.Definition.GetComponent<WeaponStatsComponent>().BulletSpeed * fmj.GetComponent<AmmoStatsComponent>().SpeedMultiplier;
+            Assert.That(source.GetBulletSpeed(weapon.InstanceId), Is.EqualTo(expectedSpeed).Within(0.01f));
             var shoot = typeof(FirstPersonWeaponController).GetMethod("Shoot", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
 
             foreach (bool silenced in new[] { false, true })
@@ -1046,7 +1048,9 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
                     Assert.That(weapons.Magazine, Is.EqualTo(magazine - 1));
                     Assert.That(newest.AmmoData, Is.SameAs(fmj.GetComponent<AmmoBallisticsComponent>().Data));
                     Assert.That(newest.SpeedMetersPerSecond, Is.EqualTo(source.GetBulletSpeed(weapon.InstanceId)).Within(0.01f));
-                    Assert.That(Vector3.Angle(newest.LaunchDirection, forward), Is.LessThanOrEqualTo(source.GetDispersionDegrees(weapon.InstanceId) + 0.01f));
+                    float expectedDispersion = source.GetDispersionDegrees(weapon.InstanceId) * (aiming ? 1f : GameConfig.Load().HipFireDispersionMultiplier);
+                    Assert.That(weapons.ShotDispersionDegrees, Is.EqualTo(expectedDispersion).Within(0.0001f));
+                    Assert.That(Vector3.Angle(newest.LaunchDirection, forward), Is.LessThanOrEqualTo(expectedDispersion + 0.01f));
                 }
             }
 

@@ -5,6 +5,7 @@ using RaidIntoDarkness.Player;
 using UnityEngine;
 using UnityEngine.Rendering;
 using XRay.Importer;
+using XRay.Importer.Levels;
 
 namespace RaidIntoDarkness.Weapons
 {
@@ -99,12 +100,14 @@ namespace RaidIntoDarkness.Weapons
         private bool _developmentAimOverride;
         private AimPhase _aimPhase;
         private float _aimBlendTime;
+        private float _hipFireDispersionMultiplier = GameConfig.DEFAULT_HIP_FIRE_DISPERSION_MULTIPLIER;
         private FirstPersonWeaponAsset _recoilSource;
 
         public event Action<int, int> AmmoChanged;
         public event Action<FirstPersonWeaponState> StateChanged;
         public event Action<GameObject> VisualCreated;
         public event Action HandGrenadeSelectionRequested;
+        public event Action FireModeChanged;
 
         public FirstPersonWeaponState State { get; private set; }
         public int ActiveSlot { get; private set; } = -1;
@@ -126,7 +129,7 @@ namespace RaidIntoDarkness.Weapons
         public GameObject HandsModel => _boundHands;
         public float ScopeZoomScroll => _player != null && !_player.GameplayInputBlocked && _input != null ? _input.ScopeZoomScroll : 0f;
         public Transform Muzzle => _muzzle;
-        public float ShotDispersionDegrees => ActiveSlot >= 0 && _ammoSource != null ? _ammoSource.GetDispersionDegrees(_slots[ActiveSlot].Key) : 0f;
+        public float ShotDispersionDegrees => ActiveWeapon is { } asset && _ammoSource != null && !IsGrenadeMode ? asset.GetShotDispersionDegrees(_ammoSource.GetDispersionDegrees(_slots[ActiveSlot].Key), _aiming, _hipFireDispersionMultiplier) : 0f;
         public float ShotMaximumDistance => ActiveSlot >= 0 && _ammoSource != null ? _ammoSource.GetFireDistance(_slots[ActiveSlot].Key) * (_ammoSource.GetBallistics(_slots[ActiveSlot].Key)?.DistanceMultiplier ?? 1f) : 0f;
         public bool IsSilenced => ActiveSlot >= 0 && _slots[ActiveSlot].Silenced;
         public bool HasGrenadeLauncher => ActiveSlot >= 0 && _slots[ActiveSlot].HasGrenadeLauncher;
@@ -175,6 +178,8 @@ namespace RaidIntoDarkness.Weapons
             NotifyAmmo();
         }
 
+        public int GetSelectedFireModeIndex(object weaponKey) => weaponKey != null && _weaponStates.TryGetValue(weaponKey, out WeaponState state) ? state.FireModeIndex : 0;
+
         public void SetSlotSilencer(int slot, bool installed)
         {
             if (IsSlot(slot) == false || _slots[slot].Silenced == installed)
@@ -222,6 +227,16 @@ namespace RaidIntoDarkness.Weapons
             }
         }
 
+        public void SetSlotRecoilMultipliers(int slot, Vector3 recoilMultiplier, float recoilSnappinessMultiplier)
+        {
+            if (IsSlot(slot))
+            {
+                Slot target = _slots[slot];
+                target.RecoilMultiplier = recoilMultiplier;
+                target.RecoilSnappinessMultiplier = recoilSnappinessMultiplier;
+            }
+        }
+
         public void SetSlotGrenadeLauncher(int slot, bool installed)
         {
             if (!IsSlot(slot) || _slots[slot].HasGrenadeLauncher == installed)
@@ -229,9 +244,10 @@ namespace RaidIntoDarkness.Weapons
                 return;
             }
 
-            _slots[slot].HasGrenadeLauncher = installed;
-            bool wasGrenadeMode = _slots[slot].GrenadeMode;
-            _slots[slot].GrenadeMode = false;
+            Slot target = _slots[slot];
+            target.HasGrenadeLauncher = installed;
+            bool wasGrenadeMode = target.GrenadeMode;
+            target.GrenadeMode = false;
             if (ActiveSlot != slot)
             {
                 return;
@@ -274,6 +290,8 @@ namespace RaidIntoDarkness.Weapons
             target.Asset = asset;
             target.Key = ammoKey;
             target.WeaponState = asset != null ? GetWeaponState(ammoKey) : null;
+            target.RecoilMultiplier = Vector3.one;
+            target.RecoilSnappinessMultiplier = 1f;
             target.GrenadeMode = false;
             if (_redrawSlot == slot && asset == null)
             {
@@ -421,6 +439,7 @@ namespace RaidIntoDarkness.Weapons
 
         private void Awake()
         {
+            _hipFireDispersionMultiplier = GameConfig.Load()?.HipFireDispersionMultiplier ?? GameConfig.DEFAULT_HIP_FIRE_DISPERSION_MULTIPLIER;
             _effects = new FirstPersonWeaponEffects(null);
             _worldCrosshair = GetComponent<WeaponWorldCrosshair>();
             if (_worldCrosshair == null)
@@ -1129,7 +1148,7 @@ namespace RaidIntoDarkness.Weapons
             }
 
             PlayShotSounds(asset, Magazine);
-            Vector3 recoil = asset.Recoil * (_player.State.IsCrouching ? 0.5f : 1.0f);
+            Vector3 recoil = Vector3.Scale(asset.Recoil, _slots[ActiveSlot].RecoilMultiplier) * (_player.State.IsCrouching ? 0.5f : 1.0f);
             if (_player.CameraController != null && _player.CameraController.Recoil != null)
             {
                 _player.CameraController.Recoil.Shoot(recoil.x, recoil.y, recoil.z);
@@ -1144,7 +1163,7 @@ namespace RaidIntoDarkness.Weapons
             BallisticAmmoData ammo = _ammoSource != null ? _ammoSource.GetBallistics(_slots[ActiveSlot].Key) : null;
             float bulletSpeed = _ammoSource?.GetBulletSpeed(_slots[ActiveSlot].Key) ?? 0f;
             float fireDistance = _ammoSource?.GetFireDistance(_slots[ActiveSlot].Key) ?? 0f;
-            float dispersion = _ammoSource?.GetDispersionDegrees(_slots[ActiveSlot].Key) ?? 0f;
+            float dispersion = ShotDispersionDegrees;
 
             if (!TryGetMuzzleRay(out Ray muzzleRay) || ammo == null || !ammo.IsConfigured || bulletSpeed <= 0f || fireDistance <= 0f || asset.Ballistics == null || asset.Ballistics.BulletPrefab == null)
             {
@@ -1187,7 +1206,18 @@ namespace RaidIntoDarkness.Weapons
             }
 
             Ray aim = muzzle;
-            if ((!ammo.FliesStraight && _aiming && !TryGetGrenadeAimRay(out aim)) || !_ammoSource.TryShoot(key))
+            if (!ammo.FliesStraight && _aiming && !TryGetGrenadeAimRay(out aim))
+            {
+                return false;
+            }
+
+            if (!ammo.FliesStraight && !_aiming && asset.UsesStandaloneHipDispersion)
+            {
+                float tangent = Mathf.Tan(ShotDispersionDegrees * Mathf.Deg2Rad);
+                aim.direction = GetDispersedDirection(Quaternion.LookRotation(muzzle.direction, Vector3.up), tangent);
+            }
+
+            if (!_ammoSource.TryShoot(key))
             {
                 return false;
             }
@@ -1205,8 +1235,7 @@ namespace RaidIntoDarkness.Weapons
 
             for (int i = 0; i < ammo.ProjectileCount; i++)
             {
-                Vector2 dispersion = UnityEngine.Random.insideUnitCircle * tangent;
-                Vector3 direction = rotation * new Vector3(dispersion.x, dispersion.y, 1f).normalized;
+                Vector3 direction = GetDispersedDirection(rotation, tangent);
                 GameObject projectileObject = Instantiate(settings.BulletPrefab, position, rotation);
                 BallisticProjectile projectile = projectileObject.GetComponent<BallisticProjectile>();
 
@@ -1217,6 +1246,12 @@ namespace RaidIntoDarkness.Weapons
 
                 projectile.Initialize(settings, ammo, position, direction, speed, distance * ammo.DistanceMultiplier, owner, _model.transform);
             }
+        }
+
+        private static Vector3 GetDispersedDirection(Quaternion rotation, float tangent)
+        {
+            Vector2 dispersion = UnityEngine.Random.insideUnitCircle * tangent;
+            return rotation * new Vector3(dispersion.x, dispersion.y, 1f).normalized;
         }
 
         private void PlayShotSounds(FirstPersonWeaponAsset asset, int magazine)
@@ -1436,6 +1471,7 @@ namespace RaidIntoDarkness.Weapons
         private void StartFireModeSwitch(FirstPersonWeaponAsset asset, WeaponState weaponState)
         {
             weaponState.FireModeIndex = (weaponState.FireModeIndex + 1) % asset.FireModes.Count;
+            FireModeChanged?.Invoke();
             _burstLeft = 0;
             FirstPersonWeaponMotion motion = FindMotion(asset, FirstPersonWeaponMotionKind.FireMode);
             if (motion == null)
@@ -1962,11 +1998,13 @@ namespace RaidIntoDarkness.Weapons
 
         private void TickRecoil()
         {
-            FirstPersonWeaponAsset asset = ActiveWeapon != null ? ActiveWeapon : _recoilSource;
+            FirstPersonWeaponAsset active = ActiveWeapon;
+            FirstPersonWeaponAsset asset = active != null ? active : _recoilSource;
             StalkerCameraRecoil recoil = _player != null && _player.CameraController != null ? _player.CameraController.Recoil : null;
             if (asset != null && recoil != null)
             {
-                recoil.Tick(asset.RecoilReturnSpeed, asset.RecoilSnappiness);
+                float snappiness = active != null ? asset.RecoilSnappiness * _slots[ActiveSlot].RecoilSnappinessMultiplier : asset.RecoilSnappiness;
+                recoil.Tick(asset.RecoilReturnSpeed, snappiness);
             }
         }
 
@@ -2234,6 +2272,8 @@ namespace RaidIntoDarkness.Weapons
             public bool Silenced { get; set; }
             public bool HasScope { get; set; }
             public bool HasGrenadeLauncher { get; set; }
+            public Vector3 RecoilMultiplier { get; set; } = Vector3.one;
+            public float RecoilSnappinessMultiplier { get; set; } = 1f;
             public bool GrenadeMode { get; set; }
             public Vector3? AimOffsetPosition { get; set; }
         }

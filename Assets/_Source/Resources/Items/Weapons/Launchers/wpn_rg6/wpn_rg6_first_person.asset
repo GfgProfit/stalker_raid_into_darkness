@@ -15,6 +15,7 @@ MonoBehaviour:
   _hudModel: {fileID: 8946883006226573649, guid: a3f7b7d0b6eae214389913bc6b886524, type: 3}
   _isMelee: 0
   _isStandaloneLauncher: 1
+  _useStandaloneHipDispersion: 1
   _handGrenadeVisual: {fileID: 0}
   _handGrenade:
     _explosionPrefab: {fileID: 0}
@@ -41,14 +42,14 @@ MonoBehaviour:
   _handGrenadeThrowSpeed: 16
   _handsPosition: {x: -0.0264, y: -0.0264, z: -0.0694}
   _handsOrientation: {x: 0, y: 0, z: 0}
-  _aimOffsetPosition: {x: -0.010225320, y: -0.004007033, z: -0.014300903}
+  _aimOffsetPosition: {x: -0.01022532, y: -0.004007033, z: -0.014300903}
   _aimOffsetRotation: {x: -0.0005, y: 0.02925, z: 0.13}
-  _ironSightAimRotationOffset: {x: -0.001387105, y: -0.003174340, z: 0.000184919}
+  _ironSightAimRotationOffset: {x: -0.001387105, y: -0.00317434, z: 0.000184919}
   _aimTime: 0.24
   _aimCameraRoll: 0.5
   _aimCameraBlendTime: 0.15
   _aimZoom: 1.15
-  _ironSightHudFieldOfView: 0.64214445
+  _ironSightHudFieldOfView: 0.64214444
   _reloadHudFovReduction: 0.15
   _muzzleBone: sight_front
   _overlayBones:
@@ -362,7 +363,7 @@ MonoBehaviour:
       serializedVersion: 2
       m_Bits: 4294967291
     _drawBallisticDebug: 0
-  _recoil: {x: 3, y: 0.55, z: 0.7}
+  _recoil: {x: 6, y: 1.1, z: 1.4}
   _recoilSnappiness: 13
   _recoilReturnSpeed: 7
   _shotSounds:

@@ -30,6 +30,9 @@ namespace RaidIntoDarkness.Integrations.Inventory
         [SerializeField] private AudioClip _detachSound;
         [SerializeField] private ItemDefinition _grenadeAmmo;
         [SerializeField] private ItemDefinition _alternativeGrenadeAmmo;
+        [SerializeField] private Vector3 _recoilIncreasePercent;
+        [SerializeField] private float _recoilSnappinessIncreasePercent;
+        [SerializeField, Range(0f, 100f)] private float _recoilDampingPercent;
 
         public string Section => _section ?? string.Empty;
         public WeaponAddonKind Kind => _kind;
@@ -47,6 +50,20 @@ namespace RaidIntoDarkness.Integrations.Inventory
         public AudioClip DetachSound => _detachSound;
         public ItemDefinition GrenadeAmmo => _grenadeAmmo;
         public ItemDefinition AlternativeGrenadeAmmo => _alternativeGrenadeAmmo;
+        public Vector3 RecoilIncreasePercent => _recoilIncreasePercent;
+        public float RecoilSnappinessIncreasePercent => _recoilSnappinessIncreasePercent;
+        public float RecoilDampingPercent => _recoilDampingPercent;
+        public Vector3 RecoilMultiplier => Kind == WeaponAddonKind.Silencer ? Vector3.one * RecoilDampingMultiplier : Vector3.one + _recoilIncreasePercent / 100f;
+        public float RecoilSnappinessMultiplier => Kind == WeaponAddonKind.Silencer ? RecoilDampingMultiplier : 1f + _recoilSnappinessIncreasePercent / 100f;
+
+        private float RecoilDampingMultiplier => 1f - _recoilDampingPercent / 100f;
+
+        internal static (Vector3 recoil, float snappiness) GetEquippedRecoilMultipliers(WeaponAddonComponent silencer, WeaponAddonComponent launcher)
+        {
+            Vector3 recoil = Vector3.Scale(silencer?.RecoilMultiplier ?? Vector3.one, launcher?.RecoilMultiplier ?? Vector3.one);
+            float snappiness = (silencer?.RecoilSnappinessMultiplier ?? 1f) * (launcher?.RecoilSnappinessMultiplier ?? 1f);
+            return (recoil, snappiness);
+        }
 
         public override float GetAdditionalWeight(ItemInstance item, IItemDefinitionResolver resolver) => GetLoadedGrenade(item)?.Weight ?? 0f;
 

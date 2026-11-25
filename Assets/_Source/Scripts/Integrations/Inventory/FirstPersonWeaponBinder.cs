@@ -32,6 +32,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
             _controller.SetAmmoSource(ammo);
             _controller.VisualCreated += OnVisualCreated;
             _controller.HandGrenadeSelectionRequested += SelectHandGrenade;
+            _controller.FireModeChanged += _window.RefreshTooltip;
             _model.ItemEquipped += OnEquipmentChanged;
             _model.ItemUnequipped += OnEquipmentChanged;
             _model.Changed += OnItemChanged;
@@ -61,6 +62,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
             {
                 _controller.VisualCreated -= OnVisualCreated;
                 _controller.HandGrenadeSelectionRequested -= SelectHandGrenade;
+                _controller.FireModeChanged -= _window.RefreshTooltip;
                 _controller.SetAmmoSource(null);
             }
         }
@@ -93,8 +95,12 @@ namespace RaidIntoDarkness.Integrations.Inventory
             FirstPersonWeaponAsset weapon = hud != null ? hud.FirstPersonWeapon : null;
             _controller.SetSlotWeapon(slot, weapon, weapon != null ? item.InstanceId : null);
             WeaponStatsComponent stats = item?.Definition.GetComponent<WeaponStatsComponent>();
-            _controller.SetSlotSilencer(slot, stats != null && (stats.SilencerStatus == WeaponAddonStatus.Permanent || stats.GetSilencer(item, _model.Resolver) != null));
-            _controller.SetSlotGrenadeLauncher(slot, stats?.GetGrenadeLauncher(item, _model.Resolver) != null);
+            WeaponAddonComponent silencer = stats?.GetSilencer(item, _model.Resolver)?.GetComponent<WeaponAddonComponent>();
+            WeaponAddonComponent launcher = stats?.GetGrenadeLauncher(item, _model.Resolver)?.GetComponent<WeaponAddonComponent>();
+            var (recoil, snappiness) = WeaponAddonComponent.GetEquippedRecoilMultipliers(silencer, launcher);
+            _controller.SetSlotRecoilMultipliers(slot, recoil, snappiness);
+            _controller.SetSlotSilencer(slot, stats?.SilencerStatus == WeaponAddonStatus.Permanent || silencer != null);
+            _controller.SetSlotGrenadeLauncher(slot, launcher != null);
             ItemDefinition scope = stats?.GetScope(item, _model.Resolver);
             _controller.SetSlotScope(slot, scope != null);
             _controller.SetSlotAimOffset(slot, hud?.GetScopeAimOffset(scope));

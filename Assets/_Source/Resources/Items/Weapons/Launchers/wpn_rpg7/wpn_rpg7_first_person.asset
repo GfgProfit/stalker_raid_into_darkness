@@ -15,6 +15,7 @@ MonoBehaviour:
   _hudModel: {fileID: 2189347407890933927, guid: 0f263a2e0df8973479021ea7392711cf, type: 3}
   _isMelee: 0
   _isStandaloneLauncher: 1
+  _useStandaloneHipDispersion: 0
   _handGrenadeVisual: {fileID: 0}
   _handGrenade:
     _explosionPrefab: {fileID: 0}
@@ -254,7 +255,7 @@ MonoBehaviour:
       serializedVersion: 2
       m_Bits: 4294967291
     _drawBallisticDebug: 0
-  _recoil: {x: 1.8, y: 0.4, z: 0.85}
+  _recoil: {x: 7.2, y: 1.6, z: 3.4}
   _recoilSnappiness: 13
   _recoilReturnSpeed: 15
   _shotSounds:

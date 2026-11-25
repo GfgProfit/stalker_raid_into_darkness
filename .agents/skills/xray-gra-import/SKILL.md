@@ -1,66 +1,61 @@
 ---
 name: xray-gra-import
-description: Use when GRA/Anomaly assets must be brought into the Unity project - OGF models (world, HUD, hands, body), OMF animations, ANM camera effects, PPE post-process effects, DDS textures, OGG sounds, icons - or when building editor setup tools that wire them into prefabs/ScriptableObjects. Enforces using the project's own X-Ray OGF/OMF/ANM importer instead of writing new importers or converting via Blender/FBX.
+description: REQUIRED when changing the project X-Ray asset importer, importing GRA/Anomaly or CoC IWP models, animations, effects, textures, audio or icons into Unity, or wiring imported assets into prefabs and ScriptableObjects. Covers OGF, OMF, ANM, PPE, DDS and OGG.
 ---
 
-# Импорт ассетов GRA через наш X-Ray импортёр
+# Import GRA assets through the project X-Ray importer
 
-В проекте есть свой рабочий импортёр: `Assets/_Tools/X-Ray OGF OMG Importer/`. Он сам импортирует OGF, OMF и ANM, находит текстуры через MO2 VFS, создаёт HDRP-материалы, конвертирует bump в normal. Пользователь жёстко реагирует на попытки писать «свой импортёр снаряжения» — **не пиши новый импортёр и не конвертируй через Blender/FBX**. Скопируй файл-победитель в `Assets` — импортёр сделает остальное.
+The project importer lives at `Assets/_Tools/X-Ray OGF OMG Importer/`. It imports OGF, OMF and ANM, finds textures through the MO2 VFS, creates HDRP materials, and converts bump textures to normal maps. When importing assets, you MUST copy the winning file into `Assets` and use this importer. Writing another importer or converting through Blender/FBX is FORBIDDEN.
 
-Не трогай без прямой необходимости:
-- парсинг OGF/OMF;
-- математику костей, bind poses, скиннинг;
-- генерацию AnimationClip и runtime Playables импортёра.
+You MUST NOT change these parts of the importer unless the task directly requires it:
 
-## Где что лежит в проекте
+- OGF/OMF parsing
+- Bone math, bind poses, and skinning
+- AnimationClip generation and runtime Playables
 
-| Что | Путь |
+## Project asset locations
+
+| Asset | Path |
 |---|---|
-| Руки (158 OGF, общий rig) | `Assets/_Source/FirstPerson/Hands/Models/` |
-| Rig для OMF рук | `wpn_hand_01.ogf`, GUID `475a6b96ee587c842bb5357963a962aa` |
-| Тело Swm_Visible_Body | `Assets/_Source/FirstPerson/Body/Models/` |
-| Анимации тела | `Assets/_Source/FirstPerson/Animations/Body/` (+ `BodyAnimationLibrary.asset`) |
-| HUD-моушены рук (подбор, экипировка) | `Assets/_Source/FirstPerson/Animations/Hands/` |
-| Анимации экипировки | `Assets/_Source/FirstPerson/Equipment/` (HUD-модели, OMF предметов, `.anm`, звуки, `EquipmentAnimationLibrary.asset`) |
-| Каталог костюмов → руки/тело | `Assets/_Source/FirstPerson/Outfits/OutfitCatalog.asset` |
-| Мировые модели и префабы предметов | `Assets/_Source/Items/{Outfits,Helmets,Backpacks}/{Models,Prefabs}` |
-| Определения предметов | `Assets/_Source/Items/Definitions/{Armor,Head,Backpack}` |
-| Иконки (кроме оружия и модулей — их делает генератор) | `Assets/_Source/Items/Icons` — из `[Интерфейс] HD GRA Иконки`, нарезка через 2D Sprite; у `ItemDefinition` есть поле-override иконки |
-| Камерные `.anm` движения | `Assets/_Source/Settings/Player/Camera/Anm/` |
+| Hands (158 OGF models sharing a rig) | `Assets/_Source/FirstPerson/Hands/Models/` |
+| Rig for hand OMF | `wpn_hand_01.ogf`, GUID `475a6b96ee587c842bb5357963a962aa` |
+| Swm_Visible_Body body | `Assets/_Source/FirstPerson/Body/Models/` |
+| Body animations | `Assets/_Source/FirstPerson/Animations/Body/` and `BodyAnimationLibrary.asset` |
+| Hand HUD motions (pickup and equip) | `Assets/_Source/FirstPerson/Animations/Hands/` |
+| Equipment animations | `Assets/_Source/FirstPerson/Equipment/` (HUD models, item OMF, `.anm`, sounds, and `EquipmentAnimationLibrary.asset`) |
+| Outfit-to-hands/body catalog | `Assets/_Source/FirstPerson/Outfits/OutfitCatalog.asset` |
+| World item models and prefabs | `Assets/_Source/Items/{Outfits,Helmets,Backpacks}/{Models,Prefabs}` |
+| Item definitions | `Assets/_Source/Items/Definitions/{Armor,Head,Backpack}` |
+| Icons (weapons and attachments follow `weapon-iwp`) | `Assets/_Source/Items/Icons` uses 2D Sprite slices from `[Интерфейс] HD GRA Иконки`. `ItemDefinition` has an icon override field |
+| Camera `.anm` motions | `Assets/_Source/Settings/Player/Camera/Anm/` |
 
-Импортёр сам кладёт `Textures/` и `Materials/` рядом с моделью — не дублируй их вручную.
+The importer generates `Textures/` and `Materials/` beside the model. You MUST NOT duplicate them manually.
 
-## Шаблон editor-сетапа
+## REQUIRED Editor setup workflow
 
-1. Статический класс в `Assets/_Source/Scripts/Editor/...` с `[MenuItem("Tools/X-Ray/...")]` и `SetupBatch()` → `EditorApplication.Exit(success ? 0 : 1)`. Логи с тегом `[Имя]`.
-2. Источники:
-   - `StalkerXRaySources.Open(scope, out error)` или `Mo2VirtualFileSystem.Plan(...)` с узким `IndexScope` (`"configs"`, нужные `meshes/...`, `anims`, `sounds/actor`), затем `XRayAssetIndex.Build(plan)`;
-   - конфиги: `XRayLtxDatabase.LoadSystem(index)` (DLTX учтён), отдельные ini — `XRayLtxDatabase.LoadFile(index, path)`.
-3. Только победители: `index.TryGet(virtualPath, out file)` → `File.ReadAllBytes(index.GetFullPath(file.Winner))`. Копируй в `Assets` внутри `AssetDatabase.StartAssetEditing/StopAssetEditing`, потом `AssetDatabase.Refresh(ForceSynchronousImport)`.
-4. OMF: задай rig через `SerializedObject` импортёра — `_rigGuid = GUID модели`, `_autoDetectRig = false`, затем `SaveAndReimport()`.
-   - Моушены рук — rig `wpn_hand_01`.
-   - Один OMF предмета на несколько разных моделей (шлемы, рюкзаки) копируй отдельно на каждую модель: `<omf>__<model>.omf`, иначе пути костей не совпадут.
-5. Текстуры и материалы моделей: прогон `XRayAssetGenerationCoordinator.NeedsGeneration` / `Process(model, options, false, out _)` до 4 проходов с `Refresh`.
-6. Валидация обязательна:
-   - пути биндингов клипов (`AnimationUtility.GetCurveBindings`) существуют в каждой целевой модели;
-   - для рук — во всех моделях из `OutfitCatalog`;
-   - кость `lead_gun` есть, если к ней крепится предмет.
-   Считай ошибки и возвращай `failures == 0`.
-7. Данные — в ScriptableObject (библиотека или каталог), связи — через `PrefabUtility.LoadPrefabContents` + `SerializedObject`, сохранение `SaveAsPrefabAsset`.
-8. Запускай через Unity Open MCP в открытом Production Editor. Для batch-режима следуй `unity-batch-mirror`. Результат проверь тестом и при необходимости кадрами.
+Follow these steps for a setup in scope.
 
-## Форматы
+1. Use a static class in `Assets/_Source/Scripts/Editor/...` with `[MenuItem("Tools/X-Ray/...")]`. A separate `SetupBatch()` entry point MUST call `EditorApplication.Exit(success ? 0 : 1)` only in an authorized, separate batch process. In the interactive Production Editor, you MUST invoke the shared operation without exiting Unity. Tag the logs with `[Name]`.
+2. Open sources through `StalkerXRaySources.Open(scope, out error)` or plan with `Mo2VirtualFileSystem.Plan(...)` and a narrow `IndexScope` (`"configs"`, affected `meshes/...`, `anims`, `sounds/actor`), then use `XRayAssetIndex.Build(plan)`. Load system configs with `XRayLtxDatabase.LoadSystem(index)`, which resolves DLTX. Load separate INI files with `XRayLtxDatabase.LoadFile(index, path)`.
+3. You MUST use winning files only. Resolve with `index.TryGet(virtualPath, out file)` and read with `File.ReadAllBytes(index.GetFullPath(file.Winner))`. Copy into `Assets` within `AssetDatabase.StartAssetEditing/StopAssetEditing`, then run `AssetDatabase.Refresh(ForceSynchronousImport)`.
+4. For OMF, you MUST assign the rig through the importer's `SerializedObject`: `_rigGuid = GUID of the model` and `_autoDetectRig = false`, then `SaveAndReimport()`. Use `wpn_hand_01` for hand motions. For one item OMF targeting multiple model rigs, such as helmets or backpacks, you MUST make a separate copy for each model using `<omf>__<model>.omf` so its bone paths match.
+5. For model textures and materials, use `XRayAssetGenerationCoordinator.NeedsGeneration` and `Process(model, options, false, out _)` for up to four passes with `Refresh`.
+6. Validation is REQUIRED. Binding paths from `AnimationUtility.GetCurveBindings` MUST exist in every target model, including every model in `OutfitCatalog` for hand clips. Items attached to `lead_gun` require that bone. You MUST count failures and return `failures == 0`.
+7. You MUST store data in a ScriptableObject library or catalog. Wire references with `PrefabUtility.LoadPrefabContents` and `SerializedObject`, then save with `SaveAsPrefabAsset`.
+8. You MUST run setup through Unity Open MCP in the active Production Editor. For a batch run, you MUST follow `unity-batch-mirror`. You MUST verify the result with a test and capture frames when needed.
 
-- `.anm`: стандартный `XRayAnmImporter` (Engine semantics, scale 1) → `XRayAnmAsset.Evaluate(time, out pos, out rot)`. Камерные эффекторы играются через `StalkerCameraEffects` (`PlayItemEffect` для анимаций предметов).
-- `.ppe` (postprocess): `u32 version`, затем параметры в порядке `base color, add color, gray color` (каждый: `float base` + 3 огибающие R, G, B), потом `gray, blur, duality h/v, noise i/g/f, cm_influence` (по огибающей). Огибающие читаются `XRayAnmReader.ReadEnvelope(reader, warnings)` (формат `Load_2`). Применение — `StalkerScreenFade` (add color в гамма-пространстве после пост-обработки, затухание `Stop(1)`).
-- `.ogg` копируются как есть в папку фичи.
-- Мировые модели предметов — ключ `visual` секции, HUD-модель скриптовой анимации — `item_visual`, руки — `[actor_hud_*] visual`, тело — `<section>_legs` → `visual`.
-- Пути в конфигах X-Ray: `\`, без `meshes/` и часто без `.ogf`; звуки — без `sounds/` и `.ogg`.
+## Asset formats
 
-## Чего не делать
+- `.anm`: Standard `XRayAnmImporter` (Engine semantics, scale 1) → `XRayAnmAsset.Evaluate(time, out pos, out rot)`. Play camera effectors through `StalkerCameraEffects`, using `PlayItemEffect` for item animations.
+- `.ppe` (post-processing): `u32 version`, then `base color, add color, gray color`, each with `float base` and three R, G, B envelopes. Then read one envelope per `gray, blur, duality h/v, noise i/g/f, cm_influence` parameter. Read envelopes through `XRayAnmReader.ReadEnvelope(reader, warnings)` (`Load_2` format). Apply through `StalkerScreenFade` with add color in gamma space after post-processing and fade-out through `Stop(1)`.
+- You MUST copy `.ogg` files as-is into the feature folder.
+- Resolve world item models from the section's `visual`, scripted HUD animation models from `item_visual`, hands from `[actor_hud_*] visual`, and bodies from `<section>_legs` → `visual`.
+- X-Ray config paths use `\`, omit `meshes/`, and often omit `.ogf`. Sound paths omit `sounds/` and `.ogg`.
 
-- Не импортировать оружие и его анимации, пока об этом не попросили. Для работы с оружием и модулями используй скилл `weapon-iwp` (модели оружия и анимации — из CoC IWP, характеристики и модели модулей — из GRA, иконки оружия и модулей делает генератор).
-- Не удалять кости, не делать retarget, не менять rig рук.
-- Не плодить дубликаты текстур, материалов, мешей и клипов (кроме копий OMF под разные rig).
-- Не перезаписывать ручные настройки материалов и префабов пользователя.
-- Не изменять файлы в `D:\GRA2.5`.
+## Restrictions
+
+- Importing weapons or their animations is FORBIDDEN unless requested. The weapon route in [AGENTS.md](../../../AGENTS.md) governs weapon asset and icon sources.
+- You MUST NOT delete bones, retarget, or change the hand rig.
+- You MUST NOT duplicate textures, materials, meshes, or clips. Separate OMF copies for distinct rigs are permitted.
+- You MUST NOT overwrite the user's manual material and prefab settings.
+- You MUST NOT change files in `D:\GRA2.5`.

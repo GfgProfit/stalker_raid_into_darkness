@@ -1,5 +1,5 @@
 #!/bin/sh
-CACHE="${MONOLITH_CACHE:-C:/Users/kagami/AppData/Local/Temp/claude/xray-monolith}"
+CACHE="${MONOLITH_CACHE:-${TMPDIR:-${TEMP:-${TMP:-/tmp}}}/xray-monolith}"
 if [ "$1" = "search" ]; then
   shift
   gh search code "$*" --repo themrdemonized/xray-monolith --limit 40

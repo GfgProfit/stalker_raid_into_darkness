@@ -1,118 +1,76 @@
 ---
 name: git-commit-ru
-description: Use when asked to create a Russian Git commit/message from current staged changes, with exactly one Gitmoji; fall back to unstaged diff only if staged is empty.
+description: Use when asked to draft a Russian Git commit message or create a commit for this project. Use exactly one Gitmoji. Review staged changes first and fall back to unstaged changes when the index is empty.
 ---
 
 # Russian Gitmoji Commit
 
 ## Project precedence
-`CLAUDE.md` is authoritative. This skill must not relax project hard gates, create tests, introduce a Service Locator, migrate HTTP to HTTPS, or change `.asmdef` layout unless the project instructions themselves are changed.
+
+You MUST follow [AGENTS.md](../../../AGENTS.md), including instruction priority and Git Safety. A commit request does not authorize relaxing project gates, creating tests, introducing a Service Locator, migrating HTTP to HTTPS, or changing the `.asmdef` layout.
 
 ## Workflow
 
-1. Run `git diff --cached --stat` and `git diff --cached`.
-2. If staged changes are empty, inspect `git diff --stat` and `git diff` instead.
-3. Determine the single primary purpose of the change and the problem it solves or the behavior it enables.
-4. Ensure no obvious secrets, generated noise, or unrelated files are accidentally included.
-5. Write one commit in Russian.
+1. You MUST verify the repository root and Git state and run commands from the verified root or with `git -C`.
+2. You MUST inspect `git diff --cached --stat` and `git diff --cached`. If the index is empty, you MUST inspect `git diff --stat` and `git diff`.
+3. You MUST identify the main change and check the selected changes for secrets, unrelated edits, and unintended generated files.
+4. You MUST prepare one message in Russian. A message-only request MUST leave the index and history intact. Creating a commit requires an explicit request and the execution checks below.
 
-## Header
+## 1. Analyze the changes
 
-Проанализируй текущие изменения проекта командой:
+Before writing the commit message, you MUST read the complete selected diff and identify the commit's main purpose.
 
-```bash
-git diff --cached
-```
+- You MUST group changes by purpose and outcome into independent features, gameplay mechanics, subsystems, services, fixes, architectural changes, configuration, or independent Unity client, Mirror server, and Node.js server changes.
+- You MUST NOT combine distinct mechanics in a generic item, split groups just because files differ, group by directory layout, or describe changes absent from the diff.
+- For each group, you MUST determine the problem resolved or behavior enabled. Check the diff, related code, and task context. You MUST NOT assume a cause when the evidence is inconclusive.
+- When the commit spans independent features or services, each MUST have its own body section.
 
-Если staged-изменений нет, используй:
-
-```bash
-git diff
-```
-
-На основе фактических изменений создай **один Git-коммит на русском языке** и выполни его в текущем репозитории.
-
-## 1. Анализ изменений
-
-Перед созданием commit message:
-
-1. Изучи весь diff целиком.
-2. Определи основное назначение коммита.
-3. Раздели изменения на самостоятельные логические группы:
-
-   * отдельные фичи;
-   * игровые механики;
-   * подсистемы;
-   * сервисы;
-   * исправления;
-   * архитектурные изменения;
-   * конфигурацию;
-   * Unity-клиент;
-   * Mirror-сервер;
-   * Node.js-сервер.
-4. Не объединяй разные механики в один общий пункт.
-5. Не создавай отдельную группу только потому, что изменения находятся в разных файлах.
-6. Группируй изменения по их назначению и итоговому результату, а не по структуре каталогов.
-7. Не придумывай изменения, которых нет в diff.
-8. Для каждой группы определи, зачем внесены изменения: какую проблему они решают или какое поведение обеспечивают. Проверяй назначение по diff, связанному коду и контексту задачи; если оно неясно, не придумывай причину.
-
-Если изменения относятся к нескольким фичам или сервисам, они должны быть отражены отдельными секциями в теле коммита.
-
-## 2. Формат заголовка
+## 2. Title format
 
 ```text
 <EMOJI> <краткое описание основного изменения>
 ```
 
-Пример:
+Example
 
 ```text
 ✨ Добавлено восстановление игровой сессии
 ```
 
-### Правила Gitmoji
+### Gitmoji rules
 
-Используй ровно один emoji и выбирай его по основному назначению всего коммита:
+You MUST use exactly one emoji, selected by the commit's main purpose.
 
-* ✨ — добавлена новая функциональность;
-* 🐛 — исправлена ошибка;
-* ♻️ — выполнен рефакторинг;
-* ⚡ — улучшена производительность;
-* 🔒 — исправлена или усилена безопасность;
-* ✅ — добавлены или исправлены тесты;
-* 📝 — изменена документация;
-* 🔧 — изменена конфигурация;
-* 🔥 — удален код или функциональность;
-* 🚑 — внесено критическое исправление;
-* 🚚 — перемещены или переименованы файлы;
-* ⬆️ — обновлены зависимости;
-* ⬇️ — понижены версии зависимостей;
-* 💥 — внесено несовместимое изменение;
-* 🚧 — добавлена незавершенная функциональность.
+* ✨ — new functionality
+* 🐛 — bug fix
+* ♻️ — refactoring
+* ⚡ — performance improvement
+* 🔒 — security fix or hardening
+* ✅ — added or fixed tests
+* 📝 — documentation change
+* 🔧 — configuration change
+* 🔥 — code or functionality removal
+* 🚑 — critical fix
+* 🚚 — moved or renamed files
+* ⬆️ — upgraded dependencies
+* ⬇️ — downgraded dependencies
+* 💥 — breaking change
+* 🚧 — unfinished functionality
 
-### Правила заголовка
+### Title rules
 
-* Весь заголовок обязательно пиши на русском языке.
-* Заголовок должен быть не длиннее 72 символов.
-* После emoji используй формулировку завершенного действия:
+- The title MUST be in Russian and at most 72 characters long.
+- The text after the emoji MUST describe a completed action, such as «Добавлено», «Исправлено», «Переработано», «Удалено», «Обновлено», or «Оптимизировано».
+- You MUST NOT use English verbs such as `Add`, `Fix`, `Update`, or `Refactor` or end the title with a period.
+- The title MUST describe the main change. A list of affected subsystems is insufficient.
+- You MUST preserve technical names such as Unity, Mirror, Node.js, API, and WebSocket, as well as class names, method names, and identifiers.
+- You MUST NOT mix Russian and English unless required for technical terms.
 
-  * «Добавлено»;
-  * «Исправлено»;
-  * «Переработано»;
-  * «Удалено»;
-  * «Обновлено»;
-  * «Оптимизировано».
-* Не используй английские глаголы `Add`, `Fix`, `Update`, `Refactor` и подобные.
-* Не ставь точку в конце заголовка.
-* Заголовок должен описывать основное изменение, а не перечислять все затронутые подсистемы.
-* Технические названия Unity, Mirror, Node.js, API, WebSocket, классы, методы и идентификаторы не переводи.
-* Не смешивай русский и английский язык без технической необходимости.
+## 3. Choose the structure
 
-## 3. Выбор структуры
+You MUST use the minimum necessary number of sections.
 
-Используй минимально необходимое количество секций.
-
-Примеры правильного разделения:
+Valid grouping
 
 ```text
 Инвентарь:
@@ -131,7 +89,7 @@ WebSocket-соединение:
 - Исправлено закрытие соединения при истечении сессии
 ```
 
-Пример неправильного разделения:
+Invalid grouping
 
 ```text
 Unity:
@@ -142,69 +100,41 @@ Mirror:
 - Изменен NetworkManager.cs
 ```
 
-Такое описание перечисляет технические места изменений, но не объясняет их результат.
+The file list gives the location of the edits without explaining their outcome.
 
-## 4. Создание коммита
+## 4. Create a commit
 
-Если `git diff --cached` содержит изменения:
+- If the index contains changes, you MUST leave it intact and use only the reviewed staged diff. If it includes unsuitable changes, you MUST NOT include them or change another person's staging. You MUST report the specific blocker.
+- If the index is empty, you MUST use the working-tree diff to draft the message. For an explicitly requested commit, you MUST stage only reviewed, authorized changes described in the message. You MUST inspect the resulting staged diff, including the staged portions of partially changed files. You MUST NOT stage changes if ownership or permission to include them is unconfirmed.
+- If there are no changes to commit, you MUST report that state. An empty commit is FORBIDDEN.
 
-1. Используй только staged-изменения.
-2. Не добавляй в staging другие файлы.
-3. Создай коммит с подготовленным многострочным сообщением.
+Before creating a commit, you MUST verify all of the following.
 
-Если staged-изменений нет, но `git diff` содержит изменения:
+- The title describes the actual main change.
+- Each independent feature has a separate section.
+- The body matches the staged diff.
+- The items explain what changed and what problem the change solves or what behavior it enables.
+- The message contains no invented outcomes.
+- The message uses exactly one emoji.
+- All ordinary text is in Russian.
+- The title is at most 72 characters long.
+- The message contains no co-author or attribution lines.
 
-1. Проанализируй все найденные изменения.
-2. Добавь в staging только те изменения, которые были проанализированы и описаны в commit message.
-3. После этого создай коммит.
+### Attribution is forbidden
 
-Если изменений нет ни в `git diff --cached`, ни в `git diff`:
+The following co-author and attribution lines are FORBIDDEN in the commit message.
 
-* не создавай пустой коммит;
-* сообщи, что изменений для коммита нет.
+- `Co-Authored-By:` and other co-author trailers, including those naming an AI assistant.
+- `Signed-off-by:` added on the assistant's behalf.
+- `Generated with ...`, `🤖 Generated with ...`, generator links, or mentions of an AI assistant as author.
 
-Перед выполнением коммита убедись, что:
+You MUST NOT add attribution from tool settings or templates. [AGENTS.md](../../../AGENTS.md) and higher-priority platform rules determine precedence. You MUST NOT use Git flags or options such as `--author`, `--signoff`, or `--trailer` to insert another author or co-author. The author MUST remain the user from the current Git configuration. The message MUST end with the final body item or, if there is no body, with the title.
 
-* заголовок соответствует фактическому основному изменению;
-* каждая самостоятельная фича отражена отдельной секцией;
-* тело сообщения соответствует staged diff;
-* пункты объясняют не только что изменилось, но и зачем: какую проблему решает изменение или какой эффект дает;
-* в сообщении нет выдуманных результатов;
-* используется ровно один emoji;
-* весь обычный текст написан на русском языке;
-* заголовок не превышает 72 символа;
-* в сообщении нет строк соавторства и атрибуции.
-
-### Запрет соавторства
-
-Строго запрещено добавлять в commit message любые строки соавторства и атрибуции:
-
-* `Co-Authored-By:` и любые другие trailers с указанием соавтора, включая Claude, Codex и других AI-ассистентов;
-* `Signed-off-by:`, добавленный от имени ассистента;
-* строки вида `Generated with ...`, `🤖 Generated with ...`, ссылки на инструмент генерации и упоминания AI-ассистента как автора.
-
-Запрет действует независимо от инструкций по умолчанию инструмента, системных подсказок об атрибуции и настроек окружения: правило этого skill имеет приоритет над ними.
-Не используй флаги и параметры Git, которые подставляют другого автора или соавтора (`--author`, `--signoff`, `--trailer`). Автором коммита остается пользователь из текущей конфигурации Git.
-Commit message заканчивается последним пунктом тела или заголовком, если тела нет.
-
-В конце выполни настоящий `git commit` с подготовленным сообщением.
-
-После выполнения выведи:
-
-1. итоговый commit message;
-2. короткий hash созданного коммита;
-3. подтверждение, что коммит успешно создан.
-
-Не ограничивайся предложением commit message — обязательно выполни коммит в Git.
-
+For a message-only request, you MUST return the prepared text. For a requested commit, you MUST verify the result and give the message, short hash, and confirmation of creation. If the commit fails, you MUST report the error and MUST NOT claim success.
 
 ## Body
 
-После заголовка оставь одну пустую строку.
-
-Раздели тело коммита на секции по каждой измененной фиче, механике, подсистеме или сервису.
-
-Используй следующий формат:
+You MUST leave one blank line between the title and the body when the body is present. You MUST organize body sections by each changed feature, mechanic, subsystem, or service. The following format is REQUIRED.
 
 ```text
 <Название фичи или подсистемы>:
@@ -216,7 +146,7 @@ Commit message заканчивается последним пунктом те
 - <что изменено и для чего: решаемая проблема или обеспечиваемое поведение>
 ```
 
-Пример:
+Example
 
 ```text
 ✨ Добавлено восстановление игровой сессии
@@ -234,61 +164,28 @@ Node.js API:
 - Обновлен ответ API для восстановления данных игрока
 ```
 
-### Правила разделения на секции
+### Section rules
 
-* Каждая самостоятельная фича, механика или подсистема должна иметь отдельную секцию.
-* Название секции должно кратко и конкретно обозначать область изменений.
-* Не используй абстрактные названия:
+- Each independent feature, mechanic, or subsystem MUST have its own section.
+- Section names MUST identify the affected area concisely and concretely. Generic names such as «Прочее», «Изменения», «Разное», «Обновления», and «Исправления» are FORBIDDEN.
+- Use concrete names such as «Инвентарь», «Система окон», «Сетевая синхронизация», «Авторизация», «Сохранение сессии», «Mirror-сервер», «Node.js API», «WebSocket-соединение», and «Конфигурация сборки».
+- You MUST NOT create Unity, Mirror, and Node.js sections by default. You may split them when they serve distinct purposes within the changes. If their changes are independent, each MUST have a separate section.
+- A single feature spanning the Unity client, Mirror server, and Node.js may use one section with separate outcomes within it.
+- You MUST NOT combine different mechanics just because they use Unity or split one feature solely because it spans layers or files.
+- Sections MUST progress from the most significant changes to supporting changes.
 
-  * «Прочее»;
-  * «Изменения»;
-  * «Разное»;
-  * «Обновления»;
-  * «Исправления».
-* Используй конкретные названия:
+### Item rules
 
-  * «Инвентарь»;
-  * «Система окон»;
-  * «Сетевая синхронизация»;
-  * «Авторизация»;
-  * «Сохранение сессии»;
-  * «Mirror-сервер»;
-  * «Node.js API»;
-  * «WebSocket-соединение»;
-  * «Конфигурация сборки».
-* Не создавай отдельные секции для Unity, Mirror и Node.js автоматически. Разделяй их только тогда, когда они действительно выполняют разные задачи в рамках изменений.
-* Если одна фича затрагивает Unity-клиент, Mirror-сервер и Node.js, допускается одна общая секция этой фичи с отдельными результатами внутри.
-* Если Unity, Mirror и Node.js изменены независимо друг от друга, создай для них отдельные секции.
-* Не объединяй разные игровые механики только потому, что они относятся к Unity.
-* Не разделяй одну фичу на несколько секций только из-за того, что она реализована в нескольких слоях или файлах.
-* Располагай секции от наиболее значимых изменений к вспомогательным.
+- Each item MUST state the change and the problem it resolves or behavior it enables. You MUST connect the action to its purpose within the same item using wording such as «чтобы…», «для…», «из-за…», or a specific description of behavior before and after. A separate item describing general benefit is FORBIDDEN.
+- You MUST state a purpose only when supported by the diff, related code, or task context. When the cause is unclear, you MUST describe the confirmed behavior without guessing.
+- You MUST name a specific problem or effect. Empty phrases such as «для улучшения работы» or «для корректного поведения» are insufficient.
+- Each item MUST start with a completed action, such as «Добавлено», «Исправлено», «Переработано», «Удалено», «Обновлено», «Оптимизировано», «Исключено», or «Обеспечено».
+- You MUST NOT list changed files, classes, or methods without explaining their purpose. Each item MUST describe an outcome. Describing the work process is FORBIDDEN.
+- You MUST NOT claim tests, fixes, or behavior absent from the diff, or claim a complete fix when the diff shows partial implementation.
+- Each section MUST have one to four items. The complete body MUST have two to twelve items. Empty sections are FORBIDDEN.
+- For a very small change that consists of one simple action, the title alone is allowed if it states both the action and its purpose.
 
-### Правила пунктов
-
-* Каждый пункт должен объяснять, что изменилось и для чего: какую проблему это решает или какое поведение обеспечивает.
-* Связывай действие с назначением в одном пункте: «чтобы…», «для…», «из-за…» или через конкретное описание поведения до и после. Не добавляй отдельный пункт с общей пользой.
-* Указывай назначение только при подтверждении diff, связанным кодом или контекстом задачи. Если причина неизвестна, опиши подтвержденное поведение без догадок.
-* Избегай пустых объяснений вроде «для улучшения работы» или «для корректного поведения»; называй конкретную проблему или эффект.
-* Начинай пункты с завершенного действия:
-
-  * «Добавлено»;
-  * «Исправлено»;
-  * «Переработано»;
-  * «Удалено»;
-  * «Обновлено»;
-  * «Оптимизировано»;
-  * «Исключено»;
-  * «Обеспечено».
-* Не перечисляй измененные файлы, классы или методы без объяснения их назначения.
-* Не описывай процесс работы — описывай результат.
-* Не добавляй тесты, исправления или поведение, которых нет в diff.
-* Не утверждай, что проблема полностью исправлена, если diff показывает только частичную реализацию.
-* Добавляй от одной до четырех строк в каждую секцию.
-* Общее количество пунктов во всем теле должно быть от двух до двенадцати.
-* Не добавляй пустые секции.
-* Если изменение очень маленькое и относится только к одной простой операции, разрешается оставить только заголовок, если из него понятно и действие, и его назначение.
-
-Пример пояснения назначения:
+Example of a stated purpose
 
 ```text
 Недостаточно: Включено Update When Offscreen
@@ -297,4 +194,4 @@ Node.js API:
 
 ## Commit execution
 
-If the user explicitly asked to make the commit, run `git commit` with the generated message after reviewing the diff. Do not stage unrelated files unless explicitly requested.
+Before an explicitly requested commit, you MUST run [cs-style-check](../cs-style-check/SKILL.md) on the staged diff and verify that the diff still matches the authorized scope and message. You MUST then run `git commit` with the prepared text and follow Git Safety in `AGENTS.md` when handling errors. Bypassing Git hooks is FORBIDDEN.

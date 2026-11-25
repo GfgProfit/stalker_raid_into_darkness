@@ -1,13 +1,15 @@
 # Batch and gates
 
+You MUST apply the Production scope, approval and dirty-scene rules from the skill entrypoint to every route below. A gate, dry run, `fixSafe` marker or Undo group grants no authority for a write, deletion, GUID change or bypass. You MUST use `enforce` for normal edits. Weaker gates REQUIRE authorization for the action and the stated safeguards. For Production material repair, you MUST select an HDRP-compatible target permitted by the project.
+
 ## Core loop: mutate → gate → fix
 
 1. **Discover** — `capabilities`, then `find_members` for reflection targets.
-2. **Declare scope** — `paths_hint` for every asset path you intend to touch.
-3. **Mutate** — typed tools preferred over `execute_csharp` / `invoke_method` / `execute_menu`; default `gate: "enforce"`.
-4. **Read the gate** — on `isError: true`, inspect `gate.delta.newIssues` + `agentNextSteps`.
-5. **Fix** — address the top error; `apply_fix` with `dry_run: true` first when a `fixId` is present. Each issue carries `rootCause` (machine-readable, branch on it) + `evidence` (the specific broken ref/value) + `fixCandidates` (every fix option with its `safe` flag) + `remediation` (the human-readable next step) — read these before choosing a fix.
-6. **Retry** — confirm `gate.delta.resolvedErrors > 0` or `newErrors == 0`.
+2. Declare scope. `paths_hint` MUST cover every asset path you intend to touch.
+3. Mutate. You SHOULD prefer typed tools over `execute_csharp` / `invoke_method` / `execute_menu`. The default is `gate: "enforce"`.
+4. Read the gate. On `isError: true`, you MUST inspect `gate.delta.newIssues` and `agentNextSteps`.
+5. Fix the top error. If a `fixId` is present, you MUST first run `apply_fix` with `dry_run: true`. Each issue carries `rootCause` (the machine-readable code for recovery), `evidence` (the specific broken reference or value), `fixCandidates` (every fix with its `safe` flag) and `remediation` (the human-readable next step). You MUST read these before choosing a fix.
+6. Retry. You MUST confirm `gate.delta.resolvedErrors > 0` or `newErrors == 0`.
 
 ### Gate modes
 
@@ -51,7 +53,7 @@
 
 Issue keys in `gate.delta.newIssues` are `ruleId|severity|assetPath|issueCode` (severity is `ERROR` / `WARN` / `INFO`). The `newIssues` / `resolvedIssues` arrays are **bounded** (first 25 keys) with a `…Truncated` count and a `newIssuesByRule` / `resolvedIssuesByRule` histogram — branch on `gate.outcome` + the counts (`newErrors`, `newWarnings`); fetch the full list via `validate_edit` / `scan_paths` when you need it. On success, `validation.passed: true`, empty `issues`, `agentNextSteps: []`. The `logs` array carries Unity console entries emitted *during this call* (always present, `[]` when none) — read it inline instead of polling `read_console` after a mutation. Stacks are omitted here; `read_console` stays the verbose path.
 
-**`gate.delta` can be `null`** — never a zeroed object — when no delta was computed. A checkpoint failure reports `gate.outcome: "failed"` with `mutation.success: false`; a mutation failure (the tool returned `success: false` or threw before validation) reports `gate.outcome: "skipped"` with `skippedReason: "mutation_failed"` and `mutation.success: false` — the gate never ran, so detect it from `mutation.success`, not from `gate.outcome`; a validate-scan failure (the scan threw, or a verify rule threw on either side of the delta) reports `gate.outcome: "validate_scan_failed"` with the mutation committed. All three carry `isError: true`: the mutation's health is **unknown** (or it failed outright). When a verify rule threw, `gate.rulesFailed` lists the rule ids whose findings are missing. Do NOT retry the mutation (it already applied) and do NOT treat the missing delta as a clean pass — run `validate_edit` / `scan_paths` on the touched paths to confirm health. `scan_paths` / `validate_edit` responses carry the sibling signal as `rulesFailed` + `scanIncomplete: true` when any selected rule threw.
+**`gate.delta` can be `null`** — never a zeroed object — when no delta was computed. A checkpoint failure reports `gate.outcome: "failed"` with `mutation.success: false`; a mutation failure (the tool returned `success: false` or threw before validation) reports `gate.outcome: "skipped"` with `skippedReason: "mutation_failed"` and `mutation.success: false` — the gate never ran, so detect it from `mutation.success`, not from `gate.outcome`; a validate-scan failure (the scan threw, or a verify rule threw on either side of the delta) reports `gate.outcome: "validate_scan_failed"` with the mutation committed. All three carry `isError: true`: the mutation's health is **unknown** (or it failed outright). When a verify rule threw, `gate.rulesFailed` lists the rule ids whose findings are missing. If validation failed after the mutation committed, you MUST NOT retry that mutation. A missing delta never establishes a clean pass. You MUST run `validate_edit` / `scan_paths` on the touched paths to confirm health. `scan_paths` / `validate_edit` responses carry the sibling signal as `rulesFailed` + `scanIncomplete: true` when any selected rule threw.
 
 ### Verify rules and issue codes
 
@@ -84,13 +86,13 @@ Every issue in a `scan_paths` / `validate_edit` response carries optional explai
 
 - `**remove_missing_script**` (safe) — strips `MonoBehaviour` whose script GUID no longer resolves. Works on `.prefab` / `.unity`.
 - `**remove_orphan_meta**` (safe) — deletes a `.meta` whose companion asset was deleted. Producer: `project_health` (live) / `offline_integrity` (offline). No asset data lost.
-- `**relink_broken_guid**` (unsafe) — rewrites a broken external GUID reference. Dry-run advertises candidate targets; apply requires `target_guid`. Never auto-applied.
-- `**fix_duplicate_guid**` (unsafe) — regenerates the GUID of one colliding asset. Re-GUIDing silently rewires the asset graph, so pick the less-referenced asset deliberately; apply on that asset's issue id. Producer: `project_health` / `offline_integrity`. Never auto-applied.
-- `**reassign_missing_shader**` (unsafe) — assigns a shader to a material whose shader is null / the error shader. Dry-run advertises candidate shaders; apply requires `target_shader` (shader name e.g. `Standard`, or asset path). Producer: `materials`. Never auto-applied.
+- `**relink_broken_guid**` (unsafe) — rewrites a broken external GUID reference. Dry-run advertises candidate targets; apply REQUIRES `target_guid`. Automatic application is FORBIDDEN.
+- `**fix_duplicate_guid**` (unsafe) — regenerates the GUID of one colliding asset. Re-GUIDing silently rewires the asset graph, so pick the less-referenced asset deliberately; apply on that asset's issue id. Producer: `project_health` / `offline_integrity`. Automatic application is FORBIDDEN.
+- `**reassign_missing_shader**` (unsafe) — assigns a shader to a material whose shader is null / the error shader. Dry-run advertises candidate shaders; apply REQUIRES `target_shader` (shader name e.g. `Standard`, or asset path). Producer: `materials`. Automatic application is FORBIDDEN.
 
 If `fix_id` omitted, the response lists every fix that can resolve the given `issue_id`.
 
-**Safe auto-fix rollback.** A non-dry-run `apply_fix` runs checkpoint → apply → validate → delta, and if the fix fails to apply **or** introduces new errors under `enforce`, the touched files are restored to their pre-fix state and the response carries a top-level `rollback` block: `{rolledBack: true, reason, restoredPaths[]}`. Read `gate.delta.newErrors` + `rollback` together — a rolled-back fix left no project change, so inspect the issue manually before retrying. Rollback is **not** triggered by new warnings (informational) or under `warn`/`off` gate modes (report-only). Applying with `gate: "off"` commits without rollback protection; the response carries `rollbackDisabled: true` so the unguarded mutation is visible — verify asset health with `validate_edit` afterward.
+**Safe auto-fix rollback.** A non-dry-run `apply_fix` runs checkpoint → apply → validate → delta, and if the fix fails to apply **or** introduces new errors under `enforce`, the touched files are restored to their pre-fix state and the response carries a top-level `rollback` block: `{rolledBack: true, reason, restoredPaths[]}`. Read `gate.delta.newErrors` + `rollback` together — a rolled-back fix left no project change, so inspect the issue manually before retrying. Rollback is **not** triggered by new warnings (informational) or under `warn`/`off` gate modes (report-only). Applying with `gate: "off"` commits without rollback protection; the response carries `rollbackDisabled: true` so the unguarded mutation is visible You MUST verify asset health with `validate_edit` afterward.
 
 ## Gate intelligence: plan before, explain after
 
@@ -106,37 +108,32 @@ Typical sequence: `impact_preview` (size) → `gate_budget_estimate` `mode: "sam
 
 `checkpoint_create` with scoped paths → run mutations (`gate: off` for bulk, or `enforce` per call) → `delta` against the checkpoint for a single verification pass.
 
-- **Session-scoped.** Checkpoints live in an in-memory ring buffer (capacity 20, LRU-evicted on access recency) and are cleared on script recompile, domain reload, or editor restart — they are never persisted to disk. Capture immediately before mutating and delta right after; do not hold a checkpoint id across a recompile.
+- **Session-scoped.** Checkpoints live in an in-memory ring buffer (capacity 20, LRU-evicted on access recency) and are cleared on script recompile, domain reload, or editor restart — they are never persisted to disk. You MUST capture immediately before mutating and run delta immediately afterward. You MUST NOT hold a checkpoint id across a recompile.
 - **Missing checkpoint is non-blocking.** If `delta` (or `mutation_explain` with a `checkpoint_id`) references a checkpoint that is gone (evicted, or lost to a reload), the call returns success with `"unavailable": true` + `agentNextSteps` rather than an error. Treat it as "no baseline to delta against" and fall back to `validate_edit` / `scan_paths` on the relevant paths. It does not block the workflow.
 - **Clear from the editor.** The Bridge window → Gate tab → Checkpoint history has a "Clear history" button (two-click confirm) that empties the session ring buffer. It touches nothing on disk and leaves gate-run history intact.
 
 ### Batch multiple mutations into one call (`batch_execute`)
 
-When you need to set up many things at once (spawn N objects + materials + assignments), one `**unity_open_mcp_batch_execute`** call runs the whole sequence in a single HTTP round trip, cutting latency and token cost. The batch is **strictly safer than sequential calls**: the WHOLE sequence shares ONE gate cycle (one checkpoint → all steps → one validate/delta) and ONE undo group.
+When you need to set up many things at once (spawn N objects + materials + assignments), one `**unity_open_mcp_batch_execute`** call runs the whole sequence in a single HTTP round trip, cutting latency and token cost. The sequence shares one gate cycle (one checkpoint → all steps → one validate/delta) and one Undo group. A late failure can leave earlier steps committed.
 
-- **When to use.** Multi-step setup where each step is independent and typed (create 3 cubes + 3 materials + assign). Prefer the per-tool array surfaces (`component_modify.fields[]`, `gameobject_modify` multi-surface) when a *single* tool already batches — `batch_execute` is for bundling *different* tools.
-- **Always pass `paths_hint`.** The batch is mutating; scope `paths_hint` to the union of every path the nested steps touch (scene paths, asset paths). Required.
-- **Prefer typed tools inside the batch.** Each `commands[i]` carries a full tool id + its `params` (omit `paths_hint`/`gate` per step — the batch owns those for the sequence). Nested meta-tools (`execute_csharp`, `invoke_method`, `execute_menu`), `batch_execute` itself, `compile_check`, and any `restart_then_settle` tool (`scene_open`, `scene_create` in Single mode, `package_add`/`remove`, `asmdef_create`/`modify`, `build_set_*`, `settings_set_player`, `reimport_package`) are **blocked** in v1 — a domain reload or scene switch mid-batch would silently abort every later step. The refusal is `batch_nested_reload_unsafe`. Use these as single top-level calls.
+- **When to use.** Multi-step setup where each step is independent and typed (create 3 cubes + 3 materials + assign). You SHOULD prefer the per-tool array surfaces (`component_modify.fields[]`, `gameobject_modify` multi-surface) when a *single* tool already batches — `batch_execute` is for bundling *different* tools.
+- **Mutation scope.** `paths_hint` MUST cover the union of every path the mutating batch touches, including affected scenes and assets. All-read batches need no mutation scope.
+- You SHOULD prefer typed tools inside the batch. Each `commands[i]` carries a full tool id + its `params` (you MUST omit `paths_hint`/`gate` per step because the batch owns both for the sequence). Nested meta-tools (`execute_csharp`, `invoke_method`, `execute_menu`), `batch_execute` itself, `compile_check`, and any `restart_then_settle` tool (`scene_open`, `scene_create` in Single mode, `package_add`/`remove`, `asmdef_create`/`modify`, `build_set_*`, `settings_set_player`, `reimport_package`) are **blocked** in v1 — a domain reload or scene switch mid-batch would silently abort every later step. The refusal is `batch_nested_reload_unsafe`. You MUST invoke these independently as top-level calls.
 - **`run_tests` is blocked too, for a different reason** (`batch_step_requires_server_poll`): its terminal result comes from the server polling a results file, which only the top-level route does. Nested, the step would report `success` with a non-terminal `{status:"started"}` body and you would never see the outcome.
 - **Nestability is NOT the `batchCapable` flag.** That flag answers "is there a headless batch-spawn fallback when the bridge is down?" — a different axis. Read the refusals above.
 - **Every refusal is pre-flight and names a reachable alternative.** Nothing ran, `batch.results[]` is empty, nothing to undo. Where a meta-tool equivalent exists the message gives it (`recompile_scripts` → `CompilationPipeline.RequestScriptCompilation()` via `execute_csharp` + poll `editor_status`; `run_tests` → `invoke_method` on the test method) — useful when your client did not refresh its tool list after `manage_tools` activated a group, so the "single top-level call" it points at is not visible to you.
 - **`fail_fast: true` (default) stops on the first failure**; later entries are `skipped` (not executed). Set `fail_fast: false` to run every step and collect per-step errors.
-- **Read `gate.delta` ONCE at the end** — the batch-level gate reports new issues introduced by the whole sequence. Partial-failure note: v1 does NOT roll back successful steps when a later step fails (same as the competitor); undo the whole batch with a single `editor_undo` if needed.
+- You MUST read `gate.delta` once at the end. The batch-level gate reports new issues from the whole sequence. In v1, earlier steps stay committed if a later step fails. You MUST verify what committed before any rollback. If rollback is authorized and the task-owned batch is the top Undo group, a single `editor_undo` can revert it. You MUST NOT undo unrelated work.
 - **Limits.** 25 commands default, 100 hard max (`batchExecuteMaxCommands` in `.unity-open-mcp/settings.json`). `parallel: true` is accepted but ignored (Unity API is main-thread; sequential only).
 - **Response shape:** `batch.results[]` carries `{ index, tool, status }` per step (`success`/`failed`/`skipped`) with `output` on success and `error` on failure.
 
 ### Read-only requests and batch preflight
 
-Use `execute_csharp(read_only: true)` only for inspection without writes,
-compile/refresh, scene switching, or play transitions. Pure reads run against
+You MUST use `execute_csharp(read_only: true)` only for inspection without writes, compile/refresh, scene switching, or play transitions. Pure reads run against
 dirty scenes without saving them, skip gates even with `paths_hint`, and return
 lifecycle `none`. This assertion does not sandbox indirect C# calls. Known
 explicit disruptive calls retain scope and dirty-scene protection.
 
 All-read `batch_execute` calls, including screenshots, need no `paths_hint` and
-create no checkpoint or undo group. Mixed/mutating batches require the explicit
-union scope. Every step is schema/lifecycle checked before dispatch; fix all
-reported errors before retrying. A failed mutation before validation reports
-`gate.outcome: "skipped"` and `skippedReason: "mutation_failed"`. Read
-`mutation.success` separately: committed work in a partial batch still receives
-validation, so a passed gate does not mean every step succeeded.
+create no checkpoint or undo group. Mixed/mutating batches REQUIRE the explicit union scope. The tool checks every step's schema and lifecycle before dispatch. You MUST fix all reported errors before retrying. A failed mutation before validation reports
+`gate.outcome: "skipped"` and `skippedReason: "mutation_failed"`. You MUST check `mutation.success` separately. Committed work in a partial batch still receives validation, so a passed gate does not establish that every step succeeded.

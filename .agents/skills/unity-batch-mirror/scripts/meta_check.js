@@ -3,7 +3,11 @@ const path = require('path');
 const crypto = require('crypto');
 const { execSync } = require('child_process');
 const project = process.env.STALKER_PROJECT || 'E:/Projects/stalker_raid_into_darkness';
-const mirror = process.env.STALKER_MIRROR || 'C:/Users/kagami/AppData/Local/Temp/claude/e--Projects-stalker-raid-into-darkness/f9f30669-85fe-4c0e-9402-a46207e682fe/scratchpad/CleanProject';
+const mirror = process.env.STALKER_MIRROR;
+if (!mirror || !path.isAbsolute(mirror)) {
+  console.error('Set STALKER_MIRROR to the authorized absolute mirror path.');
+  process.exit(2);
+}
 const fix = process.argv.includes('--fix');
 const create = process.argv.includes('--create');
 const guid = file => {

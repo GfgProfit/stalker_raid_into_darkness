@@ -2,10 +2,15 @@ const fs = require('fs');
 const path = require('path');
 const { execFileSync } = require('child_process');
 const project = process.env.STALKER_PROJECT || 'E:/Projects/stalker_raid_into_darkness';
-const out = process.env.STALKER_BUILD || path.join(process.env.STALKER_WORK || path.join(path.dirname(process.env.STALKER_MIRROR || 'C:/Users/kagami/AppData/Local/Temp/claude/e--Projects-stalker-raid-into-darkness/f9f30669-85fe-4c0e-9402-a46207e682fe/scratchpad/CleanProject'), 'batch'), 'build');
 const names = process.argv.slice(2);
 if (names.length === 0) {
   console.log('usage: compile.js <AssemblyName>...   (for example RaidIntoDarkness.Player.Editor)');
+  process.exit(2);
+}
+const work = process.env.STALKER_WORK;
+const out = process.env.STALKER_BUILD || (work && path.join(work, 'build'));
+if (!out || !path.isAbsolute(out)) {
+  console.error('Set STALKER_BUILD or STALKER_WORK to an absolute path in the task Archive.');
   process.exit(2);
 }
 fs.mkdirSync(out, { recursive: true });

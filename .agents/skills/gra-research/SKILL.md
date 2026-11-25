@@ -1,88 +1,88 @@
 ---
 name: gra-research
-description: Use whenever a task needs data, formulas or behaviour from the original game - S.T.A.L.K.E.R. Anomaly 1.5.3 with the GRA 2.5 modpack (MO2) - "как в ГРА", "как в оригинале", "найди в модпаке/в моде", "какой мод отвечает за", "посмотри мои настройки в игре/MCM", configs, Lua scripts, models, textures, sounds, animations, engine formulas (xray-monolith). Gives MO2 winner resolution, DLTX-aware LTX lookup, string tables, user settings and engine source access.
+description: REQUIRED whenever a task needs original S.T.A.L.K.E.R. Anomaly 1.5.3 behavior, data, assets, settings or formulas from the GRA 2.5 MO2 modpack. Covers mod ownership, winning files, configs, DLTX-aware LTX, localization, Lua, models, textures, sounds, animations, player/MCM settings and xray-monolith engine sources.
 ---
 
-# Исследование оригинальной GRA
+# Original GRA research
 
-Источник истины для геймплея, UI и данных — реальная игра пользователя: Anomaly 1.5.3 + модпак GRA 2.5 в MO2. Не выдумывай значения и формулы и не бери их из туториалов или OpenXRay по умолчанию. Всегда находи файл-победитель и называй мод-источник в ответе.
+For GRA behavior, the source is the user's Anomaly 1.5.3 installation with the GRA 2.5 modpack in MO2. You MUST identify the winning file and name its source mod in the response. You MUST NOT invent values or formulas or use tutorials or OpenXRay as the default source. For Raid Into Darkness implementation work, you MUST apply the code routes in [AGENTS.md](../../../AGENTS.md). GRA evidence establishes original behavior. Unity verification establishes project behavior.
 
-## Где что лежит
+Activation examples include “как в ГРА”, “как в оригинале”, “найди в модпаке/в моде”, “какой мод отвечает за”, and “посмотри мои настройки в игре/MCM”.
 
-- Базовая игра (распакованная, = `gamedata`): `D:\GRA2.5\Anomaly 1.5.3 up\tools\_unpacked`.
-- MO2: `D:\GRA2.5\MO2` (`mods`, `profiles`, `overwrite`). Выбранный профиль хранится в `ModOrganizer.ini` → `selected_profile`; сейчас это `1v2(DX11) (v_12gb) 2.5, Все включено (168)`, 174 включённых мода.
-- Консольные настройки игрока (`fov`, `hud_fov`, `mouse_sens`, `g_nearwall` и т.д.): `D:\GRA2.5\Anomaly 1.5.3 up\appdata\user.ltx`.
-- Настройки MCM: `D:\GRA2.5\MO2\overwrite\gamedata\configs\axr_options.ltx` (`fddar/...`, `swm_legs/...`, `video/player/...`).
-- Движок: `bin\AnomalyDX11.exe` (+ `.pdb`) — это **xray-monolith** (themrdemonized). В exe и pdb можно искать символы через `grep -a`.
-- Архивы `.db0` резолвер не индексирует. Распаковка: `"D:\GRA2.5\Anomaly 1.5.3 up\tools\converter.exe" -unpack -xdb <файл>` в отдельную папку. Например базовый `material_pairs.ltx` есть только в `db/mods/00_modded_exes_gamedata.db0`.
+## Source locations
 
-## Правила разрешения MO2
+- Unpacked base game (`gamedata`) is at `D:\GRA2.5\Anomaly 1.5.3 up\tools\_unpacked`.
+- MO2 is at `D:\GRA2.5\MO2` (`mods`, `profiles`, `overwrite`). `selected_profile` in `ModOrganizer.ini` identifies the active profile. Before resolving files, you MUST recheck the selected profile and enabled mod count using `profile`. If the user names another profile, you MUST inspect it and report which profile you used.
+- Player console settings (`fov`, `hud_fov`, `mouse_sens`, `g_nearwall`, and others) are in `D:\GRA2.5\Anomaly 1.5.3 up\appdata\user.ltx`.
+- MCM settings (`fddar/...`, `swm_legs/...`, `video/player/...`) are in `D:\GRA2.5\MO2\overwrite\gamedata\configs\axr_options.ltx`.
+- `bin\AnomalyDX11.exe` and its `.pdb` are from **xray-monolith** (themrdemonized). You can inspect symbols in the executable and PDB with `grep -a`.
+- The resolver does not index `.db0` archives. If you unpack one, you MUST run `"D:\GRA2.5\Anomaly 1.5.3 up\tools\converter.exe" -unpack -xdb <file>` in a dedicated task directory outside the source installation. For Unity tasks, you MUST use the canonical Archive in `AGENTS.md`. Base `material_pairs.ltx`, for example, exists only in `db/mods/00_modded_exes_gamedata.db0`.
 
-- `modlist.txt`: строки с `+` включены, с `-` выключены; **первая строка — наивысший приоритет**.
-- Победитель файла: `overwrite` → моды по порядку `modlist.txt` → базовая игра. Выключенные моды игнорируются.
-- «Реально используется в игре» = файл-победитель плюс то, что на него действительно ссылаются конфиги или скрипты. Копии, перекрытые приоритетом, не считаются.
+## MO2 resolution rules
 
-## LTX / DLTX
+- In `modlist.txt`, `+` enables a mod and `-` disables it. **The first line has the highest priority.**
+- The winning file comes from `overwrite`, then the mods in `modlist.txt` order, then the base game. Disabled mods are ignored.
+- A file qualifies as used in the game only if it wins resolution and a config or script actually references it. Shadowed copies do not qualify.
 
-- Корень `configs/system.ltx`, `#include` относительно папки файла, поддерживаются маски `*`.
-- После system подмешиваются `configs/mod_system_*.ltx` (по имени файла).
-- Заголовки:
-  - `![sec]` — изменить существующую секцию (пропуск, если её нет);
-  - `@[sec]` — создать или изменить;
-  - `!![sec]` и `[sec]` — заменить.
-- Ключи: `!key` удаляет, `>key` дописывает в список, `<key` удаляет из списка.
-- Наследование `[sec]:parent1,parent2`: при поиске ключа приоритет у последнего родителя. Кодировка cp1251, комментарии `;` и `//`.
-- Отдельные `ini_file(...)` (например `items\items\headgear_blacklist.ltx`) в system не входят — читай напрямую.
+## LTX and DLTX
 
-## Утилита `scripts/gra.js`
+- The root is `configs/system.ltx`. Resolve `#include` relative to the including file's directory. The `*` wildcard is supported.
+- `configs/mod_system_*.ltx` files are merged after `system.ltx` in filename order.
+- Section directives:
+  - `![sec]` modifies an existing section and skips absent sections.
+  - `@[sec]` creates or modifies a section.
+  - `!![sec]` and `[sec]` replace a section.
+- Key directives: `!key` deletes a key, `>key` appends to a list, and `<key` removes from a list.
+- With `[sec]:parent1,parent2` inheritance, the last parent has key lookup priority. Encoding is cp1251. The comment markers are `;` and `//`.
+- Separate `ini_file(...)` inputs, such as `items\items\headgear_blacklist.ltx`, are outside `system.ltx`. You MUST read them directly.
 
-Запуск: `node .claude/skills/gra-research/scripts/gra.js <команда>`. Все команды работают только с файлами-победителями.
+## `scripts/gra.js`
 
-| Команда | Что делает |
+When using the CLI, you MUST run `node .agents/skills/gra-research/scripts/gra.js <command>` from the project root. Commands operate on winning files.
+
+| Command | Result |
 |---|---|
-| `profile` | профиль и число модов |
-| `winner <rel>...` | все кандидаты файла с md5/размером, отмечен победитель |
-| `find <regex> [subdir] [.ext]` | поиск виртуальных путей среди победителей |
-| `grep <regex> <subdir> [.ext]` | grep только по победителям (например `grep "add_pp_effector" scripts .script`) |
-| `get <section> <key>` | значение с учётом DLTX и наследования |
-| `dump <section>...` | все ключи секции, родители, файл определения |
-| `sections <regex>` | список секций по шаблону |
-| `strings <id> \| <prefix*>` | русские строки из `configs/text/rus` |
-| `motions <name>...` | в каком OMF лежит моушен (HUD, руки, тело) |
-| `ogftex <rel\|path>...` | текстуры и шейдеры OGF (по вложенным чанкам) |
-| `settings <regex>` | строки из `user.ltx` и `axr_options.ltx` |
+| `profile` | Profile and mod count |
+| `winner <rel>...` | All candidates with MD5 and size, with the winner marked |
+| `find <regex> [subdir] [.ext]` | Virtual paths among winning files |
+| `grep <regex> <subdir> [.ext]` | Search winning files, such as `grep "add_pp_effector" scripts .script` |
+| `get <section> <key>` | Resolved value with DLTX and inheritance |
+| `dump <section>...` | All section keys, parents, and definition file |
+| `sections <regex>` | Sections matching a pattern |
+| `strings <id> \| <prefix*>` | Russian strings from `configs/text/rus` |
+| `motions <name>...` | OMF containing the motion for the HUD, hands, or body |
+| `ogftex <rel\|path>...` | OGF textures and shaders from nested chunks |
+| `settings <regex>` | Matching lines from `user.ltx` and `axr_options.ltx` |
 
-Модуль экспортирует `candidates`, `winner`, `winners`, `ltx`, `strings`, `motions`, `ogfTextures` — для одноразовых скриптов в scratchpad делай `require` этого файла, а не копию логики.
+The module exports `candidates`, `winner`, `winners`, `ltx`, `strings`, `motions`, and `ogfTextures`. For a one-off script outside Production, you MUST `require` this module and reuse its logic.
 
-## Исходники движка
+## Engine sources
 
-- `sh .claude/skills/gra-research/scripts/monolith.sh src/xrGame/HudItem.cpp` — скачивает файл в кэш и печатает путь.
-- `sh .../monolith.sh search <символ>` — `gh search code` по репозиторию.
-- Monolith отличается от OpenXRay. Например, HUD рисуется с FOV `hud_fov * 83°` независимо от `fov`, а у предметов есть per-section `hud_fov` и nearwall. Проверяй именно monolith.
+- `sh .agents/skills/gra-research/scripts/monolith.sh src/xrGame/HudItem.cpp` downloads the file into a cache and prints its path. For a Unity task, you MUST set `MONOLITH_CACHE` to an absolute cache path inside the task's Archive directory before running it.
+- `sh .agents/skills/gra-research/scripts/monolith.sh search <symbol>` runs `gh search code` against the repository.
+- You MUST verify engine behavior against Monolith. For example, Monolith uses `hud_fov * 83°` independently of `fov` when rendering the HUD. Items can also define per-section `hud_fov` and nearwall settings.
 
-## Известная карта модов (проверяй победителей заново, порядок может меняться)
+## Known mod map
 
-- `[Анимации] FDDA Redone 1.4.1` — HUD-анимации:
-  - подбор предмета;
-  - костюм, шлемы и противогазы, рюкзак, нашивки, пластины;
-  - очередь `lam2`, хуки инвентаря `zzzz_liz_fdda_redone_ui_inventory`;
-  - секции `*_headgear_hud`, `outfit_animation_*`, затемнение `deimos_short.ppe`.
-- `[Модели] Swm_Visible_Body` — тело от первого лица (`<outfit>_legs`, `swm_legs.script`).
-- `[Руки] T.H.A.P. Rework` и другие — руки (`player_hud_section` → `[actor_hud_*] visual`). Цвета рук и тела в GRA иногда не совпадают — это особенность модпака, не ошибка импорта.
-- `[Интерфейс] HD GRA Иконки` — иконки снаряжения (`textures/ui`).
-- SortingPlus.34 — сортировка инвентаря; `context-menu-overhaul-1.4.2` — ПКМ-меню.
-- Better Stats Bars и Momopate's Detailed Weapon Stats — формулы характеристик и статус-баров в тултипах.
-- `[Звук] Dark_Signal_Soundscape` — победитель большинства звуков actor.
+You MUST recheck the winning files. Mod priority can change.
 
-## HUD-секции скриптовых анимаций (движок)
+- `[Анимации] FDDA Redone 1.4.1` provides HUD animations for item pickup and for equipping outfits, helmets, gas masks, backpacks, patches, and plates. Relevant entries include the `lam2` queue, the `zzzz_liz_fdda_redone_ui_inventory` inventory hooks, `*_headgear_hud`, `outfit_animation_*`, and the `deimos_short.ppe` darkening effect.
+- `[Модели] Swm_Visible_Body` provides the first-person body (`<outfit>_legs`, `swm_legs.script`).
+- `[Руки] T.H.A.P. Rework` and other hand mods use `player_hud_section` → `[actor_hud_*] visual`. GRA can use different colors for the hands and the body. The mismatch can originate in the modpack.
+- `[Интерфейс] HD GRA Иконки` provides equipment icons (`textures/ui`).
+- SortingPlus.34 provides inventory sorting. `context-menu-overhaul-1.4.2` provides the right-click menu.
+- Better Stats Bars and Momopate's Detailed Weapon Stats provide the statistics and status-bar formulas in tooltips.
+- `[Звук] Dark_Signal_Soundscape` wins most actor sounds.
 
-- `anm_* = <моушен рук>, <моушен предмета>`.
-- `item_visual` крепится к кости рук `lead_gun` (`ancor_0` в `[actor_hud]`); корневая кость предмета принудительно identity.
-- Смещение рук: `hands_position_16x9` / `hands_orientation_16x9` (HPB, градусы).
-- Векторы X-Ray переносятся в Unity 1:1 (как `XRayUnitySpace`).
+## Scripted animation HUD sections
 
-## Как отвечать
+- `anm_* = <hand motion>, <item motion>`.
+- `item_visual` attaches to the `lead_gun` hand bone (`ancor_0` in `[actor_hud]`). The item root bone is forced to identity.
+- Hand offsets are `hands_position_16x9` and `hands_orientation_16x9` (HPB, degrees).
+- X-Ray vectors transfer to Unity 1:1, as in `XRayUnitySpace`.
 
-- Указывай мод-победитель, путь файла и ключевые значения. Если пользователь пишет «в оригинале так же», это проверка в игре — прими как факт.
-- Для массовых сверок пиши node-скрипты в scratchpad поверх `gra.js` и выдавай таблицу или CSV в scratchpad с полным путём.
-- Ничего не меняй в `D:\GRA2.5` — только чтение.
+## Reporting
+
+- You MUST name the winning mod, file path, and key values. If the user says “в оригинале так же”, you MUST treat it as their in-game verification.
+- For bulk comparisons, you MUST build temporary Node.js scripts on `gra.js` and deliver a table or CSV with its absolute path. For Unity tasks, scripts and exports MUST live in the task's Archive directory. You MUST distinguish profile, file and configuration findings from behavior verified in the game.
+- Writes to `D:\GRA2.5` are FORBIDDEN. The installation is read-only for this workflow.

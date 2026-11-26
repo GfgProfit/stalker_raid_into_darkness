@@ -100,6 +100,7 @@ namespace RaidIntoDarkness.Weapons
         public event Action<Vector3> BulletImpacted;
 
         public FirstPersonWeaponState State { get; private set; }
+        public bool IsReloading => State is FirstPersonWeaponState.Reloading or FirstPersonWeaponState.LoadingGrenade;
         public int ActiveSlot { get; private set; } = -1;
         public FirstPersonWeaponAsset ActiveWeapon => ActiveSlot >= 0 ? _slots[ActiveSlot].Asset : null;
         public int Magazine => ActiveSlot >= 0 && _ammoSource != null ? _ammoSource.GetMagazine(_slots[ActiveSlot].Key) : 0;
@@ -307,12 +308,18 @@ namespace RaidIntoDarkness.Weapons
             }
 
             _pendingSlot = slot;
+            if (IsReloading)
+            {
+                Hide();
+                return;
+            }
+
             Holster();
         }
 
         public bool Select(int slot)
         {
-            if (!IsSlot(slot) || _slots[slot].Asset == null)
+            if (IsReloading || !IsSlot(slot) || _slots[slot].Asset == null)
             {
                 return false;
             }
@@ -337,7 +344,7 @@ namespace RaidIntoDarkness.Weapons
 
         public void Holster()
         {
-            if (State == FirstPersonWeaponState.Hidden || State == FirstPersonWeaponState.Holstering)
+            if (IsReloading || State == FirstPersonWeaponState.Hidden || State == FirstPersonWeaponState.Holstering)
             {
                 return;
             }
@@ -497,7 +504,7 @@ namespace RaidIntoDarkness.Weapons
             Subscribe();
             TickRecoil();
             bool inputAllowed = _input != null && _player != null && !_player.GameplayInputBlocked;
-            if (inputAllowed)
+            if (inputAllowed && !IsReloading)
             {
                 HandleSlotInput();
             }
@@ -604,7 +611,7 @@ namespace RaidIntoDarkness.Weapons
 
         private void OnHandsRequested(object requester)
         {
-            if (requester == (object)this || State == FirstPersonWeaponState.Hidden || _subscribedRig == null || _subscribedRig.HandsOwner != (object)this)
+            if (IsReloading || requester == (object)this || State == FirstPersonWeaponState.Hidden || _subscribedRig == null || _subscribedRig.HandsOwner != (object)this)
             {
                 return;
             }

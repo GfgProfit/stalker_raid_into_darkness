@@ -4,18 +4,6 @@ using UnityEngine;
 
 namespace RaidIntoDarkness.Weapons
 {
-    public enum FirstPersonBoltState
-    {
-        Hidden,
-        Drawing,
-        Ready,
-        ThrowBegin,
-        ThrowIdle,
-        ThrowEnd,
-        Bore,
-        Holstering
-    }
-
     [DisallowMultipleComponent]
     [DefaultExecutionOrder(-10)]
     public sealed class FirstPersonBoltController : MonoBehaviour, IFirstPersonHandsOverlay
@@ -52,6 +40,11 @@ namespace RaidIntoDarkness.Weapons
 
         public void Select()
         {
+            if (_weapons != null && _weapons.IsReloading)
+            {
+                return;
+            }
+
             if (Selected)
             {
                 Selected = false;

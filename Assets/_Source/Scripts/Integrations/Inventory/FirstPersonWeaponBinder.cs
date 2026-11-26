@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace RaidIntoDarkness.Integrations.Inventory
 {
-    public sealed class FirstPersonWeaponBinder : IDisposable
+    public sealed class FirstPersonWeaponBinder : IInventoryPlacementValidator, IDisposable
     {
         public const string PRIMARY_SLOT = "Primary";
         public const string SECONDARY_SLOT = "Secondary";
@@ -37,6 +37,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
             _model.ItemEquipped += OnEquipmentChanged;
             _model.ItemUnequipped += OnEquipmentChanged;
             _model.Changed += OnItemChanged;
+            _model.AddPlacementValidator(this);
         }
 
         public void Refresh()
@@ -56,6 +57,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
 
         public void Dispose()
         {
+            _model.RemovePlacementValidator(this);
             _model.ItemEquipped -= OnEquipmentChanged;
             _model.ItemUnequipped -= OnEquipmentChanged;
             _model.Changed -= OnItemChanged;
@@ -70,12 +72,17 @@ namespace RaidIntoDarkness.Integrations.Inventory
 
         public bool IsReloading(ItemInstance item)
         {
-            if (_controller == null || _controller.State is not (FirstPersonWeaponState.Reloading or FirstPersonWeaponState.LoadingGrenade) || _window.IsEquipped(item) == false)
+            if (_controller == null || !_controller.IsReloading || _window.IsEquipped(item) == false)
             {
                 return false;
             }
 
             return item.Location.SlotId == GetEquipmentSlotId(_controller.ActiveSlot);
+        }
+
+        bool IInventoryPlacementValidator.CanPlace(ItemInstance item, InventoryContainer container, ItemPlacement placement)
+        {
+            return !IsReloading(item) || (container.Id == item.ContainerId && placement.SlotId == item.Location.SlotId);
         }
 
         internal static string GetEquipmentSlotId(int slot)

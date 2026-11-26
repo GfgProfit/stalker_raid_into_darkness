@@ -1,0 +1,60 @@
+fileFormatVersion: 2
+guid: a2c8ad339445f3b4bb3058b8e98abbd1
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\ammo_45acp|models\weapons
+    second: {fileID: 2100000, guid: f6f613ccfe3b9ce489902ad95ca126a4, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\fnx45\fnx45new|models\weapons
+    second: {fileID: 2100000, guid: afb451d20c1c3c04382a5317b360269f, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\fnx45\fnx45|models\weapons
+    second: {fileID: 2100000, guid: a08072c462453904c876fe637a635c0a, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\fnx45\mount|models\weapons
+    second: {fileID: 2100000, guid: 1425c3eed63f3a54b80cd67b43f5898d, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\fnx45\scope|models\weapons
+    second: {fileID: 2100000, guid: 7c26f281efd82684fa4edfb7338fa4af, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\fnx45\silencer_osprey9_diff|models\weapons
+    second: {fileID: 2100000, guid: 9bcb9611bf7cd594ab558bdce43ab32b, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\wpn_addon_scope_all_lens_cyan|models\transparent
+    second: {fileID: 2100000, guid: 839f0906c3a419f46a1c3156337a017e, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\wpn_addon_scope_red_dot|models\collimator
+    second: {fileID: 2100000, guid: 5d9cc0174d4f2a843bbaeb836265e4e6, type: 2}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 61e536e21e96f284493f2969a9250cdf, type: 3}
+  _scale: 1
+  _importMaterials: 1
+  _texturesFolder: 
+  _searchTexturesByName: 1
+  _importEmbeddedMotions: 1
+  _embeddedLoopMode: 0
+  _addAnimator: 1
+  _readableMeshes: 0
+  _updateWhenOffscreen: 0
+  _autoResolveResources: 1

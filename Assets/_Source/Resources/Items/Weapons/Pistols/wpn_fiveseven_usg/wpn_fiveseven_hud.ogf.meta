@@ -1,0 +1,65 @@
+fileFormatVersion: 2
+guid: b97e6a381db18c14386d4f4da2912212
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\ammo_57x28|models\weapons
+    second: {fileID: 2100000, guid: fd252b09cfe1ce14e859a7ac02606695, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\fn57\57|models\weapons
+    second: {fileID: 2100000, guid: bf3cbcfb75bfbe14682da84c66e25867, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\fn57\barrel|models\weapons
+    second: {fileID: 2100000, guid: 6a7735ae6e62d5e4ebd2079d2e6ee5ef, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\fn57\front_sight|models\weapons
+    second: {fileID: 2100000, guid: 71495406bbbd6fb4382c47a1c77c9519, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\fn57\gemtech|models\weapons
+    second: {fileID: 2100000, guid: 4e5242c1a5ef0a04e8f8f0cdac12d82d, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\fn57\mag|models\weapons
+    second: {fileID: 2100000, guid: ef2b8334c3b2e4142bfd3a522b06d0a0, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\fn57\rear_sight|models\weapons
+    second: {fileID: 2100000, guid: 9ca65076cff6ce94cb0c52fc40c50084, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\fn57\reciever|models\weapons
+    second: {fileID: 2100000, guid: 183f4fddba8cdcc4fbefffcf44b57622, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\sights|models\selflightl
+    second: {fileID: 2100000, guid: 58127d87951b89045a3f9fcbe386c95d, type: 2}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 61e536e21e96f284493f2969a9250cdf, type: 3}
+  _scale: 1
+  _importMaterials: 1
+  _texturesFolder: 
+  _searchTexturesByName: 1
+  _importEmbeddedMotions: 1
+  _embeddedLoopMode: 0
+  _addAnimator: 1
+  _readableMeshes: 0
+  _updateWhenOffscreen: 0
+  _autoResolveResources: 1

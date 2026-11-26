@@ -1,0 +1,40 @@
+fileFormatVersion: 2
+guid: 953f41631dc266f439b0483fc0630125
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\ammo_45acp|models\weapons
+    second: {fileID: 2100000, guid: f6f613ccfe3b9ce489902ad95ca126a4, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\wpn_addon_sil_45|models\weapons
+    second: {fileID: 2100000, guid: 03c1acfc809599e41a0ea9bb56b3a020, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\wpn_p220r|models\weapons
+    second: {fileID: 2100000, guid: 4072f31c4c048cf47bdca0201ae59f49, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\wpn_sig-p220|models\weapons
+    second: {fileID: 2100000, guid: 6bf34b095617e7944ab1fc40887e8ae7, type: 2}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 61e536e21e96f284493f2969a9250cdf, type: 3}
+  _scale: 1
+  _importMaterials: 1
+  _texturesFolder: 
+  _searchTexturesByName: 1
+  _importEmbeddedMotions: 1
+  _embeddedLoopMode: 0
+  _addAnimator: 1
+  _readableMeshes: 0
+  _updateWhenOffscreen: 0
+  _autoResolveResources: 1

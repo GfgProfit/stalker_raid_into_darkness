@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using RaidIntoDarkness.Effects;
 using RaidIntoDarkness.FirstPerson;
 using RaidIntoDarkness.Player;
 using UnityEngine;
@@ -21,6 +22,7 @@ namespace RaidIntoDarkness.Weapons
         private const float MAX_FRAME_DELTA = 0.1f;
         private const float REDRAW_DELAY = 0.5f;
         private const float SHOT_FADE = 0.05f;
+        private const float PISTOL_CAMERA_DEPTH_OFFSET = 0.04f;
         private const float LAUNCHER_AIM_SHOT_BLEND_TIME = 0.22f;
         private const float RELOAD_HUD_FOV_BLEND_TIME = 0.25f;
         private const float FIRE_MODE_INPUT_RELEASE_RATIO = 0.85f;
@@ -56,6 +58,9 @@ namespace RaidIntoDarkness.Weapons
         private GameObject _boundHands;
         private GameObject _model;
         private FirstPersonWeaponView _weaponView;
+        private FirstPersonRevolverView _revolverView;
+        private FirstPersonMagazineRoundsView _magazineRoundsView;
+        private int _reloadIncomingRounds;
         private Transform _modelRoot;
         private Transform _grenadeAimPoint;
         private Transform _muzzle;
@@ -260,7 +265,9 @@ namespace RaidIntoDarkness.Weapons
             UpdateUnderbarrelRound();
         }
 
-        public void SetSlotWeapon(int slot, FirstPersonWeaponAsset asset, object key)
+        public void SetSlotWeapon(int slot, FirstPersonWeaponAsset asset, object key) => SetSlotWeapon(slot, asset, key, false);
+
+        public void SetSlotWeapon(int slot, FirstPersonWeaponAsset asset, object key, bool isPistol)
         {
             if (!IsSlot(slot))
             {
@@ -275,6 +282,7 @@ namespace RaidIntoDarkness.Weapons
                 return;
             }
 
+            target.IsPistol = asset != null && isPistol;
             if (target.Asset == asset && Equals(target.Key, ammoKey))
             {
                 return;
@@ -570,6 +578,20 @@ namespace RaidIntoDarkness.Weapons
                 {
                     _weaponView?.SetLauncherRoundVisible(true);
                 }
+            }
+
+            if (_revolverView != null || _magazineRoundsView != null)
+            {
+                int loaded = Magazine;
+                bool reloading = State == FirstPersonWeaponState.Reloading;
+                if (_revolverView != null)
+                {
+                    FirstPersonWeaponInstanceState weaponState = _slots[ActiveSlot].WeaponState;
+                    weaponState.SpentChambers = _revolverView.RefreshRounds(loaded, reloading, _stateTime, weaponState.SpentChambers, _reloadIncomingRounds);
+                }
+
+                float progress = reloading && _stateDuration > 0f ? _stateTime / _stateDuration : 0f;
+                _magazineRoundsView?.Refresh(loaded, reloading, CurrentMotion == FirstPersonWeaponMotionKind.ReloadEmpty, progress, _reloadIncomingRounds);
             }
 
             TickMeleeAttack();
@@ -1148,8 +1170,14 @@ namespace RaidIntoDarkness.Weapons
 
             _burstLeft--;
             _nextShotTime = Time.time + asset.GetShotInterval(FireMode);
+            if (_revolverView != null && _revolverView.RetainsSpentCases)
+            {
+                _slots[ActiveSlot].WeaponState.SpentChambers |= 1 << Magazine;
+            }
+
             FirstPersonWeaponMotionMode mode = GetMotionMode();
-            FirstPersonWeaponMotion motion = _aiming ? asset.FindRandom(FirstPersonWeaponMotionKind.ShootAim, mode) : null;
+            FirstPersonWeaponMotion motion = Magazine == 0 ? _revolverView?.FindLastShot(_aiming) : null;
+            motion ??= _aiming ? asset.FindRandom(FirstPersonWeaponMotionKind.ShootAim, mode) : null;
             if (motion == null)
             {
                 motion = asset.FindRandom(FirstPersonWeaponMotionKind.Shoot, mode);
@@ -1311,7 +1339,8 @@ namespace RaidIntoDarkness.Weapons
 
         private void PlayEmptyClick(FirstPersonWeaponAsset asset, bool animate = true)
         {
-            if (Time.time < _nextEmptyClickTime)
+            bool revolverShotPlaying = animate && _revolverView != null && CurrentMotion is (FirstPersonWeaponMotionKind.Shoot or FirstPersonWeaponMotionKind.ShootAim) && Time.time < _actionUntil;
+            if (revolverShotPlaying || Time.time < _nextEmptyClickTime)
             {
                 return;
             }
@@ -1355,10 +1384,16 @@ namespace RaidIntoDarkness.Weapons
             }
 
             Quaternion rotation = GetMuzzleRotation(muzzle);
-            _flame = _effects.Play(IsSilenced ? asset.SilencedFlameParticles : asset.FlameParticles, muzzle, muzzle.position, rotation);
+            Transform flashFollow = _revolverView != null && _revolverView.AnchorFlashAtShotPose ? null : muzzle;
+            _flame = _effects.Play(IsSilenced ? asset.SilencedFlameParticles : asset.FlameParticles, flashFollow, muzzle.position, rotation);
             if (_flame != null)
             {
-                _effects.PlayMuzzleLight(muzzle);
+                if (flashFollow == null && _flame.Transform.TryGetComponent(out XRayParticleGroupPlayer group))
+                {
+                    group.RenderInitialFrame();
+                }
+
+                _effects.PlayMuzzleLight(flashFollow != null ? muzzle : _flame.Transform);
             }
 
             _effects.Play(IsSilenced ? asset.SilencedSmokeParticles : asset.SmokeParticles, null, muzzle.position, rotation);
@@ -1449,6 +1484,7 @@ namespace RaidIntoDarkness.Weapons
         {
             FirstPersonWeaponMotion motion = FindMotion(asset, FirstPersonWeaponMotionKind.LauncherReloadOpen);
             motion ??= Magazine <= 0 ? FindMotion(asset, FirstPersonWeaponMotionKind.ReloadEmpty) : null;
+            motion ??= _revolverView?.FindPartialReload(asset.MagazineSize - Magazine);
             if (motion == null)
             {
                 motion = FindMotion(asset, FirstPersonWeaponMotionKind.Reload);
@@ -1456,6 +1492,12 @@ namespace RaidIntoDarkness.Weapons
 
             SetAiming(false);
             _burstLeft = 0;
+            if (_revolverView != null || _magazineRoundsView != null)
+            {
+                _reloadIncomingRounds = Mathf.Min(asset.MagazineSize, Magazine + Reserve);
+                _revolverView?.BeginReload();
+            }
+
             if (motion == null)
             {
                 FinishReload(asset);
@@ -1472,6 +1514,11 @@ namespace RaidIntoDarkness.Weapons
             if (_ammoSource != null)
             {
                 _ammoSource.Reload(_slots[ActiveSlot].Key, asset.MagazineSize);
+            }
+
+            if (_revolverView != null && _revolverView.RetainsSpentCases)
+            {
+                _slots[ActiveSlot].WeaponState.SpentChambers = 0;
             }
 
             NotifyAmmo();
@@ -1947,11 +1994,13 @@ namespace RaidIntoDarkness.Weapons
             }
 
             bool grenadeMode = IsGrenadeMode;
-            bool scoped = _slots[ActiveSlot].HasScope;
+            FirstPersonWeaponSlot slot = _slots[ActiveSlot];
+            bool scoped = slot.HasScope;
             Vector3 aimPosition = grenadeMode ? asset.GetGrenadeAimOffset(scoped) : AimOffsetPosition;
             Vector3 aimEuler = grenadeMode ? asset.GrenadeAimOffsetRotation : asset.GetRifleAimRotation(scoped);
             Quaternion aimRotation = FirstPersonWeaponAsset.ToAimRotation(aimEuler * _aim);
             Vector3 position = aimPosition * _aim + aimRotation * asset.HandsPosition;
+            position.z -= (_weaponView == null ? 0f : _weaponView.HipBackOffset) * (1f - _aim);
             Quaternion rotation = aimRotation * asset.HandsRotation;
             if (EvaluateAimBlend(asset, grenadeMode, out Vector3 blendPosition, out Quaternion blendRotation))
             {
@@ -1960,6 +2009,8 @@ namespace RaidIntoDarkness.Weapons
             }
 
             Transform hands = _boundHands.transform;
+            Transform parent = hands.parent;
+            Camera camera = _player != null && _player.CameraController != null ? _player.CameraController.Camera : null;
             Vector2 idleSway = asset.AimIdleSwayDegrees;
             if (idleSway != Vector2.zero && !grenadeMode && _aimPhase == FirstPersonWeaponAimPhase.Aimed && CurrentMotion == FirstPersonWeaponMotionKind.IdleAim)
             {
@@ -1968,8 +2019,6 @@ namespace RaidIntoDarkness.Weapons
                 float strength = _aim * Mathf.Clamp01(Mathf.Min(_aimBlendTime / asset.AimTime, recovery));
                 float pitch = Mathf.Sin(phase) * idleSway.x * strength;
                 float yaw = Mathf.Sin(phase * 0.75f) * idleSway.y * strength;
-                Camera camera = _player != null && _player.CameraController != null ? _player.CameraController.Camera : null;
-                Transform parent = hands.parent;
                 if (asset.IsStandaloneLauncher && !scoped && asset.IronSightHudFieldOfView > 0f && camera != null && parent != null)
                 {
                     Vector3 pivot = parent.InverseTransformPoint(camera.transform.position);
@@ -1981,6 +2030,20 @@ namespace RaidIntoDarkness.Weapons
                 else
                 {
                     rotation *= Quaternion.Euler(pitch, yaw, 0f);
+                }
+            }
+
+            if (slot.IsPistol)
+            {
+                float cameraDepth = Mathf.Lerp(PISTOL_CAMERA_DEPTH_OFFSET, -PISTOL_CAMERA_DEPTH_OFFSET, _aim);
+                if (camera != null)
+                {
+                    Vector3 cameraOffset = camera.transform.forward * cameraDepth;
+                    position += parent != null ? parent.InverseTransformVector(cameraOffset) : cameraOffset;
+                }
+                else
+                {
+                    position.z += cameraDepth;
                 }
             }
 
@@ -2059,6 +2122,8 @@ namespace RaidIntoDarkness.Weapons
 
             _model = Instantiate(asset.HudModel, anchor != null ? anchor : hands.transform, false);
             _weaponView = _model.GetComponent<FirstPersonWeaponView>();
+            _revolverView = _model.GetComponent<FirstPersonRevolverView>();
+            _magazineRoundsView = _model.GetComponent<FirstPersonMagazineRoundsView>();
             _grenadeAimPoint = _weaponView != null && _weaponView.GrenadeMuzzle != null ? FindBone(_model, GRENADE_AIM_POINT) : null;
             _model.transform.localPosition = Vector3.zero;
             _model.transform.localRotation = Quaternion.identity;
@@ -2087,6 +2152,7 @@ namespace RaidIntoDarkness.Weapons
             Animator weaponAnimator = GetAnimator(_model);
             _graph = new FirstPersonWeaponGraph($"{name}.FirstPersonWeapon", handsAnimator, weaponAnimator, FirstPersonWeaponGraph.CreateMask(hands.transform, asset.OverlayBones), _weaponView);
             _hasLoop = false;
+            _weaponView?.UpdateMagazineRounds(Magazine);
             UpdateUnderbarrelRound();
         }
 
@@ -2180,6 +2246,8 @@ namespace RaidIntoDarkness.Weapons
             _handGrenadeRenderers = null;
             _handGrenadeVisible = false;
             _weaponView = null;
+            _revolverView = null;
+            _magazineRoundsView = null;
             _modelRoot = null;
             _grenadeAimPoint = null;
             _muzzle = null;
@@ -2217,6 +2285,7 @@ namespace RaidIntoDarkness.Weapons
 
         private void NotifyAmmo()
         {
+            _weaponView?.UpdateMagazineRounds(Magazine);
             if (State != FirstPersonWeaponState.Reloading && ActiveWeapon?.IsStandaloneLauncher == true)
             {
                 _weaponView?.SetLauncherRoundVisible(Magazine > 0);

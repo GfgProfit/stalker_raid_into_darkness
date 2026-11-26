@@ -1,0 +1,60 @@
+fileFormatVersion: 2
+guid: 77a361809beb52f4f8f9b95d9775c2d0
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\ammo_9x19|models\weapons
+    second: {fileID: 2100000, guid: 398115fdb513ebd4e88e8fa1e58e870d, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\glock17\glock17_body_diff|models\weapons
+    second: {fileID: 2100000, guid: a50fb033c70d04244898255e6193e65a, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\glock17\glock17_double_diamond_barrel_diff|models\weapons
+    second: {fileID: 2100000, guid: 08c4714bb312cbb428cdcd8b29969eee, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\glock17\glock17_mag_diff|models\weapons
+    second: {fileID: 2100000, guid: bc23416a3c9a07144ad28a0e3c28f438, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\glock17\glock17_reciever_diff|models\weapons
+    second: {fileID: 2100000, guid: 9d794d92ad322f448a076e07a8eee169, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\glock17\glock_sight_front_diff|models\weapons
+    second: {fileID: 2100000, guid: 3794109bfc6e38543a8c338ec395dc28, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\glock17\glock_sight_rear_diff|models\weapons
+    second: {fileID: 2100000, guid: 6bc95bb0554bbc74f98024a7e81c538e, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\glock17\silencer_osprey9_diff|models\weapons
+    second: {fileID: 2100000, guid: 70a8026c5cb34fa47aa4a20f20591fb6, type: 2}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 61e536e21e96f284493f2969a9250cdf, type: 3}
+  _scale: 1
+  _importMaterials: 1
+  _texturesFolder: 
+  _searchTexturesByName: 1
+  _importEmbeddedMotions: 1
+  _embeddedLoopMode: 0
+  _addAnimator: 1
+  _readableMeshes: 0
+  _updateWhenOffscreen: 0
+  _autoResolveResources: 1

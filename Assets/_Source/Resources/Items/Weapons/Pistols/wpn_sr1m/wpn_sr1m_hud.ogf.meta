@@ -1,0 +1,40 @@
+fileFormatVersion: 2
+guid: dfc29b5533a60724c896e6c95a6c52d7
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\gsh18|models\weapons
+    second: {fileID: 2100000, guid: eb739ffe80a219541bc6b2a206a0b4bc, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\sights|models\selflightl
+    second: {fileID: 2100000, guid: 58127d87951b89045a3f9fcbe386c95d, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\sr1m_silencer|models\weapons
+    second: {fileID: 2100000, guid: 38a25c99b3fcc5642a6b37d1ae167e7e, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\sr1m|models\weapons
+    second: {fileID: 2100000, guid: 919c03168bbfeeb4585ae6cb33d475cb, type: 2}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 61e536e21e96f284493f2969a9250cdf, type: 3}
+  _scale: 1
+  _importMaterials: 1
+  _texturesFolder: 
+  _searchTexturesByName: 1
+  _importEmbeddedMotions: 1
+  _embeddedLoopMode: 0
+  _addAnimator: 1
+  _readableMeshes: 0
+  _updateWhenOffscreen: 0
+  _autoResolveResources: 1

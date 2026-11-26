@@ -101,8 +101,9 @@ namespace RaidIntoDarkness.Integrations.Inventory
             ItemInstance item = equipment != null ? equipment.GetSlotOccupant(slotId) : null;
             WeaponHudComponent hud = item != null ? item.Definition.GetComponent<WeaponHudComponent>() : null;
             FirstPersonWeaponAsset weapon = hud != null ? hud.FirstPersonWeapon : null;
-            _controller.SetSlotWeapon(slot, weapon, weapon != null ? item.InstanceId : null);
             WeaponStatsComponent stats = item?.Definition.GetComponent<WeaponStatsComponent>();
+            bool isPistol = string.Equals(stats?.WeaponClass, "pistol", StringComparison.OrdinalIgnoreCase);
+            _controller.SetSlotWeapon(slot, weapon, weapon != null ? item.InstanceId : null, isPistol);
             WeaponAddonComponent silencer = stats?.GetSilencer(item, _model.Resolver)?.GetComponent<WeaponAddonComponent>();
             WeaponAddonComponent launcher = stats?.GetGrenadeLauncher(item, _model.Resolver)?.GetComponent<WeaponAddonComponent>();
             var (recoil, snappiness) = WeaponAddonComponent.GetEquippedRecoilMultipliers(silencer, launcher);

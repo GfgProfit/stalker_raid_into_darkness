@@ -74,6 +74,14 @@ namespace RaidIntoDarkness.Effects
             }
         }
 
+        public void RenderInitialFrame()
+        {
+            if (IsPlaying && _time == 0f)
+            {
+                Tick(XRayParticleSimulation.STEP);
+            }
+        }
+
         private void LateUpdate()
         {
             if (IsPlaying == false)
@@ -81,7 +89,11 @@ namespace RaidIntoDarkness.Effects
                 return;
             }
 
-            float deltaTime = Time.deltaTime;
+            Tick(Time.deltaTime);
+        }
+
+        private void Tick(float deltaTime)
+        {
             Advance(deltaTime);
 
             for (int i = 0; i < _effects.Length; i++)

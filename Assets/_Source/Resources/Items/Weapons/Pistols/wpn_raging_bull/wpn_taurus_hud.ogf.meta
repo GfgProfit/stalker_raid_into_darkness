@@ -1,0 +1,40 @@
+fileFormatVersion: 2
+guid: fa4143053fcad4d47a54f8ba62c27627
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\taurus\bullet|models\weapons
+    second: {fileID: 2100000, guid: ac8efa311177dc04eb6d7ee815bd4fba, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\taurus\loader|models\weapons
+    second: {fileID: 2100000, guid: 342c7daa8c5d5ec4eb9e788dbb98954e, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\taurus\shell|models\weapons
+    second: {fileID: 2100000, guid: 7952c59b51b5c0046948f3bc421b1ba8, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\taurus\taurus|models\weapons
+    second: {fileID: 2100000, guid: 42d0d9cd6df5ee4428248420d78abfef, type: 2}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 61e536e21e96f284493f2969a9250cdf, type: 3}
+  _scale: 1
+  _importMaterials: 1
+  _texturesFolder: 
+  _searchTexturesByName: 1
+  _importEmbeddedMotions: 1
+  _embeddedLoopMode: 0
+  _addAnimator: 1
+  _readableMeshes: 0
+  _updateWhenOffscreen: 0
+  _autoResolveResources: 1

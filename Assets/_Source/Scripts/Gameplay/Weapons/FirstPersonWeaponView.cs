@@ -26,13 +26,20 @@ namespace RaidIntoDarkness.Weapons
         [SerializeField] private SkinnedMeshRenderer[] _installedMagazineRenderers = Array.Empty<SkinnedMeshRenderer>();
         [SerializeField] private SkinnedMeshRenderer[] _replacementMagazineRenderers = Array.Empty<SkinnedMeshRenderer>();
         [SerializeField] private MagazineBonePair[] _magazineBonePairs = Array.Empty<MagazineBonePair>();
+        [SerializeField] private Renderer _installedMagazineRound;
+        [SerializeField] private Renderer _replacementMagazineRound;
+        [SerializeField] [Min(0f)] private float _hipBackOffset;
 
         private bool _magazineRolesSwapped;
+        private bool _magazineSwapping;
+        private bool _magazineHasRounds;
+        private bool _outgoingMagazineHasRounds;
 
         public Transform Muzzle => _muzzle;
         public GameObject SilencerVisual => _silencerVisual;
         public Transform SilencedMuzzle => _silencedMuzzle;
         public Transform GrenadeMuzzle => _grenadeMuzzle;
+        internal float HipBackOffset => _hipBackOffset;
 
         public void SetMuzzle(Transform muzzle)
         {
@@ -41,7 +48,7 @@ namespace RaidIntoDarkness.Weapons
 
         internal bool UsesMagazineSwap(AnimationClip clip)
         {
-            return _magazineSwapObjects != null && _installedMagazineRenderers.Length > 0 && _replacementMagazineRenderers.Length > 0 && _magazineBonePairs.Length > 0 && Array.IndexOf(_magazineSwapClips, clip) >= 0;
+            return _magazineSwapObjects != null && _installedMagazineRenderers.Length > 0 && _replacementMagazineRenderers.Length > 0 && Array.IndexOf(_magazineSwapClips, clip) >= 0;
         }
 
         internal void SetMagazineSwapObjectsVisible(bool swapping)
@@ -51,6 +58,12 @@ namespace RaidIntoDarkness.Weapons
                 return;
             }
 
+            if (swapping && !_magazineSwapping)
+            {
+                _outgoingMagazineHasRounds = _magazineHasRounds;
+            }
+
+            _magazineSwapping = swapping;
             bool showInstalled = swapping || !_magazineRolesSwapped;
             foreach (SkinnedMeshRenderer renderer in _installedMagazineRenderers)
             {
@@ -65,10 +78,37 @@ namespace RaidIntoDarkness.Weapons
             {
                 _magazineSwapObjects.SetActive(showReplacement);
             }
+
+            SetMagazineRoundVisibility();
+        }
+
+        internal void UpdateMagazineRounds(int loaded)
+        {
+            _magazineHasRounds = loaded > 0;
+            SetMagazineRoundVisibility();
+        }
+
+        private void SetMagazineRoundVisibility()
+        {
+            bool installedHasRounds = _magazineSwapping ? _outgoingMagazineHasRounds : _magazineHasRounds;
+            if (_installedMagazineRound != null)
+            {
+                _installedMagazineRound.enabled = _magazineRolesSwapped ? _magazineSwapping : installedHasRounds;
+            }
+
+            if (_replacementMagazineRound != null)
+            {
+                _replacementMagazineRound.enabled = _magazineRolesSwapped ? installedHasRounds : _magazineSwapping;
+            }
         }
 
         internal void SwapMagazineRoles()
         {
+            if (_magazineBonePairs.Length == 0)
+            {
+                return;
+            }
+
             SwapMagazineBones(_installedMagazineRenderers);
             SwapMagazineBones(_replacementMagazineRenderers);
             _magazineRolesSwapped = !_magazineRolesSwapped;

@@ -1,0 +1,35 @@
+fileFormatVersion: 2
+guid: 8d147c8a8acb5814e89ca3f4245c9eda
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\ammo_9x19|models\weapons
+    second: {fileID: 2100000, guid: 398115fdb513ebd4e88e8fa1e58e870d, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\beretta\body|models\weapons
+    second: {fileID: 2100000, guid: b93cdf182b08eb44b8e15874d1a6282b, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\sil_9mm|models\weapons
+    second: {fileID: 2100000, guid: f4870f420bc6ee4479c57a2ace897655, type: 2}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 61e536e21e96f284493f2969a9250cdf, type: 3}
+  _scale: 1
+  _importMaterials: 1
+  _texturesFolder: 
+  _searchTexturesByName: 1
+  _importEmbeddedMotions: 1
+  _embeddedLoopMode: 0
+  _addAnimator: 1
+  _readableMeshes: 0
+  _updateWhenOffscreen: 0
+  _autoResolveResources: 1

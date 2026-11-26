@@ -1,0 +1,70 @@
+fileFormatVersion: 2
+guid: 4358872a7620cee45bb26cf9b5f2e7da
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\ammo_45acp|models\weapons
+    second: {fileID: 2100000, guid: f6f613ccfe3b9ce489902ad95ca126a4, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\usp45\barrel|models\weapons
+    second: {fileID: 2100000, guid: 8b677dd6ea347a241988085ed3b1e5d9, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\usp45\body|models\weapons
+    second: {fileID: 2100000, guid: d244703691d3df944bd96d02b6d6fdc7, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\usp45\internals|models\weapons
+    second: {fileID: 2100000, guid: 5865c4691b8e0094a94d0cdf5d5c2212, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\usp45\mag|models\weapons
+    second: {fileID: 2100000, guid: 7d432cf382da18b4c90ccb4e91308a19, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\usp45\muzzle|models\weapons
+    second: {fileID: 2100000, guid: 54e470a0385cfda45bca678be308eab6, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\usp45\reciever|models\weapons
+    second: {fileID: 2100000, guid: 4e076d2e14ed75b4cb93eaed44c21d79, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\usp45\sight_front|models\weapons
+    second: {fileID: 2100000, guid: 9b0b50ccd458d96439eb76e8a4b4abb9, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\usp45\sight_rear|models\weapons
+    second: {fileID: 2100000, guid: 783b2ff5f8f077c47bca2580ae5a0da4, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\wpn_addon_sil_45|models\weapons
+    second: {fileID: 2100000, guid: 03c1acfc809599e41a0ea9bb56b3a020, type: 2}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 61e536e21e96f284493f2969a9250cdf, type: 3}
+  _scale: 1
+  _importMaterials: 1
+  _texturesFolder: 
+  _searchTexturesByName: 1
+  _importEmbeddedMotions: 1
+  _embeddedLoopMode: 0
+  _addAnimator: 1
+  _readableMeshes: 0
+  _updateWhenOffscreen: 0
+  _autoResolveResources: 1

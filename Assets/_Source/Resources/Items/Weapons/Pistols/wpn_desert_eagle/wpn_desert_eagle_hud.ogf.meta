@@ -1,0 +1,30 @@
+fileFormatVersion: 2
+guid: 12696e94a63d2a944afa99049f1fa697
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\deagle|models\weapons
+    second: {fileID: 2100000, guid: 274193bdf4409b84b962d84bce22c065, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\desert_eagle\ammo_50|models\weapons
+    second: {fileID: 2100000, guid: 86dd9e83cfddd7d44b5dc33f9f5a0ed0, type: 2}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 61e536e21e96f284493f2969a9250cdf, type: 3}
+  _scale: 1
+  _importMaterials: 1
+  _texturesFolder: 
+  _searchTexturesByName: 1
+  _importEmbeddedMotions: 1
+  _embeddedLoopMode: 0
+  _addAnimator: 1
+  _readableMeshes: 0
+  _updateWhenOffscreen: 0
+  _autoResolveResources: 1

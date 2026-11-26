@@ -1,0 +1,323 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 14d88a9e75d60c249be9eadb7fbef0ec, type: 3}
+  m_Name: wpn_beretta_first_person
+  m_EditorClassIdentifier: RaidIntoDarkness.Weapons::RaidIntoDarkness.Weapons.FirstPersonWeaponAsset
+  _hudModel: {fileID: 5435882893668236393, guid: 7728886aa95e3b54986348f689c4e05f, type: 3}
+  _isMelee: 0
+  _isStandaloneLauncher: 0
+  _useStandaloneHipDispersion: 0
+  _handGrenadeVisual: {fileID: 0}
+  _handGrenade:
+    _explosionPrefab: {fileID: 0}
+    _explosionSound: {fileID: 0}
+    _launchSound: {fileID: 0}
+    _explosionVariants: []
+    _explosionBodyVariants: []
+    _bounceSounds: {fileID: 0}
+    _bounceSurfaces: {fileID: 0}
+    _blastRadius: 5
+    _blastDamage: 90
+    _fragmentCount: 80
+    _fragmentDamage: 14
+    _selfDestructSeconds: 6
+    _armingDistance: 2.5
+    _impactBounceHeight: 0
+    _fragmentRange: 100
+    _armingSeconds: 0
+    _explodeOnImpact: 0
+    _fliesStraight: 0
+    _projectileVisual: {fileID: 0}
+    _flightTrail: {fileID: 0}
+  _handGrenadeReleaseFrame: 1
+  _handGrenadeThrowSpeed: 16
+  _handsPosition: {x: 0, y: -0.0772, z: -0.0085}
+  _handsOrientation: {x: 0, y: 0, z: 0}
+  _aimOffsetPosition: {x: -0.0006, y: 0.0091, z: 0}
+  _aimOffsetRotation: {x: 0, y: 0, z: 0}
+  _ironSightAimRotationOffset: {x: 0.002, y: 0.001, z: 0}
+  _aimTime: 0.15384614
+  _aimCameraRoll: 0
+  _aimCameraBlendTime: 0.12
+  _aimZoom: 1.15
+  _ironSightHudFieldOfView: 0
+  _reloadHudFovReduction: 0
+  _muzzleBone: wpn_body
+  _overlayBones:
+  - l_clavicle
+  - l_upperarm
+  - l_forearm
+  - l_forearm_twist
+  - l_hand
+  - l_finger0
+  - l_finger01
+  - l_finger02
+  _motions:
+  - _kind: 0
+    _handsName: beretta_draw
+    _hands: {fileID: -2909055276926549729, guid: cfa23eb7748e9504d8d23517ef6c8308, type: 3}
+    _weapon: {fileID: -1965084331185687820, guid: 731c1995bb1ad684ba227ff8b1c15a22, type: 3}
+    _emptyWeapon: {fileID: -8788583347553794728, guid: 731c1995bb1ad684ba227ff8b1c15a22, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: 648ca81077660194ebf4d6fdd510ba60, type: 3}
+    _sound: {fileID: 8300000, guid: 596cc0c70bdeb714ba39d847d05f3c4b, type: 3}
+    _speed: 1
+    _weaponSpeedMultiplier: 1
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
+  - _kind: 1
+    _handsName: beretta_holster
+    _hands: {fileID: 7413597321431452711, guid: cfa23eb7748e9504d8d23517ef6c8308, type: 3}
+    _weapon: {fileID: -1965084331185687820, guid: 731c1995bb1ad684ba227ff8b1c15a22, type: 3}
+    _emptyWeapon: {fileID: -8788583347553794728, guid: 731c1995bb1ad684ba227ff8b1c15a22, type: 3}
+    _cameraEffect: {fileID: 0}
+    _sound: {fileID: 8300000, guid: a242f355cf86e3e4985d22e54eec9034, type: 3}
+    _speed: 1
+    _weaponSpeedMultiplier: 1
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
+  - _kind: 2
+    _handsName: beretta_idle
+    _hands: {fileID: 4224429566850162408, guid: cfa23eb7748e9504d8d23517ef6c8308, type: 3}
+    _weapon: {fileID: -1965084331185687820, guid: 731c1995bb1ad684ba227ff8b1c15a22, type: 3}
+    _emptyWeapon: {fileID: -8788583347553794728, guid: 731c1995bb1ad684ba227ff8b1c15a22, type: 3}
+    _cameraEffect: {fileID: 0}
+    _sound: {fileID: 0}
+    _speed: 1
+    _weaponSpeedMultiplier: 1
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
+  - _kind: 3
+    _handsName: beretta_idle_aim
+    _hands: {fileID: 1689314780602734508, guid: cfa23eb7748e9504d8d23517ef6c8308, type: 3}
+    _weapon: {fileID: -1965084331185687820, guid: 731c1995bb1ad684ba227ff8b1c15a22, type: 3}
+    _emptyWeapon: {fileID: -8788583347553794728, guid: 731c1995bb1ad684ba227ff8b1c15a22, type: 3}
+    _cameraEffect: {fileID: 0}
+    _sound: {fileID: 0}
+    _speed: 1
+    _weaponSpeedMultiplier: 1
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
+  - _kind: 4
+    _handsName: beretta_moving
+    _hands: {fileID: 7416268860726937862, guid: cfa23eb7748e9504d8d23517ef6c8308, type: 3}
+    _weapon: {fileID: -1965084331185687820, guid: 731c1995bb1ad684ba227ff8b1c15a22, type: 3}
+    _emptyWeapon: {fileID: -8788583347553794728, guid: 731c1995bb1ad684ba227ff8b1c15a22, type: 3}
+    _cameraEffect: {fileID: 0}
+    _sound: {fileID: 0}
+    _speed: 1
+    _weaponSpeedMultiplier: 1
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
+  - _kind: 5
+    _handsName: beretta_moving_aim
+    _hands: {fileID: -1722659965591289238, guid: cfa23eb7748e9504d8d23517ef6c8308, type: 3}
+    _weapon: {fileID: -1965084331185687820, guid: 731c1995bb1ad684ba227ff8b1c15a22, type: 3}
+    _emptyWeapon: {fileID: -8788583347553794728, guid: 731c1995bb1ad684ba227ff8b1c15a22, type: 3}
+    _cameraEffect: {fileID: 0}
+    _sound: {fileID: 0}
+    _speed: 1
+    _weaponSpeedMultiplier: 1
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
+  - _kind: 6
+    _handsName: beretta_moving_slow
+    _hands: {fileID: -4694794672338189014, guid: cfa23eb7748e9504d8d23517ef6c8308, type: 3}
+    _weapon: {fileID: -1965084331185687820, guid: 731c1995bb1ad684ba227ff8b1c15a22, type: 3}
+    _emptyWeapon: {fileID: -8788583347553794728, guid: 731c1995bb1ad684ba227ff8b1c15a22, type: 3}
+    _cameraEffect: {fileID: 0}
+    _sound: {fileID: 0}
+    _speed: 1
+    _weaponSpeedMultiplier: 1
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
+  - _kind: 7
+    _handsName: beretta_crouch
+    _hands: {fileID: 239324174863900110, guid: cfa23eb7748e9504d8d23517ef6c8308, type: 3}
+    _weapon: {fileID: -1965084331185687820, guid: 731c1995bb1ad684ba227ff8b1c15a22, type: 3}
+    _emptyWeapon: {fileID: -8788583347553794728, guid: 731c1995bb1ad684ba227ff8b1c15a22, type: 3}
+    _cameraEffect: {fileID: 0}
+    _sound: {fileID: 0}
+    _speed: 1
+    _weaponSpeedMultiplier: 1
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
+  - _kind: 8
+    _handsName: beretta_sprint_start
+    _hands: {fileID: -7684601312137995948, guid: cfa23eb7748e9504d8d23517ef6c8308, type: 3}
+    _weapon: {fileID: -1965084331185687820, guid: 731c1995bb1ad684ba227ff8b1c15a22, type: 3}
+    _emptyWeapon: {fileID: -8788583347553794728, guid: 731c1995bb1ad684ba227ff8b1c15a22, type: 3}
+    _cameraEffect: {fileID: 0}
+    _sound: {fileID: 0}
+    _speed: 1
+    _weaponSpeedMultiplier: 1
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
+  - _kind: 9
+    _handsName: beretta_sprint
+    _hands: {fileID: 2090101871908263958, guid: cfa23eb7748e9504d8d23517ef6c8308, type: 3}
+    _weapon: {fileID: -1965084331185687820, guid: 731c1995bb1ad684ba227ff8b1c15a22, type: 3}
+    _emptyWeapon: {fileID: -8788583347553794728, guid: 731c1995bb1ad684ba227ff8b1c15a22, type: 3}
+    _cameraEffect: {fileID: 0}
+    _sound: {fileID: 0}
+    _speed: 1
+    _weaponSpeedMultiplier: 1
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
+  - _kind: 10
+    _handsName: beretta_sprint_end
+    _hands: {fileID: -8906328008196773864, guid: cfa23eb7748e9504d8d23517ef6c8308, type: 3}
+    _weapon: {fileID: -1965084331185687820, guid: 731c1995bb1ad684ba227ff8b1c15a22, type: 3}
+    _emptyWeapon: {fileID: -8788583347553794728, guid: 731c1995bb1ad684ba227ff8b1c15a22, type: 3}
+    _cameraEffect: {fileID: 0}
+    _sound: {fileID: 0}
+    _speed: 1
+    _weaponSpeedMultiplier: 1
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
+  - _kind: 11
+    _handsName: beretta_shoot
+    _hands: {fileID: 1195112050498286165, guid: cfa23eb7748e9504d8d23517ef6c8308, type: 3}
+    _weapon: {fileID: 4632084351945502156, guid: 731c1995bb1ad684ba227ff8b1c15a22, type: 3}
+    _emptyWeapon: {fileID: -8788583347553794728, guid: 731c1995bb1ad684ba227ff8b1c15a22, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: 0bbd7aa54c637fa44ade839b08e2c3b2, type: 3}
+    _sound: {fileID: 0}
+    _speed: 1
+    _weaponSpeedMultiplier: 1
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
+  - _kind: 12
+    _handsName: beretta_shoot_aim
+    _hands: {fileID: 7003071202992512875, guid: cfa23eb7748e9504d8d23517ef6c8308, type: 3}
+    _weapon: {fileID: 4632084351945502156, guid: 731c1995bb1ad684ba227ff8b1c15a22, type: 3}
+    _emptyWeapon: {fileID: -8788583347553794728, guid: 731c1995bb1ad684ba227ff8b1c15a22, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: 55ddc023a3d05e84fb360dc5127c100d, type: 3}
+    _sound: {fileID: 0}
+    _speed: 1
+    _weaponSpeedMultiplier: 1
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
+  - _kind: 13
+    _handsName: beretta_reload
+    _hands: {fileID: 5780006315314084832, guid: cfa23eb7748e9504d8d23517ef6c8308, type: 3}
+    _weapon: {fileID: -5802557976399934464, guid: 731c1995bb1ad684ba227ff8b1c15a22, type: 3}
+    _emptyWeapon: {fileID: 6957653534862426902, guid: 731c1995bb1ad684ba227ff8b1c15a22, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: 35dc326835abf1f4e86c387a13a2724c, type: 3}
+    _sound: {fileID: 8300000, guid: 2ca14f34cf4053e49bb873a977171cc6, type: 3}
+    _speed: 1
+    _weaponSpeedMultiplier: 1
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
+  - _kind: 14
+    _handsName: beretta_reload_empty
+    _hands: {fileID: 6908301319179245376, guid: cfa23eb7748e9504d8d23517ef6c8308, type: 3}
+    _weapon: {fileID: 6957653534862426902, guid: 731c1995bb1ad684ba227ff8b1c15a22, type: 3}
+    _emptyWeapon: {fileID: 0}
+    _cameraEffect: {fileID: 4908183818744415850, guid: 64089451e6a8b484a8053be2d4ae4fe6, type: 3}
+    _sound: {fileID: 8300000, guid: f573553d812168141bd6e9caec167f28, type: 3}
+    _speed: 1
+    _weaponSpeedMultiplier: 1
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
+  - _kind: 16
+    _handsName: beretta_misfire
+    _hands: {fileID: 6829930130237053943, guid: cfa23eb7748e9504d8d23517ef6c8308, type: 3}
+    _weapon: {fileID: -3959954400985516057, guid: 731c1995bb1ad684ba227ff8b1c15a22, type: 3}
+    _emptyWeapon: {fileID: 0}
+    _cameraEffect: {fileID: 4908183818744415850, guid: 73116998d293c1c4dba422e5e67fac67, type: 3}
+    _sound: {fileID: 8300000, guid: 481955916330f35468574b56d4dcd46d, type: 3}
+    _speed: 1
+    _weaponSpeedMultiplier: 1
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
+  - _kind: 17
+    _handsName: beretta_idle
+    _hands: {fileID: 4224429566850162408, guid: cfa23eb7748e9504d8d23517ef6c8308, type: 3}
+    _weapon: {fileID: -8788583347553794728, guid: 731c1995bb1ad684ba227ff8b1c15a22, type: 3}
+    _emptyWeapon: {fileID: -8788583347553794728, guid: 731c1995bb1ad684ba227ff8b1c15a22, type: 3}
+    _cameraEffect: {fileID: 0}
+    _sound: {fileID: 0}
+    _speed: 1
+    _weaponSpeedMultiplier: 1
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
+  _withGrenadeLauncherMotions: []
+  _grenadeModeMotions: []
+  _attachmentMotions: []
+  _aimStart: {fileID: 4908183818744415850, guid: 46353b5743ff9144a88092f0ab0c2709, type: 3}
+  _aimIdle: {fileID: 4908183818744415850, guid: 773dcfd3f77f3f847bf08636c3f17d9f, type: 3}
+  _aimIdleSwayDegrees: {x: 0, y: 0}
+  _aimEnd: {fileID: 4908183818744415850, guid: fa0d83d6b34f42e46bb5c3b7daed8b48, type: 3}
+  _crossFade: 0.15
+  _grenadeAimOffsetPosition: {x: 0, y: 0, z: 0}
+  _grenadeAimOffsetRotation: {x: 0, y: 0, z: 0}
+  _useScopedGrenadeAimOffset: 0
+  _scopedGrenadeAimOffsetPosition: {x: 0, y: 0, z: 0}
+  _grenadeAimStart: {fileID: 0}
+  _grenadeAimIdle: {fileID: 0}
+  _grenadeAimEnd: {fileID: 0}
+  _roundsPerMinute: 310
+  _twoRoundBurstRoundsPerMinute: 0
+  _emptyClicksPerMinute: 200
+  _fireModes: 01000000i
+  _magazineSize: 15
+  _flameParticles: {fileID: 1755476049746760198, guid: d7d6447f5f86f1547868fda2d3065cf4, type: 3}
+  _smokeParticles: {fileID: 9042145882251133438, guid: 29bfd920db9bfc849b69809829b02419, type: 3}
+  _silencedFlameParticles: {fileID: 0}
+  _silencedSmokeParticles: {fileID: 7499249821151438167, guid: 0804aef7dbae80341b6621d986cc82c7, type: 3}
+  _lastShotHoldFrame: 1
+  _emptyShotStrength: 0.15
+  _ballistics:
+    _bulletPrefab: {fileID: 4022291978906581112, guid: 8899b2fbc46efff4389c602431eecefa, type: 3}
+    _ballisticHitMask:
+      serializedVersion: 2
+      m_Bits: 4294967291
+    _drawBallisticDebug: 0
+  _recoil: {x: 0.7, y: 1.4, z: 0.9}
+  _recoilSnappiness: 15
+  _recoilReturnSpeed: 8
+  _shotSounds:
+  - {fileID: 8300000, guid: 4a4c5ef9b24658d4e84ad7b7adf6f358, type: 3}
+  - {fileID: 8300000, guid: 7c93d96ca3bfa094ebf8e6b629580ce5, type: 3}
+  - {fileID: 8300000, guid: 526252d4a62e532459979323df9b7c09, type: 3}
+  - {fileID: 8300000, guid: 730252c149f08164db6228d4056f8cb7, type: 3}
+  - {fileID: 8300000, guid: d2f7c23ecd79e0c468ea105b03658223, type: 3}
+  - {fileID: 8300000, guid: 62dc5f31cda122847b3d488da429dabe, type: 3}
+  _silencedShotSounds:
+  - {fileID: 8300000, guid: cd8fa393771b2f34493be96c26defc87, type: 3}
+  - {fileID: 8300000, guid: dede7204f35200d4ab5d39fd5d3906b0, type: 3}
+  - {fileID: 8300000, guid: 54066af7bf6710d4c96f2fa79359a916, type: 3}
+  - {fileID: 8300000, guid: 05f4fe0360ad80642b817ca44e6ced61, type: 3}
+  - {fileID: 8300000, guid: d22f9ff80b3368441b77ca10483c10b0, type: 3}
+  - {fileID: 8300000, guid: 4dafc6cb6e57b4c439253b9465163d39, type: 3}
+  _aimInSounds: []
+  _aimOutSounds: []
+  _emptySound: {fileID: 8300000, guid: bd3e298f6aba6a04ea72db601b902e2f, type: 3}
+  _lastShellSound: {fileID: 8300000, guid: f99feb1a09ce84441b5ed634b29663fa, type: 3}
+  _lowAmmoSound: {fileID: 0}
+  _lowAmmoThreshold: 0

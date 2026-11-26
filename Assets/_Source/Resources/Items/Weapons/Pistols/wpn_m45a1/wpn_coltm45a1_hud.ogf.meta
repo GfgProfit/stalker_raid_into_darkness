@@ -1,0 +1,85 @@
+fileFormatVersion: 2
+guid: 4eafb5eadc737a84aad6740a4d0cbf65
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\ammo_45acp|models\weapons
+    second: {fileID: 2100000, guid: f6f613ccfe3b9ce489902ad95ca126a4, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\m45a1\barrel|models\weapons
+    second: {fileID: 2100000, guid: 2ca0f44df607ba34194e9ddd777a466b, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\m45a1\body|models\weapons
+    second: {fileID: 2100000, guid: 0f491ac1984332d4aadcc6bf291b2417, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\m45a1\catch|models\weapons
+    second: {fileID: 2100000, guid: 3dbda2c7319404b408f32084d6ceac9a, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\m45a1\hammer|models\weapons
+    second: {fileID: 2100000, guid: 6adfb67ddb281b04e86014675fc4e5b6, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\m45a1\mag|models\weapons
+    second: {fileID: 2100000, guid: 5e065a0d484474e41a47671c62b8e72c, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\m45a1\pistolgrip|models\weapons
+    second: {fileID: 2100000, guid: 9d3f58851579b5048a574784e9358151, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\m45a1\sight_front|models\weapons
+    second: {fileID: 2100000, guid: 49c5a70a4880850458337b77d4fe78b2, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\m45a1\sight_rear|models\weapons
+    second: {fileID: 2100000, guid: 173d4df4b1a416f428ae1670b793f311, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\m45a1\slide|models\weapons
+    second: {fileID: 2100000, guid: 40bbe1e484f449542a8d5c266a5fca64, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\m45a1\trigger|models\weapons
+    second: {fileID: 2100000, guid: fd63da7ea914d474a84865bd7b4c9f60, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\sights|models\selflightl
+    second: {fileID: 2100000, guid: 58127d87951b89045a3f9fcbe386c95d, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\wpn_addon_sil_45|models\weapons
+    second: {fileID: 2100000, guid: 03c1acfc809599e41a0ea9bb56b3a020, type: 2}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 61e536e21e96f284493f2969a9250cdf, type: 3}
+  _scale: 1
+  _importMaterials: 1
+  _texturesFolder: 
+  _searchTexturesByName: 1
+  _importEmbeddedMotions: 1
+  _embeddedLoopMode: 0
+  _addAnimator: 1
+  _readableMeshes: 0
+  _updateWhenOffscreen: 0
+  _autoResolveResources: 1

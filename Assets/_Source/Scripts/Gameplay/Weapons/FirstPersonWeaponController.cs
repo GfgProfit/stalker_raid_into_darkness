@@ -70,6 +70,8 @@ namespace RaidIntoDarkness.Weapons
         private bool _inSprint;
         private float _stateTime;
         private float _stateDuration;
+        private float _underbarrelRoundRevealTime;
+        private Vector2 _underbarrelShellTimes;
         private float _actionUntil;
         private float _emptyWeaponAt = float.PositiveInfinity;
         private float _nextShotTime;
@@ -253,6 +255,8 @@ namespace RaidIntoDarkness.Weapons
                 StopGrenadeActionSound();
                 SetState(FirstPersonWeaponState.Ready, 0f);
             }
+
+            UpdateUnderbarrelRound();
         }
 
         public void SetSlotWeapon(int slot, FirstPersonWeaponAsset asset, object key)
@@ -544,6 +548,11 @@ namespace RaidIntoDarkness.Weapons
             if (_graph != null)
             {
                 _graph.Evaluate(deltaTime);
+            }
+
+            if (State == FirstPersonWeaponState.LoadingGrenade)
+            {
+                UpdateUnderbarrelRound();
             }
 
             if (ActiveWeapon?.IsStandaloneLauncher == true)
@@ -1402,6 +1411,10 @@ namespace RaidIntoDarkness.Weapons
             }
 
             SetAiming(false);
+            float revealTime = _weaponView != null ? _weaponView.GetUnderbarrelRoundRevealTime(motion) : float.PositiveInfinity;
+            _underbarrelRoundRevealTime = Mathf.Max(ActiveWeapon.CrossFade, revealTime);
+            _underbarrelShellTimes = _weaponView != null ? _weaponView.GetUnderbarrelShellTimes(motion) : Vector2.zero;
+            _underbarrelShellTimes.x = Mathf.Max(ActiveWeapon.CrossFade, _underbarrelShellTimes.x);
             PlayMotion(motion, ActiveWeapon.CrossFade, false, true);
             SetState(FirstPersonWeaponState.LoadingGrenade, motion.Duration);
             return true;
@@ -1755,17 +1768,18 @@ namespace RaidIntoDarkness.Weapons
                 return;
             }
 
-            if (State == FirstPersonWeaponState.LoadingGrenade || state == FirstPersonWeaponState.LoadingGrenade)
-            {
-                _weaponView?.SetLauncherRoundVisible(state == FirstPersonWeaponState.LoadingGrenade);
-            }
-
             if (state != FirstPersonWeaponState.Reloading && ActiveWeapon?.IsStandaloneLauncher == true)
             {
                 _weaponView?.SetLauncherRoundVisible(Magazine > 0);
             }
 
+            bool grenadeReloadChanged = State == FirstPersonWeaponState.LoadingGrenade || state == FirstPersonWeaponState.LoadingGrenade;
             State = state;
+            if (grenadeReloadChanged)
+            {
+                UpdateUnderbarrelRound();
+            }
+
             StateChanged?.Invoke(state);
         }
 
@@ -2066,6 +2080,7 @@ namespace RaidIntoDarkness.Weapons
             Animator weaponAnimator = GetAnimator(_model);
             _graph = new FirstPersonWeaponGraph($"{name}.FirstPersonWeapon", handsAnimator, weaponAnimator, FirstPersonWeaponGraph.CreateMask(hands.transform, asset.OverlayBones), _weaponView);
             _hasLoop = false;
+            UpdateUnderbarrelRound();
         }
 
         private void BindOptics()
@@ -2200,7 +2215,38 @@ namespace RaidIntoDarkness.Weapons
                 _weaponView?.SetLauncherRoundVisible(Magazine > 0);
             }
 
+            if (State != FirstPersonWeaponState.LoadingGrenade)
+            {
+                UpdateUnderbarrelRound();
+            }
+
             AmmoChanged?.Invoke(Magazine, Reserve);
+        }
+
+        private void UpdateUnderbarrelRound()
+        {
+            if (_weaponView == null || _weaponView.GrenadeMuzzle == null || ActiveWeapon?.IsStandaloneLauncher != false)
+            {
+                return;
+            }
+
+            bool roundVisible = false;
+            bool shellVisible = false;
+            if (HasGrenadeLauncher && _ammoSource != null)
+            {
+                if (State == FirstPersonWeaponState.LoadingGrenade)
+                {
+                    roundVisible = _stateTime >= _underbarrelRoundRevealTime;
+                    shellVisible = _stateTime >= _underbarrelShellTimes.x && _stateTime < _underbarrelShellTimes.y;
+                }
+                else
+                {
+                    _ammoSource.GetGrenadeAmmo(_slots[ActiveSlot].Key, out int loaded, out _, out _);
+                    roundVisible = loaded > 0;
+                }
+            }
+
+            _weaponView.SetUnderbarrelRoundsVisible(roundVisible, shellVisible);
         }
 
         private FirstPersonWeaponInstanceState GetWeaponState(object key)

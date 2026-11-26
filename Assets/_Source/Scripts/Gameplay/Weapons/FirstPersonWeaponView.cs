@@ -12,6 +12,10 @@ namespace RaidIntoDarkness.Weapons
         [SerializeField] private Transform _silencedMuzzle;
         [SerializeField] private Transform _grenadeMuzzle;
         [SerializeField] private GameObject _launcherRound;
+        [SerializeField] [Min(0)] private int _underbarrelRoundRevealFrame;
+        [SerializeField] private Transform _underbarrelRoundBone;
+        [SerializeField] private Transform _underbarrelShellBone;
+        [SerializeField] private Vector2Int _underbarrelShellFrames;
         [SerializeField] private Transform[] _launcherChambers = Array.Empty<Transform>();
         [SerializeField] private Transform[] _launcherReloadRounds = Array.Empty<Transform>();
         [SerializeField] private Transform[] _unfoldedLauncherSights = Array.Empty<Transform>();
@@ -133,6 +137,42 @@ namespace RaidIntoDarkness.Weapons
             }
         }
 
+        internal float GetUnderbarrelRoundRevealTime(FirstPersonWeaponMotion motion)
+        {
+            AnimationClip clip = motion.Weapon;
+            return clip != null && clip.frameRate > 0f ? _underbarrelRoundRevealFrame / (clip.frameRate * motion.WeaponSpeed) : float.PositiveInfinity;
+        }
+
+        internal Vector2 GetUnderbarrelShellTimes(FirstPersonWeaponMotion motion)
+        {
+            AnimationClip clip = motion.Weapon;
+            return _underbarrelShellBone != null && clip != null && clip.frameRate > 0f ? (Vector2)_underbarrelShellFrames / (clip.frameRate * motion.WeaponSpeed) : Vector2.zero;
+        }
+
+        internal void SetUnderbarrelRoundsVisible(bool roundVisible, bool shellVisible)
+        {
+            if (_underbarrelRoundBone != null)
+            {
+                SetBoneVisible(_underbarrelRoundBone, roundVisible);
+            }
+
+            if (_underbarrelShellBone != null)
+            {
+                SetBoneVisible(_underbarrelShellBone, shellVisible);
+            }
+
+            SetLauncherRoundVisible(roundVisible || shellVisible);
+        }
+
+        private static void SetBoneVisible(Transform bone, bool visible)
+        {
+            Vector3 scale = visible ? Vector3.one : Vector3.zero;
+            if (bone.localScale != scale)
+            {
+                bone.localScale = scale;
+            }
+        }
+
         internal void UpdateLauncherChambers(int loaded, bool inserting)
         {
             for (int i = 0; i < _launcherChambers.Length; i++)
@@ -160,16 +200,6 @@ namespace RaidIntoDarkness.Weapons
             {
                 _fixedLauncherPart.localRotation = _fixedLauncherPartRotation;
             }
-        }
-
-        [Serializable]
-        private struct MagazineBonePair
-        {
-            [SerializeField] private Transform _installed;
-            [SerializeField] private Transform _replacement;
-
-            public Transform Installed => _installed;
-            public Transform Replacement => _replacement;
         }
     }
 }

@@ -714,6 +714,15 @@ MonoBehaviour:
   _silencedMuzzle: {fileID: 6418067467814137092}
   _grenadeMuzzle: {fileID: 7337233042876566924}
   _launcherRound: {fileID: 8379195647707995023}
+  _underbarrelRoundRevealFrame: 30
+  _underbarrelRoundBone: {fileID: 9141248045181602516}
+  _underbarrelShellBone: {fileID: 359729453052672519}
+  _underbarrelShellFrames: {x: 10, y: 27}
+  _launcherChambers: []
+  _launcherReloadRounds: []
+  _unfoldedLauncherSights: []
+  _fixedLauncherPart: {fileID: 0}
+  _fixedLauncherPartRotation: {x: 0, y: 0, z: 0, w: 1}
   _magazineSwapObjects: {fileID: 421033143027635163}
   _magazineSwapClips:
   - {fileID: -5802557976399934464, guid: 4945241a00fdad647881014da4199fe3, type: 3}

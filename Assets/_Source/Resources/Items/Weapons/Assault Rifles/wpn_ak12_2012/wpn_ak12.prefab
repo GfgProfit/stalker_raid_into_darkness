@@ -5240,6 +5240,7 @@ MonoBehaviour:
   _activationAimFactor: 0.95
   _magnification: 3
   _magnificationPerScrollNotch: 0.35
+  _aimInGrenadeMode: 0
 --- !u!137 &5553328857739443840 stripped
 SkinnedMeshRenderer:
   m_CorrespondingSourceObject: {fileID: 5675159845724854932, guid: 3eafc567733c56b40929ce8c56be0166, type: 3}
@@ -5434,6 +5435,7 @@ MonoBehaviour:
   _activationAimFactor: 0.95
   _magnification: 1
   _magnificationPerScrollNotch: 0.35
+  _aimInGrenadeMode: 0
 --- !u!137 &4743324395509188001 stripped
 SkinnedMeshRenderer:
   m_CorrespondingSourceObject: {fileID: 5389425527549583567, guid: 7c1591b7dc4e5fb4e9ae8cb0d71eeded, type: 3}
@@ -5606,6 +5608,7 @@ MonoBehaviour:
   _activationAimFactor: 0.95
   _magnification: 1
   _magnificationPerScrollNotch: 0.35
+  _aimInGrenadeMode: 0
 --- !u!4 &4032995533537308371 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4065286315653441393, guid: 4487091211992de41ac34a0a838a606a, type: 3}
@@ -5926,6 +5929,7 @@ MonoBehaviour:
   _activationAimFactor: 0.95
   _magnification: 4
   _magnificationPerScrollNotch: 0.35
+  _aimInGrenadeMode: 0
 --- !u!1001 &1864182163481112661
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6091,6 +6095,7 @@ MonoBehaviour:
   _activationAimFactor: 0.95
   _magnification: 1
   _magnificationPerScrollNotch: 0.35
+  _aimInGrenadeMode: 0
 --- !u!4 &3759123061844104811 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3311818422921946686, guid: 53fbdea8e05a6274e895bd9d39f560f0, type: 3}
@@ -6415,6 +6420,7 @@ MonoBehaviour:
   _activationAimFactor: 0.95
   _magnification: 3
   _magnificationPerScrollNotch: 0.35
+  _aimInGrenadeMode: 0
 --- !u!1 &5806724944253884918 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 5459024232511092412, guid: 4cb33c9ce20528048ad5f8a44549f6f8, type: 3}
@@ -6610,6 +6616,7 @@ MonoBehaviour:
   _activationAimFactor: 0.95
   _magnification: 1.75
   _magnificationPerScrollNotch: 0.35
+  _aimInGrenadeMode: 0
 --- !u!4 &8985244120843095786 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6723584964944815397, guid: ac21bf93cca9bbc448c11f72e5d1b8fb, type: 3}
@@ -7033,6 +7040,17 @@ MonoBehaviour:
   _silencedMuzzle: {fileID: 2154802101275062669}
   _grenadeMuzzle: {fileID: 8821208677746194927}
   _launcherRound: {fileID: 1162334369035565064}
+  _underbarrelRoundRevealFrame: 13
+  _launcherChambers: []
+  _launcherReloadRounds: []
+  _unfoldedLauncherSights: []
+  _fixedLauncherPart: {fileID: 0}
+  _fixedLauncherPartRotation: {x: 0, y: 0, z: 0, w: 1}
+  _magazineSwapObjects: {fileID: 0}
+  _magazineSwapClips: []
+  _installedMagazineRenderers: []
+  _replacementMagazineRenderers: []
+  _magazineBonePairs: []
 --- !u!1 &6476253164063275821 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -70574290758936886, guid: 2e219ff8488837440b34907b89a1b154, type: 3}
@@ -7225,6 +7243,7 @@ MonoBehaviour:
   _activationAimFactor: 0.95
   _magnification: 1
   _magnificationPerScrollNotch: 0.35
+  _aimInGrenadeMode: 0
 --- !u!4 &8829902661601718180 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6721358490252200532, guid: 35faa6e16fa12de45b9656aac8716b67, type: 3}
@@ -7392,6 +7411,7 @@ MonoBehaviour:
   _activationAimFactor: 0.95
   _magnification: 3.5
   _magnificationPerScrollNotch: 0.35
+  _aimInGrenadeMode: 0
 --- !u!4 &7388706387030369183 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5315746629861569417, guid: b74a52b30ae59f84dbfc3ada1917a735, type: 3}
@@ -7577,6 +7597,7 @@ MonoBehaviour:
   _activationAimFactor: 0.95
   _magnification: 1
   _magnificationPerScrollNotch: 0.35
+  _aimInGrenadeMode: 0
 --- !u!1 &8666548707793560504 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 5531663100873799376, guid: a515214ec2537974894e07480169495c, type: 3}
@@ -7773,6 +7794,7 @@ MonoBehaviour:
   _activationAimFactor: 0.95
   _magnification: 1
   _magnificationPerScrollNotch: 0.35
+  _aimInGrenadeMode: 0
 --- !u!1001 &4270291150345926264
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -8078,6 +8100,7 @@ MonoBehaviour:
   _activationAimFactor: 0.95
   _magnification: 3
   _magnificationPerScrollNotch: 0.35
+  _aimInGrenadeMode: 0
 --- !u!1001 &4596362374004087805
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -8382,6 +8405,7 @@ MonoBehaviour:
   _activationAimFactor: 0.95
   _magnification: 1.1
   _magnificationPerScrollNotch: 0.35
+  _aimInGrenadeMode: 0
 --- !u!4 &8217395867323786603 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3658519456057703780, guid: 6a5e53a2f8f8a6f46959c365f9342d99, type: 3}
@@ -9117,6 +9141,7 @@ MonoBehaviour:
   _activationAimFactor: 0.95
   _magnification: 7
   _magnificationPerScrollNotch: 0.35
+  _aimInGrenadeMode: 0
 --- !u!4 &6521599077432990384 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 640806882605030925, guid: 9b20ee02e83a9be49b351d4e6593eea2, type: 3}
@@ -9565,6 +9590,7 @@ MonoBehaviour:
   _activationAimFactor: 0.95
   _magnification: 1
   _magnificationPerScrollNotch: 0.35
+  _aimInGrenadeMode: 0
 --- !u!1001 &7228122275630303626
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -10262,6 +10288,7 @@ MonoBehaviour:
   _activationAimFactor: 0.95
   _magnification: 3
   _magnificationPerScrollNotch: 0.35
+  _aimInGrenadeMode: 0
 --- !u!137 &2162741597840467020 stripped
 SkinnedMeshRenderer:
   m_CorrespondingSourceObject: {fileID: 8051136531856588475, guid: 889468b29eb18204bb9ad8171281ecd2, type: 3}
@@ -10434,6 +10461,7 @@ MonoBehaviour:
   _activationAimFactor: 0.95
   _magnification: 3.5
   _magnificationPerScrollNotch: 0.35
+  _aimInGrenadeMode: 0
 --- !u!4 &5614270556571891440 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4206065193146751810, guid: 44b1c76e811a4104c817075a67408c82, type: 3}
@@ -10770,6 +10798,7 @@ MonoBehaviour:
   _activationAimFactor: 0.95
   _magnification: 1
   _magnificationPerScrollNotch: 0.35
+  _aimInGrenadeMode: 0
 --- !u!4 &3036350121355481019 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5876521340342769887, guid: b644151d8e464d84abf6c25735c0972c, type: 3}

@@ -2515,6 +2515,7 @@ MonoBehaviour:
   _activationAimFactor: 0.95
   _magnification: 4
   _magnificationPerScrollNotch: 0.35
+  _aimInGrenadeMode: 0
 --- !u!1001 &2989656105034294944
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2995,6 +2996,7 @@ MonoBehaviour:
   _activationAimFactor: 0.95
   _magnification: 4
   _magnificationPerScrollNotch: 0.35
+  _aimInGrenadeMode: 0
 --- !u!1 &7126363382659226160 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 6618186223956856477, guid: cb91600686638cd48826fd5ac0004c22, type: 3}
@@ -3214,6 +3216,7 @@ MonoBehaviour:
   _activationAimFactor: 0.95
   _magnification: 3.7
   _magnificationPerScrollNotch: 0.35
+  _aimInGrenadeMode: 0
 --- !u!4 &7518570366037868380 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6256355750942409992, guid: d7cf6b7edded13f4dbf5fef655354d5a, type: 3}
@@ -3571,6 +3574,7 @@ MonoBehaviour:
   _activationAimFactor: 0.95
   _magnification: 2.8
   _magnificationPerScrollNotch: 0.35
+  _aimInGrenadeMode: 0
 --- !u!4 &8099597314629379322 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3668645351111143208, guid: e82cb918727d09c4da6753ae1fba0d2b, type: 3}
@@ -3782,6 +3786,7 @@ MonoBehaviour:
   _activationAimFactor: 0.95
   _magnification: 4
   _magnificationPerScrollNotch: 0.35
+  _aimInGrenadeMode: 0
 --- !u!1001 &5746491454178467268
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4107,6 +4112,7 @@ MonoBehaviour:
   _activationAimFactor: 0.95
   _magnification: 4
   _magnificationPerScrollNotch: 0.35
+  _aimInGrenadeMode: 0
 --- !u!4 &5272051607558352999 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2033966151772191744, guid: ba9e5bca3c500c64c8b0c3bf35437bc8, type: 3}
@@ -4470,6 +4476,17 @@ MonoBehaviour:
   _silencedMuzzle: {fileID: 0}
   _grenadeMuzzle: {fileID: 2139112423182926682}
   _launcherRound: {fileID: 2950901240904030727}
+  _underbarrelRoundRevealFrame: 13
+  _launcherChambers: []
+  _launcherReloadRounds: []
+  _unfoldedLauncherSights: []
+  _fixedLauncherPart: {fileID: 0}
+  _fixedLauncherPartRotation: {x: 0, y: 0, z: 0, w: 1}
+  _magazineSwapObjects: {fileID: 0}
+  _magazineSwapClips: []
+  _installedMagazineRenderers: []
+  _replacementMagazineRenderers: []
+  _magazineBonePairs: []
 --- !u!1 &2950901240904030727 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 9164766820817257485, guid: ab64bd2815df4bc40ab8da04997ae4d5, type: 3}
@@ -4716,6 +4733,7 @@ MonoBehaviour:
   _activationAimFactor: 0.95
   _magnification: 3
   _magnificationPerScrollNotch: 0.35
+  _aimInGrenadeMode: 0
 --- !u!1001 &6796371356500374739
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4880,6 +4898,7 @@ MonoBehaviour:
   _activationAimFactor: 0.95
   _magnification: 1
   _magnificationPerScrollNotch: 0.35
+  _aimInGrenadeMode: 0
 --- !u!137 &4815631811552649408 stripped
 SkinnedMeshRenderer:
   m_CorrespondingSourceObject: {fileID: 2055048956252165139, guid: 29e8ea99755bf4547806a30b8722df6e, type: 3}

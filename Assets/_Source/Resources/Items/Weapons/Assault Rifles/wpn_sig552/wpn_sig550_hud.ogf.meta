@@ -1,0 +1,50 @@
+fileFormatVersion: 2
+guid: a25d5ea59c7b6784895755a707290e08
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\ammo_5x56|models\weapons
+    second: {fileID: 2100000, guid: 7e8454ff369329b4bbe8ba812278c220, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\sig552\body|models\weapons
+    second: {fileID: 2100000, guid: 03ddebbde1d063b41a5293d18248c869, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\sig552\mag|models\weapons
+    second: {fileID: 2100000, guid: 53623f6ba5748484a8859195787ac33f, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\sig552\planka|models\weapons
+    second: {fileID: 2100000, guid: 807ba5411ce593340b9b1a5b854dab08, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\sig552\rail|models\weapons
+    second: {fileID: 2100000, guid: f1c283829165ef545a837e9bc4e831ad, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\wpn_addon_sil_nato|models\weapons
+    second: {fileID: 2100000, guid: f00ae8e78e447244a9c2f453f1effdd6, type: 2}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 61e536e21e96f284493f2969a9250cdf, type: 3}
+  _scale: 1
+  _importMaterials: 1
+  _texturesFolder: 
+  _searchTexturesByName: 1
+  _importEmbeddedMotions: 1
+  _embeddedLoopMode: 0
+  _addAnimator: 1
+  _readableMeshes: 0
+  _updateWhenOffscreen: 0
+  _autoResolveResources: 1

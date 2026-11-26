@@ -1,0 +1,105 @@
+fileFormatVersion: 2
+guid: cd4ea190a10877c4faf849de88da270e
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\ammo_5x56|models\weapons
+    second: {fileID: 2100000, guid: 7e8454ff369329b4bbe8ba812278c220, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\m4a1\barrel|models\weapons
+    second: {fileID: 2100000, guid: 1347446ff16e86b44b116f976b5c6a93, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\m4a1\bolt|models\weapons
+    second: {fileID: 2100000, guid: 16c2e125d85243c42a76826650811db8, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\m4a1\charge|models\weapons
+    second: {fileID: 2100000, guid: 7358137451d9f11428ba37c2c67bf331, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\m4a1\gas_block|models\weapons
+    second: {fileID: 2100000, guid: 264883ec88852ce4a9fc506942ad9fdb, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\m4a1\handguard|models\weapons
+    second: {fileID: 2100000, guid: 8a2ea1dd2603e4545aced11f42c80613, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\m4a1\m4a1|models\weapons
+    second: {fileID: 2100000, guid: 393b60bee99a8e34180095d57e634722, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\m4a1\mag|models\weapons
+    second: {fileID: 2100000, guid: 2163ae3dcc3b18a438d4abc8f43445a8, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\m4a1\muzzle|models\weapons
+    second: {fileID: 2100000, guid: 7f5e81030cd0a5b44ba9a493df4b5346, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\m4a1\pistolgrip|models\weapons
+    second: {fileID: 2100000, guid: aba028bce6698d946b17fa4b6886e25c, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\m4a1\reciever|models\weapons
+    second: {fileID: 2100000, guid: 42761329ba2b24d4a8367ad25811f4e1, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\m4a1\sight|models\weapons
+    second: {fileID: 2100000, guid: 3921c22cbc7db6a438587397766ca05b, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\m4a1\stock|models\weapons
+    second: {fileID: 2100000, guid: ab235734990a14a40a9eb81ce23c3a0e, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\wpn_addon_sil_nato|models\weapons
+    second: {fileID: 2100000, guid: f00ae8e78e447244a9c2f453f1effdd6, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\wpn_m203_ironsight|models\weapons
+    second: {fileID: 2100000, guid: aebb92c93b5df684f84dcbbb3685ddda, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\wpn_m203|models\weapons
+    second: {fileID: 2100000, guid: 97d5a4ea0722fa0468ebe7ddf0db08f5, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\wpn_m433hedp|models\weapons
+    second: {fileID: 2100000, guid: 86679637939656343adb0dbcbec9af2c, type: 2}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 61e536e21e96f284493f2969a9250cdf, type: 3}
+  _scale: 1
+  _importMaterials: 1
+  _texturesFolder: 
+  _searchTexturesByName: 1
+  _importEmbeddedMotions: 1
+  _embeddedLoopMode: 0
+  _addAnimator: 1
+  _readableMeshes: 0
+  _updateWhenOffscreen: 0
+  _autoResolveResources: 1

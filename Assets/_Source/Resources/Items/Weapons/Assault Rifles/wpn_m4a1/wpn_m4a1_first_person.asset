@@ -1,0 +1,417 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 14d88a9e75d60c249be9eadb7fbef0ec, type: 3}
+  m_Name: wpn_m4a1_first_person
+  m_EditorClassIdentifier: RaidIntoDarkness.Weapons::RaidIntoDarkness.Weapons.FirstPersonWeaponAsset
+  _hudModel: {fileID: 2142890846461373713, guid: 30a05fd4649afb44380eb86baf0b52a7, type: 3}
+  _isMelee: 0
+  _isStandaloneLauncher: 0
+  _useStandaloneHipDispersion: 0
+  _handGrenadeVisual: {fileID: 0}
+  _handGrenade:
+    _explosionPrefab: {fileID: 0}
+    _explosionSound: {fileID: 0}
+    _launchSound: {fileID: 0}
+    _explosionVariants: []
+    _explosionBodyVariants: []
+    _bounceSounds: {fileID: 0}
+    _bounceSurfaces: {fileID: 0}
+    _blastRadius: 5
+    _blastDamage: 90
+    _fragmentCount: 80
+    _fragmentDamage: 14
+    _selfDestructSeconds: 6
+    _armingDistance: 2.5
+    _impactBounceHeight: 0
+    _fragmentRange: 100
+    _armingSeconds: 0
+    _explodeOnImpact: 0
+    _fliesStraight: 0
+    _projectileVisual: {fileID: 0}
+    _flightTrail: {fileID: 0}
+  _handGrenadeReleaseFrame: 1
+  _handGrenadeThrowSpeed: 16
+  _handsPosition: {x: -0.0099, y: 0.0086, z: -0.0778}
+  _handsOrientation: {x: 0, y: 0, z: 0}
+  _aimOffsetPosition: {x: 0, y: 0, z: 0}
+  _aimOffsetRotation: {x: 0, y: 0, z: 0}
+  _ironSightAimRotationOffset: {x: 0, y: 0, z: 0}
+  _aimTime: 0.15384616
+  _aimCameraRoll: 0
+  _aimCameraBlendTime: 0.15
+  _aimZoom: 1.15
+  _ironSightHudFieldOfView: 0
+  _reloadHudFovReduction: 0
+  _muzzleBone: wpn_body
+  _overlayBones:
+  - l_clavicle
+  - l_upperarm
+  - l_forearm
+  - l_forearm_twist
+  - l_hand
+  - l_finger0
+  - l_finger01
+  - l_finger02
+  _motions:
+  - _kind: 0
+    _handsName: m4_draw
+    _hands: {fileID: -9156537903123943363, guid: fea646f7f4b8003439e74a570006ec47, type: 3}
+    _weapon: {fileID: -1965084331185687820, guid: d1a5aa379203b4d44900d09641e403d7, type: 3}
+    _emptyWeapon: {fileID: -8788583347553794728, guid: d1a5aa379203b4d44900d09641e403d7, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: 0a72ee55237c35a41aeb2cdf3e8eb40c, type: 3}
+    _sound: {fileID: 8300000, guid: ba4384c2e6a025742825a51d1d91f742, type: 3}
+    _speed: 1
+    _weaponSpeedMultiplier: 1
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
+  - _kind: 1
+    _handsName: m4_hide
+    _hands: {fileID: -332023335087973721, guid: fea646f7f4b8003439e74a570006ec47, type: 3}
+    _weapon: {fileID: -1965084331185687820, guid: d1a5aa379203b4d44900d09641e403d7, type: 3}
+    _emptyWeapon: {fileID: -8788583347553794728, guid: d1a5aa379203b4d44900d09641e403d7, type: 3}
+    _cameraEffect: {fileID: 0}
+    _sound: {fileID: 8300000, guid: aac6be68aabaf1343898f04df962c803, type: 3}
+    _speed: 1
+    _weaponSpeedMultiplier: 1
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
+  - _kind: 2
+    _handsName: m4_idle
+    _hands: {fileID: -3008505610263785336, guid: fea646f7f4b8003439e74a570006ec47, type: 3}
+    _weapon: {fileID: -1965084331185687820, guid: d1a5aa379203b4d44900d09641e403d7, type: 3}
+    _emptyWeapon: {fileID: -8788583347553794728, guid: d1a5aa379203b4d44900d09641e403d7, type: 3}
+    _cameraEffect: {fileID: 0}
+    _sound: {fileID: 0}
+    _speed: 1
+    _weaponSpeedMultiplier: 1
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
+  - _kind: 17
+    _handsName: m4_idle
+    _hands: {fileID: -3008505610263785336, guid: fea646f7f4b8003439e74a570006ec47, type: 3}
+    _weapon: {fileID: -8788583347553794728, guid: d1a5aa379203b4d44900d09641e403d7, type: 3}
+    _emptyWeapon: {fileID: -8788583347553794728, guid: d1a5aa379203b4d44900d09641e403d7, type: 3}
+    _cameraEffect: {fileID: 0}
+    _sound: {fileID: 0}
+    _speed: 1
+    _weaponSpeedMultiplier: 1
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
+  - _kind: 3
+    _handsName: m4_idle_aim
+    _hands: {fileID: -4661562253871786671, guid: fea646f7f4b8003439e74a570006ec47, type: 3}
+    _weapon: {fileID: -1965084331185687820, guid: d1a5aa379203b4d44900d09641e403d7, type: 3}
+    _emptyWeapon: {fileID: -8788583347553794728, guid: d1a5aa379203b4d44900d09641e403d7, type: 3}
+    _cameraEffect: {fileID: 0}
+    _sound: {fileID: 0}
+    _speed: 1
+    _weaponSpeedMultiplier: 1
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
+  - _kind: 4
+    _handsName: m4_walk
+    _hands: {fileID: -7815636972921653355, guid: fea646f7f4b8003439e74a570006ec47, type: 3}
+    _weapon: {fileID: -1965084331185687820, guid: d1a5aa379203b4d44900d09641e403d7, type: 3}
+    _emptyWeapon: {fileID: -8788583347553794728, guid: d1a5aa379203b4d44900d09641e403d7, type: 3}
+    _cameraEffect: {fileID: 0}
+    _sound: {fileID: 0}
+    _speed: 1
+    _weaponSpeedMultiplier: 1
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
+  - _kind: 5
+    _handsName: m4_aim_walk
+    _hands: {fileID: 6679415786433155126, guid: fea646f7f4b8003439e74a570006ec47, type: 3}
+    _weapon: {fileID: -1965084331185687820, guid: d1a5aa379203b4d44900d09641e403d7, type: 3}
+    _emptyWeapon: {fileID: -8788583347553794728, guid: d1a5aa379203b4d44900d09641e403d7, type: 3}
+    _cameraEffect: {fileID: 0}
+    _sound: {fileID: 0}
+    _speed: 1
+    _weaponSpeedMultiplier: 1
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
+  - _kind: 6
+    _handsName: m4_walk_slow
+    _hands: {fileID: -2419655622430956079, guid: fea646f7f4b8003439e74a570006ec47, type: 3}
+    _weapon: {fileID: -1965084331185687820, guid: d1a5aa379203b4d44900d09641e403d7, type: 3}
+    _emptyWeapon: {fileID: -8788583347553794728, guid: d1a5aa379203b4d44900d09641e403d7, type: 3}
+    _cameraEffect: {fileID: 0}
+    _sound: {fileID: 0}
+    _speed: 1
+    _weaponSpeedMultiplier: 1
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
+  - _kind: 7
+    _handsName: m4_walk_down
+    _hands: {fileID: -9085740149708691179, guid: fea646f7f4b8003439e74a570006ec47, type: 3}
+    _weapon: {fileID: -1965084331185687820, guid: d1a5aa379203b4d44900d09641e403d7, type: 3}
+    _emptyWeapon: {fileID: -8788583347553794728, guid: d1a5aa379203b4d44900d09641e403d7, type: 3}
+    _cameraEffect: {fileID: 0}
+    _sound: {fileID: 0}
+    _speed: 1
+    _weaponSpeedMultiplier: 1
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
+  - _kind: 8
+    _handsName: m4_sprint_start
+    _hands: {fileID: -1548196730593193685, guid: fea646f7f4b8003439e74a570006ec47, type: 3}
+    _weapon: {fileID: -1965084331185687820, guid: d1a5aa379203b4d44900d09641e403d7, type: 3}
+    _emptyWeapon: {fileID: -8788583347553794728, guid: d1a5aa379203b4d44900d09641e403d7, type: 3}
+    _cameraEffect: {fileID: 0}
+    _sound: {fileID: 0}
+    _speed: 1
+    _weaponSpeedMultiplier: 1
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
+  - _kind: 9
+    _handsName: m4_sprint
+    _hands: {fileID: 364485180105239486, guid: fea646f7f4b8003439e74a570006ec47, type: 3}
+    _weapon: {fileID: -1965084331185687820, guid: d1a5aa379203b4d44900d09641e403d7, type: 3}
+    _emptyWeapon: {fileID: -8788583347553794728, guid: d1a5aa379203b4d44900d09641e403d7, type: 3}
+    _cameraEffect: {fileID: 0}
+    _sound: {fileID: 0}
+    _speed: 1
+    _weaponSpeedMultiplier: 1
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
+  - _kind: 10
+    _handsName: m4_sprint_end
+    _hands: {fileID: 7567749149204919716, guid: fea646f7f4b8003439e74a570006ec47, type: 3}
+    _weapon: {fileID: -1965084331185687820, guid: d1a5aa379203b4d44900d09641e403d7, type: 3}
+    _emptyWeapon: {fileID: -8788583347553794728, guid: d1a5aa379203b4d44900d09641e403d7, type: 3}
+    _cameraEffect: {fileID: 0}
+    _sound: {fileID: 0}
+    _speed: 1
+    _weaponSpeedMultiplier: 1
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
+  - _kind: 11
+    _handsName: m4_shoot
+    _hands: {fileID: 7953557100968876465, guid: fea646f7f4b8003439e74a570006ec47, type: 3}
+    _weapon: {fileID: 4632084351945502156, guid: d1a5aa379203b4d44900d09641e403d7, type: 3}
+    _emptyWeapon: {fileID: -8788583347553794728, guid: d1a5aa379203b4d44900d09641e403d7, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: 653ac3035834ae34a9300e3253eb632a, type: 3}
+    _sound: {fileID: 0}
+    _speed: 1
+    _weaponSpeedMultiplier: 1
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
+  - _kind: 11
+    _handsName: m4_shoot1
+    _hands: {fileID: -4252816497853383007, guid: fea646f7f4b8003439e74a570006ec47, type: 3}
+    _weapon: {fileID: 4632084351945502156, guid: d1a5aa379203b4d44900d09641e403d7, type: 3}
+    _emptyWeapon: {fileID: -8788583347553794728, guid: d1a5aa379203b4d44900d09641e403d7, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: 3fc60baf389b9e145aa522b00881f549, type: 3}
+    _sound: {fileID: 0}
+    _speed: 1
+    _weaponSpeedMultiplier: 1
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
+  - _kind: 11
+    _handsName: m4_shoot2
+    _hands: {fileID: -8856214988146292355, guid: fea646f7f4b8003439e74a570006ec47, type: 3}
+    _weapon: {fileID: 4632084351945502156, guid: d1a5aa379203b4d44900d09641e403d7, type: 3}
+    _emptyWeapon: {fileID: -8788583347553794728, guid: d1a5aa379203b4d44900d09641e403d7, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: f8a485d5c5ed8884e97a15b6a69218a0, type: 3}
+    _sound: {fileID: 0}
+    _speed: 1
+    _weaponSpeedMultiplier: 1
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
+  - _kind: 12
+    _handsName: m4_aim_shoot
+    _hands: {fileID: 5022834989117584651, guid: fea646f7f4b8003439e74a570006ec47, type: 3}
+    _weapon: {fileID: 4632084351945502156, guid: d1a5aa379203b4d44900d09641e403d7, type: 3}
+    _emptyWeapon: {fileID: -8788583347553794728, guid: d1a5aa379203b4d44900d09641e403d7, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: 143109c39d10d434ebbbbce6e568d14c, type: 3}
+    _sound: {fileID: 0}
+    _speed: 1
+    _weaponSpeedMultiplier: 1
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
+  - _kind: 12
+    _handsName: m4_aim_shoot1
+    _hands: {fileID: 139005200440605326, guid: fea646f7f4b8003439e74a570006ec47, type: 3}
+    _weapon: {fileID: 4632084351945502156, guid: d1a5aa379203b4d44900d09641e403d7, type: 3}
+    _emptyWeapon: {fileID: -8788583347553794728, guid: d1a5aa379203b4d44900d09641e403d7, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: 8cf2c8e2d98a30649bcf19129ba37a7b, type: 3}
+    _sound: {fileID: 0}
+    _speed: 1
+    _weaponSpeedMultiplier: 1
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
+  - _kind: 12
+    _handsName: m4_aim_shoot2
+    _hands: {fileID: -1522918202820310750, guid: fea646f7f4b8003439e74a570006ec47, type: 3}
+    _weapon: {fileID: 4632084351945502156, guid: d1a5aa379203b4d44900d09641e403d7, type: 3}
+    _emptyWeapon: {fileID: -8788583347553794728, guid: d1a5aa379203b4d44900d09641e403d7, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: 6bfe6a608fbaf2849850c3f06d636957, type: 3}
+    _sound: {fileID: 0}
+    _speed: 1
+    _weaponSpeedMultiplier: 1
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
+  - _kind: 13
+    _handsName: m4_reload
+    _hands: {fileID: 3849304385762411426, guid: fea646f7f4b8003439e74a570006ec47, type: 3}
+    _weapon: {fileID: -5802557976399934464, guid: d1a5aa379203b4d44900d09641e403d7, type: 3}
+    _emptyWeapon: {fileID: 0}
+    _cameraEffect: {fileID: 4908183818744415850, guid: e130b718b30387847a1361fe0d1e0282, type: 3}
+    _sound: {fileID: 8300000, guid: a56d8b7489c757942b46957c682707d6, type: 3}
+    _speed: 1
+    _weaponSpeedMultiplier: 1
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
+  - _kind: 14
+    _handsName: m4_reload_empty
+    _hands: {fileID: -1594303566876917366, guid: fea646f7f4b8003439e74a570006ec47, type: 3}
+    _weapon: {fileID: 6957653534862426902, guid: d1a5aa379203b4d44900d09641e403d7, type: 3}
+    _emptyWeapon: {fileID: 0}
+    _cameraEffect: {fileID: 4908183818744415850, guid: fae9c366283804542970dcdad8d5e50c, type: 3}
+    _sound: {fileID: 8300000, guid: 4bbe0de01d10e0d4f9da58cc87612cb2, type: 3}
+    _speed: 1
+    _weaponSpeedMultiplier: 1
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
+  - _kind: 15
+    _handsName: m4_firemode
+    _hands: {fileID: 1001435558027493071, guid: fea646f7f4b8003439e74a570006ec47, type: 3}
+    _weapon: {fileID: -1965084331185687820, guid: d1a5aa379203b4d44900d09641e403d7, type: 3}
+    _emptyWeapon: {fileID: -8788583347553794728, guid: d1a5aa379203b4d44900d09641e403d7, type: 3}
+    _cameraEffect: {fileID: 4908183818744415850, guid: b4a38ee618af6bd4b8d1a69598bdca3d, type: 3}
+    _sound: {fileID: 8300000, guid: 6d24347de55b10c4bb995ef57623faa8, type: 3}
+    _speed: 1
+    _weaponSpeedMultiplier: 1
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
+  - _kind: 16
+    _handsName: m4_revival
+    _hands: {fileID: 3233423643615541600, guid: fea646f7f4b8003439e74a570006ec47, type: 3}
+    _weapon: {fileID: 4704616292959553053, guid: d1a5aa379203b4d44900d09641e403d7, type: 3}
+    _emptyWeapon: {fileID: 0}
+    _cameraEffect: {fileID: 4908183818744415850, guid: 1fce6aca1f43dfe4f8ea6574fb4ca2da, type: 3}
+    _sound: {fileID: 8300000, guid: 56ad9e51c9e26014fbc1b8612db6cde4, type: 3}
+    _speed: 1
+    _weaponSpeedMultiplier: 1
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
+  _withGrenadeLauncherMotions: []
+  _grenadeModeMotions: []
+  _attachmentMotions:
+  - _mode: 2
+    _motions:
+    - _kind: 12
+      _handsName: m4_aim_shoot_scope
+      _hands: {fileID: 6762265772375960704, guid: fea646f7f4b8003439e74a570006ec47, type: 3}
+      _weapon: {fileID: 4632084351945502156, guid: d1a5aa379203b4d44900d09641e403d7, type: 3}
+      _emptyWeapon: {fileID: -8788583347553794728, guid: d1a5aa379203b4d44900d09641e403d7, type: 3}
+      _cameraEffect: {fileID: 4908183818744415850, guid: bf63b3c1d178a2848854cee7d04aefe1, type: 3}
+      _sound: {fileID: 0}
+      _speed: 1
+      _weaponSpeedMultiplier: 1
+      _meleeHitPower: 0
+      _meleeReach: 0
+      _meleeContactFrame: 0
+  _aimStart: {fileID: 4908183818744415850, guid: 88da1985fe269144eb211779877444be, type: 3}
+  _aimIdle: {fileID: 4908183818744415850, guid: af00c9a2a4f8e23449bc99bde990b72c, type: 3}
+  _aimIdleSwayDegrees: {x: 0, y: 0}
+  _aimEnd: {fileID: 4908183818744415850, guid: 19673a0226791b643b797b4c09f0724e, type: 3}
+  _crossFade: 0.15
+  _grenadeAimOffsetPosition: {x: 0, y: 0, z: 0}
+  _grenadeAimOffsetRotation: {x: 0, y: 0, z: 0}
+  _useScopedGrenadeAimOffset: 0
+  _scopedGrenadeAimOffsetPosition: {x: 0, y: 0, z: 0}
+  _grenadeAimStart: {fileID: 0}
+  _grenadeAimIdle: {fileID: 0}
+  _grenadeAimEnd: {fileID: 0}
+  _roundsPerMinute: 770
+  _twoRoundBurstRoundsPerMinute: 0
+  _emptyClicksPerMinute: 200
+  _fireModes: 01000000ffffffffi
+  _magazineSize: 30
+  _flameParticles: {fileID: 4533371369864853554, guid: b756063538822f24ca32c6e5db721401, type: 3}
+  _smokeParticles: {fileID: 1495478619395769424, guid: de82c5c52acfcb346a0a2951d67124a1, type: 3}
+  _silencedFlameParticles: {fileID: 0}
+  _silencedSmokeParticles: {fileID: 3969830359355939410, guid: 8f360db1ee2283943ad154c0a11d2262, type: 3}
+  _lastShotHoldFrame: 1
+  _emptyShotStrength: 0.15
+  _ballistics:
+    _bulletPrefab: {fileID: 4022291978906581112, guid: 8899b2fbc46efff4389c602431eecefa, type: 3}
+    _ballisticHitMask:
+      serializedVersion: 2
+      m_Bits: 4294967291
+    _drawBallisticDebug: 0
+  _recoil: {x: 2.9, y: 1.15, z: 0.4}
+  _recoilSnappiness: 15
+  _recoilReturnSpeed: 12
+  _shotSounds:
+  - {fileID: 8300000, guid: ee3e70709bcf38d42b2359fe18fab893, type: 3}
+  - {fileID: 8300000, guid: 50e57044406a00147b57df0aedb3e413, type: 3}
+  - {fileID: 8300000, guid: 9444730c013eee44989ae94b405fd854, type: 3}
+  - {fileID: 8300000, guid: a029b1fdc305ce54ba0dafe62ee15919, type: 3}
+  - {fileID: 8300000, guid: 62d0c60040f71a14a8527b2816677ffe, type: 3}
+  - {fileID: 8300000, guid: f267af0890eea254d9949901c2360be3, type: 3}
+  _silencedShotSounds:
+  - {fileID: 8300000, guid: 1044c9331342d9949932c90453844fe3, type: 3}
+  - {fileID: 8300000, guid: 8bf2e0741aa83694291d7d35fec1f2c5, type: 3}
+  - {fileID: 8300000, guid: cc40e5d652c93dd46be49d9b7e9b5e74, type: 3}
+  - {fileID: 8300000, guid: 9f58c79669f62f2449530b737cfb2480, type: 3}
+  - {fileID: 8300000, guid: 7c9d3326c43918b41b6c62dad816f350, type: 3}
+  - {fileID: 8300000, guid: b3cbc3b70fd226949b0f7ab06f973c3f, type: 3}
+  _aimInSounds:
+  - {fileID: 8300000, guid: 3adc181589402d34da990f66a694f551, type: 3}
+  - {fileID: 8300000, guid: 489860fcc7dfdbb4b9c7d717b57ced0c, type: 3}
+  - {fileID: 8300000, guid: 210c195e0e94da64bab5c831526482d1, type: 3}
+  - {fileID: 8300000, guid: 2f7c4772bf30fff4ab5beeac0caf6953, type: 3}
+  - {fileID: 8300000, guid: 3735b4ee6da5c7a4cbeca3c1cedbde11, type: 3}
+  - {fileID: 8300000, guid: d335b48a29bd16a4ba4a4025527ce5f8, type: 3}
+  - {fileID: 8300000, guid: 645c26d6b23f4b74bb298e92781115fd, type: 3}
+  - {fileID: 8300000, guid: edfc78d0e8b92a041b8b3bfbfb91c7d8, type: 3}
+  - {fileID: 8300000, guid: 31d9852bb65416146ab40d41a876a31f, type: 3}
+  - {fileID: 8300000, guid: 87c446c45c54f554e98614297b661251, type: 3}
+  _aimOutSounds:
+  - {fileID: 8300000, guid: c32ecd92829f0364aa9d62c63201425a, type: 3}
+  - {fileID: 8300000, guid: b79c40a8e1c113846a29177ef59664f4, type: 3}
+  - {fileID: 8300000, guid: d00d1111a9740624ca3a5b65e2734ba8, type: 3}
+  - {fileID: 8300000, guid: 81c6ba29df9ec10428f25a0cbeb3c2ec, type: 3}
+  - {fileID: 8300000, guid: 5a5ff437c11eb9043af0b5f6f599ed57, type: 3}
+  - {fileID: 8300000, guid: 915a9dbd33738f64b8559edcd66fb8f5, type: 3}
+  - {fileID: 8300000, guid: 0a3fd8357db5f054bbe579cbc750d484, type: 3}
+  - {fileID: 8300000, guid: 22712efba62a5dc4aa7b755e35373b5c, type: 3}
+  - {fileID: 8300000, guid: c0251717b78577340ae21d59f0b3e686, type: 3}
+  - {fileID: 8300000, guid: d7e04e2b4bc590d4ea1cb86dbd830631, type: 3}
+  _emptySound: {fileID: 8300000, guid: 66dce59e07408524db8d88d6fefedca4, type: 3}
+  _lastShellSound: {fileID: 8300000, guid: a8c02199264c0bd4699bfd52abab1b2b, type: 3}
+  _lowAmmoSound: {fileID: 0}
+  _lowAmmoThreshold: 0

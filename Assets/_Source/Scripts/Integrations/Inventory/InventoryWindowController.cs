@@ -360,6 +360,11 @@ namespace RaidIntoDarkness.Integrations.Inventory
         {
             _descriptionBinding?.Dispose();
             UnbindStatusHover();
+            if (_window != null && _window.ItemShortNameProvider == FormatItemShortName)
+            {
+                _window.ItemShortNameProvider = null;
+            }
+
             if (_gameplayBlocked)
             {
                 RestoreGameplay();
@@ -567,7 +572,15 @@ namespace RaidIntoDarkness.Integrations.Inventory
             }
         }
 
-        private static string FormatItemShortName(ItemInstance item) => FormatDefinitionShortName(item?.Definition);
+        private string FormatItemShortName(ItemInstance item)
+        {
+            if (item != null && item.Location.SlotId == FirstPersonWeaponBinder.KNIFE_SLOT && item.ContainerId == _window.EquipmentContainerId)
+            {
+                return string.Empty;
+            }
+
+            return FormatDefinitionShortName(item?.Definition);
+        }
 
         internal static string FormatDefinitionShortName(ItemDefinition definition)
         {

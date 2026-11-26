@@ -7353,6 +7353,9 @@ MonoBehaviour:
     _replacement: {fileID: 3663430596644510724}
   - _installed: {fileID: 1146788132101951007}
     _replacement: {fileID: 5724104344434869316}
+  _installedMagazineRound: {fileID: 461889244131723666}
+  _replacementMagazineRound: {fileID: 7886564818690856852}
+  _hipBackOffset: 0
 --- !u!1 &2150817800923457240
 GameObject:
   m_ObjectHideFlags: 0
@@ -21994,7 +21997,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &9184810042915705207
 Transform:
   m_ObjectHideFlags: 0

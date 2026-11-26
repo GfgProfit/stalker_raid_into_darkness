@@ -26476,6 +26476,8 @@ MonoBehaviour:
     _replacement: {fileID: 8110858543584266814}
   - _installed: {fileID: 7010913728075985057}
     _replacement: {fileID: 393225746729930869}
+  _installedMagazineRound: {fileID: 5373217335013556094}
+  _replacementMagazineRound: {fileID: 8037476144285840930}
 --- !u!114 &3839586995162859987
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -13,14 +13,44 @@ MonoBehaviour:
   m_Name: wpn_ak12_first_person
   m_EditorClassIdentifier: RaidIntoDarkness.Weapons::RaidIntoDarkness.Weapons.FirstPersonWeaponAsset
   _hudModel: {fileID: 4635513672908284740, guid: 340ea9cc7e125484689521490c0db617, type: 3}
+  _isMelee: 0
+  _isStandaloneLauncher: 0
+  _useStandaloneHipDispersion: 0
+  _handGrenadeVisual: {fileID: 0}
+  _handGrenade:
+    _explosionPrefab: {fileID: 0}
+    _explosionSound: {fileID: 0}
+    _launchSound: {fileID: 0}
+    _explosionVariants: []
+    _explosionBodyVariants: []
+    _bounceSounds: {fileID: 0}
+    _bounceSurfaces: {fileID: 0}
+    _blastRadius: 5
+    _blastDamage: 90
+    _fragmentCount: 80
+    _fragmentDamage: 14
+    _selfDestructSeconds: 6
+    _armingDistance: 2.5
+    _impactBounceHeight: 0
+    _fragmentRange: 100
+    _armingSeconds: 0
+    _explodeOnImpact: 0
+    _fliesStraight: 0
+    _projectileVisual: {fileID: 0}
+    _flightTrail: {fileID: 0}
+  _handGrenadeReleaseFrame: 1
+  _handGrenadeThrowSpeed: 16
   _handsPosition: {x: 0.009675, y: -0.0172, z: -0.0096}
   _handsOrientation: {x: 0, y: 0, z: 0}
   _aimOffsetPosition: {x: 0.0019, y: 0.0033, z: 0.018}
   _aimOffsetRotation: {x: 0.00175, y: 0.00075, z: 0}
+  _ironSightAimRotationOffset: {x: 0, y: 0, z: 0}
   _aimTime: 0.16666667
   _aimCameraRoll: 0
   _aimCameraBlendTime: 0.15
   _aimZoom: 1.15
+  _ironSightHudFieldOfView: 0
+  _reloadHudFovReduction: 0
   _muzzleBone: wpn_body
   _overlayBones:
   - l_clavicle
@@ -40,6 +70,10 @@ MonoBehaviour:
     _cameraEffect: {fileID: 4908183818744415850, guid: e0a0c8bd42ef98849a6f90f7ea95319e, type: 3}
     _sound: {fileID: 8300000, guid: 6ec65d50ecc624642960f113aa15440c, type: 3}
     _speed: 1
+    _weaponSpeedMultiplier: 0
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
   - _kind: 1
     _handsName: ak12_holster
     _hands: {fileID: 3707867522726780436, guid: 0dedd0517825fa149bd3697747e8abed, type: 3}
@@ -48,6 +82,10 @@ MonoBehaviour:
     _cameraEffect: {fileID: 0}
     _sound: {fileID: 8300000, guid: 638166e77da64e446afc8c97df18ba30, type: 3}
     _speed: 1
+    _weaponSpeedMultiplier: 0
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
   - _kind: 2
     _handsName: ak12_idle
     _hands: {fileID: -1353540710366511575, guid: 0dedd0517825fa149bd3697747e8abed, type: 3}
@@ -56,6 +94,10 @@ MonoBehaviour:
     _cameraEffect: {fileID: 0}
     _sound: {fileID: 0}
     _speed: 1
+    _weaponSpeedMultiplier: 0
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
   - _kind: 3
     _handsName: ak12_idle_aim
     _hands: {fileID: -222481835466223827, guid: 0dedd0517825fa149bd3697747e8abed, type: 3}
@@ -64,6 +106,10 @@ MonoBehaviour:
     _cameraEffect: {fileID: 0}
     _sound: {fileID: 0}
     _speed: 1
+    _weaponSpeedMultiplier: 0
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
   - _kind: 4
     _handsName: ak12_moving
     _hands: {fileID: 9131670207092964090, guid: 0dedd0517825fa149bd3697747e8abed, type: 3}
@@ -72,6 +118,10 @@ MonoBehaviour:
     _cameraEffect: {fileID: 0}
     _sound: {fileID: 0}
     _speed: 1
+    _weaponSpeedMultiplier: 0
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
   - _kind: 5
     _handsName: ak12_moving_aim
     _hands: {fileID: 8133322588509474478, guid: 0dedd0517825fa149bd3697747e8abed, type: 3}
@@ -80,6 +130,10 @@ MonoBehaviour:
     _cameraEffect: {fileID: 0}
     _sound: {fileID: 0}
     _speed: 1
+    _weaponSpeedMultiplier: 0
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
   - _kind: 6
     _handsName: ak12_moving_slow
     _hands: {fileID: -5571466823536444104, guid: 0dedd0517825fa149bd3697747e8abed, type: 3}
@@ -88,6 +142,10 @@ MonoBehaviour:
     _cameraEffect: {fileID: 0}
     _sound: {fileID: 0}
     _speed: 1
+    _weaponSpeedMultiplier: 0
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
   - _kind: 7
     _handsName: ak12_crouch
     _hands: {fileID: 2452693377360530585, guid: 0dedd0517825fa149bd3697747e8abed, type: 3}
@@ -96,6 +154,10 @@ MonoBehaviour:
     _cameraEffect: {fileID: 0}
     _sound: {fileID: 0}
     _speed: 1
+    _weaponSpeedMultiplier: 0
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
   - _kind: 8
     _handsName: ak12_sprint_start
     _hands: {fileID: -1117049621926506467, guid: 0dedd0517825fa149bd3697747e8abed, type: 3}
@@ -104,6 +166,10 @@ MonoBehaviour:
     _cameraEffect: {fileID: 0}
     _sound: {fileID: 0}
     _speed: 1
+    _weaponSpeedMultiplier: 0
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
   - _kind: 9
     _handsName: ak12_sprint
     _hands: {fileID: -1355872359174352890, guid: 0dedd0517825fa149bd3697747e8abed, type: 3}
@@ -112,6 +178,10 @@ MonoBehaviour:
     _cameraEffect: {fileID: 0}
     _sound: {fileID: 0}
     _speed: 1
+    _weaponSpeedMultiplier: 0
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
   - _kind: 10
     _handsName: ak12_sprint_end
     _hands: {fileID: 6278314294724515395, guid: 0dedd0517825fa149bd3697747e8abed, type: 3}
@@ -120,6 +190,10 @@ MonoBehaviour:
     _cameraEffect: {fileID: 0}
     _sound: {fileID: 0}
     _speed: 1
+    _weaponSpeedMultiplier: 0
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
   - _kind: 11
     _handsName: ak12_shoot
     _hands: {fileID: 4064803613179730160, guid: 0dedd0517825fa149bd3697747e8abed, type: 3}
@@ -128,6 +202,10 @@ MonoBehaviour:
     _cameraEffect: {fileID: 4908183818744415850, guid: 940fab755d0819d4d97591d4dec796df, type: 3}
     _sound: {fileID: 0}
     _speed: 1
+    _weaponSpeedMultiplier: 0
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
   - _kind: 11
     _handsName: ak12_shoot1
     _hands: {fileID: -6682550996503338590, guid: 0dedd0517825fa149bd3697747e8abed, type: 3}
@@ -136,6 +214,10 @@ MonoBehaviour:
     _cameraEffect: {fileID: 4908183818744415850, guid: 93f787deaed29b443a45a9b9292647b4, type: 3}
     _sound: {fileID: 0}
     _speed: 1
+    _weaponSpeedMultiplier: 0
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
   - _kind: 11
     _handsName: ak12_shoot2
     _hands: {fileID: -5295851337755959199, guid: 0dedd0517825fa149bd3697747e8abed, type: 3}
@@ -144,6 +226,10 @@ MonoBehaviour:
     _cameraEffect: {fileID: 4908183818744415850, guid: 48669c36b550a794c9f5b24be78745d9, type: 3}
     _sound: {fileID: 0}
     _speed: 1
+    _weaponSpeedMultiplier: 0
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
   - _kind: 12
     _handsName: ak12_shoot_aim
     _hands: {fileID: 6624173459212338821, guid: 0dedd0517825fa149bd3697747e8abed, type: 3}
@@ -152,6 +238,10 @@ MonoBehaviour:
     _cameraEffect: {fileID: 4908183818744415850, guid: 28f4e827e9dc7604bbfd114d1127f3e4, type: 3}
     _sound: {fileID: 0}
     _speed: 1
+    _weaponSpeedMultiplier: 0
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
   - _kind: 12
     _handsName: ak12_shoot_aim1
     _hands: {fileID: -2505510497087088248, guid: 0dedd0517825fa149bd3697747e8abed, type: 3}
@@ -160,6 +250,10 @@ MonoBehaviour:
     _cameraEffect: {fileID: 4908183818744415850, guid: d3289896e2ed6844fbe2a73d7369235b, type: 3}
     _sound: {fileID: 0}
     _speed: 1
+    _weaponSpeedMultiplier: 0
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
   - _kind: 12
     _handsName: ak12_shoot_aim2
     _hands: {fileID: -705224850471630110, guid: 0dedd0517825fa149bd3697747e8abed, type: 3}
@@ -168,6 +262,10 @@ MonoBehaviour:
     _cameraEffect: {fileID: 4908183818744415850, guid: e1b7dd4ed3788e245a71f3e803278777, type: 3}
     _sound: {fileID: 0}
     _speed: 1
+    _weaponSpeedMultiplier: 0
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
   - _kind: 13
     _handsName: ak12_reload
     _hands: {fileID: 6797208052511775065, guid: 0dedd0517825fa149bd3697747e8abed, type: 3}
@@ -176,6 +274,10 @@ MonoBehaviour:
     _cameraEffect: {fileID: 4908183818744415850, guid: dfe33b10d8b450f4f82a9c1504db8544, type: 3}
     _sound: {fileID: 8300000, guid: f204de200215c2d48ac6b8c961171c1c, type: 3}
     _speed: 1
+    _weaponSpeedMultiplier: 0
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
   - _kind: 14
     _handsName: ak12_reload_empty
     _hands: {fileID: 1307613195190618222, guid: 0dedd0517825fa149bd3697747e8abed, type: 3}
@@ -184,6 +286,10 @@ MonoBehaviour:
     _cameraEffect: {fileID: 4908183818744415850, guid: 96294ef4ab02de446b53e388efb23b8d, type: 3}
     _sound: {fileID: 8300000, guid: 80d20f2b179d4f44ea382dd039050a02, type: 3}
     _speed: 1
+    _weaponSpeedMultiplier: 0
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
   - _kind: 15
     _handsName: ak12_firemode
     _hands: {fileID: -1828067828294825004, guid: 0dedd0517825fa149bd3697747e8abed, type: 3}
@@ -192,6 +298,10 @@ MonoBehaviour:
     _cameraEffect: {fileID: 4908183818744415850, guid: 72e3c247f812676478bfedecb9e2dcfd, type: 3}
     _sound: {fileID: 8300000, guid: 6d24347de55b10c4bb995ef57623faa8, type: 3}
     _speed: 1
+    _weaponSpeedMultiplier: 0
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
   - _kind: 16
     _handsName: ak12_misfire
     _hands: {fileID: -3756458459888044791, guid: 0dedd0517825fa149bd3697747e8abed, type: 3}
@@ -200,6 +310,10 @@ MonoBehaviour:
     _cameraEffect: {fileID: 4908183818744415850, guid: 0035eb3e0ed3eae4bb32e084cac3d940, type: 3}
     _sound: {fileID: 8300000, guid: 33ccbae60cbd30c4bb6a5a3253388dd6, type: 3}
     _speed: 1
+    _weaponSpeedMultiplier: 0
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
   - _kind: 17
     _handsName: ak12_idle
     _hands: {fileID: -1353540710366511575, guid: 0dedd0517825fa149bd3697747e8abed, type: 3}
@@ -208,6 +322,10 @@ MonoBehaviour:
     _cameraEffect: {fileID: 0}
     _sound: {fileID: 0}
     _speed: 1
+    _weaponSpeedMultiplier: 0
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
   - _kind: 18
     _handsName: ak12_g_on
     _hands: {fileID: 1230246817714439410, guid: 0dedd0517825fa149bd3697747e8abed, type: 3}
@@ -216,6 +334,10 @@ MonoBehaviour:
     _cameraEffect: {fileID: 4908183818744415850, guid: 49dcce4ee4718494da11103dfde0d399, type: 3}
     _sound: {fileID: 8300000, guid: 2f8e1db6e446f5c41824826af4f04259, type: 3}
     _speed: 1
+    _weaponSpeedMultiplier: 0
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
   - _kind: 19
     _handsName: ak12_g_off
     _hands: {fileID: 6542639976222173379, guid: 0dedd0517825fa149bd3697747e8abed, type: 3}
@@ -224,6 +346,10 @@ MonoBehaviour:
     _cameraEffect: {fileID: 4908183818744415850, guid: 56a2afbb0de5f8246af39f9f7c7d5299, type: 3}
     _sound: {fileID: 8300000, guid: 29a27264cf8edb34a9a6bc8da7dac628, type: 3}
     _speed: 1
+    _weaponSpeedMultiplier: 0
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
   - _kind: 20
     _handsName: ak12_g_reload
     _hands: {fileID: 8199875478782677516, guid: 0dedd0517825fa149bd3697747e8abed, type: 3}
@@ -232,6 +358,10 @@ MonoBehaviour:
     _cameraEffect: {fileID: 4908183818744415850, guid: 78983ec5663705c43be94168c73e803f, type: 3}
     _sound: {fileID: 8300000, guid: b24d5f603d10e254b9348b6257552cb5, type: 3}
     _speed: 1
+    _weaponSpeedMultiplier: 0
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
   _withGrenadeLauncherMotions:
   - _kind: 0
     _handsName: ak12_draw_w_gl
@@ -241,6 +371,10 @@ MonoBehaviour:
     _cameraEffect: {fileID: 4908183818744415850, guid: 3f9645dacb3786d49a1154c6b015b13d, type: 3}
     _sound: {fileID: 8300000, guid: 6ec65d50ecc624642960f113aa15440c, type: 3}
     _speed: 1
+    _weaponSpeedMultiplier: 0
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
   - _kind: 1
     _handsName: ak12_holster_w_gl
     _hands: {fileID: 3365578457041195865, guid: 0dedd0517825fa149bd3697747e8abed, type: 3}
@@ -249,6 +383,10 @@ MonoBehaviour:
     _cameraEffect: {fileID: 0}
     _sound: {fileID: 8300000, guid: 638166e77da64e446afc8c97df18ba30, type: 3}
     _speed: 1
+    _weaponSpeedMultiplier: 0
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
   - _kind: 2
     _handsName: ak12_idle_w_gl
     _hands: {fileID: 689748161145236726, guid: 0dedd0517825fa149bd3697747e8abed, type: 3}
@@ -257,6 +395,10 @@ MonoBehaviour:
     _cameraEffect: {fileID: 0}
     _sound: {fileID: 0}
     _speed: 1
+    _weaponSpeedMultiplier: 0
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
   - _kind: 3
     _handsName: ak12_idle_aim_w_gl
     _hands: {fileID: 7876720851498027194, guid: 0dedd0517825fa149bd3697747e8abed, type: 3}
@@ -265,6 +407,10 @@ MonoBehaviour:
     _cameraEffect: {fileID: 0}
     _sound: {fileID: 0}
     _speed: 1
+    _weaponSpeedMultiplier: 0
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
   - _kind: 4
     _handsName: ak12_moving_w_gl
     _hands: {fileID: -8530105214516933731, guid: 0dedd0517825fa149bd3697747e8abed, type: 3}
@@ -273,6 +419,10 @@ MonoBehaviour:
     _cameraEffect: {fileID: 0}
     _sound: {fileID: 0}
     _speed: 1
+    _weaponSpeedMultiplier: 0
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
   - _kind: 5
     _handsName: ak12_moving_aim_w_gl
     _hands: {fileID: 4779524086124301418, guid: 0dedd0517825fa149bd3697747e8abed, type: 3}
@@ -281,6 +431,10 @@ MonoBehaviour:
     _cameraEffect: {fileID: 0}
     _sound: {fileID: 0}
     _speed: 1
+    _weaponSpeedMultiplier: 0
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
   - _kind: 6
     _handsName: ak12_moving_slow_w_gl
     _hands: {fileID: 7264423374952579618, guid: 0dedd0517825fa149bd3697747e8abed, type: 3}
@@ -289,6 +443,10 @@ MonoBehaviour:
     _cameraEffect: {fileID: 0}
     _sound: {fileID: 0}
     _speed: 1
+    _weaponSpeedMultiplier: 0
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
   - _kind: 7
     _handsName: ak12_crouch_w_gl
     _hands: {fileID: 8330586226501134310, guid: 0dedd0517825fa149bd3697747e8abed, type: 3}
@@ -297,6 +455,10 @@ MonoBehaviour:
     _cameraEffect: {fileID: 0}
     _sound: {fileID: 0}
     _speed: 1
+    _weaponSpeedMultiplier: 0
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
   - _kind: 8
     _handsName: ak12_sprint_w_gl_start
     _hands: {fileID: -6604574941418161807, guid: 0dedd0517825fa149bd3697747e8abed, type: 3}
@@ -305,6 +467,10 @@ MonoBehaviour:
     _cameraEffect: {fileID: 0}
     _sound: {fileID: 0}
     _speed: 1
+    _weaponSpeedMultiplier: 0
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
   - _kind: 9
     _handsName: ak12_sprint_w_gl
     _hands: {fileID: 5117048573639769945, guid: 0dedd0517825fa149bd3697747e8abed, type: 3}
@@ -313,6 +479,10 @@ MonoBehaviour:
     _cameraEffect: {fileID: 0}
     _sound: {fileID: 0}
     _speed: 1
+    _weaponSpeedMultiplier: 0
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
   - _kind: 10
     _handsName: ak12_sprint_w_gl_end
     _hands: {fileID: -896662926878560561, guid: 0dedd0517825fa149bd3697747e8abed, type: 3}
@@ -321,6 +491,10 @@ MonoBehaviour:
     _cameraEffect: {fileID: 0}
     _sound: {fileID: 0}
     _speed: 1
+    _weaponSpeedMultiplier: 0
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
   - _kind: 11
     _handsName: ak12_w_gl_shoot
     _hands: {fileID: 5005464031172304260, guid: 0dedd0517825fa149bd3697747e8abed, type: 3}
@@ -329,6 +503,10 @@ MonoBehaviour:
     _cameraEffect: {fileID: 4908183818744415850, guid: 9e235130c938c8e46af0c5b00d550d11, type: 3}
     _sound: {fileID: 0}
     _speed: 1
+    _weaponSpeedMultiplier: 0
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
   - _kind: 11
     _handsName: ak12_w_gl_shoot1
     _hands: {fileID: 4429176132173597355, guid: 0dedd0517825fa149bd3697747e8abed, type: 3}
@@ -337,6 +515,10 @@ MonoBehaviour:
     _cameraEffect: {fileID: 4908183818744415850, guid: 3f299074ca49c7345a8f8d94eea1312a, type: 3}
     _sound: {fileID: 0}
     _speed: 1
+    _weaponSpeedMultiplier: 0
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
   - _kind: 11
     _handsName: ak12_w_gl_shoot2
     _hands: {fileID: 3893884390298647061, guid: 0dedd0517825fa149bd3697747e8abed, type: 3}
@@ -345,6 +527,10 @@ MonoBehaviour:
     _cameraEffect: {fileID: 4908183818744415850, guid: 90089cca0e9a9f5429f9f64df3b03b76, type: 3}
     _sound: {fileID: 0}
     _speed: 1
+    _weaponSpeedMultiplier: 0
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
   - _kind: 12
     _handsName: ak12_w_gl_shoot_aim
     _hands: {fileID: 1517490563640999902, guid: 0dedd0517825fa149bd3697747e8abed, type: 3}
@@ -353,6 +539,10 @@ MonoBehaviour:
     _cameraEffect: {fileID: 4908183818744415850, guid: 8a7779e30795580459b8ba64431d7f44, type: 3}
     _sound: {fileID: 0}
     _speed: 1
+    _weaponSpeedMultiplier: 0
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
   - _kind: 12
     _handsName: ak12_w_gl_shoot_aim1
     _hands: {fileID: -6885928687640968728, guid: 0dedd0517825fa149bd3697747e8abed, type: 3}
@@ -361,6 +551,10 @@ MonoBehaviour:
     _cameraEffect: {fileID: 4908183818744415850, guid: 52b42f7aa36b5124d9c62abc9e1b2315, type: 3}
     _sound: {fileID: 0}
     _speed: 1
+    _weaponSpeedMultiplier: 0
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
   - _kind: 12
     _handsName: ak12_w_gl_shoot_aim2
     _hands: {fileID: 4898256226101562551, guid: 0dedd0517825fa149bd3697747e8abed, type: 3}
@@ -369,6 +563,10 @@ MonoBehaviour:
     _cameraEffect: {fileID: 4908183818744415850, guid: 914a18a0882eb164c9690839565e4dd0, type: 3}
     _sound: {fileID: 0}
     _speed: 1
+    _weaponSpeedMultiplier: 0
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
   - _kind: 13
     _handsName: ak12_reload_w_gl
     _hands: {fileID: 7743404097489513549, guid: 0dedd0517825fa149bd3697747e8abed, type: 3}
@@ -377,6 +575,10 @@ MonoBehaviour:
     _cameraEffect: {fileID: 4908183818744415850, guid: 886e11976b7127842b45f01156ed8aec, type: 3}
     _sound: {fileID: 8300000, guid: f204de200215c2d48ac6b8c961171c1c, type: 3}
     _speed: 1
+    _weaponSpeedMultiplier: 0
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
   - _kind: 14
     _handsName: ak12_reload_empty_w_gl
     _hands: {fileID: 4098059157565195412, guid: 0dedd0517825fa149bd3697747e8abed, type: 3}
@@ -385,6 +587,10 @@ MonoBehaviour:
     _cameraEffect: {fileID: 4908183818744415850, guid: 33bf5df86e1d3f84aac604eb83089fae, type: 3}
     _sound: {fileID: 8300000, guid: 80d20f2b179d4f44ea382dd039050a02, type: 3}
     _speed: 1
+    _weaponSpeedMultiplier: 0
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
   - _kind: 15
     _handsName: ak12_firemode_w_gl
     _hands: {fileID: 3799201799926684938, guid: 0dedd0517825fa149bd3697747e8abed, type: 3}
@@ -393,6 +599,10 @@ MonoBehaviour:
     _cameraEffect: {fileID: 4908183818744415850, guid: 3f1b21a36db09144ea43c4b455f45791, type: 3}
     _sound: {fileID: 8300000, guid: 6d24347de55b10c4bb995ef57623faa8, type: 3}
     _speed: 1
+    _weaponSpeedMultiplier: 0
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
   - _kind: 16
     _handsName: ak12_misfire_w_gl
     _hands: {fileID: -6803757110349851855, guid: 0dedd0517825fa149bd3697747e8abed, type: 3}
@@ -401,6 +611,10 @@ MonoBehaviour:
     _cameraEffect: {fileID: 4908183818744415850, guid: f94570c49e1f96047b2ddb3b3c9c644b, type: 3}
     _sound: {fileID: 8300000, guid: 33ccbae60cbd30c4bb6a5a3253388dd6, type: 3}
     _speed: 1
+    _weaponSpeedMultiplier: 0
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
   - _kind: 17
     _handsName: ak12_idle_w_gl
     _hands: {fileID: 689748161145236726, guid: 0dedd0517825fa149bd3697747e8abed, type: 3}
@@ -409,6 +623,10 @@ MonoBehaviour:
     _cameraEffect: {fileID: 0}
     _sound: {fileID: 0}
     _speed: 1
+    _weaponSpeedMultiplier: 0
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
   _grenadeModeMotions:
   - _kind: 0
     _handsName: ak12_g_draw
@@ -418,6 +636,10 @@ MonoBehaviour:
     _cameraEffect: {fileID: 4908183818744415850, guid: 1fea3c3c81470fa44916c87d91de43b7, type: 3}
     _sound: {fileID: 8300000, guid: 6ec65d50ecc624642960f113aa15440c, type: 3}
     _speed: 1
+    _weaponSpeedMultiplier: 0
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
   - _kind: 1
     _handsName: ak12_g_holster
     _hands: {fileID: 2951006804646938518, guid: 0dedd0517825fa149bd3697747e8abed, type: 3}
@@ -426,6 +648,10 @@ MonoBehaviour:
     _cameraEffect: {fileID: 0}
     _sound: {fileID: 8300000, guid: 638166e77da64e446afc8c97df18ba30, type: 3}
     _speed: 1
+    _weaponSpeedMultiplier: 0
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
   - _kind: 2
     _handsName: ak12_g_idle
     _hands: {fileID: 8768106592933893504, guid: 0dedd0517825fa149bd3697747e8abed, type: 3}
@@ -434,6 +660,10 @@ MonoBehaviour:
     _cameraEffect: {fileID: 0}
     _sound: {fileID: 0}
     _speed: 1
+    _weaponSpeedMultiplier: 0
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
   - _kind: 3
     _handsName: ak12_g_idle_aim
     _hands: {fileID: 240922481408821374, guid: 0dedd0517825fa149bd3697747e8abed, type: 3}
@@ -442,6 +672,10 @@ MonoBehaviour:
     _cameraEffect: {fileID: 0}
     _sound: {fileID: 0}
     _speed: 1
+    _weaponSpeedMultiplier: 0
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
   - _kind: 4
     _handsName: ak12_g_moving
     _hands: {fileID: 3230949790609976947, guid: 0dedd0517825fa149bd3697747e8abed, type: 3}
@@ -450,6 +684,10 @@ MonoBehaviour:
     _cameraEffect: {fileID: 0}
     _sound: {fileID: 0}
     _speed: 1
+    _weaponSpeedMultiplier: 0
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
   - _kind: 5
     _handsName: ak12_g_moving_aim
     _hands: {fileID: -6342545398525322626, guid: 0dedd0517825fa149bd3697747e8abed, type: 3}
@@ -458,6 +696,10 @@ MonoBehaviour:
     _cameraEffect: {fileID: 0}
     _sound: {fileID: 0}
     _speed: 1
+    _weaponSpeedMultiplier: 0
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
   - _kind: 6
     _handsName: ak12_g_moving_slow
     _hands: {fileID: -7160770258037475591, guid: 0dedd0517825fa149bd3697747e8abed, type: 3}
@@ -466,6 +708,10 @@ MonoBehaviour:
     _cameraEffect: {fileID: 0}
     _sound: {fileID: 0}
     _speed: 1
+    _weaponSpeedMultiplier: 0
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
   - _kind: 7
     _handsName: ak12_g_crouch
     _hands: {fileID: 3741837505684908523, guid: 0dedd0517825fa149bd3697747e8abed, type: 3}
@@ -474,6 +720,10 @@ MonoBehaviour:
     _cameraEffect: {fileID: 0}
     _sound: {fileID: 0}
     _speed: 1
+    _weaponSpeedMultiplier: 0
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
   - _kind: 8
     _handsName: ak12_sprint_g_start
     _hands: {fileID: -8077161254063130696, guid: 0dedd0517825fa149bd3697747e8abed, type: 3}
@@ -482,6 +732,10 @@ MonoBehaviour:
     _cameraEffect: {fileID: 0}
     _sound: {fileID: 0}
     _speed: 1
+    _weaponSpeedMultiplier: 0
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
   - _kind: 9
     _handsName: ak12_sprint_g
     _hands: {fileID: -6884775084544106950, guid: 0dedd0517825fa149bd3697747e8abed, type: 3}
@@ -490,6 +744,10 @@ MonoBehaviour:
     _cameraEffect: {fileID: 0}
     _sound: {fileID: 0}
     _speed: 1
+    _weaponSpeedMultiplier: 0
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
   - _kind: 10
     _handsName: ak12_sprint_g_end
     _hands: {fileID: 3991771376065856815, guid: 0dedd0517825fa149bd3697747e8abed, type: 3}
@@ -498,6 +756,10 @@ MonoBehaviour:
     _cameraEffect: {fileID: 0}
     _sound: {fileID: 0}
     _speed: 1
+    _weaponSpeedMultiplier: 0
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
   - _kind: 17
     _handsName: ak12_g_idle
     _hands: {fileID: 8768106592933893504, guid: 0dedd0517825fa149bd3697747e8abed, type: 3}
@@ -506,24 +768,37 @@ MonoBehaviour:
     _cameraEffect: {fileID: 0}
     _sound: {fileID: 0}
     _speed: 1
+    _weaponSpeedMultiplier: 0
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
   - _kind: 11
     _handsName: ak12_g_shoot
     _hands: {fileID: 3251884260761529132, guid: 0dedd0517825fa149bd3697747e8abed, type: 3}
     _weapon: {fileID: 2311523035756880660, guid: 68720299cdd0826428a6359a1bbf3be7, type: 3}
-    _emptyWeapon: {fileID: 0}
+    _emptyWeapon: {fileID: -5545674670500815245, guid: 68720299cdd0826428a6359a1bbf3be7, type: 3}
     _cameraEffect: {fileID: 0}
     _sound: {fileID: 0}
     _speed: 1
+    _weaponSpeedMultiplier: 0
+    _meleeHitPower: 0
+    _meleeReach: 0
+    _meleeContactFrame: 0
+  _attachmentMotions: []
   _aimStart: {fileID: 4908183818744415850, guid: ec92eb8f5f9bbff47aa79d0fea1b1cc8, type: 3}
   _aimIdle: {fileID: 4908183818744415850, guid: 56f878b1de6abfd48b9ff8d4ca22cdbb, type: 3}
+  _aimIdleSwayDegrees: {x: 0, y: 0}
   _aimEnd: {fileID: 4908183818744415850, guid: b6d5a536c807e0f42a03194a86cb203c, type: 3}
   _crossFade: 0.15
   _grenadeAimOffsetPosition: {x: -0.0081, y: 0.0004, z: -0.0495}
   _grenadeAimOffsetRotation: {x: 0.0015, y: 0.0005, z: 0}
+  _useScopedGrenadeAimOffset: 0
+  _scopedGrenadeAimOffsetPosition: {x: 0, y: 0, z: 0}
   _grenadeAimStart: {fileID: 4908183818744415850, guid: 72f032b32a41f6741a233c3a593ced60, type: 3}
   _grenadeAimIdle: {fileID: 4908183818744415850, guid: 848f0425810241248be72b09c195b872, type: 3}
   _grenadeAimEnd: {fileID: 4908183818744415850, guid: e9b387bd24be7ce49aba1e136cff0d1b, type: 3}
   _roundsPerMinute: 700
+  _twoRoundBurstRoundsPerMinute: 0
   _emptyClicksPerMinute: 200
   _fireModes: 0200000001000000ffffffffi
   _magazineSize: 45

@@ -164,8 +164,8 @@ MonoBehaviour:
         - {fileID: 11400000, guid: 3692a31afb1686341add931beeea3d2c, type: 2}
         - {fileID: 11400000, guid: e95ace63b43e2ad478d34913a79b2c68, type: 2}
         - {fileID: 11400000, guid: 890de65b739559841b6df555700037b5, type: 2}
-        _grenadeLauncherStatus: 0
-        _grenadeLauncherSection: 
+        _grenadeLauncherStatus: 2
+        _grenadeLauncherSection: wpn_addon_grenade_launcher_m203
         _blockSilencerWithGrenadeLauncher: 0
         _exposedRound: {fileID: 0}
     - rid: 115149152802308192
@@ -178,6 +178,7 @@ MonoBehaviour:
         _attachmentBones:
         - wpn_scope
         - wpn_silencer
+        - wpn_launcher
         _firstPersonWeapon: {fileID: 11400000, guid: 0e7bd07ca567d32479b02066af1c45e6, type: 2}
         _scopeAimOffsets:
         - _scope: {fileID: 11400000, guid: 867a7f373388760469fc24ccebf9f005, type: 2}

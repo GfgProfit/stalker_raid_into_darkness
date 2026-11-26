@@ -26,6 +26,7 @@ namespace RaidIntoDarkness.Weapons
         private const float FIRE_MODE_INPUT_RELEASE_RATIO = 0.85f;
         private const float SOUND_VOLUME = 1.0f;
         private const int MELEE_HIT_BUFFER_SIZE = 16;
+        private const string GRENADE_AIM_POINT = "GrenadeAimPoint";
 
         [SerializeField] private StalkerPlayerController _player;
         [SerializeField] private StalkerPlayerInput _input;
@@ -56,6 +57,7 @@ namespace RaidIntoDarkness.Weapons
         private GameObject _model;
         private FirstPersonWeaponView _weaponView;
         private Transform _modelRoot;
+        private Transform _grenadeAimPoint;
         private Transform _muzzle;
         private bool _muzzleFromView;
         private bool _ballisticsWarningLogged;
@@ -418,9 +420,26 @@ namespace RaidIntoDarkness.Weapons
 
         internal bool TryGetGrenadeAimRay(out Ray ray)
         {
-            Camera camera = _player.CameraController != null ? _player.CameraController.Camera : null;
-            ray = camera != null ? camera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f)) : default;
-            return camera != null;
+            ray = default;
+            Camera camera = _player != null && _player.CameraController != null ? _player.CameraController.Camera : null;
+            if (camera == null)
+            {
+                return false;
+            }
+
+            Vector3 viewport = new Vector3(0.5f, 0.5f, 0f);
+            if (IsGrenadeMode && _aiming && _grenadeAimPoint != null)
+            {
+                Vector3 sight = camera.WorldToViewportPoint(_grenadeAimPoint.position);
+                if (sight.z > camera.nearClipPlane && float.IsFinite(sight.z) && float.IsFinite(sight.x) && float.IsFinite(sight.y))
+                {
+                    viewport.x = Mathf.Lerp(viewport.x, sight.x, _aim);
+                    viewport.y = Mathf.Lerp(viewport.y, sight.y, _aim);
+                }
+            }
+
+            ray = camera.ViewportPointToRay(viewport);
+            return true;
         }
 
         private void Awake()
@@ -2019,6 +2038,7 @@ namespace RaidIntoDarkness.Weapons
 
             _model = Instantiate(asset.HudModel, anchor != null ? anchor : hands.transform, false);
             _weaponView = _model.GetComponent<FirstPersonWeaponView>();
+            _grenadeAimPoint = _weaponView != null && _weaponView.GrenadeMuzzle != null ? FindBone(_model, GRENADE_AIM_POINT) : null;
             _model.transform.localPosition = Vector3.zero;
             _model.transform.localRotation = Quaternion.identity;
             Renderer[] renderers = _model.GetComponentsInChildren<Renderer>(true);
@@ -2139,6 +2159,7 @@ namespace RaidIntoDarkness.Weapons
             _handGrenadeVisible = false;
             _weaponView = null;
             _modelRoot = null;
+            _grenadeAimPoint = null;
             _muzzle = null;
             _muzzleFromView = false;
             _flame = null;

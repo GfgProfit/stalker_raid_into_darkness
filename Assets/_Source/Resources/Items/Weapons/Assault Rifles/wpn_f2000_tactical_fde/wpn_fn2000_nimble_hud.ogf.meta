@@ -1,0 +1,55 @@
+fileFormatVersion: 2
+guid: 00cc3eb930c29c34b8cdf30e09415ab2
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\ammo_5x56|models\weapons
+    second: {fileID: 2100000, guid: 7d26ad9fd12445e4e9f17f7fc71c8709, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\fn2000\f2000_1|models\weapons
+    second: {fileID: 2100000, guid: afe3d0f5c4ed15248beb935d8082d2d9, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\fn2000\f2000_2_fde|models\weapons
+    second: {fileID: 2100000, guid: 5d886b223a54ca340b0057fb7486b758, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\fn2000\f2000gl|models\weapons
+    second: {fileID: 2100000, guid: 4b5e0cb1dd26c504da430bd9af163013, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\fn2000\mag40|models\weapons
+    second: {fileID: 2100000, guid: 240f1155d0d55c64ebb465588556cc1b, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\wpn_addon_sil_nato|models\weapons
+    second: {fileID: 2100000, guid: cfd9785dd8322744b844941a0f3cf22e, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\wpn_m433hedp|models\weapons
+    second: {fileID: 2100000, guid: c07c5247d4caf47428212ca0c946b6ea, type: 2}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 61e536e21e96f284493f2969a9250cdf, type: 3}
+  _scale: 1
+  _importMaterials: 1
+  _texturesFolder: 
+  _searchTexturesByName: 1
+  _importEmbeddedMotions: 1
+  _embeddedLoopMode: 0
+  _addAnimator: 1
+  _readableMeshes: 0
+  _updateWhenOffscreen: 0
+  _autoResolveResources: 1

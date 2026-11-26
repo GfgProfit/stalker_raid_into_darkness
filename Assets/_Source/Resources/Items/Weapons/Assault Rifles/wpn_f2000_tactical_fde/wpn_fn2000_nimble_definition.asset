@@ -1,0 +1,219 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da0f90c2955673d46b25d465cbe44ed0, type: 3}
+  m_Name: wpn_fn2000_nimble_definition
+  m_EditorClassIdentifier: Inventory::Inventory.ItemDefinition
+  _definitionId: f6f32463cb0053948978bd3d94b895fb
+  _displayName: "\u0428\u0442\u0443\u0440\u043C\u043E\u0432\u0430\u044F \u0432\u0438\u043D\u0442\u043E\u0432\u043A\u0430 FN F2000 Tactical (FDE)"
+  _shortName: FN F2000 Tactical
+  _description: "\u0411\u0435\u043B\u044C\u0433\u0438\u0439\u0441\u043A\u0430\u044F \u0448\u0442\u0443\u0440\u043C\u043E\u0432\u0430\u044F \u0432\u0438\u043D\u0442\u043E\u0432\u043A\u0430 \u043F\u043E\u0434 \u043F\u0440\u043E\u043C\u0435\u0436\u0443\u0442\u043E\u0447\u043D\u044B\u0439 \u043F\u0430\u0442\u0440\u043E\u043D 5,56\xD745 \u043C\u043C NATO, \u0440\u0430\u0437\u0440\u0430\u0431\u043E\u0442\u0430\u043D\u043D\u0430\u044F \u043A\u043E\u043C\u043F\u0430\u043D\u0438\u0435\u0439 FN Herstal \u0438 \u0432\u043F\u0435\u0440\u0432\u044B\u0435 \u043F\u0440\u0435\u0434\u0441\u0442\u0430\u0432\u043B\u0435\u043D\u043D\u0430\u044F \u0432 2001 \u0433\u043E\u0434\u0443. \u0412\u044B\u043F\u043E\u043B\u043D\u0435\u043D\u0430 \u043F\u043E \u043A\u043E\u043C\u043F\u043E\u043D\u043E\u0432\u043E\u0447\u043D\u043E\u0439 \u0441\u0445\u0435\u043C\u0435 \u0431\u0443\u043B\u043B-\u043F\u0430\u043F \u0441 \u0448\u0438\u0440\u043E\u043A\u0438\u043C \u043F\u0440\u0438\u043C\u0435\u043D\u0435\u043D\u0438\u0435\u043C \u0432\u044B\u0441\u043E\u043A\u043E\u043F\u0440\u043E\u0447\u043D\u044B\u0445 \u043F\u043E\u043B\u0438\u043C\u0435\u0440\u043D\u044B\u0445 \u043C\u0430\u0442\u0435\u0440\u0438\u0430\u043B\u043E\u0432. \u0410\u0432\u0442\u043E\u043C\u0430\u0442\u0438\u043A\u0430 \u043E\u0441\u043D\u043E\u0432\u0430\u043D\u0430 \u043D\u0430 \u043E\u0442\u0432\u043E\u0434\u0435 \u043F\u043E\u0440\u043E\u0445\u043E\u0432\u044B\u0445 \u0433\u0430\u0437\u043E\u0432 \u0441 \u043A\u043E\u0440\u043E\u0442\u043A\u0438\u043C \u0445\u043E\u0434\u043E\u043C \u0433\u0430\u0437\u043E\u0432\u043E\u0433\u043E \u043F\u043E\u0440\u0448\u043D\u044F \u0438 \u0437\u0430\u043F\u0438\u0440\u0430\u043D\u0438\u0435\u043C \u043A\u0430\u043D\u0430\u043B\u0430 \u0441\u0442\u0432\u043E\u043B\u0430 \u043F\u043E\u0432\u043E\u0440\u043E\u0442\u043D\u044B\u043C \u0437\u0430\u0442\u0432\u043E\u0440\u043E\u043C. \u041E\u0442\u043B\u0438\u0447\u0438\u0442\u0435\u043B\u044C\u043D\u043E\u0439 \u043E\u0441\u043E\u0431\u0435\u043D\u043D\u043E\u0441\u0442\u044C\u044E \u043A\u043E\u043D\u0441\u0442\u0440\u0443\u043A\u0446\u0438\u0438 \u044F\u0432\u043B\u044F\u0435\u0442\u0441\u044F \u043E\u0440\u0438\u0433\u0438\u043D\u0430\u043B\u044C\u043D\u0430\u044F \u0441\u0438\u0441\u0442\u0435\u043C\u0430 \u0432\u044B\u0431\u0440\u043E\u0441\u0430 \u0441\u0442\u0440\u0435\u043B\u044F\u043D\u044B\u0445 \u0433\u0438\u043B\u044C\u0437 \u0432\u043F\u0435\u0440\u0451\u0434 \u0447\u0435\u0440\u0435\u0437 \u0441\u043F\u0435\u0446\u0438\u0430\u043B\u044C\u043D\u044B\u0439 \u043A\u0430\u043D\u0430\u043B, \u043E\u0431\u0435\u0441\u043F\u0435\u0447\u0438\u0432\u0430\u044E\u0449\u0430\u044F \u0432\u043E\u0437\u043C\u043E\u0436\u043D\u043E\u0441\u0442\u044C \u0441\u0442\u0440\u0435\u043B\u044C\u0431\u044B \u0441 \u043B\u044E\u0431\u043E\u0433\u043E \u043F\u043B\u0435\u0447\u0430. \u0412 \u043E\u0442\u043B\u0438\u0447\u0438\u0435 \u043E\u0442 \u0431\u0430\u0437\u043E\u0432\u043E\u0439 F2000 \u0441\u043E \u0448\u0442\u0430\u0442\u043D\u044B\u043C \u043E\u043F\u0442\u0438\u0447\u0435\u0441\u043A\u0438\u043C \u043F\u0440\u0438\u0446\u0435\u043B\u043E\u043C \u043A\u0440\u0430\u0442\u043D\u043E\u0441\u0442\u044C\u044E 1,6\xD7, \u043C\u043E\u0434\u0438\u0444\u0438\u043A\u0430\u0446\u0438\u044F Tactical \u043E\u0441\u043D\u0430\u0449\u0435\u043D\u0430 \u0432\u0435\u0440\u0445\u043D\u0435\u0439 \u043F\u043B\u0430\u043D\u043A\u043E\u0439 \u0441\u0442\u0430\u043D\u0434\u0430\u0440\u0442\u0430 Picatinny \u0438 \u0440\u0435\u0437\u0435\u0440\u0432\u043D\u044B\u043C\u0438 \u043C\u0435\u0445\u0430\u043D\u0438\u0447\u0435\u0441\u043A\u0438\u043C\u0438 \u043F\u0440\u0438\u0446\u0435\u043B\u044C\u043D\u044B\u043C\u0438 \u043F\u0440\u0438\u0441\u043F\u043E\u0441\u043E\u0431\u043B\u0435\u043D\u0438\u044F\u043C\u0438. \u0414\u043B\u0438\u043D\u0430 \u0441\u0442\u0432\u043E\u043B\u0430 \u0441\u043E\u0441\u0442\u0430\u0432\u043B\u044F\u0435\u0442 400 \u043C\u043C, \u043E\u0431\u0449\u0430\u044F \u0434\u043B\u0438\u043D\u0430 \u043E\u0440\u0443\u0436\u0438\u044F \u2014 688 \u043C\u043C, \u043C\u0430\u0441\u0441\u0430 \u0441 \u043F\u0443\u0441\u0442\u044B\u043C \u043C\u0430\u0433\u0430\u0437\u0438\u043D\u043E\u043C \u2014 3,4 \u043A\u0433. \u041F\u043E\u0434\u0434\u0435\u0440\u0436\u0438\u0432\u0430\u0435\u0442 \u043E\u0434\u0438\u043D\u043E\u0447\u043D\u044B\u0439 \u0438 \u0430\u0432\u0442\u043E\u043C\u0430\u0442\u0438\u0447\u0435\u0441\u043A\u0438\u0439 \u0440\u0435\u0436\u0438\u043C\u044B \u0441\u0442\u0440\u0435\u043B\u044C\u0431\u044B \u0441 \u0442\u0435\u0445\u043D\u0438\u0447\u0435\u0441\u043A\u0438\u043C \u0442\u0435\u043C\u043F\u043E\u043C \u043E\u043A\u043E\u043B\u043E 850 \u0432\u044B\u0441\u0442\u0440\u0435\u043B\u043E\u0432 \u0432 \u043C\u0438\u043D\u0443\u0442\u0443. \u041F\u0438\u0442\u0430\u043D\u0438\u0435 \u043E\u0441\u0443\u0449\u0435\u0441\u0442\u0432\u043B\u044F\u0435\u0442\u0441\u044F \u0438\u0437 \u043E\u0442\u044A\u0451\u043C\u043D\u044B\u0445 \u043A\u043E\u0440\u043E\u0431\u0447\u0430\u0442\u044B\u0445 \u043C\u0430\u0433\u0430\u0437\u0438\u043D\u043E\u0432 \u0441\u0442\u0430\u043D\u0434\u0430\u0440\u0442\u0430 STANAG \u0451\u043C\u043A\u043E\u0441\u0442\u044C\u044E 30 \u043F\u0430\u0442\u0440\u043E\u043D\u043E\u0432. \u041C\u043E\u0434\u0443\u043B\u044C\u043D\u0430\u044F \u043A\u043E\u043D\u0441\u0442\u0440\u0443\u043A\u0446\u0438\u044F \u043F\u0440\u0435\u0434\u0443\u0441\u043C\u0430\u0442\u0440\u0438\u0432\u0430\u0435\u0442 \u0437\u0430\u043C\u0435\u043D\u0443 \u0446\u0435\u0432\u044C\u044F \u0438 \u0443\u0441\u0442\u0430\u043D\u043E\u0432\u043A\u0443 \u0434\u043E\u043F\u043E\u043B\u043D\u0438\u0442\u0435\u043B\u044C\u043D\u043E\u0433\u043E \u043E\u0431\u043E\u0440\u0443\u0434\u043E\u0432\u0430\u043D\u0438\u044F. \u0412 \u0434\u0430\u043D\u043D\u043E\u043C \u0438\u0441\u043F\u043E\u043B\u043D\u0435\u043D\u0438\u0438 \u043F\u043E\u043B\u0438\u043C\u0435\u0440\u043D\u044B\u0435 \u044D\u043B\u0435\u043C\u0435\u043D\u0442\u044B \u043A\u043E\u0440\u043F\u0443\u0441\u0430 \u0438\u043C\u0435\u044E\u0442 \u043F\u0435\u0441\u043E\u0447\u043D\u043E-\u043A\u043E\u0440\u0438\u0447\u043D\u0435\u0432\u0443\u044E \u043E\u043A\u0440\u0430\u0441\u043A\u0443 FDE (Flat Dark Earth)."
+  _category: Weapon
+  _tags:
+  - Rifle
+  _size: {x: 5, y: 2}
+  _weight: 3.8
+  _maxStack: 1
+  _allowRotation: 1
+  _backgroundColor: {r: 1, g: 1, b: 1, a: 0.04}
+  _fallbackIcon: {fileID: 0}
+  _iconOverride: {fileID: 0}
+  _visualPrefab: {fileID: 8191019867550233303, guid: 805807bfa4f022e4398b4bd92e26a476, type: 3}
+  _defaultIconVariant: []
+  _icon:
+    _generateIcon: 1
+    _pixelsPerCell: 64
+    _antiAliasing: 1
+    _useOutline: 0
+    _outlineWidth: 2
+    _useShadow: 1
+    _shadowOffset: {x: 2, y: -2}
+    _shadowBlur: 2
+    _defaultView:
+      _modelEulerAngles: {x: 0, y: 0, z: 0}
+      _modelScale: {x: 1, y: 1, z: 1}
+      _cameraEulerAngles: {x: 0, y: -90, z: 0}
+      _padding: 1.15
+      _useDirectionalLight: 1
+      _lightIntensity: 10
+    _useCustomSlotView: 0
+    _slotView:
+      _modelEulerAngles: {x: 0, y: 0, z: 0}
+      _modelScale: {x: 1, y: 1, z: 1}
+      _cameraEulerAngles: {x: 25, y: -135, z: 0}
+      _padding: 1.15
+      _useDirectionalLight: 1
+      _lightIntensity: 10
+  _components:
+  - rid: 115149152802308190
+  - rid: 115149152802308191
+  - rid: 115149152802308192
+  - rid: 115149152802308193
+  - rid: 115149152802308194
+  references:
+    version: 2
+    RefIds:
+    - rid: 115149152802308190
+      type: {class: EquippableItemComponent, ns: Inventory, asm: Inventory}
+      data:
+        _preferredSlotIds:
+        - Primary
+        - Secondary
+    - rid: 115149152802308191
+      type: {class: WeaponStatsComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      data:
+        _section: wpn_fn2000_nimble
+        _weaponClass: assault_rifle
+        _cost: 42950
+        _repairType: rifle_5
+        _hitPower: 0.51
+        _hitImpulse: 25
+        _bulletSpeed: 920
+        _fireDistance: 1000
+        _rpm: 895
+        _fireModes: 0100000003000000ffffffffi
+        _magazineSize: 40
+        _ammoClasses:
+        - ammo_5.56x45_ss190
+        - ammo_5.56x45_ap
+        _fireDispersionBase: 0.29
+        _camDispersion: 0.7
+        _camDispersionIncrement: 0.0675
+        _conditionShotDecrement: 0.00065
+        _misfireProbability: 0.005
+        _silencerStatus: 2
+        _silencerSection: wpn_sil_nato
+        _scopeStatus: 2
+        _scopes:
+        - ac10632
+        - acog
+        - e0t2
+        - aimpoint
+        - specter
+        - exps3
+        - ado
+        - cortex
+        - delta_high
+        - echo1
+        - gauss_sight
+        - hco
+        - he510
+        - kemper
+        - lco1
+        - march_f_shorty
+        - p1x42
+        - ps320
+        - rmr_high
+        - romeo4
+        - t12
+        - tac30
+        - tango6
+        - vulcan
+        _compatibleScopes:
+        - {fileID: 11400000, guid: 867a7f373388760469fc24ccebf9f005, type: 2}
+        - {fileID: 11400000, guid: 47f9977e8eb796245ab8518ef902a33e, type: 2}
+        - {fileID: 11400000, guid: 22cb15100d34bc845a2f8f79cdbf0e0a, type: 2}
+        - {fileID: 11400000, guid: fc1a4cfb4771da944a45b0e79530107d, type: 2}
+        - {fileID: 11400000, guid: 0aea60fd72bbf20439531fbef8d7f762, type: 2}
+        - {fileID: 11400000, guid: 95347acdc8dd3584c9538dac3fa17378, type: 2}
+        - {fileID: 11400000, guid: b8f7a32877cf9f944a197c0a2dea0985, type: 2}
+        - {fileID: 11400000, guid: d855bb1f921169747b0732aaaa6a69a5, type: 2}
+        - {fileID: 11400000, guid: 3f2facb1660da024baee567fb8ef6225, type: 2}
+        - {fileID: 11400000, guid: f31be855ebfe15642a9e098be2a2bd71, type: 2}
+        - {fileID: 11400000, guid: 8181cebeead0e5340b5f73ba278b07f4, type: 2}
+        - {fileID: 11400000, guid: 221259caddfe3c842a416289d818380e, type: 2}
+        - {fileID: 11400000, guid: 43fb054a0e26ab0488efc9929d2c2d00, type: 2}
+        - {fileID: 11400000, guid: a0811b3d53d02aa4a8fd9b073b6e17d8, type: 2}
+        - {fileID: 11400000, guid: c7cb16990af3cc2419e8e6cf167b9836, type: 2}
+        - {fileID: 11400000, guid: 2fb8162459955f041b6d7aa702b3cc65, type: 2}
+        - {fileID: 11400000, guid: 55b9e4df57ad16643ae21c0c2a23725e, type: 2}
+        - {fileID: 11400000, guid: ab381d6cdabfee4499e0bb853e070ce2, type: 2}
+        - {fileID: 11400000, guid: 2e7d984e83db37e4eb8aff33f32934a2, type: 2}
+        - {fileID: 11400000, guid: 09126018d7d4a9d4fa72717db2fd42aa, type: 2}
+        - {fileID: 11400000, guid: 116d06cec93c73748938e8e7c294e0d0, type: 2}
+        - {fileID: 11400000, guid: 0e4b9929963f1a040b8db026e6921bbf, type: 2}
+        - {fileID: 11400000, guid: 0b165be4bec43654eaa5b3c10030535a, type: 2}
+        - {fileID: 11400000, guid: 890de65b739559841b6df555700037b5, type: 2}
+        _grenadeLauncherStatus: 2
+        _grenadeLauncherSection: wpn_addon_grenade_launcher_gl1
+        _blockSilencerWithGrenadeLauncher: 0
+        _exposedRound: {fileID: 0}
+    - rid: 115149152802308192
+      type: {class: WeaponHudComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      data:
+        _hudModel: {fileID: 8191019867550233303, guid: 805807bfa4f022e4398b4bd92e26a476, type: 3}
+        _weaponMotions: {fileID: 8815230551390286010, guid: d834f2a3847f927448be67a9baf1036b, type: 3}
+        _handsMotions: {fileID: 8815230551390286010, guid: 0787f0177d6a342438800b812786b9c3, type: 3}
+        _handsMotionPrefix: fn2000_
+        _attachmentBones:
+        - wpn_scope
+        - wpn_silencer
+        - wpn_launcher
+        _firstPersonWeapon: {fileID: 11400000, guid: ceb01a4261371da45af6b10da0600735, type: 2}
+        _scopeAimOffsets:
+        - _scope: {fileID: 11400000, guid: 867a7f373388760469fc24ccebf9f005, type: 2}
+          _position: {x: 0.004213769, y: 0.010238157, z: -0.06799856}
+        - _scope: {fileID: 11400000, guid: 47f9977e8eb796245ab8518ef902a33e, type: 2}
+          _position: {x: 0.004213766, y: 0.0042168573, z: -0.06799846}
+        - _scope: {fileID: 11400000, guid: 22cb15100d34bc845a2f8f79cdbf0e0a, type: 2}
+          _position: {x: 0.0042137015, y: 0.0061631575, z: -0.06799846}
+        - _scope: {fileID: 11400000, guid: fc1a4cfb4771da944a45b0e79530107d, type: 2}
+          _position: {x: 0.004213674, y: 0.0032937564, z: -0.06799836}
+        - _scope: {fileID: 11400000, guid: 0aea60fd72bbf20439531fbef8d7f762, type: 2}
+          _position: {x: 0.004213767, y: 0.006326057, z: -0.06799836}
+        - _scope: {fileID: 11400000, guid: 95347acdc8dd3584c9538dac3fa17378, type: 2}
+          _position: {x: 0.0042137685, y: 0.0015555564, z: -0.067998655}
+        - _scope: {fileID: 11400000, guid: b8f7a32877cf9f944a197c0a2dea0985, type: 2}
+          _position: {x: 0.0042137336, y: 0.0044682566, z: -0.067998655}
+        - _scope: {fileID: 11400000, guid: d855bb1f921169747b0732aaaa6a69a5, type: 2}
+          _position: {x: 0.0042136936, y: -0.0029027425, z: -0.06799836}
+        - _scope: {fileID: 11400000, guid: 3f2facb1660da024baee567fb8ef6225, type: 2}
+          _position: {x: 0.0042137112, y: 0.004824158, z: -0.06799876}
+        - _scope: {fileID: 11400000, guid: f31be855ebfe15642a9e098be2a2bd71, type: 2}
+          _position: {x: 0.0042137317, y: -0.0033976436, z: -0.067998655}
+        - _scope: {fileID: 11400000, guid: 8181cebeead0e5340b5f73ba278b07f4, type: 2}
+          _position: {x: 0.00421368, y: -0.00014854223, z: -0.06799836}
+        - _scope: {fileID: 11400000, guid: 221259caddfe3c842a416289d818380e, type: 2}
+          _position: {x: 0.0042136903, y: 0.0015620571, z: -0.06799876}
+        - _scope: {fileID: 11400000, guid: 43fb054a0e26ab0488efc9929d2c2d00, type: 2}
+          _position: {x: 0.0042137187, y: 0.007245157, z: -0.06799876}
+        - _scope: {fileID: 11400000, guid: a0811b3d53d02aa4a8fd9b073b6e17d8, type: 2}
+          _position: {x: 0.004213722, y: 0.0068213567, z: -0.06799836}
+        - _scope: {fileID: 11400000, guid: c7cb16990af3cc2419e8e6cf167b9836, type: 2}
+          _position: {x: 0.004213703, y: 0.0037308577, z: -0.06799856}
+        - _scope: {fileID: 11400000, guid: 2fb8162459955f041b6d7aa702b3cc65, type: 2}
+          _position: {x: 0.004213714, y: -0.00028324313, z: -0.067998156}
+        - _scope: {fileID: 11400000, guid: 55b9e4df57ad16643ae21c0c2a23725e, type: 2}
+          _position: {x: 0.0042136977, y: 0.009676257, z: -0.06799876}
+        - _scope: {fileID: 11400000, guid: ab381d6cdabfee4499e0bb853e070ce2, type: 2}
+          _position: {x: 0.004213737, y: 0.0046131574, z: -0.06799836}
+        - _scope: {fileID: 11400000, guid: 2e7d984e83db37e4eb8aff33f32934a2, type: 2}
+          _position: {x: 0.0042136936, y: 0.007512357, z: -0.06799876}
+        - _scope: {fileID: 11400000, guid: 09126018d7d4a9d4fa72717db2fd42aa, type: 2}
+          _position: {x: 0.004213714, y: 0.007506756, z: -0.06799846}
+        - _scope: {fileID: 11400000, guid: 116d06cec93c73748938e8e7c294e0d0, type: 2}
+          _position: {x: 0.0042136987, y: 0.017340258, z: -0.09115696}
+        - _scope: {fileID: 11400000, guid: 0e4b9929963f1a040b8db026e6921bbf, type: 2}
+          _position: {x: 0.0042137154, y: -0.00085114315, z: -0.067998655}
+        - _scope: {fileID: 11400000, guid: 0b165be4bec43654eaa5b3c10030535a, type: 2}
+          _position: {x: 0.0042136977, y: 0.004016457, z: -0.05387906}
+        - _scope: {fileID: 11400000, guid: 890de65b739559841b6df555700037b5, type: 2}
+          _position: {x: 0.0042136814, y: 0.00024965778, z: -0.06799876}
+    - rid: 115149152802308193
+      type: {class: WorldItemComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      data:
+        _prefab: {fileID: 8428386724098643397, guid: 805807bfa4f022e4398b4bd92e26a476, type: 3}
+    - rid: 115149152802308194
+      type: {class: ItemTakeSoundComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      data:
+        _category: arplatform
+        _clips:
+        - {fileID: 8300000, guid: 6ccfefc343843b643a8ec5c2f24c4807, type: 3}

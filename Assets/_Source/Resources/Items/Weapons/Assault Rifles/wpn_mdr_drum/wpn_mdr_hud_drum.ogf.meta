@@ -1,0 +1,75 @@
+fileFormatVersion: 2
+guid: 8ce876d8107122c4697295148795b48f
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\ammo_762x51_diff|models\weapons
+    second: {fileID: 2100000, guid: f54adc689b2d2f54eb4ea243be1b6a73, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\mdr\barrel|models\weapons
+    second: {fileID: 2100000, guid: 5b9d6f004f47a0b44a79cef2f9593a7a, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\mdr\handguard_fde|models\weapons
+    second: {fileID: 2100000, guid: 51d9a2e203c5a9941848f93eb8008826, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\mdr\lower_fde|models\weapons
+    second: {fileID: 2100000, guid: 1c5a0d36efa032e4b9586414a72f41eb, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\mdr\mag_drum|models\weapons
+    second: {fileID: 2100000, guid: b5953c53b65fcea43971c041f906b3ee, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\mdr\pistolgrip_fde|models\weapons
+    second: {fileID: 2100000, guid: 6da6f4e37601ad74e809a54396d9d73e, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\mdr\sight_front|models\weapons
+    second: {fileID: 2100000, guid: fefa34b8c6a3e6649a57a6ee42af9652, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\mdr\sight_rear|models\weapons
+    second: {fileID: 2100000, guid: b2b327765b46d9540a9ce5ddd296656e, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\mdr\upper|models\weapons
+    second: {fileID: 2100000, guid: 12b143794b0e86e489cafc7ef1eb0cd5, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\sa58\sa58_aac_blackout_51t_flash_hider_diff|models\weapons
+    second: {fileID: 2100000, guid: d7126ed1c0d55954888363bf7539a8c6, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\sil_nato_762|models\weapons
+    second: {fileID: 2100000, guid: af6c5104673fe87419049c538a32e108, type: 2}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 61e536e21e96f284493f2969a9250cdf, type: 3}
+  _scale: 1
+  _importMaterials: 1
+  _texturesFolder: 
+  _searchTexturesByName: 1
+  _importEmbeddedMotions: 1
+  _embeddedLoopMode: 0
+  _addAnimator: 1
+  _readableMeshes: 0
+  _updateWhenOffscreen: 0
+  _autoResolveResources: 1

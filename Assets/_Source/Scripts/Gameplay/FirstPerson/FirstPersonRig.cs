@@ -6,6 +6,7 @@ using XRay.Importer;
 namespace RaidIntoDarkness.FirstPerson
 {
     [DisallowMultipleComponent]
+    [DefaultExecutionOrder(150)]
     public sealed class FirstPersonRig : MonoBehaviour
     {
         [SerializeField] private FirstPersonOutfitCatalog _catalog;
@@ -21,6 +22,7 @@ namespace RaidIntoDarkness.FirstPerson
         private GameObject _body;
         private XRayRigPlayer _bodyPlayer;
         private FirstPersonOutfitEntry _current;
+        private FirstPersonWeaponObstruction _weaponObstruction;
 
         public FirstPersonOutfitEntry Current => _current;
         public GameObject Hands => _hands;
@@ -33,6 +35,45 @@ namespace RaidIntoDarkness.FirstPerson
 
         public event Action<FirstPersonOutfitEntry, bool> OutfitApplied;
         public event Action<object> HandsRequested;
+
+        public void InitializeWeaponObstruction(Transform observer, LayerMask collisionMask)
+        {
+            _weaponObstruction?.Dispose();
+            _weaponObstruction = null;
+            if (observer == null)
+            {
+                return;
+            }
+
+            try
+            {
+                FirstPersonContactCatalog calibration = FirstPersonContactCatalog.Load();
+                if (calibration == null)
+                {
+                    Debug.LogError("First-person collision calibration is missing. Run Tools/Raid Into Darkness/Calibrate First Person Collision.", this);
+                    return;
+                }
+
+                _weaponObstruction = new FirstPersonWeaponObstruction(transform, observer, collisionMask, calibration);
+            }
+            catch (Exception exception) when (exception is System.IO.IOException or System.IO.InvalidDataException or ArgumentException)
+            {
+                Debug.LogError($"Could not load first-person collision calibration: {exception.Message}", this);
+            }
+        }
+
+        public void SetWeaponObstruction(object owner, GameObject weapon, Transform muzzle, bool useMuzzleAxis)
+        {
+            if (owner == HandsOwner)
+            {
+                _weaponObstruction?.Bind(weapon, muzzle, useMuzzleAxis);
+            }
+        }
+
+        public void InvalidateWeaponObstructionGeometry()
+        {
+            _weaponObstruction?.InvalidateGeometry();
+        }
 
         public void RequestHands(object requester)
         {
@@ -58,6 +99,7 @@ namespace RaidIntoDarkness.FirstPerson
             if (HandsOwner == owner)
             {
                 HandsOwner = null;
+                _weaponObstruction?.Bind(null, null, false);
             }
         }
 
@@ -67,6 +109,24 @@ namespace RaidIntoDarkness.FirstPerson
             {
                 ApplyOutfit(_initialOutfit);
             }
+        }
+
+        private void LateUpdate()
+        {
+            if (HandsBusy && HandsVisible && _hands != null)
+            {
+                _weaponObstruction?.Tick(_hands, gameObject.scene.GetPhysicsScene(), Time.deltaTime);
+            }
+        }
+
+        private void OnDisable()
+        {
+            _weaponObstruction?.Clear();
+        }
+
+        private void OnDestroy()
+        {
+            _weaponObstruction?.Dispose();
         }
 
         public bool ApplyOutfit(string section)
@@ -86,6 +146,7 @@ namespace RaidIntoDarkness.FirstPerson
 
             if (_current == null || _current.HandsModel != entry.HandsModel)
             {
+                _weaponObstruction?.Clear();
                 Replace(ref _hands, entry.HandsModel, _handsRoot);
                 ApplyHandsVisibility();
             }
@@ -106,6 +167,11 @@ namespace RaidIntoDarkness.FirstPerson
         public void SetHandsVisible(bool visible)
         {
             _handsVisible = visible;
+            if (!visible)
+            {
+                _weaponObstruction?.Clear();
+            }
+
             ApplyHandsVisibility();
         }
 

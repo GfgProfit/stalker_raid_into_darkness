@@ -9,21 +9,6 @@ using XRay.Importer.Levels;
 
 namespace RaidIntoDarkness.Weapons
 {
-    public enum FirstPersonWeaponState
-    {
-        Hidden = 0,
-        Drawing = 1,
-        Ready = 2,
-        Reloading = 3,
-        SwitchingMode = 4,
-        Holstering = 5,
-        SwitchingGrenadeMode = 6,
-        LoadingGrenade = 7,
-        PreparingHandGrenade = 8,
-        HoldingHandGrenade = 9,
-        ThrowingHandGrenade = 10
-    }
-
     [DisallowMultipleComponent]
     public sealed class FirstPersonWeaponController : MonoBehaviour, IFirstPersonHandsOverlay
     {
@@ -48,8 +33,8 @@ namespace RaidIntoDarkness.Weapons
         [SerializeField] private AudioSource _shotAudio;
         [SerializeField] private string _itemAnchorBone = FirstPersonHudAnimator.ITEM_ANCHOR_BONE;
 
-        private readonly Slot[] _slots = { new Slot(), new Slot(), new Slot(), new Slot() };
-        private readonly Dictionary<object, WeaponState> _weaponStates = new Dictionary<object, WeaponState>();
+        private readonly FirstPersonWeaponSlot[] _slots = { new FirstPersonWeaponSlot(), new FirstPersonWeaponSlot(), new FirstPersonWeaponSlot(), new FirstPersonWeaponSlot() };
+        private readonly Dictionary<object, FirstPersonWeaponInstanceState> _weaponStates = new Dictionary<object, FirstPersonWeaponInstanceState>();
         private readonly List<MonoBehaviour> _opticsBindings = new List<MonoBehaviour>();
         private readonly List<WeaponReticleCycle> _reticleBindings = new List<WeaponReticleCycle>();
         private IFirstPersonWeaponAmmoSource _ammoSource;
@@ -98,7 +83,7 @@ namespace RaidIntoDarkness.Weapons
         private bool _aiming;
         private bool _aimedLauncherShot;
         private bool _developmentAimOverride;
-        private AimPhase _aimPhase;
+        private FirstPersonWeaponAimPhase _aimPhase;
         private float _aimBlendTime;
         private float _hipFireDispersionMultiplier = GameConfig.DEFAULT_HIP_FIRE_DISPERSION_MULTIPLIER;
         private FirstPersonWeaponAsset _recoilSource;
@@ -108,6 +93,7 @@ namespace RaidIntoDarkness.Weapons
         public event Action<GameObject> VisualCreated;
         public event Action HandGrenadeSelectionRequested;
         public event Action FireModeChanged;
+        public event Action<Vector3> BulletImpacted;
 
         public FirstPersonWeaponState State { get; private set; }
         public int ActiveSlot { get; private set; } = -1;
@@ -178,7 +164,7 @@ namespace RaidIntoDarkness.Weapons
             NotifyAmmo();
         }
 
-        public int GetSelectedFireModeIndex(object weaponKey) => weaponKey != null && _weaponStates.TryGetValue(weaponKey, out WeaponState state) ? state.FireModeIndex : 0;
+        public int GetSelectedFireModeIndex(object weaponKey) => weaponKey != null && _weaponStates.TryGetValue(weaponKey, out FirstPersonWeaponInstanceState state) ? state.FireModeIndex : 0;
 
         public void SetSlotSilencer(int slot, bool installed)
         {
@@ -231,7 +217,7 @@ namespace RaidIntoDarkness.Weapons
         {
             if (IsSlot(slot))
             {
-                Slot target = _slots[slot];
+                FirstPersonWeaponSlot target = _slots[slot];
                 target.RecoilMultiplier = recoilMultiplier;
                 target.RecoilSnappinessMultiplier = recoilSnappinessMultiplier;
             }
@@ -244,7 +230,7 @@ namespace RaidIntoDarkness.Weapons
                 return;
             }
 
-            Slot target = _slots[slot];
+            FirstPersonWeaponSlot target = _slots[slot];
             target.HasGrenadeLauncher = installed;
             bool wasGrenadeMode = target.GrenadeMode;
             target.GrenadeMode = false;
@@ -274,7 +260,7 @@ namespace RaidIntoDarkness.Weapons
                 return;
             }
 
-            Slot target = _slots[slot];
+            FirstPersonWeaponSlot target = _slots[slot];
             object ammoKey = key ?? asset;
             if (slot == HAND_GRENADE_SELECTION && ActiveSlot == slot && State == FirstPersonWeaponState.ThrowingHandGrenade && _handGrenadeReleased)
             {
@@ -681,7 +667,7 @@ namespace RaidIntoDarkness.Weapons
             _aim = 0.0f;
             _aiming = false;
             ResetAimCamera();
-            _aimPhase = AimPhase.Hip;
+            _aimPhase = FirstPersonWeaponAimPhase.Hip;
             _aimBlendTime = 0f;
             _hasLoop = false;
             _inSprint = false;
@@ -1244,8 +1230,18 @@ namespace RaidIntoDarkness.Weapons
                     projectile = projectileObject.AddComponent<BallisticProjectile>();
                 }
 
+                if (BulletImpacted != null)
+                {
+                    projectile.Impacted += NotifyBulletImpact;
+                }
+
                 projectile.Initialize(settings, ammo, position, direction, speed, distance * ammo.DistanceMultiplier, owner, _model.transform);
             }
+        }
+
+        private void NotifyBulletImpact(Vector3 position)
+        {
+            BulletImpacted?.Invoke(position);
         }
 
         private static Vector3 GetDispersedDirection(Quaternion rotation, float tangent)
@@ -1468,7 +1464,7 @@ namespace RaidIntoDarkness.Weapons
             return true;
         }
 
-        private void StartFireModeSwitch(FirstPersonWeaponAsset asset, WeaponState weaponState)
+        private void StartFireModeSwitch(FirstPersonWeaponAsset asset, FirstPersonWeaponInstanceState weaponState)
         {
             weaponState.FireModeIndex = (weaponState.FireModeIndex + 1) % asset.FireModes.Count;
             FireModeChanged?.Invoke();
@@ -1782,15 +1778,15 @@ namespace RaidIntoDarkness.Weapons
             }
 
             asset.GetAimClips(grenadeMode, out XRayAnmAsset start, out _, out XRayAnmAsset end);
-            if (aiming && _aimPhase == AimPhase.Hip)
+            if (aiming && _aimPhase == FirstPersonWeaponAimPhase.Hip)
             {
-                _aimPhase = start != null ? AimPhase.Entering : end != null ? AimPhase.Leaving : AimPhase.Aimed;
-                _aimBlendTime = _aimPhase == AimPhase.Leaving ? end.Duration : 0f;
+                _aimPhase = start != null ? FirstPersonWeaponAimPhase.Entering : end != null ? FirstPersonWeaponAimPhase.Leaving : FirstPersonWeaponAimPhase.Aimed;
+                _aimBlendTime = _aimPhase == FirstPersonWeaponAimPhase.Leaving ? end.Duration : 0f;
             }
-            else if (!aiming && _aimPhase == AimPhase.Aimed)
+            else if (!aiming && _aimPhase == FirstPersonWeaponAimPhase.Aimed)
             {
-                _aimPhase = end != null ? AimPhase.Leaving : start != null ? AimPhase.Entering : AimPhase.Hip;
-                _aimBlendTime = _aimPhase == AimPhase.Entering ? start.Duration : 0f;
+                _aimPhase = end != null ? FirstPersonWeaponAimPhase.Leaving : start != null ? FirstPersonWeaponAimPhase.Entering : FirstPersonWeaponAimPhase.Hip;
+                _aimBlendTime = _aimPhase == FirstPersonWeaponAimPhase.Entering ? start.Duration : 0f;
             }
         }
 
@@ -1811,7 +1807,7 @@ namespace RaidIntoDarkness.Weapons
             }
 
             asset.GetAimClips(grenadeMode, out XRayAnmAsset start, out _, out XRayAnmAsset end);
-            XRayAnmAsset clip = _aimPhase == AimPhase.Entering ? start : _aimPhase == AimPhase.Leaving ? end : null;
+            XRayAnmAsset clip = _aimPhase == FirstPersonWeaponAimPhase.Entering ? start : _aimPhase == FirstPersonWeaponAimPhase.Leaving ? end : null;
 
             if (clip == null)
             {
@@ -1819,13 +1815,13 @@ namespace RaidIntoDarkness.Weapons
                 return;
             }
 
-            bool entering = _aimPhase == AimPhase.Entering;
+            bool entering = _aimPhase == FirstPersonWeaponAimPhase.Entering;
             bool forward = entering == _aiming;
             _aimBlendTime = Mathf.Clamp(_aimBlendTime + (forward ? deltaTime : -deltaTime), 0f, clip.Duration);
 
             if (forward && _aimBlendTime >= clip.Duration || !forward && _aimBlendTime <= 0f)
             {
-                _aimPhase = _aiming ? AimPhase.Aimed : AimPhase.Hip;
+                _aimPhase = _aiming ? FirstPersonWeaponAimPhase.Aimed : FirstPersonWeaponAimPhase.Hip;
                 _aimBlendTime = 0f;
             }
         }
@@ -1878,7 +1874,7 @@ namespace RaidIntoDarkness.Weapons
         {
             _aiming = false;
             _aim = 0f;
-            _aimPhase = AimPhase.Hip;
+            _aimPhase = FirstPersonWeaponAimPhase.Hip;
             _aimBlendTime = 0f;
             ResetAimCamera();
         }
@@ -1925,7 +1921,7 @@ namespace RaidIntoDarkness.Weapons
 
             Transform hands = _boundHands.transform;
             Vector2 idleSway = asset.AimIdleSwayDegrees;
-            if (idleSway != Vector2.zero && !grenadeMode && _aimPhase == AimPhase.Aimed && CurrentMotion == FirstPersonWeaponMotionKind.IdleAim)
+            if (idleSway != Vector2.zero && !grenadeMode && _aimPhase == FirstPersonWeaponAimPhase.Aimed && CurrentMotion == FirstPersonWeaponMotionKind.IdleAim)
             {
                 float phase = _aimBlendTime * Mathf.PI * 0.5f;
                 float recovery = (Time.time - _actionUntil) / LAUNCHER_AIM_SHOT_BLEND_TIME;
@@ -1961,13 +1957,13 @@ namespace RaidIntoDarkness.Weapons
 
             switch (_aimPhase)
             {
-                case AimPhase.Entering:
+                case FirstPersonWeaponAimPhase.Entering:
                     clip = start;
                     break;
-                case AimPhase.Leaving:
+                case FirstPersonWeaponAimPhase.Leaving:
                     clip = end;
                     break;
-                case AimPhase.Aimed:
+                case FirstPersonWeaponAimPhase.Aimed:
                     clip = idle != null ? idle : start != null ? start : end;
 
                     if (clip != null)
@@ -2077,6 +2073,12 @@ namespace RaidIntoDarkness.Weapons
             Transform muzzle = _weaponView != null ? IsSilenced ? _weaponView.SilencedMuzzle : _weaponView.Muzzle : null;
             _muzzleFromView = muzzle != null;
             _muzzle = _muzzleFromView ? muzzle : FindBone(_model, ActiveWeapon.MuzzleBone);
+            FirstPersonRig rig = _player != null ? _player.Rig : null;
+            if (rig != null)
+            {
+                bool hasBarrel = ActiveWeapon is { IsMelee: false, IsHandGrenade: false };
+                rig.SetWeaponObstruction(this, hasBarrel ? _model : null, hasBarrel ? _muzzle : null, _muzzleFromView);
+            }
         }
 
         private void RebuildVisuals()
@@ -2147,6 +2149,11 @@ namespace RaidIntoDarkness.Weapons
                 _boundHands.transform.localRotation = _savedHandsRotation;
             }
 
+            if (rig != null)
+            {
+                rig.SetWeaponObstruction(this, null, null, false);
+            }
+
             if (releaseHands && rig != null && rig.HandsOwner == (object)this)
             {
                 rig.SetHandsVisible(false);
@@ -2175,11 +2182,11 @@ namespace RaidIntoDarkness.Weapons
             AmmoChanged?.Invoke(Magazine, Reserve);
         }
 
-        private WeaponState GetWeaponState(object key)
+        private FirstPersonWeaponInstanceState GetWeaponState(object key)
         {
-            if (!_weaponStates.TryGetValue(key, out WeaponState weaponState))
+            if (!_weaponStates.TryGetValue(key, out FirstPersonWeaponInstanceState weaponState))
             {
-                weaponState = new WeaponState();
+                weaponState = new FirstPersonWeaponInstanceState();
                 _weaponStates.Add(key, weaponState);
             }
 
@@ -2254,33 +2261,6 @@ namespace RaidIntoDarkness.Weapons
             }
 
             return null;
-        }
-
-        private enum AimPhase
-        {
-            Hip,
-            Entering,
-            Aimed,
-            Leaving
-        }
-
-        private sealed class Slot
-        {
-            public FirstPersonWeaponAsset Asset { get; set; }
-            public object Key { get; set; }
-            public WeaponState WeaponState { get; set; }
-            public bool Silenced { get; set; }
-            public bool HasScope { get; set; }
-            public bool HasGrenadeLauncher { get; set; }
-            public Vector3 RecoilMultiplier { get; set; } = Vector3.one;
-            public float RecoilSnappinessMultiplier { get; set; } = 1f;
-            public bool GrenadeMode { get; set; }
-            public Vector3? AimOffsetPosition { get; set; }
-        }
-
-        private sealed class WeaponState
-        {
-            public int FireModeIndex { get; set; }
         }
     }
 }

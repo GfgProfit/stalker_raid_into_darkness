@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -34,6 +35,8 @@ namespace RaidIntoDarkness.Weapons
         public Vector3 Velocity => _velocity;
         public float SpeedMetersPerSecond => _velocity.magnitude;
         public float DistanceTravelledMeters => _distanceTravelled;
+
+        internal event Action<Vector3> Impacted;
 
         public void Initialize(WeaponBallisticsSettings weaponData, BallisticAmmoData ammoData, Vector3 position, Vector3 direction, float speedMetersPerSecond, float maximumDistance, Transform ownerRoot, Transform weaponRoot)
         {
@@ -151,7 +154,9 @@ namespace RaidIntoDarkness.Weapons
                     Debug.DrawLine(_position, hit.point, Color.yellow, _weaponData.BallisticDebugDurationSeconds);
                 }
 
-                return ResolveImpact(hit, impactVelocity);
+                bool continues = ResolveImpact(hit, impactVelocity);
+                Impacted?.Invoke(hit.point);
+                return continues;
             }
 
             if (_weaponData.DrawBallisticDebug)
@@ -217,10 +222,10 @@ namespace RaidIntoDarkness.Weapons
 
             Vector3 incoming = impactVelocity.normalized;
             Vector3 reflected = Vector3.Reflect(incoming, hit.normal);
-            Vector2 spread = Random.insideUnitCircle * Mathf.Tan(10f * Mathf.Deg2Rad);
+            Vector2 spread = UnityEngine.Random.insideUnitCircle * Mathf.Tan(10f * Mathf.Deg2Rad);
             Vector3 direction = Quaternion.LookRotation(reflected) * new Vector3(spread.x, spread.y, 1f).normalized;
 
-            if (Vector3.Dot(incoming, direction) <= Random.Range(0.2f, 0.6f))
+            if (Vector3.Dot(incoming, direction) <= UnityEngine.Random.Range(0.2f, 0.6f))
             {
                 return false;
             }

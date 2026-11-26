@@ -105,6 +105,8 @@ namespace RaidIntoDarkness.Player
             _visibleBody.Initialize(_profile);
             if (_rig != null)
             {
+                Transform observer = _camera.Camera != null ? _camera.Camera.transform : _camera.CameraRoot;
+                _rig.InitializeWeaponObstruction(observer, _profile.Unity.CollisionMask);
                 _rig.OutfitApplied += OnOutfitApplied;
             }
 

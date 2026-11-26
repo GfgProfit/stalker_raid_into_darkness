@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Reflection;
 using NUnit.Framework;
 using RaidIntoDarkness.Weapons;
 using UnityEngine;
@@ -79,6 +80,58 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
                 Object.Destroy(nearWall);
                 Object.Destroy(farWall);
                 Object.Destroy(root);
+            }
+        }
+
+        [UnityTest]
+        public IEnumerator BulletImpactDebugMarksTheSurfaceAndClearsWhenDisabled()
+        {
+            Vector3 origin = new Vector3(10000f, 10000f, 10000f);
+            var owner = new GameObject("Impact Debug Test Weapon");
+            var muzzleModel = new GameObject("Impact Debug Test Model");
+            muzzleModel.transform.SetParent(owner.transform, false);
+            var prefab = new GameObject("Impact Debug Test Bullet");
+            GameObject wall = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            wall.transform.position = origin + Vector3.forward * 5f;
+            var weapon = owner.AddComponent<FirstPersonWeaponController>();
+            weapon.enabled = false;
+            var debug = owner.AddComponent<BulletImpactDebug>();
+
+            try
+            {
+                const BindingFlags FLAGS = BindingFlags.Instance | BindingFlags.NonPublic;
+                typeof(BulletImpactDebug).GetField("_lifetime", FLAGS).SetValue(debug, 0.35f);
+                typeof(FirstPersonWeaponController).GetField("_model", FLAGS).SetValue(weapon, muzzleModel);
+                var settings = new WeaponBallisticsSettings();
+                typeof(WeaponBallisticsSettings).GetField("_bulletPrefab", FLAGS).SetValue(settings, prefab);
+                MethodInfo shoot = typeof(FirstPersonWeaponController).GetMethod("SpawnProjectiles", FLAGS);
+
+                Physics.SyncTransforms();
+                shoot.Invoke(weapon, new object[] { settings, new BallisticAmmoData(), origin, Quaternion.identity, 950f, 30f, 0f });
+                GameObject marker = null;
+                float deadline = Time.realtimeSinceStartup + 2f;
+                while (marker == null && Time.realtimeSinceStartup < deadline)
+                {
+                    yield return null;
+                    marker = GameObject.Find("Bullet Impact Marker");
+                }
+
+                Assert.That(marker, Is.Not.Null);
+                Assert.That(marker.transform.position.z, Is.EqualTo(wall.transform.position.z - 0.5f).Within(0.002f));
+                Assert.That(marker.GetComponent<Collider>(), Is.Null);
+                Assert.That(marker.GetComponent<MeshRenderer>().sharedMaterial.GetColor("_UnlitColor"), Is.EqualTo(Color.red));
+                yield return new WaitForSecondsRealtime(0.4f);
+                Assert.That(marker.activeSelf, Is.False);
+
+                debug.enabled = false;
+                yield return null;
+                Assert.That(marker == null, Is.True);
+            }
+            finally
+            {
+                Object.Destroy(owner);
+                Object.Destroy(prefab);
+                Object.Destroy(wall);
             }
         }
 

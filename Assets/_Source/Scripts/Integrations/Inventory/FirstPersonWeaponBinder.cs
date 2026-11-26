@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Inventory;
 using Inventory.UI;
 using Inventory.IconGeneration;
+using RaidIntoDarkness.FirstPerson;
 using RaidIntoDarkness.Weapons;
 using UnityEngine;
 
@@ -194,6 +195,12 @@ namespace RaidIntoDarkness.Integrations.Inventory
             }
 
             ItemIconVisualConfigurators.Apply(model, item.Definition, item.VisualVariant);
+            FirstPersonRig rig = model.GetComponentInParent<FirstPersonRig>();
+            if (rig != null)
+            {
+                rig.InvalidateWeaponObstructionGeometry();
+            }
+
             _configuredModel = model;
             _configuredDefinition = item.Definition;
             _configuredVariant.Clear();

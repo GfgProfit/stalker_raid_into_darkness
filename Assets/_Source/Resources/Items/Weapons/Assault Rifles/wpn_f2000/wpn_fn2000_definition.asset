@@ -94,8 +94,8 @@ MonoBehaviour:
         _scopeStatus: 1
         _scopes: []
         _compatibleScopes: []
-        _grenadeLauncherStatus: 0
-        _grenadeLauncherSection: 
+        _grenadeLauncherStatus: 2
+        _grenadeLauncherSection: wpn_addon_grenade_launcher_gl1
         _blockSilencerWithGrenadeLauncher: 0
         _exposedRound: {fileID: 0}
     - rid: 115149152802308192
@@ -108,6 +108,7 @@ MonoBehaviour:
         _attachmentBones:
         - wpn_scope
         - wpn_silencer
+        - wpn_launcher
         _firstPersonWeapon: {fileID: 11400000, guid: 730fa4440360c2f43a7d62981e76de8c, type: 2}
         _scopeAimOffsets: []
     - rid: 115149152802308193

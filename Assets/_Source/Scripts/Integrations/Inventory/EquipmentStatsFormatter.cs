@@ -224,7 +224,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
 
                 if (row.Condition)
                 {
-                    value *= fullCondition && row.LiteralPercent ? 1f : condition;
+                    value *= fullCondition && row.IsLiteralPercent(PERCENT_UNIT) ? 1f : condition;
                     otherValue *= otherCondition;
                 }
                 Add(stats, row, value, otherValue, row.Unit == KILOGRAM_UNIT ? kilograms : row.Unit);
@@ -447,6 +447,11 @@ namespace RaidIntoDarkness.Integrations.Inventory
             const string AMMO_PREFIX = "ammo_";
             switch (section)
             {
+                case "ammo_50ae":
+                    return ".50 AE";
+                case "ammo_44mag":
+                case "ammo_44mag_boom":
+                    return ".44 Magnum";
                 case "ammo_m209":
                 case "ammo_m397a1":
                     return "40x46 мм";
@@ -548,7 +553,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
                 return;
             }
 
-            if (row.LiteralPercent)
+            if (row.IsLiteralPercent(PERCENT_UNIT))
             {
                 AddPercentage(stats, row, value, otherValue);
                 return;
@@ -618,33 +623,6 @@ namespace RaidIntoDarkness.Integrations.Inventory
 
             string text = value.ToString("0.##", CultureInfo.InvariantCulture) + PERCENT_UNIT;
             stats.Add(new InventoryItemStat(_window.Label(row.Key, row.Fallback), text, _window.Theme != null ? _window.Theme.Icon(row.Icon) : null, tone, comparison));
-        }
-
-        private readonly struct StatRow
-        {
-            public StatRow(string key, string fallback, string icon, string negativeIcon, EquipmentStat stat, double magnitude, string unit, bool sign, bool condition)
-            {
-                Key = key;
-                Fallback = fallback;
-                Icon = icon;
-                NegativeIcon = negativeIcon;
-                Stat = stat;
-                Magnitude = magnitude;
-                Unit = unit;
-                Sign = sign;
-                Condition = condition;
-            }
-
-            public string Key { get; }
-            public string Fallback { get; }
-            public string Icon { get; }
-            public string NegativeIcon { get; }
-            public EquipmentStat Stat { get; }
-            public double Magnitude { get; }
-            public string Unit { get; }
-            public bool Sign { get; }
-            public bool Condition { get; }
-            public bool LiteralPercent => Unit == PERCENT_UNIT && Stat != EquipmentStat.Speed;
         }
     }
 }

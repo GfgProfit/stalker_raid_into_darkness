@@ -1,0 +1,70 @@
+fileFormatVersion: 2
+guid: dbdaee2572cb57d41bf5e75a54a66fd6
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\ammo_5x56|models\weapons
+    second: {fileID: 2100000, guid: 7e8454ff369329b4bbe8ba812278c220, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\dvl_10\scope_pso_1m2-1_lens_diff|models\model
+    second: {fileID: 2100000, guid: 99cf3a27664f8f3498ae0890d727cdc1, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\dvl_10\scope_pso_1m2-1_lens_trans|models\window
+    second: {fileID: 2100000, guid: ff1346e2272f9c04a92c6ba44d59f750, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\fn2000\f2000_1|models\weapons
+    second: {fileID: 2100000, guid: 29a60d9e1d5b80a479e17fe184d88262, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\fn2000\f2000_2|models\weapons
+    second: {fileID: 2100000, guid: d71a4bb4045a66c418adedef6c303b4e, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\fn2000\f2000gl|models\weapons
+    second: {fileID: 2100000, guid: ee8492920b84ac2498d95e5003d4d313, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\fn2000\f2000s|models\weapons
+    second: {fileID: 2100000, guid: 898d3036fa4ac1642b24ad8b2171e420, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\wpn_addon_sil_nato|models\weapons
+    second: {fileID: 2100000, guid: f00ae8e78e447244a9c2f453f1effdd6, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\wpn_crosshair_fn2000|models_lense_scope
+    second: {fileID: 2100000, guid: 88276ffdc1ac2604d882ce6d287b6f61, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\wpn_m433hedp|models\weapons
+    second: {fileID: 2100000, guid: c07c5247d4caf47428212ca0c946b6ea, type: 2}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 61e536e21e96f284493f2969a9250cdf, type: 3}
+  _scale: 1
+  _importMaterials: 1
+  _texturesFolder: 
+  _searchTexturesByName: 1
+  _importEmbeddedMotions: 1
+  _embeddedLoopMode: 0
+  _addAnimator: 1
+  _readableMeshes: 0
+  _updateWhenOffscreen: 0
+  _autoResolveResources: 1

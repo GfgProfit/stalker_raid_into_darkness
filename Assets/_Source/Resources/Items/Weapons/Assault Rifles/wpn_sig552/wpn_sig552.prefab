@@ -10526,6 +10526,7 @@ GameObject:
   m_Component:
   - component: {fileID: 427548543409775675}
   - component: {fileID: 5373217335013556094}
+  - component: {fileID: 1962484997429525494}
   m_Layer: 0
   m_Name: Installed Cartridges
   m_TagString: Untagged
@@ -10632,6 +10633,23 @@ SkinnedMeshRenderer:
     m_Center: {x: 0.000261195, y: -0.06696203, z: 0.01126921}
     m_Extent: {x: 0.00819318, y: 0.10386333, z: 0.03921479}
   m_DirtyAABB: 0
+--- !u!114 &1962484997429525494
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4080134544142465933}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 961b8a141a69bb848aa62c047444203e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Inventory.IconGeneration::Inventory.IconGeneration.ItemIconRendererOverride
+  _renderer: {fileID: 5373217335013556094}
+  _hide: 0
+  _localBounds:
+    m_Center: {x: 0.00026119128, y: 0.016443908, z: -0.000900181}
+    m_Extent: {x: 0.010193184, y: 0.0119192265, z: 0.0290454}
 --- !u!1 &4104903111651256977
 GameObject:
   m_ObjectHideFlags: 0
@@ -21982,6 +22000,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5149626954902892081}
   - component: {fileID: 1734274433848156912}
+  - component: {fileID: 6877775537145462421}
   m_Layer: 0
   m_Name: Chamber Shell
   m_TagString: Untagged
@@ -22088,6 +22107,23 @@ SkinnedMeshRenderer:
     m_Center: {x: 0.000261195, y: -0.06696203, z: 0.01126921}
     m_Extent: {x: 0.00819318, y: 0.10386333, z: 0.03921479}
   m_DirtyAABB: 0
+--- !u!114 &6877775537145462421
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7512442844966396664}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 961b8a141a69bb848aa62c047444203e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Inventory.IconGeneration::Inventory.IconGeneration.ItemIconRendererOverride
+  _renderer: {fileID: 1734274433848156912}
+  _hide: 1
+  _localBounds:
+    m_Center: {x: 0, y: 0, z: 0}
+    m_Extent: {x: 0, y: 0, z: 0}
 --- !u!1 &7515576258986074600
 GameObject:
   m_ObjectHideFlags: 0
@@ -25880,6 +25916,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6481793194273730027}
   - component: {fileID: 7187644773607323900}
+  - component: {fileID: 6323779938464841995}
   m_Layer: 0
   m_Name: Installed Magazine
   m_TagString: Untagged
@@ -25986,6 +26023,23 @@ SkinnedMeshRenderer:
     m_Center: {x: 0.0008712001, y: -0.14949524, z: 0.010587454}
     m_Extent: {x: 0.013092492, y: 0.1772691, z: 0.045644104}
   m_DirtyAABB: 0
+--- !u!114 &6323779938464841995
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9114491726999823473}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 961b8a141a69bb848aa62c047444203e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Inventory.IconGeneration::Inventory.IconGeneration.ItemIconRendererOverride
+  _renderer: {fileID: 7187644773607323900}
+  _hide: 0
+  _localBounds:
+    m_Center: {x: 0.0008712113, y: -0.06082, z: 0.010587722}
+    m_Extent: {x: 0.015092496, y: 0.09059388, z: 0.047643837}
 --- !u!1 &9199578467716923363
 GameObject:
   m_ObjectHideFlags: 0

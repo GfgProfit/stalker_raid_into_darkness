@@ -73,6 +73,12 @@ namespace RaidIntoDarkness.Inventory.UI
 
         public void Bind(ItemInstance item, InventoryGridViewBase grid)
         {
+            if (_grid != null && (Item != item || _grid != grid))
+            {
+                _grid.Window?.HandleItemViewDetached(this);
+                SetHovered(false);
+            }
+
             Item = item;
             _grid = grid;
             _canvasGroup.blocksRaycasts = true;
@@ -210,8 +216,8 @@ namespace RaidIntoDarkness.Inventory.UI
 
         public void OnInitializePotentialDrag(PointerEventData eventData) => eventData.useDragThreshold = true;
         public void OnBeginDrag(PointerEventData eventData) => _grid?.Window?.HandleBeginDrag(this, eventData);
-        public void OnDrag(PointerEventData eventData) => _grid?.Window?.HandleDrag(eventData);
-        public void OnEndDrag(PointerEventData eventData) => _grid?.Window?.HandleEndDrag(eventData);
+        public void OnDrag(PointerEventData eventData) => _grid?.Window?.HandleItemDrag(this, eventData);
+        public void OnEndDrag(PointerEventData eventData) => _grid?.Window?.HandleItemEndDrag(this, eventData);
 
         private void OnDisable()
         {
@@ -222,7 +228,7 @@ namespace RaidIntoDarkness.Inventory.UI
             }
 
             SetHovered(false);
-            _grid?.Window?.HandleItemPointerExit(this, null);
+            _grid?.Window?.HandleItemViewDetached(this);
 
             if (_backgroundTarget != null)
             {

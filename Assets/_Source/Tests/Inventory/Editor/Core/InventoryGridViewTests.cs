@@ -292,6 +292,7 @@ namespace RaidIntoDarkness.Inventory.Core.Tests
             model = new InventoryModel(_items.Database);
             model.AddContainer(new GridContainer("Backpack", 10, 8, "Player", "Backpack"));
             window.Bind(model, null);
+            window.Open();
             return window;
         }
 

@@ -93,9 +93,9 @@ namespace RaidIntoDarkness.Inventory.UI
         {
             _position = position;
             _eventCamera = eventCamera;
-            if (string.IsNullOrEmpty(_hoveredStatus) == false && _window != null && _window.Tooltip != null)
+            if (string.IsNullOrEmpty(_hoveredStatus) == false && _window != null)
             {
-                _window.Tooltip.Follow(position, eventCamera);
+                _window.MoveExternalTooltip(position, eventCamera);
             }
         }
 

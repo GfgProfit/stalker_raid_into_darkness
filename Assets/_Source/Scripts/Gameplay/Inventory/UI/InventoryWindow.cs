@@ -14,7 +14,6 @@ namespace RaidIntoDarkness.Inventory.UI
     public sealed class InventoryWindow : MonoBehaviour
     {
         private const float STATUS_DURATION = 2.5f;
-        private const float DROP_AREA_FADE_DURATION = 0.15f;
 
         [SerializeField] private RectTransform _content;
         [SerializeField] private List<InventoryGridViewBase> _grids = new();
@@ -40,27 +39,17 @@ namespace RaidIntoDarkness.Inventory.UI
         [SerializeField] private string _weightFormatUnlimited = "Weight: {0} kg";
         [SerializeField] private Color _overweightColor = new(1f, 0.55f, 0.2f, 1f);
 
-        private readonly List<RaycastResult> _raycastResults = new();
-        private readonly List<InventoryItemStat> _tooltipStats = new();
         private readonly List<InventoryContextMenuEntry> _menuEntries = new();
-        private readonly List<RectInt> _compatibleAreas = new();
-        private InventoryDropAreaViewModel _dropAreaViewModel;
-        private IDisposable _dropAreaBinding;
+        private readonly InventoryItemHover _itemHover = new();
+
         private IDisposable _modelBinding;
         private IDisposable _commandBinding;
         private InventoryWindowViewModel _commands;
-        private float _dropAreaTargetAlpha;
-        private InventoryDragState _drag;
-        private InventoryItemView _hovered;
-        private float _hoverStart;
-        private Vector2 _hoverPosition;
-        private Camera _hoverCamera;
-        private PointerEventData _hoverPointer;
-        private EventSystem _hoverEventSystem;
+        private InventoryDragInteraction _dragInteraction;
+        private InventoryWeaponAttachments _itemDropHandler;
         private float _statusUntil;
         private string _hint = string.Empty;
         private bool _initialized;
-        private bool _externalTooltip;
         private AudioSource _audio;
         private float _lastSoundTime = float.MinValue;
 
@@ -69,8 +58,8 @@ namespace RaidIntoDarkness.Inventory.UI
         public InventoryActionRegistry Actions { get; private set; }
         public InventoryInputBindings Input => _input;
         public bool IsOpen { get; private set; }
-        public bool IsDragging => _drag != null;
-        public InventoryDragState Drag => _drag;
+        public bool IsDragging => _dragInteraction?.State != null;
+        public InventoryDragState Drag => _dragInteraction?.State;
         public IReadOnlyList<InventoryGridViewBase> Grids => _grids;
         public RectTransform Content => _content;
         public InventoryTooltip Tooltip => _tooltip;
@@ -87,13 +76,36 @@ namespace RaidIntoDarkness.Inventory.UI
         public bool IsSecondaryOpen => _secondaryRoot != null && _secondaryRoot.gameObject.activeSelf && Model != null && Model.GetContainer(_secondaryContainerId) != null;
         public Func<ItemInstance, bool> ItemFilter { get; private set; }
         public Func<ItemInstance, InventoryItemDecoration> ItemDecorator { get; set; }
-        public Action<ItemInstance, List<InventoryItemStat>> ItemStatsProvider { get; set; }
-        public Func<ItemInstance, string> ItemDescriptionProvider { get; set; }
+        public Action<ItemInstance, List<InventoryItemStat>> ItemStatsProvider
+        {
+            get => _itemHover.StatsProvider;
+            set => _itemHover.StatsProvider = value;
+        }
+
+        public Func<ItemInstance, string> ItemDescriptionProvider
+        {
+            get => _itemHover.DescriptionProvider;
+            set => _itemHover.DescriptionProvider = value;
+        }
         public Func<ItemInstance, string> ItemShortNameProvider { get; set; }
         public Func<ItemInstance, float?> ItemConditionProvider { get; set; }
         public Func<InventoryActionContext, IInventoryItemAction, InventoryActionStyle> ActionStyleProvider { get; set; }
-        public InventoryWeaponAttachments ItemDropHandler { get; set; }
-        public ItemInstance HoveredItem => _hovered != null ? _hovered.Item : null;
+        public ItemInstance HoveredItem => _itemHover.Item;
+
+        public InventoryWeaponAttachments ItemDropHandler
+        {
+            get => _itemDropHandler;
+            set
+            {
+                _itemDropHandler = value;
+                if (_dragInteraction != null)
+                {
+                    _dragInteraction.Attachments = value;
+                }
+            }
+        }
+
+        private bool CanPointAtItem => IsOpen && isActiveAndEnabled && IsDragging == false && HasModalWidget == false;
 
         public event Action<InventoryWindow> Opened;
         public event Action<InventoryWindow> Closed;
@@ -113,6 +125,7 @@ namespace RaidIntoDarkness.Inventory.UI
             _weightText = weightText;
             _statusText = statusText;
             _grids = new List<InventoryGridViewBase>(grids);
+            _itemHover.Configure(_tooltip, _tooltipDelay, _theme);
         }
 
         public void ConfigureContainers(string primaryContainerId, string secondaryContainerId, string equipmentContainerId, string weightOwnerId, float maxCarryWeight)
@@ -137,6 +150,7 @@ namespace RaidIntoDarkness.Inventory.UI
             _weightFormat = weightFormat;
             _weightFormatUnlimited = weightFormatUnlimited;
             _overweightColor = overweightColor;
+            _itemHover.Configure(_tooltip, _tooltipDelay, _theme);
         }
 
         public string Label(string key, string fallback) => _theme != null ? _theme.Label(key, fallback) : fallback;
@@ -150,9 +164,8 @@ namespace RaidIntoDarkness.Inventory.UI
                 return;
             }
 
-            CancelDrag();
+            _dragInteraction?.Suspend();
             HideTransientWidgets();
-            ResetDropArea();
             _secondaryRoot.gameObject.SetActive(visible);
         }
 
@@ -212,7 +225,14 @@ namespace RaidIntoDarkness.Inventory.UI
                 Equipment = equipment,
                 WorldDrop = worldDrop
             };
-            _commandBinding = _commands.Completed.Subscribe(ReportCommand);
+            InventoryWindowViewModel commands = _commands;
+            _commandBinding = commands.Completed.Subscribe(ReportCommand);
+            _dragInteraction = new InventoryDragInteraction(model, _grids, transform, _dragLayer, _dropItemArea, _secondaryRoot, _primaryContainerId, _equipmentContainerId, () => commands.CanDropInWorld, item => commands.Drop(item, true))
+            {
+                Attachments = _itemDropHandler,
+                Equipment = equipment
+            };
+            _dragInteraction.Starting += HideTransientWidgets;
 
             foreach (InventoryGridViewBase grid in _grids)
             {
@@ -232,20 +252,18 @@ namespace RaidIntoDarkness.Inventory.UI
                 grid.Bind(this, container);
             }
 
+            _itemHover.Bind(model);
             _modelBinding = Observable.FromEvent<InventoryChange>(handler => model.Changed += handler, handler => model.Changed -= handler)
-                .Subscribe(OnModelChanged);
+                .Subscribe(_ => UpdateWeight());
             UpdateWeight();
         }
 
         public void Unbind()
         {
-            CancelDrag();
-            ResetDropArea();
-
-            if (_splitDialog != null)
-            {
-                _splitDialog.Hide();
-            }
+            _dragInteraction?.Dispose();
+            _dragInteraction = null;
+            _itemHover.Unbind();
+            HideTransientWidgets();
 
             _commandBinding?.Dispose();
             _commandBinding = null;
@@ -296,10 +314,9 @@ namespace RaidIntoDarkness.Inventory.UI
                 return;
             }
 
-            CancelDrag();
-            HideTransientWidgets();
-            ResetDropArea();
             IsOpen = false;
+            _dragInteraction?.Suspend();
+            HideTransientWidgets();
 
             if (_content != null)
             {
@@ -324,9 +341,7 @@ namespace RaidIntoDarkness.Inventory.UI
 
         public void HideTransientWidgets()
         {
-            _hovered = null;
-            _externalTooltip = false;
-            _tooltip?.Hide();
+            _itemHover.Clear();
             _contextMenu?.Hide();
             _splitDialog?.Hide();
             _inspectPanel?.Hide();
@@ -365,37 +380,23 @@ namespace RaidIntoDarkness.Inventory.UI
 
         public void HandleItemPointerEnter(InventoryItemView view, PointerEventData eventData)
         {
-            if (IsCurrentItemView(view) == false)
+            if (CanPointAtItem == false || _itemHover.Enter(view, eventData) == false)
             {
                 return;
             }
 
-            if (_hovered != view)
+            if (_input.TransferHeld && CanHoverTransfer(view.Item))
             {
-                _tooltip?.Hide();
-            }
-
-            _externalTooltip = false;
-            _hovered = view;
-            _hoverStart = Time.unscaledTime;
-            _hoverPosition = eventData.position;
-            _hoverCamera = eventData.enterEventCamera;
-
-            if (_drag == null && HasModalWidget == false && _input.TransferHeld && CanHoverTransfer(view.Item))
-            {
-                _hovered = null;
-                _tooltip?.Hide();
-                QuickTransfer(view.Item);
+                TransferHoveredItem();
             }
         }
 
-        public void HandleItemPointerExit(InventoryItemView view, PointerEventData eventData)
+        public void HandleItemPointerExit(InventoryItemView view, PointerEventData eventData) => _itemHover.Exit(view);
+
+        internal void HandleItemViewDetached(InventoryItemView view)
         {
-            if (_hovered == view)
-            {
-                _hovered = null;
-                _tooltip?.Hide();
-            }
+            _dragInteraction?.ResetSource(view);
+            _itemHover.Exit(view);
         }
 
         public void HandleItemClick(InventoryItemView view, PointerEventData eventData)
@@ -455,196 +456,72 @@ namespace RaidIntoDarkness.Inventory.UI
 
         public void HandleBeginDrag(InventoryItemView view, PointerEventData eventData)
         {
-            if (eventData.button != PointerEventData.InputButton.Left || view.Item == null)
+            if (IsOpen && isActiveAndEnabled)
             {
-                return;
+                _dragInteraction?.BeginPointer(view, eventData, _theme, IconProvider);
             }
-
-            BeginDrag(view.Item, view.Grid, view.Item.Amount, eventData.position, eventData.pressEventCamera);
         }
 
-        public void HandleDrag(PointerEventData eventData)
+        public void HandleDrag(PointerEventData eventData) => UpdateDrag(eventData.position, eventData.pressEventCamera);
+
+        internal void HandleItemDrag(InventoryItemView view, PointerEventData eventData)
         {
-            if (_drag != null)
+            if (_dragInteraction?.MatchesPointer(view, eventData.pointerId) == true)
             {
-                UpdateDrag(eventData.position, eventData.pressEventCamera);
+                HandleDrag(eventData);
             }
         }
 
         public void HandleEndDrag(PointerEventData eventData)
         {
-            if (_drag != null)
+            if (_dragInteraction?.TrackPointer(eventData.position, eventData.pressEventCamera) == true)
             {
-                _drag.LastScreenPosition = eventData.position;
-                _drag.EventCamera = eventData.pressEventCamera;
                 CompleteDrag();
+            }
+        }
+
+        internal void HandleItemEndDrag(InventoryItemView view, PointerEventData eventData)
+        {
+            if (_dragInteraction?.MatchesPointer(view, eventData.pointerId) == true)
+            {
+                HandleEndDrag(eventData);
             }
         }
 
         public bool BeginDrag(ItemInstance item, InventoryGridViewBase sourceGrid, int amount, Vector2 screenPosition, Camera eventCamera)
         {
-            if (IsOpen == false || item == null || sourceGrid == null || Model == null || Model.ContainsItem(item) == false)
-            {
-                return false;
-            }
-
-            CancelDrag();
-            HideTransientWidgets();
-            int resolvedAmount = Mathf.Clamp(amount, 1, item.Amount);
-            bool slotItem = sourceGrid.UsesSlotIcon(item, out _);
-            _drag = new InventoryDragState
-            {
-                Item = item,
-                SourceGrid = sourceGrid,
-                SourceView = sourceGrid.GetItemView(item),
-                Rotated = slotItem == false && item.Location.Rotated,
-                Amount = resolvedAmount,
-                IsSplit = resolvedAmount < item.Amount,
-                EventCamera = eventCamera
-            };
-
-            RectTransform layer = _dragLayer != null ? _dragLayer : (RectTransform)transform;
-            _drag.Ghost = InventoryItemDragGhost.Create(layer, item, sourceGrid.CellSize, _drag.Rotated, Theme, IconProvider);
-            _drag.Ghost.transform.SetAsLastSibling();
-
-            if (_drag.IsSplit == false)
-            {
-                _drag.SourceView?.SetDragSource(true);
-            }
-
-            ShowCompatibleSlots(item);
-            _dropAreaViewModel?.SetVisible(_drag.IsSplit == false && CanUseDropArea());
-            UpdateDrag(screenPosition, eventCamera);
-            return true;
+            return IsOpen && isActiveAndEnabled && _dragInteraction?.Begin(item, sourceGrid, amount, screenPosition, eventCamera, _theme, IconProvider, null) == true;
         }
 
-        public void UpdateDrag(Vector2 screenPosition, Camera eventCamera)
-        {
-            if (_drag == null)
-            {
-                return;
-            }
+        public void UpdateDrag(Vector2 screenPosition, Camera eventCamera) => _dragInteraction?.Update(screenPosition, eventCamera);
 
-            _drag.LastScreenPosition = screenPosition;
-            _drag.EventCamera = eventCamera;
-            RectTransform ghostRect = _drag.Ghost.RectTransform;
-            var ghostParent = (RectTransform)ghostRect.parent;
-            RectTransformUtility.ScreenPointToLocalPointInRectangle(ghostParent, screenPosition, eventCamera, out Vector2 local);
-            ghostRect.anchorMin = new Vector2(0.5f, 0.5f);
-            ghostRect.anchorMax = new Vector2(0.5f, 0.5f);
-            ghostRect.localPosition = local;
-            RefreshDragTarget();
-        }
-
-        private void RefreshDragTarget()
-        {
-            Vector2 screenPosition = _drag.LastScreenPosition;
-            Camera eventCamera = _drag.EventCamera;
-            InventoryGridViewBase previousTarget = _drag.TargetGrid;
-            InventoryGridViewBase target = IsOverDropArea(screenPosition, eventCamera) ? null : FindGridAt(screenPosition);
-
-            if (previousTarget != null && previousTarget != target)
-            {
-                previousTarget.SetPlacementHighlight(default, Color.clear);
-            }
-
-            _drag.TargetGrid = target;
-            _drag.Kind = InventoryDropKind.None;
-            _drag.Failure = InventoryFailure.None;
-            _drag.AutoPlace = false;
-            _drag.TargetItem = null;
-
-            if (target == null)
-            {
-                return;
-            }
-
-            Evaluate(target, screenPosition, eventCamera, out Vector2Int origin, out RectInt area, out InventoryDropKind kind, out InventoryFailure failure);
-            _drag.TargetOrigin = origin;
-            _drag.Kind = kind;
-            _drag.Failure = failure;
-            Color highlight = kind switch
-            {
-                InventoryDropKind.Valid => target.Style.ValidPlacementColor,
-                InventoryDropKind.Merge => target.Style.MergePlacementColor,
-                _ => target.Style.InvalidPlacementColor
-            };
-
-            target.SetPlacementHighlight(area, highlight);
-        }
-
-        public void RotateDrag()
-        {
-            if (_drag == null || _drag.Item.Definition.AllowRotation == false)
-            {
-                return;
-            }
-
-            _drag.Rotated = _drag.Rotated == false;
-            _drag.Ghost.SetRotation(_drag.Rotated, _drag.SourceGrid.CellSize);
-            UpdateDrag(_drag.LastScreenPosition, _drag.EventCamera);
-        }
+        public void RotateDrag() => _dragInteraction?.Rotate();
 
         public InventoryResult CompleteDrag()
         {
-            if (_drag == null)
+            if (_dragInteraction == null)
             {
                 return InventoryResult.Fail(InventoryFailure.InvalidItem);
             }
 
-            RefreshDragTarget();
-            InventoryDragState drag = _drag;
-            bool dropInWorld = IsOverDropArea(drag.LastScreenPosition, drag.EventCamera);
-            InventoryResult result = InventoryResult.Fail(InventoryFailure.NoSlot);
-            string sourceContainerId = drag.Item != null ? drag.Item.ContainerId : null;
-            EndDrag();
-
-            if (dropInWorld)
+            var completed = _dragInteraction.Complete();
+            if (completed.AttachmentSource != null)
             {
-                return _dropAreaViewModel.Drop(drag.Item);
+                ReportAttachmentResult(completed.Result, completed.AttachmentSource);
+            }
+            else if (completed.ReportFailure)
+            {
+                ShowStatus(DescribeFailure(completed.Result.Failure));
+            }
+            else if (completed.Sound is InventorySound sound)
+            {
+                PlaySound(sound);
             }
 
-            if (drag.TargetGrid != null && drag.TargetGrid.Container != null && drag.Kind != InventoryDropKind.None)
-            {
-                InventoryContainer target = drag.TargetGrid.Container;
-
-                var applied = InventoryDragOperations.Apply(Model, ItemDropHandler, _commands?.Equipment, drag.Item, target, drag.TargetItem, drag.TargetOrigin, drag.Rotated, drag.IsSplit, drag.Amount, drag.AutoPlace, drag.Kind != InventoryDropKind.Invalid, _equipmentContainerId, _primaryContainerId);
-                result = applied.Result;
-                if (applied.Attachment)
-                {
-                    ReportAttachmentResult(result, drag.Item);
-                    return result;
-                }
-
-                if (applied.Queued)
-                {
-                    return result;
-                }
-
-                if (result.Success == false)
-                {
-                    ShowStatus(DescribeFailure(result.Failure));
-                }
-                else if (target.Id == _equipmentContainerId)
-                {
-                    PlaySound(InventorySound.ToSlot);
-                }
-                else if (sourceContainerId == _equipmentContainerId)
-                {
-                    PlaySound(InventorySound.ToBag);
-                }
-            }
-
-            return result;
+            return completed.Result;
         }
 
-        public void CancelDrag()
-        {
-            if (_drag != null)
-            {
-                EndDrag();
-            }
-        }
+        public void CancelDrag() => _dragInteraction?.Cancel();
 
         public void OpenContextMenu(ItemInstance item, InventoryGridViewBase grid, Vector2 screenPosition, Camera eventCamera)
         {
@@ -653,7 +530,7 @@ namespace RaidIntoDarkness.Inventory.UI
                 return;
             }
 
-            _tooltip?.Hide();
+            _itemHover.Clear();
             var context = new InventoryActionContext(this, item, grid);
             Actions.BuildMenu(context, ActionStyleProvider, _menuEntries);
             _contextMenu.Show(screenPosition, eventCamera, _menuEntries);
@@ -700,6 +577,7 @@ namespace RaidIntoDarkness.Inventory.UI
                 return;
             }
 
+            _itemHover.Clear();
             _splitDialog.Show(Model, item, amount => _commands?.Split(item, amount));
             ApplyThemeTo(_splitDialog);
         }
@@ -732,6 +610,7 @@ namespace RaidIntoDarkness.Inventory.UI
                 return;
             }
 
+            _itemHover.Clear();
             var request = ItemIconRequest.ForItem(item);
             Sprite icon = null;
 
@@ -762,6 +641,11 @@ namespace RaidIntoDarkness.Inventory.UI
             if (_commands != null)
             {
                 _commands.Equipment = equipment;
+            }
+
+            if (_dragInteraction != null)
+            {
+                _dragInteraction.Equipment = equipment;
             }
         }
 
@@ -873,54 +757,25 @@ namespace RaidIntoDarkness.Inventory.UI
 
         public void ClearHint() => ShowHint(string.Empty);
 
-        public IReadOnlyList<InventoryItemStat> CollectStats(ItemInstance item)
-        {
-            _tooltipStats.Clear();
+        public IReadOnlyList<InventoryItemStat> CollectStats(ItemInstance item) => _itemHover.CollectStats(item);
 
-            if (item != null && ItemStatsProvider != null)
-            {
-                ItemStatsProvider(item, _tooltipStats);
-            }
-
-            return _tooltipStats;
-        }
-
-        public string CollectDescription(ItemInstance item) => item != null && ItemDescriptionProvider != null ? ItemDescriptionProvider(item) : null;
+        public string CollectDescription(ItemInstance item) => _itemHover.CollectDescription(item);
 
         public bool ShowTooltip(string title, string description, Vector2 screenPosition, Camera eventCamera)
         {
-            if (IsOpen == false || _tooltip == null || IsDragging || HasModalWidget)
-            {
-                return false;
-            }
-            _hovered = null;
-            _externalTooltip = true;
-            _hoverPosition = screenPosition;
-            _hoverCamera = eventCamera;
-            _tooltip.Show(title, description, screenPosition, eventCamera);
-            ApplyThemeTo(_tooltip);
-            return true;
+            return CanPointAtItem && _itemHover.ShowExternal(title, description, screenPosition, eventCamera);
         }
 
-        public void HideTooltip()
-        {
-            if (_externalTooltip)
-            {
-                _externalTooltip = false;
-                _tooltip?.Hide();
-            }
-        }
+        public void HideTooltip() => _itemHover.HideExternal();
+
+        internal void MoveExternalTooltip(Vector2 screenPosition, Camera eventCamera) => _itemHover.FollowExternal(screenPosition, eventCamera);
 
         public void RefreshTooltip()
         {
-            if (_tooltip == null || _tooltip.IsVisible == false || _hovered == null || _hovered.Item == null)
+            if (CanPointAtItem)
             {
-                return;
+                _itemHover.Refresh();
             }
-
-            Vector2 pointer = UnityEngine.InputSystem.Pointer.current != null ? UnityEngine.InputSystem.Pointer.current.position.ReadValue() : _hoverPosition;
-            _tooltip.Show(_hovered.Item, pointer, _hoverCamera, CollectStats(_hovered.Item), CollectDescription(_hovered.Item));
-            ApplyThemeTo(_tooltip);
         }
 
         public void PlaySound(InventorySound sound)
@@ -969,7 +824,7 @@ namespace RaidIntoDarkness.Inventory.UI
         {
             if (_theme != null && widget != null)
             {
-                _theme.ApplyTo(widget.transform, widget is InventoryTooltip == false);
+                _theme.ApplyTo(widget.transform, true);
             }
         }
 
@@ -1002,10 +857,7 @@ namespace RaidIntoDarkness.Inventory.UI
             Actions = new InventoryActionRegistry();
             InventoryBuiltInActions.RegisterDefaults(Actions);
 
-            if (_tooltip != null)
-            {
-                _tooltip.Theme = _theme;
-            }
+            _itemHover.Configure(_tooltip, _tooltipDelay, _theme);
 
             if (_contextMenu != null)
             {
@@ -1028,28 +880,10 @@ namespace RaidIntoDarkness.Inventory.UI
             }
         }
 
-        private void OnEnable()
-        {
-            if (_dropItemArea == null)
-            {
-                return;
-            }
-
-            _dropItemArea.interactable = false;
-            _dropItemArea.blocksRaycasts = false;
-            ResetDropArea();
-            _dropAreaViewModel = new InventoryDropAreaViewModel(TryDropItem);
-            _dropAreaBinding = _dropAreaViewModel.Visibility.Subscribe(visible => _dropAreaTargetAlpha = visible ? 1f : 0f);
-        }
-
         private void OnDisable()
         {
-            CancelDrag();
-            _dropAreaBinding?.Dispose();
-            _dropAreaViewModel?.Dispose();
-            _dropAreaBinding = null;
-            _dropAreaViewModel = null;
-            ResetDropArea();
+            _dragInteraction?.Suspend();
+            _itemHover.Clear();
         }
 
         private void OnDestroy() => Unbind();
@@ -1067,133 +901,27 @@ namespace RaidIntoDarkness.Inventory.UI
                 return;
             }
 
-            if (_dropItemArea != null && _dropItemArea.alpha != _dropAreaTargetAlpha)
-            {
-                _dropItemArea.alpha = Mathf.MoveTowards(_dropItemArea.alpha, _dropAreaTargetAlpha, Time.unscaledDeltaTime / DROP_AREA_FADE_DURATION);
-            }
-
-            if (_drag != null && _input.RotatePressed)
+            _dragInteraction?.Tick();
+            if (IsDragging && _input.RotatePressed)
             {
                 RotateDrag();
             }
 
-            if (_hovered != null && _drag == null && HasModalWidget == false && _input.TransferPressed && Model != null && Model.ContainsItem(_hovered.Item) && CanHoverTransfer(_hovered.Item))
+            if (CanPointAtItem && _input.TransferPressed)
             {
-                ItemInstance item = _hovered.Item;
-                _hovered = null;
+                TransferHoveredItem();
+            }
+        }
 
-                if (_tooltip != null)
-                {
-                    _tooltip.Hide();
-                }
+        private void LateUpdate() => _itemHover.Tick(CanPointAtItem);
 
+        private void TransferHoveredItem()
+        {
+            ItemInstance item = _itemHover.Item;
+            if (CanHoverTransfer(item))
+            {
+                _itemHover.Clear();
                 QuickTransfer(item);
-            }
-        }
-
-        private void LateUpdate()
-        {
-            if (IsOpen == false || _drag != null || HasModalWidget || _tooltip == null)
-            {
-                _externalTooltip = false;
-                _tooltip?.Hide();
-                return;
-            }
-
-            Vector2 pointer = UnityEngine.InputSystem.Pointer.current != null ? UnityEngine.InputSystem.Pointer.current.position.ReadValue() : _hoverPosition;
-
-            if (_externalTooltip)
-            {
-                _tooltip.Follow(pointer, _hoverCamera);
-                return;
-            }
-            if (_hovered == null)
-            {
-                _tooltip.Hide();
-                return;
-            }
-
-            if (IsHoveredItemAt(pointer) == false)
-            {
-                _hovered = null;
-                _tooltip.Hide();
-                return;
-            }
-
-            if (Time.unscaledTime - _hoverStart < _tooltipDelay)
-            {
-                return;
-            }
-
-            if (_tooltip.IsVisible == false)
-            {
-                _tooltip.Show(_hovered.Item, pointer, _hoverCamera, CollectStats(_hovered.Item), CollectDescription(_hovered.Item));
-                ApplyThemeTo(_tooltip);
-            }
-            else
-            {
-                _tooltip.Follow(pointer, _hoverCamera);
-            }
-        }
-
-        private bool IsHoveredItemAt(Vector2 screenPosition)
-        {
-            if (_hovered == null || _hovered.isActiveAndEnabled == false)
-            {
-                return false;
-            }
-
-            EventSystem eventSystem = EventSystem.current;
-
-            if (eventSystem == null)
-            {
-                return false;
-            }
-
-            if (_hoverPointer == null || _hoverEventSystem != eventSystem)
-            {
-                _hoverEventSystem = eventSystem;
-                _hoverPointer = new PointerEventData(eventSystem);
-            }
-
-            _hoverPointer.Reset();
-            _hoverPointer.position = screenPosition;
-            _raycastResults.Clear();
-            eventSystem.RaycastAll(_hoverPointer, _raycastResults);
-            return _raycastResults.Count > 0 && _raycastResults[0].gameObject != null && _raycastResults[0].gameObject.GetComponentInParent<InventoryItemView>() == _hovered;
-        }
-
-        private bool IsCurrentItemView(InventoryItemView view)
-        {
-            return view != null && view.isActiveAndEnabled && view.Item != null && Model != null && Model.ContainsItem(view.Item) && view.Grid != null && view.Grid.Container != null && view.Grid.Container.Contains(view.Item);
-        }
-
-        private void OnModelChanged(InventoryChange change)
-        {
-            UpdateWeight();
-
-            InventoryItemView hovered = _hovered;
-            if (ReferenceEquals(hovered, null) == false && (change.Kind == InventoryChangeKind.Cleared || change.Item == hovered.Item) && IsCurrentItemView(hovered) == false)
-            {
-                HandleItemPointerExit(hovered, null);
-            }
-
-            if (_drag == null)
-            {
-                return;
-            }
-
-            if (Model.ContainsItem(_drag.Item) == false || _drag.SourceGrid == null || _drag.SourceGrid.Container == null || _drag.SourceGrid.Container.Contains(_drag.Item) == false)
-            {
-                CancelDrag();
-                return;
-            }
-
-            InventoryGridViewBase target = _drag.TargetGrid;
-
-            if (change.Item == _drag.Item || change.Affects(_drag.Item.ContainerId) || (target != null && change.Affects(target.ContainerId)))
-            {
-                RefreshDragTarget();
             }
         }
 
@@ -1210,169 +938,6 @@ namespace RaidIntoDarkness.Inventory.UI
             string format = _maxCarryWeight > 0f ? _weightFormat : _weightFormatUnlimited;
             _weightText.text = string.Format(System.Globalization.CultureInfo.InvariantCulture, format, InventoryUIFactory.FormatWeight(weight), InventoryUIFactory.FormatWeight(_maxCarryWeight), ColorUtility.ToHtmlStringRGB(weightColor));
             _weightText.color = format.Contains("{2}") ? Color.white : weightColor;
-        }
-
-        private void EndDrag()
-        {
-            InventoryDragState drag = _drag;
-            _drag = null;
-            _dropAreaViewModel?.SetVisible(false);
-
-            if (drag.Ghost != null)
-            {
-                InventoryUIFactory.Destroy(drag.Ghost.gameObject);
-            }
-
-            if (drag.SourceView != null)
-            {
-                drag.SourceView.SetDragSource(false);
-            }
-
-            foreach (InventoryGridViewBase grid in _grids)
-            {
-                if (grid != null)
-                {
-                    grid.ClearHighlights();
-                }
-            }
-        }
-
-        private bool CanUseDropArea()
-        {
-            return IsOpen && _dropItemArea != null && _dropItemArea.isActiveAndEnabled && _commands?.CanDropInWorld == true && (_secondaryRoot == null || _secondaryRoot.gameObject.activeSelf == false);
-        }
-
-        private bool IsOverDropArea(Vector2 screenPosition, Camera eventCamera)
-        {
-            return _dropAreaViewModel?.IsVisible == true && CanUseDropArea() && RectTransformUtility.RectangleContainsScreenPoint((RectTransform)_dropItemArea.transform, screenPosition, eventCamera);
-        }
-
-        private void ResetDropArea()
-        {
-            _dropAreaViewModel?.SetVisible(false);
-            _dropAreaTargetAlpha = 0f;
-            if (_dropItemArea != null)
-            {
-                _dropItemArea.alpha = 0f;
-            }
-        }
-
-        private void ShowCompatibleSlots(ItemInstance item)
-        {
-            foreach (InventoryGridViewBase grid in _grids)
-            {
-                if (grid is not InventorySlotGridView slotGrid || slotGrid.Container is not SlottedContainer container)
-                {
-                    continue;
-                }
-
-                _compatibleAreas.Clear();
-
-                foreach (SlotDefinition slot in container.Slots)
-                {
-                    ItemInstance occupant = container.GetSlotOccupant(slot.Id);
-
-                    if (slot.Rule.AcceptsDefinition(item.Definition) && container.IsSlotAvailable(slot, item) && (slot.Mode == SlotMode.Grid || occupant == null || occupant == item))
-                    {
-                        _compatibleAreas.Add(slot.Bounds);
-                    }
-                }
-
-                grid.SetCompatibleAreas(_compatibleAreas);
-            }
-        }
-
-        private InventoryGridViewBase FindGridAt(Vector2 screenPosition)
-        {
-            EventSystem eventSystem = EventSystem.current;
-
-            if (eventSystem == null)
-            {
-                return null;
-            }
-
-            var pointer = new PointerEventData(eventSystem) { position = screenPosition };
-            _raycastResults.Clear();
-            eventSystem.RaycastAll(pointer, _raycastResults);
-
-            foreach (RaycastResult result in _raycastResults)
-            {
-                if (result.gameObject == null)
-                {
-                    continue;
-                }
-
-                InventoryGridViewBase grid = result.gameObject.GetComponentInParent<InventoryGridViewBase>();
-
-                if (grid != null && _grids.Contains(grid))
-                {
-                    return grid.Container != null && Model.GetContainer(grid.ContainerId) == grid.Container ? grid : null;
-                }
-
-                if (result.gameObject.GetComponentInParent<InventoryWindow>() == this)
-                {
-                    return null;
-                }
-            }
-
-            return null;
-        }
-
-        private void Evaluate(InventoryGridViewBase target, Vector2 screenPosition, Camera eventCamera, out Vector2Int origin, out RectInt area, out InventoryDropKind kind, out InventoryFailure failure)
-        {
-            InventoryContainer container = target.Container;
-            ItemInstance item = _drag.Item;
-            bool slotTarget = container is SlottedContainer;
-            origin = default;
-            area = default;
-            failure = InventoryFailure.None;
-
-            if (target.TryGetCellAtScreen(screenPosition, eventCamera, out Vector2Int targetCell))
-            {
-                ItemInstance targetItem = container.GetItemAt(targetCell);
-                if (InventoryDragOperations.TryPreviewItemTarget(Model, ItemDropHandler, item, targetItem, _drag.IsSplit, _drag.Amount, out kind, out failure))
-                {
-                    _drag.TargetItem = targetItem;
-                    origin = targetItem.Location.Position;
-                    area = container.GetItemArea(targetItem);
-                    return;
-                }
-            }
-
-            if (target == _drag.SourceGrid && slotTarget == false)
-            {
-                kind = InventoryDropKind.None;
-                return;
-            }
-
-            Vector2 pointer = target.ScreenToTopLeftLocal(screenPosition, eventCamera);
-            Vector2Int size = item.GetSize(_drag.Rotated);
-            origin = target.GetPlacementOrigin(pointer, size);
-            area = new RectInt(origin, size);
-
-            if (container.TryResolvePlacement(item, origin, _drag.Rotated, out ItemPlacement placement, out failure))
-            {
-                area = placement.Area;
-            }
-
-            var preview = InventoryDragOperations.PreviewPlacement(Model, item, container, origin, _drag.Rotated, _drag.IsSplit, _drag.Amount, _primaryContainerId, area);
-            area = preview.Area;
-            kind = preview.Kind;
-            failure = preview.Failure;
-            _drag.AutoPlace = preview.AutoPlace;
-            if (kind == InventoryDropKind.Invalid)
-            {
-                ClipToContainer(ref area, container);
-            }
-        }
-
-        private static void ClipToContainer(ref RectInt area, InventoryContainer container)
-        {
-            int xMin = Mathf.Clamp(area.xMin, 0, container.Width);
-            int yMin = Mathf.Clamp(area.yMin, 0, container.Height);
-            int xMax = Mathf.Clamp(area.xMax, 0, container.Width);
-            int yMax = Mathf.Clamp(area.yMax, 0, container.Height);
-            area = new RectInt(xMin, yMin, Mathf.Max(0, xMax - xMin), Mathf.Max(0, yMax - yMin));
         }
     }
 }

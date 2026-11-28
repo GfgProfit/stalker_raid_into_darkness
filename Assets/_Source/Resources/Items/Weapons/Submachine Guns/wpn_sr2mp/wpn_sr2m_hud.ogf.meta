@@ -1,0 +1,30 @@
+fileFormatVersion: 2
+guid: e641afa9beb414f468345d6157baf37e
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\sr2m\sr-2mp_sil|models\weapons
+    second: {fileID: 2100000, guid: cc6f2ff21967dcc40985511425a08caa, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\sr2m\sr-2mp|models\weapons
+    second: {fileID: 2100000, guid: a32436f6894eb3945b7b91b13296c5d3, type: 2}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 61e536e21e96f284493f2969a9250cdf, type: 3}
+  _scale: 1
+  _importMaterials: 1
+  _texturesFolder: 
+  _searchTexturesByName: 1
+  _importEmbeddedMotions: 1
+  _embeddedLoopMode: 0
+  _addAnimator: 1
+  _readableMeshes: 0
+  _updateWhenOffscreen: 0
+  _autoResolveResources: 1

@@ -1,0 +1,75 @@
+fileFormatVersion: 2
+guid: bb1edb1f707c49a4a98b4d279a15ece5
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\p90\body_p90|models\weapons
+    second: {fileID: 2100000, guid: 8b3393a55f3f1b34c846db85b8822ec2, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\p90\charge_p90|models\weapons
+    second: {fileID: 2100000, guid: 28a788284397291428ac567fb6f06256, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\p90\mag_p90|models\weapons
+    second: {fileID: 2100000, guid: 439c9799e9bab2c49b76df72038020c1, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\p90\muzzle_p90|models\weapons
+    second: {fileID: 2100000, guid: 543f9d8a084e3c347b99a2196de95343, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\p90\reciever_p90|models\weapons
+    second: {fileID: 2100000, guid: bec6940bab498ba4983d24ab1b52686b, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\p90\scope_p90|models\weapons
+    second: {fileID: 2100000, guid: 00222a161ac310d4ba3ea95edea22d63, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\p90\silencer_p90|models\weapons
+    second: {fileID: 2100000, guid: 3d8af232b5f479e479d40b267cc02b74, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\p90\stock_p90_pad|models\model
+    second: {fileID: 2100000, guid: b3c694ac29f85c24195558ccaca4918d, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\p90\stock_p90|models\model
+    second: {fileID: 2100000, guid: 073fc343120834f43a4f1bab6a397090, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\wpn_addon_scope_all_lens_cyan|models\transparent
+    second: {fileID: 2100000, guid: 1192b71013c5a0243a91b9fa47726822, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\wpn_addon_scope_p90_mark|models\collimator
+    second: {fileID: 2100000, guid: bf3510d4b9b27c949b96f016ea37188a, type: 2}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 61e536e21e96f284493f2969a9250cdf, type: 3}
+  _scale: 1
+  _importMaterials: 1
+  _texturesFolder: 
+  _searchTexturesByName: 1
+  _importEmbeddedMotions: 1
+  _embeddedLoopMode: 0
+  _addAnimator: 1
+  _readableMeshes: 0
+  _updateWhenOffscreen: 0
+  _autoResolveResources: 1

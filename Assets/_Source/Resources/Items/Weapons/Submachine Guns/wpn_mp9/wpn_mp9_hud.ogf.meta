@@ -1,0 +1,80 @@
+fileFormatVersion: 2
+guid: 818f59b60f1dd8e45a0eea47e2d9d06e
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\ammo_9x19|models\weapons
+    second: {fileID: 2100000, guid: 159cd7f32fb1e7548a645acf0dbe439e, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\mp9\barrel|models\weapons
+    second: {fileID: 2100000, guid: be3131d67f49a9a408341615eed31ced, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\mp9\body|models\weapons
+    second: {fileID: 2100000, guid: 8a28dd5c0ddef984189f1e7a57d20837, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\mp9\charge|models\weapons
+    second: {fileID: 2100000, guid: 92f14b135ebfba14eba935ff51b5bb33, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\mp9\grip|models\weapons
+    second: {fileID: 2100000, guid: 22241c08d7f66404c8acb0f576a3a9f2, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\mp9\internals|models\weapons
+    second: {fileID: 2100000, guid: cc2dd8887f8fe0240a48c663d2e871be, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\mp9\mag|models\weapons
+    second: {fileID: 2100000, guid: 16b5b10bd5923874abd548df4effce7b, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\mp9\muzzle|models\weapons
+    second: {fileID: 2100000, guid: af6717194c1349b4b9bccfbb695553f9, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\mp9\reciever|models\weapons
+    second: {fileID: 2100000, guid: c50436a995fe69d44a203ac4b9aea50f, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\mp9\sight|models\weapons
+    second: {fileID: 2100000, guid: 4233ac2c1f567114c98b0255bd3d336f, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\mp9\silencer|models\weapons
+    second: {fileID: 2100000, guid: 03a0258d85379844b9d71d8835bb682d, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\mp9\stock|models\weapons
+    second: {fileID: 2100000, guid: 656939ea05af7a44ca7adcfc30d9c5f9, type: 2}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 61e536e21e96f284493f2969a9250cdf, type: 3}
+  _scale: 1
+  _importMaterials: 1
+  _texturesFolder: 
+  _searchTexturesByName: 1
+  _importEmbeddedMotions: 1
+  _embeddedLoopMode: 0
+  _addAnimator: 1
+  _readableMeshes: 0
+  _updateWhenOffscreen: 0
+  _autoResolveResources: 1

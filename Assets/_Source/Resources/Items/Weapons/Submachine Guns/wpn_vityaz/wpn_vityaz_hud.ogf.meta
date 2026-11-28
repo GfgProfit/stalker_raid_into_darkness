@@ -1,0 +1,100 @@
+fileFormatVersion: 2
+guid: fb58877fd34f8d748bbd18a76ab17f73
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\acog\wpn_addon_scope_acog_lens|models_lense_scope
+    second: {fileID: 2100000, guid: ecf6438de54969a4f9316d354de107c6, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\acog\wpn_addon_scope_acog_mount|models\weapons
+    second: {fileID: 2100000, guid: 68fe029db1bc47746a37b0257abf8031, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\acog\wpn_addon_scope_trijicon_acog_4x32|models\weapons
+    second: {fileID: 2100000, guid: f9aa486eed8c72f478c35c1b7d77784a, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\ammo_9x19|models\weapons
+    second: {fileID: 2100000, guid: 1963e1a6b718cb34f9111538567bbd45, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\dvl_10\scope_pso_1m2-1_lens_diff|models\model
+    second: {fileID: 2100000, guid: 9f99633132456de48838c993f9147783, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\dvl_10\scope_pso_1m2-1_lens_trans|models\window
+    second: {fileID: 2100000, guid: f0e16f5fa742788468fe30d7ae27a263, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\vityaz\body|models\weapons
+    second: {fileID: 2100000, guid: 48ff78dd7c7343d42b54c5cc956dcf7f, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\vityaz\bolt|models\weapons
+    second: {fileID: 2100000, guid: 03ec3489a0ddcb84d95cc5e98df59197, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\vityaz\handguard|models\weapons
+    second: {fileID: 2100000, guid: 318965009f6680b44930fdb85b24f5aa, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\vityaz\mag|models\weapons
+    second: {fileID: 2100000, guid: 70344a3c1be63964884ecbbd4eeb0f7b, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\vityaz\muzzle|models\weapons
+    second: {fileID: 2100000, guid: 02ac326bc809cab4bb0b70b6d204de92, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\vityaz\pistolgrip|models\weapons
+    second: {fileID: 2100000, guid: 2d3f3132518c27b42b1139330c4b879c, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\vityaz\reciever|models\weapons
+    second: {fileID: 2100000, guid: 331c2df535fab5a4893acaf3739c9cb0, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\vityaz\sight|models\weapons
+    second: {fileID: 2100000, guid: a9ae1441e70b4cb4bb0618b5804384ac, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\vityaz\silencer|models\weapons
+    second: {fileID: 2100000, guid: fd0cc2f1b4f3f254490dfd8b416643c6, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\vityaz\stock|models\weapons
+    second: {fileID: 2100000, guid: d141367dbcc581c42b1f160ad41fd878, type: 2}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 61e536e21e96f284493f2969a9250cdf, type: 3}
+  _scale: 1
+  _importMaterials: 1
+  _texturesFolder: 
+  _searchTexturesByName: 1
+  _importEmbeddedMotions: 1
+  _embeddedLoopMode: 0
+  _addAnimator: 1
+  _readableMeshes: 0
+  _updateWhenOffscreen: 0
+  _autoResolveResources: 1

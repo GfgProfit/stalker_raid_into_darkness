@@ -1,0 +1,35 @@
+fileFormatVersion: 2
+guid: b3754569912e7fe4284730fc524e10a8
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\pm|models\weapons
+    second: {fileID: 2100000, guid: aafc00beeb623ca4a8873a06a1be6f25, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\silencer_pbs1_diff|models\weapons
+    second: {fileID: 2100000, guid: 25523b5e73cb6d3449d322b3a65867c8, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\wpn_bizon|models\weapons
+    second: {fileID: 2100000, guid: 28d623b39bb828049b31a3af9ee83a19, type: 2}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 61e536e21e96f284493f2969a9250cdf, type: 3}
+  _scale: 1
+  _importMaterials: 1
+  _texturesFolder: 
+  _searchTexturesByName: 1
+  _importEmbeddedMotions: 1
+  _embeddedLoopMode: 0
+  _addAnimator: 1
+  _readableMeshes: 0
+  _updateWhenOffscreen: 0
+  _autoResolveResources: 1

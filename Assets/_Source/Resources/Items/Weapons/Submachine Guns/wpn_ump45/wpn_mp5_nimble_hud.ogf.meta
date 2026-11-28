@@ -1,0 +1,100 @@
+fileFormatVersion: 2
+guid: 1af701b0f44baf74d83f763050a77a7f
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\acog\wpn_addon_scope_acog_lens|models_lense_scope
+    second: {fileID: 2100000, guid: 0bc51673b4cd04640a0f8bc3333aac33, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\acog\wpn_addon_scope_acog_mount|models\weapons
+    second: {fileID: 2100000, guid: 0f1a71f54d6f5c74d80aacc19df35700, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\acog\wpn_addon_scope_trijicon_acog_4x32|models\weapons
+    second: {fileID: 2100000, guid: 6e4c4d0ea8e297a4b8776e7e2585c001, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\ammo_45acp|models\weapons
+    second: {fileID: 2100000, guid: 62b59e0487652d6419a1d7fd45142e19, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\dvl_10\scope_pso_1m2-1_lens_diff|models\model
+    second: {fileID: 2100000, guid: b370d63a42cb31b4cad250e59e1d2473, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\dvl_10\scope_pso_1m2-1_lens_trans|models\window
+    second: {fileID: 2100000, guid: 354de2b8d40c7c5429a4507ab95cdd0b, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\ump45\barrel_ump45|models\weapons
+    second: {fileID: 2100000, guid: 58e5afb20d9a84b4cb035ad608ad39f3, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\ump45\body_ump45|models\model
+    second: {fileID: 2100000, guid: d2c5c6ddb83af9c49b469ca0ba852b66, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\ump45\bolt_ump45|models\weapons
+    second: {fileID: 2100000, guid: 92e702352b052f54393441b615578de8, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\ump45\charge_ump45|models\weapons
+    second: {fileID: 2100000, guid: c7b54e6e672fa1242bcbbcb60b49eead, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\ump45\foregrip_kac|models\model
+    second: {fileID: 2100000, guid: 3d371af4fdd28544f8f01b2cca9ccc1a, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\ump45\mag_ump45|models\weapons
+    second: {fileID: 2100000, guid: 5866b8b548e5b8d4280a3c879d208dc9, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\ump45\mount_ump45|models\weapons
+    second: {fileID: 2100000, guid: 323e538e13657fe44bc0aab8ceda6e59, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\ump45\reciever_ump45|models\weapons
+    second: {fileID: 2100000, guid: fe3a6b9af0b24384fa2275a2b5641d4c, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\ump45\stock_ump45|models\model
+    second: {fileID: 2100000, guid: 5fdc91b7df5981d46a6d3ebd8eeb9618, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wpn\wpn_addon_sil_45|models\weapons
+    second: {fileID: 2100000, guid: 046892be830fe42419ee72d481fe81cc, type: 2}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 61e536e21e96f284493f2969a9250cdf, type: 3}
+  _scale: 1
+  _importMaterials: 1
+  _texturesFolder: 
+  _searchTexturesByName: 1
+  _importEmbeddedMotions: 1
+  _embeddedLoopMode: 0
+  _addAnimator: 1
+  _readableMeshes: 0
+  _updateWhenOffscreen: 0
+  _autoResolveResources: 1

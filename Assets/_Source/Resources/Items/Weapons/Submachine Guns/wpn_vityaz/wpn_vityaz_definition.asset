@@ -1,0 +1,195 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da0f90c2955673d46b25d465cbe44ed0, type: 3}
+  m_Name: wpn_vityaz_definition
+  m_EditorClassIdentifier: Inventory::Inventory.ItemDefinition
+  _definitionId: cd5ccfb37ea26f44ea6c47f473cc8b53
+  _displayName: "\u041F\u0438\u0441\u0442\u043E\u043B\u0435\u0442-\u043F\u0443\u043B\u0435\u043C\u0451\u0442 \u041F\u041F-19-01 \xAB\u0412\u0438\u0442\u044F\u0437\u044C\xBB"
+  _shortName: "\u0412\u0438\u0442\u044F\u0437\u044C"
+  _description: "\u0420\u043E\u0441\u0441\u0438\u0439\u0441\u043A\u0438\u0439 \u043F\u0438\u0441\u0442\u043E\u043B\u0435\u0442-\u043F\u0443\u043B\u0435\u043C\u0451\u0442 \u043F\u043E\u0434 \u043F\u0430\u0442\u0440\u043E\u043D 9\xD719 \u043C\u043C Parabellum, \u0440\u0430\u0437\u0440\u0430\u0431\u043E\u0442\u0430\u043D\u043D\u044B\u0439 \u0432 2004 \u0433\u043E\u0434\u0443 \u043D\u0430 \u0418\u0436\u0435\u0432\u0441\u043A\u043E\u043C \u043C\u0430\u0448\u0438\u043D\u043E\u0441\u0442\u0440\u043E\u0438\u0442\u0435\u043B\u044C\u043D\u043E\u043C \u0437\u0430\u0432\u043E\u0434\u0435 (\u043D\u044B\u043D\u0435 \u043A\u043E\u043D\u0446\u0435\u0440\u043D \xAB\u041A\u0430\u043B\u0430\u0448\u043D\u0438\u043A\u043E\u0432\xBB) \u043F\u043E \u0442\u0440\u0435\u0431\u043E\u0432\u0430\u043D\u0438\u044F\u043C \u043E\u0442\u0440\u044F\u0434\u0430 \u0441\u043F\u0435\u0446\u0438\u0430\u043B\u044C\u043D\u043E\u0433\u043E \u043D\u0430\u0437\u043D\u0430\u0447\u0435\u043D\u0438\u044F \u0432\u043D\u0443\u0442\u0440\u0435\u043D\u043D\u0438\u0445 \u0432\u043E\u0439\u0441\u043A \u041C\u0412\u0414 \u0420\u043E\u0441\u0441\u0438\u0438 \xAB\u0412\u0438\u0442\u044F\u0437\u044C\xBB, \u0432 \u0447\u0435\u0441\u0442\u044C \u043A\u043E\u0442\u043E\u0440\u043E\u0433\u043E \u043F\u043E\u043B\u0443\u0447\u0438\u043B \u0441\u0432\u043E\u0451 \u043D\u0430\u0437\u0432\u0430\u043D\u0438\u0435. \u041F\u0440\u0435\u0434\u0441\u0442\u0430\u0432\u043B\u044F\u0435\u0442 \u0441\u043E\u0431\u043E\u0439 \u0434\u0430\u043B\u044C\u043D\u0435\u0439\u0448\u0435\u0435 \u0440\u0430\u0437\u0432\u0438\u0442\u0438\u0435 \u043F\u0438\u0441\u0442\u043E\u043B\u0435\u0442\u0430-\u043F\u0443\u043B\u0435\u043C\u0451\u0442\u0430 \u041F\u041F-19 \xAB\u0411\u0438\u0437\u043E\u043D\xBB \u0441 \u0438\u0441\u043F\u043E\u043B\u044C\u0437\u043E\u0432\u0430\u043D\u0438\u0435\u043C \u043A\u043E\u043D\u0441\u0442\u0440\u0443\u043A\u0442\u0438\u0432\u043D\u044B\u0445 \u044D\u043B\u0435\u043C\u0435\u043D\u0442\u043E\u0432 \u0430\u0432\u0442\u043E\u043C\u0430\u0442\u0430 \u041A\u0430\u043B\u0430\u0448\u043D\u0438\u043A\u043E\u0432\u0430. \u0421\u0435\u0440\u0438\u0439\u043D\u043E\u0435 \u043F\u0440\u043E\u0438\u0437\u0432\u043E\u0434\u0441\u0442\u0432\u043E \u043D\u0430\u0447\u0430\u043B\u043E\u0441\u044C \u0432 2008 \u0433\u043E\u0434\u0443. \u0410\u0432\u0442\u043E\u043C\u0430\u0442\u0438\u043A\u0430 \u043E\u0441\u043D\u043E\u0432\u0430\u043D\u0430 \u043D\u0430 \u0438\u0441\u043F\u043E\u043B\u044C\u0437\u043E\u0432\u0430\u043D\u0438\u0438 \u044D\u043D\u0435\u0440\u0433\u0438\u0438 \u043E\u0442\u0434\u0430\u0447\u0438 \u0441\u0432\u043E\u0431\u043E\u0434\u043D\u043E\u0433\u043E \u0437\u0430\u0442\u0432\u043E\u0440\u0430, \u0441\u0442\u0440\u0435\u043B\u044C\u0431\u0430 \u0432\u0435\u0434\u0451\u0442\u0441\u044F \u0441 \u0437\u0430\u043A\u0440\u044B\u0442\u043E\u0433\u043E \u0437\u0430\u0442\u0432\u043E\u0440\u0430. \u0423\u0434\u0430\u0440\u043D\u043E-\u0441\u043F\u0443\u0441\u043A\u043E\u0432\u043E\u0439 \u043C\u0435\u0445\u0430\u043D\u0438\u0437\u043C \u043A\u0443\u0440\u043A\u043E\u0432\u043E\u0433\u043E \u0442\u0438\u043F\u0430 \u043E\u0431\u0435\u0441\u043F\u0435\u0447\u0438\u0432\u0430\u0435\u0442 \u043E\u0434\u0438\u043D\u043E\u0447\u043D\u044B\u0439 \u0438 \u043D\u0435\u043F\u0440\u0435\u0440\u044B\u0432\u043D\u044B\u0439 \u0430\u0432\u0442\u043E\u043C\u0430\u0442\u0438\u0447\u0435\u0441\u043A\u0438\u0439 \u043E\u0433\u043E\u043D\u044C \u0441 \u0442\u0435\u0445\u043D\u0438\u0447\u0435\u0441\u043A\u0438\u043C \u0442\u0435\u043C\u043F\u043E\u043C 700\u2013750 \u0432\u044B\u0441\u0442\u0440\u0435\u043B\u043E\u0432 \u0432 \u043C\u0438\u043D\u0443\u0442\u0443. \u0421\u0442\u0432\u043E\u043B\u044C\u043D\u0430\u044F \u043A\u043E\u0440\u043E\u0431\u043A\u0430 \u0438\u0437\u0433\u043E\u0442\u043E\u0432\u043B\u0435\u043D\u0430 \u0438\u0437 \u0448\u0442\u0430\u043C\u043F\u043E\u0432\u0430\u043D\u043D\u043E\u0439 \u0441\u0442\u0430\u043B\u0438. \u041E\u0440\u0443\u0436\u0438\u0435 \u043E\u0441\u043D\u0430\u0449\u0435\u043D\u043E \u0441\u043A\u043B\u0430\u0434\u043D\u044B\u043C \u043C\u0435\u0442\u0430\u043B\u043B\u0438\u0447\u0435\u0441\u043A\u0438\u043C \u0440\u0430\u043C\u043E\u0447\u043D\u044B\u043C \u043F\u0440\u0438\u043A\u043B\u0430\u0434\u043E\u043C, \u0444\u043B\u0430\u0436\u043A\u043E\u0432\u044B\u043C \u043F\u0440\u0435\u0434\u043E\u0445\u0440\u0430\u043D\u0438\u0442\u0435\u043B\u0435\u043C-\u043F\u0435\u0440\u0435\u0432\u043E\u0434\u0447\u0438\u043A\u043E\u043C \u0440\u0435\u0436\u0438\u043C\u043E\u0432 \u043E\u0433\u043D\u044F \u0438 \u043E\u0442\u043A\u0440\u044B\u0442\u044B\u043C\u0438 \u043C\u0435\u0445\u0430\u043D\u0438\u0447\u0435\u0441\u043A\u0438\u043C\u0438 \u043F\u0440\u0438\u0446\u0435\u043B\u044C\u043D\u044B\u043C\u0438 \u043F\u0440\u0438\u0441\u043F\u043E\u0441\u043E\u0431\u043B\u0435\u043D\u0438\u044F\u043C\u0438. \u0412 \u043E\u0442\u043B\u0438\u0447\u0438\u0435 \u043E\u0442 \u043F\u0440\u0435\u0434\u0448\u0435\u0441\u0442\u0432\u0435\u043D\u043D\u0438\u043A\u0430 \u0441\u043E \u0448\u043D\u0435\u043A\u043E\u0432\u044B\u043C \u043C\u0430\u0433\u0430\u0437\u0438\u043D\u043E\u043C, \u043F\u0438\u0442\u0430\u043D\u0438\u0435 \u043E\u0441\u0443\u0449\u0435\u0441\u0442\u0432\u043B\u044F\u0435\u0442\u0441\u044F \u0438\u0437 \u043E\u0442\u044A\u0451\u043C\u043D\u044B\u0445 \u0434\u0432\u0443\u0445\u0440\u044F\u0434\u043D\u044B\u0445 \u043F\u043E\u043B\u0438\u043C\u0435\u0440\u043D\u044B\u0445 \u043A\u043E\u0440\u043E\u0431\u0447\u0430\u0442\u044B\u0445 \u043C\u0430\u0433\u0430\u0437\u0438\u043D\u043E\u0432 \u0451\u043C\u043A\u043E\u0441\u0442\u044C\u044E 30 \u043F\u0430\u0442\u0440\u043E\u043D\u043E\u0432. \u041C\u0430\u0441\u0441\u0430 \u0431\u0435\u0437 \u043F\u0430\u0442\u0440\u043E\u043D\u043E\u0432 \u0441\u043E\u0441\u0442\u0430\u0432\u043B\u044F\u0435\u0442 \u043E\u043A\u043E\u043B\u043E 3 \u043A\u0433. \u041F\u0440\u0435\u0434\u0443\u0441\u043C\u043E\u0442\u0440\u0435\u043D\u0430 \u0432\u043E\u0437\u043C\u043E\u0436\u043D\u043E\u0441\u0442\u044C \u0443\u0441\u0442\u0430\u043D\u043E\u0432\u043A\u0438 \u0434\u043E\u043F\u043E\u043B\u043D\u0438\u0442\u0435\u043B\u044C\u043D\u044B\u0445 \u043F\u0440\u0438\u0446\u0435\u043B\u044C\u043D\u044B\u0445 \u043F\u0440\u0438\u0441\u043F\u043E\u0441\u043E\u0431\u043B\u0435\u043D\u0438\u0439 \u0438 \u0433\u043B\u0443\u0448\u0438\u0442\u0435\u043B\u044F. \u0417\u043D\u0430\u0447\u0438\u0442\u0435\u043B\u044C\u043D\u0430\u044F \u0443\u043D\u0438\u0444\u0438\u043A\u0430\u0446\u0438\u044F \u0441 \u0430\u0432\u0442\u043E\u043C\u0430\u0442\u0430\u043C\u0438 \u041A\u0430\u043B\u0430\u0448\u043D\u0438\u043A\u043E\u0432\u0430 \u043F\u043E\u0437\u0432\u043E\u043B\u0438\u043B\u0430 \u0443\u043F\u0440\u043E\u0441\u0442\u0438\u0442\u044C \u043F\u0440\u043E\u0438\u0437\u0432\u043E\u0434\u0441\u0442\u0432\u043E \u0438 \u0442\u0435\u0445\u043D\u0438\u0447\u0435\u0441\u043A\u043E\u0435 \u043E\u0431\u0441\u043B\u0443\u0436\u0438\u0432\u0430\u043D\u0438\u0435 \u043E\u0440\u0443\u0436\u0438\u044F."
+  _category: Weapon
+  _tags:
+  - SMG
+  _size: {x: 4, y: 2}
+  _weight: 2.85
+  _maxStack: 1
+  _allowRotation: 1
+  _backgroundColor: {r: 1, g: 1, b: 1, a: 0.04}
+  _fallbackIcon: {fileID: 0}
+  _iconOverride: {fileID: 0}
+  _visualPrefab: {fileID: 4964182309519645567, guid: a371b72416f51974982de737021c2dae, type: 3}
+  _defaultIconVariant: []
+  _icon:
+    _generateIcon: 1
+    _pixelsPerCell: 64
+    _antiAliasing: 1
+    _useOutline: 0
+    _outlineWidth: 2
+    _useShadow: 1
+    _shadowOffset: {x: 2, y: -2}
+    _shadowBlur: 2
+    _defaultView:
+      _modelEulerAngles: {x: 0, y: 0, z: 0}
+      _modelScale: {x: 1, y: 1, z: 1}
+      _cameraEulerAngles: {x: 0, y: -90, z: 0}
+      _padding: 1.06
+      _useDirectionalLight: 1
+      _lightIntensity: 10
+    _useCustomSlotView: 0
+    _slotView:
+      _modelEulerAngles: {x: 0, y: 0, z: 0}
+      _modelScale: {x: 1, y: 1, z: 1}
+      _cameraEulerAngles: {x: 0, y: -90, z: 0}
+      _padding: 1.06
+      _useDirectionalLight: 1
+      _lightIntensity: 10
+  _components:
+  - rid: 115149063313949397
+  - rid: 115149063313949398
+  - rid: 115149063313949399
+  - rid: 115149063313949400
+  - rid: 115149063313949401
+  references:
+    version: 2
+    RefIds:
+    - rid: 115149063313949397
+      type: {class: WeaponStatsComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      data:
+        _section: wpn_vityaz
+        _weaponClass: smg
+        _cost: 21880
+        _repairType: 
+        _hitPower: 1.06
+        _hitImpulse: 10
+        _bulletSpeed: 380
+        _fireDistance: 220
+        _rpm: 700
+        _fireModes: 01000000ffffffffi
+        _magazineSize: 30
+        _ammoClasses:
+        - ammo_9x19_fmj
+        - ammo_9x19_pbp
+        _fireDispersionBase: 0.28
+        _camDispersion: 0.9
+        _camDispersionIncrement: 0.25
+        _conditionShotDecrement: 0.00085
+        _misfireProbability: 0.005
+        _silencerStatus: 2
+        _silencerSection: sil_vityaz
+        _scopeStatus: 2
+        _scopes:
+        - ac10632
+        - acog
+        - e0t2
+        - aimpoint
+        - specter
+        - exps3
+        - aim_low
+        - d0cter
+        - delta_high
+        - deltapoint
+        - hco
+        - he510
+        - lco1
+        - p1x42
+        - rmr
+        - rmr_high
+        - romeo4
+        - t12
+        _compatibleScopes:
+        - {fileID: 11400000, guid: 867a7f373388760469fc24ccebf9f005, type: 2}
+        - {fileID: 11400000, guid: 47f9977e8eb796245ab8518ef902a33e, type: 2}
+        - {fileID: 11400000, guid: 22cb15100d34bc845a2f8f79cdbf0e0a, type: 2}
+        - {fileID: 11400000, guid: fc1a4cfb4771da944a45b0e79530107d, type: 2}
+        - {fileID: 11400000, guid: 0aea60fd72bbf20439531fbef8d7f762, type: 2}
+        - {fileID: 11400000, guid: 95347acdc8dd3584c9538dac3fa17378, type: 2}
+        - {fileID: 11400000, guid: 9f2fc43076f60a5459bd673f5547bd94, type: 2}
+        - {fileID: 11400000, guid: 1525e10127d18f242aba1fc3711ae389, type: 2}
+        - {fileID: 11400000, guid: 3f2facb1660da024baee567fb8ef6225, type: 2}
+        - {fileID: 11400000, guid: fda774a86032cfa49bb671d46146021c, type: 2}
+        - {fileID: 11400000, guid: 221259caddfe3c842a416289d818380e, type: 2}
+        - {fileID: 11400000, guid: 43fb054a0e26ab0488efc9929d2c2d00, type: 2}
+        - {fileID: 11400000, guid: c7cb16990af3cc2419e8e6cf167b9836, type: 2}
+        - {fileID: 11400000, guid: 55b9e4df57ad16643ae21c0c2a23725e, type: 2}
+        - {fileID: 11400000, guid: 47a9dcca3036c484a875295e2c1a2df4, type: 2}
+        - {fileID: 11400000, guid: 2e7d984e83db37e4eb8aff33f32934a2, type: 2}
+        - {fileID: 11400000, guid: 09126018d7d4a9d4fa72717db2fd42aa, type: 2}
+        - {fileID: 11400000, guid: 116d06cec93c73748938e8e7c294e0d0, type: 2}
+        _grenadeLauncherStatus: 0
+        _grenadeLauncherSection: 
+        _blockSilencerWithGrenadeLauncher: 0
+        _exposedRound: {fileID: 0}
+    - rid: 115149063313949398
+      type: {class: EquippableItemComponent, ns: Inventory, asm: Inventory}
+      data:
+        _preferredSlotIds:
+        - Primary
+        - Secondary
+    - rid: 115149063313949399
+      type: {class: WeaponHudComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      data:
+        _hudModel: {fileID: 4964182309519645567, guid: a371b72416f51974982de737021c2dae, type: 3}
+        _weaponMotions: {fileID: 8815230551390286010, guid: e7ceb1119e51cae40a5419c2a7d7eb68, type: 3}
+        _handsMotions: {fileID: 8815230551390286010, guid: 8b421837c6925c8498e1a428725819ed, type: 3}
+        _handsMotionPrefix: vityaz_
+        _attachmentBones:
+        - wpn_silencer
+        - ScopeRailMount
+        _firstPersonWeapon: {fileID: 11400000, guid: decda19e6ce19ae4b832628ebff03e35, type: 2}
+        _scopeAimOffsets:
+        - _scope: {fileID: 11400000, guid: 867a7f373388760469fc24ccebf9f005, type: 2}
+          _position: {x: 0.004383616, y: -0.01036103, z: -0.04191928}
+        - _scope: {fileID: 11400000, guid: 47f9977e8eb796245ab8518ef902a33e, type: 2}
+          _position: {x: 0.004432855, y: -0.01638214, z: -0.00039215}
+        - _scope: {fileID: 11400000, guid: 22cb15100d34bc845a2f8f79cdbf0e0a, type: 2}
+          _position: {x: 0.004370553, y: -0.01443578, z: -0.00077409}
+        - _scope: {fileID: 11400000, guid: fc1a4cfb4771da944a45b0e79530107d, type: 2}
+          _position: {x: 0.004401871, y: -0.01730543, z: -0.00886874}
+        - _scope: {fileID: 11400000, guid: 0aea60fd72bbf20439531fbef8d7f762, type: 2}
+          _position: {x: 0.004389742, y: -0.01427287, z: -0.00127497}
+        - _scope: {fileID: 11400000, guid: 95347acdc8dd3584c9538dac3fa17378, type: 2}
+          _position: {x: 0.004393249, y: -0.01904359, z: -0.02120313}
+        - _scope: {fileID: 11400000, guid: 9f2fc43076f60a5459bd673f5547bd94, type: 2}
+          _position: {x: 0.00438512, y: -0.00235034, z: 0.0032558}
+        - _scope: {fileID: 11400000, guid: 1525e10127d18f242aba1fc3711ae389, type: 2}
+          _position: {x: 0.004376882, y: -0.000212674, z: -0.02810201}
+        - _scope: {fileID: 11400000, guid: 3f2facb1660da024baee567fb8ef6225, type: 2}
+          _position: {x: 0.004395411, y: -0.01577519, z: -0.02716932}
+        - _scope: {fileID: 11400000, guid: fda774a86032cfa49bb671d46146021c, type: 2}
+          _position: {x: 0.004380578, y: -0.005402296, z: -0.02350144}
+        - _scope: {fileID: 11400000, guid: 221259caddfe3c842a416289d818380e, type: 2}
+          _position: {x: 0.004405928, y: -0.0190371, z: 0.00757165}
+        - _scope: {fileID: 11400000, guid: 43fb054a0e26ab0488efc9929d2c2d00, type: 2}
+          _position: {x: 0.004395626, y: -0.01335402, z: -0.03053574}
+        - _scope: {fileID: 11400000, guid: c7cb16990af3cc2419e8e6cf167b9836, type: 2}
+          _position: {x: 0.004384561, y: -0.01686846, z: -0.00975709}
+        - _scope: {fileID: 11400000, guid: 55b9e4df57ad16643ae21c0c2a23725e, type: 2}
+          _position: {x: 0.004371788, y: -0.0109229, z: -0.03733692}
+        - _scope: {fileID: 11400000, guid: 47a9dcca3036c484a875295e2c1a2df4, type: 2}
+          _position: {x: 0.004396819, y: -0.001239014, z: -0.02257018}
+        - _scope: {fileID: 11400000, guid: 2e7d984e83db37e4eb8aff33f32934a2, type: 2}
+          _position: {x: 0.004393504, y: -0.01308689, z: -0.02949676}
+        - _scope: {fileID: 11400000, guid: 09126018d7d4a9d4fa72717db2fd42aa, type: 2}
+          _position: {x: 0.00438922, y: -0.01309252, z: -0.00065669}
+        - _scope: {fileID: 11400000, guid: 116d06cec93c73748938e8e7c294e0d0, type: 2}
+          _position: {x: 0.004393667, y: -0.003258547, z: -0.08299418}
+    - rid: 115149063313949400
+      type: {class: ItemTakeSoundComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      data:
+        _category: weapon
+        _clips:
+        - {fileID: 8300000, guid: ffaa18b396584214484ce81b26793ce4, type: 3}
+        - {fileID: 8300000, guid: 5a49c4bfd5dafa843969f2f14f2bac47, type: 3}
+    - rid: 115149063313949401
+      type: {class: WorldItemComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      data:
+        _prefab: {fileID: 6448308894478172792, guid: a371b72416f51974982de737021c2dae, type: 3}

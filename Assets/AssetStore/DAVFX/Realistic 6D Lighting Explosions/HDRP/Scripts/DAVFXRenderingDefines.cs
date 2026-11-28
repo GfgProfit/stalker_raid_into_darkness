@@ -25,7 +25,6 @@ namespace DAVFX.Realistic6DExplosionsPack
 
     private static void SetMaterialKeywords()
     {
-        Debug.Log("CALLED");
         // Check the current render pipeline
         RenderPipelineAsset currentPipeline = GraphicsSettings.currentRenderPipeline;
 
@@ -36,13 +35,11 @@ namespace DAVFX.Realistic6DExplosionsPack
 
             if (pipelineName.Contains("UniversalRenderPipelineAsset"))
             {
-                Debug.Log("Set to URP");
                 Shader.EnableKeyword("URP_ENABLED");
                 Shader.DisableKeyword("HDRP_ENABLED");
             }
             else if (pipelineName.Contains("HDRenderPipelineAsset"))
             {
-                Debug.Log("Set to HDRP");
                 Shader.EnableKeyword("HDRP_ENABLED");
                 Shader.DisableKeyword("URP_ENABLED");
             }

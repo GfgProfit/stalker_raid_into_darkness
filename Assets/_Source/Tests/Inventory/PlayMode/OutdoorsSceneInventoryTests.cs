@@ -1,7 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using RaidIntoDarkness.Inventory;
+using RaidIntoDarkness.Inventory.IconGeneration;
 using RaidIntoDarkness.Inventory.UI;
 using NUnit.Framework;
 using RaidIntoDarkness.FirstPerson;
@@ -11,6 +13,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Controls;
 using UnityEngine.InputSystem.UI;
+using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
 using UnityEngine.UI;
@@ -23,6 +26,9 @@ namespace RaidIntoDarkness.Inventory.Tests
         private const string BACKPACK = "Backpack";
         private const string STASH = "Stash";
         private const string EQUIPMENT = "Equipment";
+        private const string NATO_SILENCER = "wpn_sil_nato";
+        private const string GP25 = "wpn_addon_grenade_launcher_definition";
+        private const double ICON_TIMEOUT_SECONDS = 20d;
 
         private Keyboard _keyboard;
         private Mouse _mouse;
@@ -1067,9 +1073,12 @@ namespace RaidIntoDarkness.Inventory.Tests
             yield return null;
 
             InventoryWindowController controller = Object.FindAnyObjectByType<InventoryWindowController>();
+            Assert.That(controller, Is.Not.Null);
+            ItemDatabase database = controller.Inventory.Database;
             var addons = new Dictionary<string, ItemDefinition>();
+            var provider = new ItemIconCacheProvider();
 
-            foreach (ItemDefinition definition in controller.Inventory.Database.Definitions)
+            foreach (ItemDefinition definition in database.Definitions)
             {
                 if (definition.IsCategory("Attachment"))
                 {
@@ -1084,25 +1093,21 @@ namespace RaidIntoDarkness.Inventory.Tests
                 WeaponAddonComponent component = addon.GetComponent<WeaponAddonComponent>();
                 Assert.That(component, Is.Not.Null, addon.name);
                 Assert.That(addon.VisualPrefab, Is.Not.Null, addon.name + " has no GRA model");
-                if (component.Kind == WeaponAddonKind.Silencer)
+                if (addon.CanGenerateIcon == false)
                 {
-                    Assert.That(addon.CanGenerateIcon, Is.True, addon.name + " must generate its icon from the model");
-                    Assert.That(addon.IconOverride, Is.Null, addon.name);
-                }
-                else if (component.Kind == WeaponAddonKind.Scope)
-                {
-                    Assert.That(addon.CanGenerateIcon || addon.IconOverride != null, Is.True, addon.name + " has no icon");
-                }
-                else
-                {
-                    Assert.That(addon.IconOverride, Is.Not.Null, addon.name + " must use the GRA HD icon");
-                    Assert.That(addon.IconOverride.name, Is.EqualTo(addon.name));
-                    Assert.That(addon.CanGenerateIcon, Is.False, addon.name);
+                    Sprite configured = addon.IconOverride != null ? addon.IconOverride : addon.FallbackIcon;
+                    var request = new ItemIconRequest(addon, null, addon.Width, addon.Height, ItemIconProfileType.Default);
+                    Assert.That(configured, Is.Not.Null, addon.name + " has no configured icon source");
+                    Assert.That(provider.TryGetIcon(request, out Sprite icon), Is.True, addon.name);
+                    Assert.That(icon, Is.SameAs(configured), addon.name);
                 }
             }
 
-            Assert.That(addons["wpn_sil_nato"].Size, Is.EqualTo(new Vector2Int(1, 1)), "GRA 2x2 must become 1x1");
-            Assert.That(addons["wpn_sil_nato"].GetComponent<WeaponAddonComponent>().Kind, Is.EqualTo(WeaponAddonKind.Silencer));
+            ItemDefinition nato = addons[NATO_SILENCER];
+            ItemDefinition gp25 = addons[GP25];
+            Assert.That(nato.Size, Is.EqualTo(new Vector2Int(2, 1)), "NATO suppressor uses the authored two-cell footprint");
+            Assert.That(nato.GetComponent<WeaponAddonComponent>().Kind, Is.EqualTo(WeaponAddonKind.Silencer));
+            Assert.That(gp25.GetComponent<WeaponAddonComponent>().Kind, Is.EqualTo(WeaponAddonKind.GrenadeLauncher));
             Assert.That(addons["acog"].GetComponent<WeaponAddonComponent>().Kind, Is.EqualTo(WeaponAddonKind.Scope));
             foreach (string scope in new[] { "pso1m21", "1p59", "t12", "1pn93", "leupold", "specter" })
             {
@@ -1119,7 +1124,7 @@ namespace RaidIntoDarkness.Inventory.Tests
 
             WeaponStatsComponent aug = null;
 
-            foreach (ItemDefinition definition in controller.Inventory.Database.Definitions)
+            foreach (ItemDefinition definition in database.Definitions)
             {
                 if (DefinitionSection(definition) == "wpn_aug_a3")
                 {
@@ -1127,6 +1132,7 @@ namespace RaidIntoDarkness.Inventory.Tests
                 }
             }
 
+            Assert.That(aug, Is.Not.Null);
             Assert.That(addons.ContainsKey(aug.SilencerSection), Is.True);
             Assert.That(aug.GrenadeLauncherStatus, Is.EqualTo(WeaponAddonStatus.None));
             Assert.That(aug.GrenadeLauncherSection, Is.Empty);
@@ -1136,31 +1142,111 @@ namespace RaidIntoDarkness.Inventory.Tests
                 Assert.That(addons.ContainsKey(scope), Is.True, "AUG scope " + scope + " is missing");
             }
 
-            yield return new WaitForSeconds(1.0f);
-            var placed = new HashSet<ItemDefinition>();
-            WorldItem silencer = null;
+            ItemDefinition patch = database.Definitions.Single(definition => definition.name == "dolg_patch");
+            Assert.That(patch.IconOverride, Is.Not.Null);
+            yield return VerifyRequestedIcon(provider, patch, false);
+            yield return VerifyRequestedIcon(provider, nato, true);
+            yield return VerifyRequestedIcon(provider, gp25, true);
 
-            foreach (WorldItem worldItem in Object.FindObjectsByType<WorldItem>(FindObjectsSortMode.None))
+            WorldItemInteractor interactor = Object.FindAnyObjectByType<WorldItemInteractor>();
+            Assert.That(interactor, Is.Not.Null);
+            var fixtures = new List<WorldItem>();
+            try
             {
-                if (worldItem.Definition != null && worldItem.Definition.IsCategory("Attachment"))
+                foreach (ItemDefinition addon in addons.Values)
                 {
-                    placed.Add(worldItem.Definition);
-                    silencer = worldItem.Definition.name == "wpn_sil_nato" ? worldItem : silencer;
+                    WorldItem placedItem = interactor.Spawn(addon, 1);
+                    Assert.That(placedItem, Is.Not.Null, addon.name + " cannot spawn as a world item");
+                    fixtures.Add(placedItem);
+                    if (addon != nato)
+                    {
+                        Rigidbody body = placedItem.GetComponent<Rigidbody>();
+                        Assert.That(body, Is.Not.Null, addon.name);
+                        body.isKinematic = true;
+                        body.detectCollisions = false;
+                        placedItem.transform.position += Vector3.right * (fixtures.Count * 2f);
+                    }
+                }
+
+                yield return new WaitForSeconds(1.0f);
+                var placed = new HashSet<ItemDefinition>(fixtures.Where(worldItem => worldItem != null && worldItem.isActiveAndEnabled).Select(worldItem => worldItem.Definition));
+                Assert.That(placed, Is.EquivalentTo(addons.Values), "every addon must be available as a world item");
+                WorldItem silencer = fixtures.Single(worldItem => worldItem.Definition == nato);
+                Assert.That(silencer.transform.position.y, Is.GreaterThan(-5f), "the silencer fell through the ground");
+                Assert.That(interactor.TryPickUp(silencer), Is.True);
+                InventoryContainer backpack = controller.Inventory.Model.GetContainer(BACKPACK);
+                Assert.That(backpack.Items.Any(item => item.Definition == nato), Is.True, "the picked silencer did not reach the backpack");
+
+                double deadline = Time.realtimeSinceStartupAsDouble + ICON_TIMEOUT_SECONDS;
+                while ((ItemIconCache.IsPrewarmed == false || ItemIconCache.IsWorking) && Time.realtimeSinceStartupAsDouble < deadline)
+                {
+                    yield return null;
+                }
+
+                Assert.That(ItemIconCache.IsPrewarmed && ItemIconCache.IsWorking == false, Is.True, "scene icon prewarm and queued requests must finish before leaving PlayMode");
+            }
+            finally
+            {
+                foreach (WorldItem worldItem in fixtures)
+                {
+                    if (worldItem != null)
+                    {
+                        worldItem.gameObject.SetActive(false);
+                        Object.Destroy(worldItem.gameObject);
+                    }
                 }
             }
+        }
 
-            Assert.That(placed.Count, Is.EqualTo(addons.Count), "every addon must lie in the world");
-            Assert.That(silencer, Is.Not.Null);
-            Assert.That(silencer.transform.position.y, Is.GreaterThan(-5f), "the silencer fell through the ground");
-            Assert.That(Object.FindAnyObjectByType<WorldItemInteractor>().TryPickUp(silencer), Is.True);
-            bool inBackpack = false;
-
-            foreach (ItemInstance item in controller.Window.FindGrid(BACKPACK).Container.Items)
+        private static IEnumerator VerifyRequestedIcon(IItemIconProvider provider, ItemDefinition definition, bool verifyGenerated)
+        {
+            using var cancellation = new CancellationTokenSource();
+            var request = new ItemIconRequest(definition, null, definition.Width, definition.Height, ItemIconProfileType.Default);
+            Sprite sprite = null;
+            bool ready = false;
+            double deadline = Time.realtimeSinceStartupAsDouble + ICON_TIMEOUT_SECONDS;
+            provider.RequestIcon(request, result =>
             {
-                inBackpack |= item.Definition.name == "wpn_sil_nato";
-            }
+                sprite = result;
+                ready = true;
+            }, cancellation.Token);
+            try
+            {
+                while (ready == false && Time.realtimeSinceStartupAsDouble < deadline)
+                {
+                    yield return null;
+                }
 
-            Assert.That(inBackpack, Is.True, "the picked silencer did not reach the backpack");
+                Assert.That(ready, Is.True, definition.name + " icon did not complete");
+                Assert.That(sprite, Is.Not.Null, definition.name);
+                Assert.That(sprite.texture, Is.Not.Null, definition.name);
+                if (verifyGenerated == false)
+                {
+                    Assert.That(sprite, Is.SameAs(definition.IconOverride), definition.name);
+                    yield break;
+                }
+
+                Assert.That(definition.CanGenerateIcon, Is.True, definition.name);
+                Assert.That(sprite, Is.Not.SameAs(definition.FallbackIcon), definition.name + " returned the fallback sprite");
+                Assert.That(sprite.name, Is.EqualTo(definition.name + " Runtime Icon"));
+                int pixelsPerCell = ItemIconGeneratorSettings.LoadDefault().IconRenderScale * definition.Icon.PixelsPerCell;
+                Assert.That(sprite.rect.size, Is.EqualTo(new Vector2(definition.Width * pixelsPerCell, definition.Height * pixelsPerCell)));
+                Assert.That(provider.TryGetIcon(request, out Sprite cached), Is.True, definition.name);
+                Assert.That(cached, Is.SameAs(sprite), definition.name);
+
+                AsyncGPUReadbackRequest readback = AsyncGPUReadback.Request(sprite.texture, 0, TextureFormat.RGBA32);
+                while (readback.done == false && Time.realtimeSinceStartupAsDouble < deadline)
+                {
+                    yield return null;
+                }
+
+                Assert.That(readback.done && readback.hasError == false, Is.True, definition.name + " icon could not be read back");
+                Assert.That(readback.GetData<Color32>().Any(pixel => pixel.a > 128), Is.True, definition.name + " icon has no visible pixels");
+            }
+            finally
+            {
+                cancellation.Cancel();
+            }
         }
 
         private static ItemInstance AddItem(InventoryModel model, InventoryWindowController controller, InventoryWindow window, string definitionName)

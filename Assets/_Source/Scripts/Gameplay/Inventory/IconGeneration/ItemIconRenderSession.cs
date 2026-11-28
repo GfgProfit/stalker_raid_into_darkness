@@ -64,23 +64,25 @@ namespace RaidIntoDarkness.Inventory.IconGeneration
                 return null;
             }
 
-            _rootObject.transform.SetPositionAndRotation(_settings.RenderOrigin, Quaternion.Euler(renderProfile.ModelEulerAngles));
-            _rootObject.transform.localScale = renderProfile.ModelScale;
-            BuildEffectiveVariant(definition, variantIds);
-            ItemIconVisualConfigurators.Apply(_rootObject, definition, _effectiveVariant);
-            ItemIconSceneBuilder.DisableLocalEnvironment(_rootObject);
-
-            if (ItemIconSceneBuilder.TryCalculateBounds(_renderers, _rootObject.transform.position, out Bounds bounds) == false)
-            {
-                return null;
-            }
-
+            GameObject root = _rootObject;
             RenderTexture renderTexture = null;
             RenderTexture readbackTexture = null;
             int antiAliasing = definition.Icon.AntiAliasing;
 
             try
             {
+                root.transform.SetPositionAndRotation(_settings.RenderOrigin, Quaternion.Euler(renderProfile.ModelEulerAngles));
+                root.transform.localScale = renderProfile.ModelScale;
+                root.SetActive(true);
+                BuildEffectiveVariant(definition, variantIds);
+                ItemIconVisualConfigurators.Apply(root, definition, _effectiveVariant);
+                ItemIconSceneBuilder.DisableLocalEnvironment(root);
+
+                if (ItemIconSceneBuilder.TryCalculateBounds(_renderers, root.transform.position, out Bounds bounds) == false)
+                {
+                    return null;
+                }
+
                 int textureWidth = renderProfile.TextureWidth;
                 int textureHeight = renderProfile.TextureHeight;
                 renderTexture = RenderTexture.GetTemporary(textureWidth, textureHeight, 24, _settings.RenderTextureFormat, RenderTextureReadWrite.Default, antiAliasing);
@@ -128,6 +130,11 @@ namespace RaidIntoDarkness.Inventory.IconGeneration
             }
             finally
             {
+                if (root != null && root.activeSelf)
+                {
+                    root.SetActive(false);
+                }
+
                 if (renderTexture != null)
                 {
                     RenderTexture.ReleaseTemporary(renderTexture);
@@ -231,9 +238,15 @@ namespace RaidIntoDarkness.Inventory.IconGeneration
 
         private void RenderFrame(ItemDefinition definition, Bounds bounds, RenderTexture renderTexture, IconRenderProfile renderProfile, int antiAliasing)
         {
+            GameObject root = _rootObject;
             try
             {
-                _sceneIsolation.Apply(_settings.ExcludeIconLayerFromSceneLights, _rootObject.transform, _settings.RenderLayer);
+                if (root.activeSelf == false)
+                {
+                    root.SetActive(true);
+                }
+
+                _sceneIsolation.Apply(_settings.ExcludeIconLayerFromSceneLights, root.transform, _settings.RenderLayer);
                 _volume.enabled = true;
                 ItemIconCameraConfigurator.ConfigureRenderCamera(_renderCamera, bounds, renderTexture, _settings, renderProfile, antiAliasing);
 
@@ -251,6 +264,7 @@ namespace RaidIntoDarkness.Inventory.IconGeneration
                 _volume.enabled = false;
                 _sceneIsolation.Restore();
                 ItemIconLightFactory.Disable(_lights);
+                root.SetActive(false);
             }
         }
 

@@ -1,9 +1,11 @@
 using System;
 using System.Collections;
+using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using RaidIntoDarkness.Inventory.IconGeneration;
 using NUnit.Framework;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.HighDefinition;
@@ -32,11 +34,19 @@ namespace RaidIntoDarkness.Inventory.Core.Tests
                 yield break;
             }
 
-            _pipelineWarmedUp = true;
-            LogAssert.ignoreFailingMessages = true;
-            ItemDefinition warmUp = CreateRenderableItem("warm_up_item");
-            yield return UniTask.ToCoroutine(async () => await RenderPixels(warmUp, Array.Empty<string>(), CancellationToken.None));
-            LogAssert.ignoreFailingMessages = false;
+            bool previousIgnore = LogAssert.ignoreFailingMessages;
+            try
+            {
+                LogAssert.ignoreFailingMessages = true;
+                using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(25));
+                ItemDefinition warmUp = CreateRenderableItem("warm_up_item");
+                yield return UniTask.ToCoroutine(async () => await RenderPixels(warmUp, Array.Empty<string>(), timeout.Token));
+                _pipelineWarmedUp = true;
+            }
+            finally
+            {
+                LogAssert.ignoreFailingMessages = previousIgnore;
+            }
         }
 
         [TearDown]
@@ -91,6 +101,8 @@ namespace RaidIntoDarkness.Inventory.Core.Tests
         [UnityTest]
         public IEnumerator RenderIgnoresModelFromAnotherOpenSession() => UniTask.ToCoroutine(async () =>
         {
+            using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(25));
+            CancellationToken token = timeout.Token;
             ItemDefinition first = CreateRenderableItem("first_open_session_item");
             ItemDefinition second = CreateRenderableItem("second_open_session_item");
             GameObject extraMesh = GameObject.CreatePrimitive(PrimitiveType.Cube);
@@ -101,15 +113,26 @@ namespace RaidIntoDarkness.Inventory.Core.Tests
             extraMesh.GetComponent<Renderer>().sharedMaterial = material;
 
             using var secondSession = new ItemIconBatchRenderSession(_settings);
-            Color32[] baseline = await RenderPixels(secondSession, second, Array.Empty<string>(), CancellationToken.None);
+            Color32[] baseline = await RenderPixels(secondSession, second, Array.Empty<string>(), token);
             using var firstSession = new ItemIconBatchRenderSession(_settings);
-            Color32[] firstPixels = await RenderPixels(firstSession, first, Array.Empty<string>(), CancellationToken.None);
-            Color32[] withFirstSessionOpen = await RenderPixels(secondSession, second, Array.Empty<string>(), CancellationToken.None);
-            Color32[] fromNewSession = await RenderPixels(second, Array.Empty<string>(), CancellationToken.None);
+            Color32[] firstPixels = await RenderPixels(firstSession, first, Array.Empty<string>(), token);
+            AssertModelInactive(first);
+            Color32[] withFirstSessionOpen = await RenderPixels(secondSession, second, Array.Empty<string>(), token);
+            Color32[] fromNewSession = await RenderPixels(second, Array.Empty<string>(), token);
 
             Assert.That(MaxDifference(baseline, firstPixels), Is.GreaterThan(50));
-            Assert.That(MaxDifference(baseline, withFirstSessionOpen), Is.LessThanOrEqualTo(3));
-            Assert.That(MaxDifference(baseline, fromNewSession), Is.LessThanOrEqualTo(3));
+            Assert.That(MaxDifference(baseline, withFirstSessionOpen), Is.LessThanOrEqualTo(3), () => DescribeIsolationDifference("reused session", baseline, firstPixels, withFirstSessionOpen));
+            Assert.That(MaxDifference(baseline, fromNewSession), Is.LessThanOrEqualTo(3), () => DescribeIsolationDifference("new session", baseline, firstPixels, fromNewSession));
+
+            EditorApplication.QueuePlayerLoopUpdate();
+            await UniTask.Yield(PlayerLoopTiming.LastPostLateUpdate, token);
+            Color32[] afterEditorUpdate = await RenderPixels(secondSession, second, Array.Empty<string>(), token);
+            Assert.That(MaxDifference(baseline, afterEditorUpdate), Is.LessThanOrEqualTo(3), () => DescribeIsolationDifference("reused session after queued editor update", baseline, firstPixels, afterEditorUpdate));
+
+            Color32[] firstRenderedAgain = await RenderPixels(firstSession, first, Array.Empty<string>(), token);
+            Assert.That(MaxDifference(firstPixels, firstRenderedAgain), Is.LessThanOrEqualTo(3), "the other open session can still render its model");
+            AssertModelInactive(first);
+            AssertModelInactive(second);
         });
 
         [UnityTest]
@@ -194,9 +217,52 @@ namespace RaidIntoDarkness.Inventory.Core.Tests
         {
             Texture2D texture = await session.RenderAsync(definition, variantIds, definition.Width, definition.Height, ItemIconProfileType.Default, cancellationToken);
             Assert.That(texture, Is.Not.Null);
-            Color32[] pixels = texture.GetPixels32();
-            Object.DestroyImmediate(texture);
-            return pixels;
+            try
+            {
+                return texture.GetPixels32();
+            }
+            finally
+            {
+                Object.DestroyImmediate(texture);
+            }
+        }
+
+        private static string DescribeIsolationDifference(string pass, Color32[] baseline, Color32[] foreign, Color32[] actual)
+        {
+            int introduced = 0;
+            int missing = 0;
+            int introducedRed = 0;
+            int introducedInForeignFootprint = 0;
+            for (int i = 0; i < baseline.Length; i++)
+            {
+                if (baseline[i].a < 8 && actual[i].a > 200)
+                {
+                    introduced++;
+                    if (actual[i].r > actual[i].g + 32 && actual[i].r > actual[i].b + 32)
+                    {
+                        introducedRed++;
+                    }
+
+                    if (foreign[i].a > 200)
+                    {
+                        introducedInForeignFootprint++;
+                    }
+                }
+                else if (baseline[i].a > 200 && actual[i].a < 8)
+                {
+                    missing++;
+                }
+            }
+
+            return $"{pass}: {introduced} new opaque pixels ({introducedRed} red), {missing} missing opaque pixels, {introducedInForeignFootprint} new pixels in the other icon's footprint. Graphics: {SystemInfo.graphicsDeviceType}.";
+        }
+
+        private static void AssertModelInactive(ItemDefinition definition)
+        {
+            string rootName = $"Runtime Icon Root - {definition.name}";
+            GameObject[] roots = Resources.FindObjectsOfTypeAll<GameObject>().Where(candidate => candidate.name == rootName).ToArray();
+            Assert.That(roots, Is.Not.Empty, "the open session still owns its model");
+            Assert.That(roots.All(root => root.activeSelf == false), Is.True, "open session models stay inactive between render requests");
         }
 
         private ItemDefinition CreateRenderableItem(string id, bool withScopeVariant = false)

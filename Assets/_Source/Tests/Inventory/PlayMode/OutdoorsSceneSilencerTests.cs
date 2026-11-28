@@ -83,6 +83,63 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
         }
 
         [UnityTest]
+        public IEnumerator DraggingSilencerOntoBlockedWeaponMovesItToTheBackpackEnd()
+        {
+            yield return LoadScene();
+            InventoryWindowController controller = Object.FindAnyObjectByType<InventoryWindowController>();
+            InventoryWindow window = controller.Window;
+            InventoryModel model = controller.Inventory.Model;
+            controller.Open(true);
+            var backpack = (GridContainer)model.GetContainer(window.PrimaryContainerId);
+            while (backpack.Items.Count > 0)
+            {
+                Assert.That(model.TryRemove(backpack.Items[0].InstanceId).Success, Is.True);
+            }
+
+            int originalHeight = backpack.Height;
+            ItemInstance weapon = model.CreateItem(Find(controller, "wpn_aug_a3"));
+            ItemInstance silencer = Add(controller, Find(controller, "wpn_sil_nato"), window.SecondaryContainerId);
+            ItemDefinition filler = FindSmall(controller);
+            ItemInstance left = model.CreateItem(filler);
+            ItemInstance right = model.CreateItem(filler);
+            ItemInstance last = model.CreateItem(filler);
+            Vector2Int originalPosition = Vector2Int.right;
+            var rightPosition = new Vector2Int(originalPosition.x + weapon.Definition.Width, 0);
+            var lastPosition = new Vector2Int(0, originalHeight - 1);
+            Assert.That(model.TryAdd(weapon, backpack.Id, originalPosition, false).Success, Is.True);
+            Assert.That(model.TryAdd(left, backpack.Id, Vector2Int.zero, false).Success, Is.True);
+            Assert.That(model.TryAdd(right, backpack.Id, rightPosition, false).Success, Is.True);
+            Assert.That(model.TryAdd(last, backpack.Id, lastPosition, false).Success, Is.True);
+            yield return null;
+
+            InventoryGridViewBase source = window.FindGrid(silencer.ContainerId);
+            InventoryGridViewBase target = window.FindGrid(backpack.Id);
+            Assert.That(window.BeginDrag(silencer, source, 1, ScreenPoint(source.GetItemView(silencer)), null), Is.True);
+            window.UpdateDrag(ScreenPoint(target.GetItemView(weapon)), null);
+            Assert.That(window.Drag.Kind, Is.EqualTo(InventoryDropKind.Valid));
+            Assert.That(weapon.Location.Position, Is.EqualTo(originalPosition));
+            Assert.That(backpack.Height, Is.EqualTo(originalHeight));
+            Assert.That(model.ContainsItem(silencer), Is.True);
+
+            Assert.That(window.CompleteDrag().Success, Is.True);
+            Assert.That(model.ContainsItem(silencer), Is.False);
+            Assert.That(controller.WeaponAttachments.GetSilencer(weapon), Is.SameAs(silencer.Definition));
+            Assert.That(weapon.Location.Position, Is.EqualTo(new Vector2Int(0, originalHeight)));
+            Assert.That(weapon.GetSize(false), Is.EqualTo(new Vector2Int(6, 2)));
+            Assert.That(backpack.Height, Is.EqualTo(originalHeight + backpack.RowGrowth));
+            Assert.That(backpack.GetItemAt(lastPosition), Is.SameAs(last));
+            Assert.That(backpack.GetItemAt(rightPosition), Is.SameAs(right));
+            Assert.That(backpack.GetItemAt(Vector2Int.zero), Is.SameAs(left));
+            Assert.That(target.Rows, Is.EqualTo(backpack.Height));
+
+            controller.Close();
+            controller.Open(true);
+            Assert.That(weapon.Location.Position.y, Is.LessThan(originalHeight));
+            Assert.That(controller.WeaponAttachments.GetSilencer(weapon), Is.SameAs(silencer.Definition));
+            controller.Close();
+        }
+
+        [UnityTest]
         public IEnumerator SilencerPersistsWithLoadedAmmoAndUsesOnlyOneWorldItemAndRigidbody()
         {
             yield return LoadScene();

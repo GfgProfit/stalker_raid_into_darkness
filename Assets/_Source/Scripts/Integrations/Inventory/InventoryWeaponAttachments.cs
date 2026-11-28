@@ -108,17 +108,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
             updated.SetState(SILENCER_LEFT_STATE, null);
             var variants = new List<string>(weapon.VisualVariant) { silencer.DefinitionId };
             updated.SetVisualVariant(variants);
-            Vector2Int position = weapon.Location.Position;
-            InventoryResult result = _model.TryReconfigureItem(weapon, updated, position, silencer, apply: apply);
-
-            if (result.Success || _model.GetContainer(weapon.ContainerId) is SlottedContainer)
-            {
-                return result;
-            }
-
-            updated.SetState(SILENCER_LEFT_STATE, "1");
-            position -= weapon.Location.Rotated ? Vector2Int.up : Vector2Int.right;
-            return _model.TryReconfigureItem(weapon, updated, position, silencer, apply: apply);
+            return InstallWithPlacement(weapon, updated, silencer, apply, allowLeftExpansion: true);
         }
 
         public InventoryResult Detach(ItemInstance weapon, bool apply = true)
@@ -213,7 +203,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
 
             variants.Add(scope.DefinitionId);
             updated.SetVisualVariant(variants);
-            return _model.TryReconfigureItem(weapon, updated, weapon.Location.Position, consumed: scope, returned: returned, returnContainerId: scope.ContainerId, apply: apply, mergeReturned: true);
+            return InstallWithPlacement(weapon, updated, scope, apply, returned);
         }
 
         public InventoryResult DetachScope(ItemInstance weapon, bool apply = true)
@@ -271,7 +261,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
             updated.SetState(GRENADE_LAUNCHER_STATE, launcher.DefinitionId);
             updated.SetState(GRENADE_LAUNCHER_ITEM_STATE, JsonUtility.ToJson(data));
             updated.SetVisualVariant(new List<string>(weapon.VisualVariant) { launcher.DefinitionId });
-            return _model.TryReconfigureItem(weapon, updated, weapon.Location.Position, consumed: launcher, apply: apply);
+            return InstallWithPlacement(weapon, updated, launcher, apply);
         }
 
         public InventoryResult DetachGrenadeLauncher(ItemInstance weapon, bool apply = true)
@@ -305,6 +295,42 @@ namespace RaidIntoDarkness.Integrations.Inventory
             }
 
             return result;
+        }
+
+        private InventoryResult InstallWithPlacement(ItemInstance weapon, ItemInstance updated, ItemInstance addon, bool apply, ItemInstance returned = null, bool allowLeftExpansion = false)
+        {
+            InventoryResult TryPlaceAt(Vector2Int position) => _model.TryReconfigureItem(weapon, updated, position, consumed: addon, returned: returned, returnContainerId: addon.ContainerId, apply: apply, mergeReturned: true);
+
+            InventoryResult result = TryPlaceAt(weapon.Location.Position);
+            if (result.Failure is not (InventoryFailure.Occupied or InventoryFailure.OutOfBounds) || _model.GetContainer(weapon.ContainerId) is not GridContainer grid)
+            {
+                return result;
+            }
+
+            if (allowLeftExpansion)
+            {
+                updated.SetState(SILENCER_LEFT_STATE, "1");
+                result = TryPlaceAt(weapon.Location.Position - (weapon.Location.Rotated ? Vector2Int.up : Vector2Int.right));
+                if (result.Failure is not (InventoryFailure.Occupied or InventoryFailure.OutOfBounds))
+                {
+                    return result;
+                }
+
+                updated.SetState(SILENCER_LEFT_STATE, null);
+            }
+
+            int bottom = 0;
+            IReadOnlyList<ItemInstance> items = grid.Items;
+            for (int i = 0; i < items.Count; i++)
+            {
+                ItemInstance placed = items[i];
+                if (placed != weapon && (placed != addon || addon.Amount > 1))
+                {
+                    bottom = Mathf.Max(bottom, grid.GetItemArea(placed).yMax);
+                }
+            }
+
+            return TryPlaceAt(new Vector2Int(0, bottom));
         }
 
         private bool CanOfferInstall(ItemInstance addon, ItemInstance weapon)

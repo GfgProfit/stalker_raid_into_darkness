@@ -18,26 +18,40 @@ MonoBehaviour:
     _acceptedCategory: Head
     _width: 2
     _height: 2
+    _equipmentLayout: {fileID: 0}
+    _slotIds: []
   - _restrictCategory: 1
     _acceptedCategory: Armor
     _width: 2
     _height: 3
+    _equipmentLayout: {fileID: 0}
+    _slotIds: []
   - _restrictCategory: 1
     _acceptedCategory: Weapon
     _width: 5
     _height: 2
+    _equipmentLayout: {fileID: 11400000, guid: 2c8aea78f81a5f547a79363e801c4236, type: 2}
+    _slotIds:
+    - Primary
+    - Secondary
   - _restrictCategory: 1
     _acceptedCategory: Weapon
     _width: 2
     _height: 1
+    _equipmentLayout: {fileID: 0}
+    _slotIds: []
   - _restrictCategory: 1
     _acceptedCategory: Accessory
     _width: 2
     _height: 1
+    _equipmentLayout: {fileID: 0}
+    _slotIds: []
   - _restrictCategory: 1
     _acceptedCategory: Consumable
     _width: 1
     _height: 1
+    _equipmentLayout: {fileID: 0}
+    _slotIds: []
   _prewarmFrameBudgetMilliseconds: 6
   _renderLayer: 31
   _renderingLayer: 7

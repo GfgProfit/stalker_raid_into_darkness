@@ -47,7 +47,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
         public static async UniTask<bool> RunAsync(bool bakeIcons)
         {
             ImportTmpEssentials();
-            InventoryDemoContentBuilder.DemoContent content = InventoryDemoContentBuilder.Build();
+            InventoryDemoContent content = InventoryDemoContentBuilder.Build();
             TMP_FontAsset font = GraInventoryWindowBuilder.ImportAssets();
             ApplyDefaultFont(font);
             InventoryTheme theme = GraInventoryWindowBuilder.BuildTheme(font);

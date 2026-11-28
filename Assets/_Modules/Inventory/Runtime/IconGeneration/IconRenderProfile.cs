@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 namespace Inventory.IconGeneration
@@ -73,32 +72,5 @@ namespace Inventory.IconGeneration
         {
             return (settings == null ? ItemIconGeneratorSettings.LoadDefault() : settings).IconRenderScale;
         }
-    }
-
-    [Serializable]
-    public struct ItemIconSlotProfile : IEquatable<ItemIconSlotProfile>
-    {
-        [SerializeField] private bool _restrictCategory;
-        [SerializeField] private string _acceptedCategory;
-        [SerializeField] private int _width;
-        [SerializeField] private int _height;
-
-        public ItemIconSlotProfile(bool restrictCategory, string acceptedCategory, int width, int height)
-        {
-            _restrictCategory = restrictCategory;
-            _acceptedCategory = restrictCategory ? acceptedCategory : string.Empty;
-            _width = Mathf.Max(1, width);
-            _height = Mathf.Max(1, height);
-        }
-
-        public int Width => Mathf.Max(1, _width);
-        public int Height => Mathf.Max(1, _height);
-        public bool RestrictsCategory => _restrictCategory;
-        public string AcceptedCategory => _acceptedCategory ?? string.Empty;
-
-        public bool Accepts(ItemDefinition definition) => definition != null && (_restrictCategory == false || definition.IsCategory(AcceptedCategory));
-        public bool Equals(ItemIconSlotProfile other) => _restrictCategory == other._restrictCategory && AcceptedCategory == other.AcceptedCategory && Width == other.Width && Height == other.Height;
-        public override bool Equals(object obj) => obj is ItemIconSlotProfile other && Equals(other);
-        public override int GetHashCode() => HashCode.Combine(_restrictCategory, AcceptedCategory, Width, Height);
     }
 }

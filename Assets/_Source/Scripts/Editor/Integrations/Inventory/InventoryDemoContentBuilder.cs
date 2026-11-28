@@ -50,17 +50,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
             return stats != null && stats.Section.Length > 0 ? stats.Section : definition.name;
         }
 
-        public sealed class DemoContent
-        {
-            public readonly Dictionary<string, ItemDefinition> Items = new();
-            public ItemDatabase Database;
-            public InventorySeed Seed;
-            public InventorySlotLayout EquipmentLayout;
-            public ItemIconGeneratorSettings Settings;
-            public BakedItemIconCatalog Catalog;
-        }
-
-        public static DemoContent Build()
+        public static InventoryDemoContent Build()
         {
             EnsureFolder(LAYOUTS_FOLDER);
             EnsureFolder(RESOURCES_FOLDER);
@@ -70,7 +60,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
                 AssetDatabase.DeleteAsset(LEGACY_DEMO_FOLDER);
             }
 
-            var content = new DemoContent();
+            var content = new InventoryDemoContent();
 
             string[] definitionGuids = AssetDatabase.FindAssets("t:" + nameof(ItemDefinition), ITEM_DEFINITION_FOLDERS);
 
@@ -110,7 +100,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
             content.Database.SetDefinitions(content.Items.Values);
             EditorUtility.SetDirty(content.Database);
             content.EquipmentLayout = BuildEquipmentLayout();
-            content.Settings = BuildGeneratorSettings();
+            content.Settings = BuildGeneratorSettings(content.EquipmentLayout);
             content.Catalog = CreateOrLoad<BakedItemIconCatalog>(CATALOG_PATH);
             content.Seed = BuildSeed();
             AssetDatabase.SaveAssets();
@@ -131,8 +121,8 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
                 new('K', "Backpack", "Рюкзак", SlotMode.Single, SlotRule.Create(categories: new[] { "Backpack" }), "Equipment"),
                 new('B', "Binocular", "Бинокль", SlotMode.Single, SlotRule.Create(categories: new[] { "Binocular" }), "Equipment"),
                 new('N', "Knife", "Холодное", SlotMode.Single, SlotRule.Create(categories: new[] { WEAPON_CATEGORY }, requiredTags: new[] { KNIFE_TAG, PISTOL_TAG }), "Weapons"),
-                new('P', "Primary", "Основное", SlotMode.Single, SlotRule.Create(categories: new[] { WEAPON_CATEGORY }, forbiddenTags: new[] { KNIFE_TAG }), "Weapons"),
-                new('S', "Secondary", "Вторичное", SlotMode.Single, SlotRule.Create(categories: new[] { WEAPON_CATEGORY }, forbiddenTags: new[] { KNIFE_TAG }), "Weapons")
+                new('P', "Primary", "Основное", SlotMode.Single, SlotRule.Create(categories: new[] { WEAPON_CATEGORY }, forbiddenTags: new[] { KNIFE_TAG, PISTOL_TAG }), "Weapons"),
+                new('S', "Secondary", "Вторичное", SlotMode.Single, SlotRule.Create(categories: new[] { WEAPON_CATEGORY }, forbiddenTags: new[] { KNIFE_TAG, PISTOL_TAG }), "Weapons")
             };
 
             char[] quickKeys = { '1', '2', '3', '4' };
@@ -168,7 +158,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
             return seed;
         }
 
-        private static ItemIconGeneratorSettings BuildGeneratorSettings()
+        private static ItemIconGeneratorSettings BuildGeneratorSettings(InventorySlotLayout equipmentLayout)
         {
             var settings = CreateOrLoad<ItemIconGeneratorSettings>(SETTINGS_PATH);
             var serialized = new SerializedObject(settings);
@@ -242,6 +232,15 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
                 profile.FindPropertyRelative("_acceptedCategory").stringValue = slotProfiles[i].Category;
                 profile.FindPropertyRelative("_width").intValue = slotProfiles[i].Width;
                 profile.FindPropertyRelative("_height").intValue = slotProfiles[i].Height;
+                bool usesLargeWeaponSlots = slotProfiles[i] == (WEAPON_CATEGORY, 5, 2);
+                profile.FindPropertyRelative("_equipmentLayout").objectReferenceValue = usesLargeWeaponSlots ? equipmentLayout : null;
+                SerializedProperty slotIds = profile.FindPropertyRelative("_slotIds");
+                slotIds.arraySize = usesLargeWeaponSlots ? 2 : 0;
+                if (usesLargeWeaponSlots)
+                {
+                    slotIds.GetArrayElementAtIndex(0).stringValue = FirstPersonWeaponBinder.PRIMARY_SLOT;
+                    slotIds.GetArrayElementAtIndex(1).stringValue = FirstPersonWeaponBinder.SECONDARY_SLOT;
+                }
             }
 
             serialized.ApplyModifiedPropertiesWithoutUndo();
@@ -251,14 +250,9 @@ namespace RaidIntoDarkness.Integrations.Inventory.Editor
 
         private static string[] PreferredWeaponSlots(ItemDefinition definition)
         {
-            if (definition.HasTag(KNIFE_TAG))
+            if (definition.HasTag(KNIFE_TAG) || definition.HasTag(PISTOL_TAG))
             {
                 return new[] { "Knife" };
-            }
-
-            if (definition.HasTag(PISTOL_TAG))
-            {
-                return new[] { "Secondary", "Knife", "Primary" };
             }
 
             return new[] { "Primary", "Secondary" };

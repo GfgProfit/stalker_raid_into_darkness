@@ -157,6 +157,7 @@ MonoBehaviour:
       _requiredTags: []
       _forbiddenTags:
       - Knife
+      - Pistol
       _validatorId: 
       _requiresOccupiedSlots: []
       _blockedByOccupiedSlots: []
@@ -172,6 +173,7 @@ MonoBehaviour:
       _requiredTags: []
       _forbiddenTags:
       - Knife
+      - Pistol
       _validatorId: 
       _requiresOccupiedSlots: []
       _blockedByOccupiedSlots: []

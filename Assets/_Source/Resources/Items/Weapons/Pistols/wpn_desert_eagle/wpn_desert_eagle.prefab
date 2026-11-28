@@ -900,6 +900,7 @@ GameObject:
   - component: {fileID: 2096560645176020526}
   - component: {fileID: 5902504979816718965}
   - component: {fileID: 4639804368429970913}
+  - component: {fileID: 4103630928515497126}
   m_Layer: 0
   m_Name: Visual
   m_TagString: Untagged
@@ -1050,6 +1051,30 @@ MonoBehaviour:
   _installedMagazineRound: {fileID: 0}
   _replacementMagazineRound: {fileID: 0}
   _hipBackOffset: 0.11
+--- !u!114 &4103630928515497126
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5247998536126919901}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 881c6a4efbb78d645b8b0178429b83af, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: RaidIntoDarkness.Weapons::RaidIntoDarkness.Weapons.FirstPersonMagazineRoundsView
+  _bones:
+  - {fileID: 2859571240114177367}
+  - {fileID: 5987487248060674981}
+  - {fileID: 1797988733037756121}
+  - {fileID: 5978998097091166183}
+  - {fileID: 912048088582184274}
+  - {fileID: 4452135429272799795}
+  - {fileID: 6482905046016000981}
+  - {fileID: 5238932358867029585}
+  _visibleByCount: 000000000100000003000000070000000f0000001f0000003f0000007f000000i
+  _tacticalExchange: 0.47619045
+  _emptyExchange: 0.24999999
 --- !u!1 &5541806679141766627
 GameObject:
   m_ObjectHideFlags: 0

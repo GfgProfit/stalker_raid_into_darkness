@@ -73,7 +73,7 @@ The project attaches modules to the weapon bones at runtime. This avoids a separ
 **Attachment icons MUST come from GRA HD atlases**, as chosen by the user. You MUST use only this atlas-selection procedure for attachments:
 
 - Atlas: Read `icons_texture` from the attachment section and remove spaces from the value. GRA has the typo `ui\ui_ raid_hd_aattachments`. If the key is absent, use `ui\ui_icon_equipment`.
-- Rectangle: Use `inv_grid_x/y/width/height` × 50 px. Measure `y` from the top.
+- Rectangle: Use `inv_grid_x/y/width/height` x 50 px. Measure `y` from the top.
 - Convert the atlas to PNG at `Assets/_Source/Items/Icons/<name>.png` and create sprites named after the sections with `ISpriteEditorDataProvider`. Reference each sprite through `ItemDefinition._iconOverride` and set `_generateIcon = false`.
 
 The project icon generator is at `Assets/_Modules/Inventory/Runtime/IconGeneration`. Its window is `Assets/_Modules/Inventory/Editor/IconGeneration/ItemIconGeneratorWindow.cs`. Attachment variants use `ItemIconVariantPart` in the item's visual prefab with `_part`, `_group`, `_installedObjects`, `_defaultObjects`, `_requiredParts`, `_incompatibleParts`, and `_sizeDelta`.

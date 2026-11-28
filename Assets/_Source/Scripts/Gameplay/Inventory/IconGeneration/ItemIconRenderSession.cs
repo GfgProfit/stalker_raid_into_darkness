@@ -167,6 +167,13 @@ namespace RaidIntoDarkness.Inventory.IconGeneration
 
             ItemIconRenderer.DestroyObject(_cameraObject);
             ItemIconRenderer.DestroyObject(_volumeObject);
+
+            for (int i = 0; i < _volumeProfile.components.Count; i++)
+            {
+                ItemIconRenderer.DestroyObject(_volumeProfile.components[i]);
+            }
+
+            _volumeProfile.components.Clear();
             ItemIconRenderer.DestroyObject(_volumeProfile);
         }
 

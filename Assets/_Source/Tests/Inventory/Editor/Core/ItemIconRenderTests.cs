@@ -173,16 +173,35 @@ namespace RaidIntoDarkness.Inventory.Core.Tests
         public IEnumerator SessionCleansUpCamerasLightsAndVolumes() => UniTask.ToCoroutine(async () =>
         {
             ItemDefinition definition = CreateRenderableItem("cleanup_item");
-            await RenderPixels(definition, Array.Empty<string>(), CancellationToken.None);
             int cameras = Count<Camera>();
             int lights = Count<Light>();
-            int volumes = Count<Volume>();
+            Volume[] existingVolumes = Resources.FindObjectsOfTypeAll<Volume>();
 
-            await RenderPixels(definition, Array.Empty<string>(), CancellationToken.None);
+            for (int i = 0; i < 2; i++)
+            {
+                VolumeProfile profile;
+                VolumeComponent[] overrides;
+                GameObject root;
 
-            Assert.That(Count<Camera>(), Is.EqualTo(cameras));
-            Assert.That(Count<Light>(), Is.EqualTo(lights));
-            Assert.That(Count<Volume>(), Is.EqualTo(volumes));
+                using (var session = new ItemIconBatchRenderSession(_settings))
+                {
+                    Volume volume = Resources.FindObjectsOfTypeAll<Volume>().Except(existingVolumes).Single();
+                    profile = volume.sharedProfile;
+                    overrides = profile.components.ToArray();
+                    Assert.That(overrides, Is.Not.Empty);
+
+                    await RenderPixels(session, definition, Array.Empty<string>(), CancellationToken.None);
+                    root = Resources.FindObjectsOfTypeAll<GameObject>().Single(candidate => candidate.name == $"Runtime Icon Root - {definition.name}");
+                    Assert.That(root.activeSelf, Is.False);
+                }
+
+                Assert.That(root == null, Is.True, "the model is released");
+                Assert.That(profile == null, Is.True, "the profile is released");
+                Assert.That(overrides.All(component => component == null), Is.True, "the profile's runtime overrides are released");
+                Assert.That(Count<Camera>(), Is.EqualTo(cameras));
+                Assert.That(Count<Light>(), Is.EqualTo(lights));
+                Assert.That(Count<Volume>(), Is.EqualTo(existingVolumes.Length));
+            }
         });
 
         [UnityTest]

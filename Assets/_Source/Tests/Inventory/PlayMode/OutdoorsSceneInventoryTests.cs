@@ -198,6 +198,72 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
         }
 
         [UnityTest]
+        public IEnumerator DragDropAreaFadesAndDropsOnlyWithStashClosed()
+        {
+            SceneManager.LoadScene(SCENE, LoadSceneMode.Single);
+            yield return new WaitForSeconds(0.6f);
+            InventoryWindowController controller = Object.FindAnyObjectByType<InventoryWindowController>();
+            controller.Player.CameraController.SetLook(0f, 90f);
+            controller.Open();
+            yield return null;
+
+            InventoryWindow window = controller.Window;
+            InventoryModel model = controller.Inventory.Model;
+            CanvasGroup area = window.Content.GetComponentsInChildren<CanvasGroup>(true).Single(group => group.name == "Drop Item Area");
+            var areaRect = (RectTransform)area.transform;
+            Vector2 dropPoint = RectTransformUtility.WorldToScreenPoint(null, areaRect.TransformPoint(areaRect.rect.center));
+            ItemDefinition definition = controller.Inventory.Database.Definitions.First(item => DefinitionSection(item) == "ammo_5.56x45_ss190");
+            ItemInstance item = model.CreateItem(definition, 4);
+            Assert.That(model.TryAddAuto(item, BACKPACK, mergeStacks: false).Success, Is.True);
+            InventoryGridViewBase bag = window.FindGrid(BACKPACK);
+            Vector2 start = RectTransformUtility.WorldToScreenPoint(null, bag.GetItemView(item).RectTransform.position);
+
+            Assert.That(area.alpha, Is.Zero);
+            Assert.That(area.blocksRaycasts, Is.False);
+            Assert.That(window.BeginDrag(item, bag, item.Amount, start, null), Is.True);
+            Assert.That(area.alpha, Is.Zero);
+            yield return new WaitForSecondsRealtime(0.25f);
+            Assert.That(area.alpha, Is.EqualTo(1f));
+            window.CancelDrag();
+            yield return new WaitForSecondsRealtime(0.25f);
+            Assert.That(area.alpha, Is.Zero);
+            Assert.That(model.ContainsItem(item), Is.True);
+
+            Assert.That(window.BeginDrag(item, bag, item.Amount, start, null), Is.True);
+            yield return new WaitForSecondsRealtime(0.25f);
+            controller.Open(true);
+            Assert.That(window.IsSecondaryOpen, Is.True);
+            Assert.That(window.IsDragging, Is.False);
+            Assert.That(area.alpha, Is.Zero);
+            Assert.That(window.BeginDrag(item, bag, item.Amount, start, null), Is.True);
+            window.UpdateDrag(dropPoint, null);
+            yield return new WaitForSecondsRealtime(0.25f);
+            Assert.That(area.alpha, Is.Zero);
+            window.CompleteDrag();
+            Assert.That(model.ContainsItem(item), Is.True);
+
+            if (item.ContainerId != BACKPACK)
+            {
+                Assert.That(model.TryTransfer(item.InstanceId, BACKPACK).Success, Is.True);
+            }
+
+            controller.Open();
+            Assert.That(window.IsSecondaryOpen, Is.False);
+            start = RectTransformUtility.WorldToScreenPoint(null, bag.GetItemView(item).RectTransform.position);
+            Assert.That(window.BeginDrag(item, bag, item.Amount, start, null), Is.True);
+            yield return new WaitForSecondsRealtime(0.25f);
+            window.UpdateDrag(dropPoint, null);
+            Assert.That(window.CompleteDrag().Success, Is.True);
+            Assert.That(model.ContainsItem(item), Is.False);
+            WorldItem dropped = Object.FindObjectsByType<WorldItem>().Single(worldItem => worldItem.Instance == item);
+            Assert.That(dropped.Amount, Is.EqualTo(4));
+            Assert.That(dropped.GetComponent<Rigidbody>().angularVelocity.sqrMagnitude, Is.GreaterThan(0f));
+            yield return new WaitForSecondsRealtime(0.25f);
+            Assert.That(area.alpha, Is.Zero);
+            controller.Close();
+        }
+
+        [UnityTest]
         public IEnumerator DroppingFromInventoryTossesItemsForwardAndDownWithSpin()
         {
             SceneManager.LoadScene(SCENE, LoadSceneMode.Single);

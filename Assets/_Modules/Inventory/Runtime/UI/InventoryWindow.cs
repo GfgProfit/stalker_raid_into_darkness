@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using R3;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -11,6 +12,7 @@ namespace Inventory.UI
     public sealed class InventoryWindow : MonoBehaviour
     {
         private const float STATUS_DURATION = 2.5f;
+        private const float DROP_AREA_FADE_DURATION = 0.15f;
 
         [SerializeField] private RectTransform _content;
         [SerializeField] private List<InventoryGridViewBase> _grids = new();
@@ -31,6 +33,7 @@ namespace Inventory.UI
         [SerializeField] private InventoryInputBindings _input = new();
         [SerializeField] private InventoryTheme _theme;
         [SerializeField] private RectTransform _secondaryRoot;
+        [SerializeField] private CanvasGroup _dropItemArea;
         [SerializeField] private string _weightFormat = "Weight: {0} / {1} kg";
         [SerializeField] private string _weightFormatUnlimited = "Weight: {0} kg";
         [SerializeField] private Color _overweightColor = new(1f, 0.55f, 0.2f, 1f);
@@ -40,6 +43,9 @@ namespace Inventory.UI
         private readonly List<InventoryItemStat> _tooltipStats = new();
         private readonly List<InventoryContextMenu.Entry> _menuEntries = new();
         private readonly List<RectInt> _compatibleAreas = new();
+        private InventoryDropAreaViewModel _dropAreaViewModel;
+        private IDisposable _dropAreaBinding;
+        private float _dropAreaTargetAlpha;
         private InventoryDragState _drag;
         private InventoryItemView _hovered;
         private float _hoverStart;
@@ -144,6 +150,7 @@ namespace Inventory.UI
 
             CancelDrag();
             HideTransientWidgets();
+            ResetDropArea();
             _secondaryRoot.gameObject.SetActive(visible);
         }
 
@@ -206,6 +213,7 @@ namespace Inventory.UI
         public void Unbind()
         {
             CancelDrag();
+            ResetDropArea();
 
             if (_splitDialog != null)
             {
@@ -269,6 +277,7 @@ namespace Inventory.UI
 
             CancelDrag();
             HideTransientWidgets();
+            ResetDropArea();
             IsOpen = false;
 
             if (_content != null)
@@ -484,6 +493,7 @@ namespace Inventory.UI
             }
 
             ShowCompatibleSlots(item);
+            _dropAreaViewModel?.SetVisible(_drag.IsSplit == false && CanUseDropArea());
             UpdateDrag(screenPosition, eventCamera);
             return true;
         }
@@ -504,7 +514,7 @@ namespace Inventory.UI
             ghostRect.anchorMax = new Vector2(0.5f, 0.5f);
             ghostRect.localPosition = local;
             InventoryGridViewBase previousTarget = _drag.TargetGrid;
-            InventoryGridViewBase target = FindGridAt(screenPosition);
+            InventoryGridViewBase target = IsOverDropArea(screenPosition, eventCamera) ? null : FindGridAt(screenPosition);
 
             if (previousTarget != null && previousTarget != target)
             {
@@ -553,9 +563,15 @@ namespace Inventory.UI
             }
 
             InventoryDragState drag = _drag;
+            bool dropInWorld = IsOverDropArea(drag.LastScreenPosition, drag.EventCamera);
             InventoryResult result = InventoryResult.Fail(InventoryFailure.NoSlot);
             string sourceContainerId = drag.Item != null ? drag.Item.ContainerId : null;
             EndDrag();
+
+            if (dropInWorld)
+            {
+                return _dropAreaViewModel.Drop(drag.Item);
+            }
 
             if (drag.TargetGrid != null && drag.TargetGrid.Container != null && drag.Kind != InventoryDropKind.None)
             {
@@ -879,21 +895,25 @@ namespace Inventory.UI
             ItemInspected?.Invoke(item);
         }
 
-        public void DropItem(ItemInstance item)
+        public void DropItem(ItemInstance item) => TryDropItem(item);
+
+        public void DropItemNow(ItemInstance item) => TryDropItemNow(item);
+
+        private InventoryResult TryDropItem(ItemInstance item)
         {
-            if (IsEquipped(item) && EquipmentGate != null && EquipmentGate.HandleDrop(item))
+            if (Model != null && IsEquipped(item) && EquipmentGate != null && EquipmentGate.HandleDrop(item))
             {
-                return;
+                return InventoryResult.Ok(item, item.Amount);
             }
 
-            DropItemNow(item);
+            return TryDropItemNow(item);
         }
 
-        public void DropItemNow(ItemInstance item)
+        private InventoryResult TryDropItemNow(ItemInstance item)
         {
             if (item == null || Model == null || Model.ContainsItem(item) == false)
             {
-                return;
+                return InventoryResult.Fail(InventoryFailure.ItemNotFound);
             }
 
             InventoryResult result = DropToWorld != null ? DropToWorld(item) : Model.TryRemove(item.InstanceId);
@@ -903,6 +923,8 @@ namespace Inventory.UI
                 PlaySound(InventorySound.Drop);
                 ItemDropped?.Invoke(result.Item);
             }
+
+            return result;
         }
 
         public void ShowStatus(string message)
@@ -1091,6 +1113,30 @@ namespace Inventory.UI
             }
         }
 
+        private void OnEnable()
+        {
+            if (_dropItemArea == null)
+            {
+                return;
+            }
+
+            _dropItemArea.interactable = false;
+            _dropItemArea.blocksRaycasts = false;
+            ResetDropArea();
+            _dropAreaViewModel = new InventoryDropAreaViewModel(TryDropItem);
+            _dropAreaBinding = _dropAreaViewModel.Visibility.Subscribe(visible => _dropAreaTargetAlpha = visible ? 1f : 0f);
+        }
+
+        private void OnDisable()
+        {
+            CancelDrag();
+            _dropAreaBinding?.Dispose();
+            _dropAreaViewModel?.Dispose();
+            _dropAreaBinding = null;
+            _dropAreaViewModel = null;
+            ResetDropArea();
+        }
+
         private void OnDestroy() => Unbind();
 
         private void Update()
@@ -1104,6 +1150,11 @@ namespace Inventory.UI
             if (IsOpen == false)
             {
                 return;
+            }
+
+            if (_dropItemArea != null && _dropItemArea.alpha != _dropAreaTargetAlpha)
+            {
+                _dropItemArea.alpha = Mathf.MoveTowards(_dropItemArea.alpha, _dropAreaTargetAlpha, Time.unscaledDeltaTime / DROP_AREA_FADE_DURATION);
             }
 
             if (_drag != null && _input.RotatePressed)
@@ -1226,6 +1277,7 @@ namespace Inventory.UI
         {
             InventoryDragState drag = _drag;
             _drag = null;
+            _dropAreaViewModel?.SetVisible(false);
 
             if (drag.Ghost != null)
             {
@@ -1243,6 +1295,26 @@ namespace Inventory.UI
                 {
                     grid.ClearHighlights();
                 }
+            }
+        }
+
+        private bool CanUseDropArea()
+        {
+            return IsOpen && _dropItemArea != null && _dropItemArea.isActiveAndEnabled && DropToWorld != null && (_secondaryRoot == null || _secondaryRoot.gameObject.activeSelf == false);
+        }
+
+        private bool IsOverDropArea(Vector2 screenPosition, Camera eventCamera)
+        {
+            return _dropAreaViewModel?.IsVisible == true && CanUseDropArea() && RectTransformUtility.RectangleContainsScreenPoint((RectTransform)_dropItemArea.transform, screenPosition, eventCamera);
+        }
+
+        private void ResetDropArea()
+        {
+            _dropAreaViewModel?.SetVisible(false);
+            _dropAreaTargetAlpha = 0f;
+            if (_dropItemArea != null)
+            {
+                _dropItemArea.alpha = 0f;
             }
         }
 

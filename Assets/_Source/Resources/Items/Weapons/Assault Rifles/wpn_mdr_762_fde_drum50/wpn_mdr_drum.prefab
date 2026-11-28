@@ -19783,6 +19783,17 @@ MonoBehaviour:
   _amount: 1
   _silencerVisual: {fileID: 5450923572817824482}
   _silencerCollider: {fileID: 2743834524992625880}
+  _weaponPose:
+  - _bone: {fileID: 7722964130253750694}
+    _loadedPosition: {x: -0.000000015703336, y: -0.0000000018044375, z: -0.22758827}
+    _loadedRotation: {x: 0, y: 0, z: 0, w: 1}
+    _emptyPosition: {x: -0.000000014140824, y: -0.000000002910383, z: -0.32758826}
+    _emptyRotation: {x: 0, y: 0, z: 0, w: 1}
+  - _bone: {fileID: 7431008888505367219}
+    _loadedPosition: {x: -5.675247e-10, y: -0.03728476, z: -0.16850816}
+    _loadedRotation: {x: 0, y: 0, z: 0, w: 1}
+    _emptyPosition: {x: -5.675247e-10, y: -0.03728476, z: -0.16850816}
+    _emptyRotation: {x: -0.30070338, y: 0, z: 0, w: 0.9537177}
 --- !u!82 &4819562805896327981
 AudioSource:
   m_ObjectHideFlags: 0
@@ -25695,8 +25706,21 @@ MonoBehaviour:
   _installedMagazineRenderers: []
   _replacementMagazineRenderers: []
   _magazineBonePairs: []
+  _installedMagazineRound: {fileID: 0}
+  _replacementMagazineRound: {fileID: 0}
+  _hipBackOffset: 0
 --- !u!1 &5450923572817824482 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 42846990527746500, guid: 8ce876d8107122c4697295148795b48f, type: 3}
+  m_PrefabInstance: {fileID: 5421677575485643558}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &7431008888505367219 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 3178859850564379029, guid: 8ce876d8107122c4697295148795b48f, type: 3}
+  m_PrefabInstance: {fileID: 5421677575485643558}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &7722964130253750694 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -6912794587323032960, guid: 8ce876d8107122c4697295148795b48f, type: 3}
   m_PrefabInstance: {fileID: 5421677575485643558}
   m_PrefabAsset: {fileID: 0}

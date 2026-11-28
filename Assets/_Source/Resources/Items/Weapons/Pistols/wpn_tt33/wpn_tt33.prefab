@@ -256,6 +256,22 @@ MonoBehaviour:
   _amount: 1
   _silencerVisual: {fileID: 0}
   _silencerCollider: {fileID: 0}
+  _weaponPose:
+  - _bone: {fileID: 4889415047483535632}
+    _loadedPosition: {x: -0.011934675, y: 0.06625441, z: 0.21025738}
+    _loadedRotation: {x: 0, y: 0, z: 0, w: 1}
+    _emptyPosition: {x: -0.01193472, y: 0.06625458, z: 0.16825742}
+    _emptyRotation: {x: 0, y: 0, z: 0, w: 1}
+  - _bone: {fileID: 3473551131985106295}
+    _loadedPosition: {x: -0.011934668, y: 0.049817365, z: 0.13353026}
+    _loadedRotation: {x: 0, y: 0, z: 0, w: 1}
+    _emptyPosition: {x: -0.01193472, y: 0.049817257, z: 0.13353038}
+    _emptyRotation: {x: 0.043612048, y: 0, z: 0, w: 0.99904853}
+  - _bone: {fileID: 6441488136559403106}
+    _loadedPosition: {x: -0.01193469, y: 0.06625441, z: 0.23613441}
+    _loadedRotation: {x: 0, y: 0, z: 0, w: 1}
+    _emptyPosition: {x: -0.011934727, y: 0.06625459, z: 0.19595122}
+    _emptyRotation: {x: 0, y: 0, z: 0, w: 1}
 --- !u!82 &1218433704870098772
 AudioSource:
   m_ObjectHideFlags: 0

@@ -4820,6 +4820,12 @@ MonoBehaviour:
   _amount: 1
   _silencerVisual: {fileID: 528953135229668132}
   _silencerCollider: {fileID: 4342833425070047372}
+  _weaponPose:
+  - _bone: {fileID: 7389523817860085851}
+    _loadedPosition: {x: -0.000000018626451, y: 0.0151922405, z: -0.10564458}
+    _loadedRotation: {x: 0, y: 0, z: 0, w: 1}
+    _emptyPosition: {x: -0.000000018626451, y: 0.0151922405, z: -0.2206446}
+    _emptyRotation: {x: 0, y: 0, z: 0, w: 1}
 --- !u!82 &1409948605333049379
 AudioSource:
   m_ObjectHideFlags: 0
@@ -7059,6 +7065,11 @@ GameObject:
 --- !u!1 &6718969123198915013 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -298484217725928414, guid: 2e219ff8488837440b34907b89a1b154, type: 3}
+  m_PrefabInstance: {fileID: 2802647437560540647}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &7389523817860085851 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4641483041718588860, guid: 2e219ff8488837440b34907b89a1b154, type: 3}
   m_PrefabInstance: {fileID: 2802647437560540647}
   m_PrefabAsset: {fileID: 0}
 --- !u!4 &8399434620600382403 stripped

@@ -31,9 +31,9 @@ namespace RaidIntoDarkness.Inventory.Tests
             yield return new WaitForSeconds(0.6f);
             InventoryWindowController inventory = Object.FindAnyObjectByType<InventoryWindowController>();
             InventoryWindow window = inventory.Window;
-            InventoryModel model = inventory.Inventory.Model;
+            InventoryModel model = inventory.Runtime().Model;
             inventory.Player.CameraController.SetLook(0f, 20f);
-            ItemDefinition weaponDefinition = inventory.Inventory.Database.Definitions.First(item => DefinitionSection(item) == "wpn_ak74");
+            ItemDefinition weaponDefinition = inventory.Runtime().Database.Definitions.First(item => DefinitionSection(item) == "wpn_ak74");
             ItemInstance weapon = model.CreateItem(weaponDefinition);
             Assert.That(model.TryAddAuto(weapon, window.PrimaryContainerId, false).Success, Is.True);
             Assert.That(model.TryEquip(weapon.InstanceId, window.EquipmentContainerId).Success, Is.True);
@@ -48,7 +48,7 @@ namespace RaidIntoDarkness.Inventory.Tests
             }
 
             Assert.That(controller.State, Is.EqualTo(FirstPersonWeaponState.Ready));
-            ItemDefinition dropDefinition = inventory.Inventory.Database.Definitions.First(item => item?.GetComponent<EquipmentStatsComponent>()?.Section == "dolg_outfit");
+            ItemDefinition dropDefinition = inventory.Runtime().Database.Definitions.First(item => item?.GetComponent<EquipmentStatsComponent>()?.Section == "dolg_outfit");
             string ammoSection = weaponDefinition.GetComponent<WeaponStatsComponent>().AmmoClasses[0];
             inventory.Open();
 
@@ -101,8 +101,8 @@ namespace RaidIntoDarkness.Inventory.Tests
             yield return new WaitForSeconds(0.6f);
             InventoryWindowController inventory = Object.FindAnyObjectByType<InventoryWindowController>();
             Assert.That(inventory, Is.Not.Null);
-            InventoryModel model = inventory.Inventory.Model;
-            ItemDefinition definition = inventory.Inventory.Database.Definitions.FirstOrDefault(item => DefinitionSection(item) == "wpn_ak74");
+            InventoryModel model = inventory.Runtime().Model;
+            ItemDefinition definition = inventory.Runtime().Database.Definitions.FirstOrDefault(item => DefinitionSection(item) == "wpn_ak74");
             Assert.That(definition, Is.Not.Null);
             ItemInstance weapon = model.CreateItem(definition);
             Assert.That(model.TryAddAuto(weapon, inventory.Window.PrimaryContainerId, false).Success, Is.True);

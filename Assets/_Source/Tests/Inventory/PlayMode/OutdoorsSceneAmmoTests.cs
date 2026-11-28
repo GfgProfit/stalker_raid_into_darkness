@@ -39,7 +39,7 @@ namespace RaidIntoDarkness.Inventory.Tests
             InventoryWindowController controller = Object.FindAnyObjectByType<InventoryWindowController>();
             WorldItemInteractor interactor = Object.FindAnyObjectByType<WorldItemInteractor>();
             InventoryWindow window = controller.Window;
-            InventoryModel model = controller.Inventory.Model;
+            InventoryModel model = controller.Runtime().Model;
             ItemInstance first = AddItem(controller, "ammo_5.56x45_ss190", window.PrimaryContainerId);
             ItemDefinition definition = first.Definition;
             Assert.That(interactor.TryPickUp(interactor.Spawn(definition, 15)), Is.True);
@@ -80,7 +80,7 @@ namespace RaidIntoDarkness.Inventory.Tests
             yield return new WaitForSeconds(0.5f);
             InventoryWindowController controller = Object.FindAnyObjectByType<InventoryWindowController>();
             InventoryWindow window = controller.Window;
-            InventoryModel model = controller.Inventory.Model;
+            InventoryModel model = controller.Runtime().Model;
             string bag = window.PrimaryContainerId;
             string stash = window.SecondaryContainerId;
             ItemInstance pmm = AddItem(controller, "ammo_9x18_pmm", bag);
@@ -121,7 +121,7 @@ namespace RaidIntoDarkness.Inventory.Tests
             yield return new WaitForSeconds(0.5f);
             InventoryWindowController controller = Object.FindAnyObjectByType<InventoryWindowController>();
             InventoryWindow window = controller.Window;
-            InventoryModel model = controller.Inventory.Model;
+            InventoryModel model = controller.Runtime().Model;
             ItemInstance destination = AddItem(controller, "ammo_5.56x45_ss190", window.PrimaryContainerId, 30);
             InventoryResult split = model.TrySplitAuto(destination.InstanceId, 12);
             Assert.That(split.Success, Is.True);
@@ -165,7 +165,7 @@ namespace RaidIntoDarkness.Inventory.Tests
             yield return new WaitForSeconds(0.5f);
             InventoryWindowController controller = Object.FindAnyObjectByType<InventoryWindowController>();
             InventoryWindow window = controller.Window;
-            InventoryModel model = controller.Inventory.Model;
+            InventoryModel model = controller.Runtime().Model;
             string backpack = window.PrimaryContainerId;
             ItemInstance source = AddItem(controller, "ammo_5.56x45_ss190", backpack, 12);
             ItemInstance destination = AddItem(controller, "ammo_5.56x45_ss190", backpack, 20);
@@ -231,7 +231,7 @@ namespace RaidIntoDarkness.Inventory.Tests
             yield return new WaitForSeconds(0.5f);
             InventoryWindowController controller = Object.FindAnyObjectByType<InventoryWindowController>();
             InventoryWindow window = controller.Window;
-            InventoryModel model = controller.Inventory.Model;
+            InventoryModel model = controller.Runtime().Model;
             ItemInstance weapon = AddItem(controller, "wpn_aug_a3", window.PrimaryContainerId);
             ItemInstance leftWeapon = AddItem(controller, "wpn_aug_a3", window.SecondaryContainerId);
             ItemInstance equippedWeapon = AddItem(controller, "wpn_aug_a3", window.PrimaryContainerId);
@@ -428,7 +428,7 @@ namespace RaidIntoDarkness.Inventory.Tests
             Assert.That(controller, Is.Not.Null);
             var sections = new HashSet<string>();
 
-            foreach (ItemDefinition definition in controller.Inventory.Database.Definitions)
+            foreach (ItemDefinition definition in controller.Runtime().Database.Definitions)
             {
                 if (definition.IsCategory("Ammo") == false)
                 {
@@ -483,8 +483,8 @@ namespace RaidIntoDarkness.Inventory.Tests
             InventoryWindowController controller = Object.FindAnyObjectByType<InventoryWindowController>();
             WorldItemInteractor interactor = Object.FindAnyObjectByType<WorldItemInteractor>();
             InventoryWindow window = controller.Window;
-            InventoryModel model = controller.Inventory.Model;
-            ItemDefinition definition = FindDefinition(controller.Inventory.Database, "ammo_9x18_fmj");
+            InventoryModel model = controller.Runtime().Model;
+            ItemDefinition definition = FindDefinition(controller.Runtime().Database, "ammo_9x18_fmj");
             WorldItem box = interactor.Spawn(definition, 7);
             Assert.That(box, Is.Not.Null);
             int taken = controller.ItemSounds.PlayedCount;
@@ -598,7 +598,7 @@ namespace RaidIntoDarkness.Inventory.Tests
 
         private static ItemInstance AddItem(InventoryWindowController controller, string section, string containerId, int amount = 1)
         {
-            foreach (ItemDefinition definition in controller.Inventory.Database.Definitions)
+            foreach (ItemDefinition definition in controller.Runtime().Database.Definitions)
             {
                 if (definition == null)
                 {
@@ -609,8 +609,8 @@ namespace RaidIntoDarkness.Inventory.Tests
 
                 if (definitionSection == section || definition.name == section || definition.name == section + "_definition")
                 {
-                    ItemInstance item = controller.Inventory.Model.CreateItem(definition, amount);
-                    Assert.That(controller.Inventory.Model.TryAddAuto(item, containerId, false).Success, Is.True, section);
+                    ItemInstance item = controller.Runtime().Model.CreateItem(definition, amount);
+                    Assert.That(controller.Runtime().Model.TryAddAuto(item, containerId, false).Success, Is.True, section);
                     return item;
                 }
             }

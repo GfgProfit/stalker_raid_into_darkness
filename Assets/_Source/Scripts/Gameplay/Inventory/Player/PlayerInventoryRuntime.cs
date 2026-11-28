@@ -15,7 +15,7 @@ namespace RaidIntoDarkness.Inventory.Infrastructure
 {
     [DefaultExecutionOrder(-201)]
     [DisallowMultipleComponent]
-    public sealed class PlayerInventoryRuntime : MonoBehaviour, IStalkerCarryWeightSource, IStalkerSprintSource, IAnomalyProtectionSource, IAnomalyEquipmentWearSource
+    public sealed class PlayerInventoryRuntime : MonoBehaviour, IStalkerCarryWeightSource, IStalkerSprintSource, IAnomalyProtectionSource, IAnomalyEquipmentWearSource, IInventoryPresentationSource, IInventorySpawnCatalog, IInventoryWeaponStatus
     {
         [SerializeField] private ItemDatabase _database;
         [SerializeField] private InventorySeed _seed;
@@ -46,6 +46,32 @@ namespace RaidIntoDarkness.Inventory.Infrastructure
             add => _forcedDropCompleted.Add(value);
             remove => _forcedDropCompleted.Remove(value);
         }
+
+        event Action<ItemInstance, InventoryResult> IInventoryPresentationSource.ForcedDropCompleted
+        {
+            add => ForcedDropCompleted += value;
+            remove => ForcedDropCompleted -= value;
+        }
+
+        event Action IInventoryWeaponStatus.FireModeChanged
+        {
+            add
+            {
+                if (_weapons != null)
+                {
+                    _weapons.FireModeChanged += value;
+                }
+            }
+            remove
+            {
+                if (_weapons != null)
+                {
+                    _weapons.FireModeChanged -= value;
+                }
+            }
+        }
+
+        IReadOnlyList<ItemDefinition> IInventorySpawnCatalog.Definitions => _database != null ? _database.Definitions : null;
 
         internal string PrimaryContainerId => _backpack?.Id;
         internal string EquipmentContainerId => _equipmentContainerId;
@@ -235,15 +261,36 @@ namespace RaidIntoDarkness.Inventory.Infrastructure
             return true;
         }
 
-        internal InventoryResult TryDrop(ItemInstance item)
+        bool IInventoryPresentationSource.TryGetPresentation(out InventoryPresentationBindings bindings)
         {
-            if (Model.ContainsItem(item) == false)
+            if (EnsureInitialized() == false)
             {
-                return InventoryResult.Fail(InventoryFailure.ItemNotFound);
+                bindings = default;
+                return false;
             }
 
-            return _worldDrop?.Available == true ? _worldDrop.TryDrop(Model, item) : Model.TryRemove(item.InstanceId);
+            bindings = new InventoryPresentationBindings(Model, IconProvider, WeaponAmmo, WeaponAttachments, EquipmentAnimations, this, this, WorldInteraction, TryDrop);
+            return true;
         }
+
+        UniTask IInventoryPresentationSource.PrewarmIconsAsync(CancellationToken cancellationToken) => PrewarmIconsAsync(cancellationToken);
+
+        bool IInventoryWeaponStatus.IsReloading(ItemInstance item) => WeaponBinder?.IsReloading(item) == true;
+
+        int IInventoryWeaponStatus.GetSelectedFireModeIndex(string instanceId) => _weapons != null ? _weapons.GetSelectedFireModeIndex(instanceId) : 0;
+
+        int IInventorySpawnCatalog.Grant(ItemDefinition definition, int quantity, int condition, out InventoryFailure failure)
+        {
+            return InventorySpawn.Grant(isActiveAndEnabled ? Model : null, PrimaryContainerId, definition, quantity, condition, out failure);
+        }
+
+        internal InventoryResult TryDrop(ItemInstance item)
+        {
+            Func<ItemInstance, InventoryResult> drop = _worldDrop?.Available == true ? DropToWorld : null;
+            return InventoryItemOperations.Drop(Model, item, drop);
+        }
+
+        private InventoryResult DropToWorld(ItemInstance item) => _worldDrop.TryDrop(Model, item);
 
         private void PublishForcedDrop(ItemInstance item, InventoryResult result)
         {

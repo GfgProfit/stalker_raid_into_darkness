@@ -9,15 +9,13 @@ using UnityEngine;
 
 namespace RaidIntoDarkness.Inventory.Infrastructure
 {
-    public sealed class EquipmentAnimationQueue : IEquipmentAnimationRequests, IDisposable
+    public sealed class EquipmentAnimationQueue : IInventoryEquipmentPresentation, IDisposable
     {
         public const float UNEQUIP_FADE_DELAY = 0.4f;
         public const float EQUIP_FADE_START = 0.35f;
         public const float EQUIP_FADE_STOP = 0.25f;
 
         private const int MAX_STEPS_PER_TICK = 64;
-        public static readonly Color IN_USE_TINT = new Color32(255, 159, 82, 100);
-
         private readonly EquipmentInventoryCommands _commands;
         private readonly InventoryModel _model;
         private readonly string _equipmentContainerId;
@@ -51,6 +49,18 @@ namespace RaidIntoDarkness.Inventory.Infrastructure
 
         internal event Action<ItemInstance> ItemUseChanged;
         internal event Action<EquipmentAnimationRequestKind, ItemInstance, InventoryResult, bool> OperationCompleted;
+
+        event Action<ItemInstance> IInventoryEquipmentPresentation.ItemUseChanged
+        {
+            add => ItemUseChanged += value;
+            remove => ItemUseChanged -= value;
+        }
+
+        event Action<EquipmentAnimationRequestKind, ItemInstance, InventoryResult, bool> IInventoryEquipmentPresentation.OperationCompleted
+        {
+            add => OperationCompleted += value;
+            remove => OperationCompleted -= value;
+        }
 
         public bool IsBusy => _steps.Count > 0 || _requests.Count > 0;
         public int PendingRequests => _requests.Count;

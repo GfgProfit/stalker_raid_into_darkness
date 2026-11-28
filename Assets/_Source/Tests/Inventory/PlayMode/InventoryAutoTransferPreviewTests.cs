@@ -24,7 +24,7 @@ namespace RaidIntoDarkness.Inventory.Tests
             {
                 controller = Object.FindAnyObjectByType<InventoryWindowController>();
 
-                if (controller != null && controller.Inventory != null && controller.Window != null && controller.Inventory.Model.GetContainer(controller.Window.PrimaryContainerId) != null)
+                if (controller != null && controller.PresentationSource != null && controller.Window != null && controller.Runtime().Model.GetContainer(controller.Window.PrimaryContainerId) != null)
                 {
                     break;
                 }
@@ -35,7 +35,7 @@ namespace RaidIntoDarkness.Inventory.Tests
             Assert.That(controller, Is.Not.Null);
             controller.Open(true);
             InventoryWindow window = controller.Window;
-            InventoryModel model = controller.Inventory.Model;
+            InventoryModel model = controller.Runtime().Model;
             InventoryGridViewBase sourceGrid = window.FindGrid(window.PrimaryContainerId);
             InventoryGridViewBase targetGrid = window.FindGrid(window.SecondaryContainerId);
             InventoryContainer source = model.GetContainer(window.PrimaryContainerId);

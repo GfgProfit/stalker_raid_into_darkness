@@ -20,6 +20,7 @@ namespace RaidIntoDarkness.Inventory.Infrastructure
 
         private readonly WorldItemTargetSearch _targetSearch = new();
         private readonly InventoryObservers<Action<(ItemInstance Item, InventoryResult Result)>> _pickupObservers = new();
+        private readonly InventoryObservers<Action<ItemInstance>> _pickupSoundObservers = new();
         private PlayerInventoryRuntime _inventory;
         private WorldItem _hintTarget;
         private WorldItem _pickupTarget;
@@ -32,6 +33,12 @@ namespace RaidIntoDarkness.Inventory.Infrastructure
         {
             add => _pickupObservers.Add(value);
             remove => _pickupObservers.Remove(value);
+        }
+
+        public event Action<ItemInstance> PickupSucceeded
+        {
+            add => _pickupSoundObservers.Add(value);
+            remove => _pickupSoundObservers.Remove(value);
         }
 
         public bool CanDrop => isActiveAndEnabled && _inventory != null;
@@ -128,6 +135,7 @@ namespace RaidIntoDarkness.Inventory.Infrastructure
                 }
 
                 PublishPickup(item, result);
+                _pickupSoundObservers.Publish(item, static (observer, picked) => observer(picked), static picked => $"{nameof(PickupSucceeded)} for item '{picked.InstanceId}'");
                 return true;
             }
             finally

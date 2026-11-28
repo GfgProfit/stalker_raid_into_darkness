@@ -9,14 +9,12 @@ namespace RaidIntoDarkness.Inventory.UI
     {
         private readonly InventoryWindow _window;
         private readonly Func<ItemInstance, InventoryResult> _drop;
-        private readonly InventoryItemSounds _sounds;
         private readonly CompositeDisposable _subscriptions = new();
 
-        public InventoryWorldItemBinding(InventoryWindow window, IWorldItemInteraction interaction, Func<ItemInstance, InventoryResult> drop, InventoryItemSounds sounds)
+        public InventoryWorldItemBinding(InventoryWindow window, IWorldItemInteraction interaction, Func<ItemInstance, InventoryResult> drop)
         {
             _window = window;
             _drop = drop;
-            _sounds = sounds;
             _subscriptions.Add(Observable.FromEvent<string>(handler => interaction.HintChanged += handler, handler => interaction.HintChanged -= handler).Subscribe(SetHint));
             _subscriptions.Add(Observable.FromEvent<bool>(handler => interaction.DropAvailabilityChanged += handler, handler => interaction.DropAvailabilityChanged -= handler).Subscribe(SetDropAvailable));
             _subscriptions.Add(Observable.FromEvent<(ItemInstance Item, InventoryResult Result)>(handler => interaction.PickupCompleted += handler, handler => interaction.PickupCompleted -= handler).Subscribe(ReportPickup));
@@ -55,14 +53,7 @@ namespace RaidIntoDarkness.Inventory.UI
                 return;
             }
 
-            if (available)
-            {
-                _window.DropToWorld = _drop;
-            }
-            else if (_window.DropToWorld == _drop)
-            {
-                _window.DropToWorld = null;
-            }
+            _window.BindWorldDrop(available ? _drop : null);
         }
 
         private void ReportPickup((ItemInstance Item, InventoryResult Result) pickup)
@@ -75,7 +66,6 @@ namespace RaidIntoDarkness.Inventory.UI
             if (pickup.Result.Success)
             {
                 _window.ShowStatus(_window.FormatLabel("status_picked", "Picked up {0}", pickup.Item.Definition.DisplayName));
-                _sounds.PlayTake(pickup.Item);
             }
             else
             {

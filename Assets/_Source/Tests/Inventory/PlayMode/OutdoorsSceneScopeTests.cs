@@ -32,7 +32,7 @@ namespace RaidIntoDarkness.Inventory.Tests
             SceneManager.LoadScene(SceneName, LoadSceneMode.Single);
             yield return new WaitForSeconds(0.6f);
             InventoryWindowController inventory = Object.FindAnyObjectByType<InventoryWindowController>();
-            InventoryModel model = inventory.Inventory.Model;
+            InventoryModel model = inventory.Runtime().Model;
             FirstPersonWeaponController controller = inventory.Player.GetComponentInChildren<FirstPersonWeaponController>();
             Transform camera = inventory.Player.CameraController.Camera.transform;
             ItemInstance weapon = Add(inventory, "wpn_mp9");
@@ -77,7 +77,7 @@ namespace RaidIntoDarkness.Inventory.Tests
             SceneManager.LoadScene(SceneName, LoadSceneMode.Single);
             yield return new WaitForSeconds(0.6f);
             InventoryWindowController inventory = Object.FindAnyObjectByType<InventoryWindowController>();
-            InventoryModel model = inventory.Inventory.Model;
+            InventoryModel model = inventory.Runtime().Model;
             InventoryWindow window = inventory.Window;
             FirstPersonWeaponController controller = inventory.Player.GetComponentInChildren<FirstPersonWeaponController>();
             ItemInstance weapon = Add(inventory, "wpn_aug_a3");
@@ -137,7 +137,7 @@ namespace RaidIntoDarkness.Inventory.Tests
             SceneManager.LoadScene(SceneName, LoadSceneMode.Single);
             yield return new WaitForSeconds(0.6f);
             InventoryWindowController inventory = Object.FindAnyObjectByType<InventoryWindowController>();
-            InventoryModel model = inventory.Inventory.Model;
+            InventoryModel model = inventory.Runtime().Model;
             FirstPersonWeaponController controller = inventory.Player.GetComponentInChildren<FirstPersonWeaponController>();
             ItemInstance weapon = Add(inventory, "wpn_aug_a3");
             ItemInstance scope = Add(inventory, "exps3");
@@ -192,8 +192,8 @@ namespace RaidIntoDarkness.Inventory.Tests
             ItemInstance weapon = Add(inventory, "wpn_aug_a3");
             ItemInstance scope = Add(inventory, "specter");
             string ammoSection = weapon.Definition.GetComponent<WeaponStatsComponent>().AmmoClasses[0];
-            ItemDefinition ammo = inventory.Inventory.Database.Definitions.Single(item => item.GetComponent<AmmoStatsComponent>()?.Section == ammoSection);
-            InventoryModel model = inventory.Inventory.Model;
+            ItemDefinition ammo = inventory.Runtime().Database.Definitions.Single(item => item.GetComponent<AmmoStatsComponent>()?.Section == ammoSection);
+            InventoryModel model = inventory.Runtime().Model;
             ItemInstance loaded = weapon.CreateDraft();
             loaded.SetState(WeaponMagazineState.AMMO_SECTION_STATE, ammoSection);
             loaded.SetState(WeaponMagazineState.MAGAZINE_STATE, "2");
@@ -275,15 +275,15 @@ namespace RaidIntoDarkness.Inventory.Tests
 
         private static ItemInstance Add(InventoryWindowController inventory, string section)
         {
-            foreach (ItemDefinition definition in inventory.Inventory.Database.Definitions)
+            foreach (ItemDefinition definition in inventory.Runtime().Database.Definitions)
             {
                 if (DefinitionSection(definition) != section)
                 {
                     continue;
                 }
 
-                ItemInstance item = inventory.Inventory.Model.CreateItem(definition);
-                Assert.That(inventory.Inventory.Model.TryAddAuto(item, inventory.Window.PrimaryContainerId, false).Success, Is.True, section);
+                ItemInstance item = inventory.Runtime().Model.CreateItem(definition);
+                Assert.That(inventory.Runtime().Model.TryAddAuto(item, inventory.Window.PrimaryContainerId, false).Success, Is.True, section);
                 return item;
             }
 
@@ -298,7 +298,7 @@ namespace RaidIntoDarkness.Inventory.Tests
             yield return new WaitForSeconds(0.6f);
             InventoryWindowController inventory = Object.FindAnyObjectByType<InventoryWindowController>();
             InventoryWindow window = inventory.Window;
-            InventoryModel model = inventory.Inventory.Model;
+            InventoryModel model = inventory.Runtime().Model;
             ItemInstance weapon = Add(inventory, "wpn_aug_a3");
             ItemInstance first = Add(inventory, "acog");
             ItemInstance second = Add(inventory, "leupold");

@@ -41,7 +41,7 @@ namespace RaidIntoDarkness.Inventory.Tests
             Assert.That(_controller, Is.Not.Null);
             _controller.Open(true);
             _window = _controller.Window;
-            _model = _controller.Inventory.Model;
+            _model = _controller.Runtime().Model;
             _weapons = _controller.Player.GetComponentInChildren<FirstPersonWeaponController>();
             Assert.That(_weapons, Is.Not.Null);
             Assert.That(_controller.EquipmentAnimations, Is.Not.Null);
@@ -82,7 +82,7 @@ namespace RaidIntoDarkness.Inventory.Tests
             var origin = new Vector2Int(3, 4);
             bool rotated = item.Definition.AllowRotation;
             yield return Draw(FirstPersonWeaponController.PRIMARY_SLOT);
-            EquipmentAnimationQueue queue = _controller.EquipmentAnimations;
+            EquipmentAnimationQueue queue = _controller.Runtime().EquipmentAnimations;
             Assert.That(queue.HandleUnequip(item, new InventoryUnequipTarget(TARGET_CONTAINER, origin, rotated, false)), Is.True);
             Assert.That(queue.HandleUnequip(item, InventoryUnequipTarget.Auto(_window.PrimaryContainerId)), Is.True);
             AssertPendingHide(item, SlotId.Primary);
@@ -135,7 +135,7 @@ namespace RaidIntoDarkness.Inventory.Tests
         {
             ItemDefinition definition = null;
 
-            foreach (ItemDefinition candidate in _controller.Inventory.Database.Definitions)
+            foreach (ItemDefinition candidate in _controller.Runtime().Database.Definitions)
             {
                 if (DefinitionSection(candidate) == AUG)
                 {

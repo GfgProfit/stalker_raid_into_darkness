@@ -1,10 +1,9 @@
-using RaidIntoDarkness.Inventory.Domain;
 using System;
 using RaidIntoDarkness.Weapons;
 using UnityEngine;
 using XRay.Importer;
 
-namespace RaidIntoDarkness.Inventory.Infrastructure
+namespace RaidIntoDarkness.Inventory.Domain
 {
     [Serializable]
     public sealed class WeaponHudComponent : ItemDefinitionComponent

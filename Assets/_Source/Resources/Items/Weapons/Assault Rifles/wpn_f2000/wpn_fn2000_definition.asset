@@ -97,7 +97,7 @@ MonoBehaviour:
         _blockSilencerWithGrenadeLauncher: 0
         _exposedRound: {fileID: 0}
     - rid: 115149152802308192
-      type: {class: WeaponHudComponent, ns: RaidIntoDarkness.Inventory.Infrastructure, asm: RaidIntoDarkness.Inventory}
+      type: {class: WeaponHudComponent, ns: RaidIntoDarkness.Inventory.Domain, asm: RaidIntoDarkness.Inventory}
       data:
         _hudModel: {fileID: 1251375483226474302, guid: 1a3d0be93abc24a49b719b4487487f99, type: 3}
         _weaponMotions: {fileID: 8815230551390286010, guid: d834f2a3847f927448be67a9baf1036b, type: 3}
@@ -114,7 +114,7 @@ MonoBehaviour:
       data:
         _prefab: {fileID: 5276912454624623506, guid: 1a3d0be93abc24a49b719b4487487f99, type: 3}
     - rid: 115149152802308194
-      type: {class: ItemTakeSoundComponent, ns: RaidIntoDarkness.Inventory.Infrastructure, asm: RaidIntoDarkness.Inventory}
+      type: {class: ItemTakeSoundComponent, ns: RaidIntoDarkness.Inventory.Domain, asm: RaidIntoDarkness.Inventory}
       data:
         _category: arplatform
         _clips:

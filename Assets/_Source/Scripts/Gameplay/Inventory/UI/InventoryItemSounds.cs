@@ -1,4 +1,4 @@
-using RaidIntoDarkness.Inventory.Infrastructure;
+using RaidIntoDarkness.Inventory.Application;
 using RaidIntoDarkness.Inventory.Domain;
 using System;
 using UnityEngine;
@@ -13,13 +13,19 @@ namespace RaidIntoDarkness.Inventory.UI
 
         private readonly InventoryWindow _window;
         private readonly InventoryModel _model;
+        private readonly IWorldItemInteraction _world;
         private float _lastTime = float.MinValue;
 
-        public InventoryItemSounds(InventoryWindow window)
+        internal InventoryItemSounds(InventoryWindow window, IWorldItemInteraction world)
         {
             _window = window;
             _model = window.Model;
             _model.Changed += OnChanged;
+            _world = world;
+            if (_world != null)
+            {
+                _world.PickupSucceeded += PlayTake;
+            }
         }
 
         public int PlayedCount { get; private set; }
@@ -34,6 +40,10 @@ namespace RaidIntoDarkness.Inventory.UI
         public void Dispose()
         {
             _model.Changed -= OnChanged;
+            if (_world != null)
+            {
+                _world.PickupSucceeded -= PlayTake;
+            }
         }
 
         private void OnChanged(InventoryChange change)
@@ -61,7 +71,8 @@ namespace RaidIntoDarkness.Inventory.UI
         private void Play(ItemInstance item, float volume)
         {
             ItemTakeSoundComponent sound = item != null ? item.Definition.GetComponent<ItemTakeSoundComponent>() : null;
-            AudioClip clip = sound != null ? sound.Pick() : null;
+            var clips = sound?.Clips;
+            AudioClip clip = clips is { Count: > 0 } ? clips[UnityEngine.Random.Range(0, clips.Count)] : null;
 
             if (clip == null)
             {

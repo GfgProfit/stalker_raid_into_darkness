@@ -82,7 +82,7 @@ MonoBehaviour:
         _recoilSnappinessIncreasePercent: 0
         _recoilDampingPercent: 18
     - rid: 115149188962189599
-      type: {class: ItemTakeSoundComponent, ns: RaidIntoDarkness.Inventory.Infrastructure, asm: RaidIntoDarkness.Inventory}
+      type: {class: ItemTakeSoundComponent, ns: RaidIntoDarkness.Inventory.Domain, asm: RaidIntoDarkness.Inventory}
       data:
         _category: attchsilen
         _clips:

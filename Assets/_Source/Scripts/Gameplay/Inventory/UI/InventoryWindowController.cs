@@ -1,4 +1,3 @@
-using RaidIntoDarkness.Inventory.Infrastructure;
 using RaidIntoDarkness.Inventory.Domain;
 using System;
 using System.Collections.Generic;
@@ -8,7 +7,6 @@ using R3;
 using RaidIntoDarkness.DI;
 using RaidIntoDarkness.Player;
 using RaidIntoDarkness.Settings;
-using RaidIntoDarkness.Weapons;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -28,10 +26,12 @@ namespace RaidIntoDarkness.Inventory.UI
         public const string OUTFIT_PATCH_ACTION = "outfit_patch";
         public const string UNLOAD_WEAPON_ACTION = "unload_weapon";
 
+        internal static readonly Color EQUIPMENT_IN_USE_TINT = new Color32(255, 159, 82, 100);
+
         private static readonly Color _compatibleAmmoTint = new(0f, 1f, 0.35f, 0.22f);
 
         [SerializeField] private InventoryWindow _window;
-        [SerializeField] private PlayerInventoryRuntime _inventory;
+        [SerializeField] private MonoBehaviour _inventory;
         [SerializeField] private StalkerPlayerController _player;
         [SerializeField] private SpawnMenuView _spawnMenu;
         [SerializeField] private InputActionReference _toggleInventory;
@@ -62,11 +62,12 @@ namespace RaidIntoDarkness.Inventory.UI
         private IDisposable _conditionBinding;
         private EquipmentStatusPresenter _statusPresenter;
         private InventoryStatusTooltipBinding _statusTooltip;
-        private FirstPersonWeaponController _weapons;
+        private InventoryPresentationBindings _presentation;
+        private IInventoryWeaponStatus _weaponStatus;
         private InventoryWeaponAmmoSource _weaponAmmo;
         private InventoryWeaponAttachments _weaponAttachments;
         private InventoryAttachmentActions _attachmentActions;
-        private EquipmentAnimationQueue _equipmentAnimations;
+        private IInventoryEquipmentPresentation _equipmentAnimations;
         private InventoryItemSounds _itemSounds;
         private InventoryWorldItemBinding _worldItemBinding;
         private ItemInstance _statsHovered;
@@ -79,19 +80,19 @@ namespace RaidIntoDarkness.Inventory.UI
         private bool _statsDirty = true;
 
         public InventoryWindow Window => _window;
-        public PlayerInventoryRuntime Inventory => _inventory;
+        internal IInventoryPresentationSource PresentationSource => _inventory as IInventoryPresentationSource;
         public StalkerPlayerController Player => _player;
         public bool IsOpen => _window != null && _window.IsOpen;
         public bool GameplayBlocked => _inputLock.IsBlocked;
         public bool IsStashVisible => IsOpen && _window.SecondaryVisible;
         public InventorySortViewModel Sorting => _sorting;
-        public EquipmentAnimationQueue EquipmentAnimations => _equipmentAnimations;
+        internal IInventoryEquipmentPresentation EquipmentAnimations => _equipmentAnimations;
         public InventoryItemSounds ItemSounds => _itemSounds;
         public InventoryWeaponAttachments WeaponAttachments => _weaponAttachments;
 
-        public void Configure(InventoryWindow window, PlayerInventoryRuntime inventory, StalkerPlayerController player, InputActionReference toggleInventory, InputActionReference closeInventory, SpawnMenuView spawnMenu = null)
+        public void Configure(InventoryWindow window, MonoBehaviour inventory, StalkerPlayerController player, InputActionReference toggleInventory, InputActionReference closeInventory, SpawnMenuView spawnMenu = null)
         {
-            if (_bound && (_window != window || _inventory != inventory || _player != player))
+            if (_bound && (_window != window || _inventory != inventory || _player != player || _spawnMenu != spawnMenu))
             {
                 Close();
                 _inputLock.Restore(_player);
@@ -211,19 +212,16 @@ namespace RaidIntoDarkness.Inventory.UI
 
         private void Start()
         {
-            if (EnsureBound() && _spawnMenu != null)
-            {
-                _spawnMenu.Bind(_inventory, _window, _statsFormatter, _fullStatsModifier, _gameSettings);
-            }
+            EnsureBound();
 
             if (_window != null)
             {
                 _window.Close();
             }
 
-            if (_prewarmIcons && _inventory != null)
+            if (_prewarmIcons && _inventory != null && PresentationSource is { } source)
             {
-                _inventory.PrewarmIconsAsync(destroyCancellationToken).Forget();
+                source.PrewarmIconsAsync(destroyCancellationToken).Forget();
             }
         }
 
@@ -391,6 +389,7 @@ namespace RaidIntoDarkness.Inventory.UI
             }
 
             _bound = false;
+            _spawnMenu?.Unbind();
             UnbindBackpackLayout();
             UnbindConditionStatus();
             _descriptionBinding?.Dispose();
@@ -401,15 +400,18 @@ namespace RaidIntoDarkness.Inventory.UI
                 _sorting = null;
             }
 
-            if (_inventory != null)
+            if (_presentation.Model != null)
             {
-                _inventory.Model.Changed -= OnModelChanged;
-                _inventory.ForcedDropCompleted -= OnForcedDropCompleted;
+                _presentation.Model.Changed -= OnModelChanged;
+                if (PresentationSource is { } source)
+                {
+                    source.ForcedDropCompleted -= OnForcedDropCompleted;
+                }
             }
 
-            if (_weapons != null && _window != null)
+            if (_weaponStatus != null && _window != null)
             {
-                _weapons.FireModeChanged -= _window.RefreshTooltip;
+                _weaponStatus.FireModeChanged -= _window.RefreshTooltip;
             }
 
             if (_equipmentAnimations != null)
@@ -430,7 +432,7 @@ namespace RaidIntoDarkness.Inventory.UI
                 _window.ItemShortNameProvider = null;
                 _window.ItemDecorator = null;
                 _window.ActionStyleProvider = null;
-                _window.EquipmentGate = null;
+                _window.BindEquipmentRequests(null);
                 _window.Actions.Unregister(FAVORITE_ACTION);
                 _window.Actions.Unregister(JUNK_ACTION);
                 _window.Actions.Unregister(UNLOAD_WEAPON_ACTION);
@@ -441,9 +443,10 @@ namespace RaidIntoDarkness.Inventory.UI
             _attachmentActions = null;
             _weaponAmmo = null;
             _weaponAttachments = null;
-            _weapons = null;
+            _weaponStatus = null;
             _equipmentAnimations = null;
             UnbindWorldItems();
+            _presentation = default;
             _itemSounds = null;
             _statsFormatter = null;
             _statusPresenter = null;
@@ -461,7 +464,18 @@ namespace RaidIntoDarkness.Inventory.UI
                 return true;
             }
 
-            if (_window == null || _inventory == null || _inventory.EnsureInitialized() == false)
+            if (_window == null || _inventory == null)
+            {
+                return false;
+            }
+
+            if (PresentationSource is not { } source)
+            {
+                Debug.LogError("Inventory source must implement the inventory presentation contract.", this);
+                return false;
+            }
+
+            if (source.TryGetPresentation(out _presentation) == false)
             {
                 return false;
             }
@@ -473,7 +487,7 @@ namespace RaidIntoDarkness.Inventory.UI
                 InventoryBackpackViewport.Ensure(backpackGrid);
             }
 
-            _window.Bind(_inventory.Model, _inventory.IconProvider);
+            _window.Bind(_presentation.Model, _presentation.Icons);
             _window.Opened += OnInventoryOpened;
             _window.Closed += OnInventoryClosed;
             if (_window.IsOpen)
@@ -483,31 +497,32 @@ namespace RaidIntoDarkness.Inventory.UI
             }
 
             BindSorting();
-            _weapons = _inventory.Weapons;
-            _weaponAmmo = _inventory.WeaponAmmo;
-            _weaponAttachments = _inventory.WeaponAttachments;
-            _equipmentAnimations = _inventory.EquipmentAnimations;
-            _statsFormatter = new EquipmentStatsFormatter(_window, weaponAmmo: _weaponAmmo, weapons: _weapons);
+            _weaponStatus = _presentation.WeaponStatus;
+            _weaponAmmo = _presentation.WeaponAmmo;
+            _weaponAttachments = _presentation.WeaponAttachments;
+            _equipmentAnimations = _presentation.Equipment;
+            _statsFormatter = new EquipmentStatsFormatter(_window, weaponAmmo: _weaponAmmo, weaponStatus: _weaponStatus);
             _window.ItemStatsProvider = _statsFormatter.Collect;
             BindItemDescriptions();
+            _spawnMenu?.Bind(_presentation.SpawnCatalog, _window, _statsFormatter, _fullStatsModifier, _gameSettings);
             _window.ItemShortNameProvider = FormatItemShortName;
             _statusPresenter = _status != null ? new EquipmentStatusPresenter(_window, _status) : null;
             BindStatusHover();
-            _inventory.Model.Changed += OnModelChanged;
-            _inventory.ForcedDropCompleted += OnForcedDropCompleted;
-            _itemSounds = new InventoryItemSounds(_window);
+            _presentation.Model.Changed += OnModelChanged;
+            source.ForcedDropCompleted += OnForcedDropCompleted;
+            _itemSounds = new InventoryItemSounds(_window, _presentation.World);
             BindWorldItems();
             _attachmentActions = new InventoryAttachmentActions(_window, _weaponAttachments);
             _window.Actions.Register(new InventoryDelegateAction(UNLOAD_WEAPON_ACTION, 24, context => _window.Label(UNLOAD_WEAPON_ACTION, "Разрядить"), UnloadWeapon, context => _weaponAmmo.HasLoadedAmmo(context.Item), CanUnloadWeapon));
 
-            if (_weapons != null)
+            if (_weaponStatus != null)
             {
-                _weapons.FireModeChanged += _window.RefreshTooltip;
+                _weaponStatus.FireModeChanged += _window.RefreshTooltip;
             }
 
             if (_equipmentAnimations != null)
             {
-                _window.EquipmentGate = _equipmentAnimations;
+                _window.BindEquipmentRequests(_equipmentAnimations);
                 _equipmentAnimations.ItemUseChanged += OnEquipmentItemUseChanged;
                 _equipmentAnimations.OperationCompleted += OnEquipmentOperationCompleted;
                 _window.Actions.Register(new InventoryDelegateAction(OUTFIT_PATCH_ACTION, 12, context => _window.Label("outfit_patch_remove", "Снять нашивку"), RemoveOutfitPatch, context => _equipmentAnimations.HasPatchMotion(context.Item), context => _equipmentAnimations.IsInUse(context.Item) == false));
@@ -602,11 +617,11 @@ namespace RaidIntoDarkness.Inventory.UI
             _window.RefreshTooltip();
         }
 
-        private bool CanUnloadWeapon(InventoryActionContext context) => _inventory.WeaponBinder?.IsReloading(context.Item) != true && _weaponAmmo.Unload(context.Item, false).Success;
+        private bool CanUnloadWeapon(InventoryActionContext context) => _weaponStatus?.IsReloading(context.Item) != true && _weaponAmmo.Unload(context.Item, false).Success;
 
         private void UnloadWeapon(InventoryActionContext context)
         {
-            if (_inventory.WeaponBinder?.IsReloading(context.Item) == true)
+            if (_weaponStatus?.IsReloading(context.Item) == true)
             {
                 return;
             }
@@ -620,7 +635,7 @@ namespace RaidIntoDarkness.Inventory.UI
 
         private void BindSorting()
         {
-            _sorting = new InventorySortViewModel(_inventory.Model, new[] { _window.PrimaryContainerId, _window.SecondaryContainerId }, _favoriteBadge, _junkBadge);
+            _sorting = new InventorySortViewModel(_presentation.Model, new[] { _window.PrimaryContainerId, _window.SecondaryContainerId }, _favoriteBadge, _junkBadge);
             _sorting.Changed += OnSortingChanged;
             _window.ItemDecorator = DecorateItem;
             _window.ActionStyleProvider = new ContextMenuOverhaulStyle(_window, _sorting).Resolve;
@@ -711,7 +726,7 @@ namespace RaidIntoDarkness.Inventory.UI
 
             if (_equipmentAnimations?.IsInUse(item) == true)
             {
-                return new InventoryItemDecoration(EquipmentAnimationQueue.IN_USE_TINT, decoration.Badge, decoration.CommunityIcon, decoration.CommunityIconSize);
+                return new InventoryItemDecoration(EQUIPMENT_IN_USE_TINT, decoration.Badge, decoration.CommunityIcon, decoration.CommunityIconSize);
             }
 
             if (_compatibilityHovered == null || item == null || item == _compatibilityHovered)
@@ -798,9 +813,9 @@ namespace RaidIntoDarkness.Inventory.UI
 
         private void BindWorldItems()
         {
-            if (_worldItemBinding == null && _bound && _inventory.WorldInteraction is { } interaction)
+            if (_worldItemBinding == null && _bound && _presentation.World is { } interaction)
             {
-                _worldItemBinding = new InventoryWorldItemBinding(_window, interaction, _inventory.TryDrop, _itemSounds);
+                _worldItemBinding = new InventoryWorldItemBinding(_window, interaction, _presentation.Drop);
             }
         }
 

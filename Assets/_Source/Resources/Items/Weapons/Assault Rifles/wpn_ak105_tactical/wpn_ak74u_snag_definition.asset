@@ -195,7 +195,7 @@ MonoBehaviour:
       data:
         _preferredSlotIds: 090000000a000000i
     - rid: 115149063313949399
-      type: {class: WeaponHudComponent, ns: RaidIntoDarkness.Inventory.Infrastructure, asm: RaidIntoDarkness.Inventory}
+      type: {class: WeaponHudComponent, ns: RaidIntoDarkness.Inventory.Domain, asm: RaidIntoDarkness.Inventory}
       data:
         _hudModel: {fileID: 8715309497856292916, guid: 468937338333ec641acfceef3e8b3636, type: 3}
         _weaponMotions: {fileID: 8815230551390286010, guid: 5c80218faeb32ff469f40c4f4deb2104, type: 3}
@@ -354,7 +354,7 @@ MonoBehaviour:
           _position: {x: 0.0043074037, y: -0.011643223, z: -0.19716507}
           _depthOffset: 0
     - rid: 115149063313949400
-      type: {class: ItemTakeSoundComponent, ns: RaidIntoDarkness.Inventory.Infrastructure, asm: RaidIntoDarkness.Inventory}
+      type: {class: ItemTakeSoundComponent, ns: RaidIntoDarkness.Inventory.Domain, asm: RaidIntoDarkness.Inventory}
       data:
         _category: weapon
         _clips:

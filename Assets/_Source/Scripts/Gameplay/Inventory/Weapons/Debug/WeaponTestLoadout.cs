@@ -27,7 +27,7 @@ namespace RaidIntoDarkness.Inventory.Infrastructure
         private void GrantLoadout()
         {
             InventoryWindowController inventory = _inventoryController;
-            PlayerInventoryRuntime runtime = inventory != null ? inventory.Inventory : null;
+            PlayerInventoryRuntime runtime = inventory != null ? inventory.PresentationSource as PlayerInventoryRuntime : null;
             if (runtime == null || runtime.Database == null || runtime.EnsureInitialized() == false)
             {
                 Debug.LogWarning("Инвентарь игрока недоступен.", this);

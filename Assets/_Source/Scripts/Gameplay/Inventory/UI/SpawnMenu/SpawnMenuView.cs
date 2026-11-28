@@ -1,4 +1,3 @@
-using RaidIntoDarkness.Inventory.Infrastructure;
 using RaidIntoDarkness.Inventory.Application;
 using RaidIntoDarkness.Inventory.Domain;
 using System;
@@ -52,7 +51,7 @@ namespace RaidIntoDarkness.Inventory.UI
         private readonly List<SpawnMenuCategoryRow> _rows = new();
         private readonly List<SpawnMenuEntry> _results = new();
         private readonly List<InventoryItemStat> _tooltipStats = new();
-        private PlayerInventoryRuntime _inventory;
+        private IInventorySpawnCatalog _catalogSource;
         private InventoryWindow _inventoryWindow;
         private EquipmentStatsFormatter _statsFormatter;
         private IGameSettings _gameSettings;
@@ -79,9 +78,9 @@ namespace RaidIntoDarkness.Inventory.UI
         private bool _tooltipNeedsRefresh;
         private bool _showItemDescriptions = GameSettingsStore.DEFAULT_SHOW_ITEM_DESCRIPTIONS;
 
-        internal void Bind(PlayerInventoryRuntime inventory, InventoryWindow window, EquipmentStatsFormatter statsFormatter, InputActionReference fullStatsModifier, IGameSettings gameSettings)
+        internal void Bind(IInventorySpawnCatalog catalogSource, InventoryWindow window, EquipmentStatsFormatter statsFormatter, InputActionReference fullStatsModifier, IGameSettings gameSettings)
         {
-            _inventory = inventory;
+            _catalogSource = catalogSource;
             _inventoryWindow = window;
             _statsFormatter = statsFormatter;
             _fullStatsModifier = fullStatsModifier;
@@ -90,6 +89,34 @@ namespace RaidIntoDarkness.Inventory.UI
             {
                 BindDescriptionSetting();
                 EnsureCatalog();
+            }
+        }
+
+        internal void Unbind()
+        {
+            _descriptionBinding?.Dispose();
+            _descriptionBinding = null;
+            _catalogSource = null;
+            _inventoryWindow = null;
+            _statsFormatter = null;
+            _fullStatsModifier = null;
+            _gameSettings = null;
+            if (_load != null)
+            {
+                StopCoroutine(_load);
+                _load = null;
+            }
+
+            _definitions = null;
+            _catalog = null;
+            _selected = null;
+            _category = null;
+            _hoveredCell = null;
+            _hoveredEntry = null;
+            _hoverCamera = null;
+            if (_tooltip != null)
+            {
+                _tooltip.Hide();
             }
         }
 
@@ -231,7 +258,7 @@ namespace RaidIntoDarkness.Inventory.UI
 
         private void EnsureCatalog()
         {
-            IReadOnlyList<ItemDefinition> definitions = _inventory != null && _inventory.Database != null && _inventoryWindow != null && _inventoryWindow.Model != null ? _inventory.Database.Definitions : null;
+            IReadOnlyList<ItemDefinition> definitions = _inventoryWindow != null && _inventoryWindow.Model != null ? _catalogSource?.Definitions : null;
             if (_catalog != null && ReferenceEquals(_definitions, definitions))
             {
                 return;
@@ -459,7 +486,7 @@ namespace RaidIntoDarkness.Inventory.UI
 
         private void GrantSelected()
         {
-            if (_selected == null)
+            if (_selected == null || _catalogSource == null)
             {
                 return;
             }
@@ -468,7 +495,7 @@ namespace RaidIntoDarkness.Inventory.UI
             int packSize = _selected.PackSize;
             int quantity = _selected.GetUnitCount(_selected.Quantity);
             int condition = _selected.SupportsCondition ? _selected.Condition : 100;
-            int added = InventorySpawn.Grant(_inventory.isActiveAndEnabled ? _inventory.Model : null, _inventory.PrimaryContainerId, _selected.Definition, quantity, condition, out InventoryFailure failure);
+            int added = _catalogSource.Grant(_selected.Definition, quantity, condition, out InventoryFailure failure);
             if (added == quantity)
             {
                 _status.text = packSize > 1 ? $"Выдано пачек: {_selected.Quantity} ({added} патр.)" : $"Выдано: {added}";

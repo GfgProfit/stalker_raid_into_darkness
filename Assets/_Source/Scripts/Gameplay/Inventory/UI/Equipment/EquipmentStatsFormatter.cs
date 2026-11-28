@@ -1,4 +1,3 @@
-using RaidIntoDarkness.Inventory.Infrastructure;
 using RaidIntoDarkness.Inventory.Domain;
 using System;
 using System.Collections.Generic;
@@ -82,7 +81,7 @@ namespace RaidIntoDarkness.Inventory.UI
         private readonly InventoryWindow _window;
         private readonly AnomalyBalanceConfig _anomalyConfig;
         private readonly InventoryWeaponAmmoSource _weaponAmmo;
-        private readonly FirstPersonWeaponController _weapons;
+        private readonly IInventoryWeaponStatus _weaponStatus;
         private readonly float _hipFireDispersionMultiplier;
         private readonly StringBuilder _builder = new(1024);
 
@@ -90,14 +89,14 @@ namespace RaidIntoDarkness.Inventory.UI
         {
         }
 
-        internal EquipmentStatsFormatter(InventoryWindow window, InventoryWeaponAmmoSource weaponAmmo, FirstPersonWeaponController weapons, AnomalyBalanceConfig anomalyConfig = null)
+        internal EquipmentStatsFormatter(InventoryWindow window, InventoryWeaponAmmoSource weaponAmmo, IInventoryWeaponStatus weaponStatus, AnomalyBalanceConfig anomalyConfig = null)
         {
             _window = window;
             GameConfig gameConfig = GameConfig.Load();
             _anomalyConfig = anomalyConfig != null ? anomalyConfig : gameConfig?.AnomalyBalance;
             _hipFireDispersionMultiplier = gameConfig != null ? gameConfig.HipFireDispersionMultiplier : GameConfig.DEFAULT_HIP_FIRE_DISPERSION_MULTIPLIER;
             _weaponAmmo = weaponAmmo;
-            _weapons = weapons;
+            _weaponStatus = weaponStatus;
         }
 
         public bool FullCondition { get; set; }
@@ -318,7 +317,7 @@ namespace RaidIntoDarkness.Inventory.UI
         private void AddFireModes(List<InventoryItemStat> rows, FirstPersonWeaponAsset profile, ItemInstance item)
         {
             IReadOnlyList<int> modes = profile.FireModes;
-            int active = Mathf.Clamp(_weapons?.GetSelectedFireModeIndex(item?.InstanceId) ?? 0, 0, modes.Count - 1);
+            int active = Mathf.Clamp(_weaponStatus?.GetSelectedFireModeIndex(item?.InstanceId) ?? 0, 0, modes.Count - 1);
             _builder.Clear();
             for (int i = 0; i < modes.Count; i++)
             {

@@ -137,7 +137,7 @@ MonoBehaviour:
       data:
         _prefab: {fileID: 28202580715113543, guid: b6beb2c3ec105f84fba1109d11e096b3, type: 3}
     - rid: 3479885488572596261
-      type: {class: ItemTakeSoundComponent, ns: RaidIntoDarkness.Inventory.Infrastructure, asm: RaidIntoDarkness.Inventory}
+      type: {class: ItemTakeSoundComponent, ns: RaidIntoDarkness.Inventory.Domain, asm: RaidIntoDarkness.Inventory}
       data:
         _category: mediumarmor
         _clips:

@@ -96,7 +96,7 @@ MonoBehaviour:
         _blockSilencerWithGrenadeLauncher: 0
         _exposedRound: {fileID: 0}
     - rid: 115149112346673456
-      type: {class: WeaponHudComponent, ns: RaidIntoDarkness.Inventory.Infrastructure, asm: RaidIntoDarkness.Inventory}
+      type: {class: WeaponHudComponent, ns: RaidIntoDarkness.Inventory.Domain, asm: RaidIntoDarkness.Inventory}
       data:
         _hudModel: {fileID: 8946883006226573649, guid: a3f7b7d0b6eae214389913bc6b886524, type: 3}
         _weaponMotions: {fileID: 8815230551390286010, guid: 541a0bfce22a7d148a26ef54309e5712, type: 3}

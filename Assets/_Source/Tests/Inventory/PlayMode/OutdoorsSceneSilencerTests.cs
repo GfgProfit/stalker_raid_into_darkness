@@ -34,7 +34,7 @@ namespace RaidIntoDarkness.Inventory.Tests
         {
             yield return LoadScene();
             InventoryWindowController controller = Object.FindAnyObjectByType<InventoryWindowController>();
-            InventoryModel model = controller.Inventory.Model;
+            InventoryModel model = controller.Runtime().Model;
             InventoryWeaponAttachments attachments = controller.WeaponAttachments;
             ItemDefinition weaponDefinition = Find(controller, "wpn_aug_a3");
             ItemDefinition silencerDefinition = Find(controller, "wpn_sil_nato");
@@ -91,7 +91,7 @@ namespace RaidIntoDarkness.Inventory.Tests
             yield return LoadScene();
             InventoryWindowController controller = Object.FindAnyObjectByType<InventoryWindowController>();
             InventoryWindow window = controller.Window;
-            InventoryModel model = controller.Inventory.Model;
+            InventoryModel model = controller.Runtime().Model;
             controller.Open(true);
             var backpack = (GridContainer)model.GetContainer(window.PrimaryContainerId);
             while (backpack.Items.Count > 0)
@@ -148,7 +148,7 @@ namespace RaidIntoDarkness.Inventory.Tests
             yield return LoadScene();
             InventoryWindowController controller = Object.FindAnyObjectByType<InventoryWindowController>();
             InventoryWindow window = controller.Window;
-            InventoryModel model = controller.Inventory.Model;
+            InventoryModel model = controller.Runtime().Model;
             ItemInstance weapon = Add(controller, Find(controller, "wpn_aug_a3"), window.PrimaryContainerId);
             ItemInstance silencer = Add(controller, Find(controller, "wpn_sil_nato"), window.PrimaryContainerId);
             Add(controller, Find(controller, "ammo_5.56x45_ss190"), window.PrimaryContainerId, 30);
@@ -206,7 +206,7 @@ namespace RaidIntoDarkness.Inventory.Tests
             yield return LoadScene();
             InventoryWindowController controller = Object.FindAnyObjectByType<InventoryWindowController>();
             InventoryWindow window = controller.Window;
-            InventoryModel model = controller.Inventory.Model;
+            InventoryModel model = controller.Runtime().Model;
             ItemInstance weapon = Add(controller, Find(controller, "wpn_aug_a3"), window.PrimaryContainerId);
             ItemInstance leftWeapon = Add(controller, weapon.Definition, window.SecondaryContainerId);
             ItemInstance equipped = Add(controller, weapon.Definition, window.PrimaryContainerId);
@@ -297,7 +297,7 @@ namespace RaidIntoDarkness.Inventory.Tests
             yield return LoadScene();
             InventoryWindowController controller = Object.FindAnyObjectByType<InventoryWindowController>();
             InventoryWindow window = controller.Window;
-            InventoryModel model = controller.Inventory.Model;
+            InventoryModel model = controller.Runtime().Model;
             ItemInstance weapon = Add(controller, Find(controller, "wpn_aug_a3"), window.PrimaryContainerId);
             ItemInstance silencer = Add(controller, Find(controller, "wpn_sil_nato"), window.PrimaryContainerId);
             Assert.That(model.TryEquip(weapon.InstanceId, window.EquipmentContainerId).Success, Is.True);
@@ -332,7 +332,7 @@ namespace RaidIntoDarkness.Inventory.Tests
             yield return LoadScene();
             InventoryWindowController controller = Object.FindAnyObjectByType<InventoryWindowController>();
             InventoryWindow window = controller.Window;
-            InventoryModel model = controller.Inventory.Model;
+            InventoryModel model = controller.Runtime().Model;
             FirstPersonWeaponController weapons = controller.Player.GetComponentInChildren<FirstPersonWeaponController>();
             ItemInstance weapon = Add(controller, Find(controller, "wpn_aug_a3"), window.PrimaryContainerId);
             ItemInstance silencer = Add(controller, Find(controller, "wpn_sil_nato"), window.PrimaryContainerId);
@@ -503,7 +503,7 @@ namespace RaidIntoDarkness.Inventory.Tests
 
         private static ItemDefinition Find(InventoryWindowController controller, string section)
         {
-            foreach (ItemDefinition definition in controller.Inventory.Database.Definitions)
+            foreach (ItemDefinition definition in controller.Runtime().Database.Definitions)
             {
                 if (DefinitionSection(definition) == section)
                 {
@@ -517,7 +517,7 @@ namespace RaidIntoDarkness.Inventory.Tests
 
         private static ItemDefinition FindSmall(InventoryWindowController controller)
         {
-            foreach (ItemDefinition definition in controller.Inventory.Database.Definitions)
+            foreach (ItemDefinition definition in controller.Runtime().Database.Definitions)
             {
                 if (definition.Size == Vector2Int.one)
                 {
@@ -531,8 +531,8 @@ namespace RaidIntoDarkness.Inventory.Tests
 
         private static ItemInstance Add(InventoryWindowController controller, ItemDefinition definition, string containerId, int amount = 1)
         {
-            ItemInstance item = controller.Inventory.Model.CreateItem(definition, amount);
-            Assert.That(controller.Inventory.Model.TryAddAuto(item, containerId, false).Success, Is.True, definition.name);
+            ItemInstance item = controller.Runtime().Model.CreateItem(definition, amount);
+            Assert.That(controller.Runtime().Model.TryAddAuto(item, containerId, false).Success, Is.True, definition.name);
             return item;
         }
 

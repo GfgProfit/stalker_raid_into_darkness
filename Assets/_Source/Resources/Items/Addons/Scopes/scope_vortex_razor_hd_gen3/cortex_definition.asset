@@ -86,7 +86,7 @@ MonoBehaviour:
       data:
         _prefab: {fileID: 7537648757385891744, guid: 53fbdea8e05a6274e895bd9d39f560f0, type: 3}
     - rid: 3479885496768528697
-      type: {class: ItemTakeSoundComponent, ns: RaidIntoDarkness.Inventory.Infrastructure, asm: RaidIntoDarkness.Inventory}
+      type: {class: ItemTakeSoundComponent, ns: RaidIntoDarkness.Inventory.Domain, asm: RaidIntoDarkness.Inventory}
       data:
         _category: attchscope
         _clips:

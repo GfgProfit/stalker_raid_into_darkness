@@ -239,8 +239,8 @@ namespace RaidIntoDarkness.Inventory.Tests
             InventoryWindowController controller = Object.FindAnyObjectByType<InventoryWindowController>();
             StalkerPlayerController player = controller.Player;
             FirstPersonWeaponController weapons = player.GetComponentInChildren<FirstPersonWeaponController>();
-            ItemInstance weapon = AddItem(controller.Inventory.Model, FindDefinition(controller.Inventory.Database, AUG), controller.Window.PrimaryContainerId, 1);
-            Assert.That(controller.Inventory.Model.TryEquip(weapon.InstanceId, controller.Window.EquipmentContainerId).Success, Is.True);
+            ItemInstance weapon = AddItem(controller.Runtime().Model, FindDefinition(controller.Runtime().Database, AUG), controller.Window.PrimaryContainerId, 1);
+            Assert.That(controller.Runtime().Model.TryEquip(weapon.InstanceId, controller.Window.EquipmentContainerId).Success, Is.True);
             player.CameraController.SetCursorLocked(true);
             yield return Tap(_keyboard.digit3Key);
             yield return WaitWhile(() => weapons.State != FirstPersonWeaponState.Ready);
@@ -340,8 +340,8 @@ namespace RaidIntoDarkness.Inventory.Tests
             InventoryWindowController controller = Object.FindAnyObjectByType<InventoryWindowController>();
             StalkerPlayerController player = controller.Player;
             FirstPersonWeaponController weapons = player.GetComponentInChildren<FirstPersonWeaponController>();
-            ItemInstance weapon = AddItem(controller.Inventory.Model, FindDefinition(controller.Inventory.Database, AUG), controller.Window.PrimaryContainerId, 1);
-            Assert.That(controller.Inventory.Model.TryEquip(weapon.InstanceId, controller.Window.EquipmentContainerId).Success, Is.True);
+            ItemInstance weapon = AddItem(controller.Runtime().Model, FindDefinition(controller.Runtime().Database, AUG), controller.Window.PrimaryContainerId, 1);
+            Assert.That(controller.Runtime().Model.TryEquip(weapon.InstanceId, controller.Window.EquipmentContainerId).Success, Is.True);
             player.CameraController.SetCursorLocked(true);
             yield return Tap(_keyboard.digit3Key);
             yield return WaitWhile(() => weapons.State != FirstPersonWeaponState.Ready);
@@ -415,11 +415,11 @@ namespace RaidIntoDarkness.Inventory.Tests
             SceneManager.LoadScene(SCENE, LoadSceneMode.Single);
             yield return new WaitForSeconds(0.6f);
             InventoryWindowController controller = Object.FindAnyObjectByType<InventoryWindowController>();
-            InventoryModel model = controller.Inventory.Model;
+            InventoryModel model = controller.Runtime().Model;
             StalkerPlayerController player = controller.Player;
             FirstPersonWeaponController weapons = player.GetComponentInChildren<FirstPersonWeaponController>();
-            ItemInstance weapon = AddItem(model, FindDefinition(controller.Inventory.Database, AUG), controller.Window.PrimaryContainerId, 1);
-            ItemDefinition fmj = FindDefinition(controller.Inventory.Database, "ammo_5.56x45_ss190");
+            ItemInstance weapon = AddItem(model, FindDefinition(controller.Runtime().Database, AUG), controller.Window.PrimaryContainerId, 1);
+            ItemDefinition fmj = FindDefinition(controller.Runtime().Database, "ammo_5.56x45_ss190");
             AddItem(model, fmj, controller.Window.PrimaryContainerId, 1);
             Assert.That(model.TryEquip(weapon.InstanceId, controller.Window.EquipmentContainerId).Success, Is.True);
             player.CameraController.SetCursorLocked(true);
@@ -549,10 +549,10 @@ namespace RaidIntoDarkness.Inventory.Tests
             yield return new WaitForSeconds(0.5f);
             InventoryWindowController controller = Object.FindAnyObjectByType<InventoryWindowController>();
             InventoryWindow window = controller.Window;
-            InventoryModel model = controller.Inventory.Model;
-            ItemInstance weapon = AddItem(model, FindDefinition(controller.Inventory.Database, AUG), window.PrimaryContainerId, 1);
-            ItemDefinition fmj = FindDefinition(controller.Inventory.Database, "ammo_5.56x45_ss190");
-            ItemDefinition ep = FindDefinition(controller.Inventory.Database, "ammo_5.56x45_ap");
+            InventoryModel model = controller.Runtime().Model;
+            ItemInstance weapon = AddItem(model, FindDefinition(controller.Runtime().Database, AUG), window.PrimaryContainerId, 1);
+            ItemDefinition fmj = FindDefinition(controller.Runtime().Database, "ammo_5.56x45_ss190");
+            ItemDefinition ep = FindDefinition(controller.Runtime().Database, "ammo_5.56x45_ap");
             AddItem(model, fmj, window.PrimaryContainerId, 30);
             AddItem(model, ep, window.PrimaryContainerId, 40);
             InventoryContainer backpack = model.GetContainer(window.PrimaryContainerId);
@@ -622,7 +622,7 @@ namespace RaidIntoDarkness.Inventory.Tests
             FirstPersonWeaponController weapons = player.GetComponentInChildren<FirstPersonWeaponController>();
             Assert.That(weapons, Is.Not.Null, "FPS_Player has no FirstPersonWeaponController");
             Assert.That(player.CameraController.Recoil, Is.Not.Null, "camera recoil is not assigned");
-            ItemDefinition definition = FindDefinition(controller.Inventory.Database, AUG);
+            ItemDefinition definition = FindDefinition(controller.Runtime().Database, AUG);
             WorldItem aug = interactor.Spawn(definition, 1);
             Assert.That(aug, Is.Not.Null, "the AUG world prefab could not be placed in the test scene");
             Assert.That(aug.Definition, Is.SameAs(definition));
@@ -651,7 +651,7 @@ namespace RaidIntoDarkness.Inventory.Tests
             Assert.That(item, Is.Not.Null);
             for (int i = 0; i < 4; i++)
             {
-                Assert.That(interactor.TryPickUp(interactor.Spawn(FindDefinition(controller.Inventory.Database, "ammo_5.56x45_ss190"), 15)), Is.True);
+                Assert.That(interactor.TryPickUp(interactor.Spawn(FindDefinition(controller.Runtime().Database, "ammo_5.56x45_ss190"), 15)), Is.True);
             }
 
             window.EquipItem(item);
@@ -690,7 +690,7 @@ namespace RaidIntoDarkness.Inventory.Tests
 
             string loadedSection = item.GetState(WeaponMagazineState.AMMO_SECTION_STATE);
             float previousCaptureDeltaTime = Time.captureDeltaTime;
-            controller.Inventory.Model.Changed += ObserveShot;
+            controller.Runtime().Model.Changed += ObserveShot;
             try
             {
                 Time.captureDeltaTime = 1f / 60f;
@@ -704,7 +704,7 @@ namespace RaidIntoDarkness.Inventory.Tests
             }
             finally
             {
-                controller.Inventory.Model.Changed -= ObserveShot;
+                controller.Runtime().Model.Changed -= ObserveShot;
                 Time.captureDeltaTime = previousCaptureDeltaTime;
             }
 
@@ -724,7 +724,7 @@ namespace RaidIntoDarkness.Inventory.Tests
 
             yield return Tap(_keyboard.rKey);
             Assert.That(weapons.State, Is.EqualTo(FirstPersonWeaponState.Reloading));
-            WorldItem reloadPickup = interactor.Spawn(FindDefinition(controller.Inventory.Database, "ammo_5.56x45_ss190"), 1);
+            WorldItem reloadPickup = interactor.Spawn(FindDefinition(controller.Runtime().Database, "ammo_5.56x45_ss190"), 1);
             Assert.That(reloadPickup, Is.Not.Null);
             reloadPickup.GetComponent<Rigidbody>().isKinematic = true;
             Transform pickupView = player.CameraController.Camera.transform;
@@ -791,11 +791,11 @@ namespace RaidIntoDarkness.Inventory.Tests
             yield return new WaitForSeconds(0.5f);
             InventoryWindowController controller = Object.FindAnyObjectByType<InventoryWindowController>();
             InventoryWindow window = controller.Window;
-            InventoryModel model = controller.Inventory.Model;
-            ItemInstance weapon = AddItem(model, FindDefinition(controller.Inventory.Database, AUG), window.PrimaryContainerId, 1);
-            ItemDefinition fmj = FindDefinition(controller.Inventory.Database, "ammo_5.56x45_ss190");
-            ItemDefinition epr = FindDefinition(controller.Inventory.Database, "ammo_5.56x45_ap");
-            AddItem(model, FindDefinition(controller.Inventory.Database, "ammo_9x18_fmj"), window.PrimaryContainerId, 15);
+            InventoryModel model = controller.Runtime().Model;
+            ItemInstance weapon = AddItem(model, FindDefinition(controller.Runtime().Database, AUG), window.PrimaryContainerId, 1);
+            ItemDefinition fmj = FindDefinition(controller.Runtime().Database, "ammo_5.56x45_ss190");
+            ItemDefinition epr = FindDefinition(controller.Runtime().Database, "ammo_5.56x45_ap");
+            AddItem(model, FindDefinition(controller.Runtime().Database, "ammo_9x18_fmj"), window.PrimaryContainerId, 15);
             ItemInstance stashAmmo = AddItem(model, fmj, window.SecondaryContainerId, 15);
 
             using (var source = new InventoryWeaponAmmoSource(model, window.PrimaryContainerId))
@@ -864,9 +864,9 @@ namespace RaidIntoDarkness.Inventory.Tests
             yield return new WaitForSeconds(0.5f);
             InventoryWindowController controller = Object.FindAnyObjectByType<InventoryWindowController>();
             InventoryWindow window = controller.Window;
-            InventoryModel model = controller.Inventory.Model;
+            InventoryModel model = controller.Runtime().Model;
             FirstPersonWeaponController weapons = controller.Player.GetComponentInChildren<FirstPersonWeaponController>();
-            ItemInstance weapon = AddItem(model, FindDefinition(controller.Inventory.Database, AUG), window.PrimaryContainerId, 1);
+            ItemInstance weapon = AddItem(model, FindDefinition(controller.Runtime().Database, AUG), window.PrimaryContainerId, 1);
             window.EquipItem(weapon);
             yield return WaitWhile(() => controller.EquipmentAnimations.IsBusy);
             controller.Player.CameraController.SetCursorLocked(true);
@@ -876,7 +876,7 @@ namespace RaidIntoDarkness.Inventory.Tests
             Assert.That(view.Text.text, Does.StartWith("0/0 "));
             yield return Tap(_mouse.leftButton);
             Assert.That(weapons.Magazine, Is.Zero);
-            ItemInstance ammo = AddItem(model, FindDefinition(controller.Inventory.Database, "ammo_5.56x45_ss190"), window.PrimaryContainerId, 10);
+            ItemInstance ammo = AddItem(model, FindDefinition(controller.Runtime().Database, "ammo_5.56x45_ss190"), window.PrimaryContainerId, 10);
             Assert.That(view.Text.text, Does.StartWith("0/10 "));
             Assert.That(model.TryTransfer(ammo.InstanceId, window.SecondaryContainerId).Success, Is.True);
             Assert.That(view.Text.text, Does.StartWith("0/0 "));
@@ -914,11 +914,11 @@ namespace RaidIntoDarkness.Inventory.Tests
             yield return new WaitForSeconds(0.5f);
             InventoryWindowController controller = Object.FindAnyObjectByType<InventoryWindowController>();
             InventoryWindow window = controller.Window;
-            InventoryModel model = controller.Inventory.Model;
+            InventoryModel model = controller.Runtime().Model;
             FirstPersonWeaponController weapons = controller.Player.GetComponentInChildren<FirstPersonWeaponController>();
-            ItemInstance weapon = AddItem(model, FindDefinition(controller.Inventory.Database, AUG), window.PrimaryContainerId, 1);
-            ItemDefinition fmj = FindDefinition(controller.Inventory.Database, "ammo_5.56x45_ss190");
-            ItemDefinition ep = FindDefinition(controller.Inventory.Database, "ammo_5.56x45_ap");
+            ItemInstance weapon = AddItem(model, FindDefinition(controller.Runtime().Database, AUG), window.PrimaryContainerId, 1);
+            ItemDefinition fmj = FindDefinition(controller.Runtime().Database, "ammo_5.56x45_ss190");
+            ItemDefinition ep = FindDefinition(controller.Runtime().Database, "ammo_5.56x45_ap");
             AddItem(model, fmj, window.PrimaryContainerId, 15);
             ItemInstance epBox = AddItem(model, ep, window.PrimaryContainerId, 15);
             window.EquipItem(weapon);
@@ -961,11 +961,11 @@ namespace RaidIntoDarkness.Inventory.Tests
             SceneManager.LoadScene(SCENE, LoadSceneMode.Single);
             yield return new WaitForSeconds(0.5f);
             InventoryWindowController controller = Object.FindAnyObjectByType<InventoryWindowController>();
-            InventoryModel model = controller.Inventory.Model;
+            InventoryModel model = controller.Runtime().Model;
             string backpack = controller.Window.PrimaryContainerId;
-            ItemInstance weapon = AddItem(model, FindDefinition(controller.Inventory.Database, AUG), backpack, 1);
-            ItemDefinition fmj = FindDefinition(controller.Inventory.Database, "ammo_5.56x45_ss190");
-            ItemDefinition ep = FindDefinition(controller.Inventory.Database, "ammo_5.56x45_ap");
+            ItemInstance weapon = AddItem(model, FindDefinition(controller.Runtime().Database, AUG), backpack, 1);
+            ItemDefinition fmj = FindDefinition(controller.Runtime().Database, "ammo_5.56x45_ss190");
+            ItemDefinition ep = FindDefinition(controller.Runtime().Database, "ammo_5.56x45_ap");
             AddItem(model, fmj, backpack, 15);
             AddItem(model, fmj, backpack, 15);
             ItemInstance epBox = AddItem(model, ep, backpack, 15);
@@ -1013,11 +1013,11 @@ namespace RaidIntoDarkness.Inventory.Tests
             SceneManager.LoadScene(SCENE, LoadSceneMode.Single);
             yield return new WaitForSeconds(0.6f);
             InventoryWindowController controller = Object.FindAnyObjectByType<InventoryWindowController>();
-            InventoryModel model = controller.Inventory.Model;
+            InventoryModel model = controller.Runtime().Model;
             StalkerPlayerController player = controller.Player;
             FirstPersonWeaponController weapons = player.GetComponentInChildren<FirstPersonWeaponController>();
-            ItemInstance weapon = AddItem(model, FindDefinition(controller.Inventory.Database, AUG), controller.Window.PrimaryContainerId, 1);
-            ItemDefinition fmj = FindDefinition(controller.Inventory.Database, "ammo_5.56x45_ss190");
+            ItemInstance weapon = AddItem(model, FindDefinition(controller.Runtime().Database, AUG), controller.Window.PrimaryContainerId, 1);
+            ItemDefinition fmj = FindDefinition(controller.Runtime().Database, "ammo_5.56x45_ss190");
             AddItem(model, fmj, controller.Window.PrimaryContainerId, 12);
             Assert.That(model.TryEquip(weapon.InstanceId, controller.Window.EquipmentContainerId).Success, Is.True);
             player.CameraController.SetCursorLocked(true);
@@ -1033,7 +1033,7 @@ namespace RaidIntoDarkness.Inventory.Tests
             {
                 if (silenced)
                 {
-                    ItemInstance silencer = AddItem(model, FindDefinition(controller.Inventory.Database, "wpn_sil_nato"), controller.Window.PrimaryContainerId, 1);
+                    ItemInstance silencer = AddItem(model, FindDefinition(controller.Runtime().Database, "wpn_sil_nato"), controller.Window.PrimaryContainerId, 1);
                     Assert.That(controller.WeaponAttachments.Install(silencer, weapon).Success, Is.True);
                 }
 

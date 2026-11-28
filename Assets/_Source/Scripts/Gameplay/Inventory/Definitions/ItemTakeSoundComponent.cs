@@ -1,9 +1,8 @@
-using RaidIntoDarkness.Inventory.Domain;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace RaidIntoDarkness.Inventory.Infrastructure
+namespace RaidIntoDarkness.Inventory.Domain
 {
     [Serializable]
     public sealed class ItemTakeSoundComponent : ItemDefinitionComponent
@@ -14,10 +13,5 @@ namespace RaidIntoDarkness.Inventory.Infrastructure
 
         public string Category => _category;
         public IReadOnlyList<AudioClip> Clips => _clips;
-
-        public AudioClip Pick()
-        {
-            return _clips != null && _clips.Count > 0 ? _clips[UnityEngine.Random.Range(0, _clips.Count)] : null;
-        }
     }
 }

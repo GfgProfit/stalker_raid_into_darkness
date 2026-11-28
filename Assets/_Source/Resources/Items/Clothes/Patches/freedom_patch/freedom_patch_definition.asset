@@ -59,7 +59,7 @@ MonoBehaviour:
     version: 2
     RefIds:
     - rid: 115149081108283494
-      type: {class: ItemTakeSoundComponent, ns: RaidIntoDarkness.Inventory.Infrastructure, asm: RaidIntoDarkness.Inventory}
+      type: {class: ItemTakeSoundComponent, ns: RaidIntoDarkness.Inventory.Domain, asm: RaidIntoDarkness.Inventory}
       data:
         _category: patch
         _clips:

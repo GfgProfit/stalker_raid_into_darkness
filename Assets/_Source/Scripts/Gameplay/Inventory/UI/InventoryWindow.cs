@@ -47,6 +47,8 @@ namespace RaidIntoDarkness.Inventory.UI
         private InventoryDropAreaViewModel _dropAreaViewModel;
         private IDisposable _dropAreaBinding;
         private IDisposable _modelBinding;
+        private IDisposable _commandBinding;
+        private InventoryWindowViewModel _commands;
         private float _dropAreaTargetAlpha;
         private InventoryDragState _drag;
         private InventoryItemView _hovered;
@@ -90,9 +92,7 @@ namespace RaidIntoDarkness.Inventory.UI
         public Func<ItemInstance, string> ItemShortNameProvider { get; set; }
         public Func<ItemInstance, float?> ItemConditionProvider { get; set; }
         public Func<InventoryActionContext, IInventoryItemAction, InventoryActionStyle> ActionStyleProvider { get; set; }
-        public IEquipmentAnimationRequests EquipmentGate { get; set; }
         public InventoryWeaponAttachments ItemDropHandler { get; set; }
-        public Func<ItemInstance, InventoryResult> DropToWorld { get; set; }
         public ItemInstance HoveredItem => _hovered != null ? _hovered.Item : null;
 
         public event Action<InventoryWindow> Opened;
@@ -202,9 +202,17 @@ namespace RaidIntoDarkness.Inventory.UI
         public void Bind(InventoryModel model, IItemIconProvider iconProvider)
         {
             Initialize();
+            IEquipmentAnimationRequests equipment = _commands?.Equipment;
+            Func<ItemInstance, InventoryResult> worldDrop = _commands?.WorldDrop;
             Unbind();
             Model = model;
             IconProvider = iconProvider;
+            _commands = new InventoryWindowViewModel(model, _equipmentContainerId, _primaryContainerId)
+            {
+                Equipment = equipment,
+                WorldDrop = worldDrop
+            };
+            _commandBinding = _commands.Completed.Subscribe(ReportCommand);
 
             foreach (InventoryGridViewBase grid in _grids)
             {
@@ -239,6 +247,10 @@ namespace RaidIntoDarkness.Inventory.UI
                 _splitDialog.Hide();
             }
 
+            _commandBinding?.Dispose();
+            _commandBinding = null;
+            _commands?.Dispose();
+            _commands = null;
             _modelBinding?.Dispose();
             _modelBinding = null;
 
@@ -596,7 +608,7 @@ namespace RaidIntoDarkness.Inventory.UI
             {
                 InventoryContainer target = drag.TargetGrid.Container;
 
-                var applied = InventoryDragOperations.Apply(Model, ItemDropHandler, EquipmentGate, drag.Item, target, drag.TargetItem, drag.TargetOrigin, drag.Rotated, drag.IsSplit, drag.Amount, drag.AutoPlace, drag.Kind != InventoryDropKind.Invalid, _equipmentContainerId, _primaryContainerId);
+                var applied = InventoryDragOperations.Apply(Model, ItemDropHandler, _commands?.Equipment, drag.Item, target, drag.TargetItem, drag.TargetOrigin, drag.Rotated, drag.IsSplit, drag.Amount, drag.AutoPlace, drag.Kind != InventoryDropKind.Invalid, _equipmentContainerId, _primaryContainerId);
                 result = applied.Result;
                 if (applied.Attachment)
                 {
@@ -653,87 +665,42 @@ namespace RaidIntoDarkness.Inventory.UI
             }
         }
 
-        public bool CanUseItem(ItemInstance item) => item != null && item.Definition.GetComponent<ConsumableItemComponent>() != null;
+        public bool CanUseItem(ItemInstance item) => InventoryItemOperations.CanUse(item);
 
-        public void UseItem(ItemInstance item)
-        {
-            if (item.Definition.TryGetComponent(out ConsumableItemComponent consumable))
-            {
-                InventoryResult result = Model.TryRemove(item.InstanceId, consumable.AmountPerUse);
+        public void UseItem(ItemInstance item) => _commands?.Use(item);
 
-                if (result.Success == false)
-                {
-                    ShowStatus(DescribeFailure(result.Failure));
-                    return;
-                }
-            }
-
-            ShowStatus(FormatLabel("status_used", "Used {0}", item.Definition.DisplayName));
-            PlaySound(InventorySound.Use);
-            ItemUsed?.Invoke(item);
-        }
-
-        public bool IsEquipped(ItemInstance item) => item != null && item.ContainerId == _equipmentContainerId && Model?.GetContainer(_equipmentContainerId) is SlottedContainer;
+        public bool IsEquipped(ItemInstance item) => Model != null && EquipmentInventoryCommands.IsEquipped(Model, item, _equipmentContainerId);
 
         public bool HasEquipmentSlotFor(ItemInstance item) => Model?.HasEquipmentSlotFor(item, _equipmentContainerId) == true;
 
         public bool CanEquipItem(ItemInstance item) => Model?.CanEquipItem(item, _equipmentContainerId, _primaryContainerId) == true;
 
-        public void EquipItem(ItemInstance item)
-        {
-            if (EquipmentGate != null && EquipmentGate.HandleEquip(item, null))
-            {
-                return;
-            }
+        public void EquipItem(ItemInstance item) => _commands?.Equip(item, null, true);
 
-            EquipItemNow(item, null);
-        }
-
-        public void EquipItemNow(ItemInstance item, SlotDefinition slot)
-        {
-            if (item == null || Model == null || Model.ContainsItem(item) == false)
-            {
-                return;
-            }
-
-            InventoryResult result = Model.TryEquipItem(item, _equipmentContainerId, slot?.Id ?? SlotId.None, _primaryContainerId);
-            ReportEquippedItem(item, result);
-        }
+        public void EquipItemNow(ItemInstance item, SlotDefinition slot) => _commands?.Equip(item, slot, false);
 
         public void UnequipItem(ItemInstance item)
         {
             InventoryUnequipTarget target = InventoryUnequipTarget.Auto(_primaryContainerId);
 
-            if (EquipmentGate != null && EquipmentGate.HandleUnequip(item, target))
-            {
-                return;
-            }
-
-            UnequipItemNow(item, target);
+            _commands?.Unequip(item, target, true, true);
         }
 
         public InventoryResult UnequipItemNow(ItemInstance item, InventoryUnequipTarget target) => UnequipItemNow(item, target, true);
 
         public InventoryResult UnequipItemNow(ItemInstance item, InventoryUnequipTarget target, bool playSound)
         {
-            if (item == null || Model == null || Model.ContainsItem(item) == false)
-            {
-                return InventoryResult.Fail(InventoryFailure.ItemNotFound);
-            }
-
-            InventoryResult result = Model.TryUnequipItem(item, target.ContainerId, target.Origin, target.Rotated, target.AutoPlace);
-            ReportUnequippedItem(item, result, playSound);
-            return result;
+            return _commands?.Unequip(item, target, false, playSound) ?? InventoryResult.Fail(InventoryFailure.ItemNotFound);
         }
 
         public void OpenSplitDialog(ItemInstance item)
         {
-            if (_splitDialog == null || Model == null || Model.ContainsItem(item) == false || item.Amount < 2)
+            if (_splitDialog == null || _commands?.CanSplit(item) != true)
             {
                 return;
             }
 
-            _splitDialog.Show(Model, item, amount => Report(Model.TrySplitAuto(item.InstanceId, amount), FormatLabel("status_split", "Split {0} x {1}", amount, item.Definition.DisplayName)));
+            _splitDialog.Show(Model, item, amount => _commands?.Split(item, amount));
             ApplyThemeTo(_splitDialog);
         }
 
@@ -756,22 +723,7 @@ namespace RaidIntoDarkness.Inventory.UI
 
         public string GetQuickTransferTargetName(ItemInstance item) => GetQuickTransferTarget(item)?.DisplayName ?? string.Empty;
 
-        public void QuickTransfer(ItemInstance item)
-        {
-            InventoryContainer target = GetQuickTransferTarget(item);
-
-            if (target != null && IsEquipped(item) && EquipmentGate != null && EquipmentGate.HandleUnequip(item, InventoryUnequipTarget.Auto(target.Id)))
-            {
-                return;
-            }
-
-            bool equipped = IsEquipped(item);
-
-            if (target != null && Report(Model.TryTransfer(item.InstanceId, target.Id), FormatLabel("status_moved", "Moved to {0}", target.DisplayName)) && equipped)
-            {
-                PlaySound(InventorySound.ToBag);
-            }
-        }
+        public void QuickTransfer(ItemInstance item) => _commands?.Transfer(item, GetQuickTransferTarget(item));
 
         public void InspectItem(ItemInstance item)
         {
@@ -801,28 +753,56 @@ namespace RaidIntoDarkness.Inventory.UI
 
         public void DropItem(ItemInstance item) => TryDropItem(item);
 
-        public void DropItemNow(ItemInstance item) => TryDropItemNow(item);
+        public void DropItemNow(ItemInstance item) => _commands?.Drop(item, false);
 
-        private InventoryResult TryDropItem(ItemInstance item)
+        private InventoryResult TryDropItem(ItemInstance item) => _commands?.Drop(item, true) ?? InventoryResult.Fail(InventoryFailure.ItemNotFound);
+
+        internal void BindEquipmentRequests(IEquipmentAnimationRequests equipment)
         {
-            if (Model != null && IsEquipped(item) && EquipmentGate != null && EquipmentGate.HandleDrop(item))
+            if (_commands != null)
             {
-                return InventoryResult.Ok(item, item.Amount);
+                _commands.Equipment = equipment;
             }
-
-            return TryDropItemNow(item);
         }
 
-        private InventoryResult TryDropItemNow(ItemInstance item)
+        internal void BindWorldDrop(Func<ItemInstance, InventoryResult> drop)
         {
-            if (item == null || Model == null || Model.ContainsItem(item) == false)
+            if (_commands != null)
             {
-                return InventoryResult.Fail(InventoryFailure.ItemNotFound);
+                _commands.WorldDrop = drop;
             }
+        }
 
-            InventoryResult result = DropToWorld != null ? DropToWorld(item) : Model.TryRemove(item.InstanceId);
-            ReportDroppedItem(item, result);
-            return result;
+        private void ReportCommand((InventoryWindowCommand Kind, ItemInstance Item, InventoryResult Result, bool PlaySound, int Amount, InventoryContainer Target) command)
+        {
+            switch (command.Kind)
+            {
+                case InventoryWindowCommand.Use:
+                    if (Report(command.Result, FormatLabel("status_used", "Used {0}", command.Item.Definition.DisplayName)))
+                    {
+                        PlaySound(InventorySound.Use);
+                        ItemUsed?.Invoke(command.Item);
+                    }
+                    break;
+                case InventoryWindowCommand.Equip:
+                    ReportEquippedItem(command.Item, command.Result);
+                    break;
+                case InventoryWindowCommand.Unequip:
+                    ReportUnequippedItem(command.Item, command.Result, command.PlaySound);
+                    break;
+                case InventoryWindowCommand.Split:
+                    Report(command.Result, FormatLabel("status_split", "Split {0} x {1}", command.Amount, command.Item.Definition.DisplayName));
+                    break;
+                case InventoryWindowCommand.Transfer:
+                    if (Report(command.Result, FormatLabel("status_moved", "Moved to {0}", command.Target.DisplayName)) && command.PlaySound)
+                    {
+                        PlaySound(InventorySound.ToBag);
+                    }
+                    break;
+                case InventoryWindowCommand.Drop:
+                    ReportDroppedItem(command.Item, command.Result);
+                    break;
+            }
         }
 
         internal void ReportEquippedItem(ItemInstance item, InventoryResult result)
@@ -1259,7 +1239,7 @@ namespace RaidIntoDarkness.Inventory.UI
 
         private bool CanUseDropArea()
         {
-            return IsOpen && _dropItemArea != null && _dropItemArea.isActiveAndEnabled && DropToWorld != null && (_secondaryRoot == null || _secondaryRoot.gameObject.activeSelf == false);
+            return IsOpen && _dropItemArea != null && _dropItemArea.isActiveAndEnabled && _commands?.CanDropInWorld == true && (_secondaryRoot == null || _secondaryRoot.gameObject.activeSelf == false);
         }
 
         private bool IsOverDropArea(Vector2 screenPosition, Camera eventCamera)

@@ -11,5 +11,6 @@ namespace RaidIntoDarkness.Inventory.Application
         event Action<string> HintChanged;
         event Action<bool> DropAvailabilityChanged;
         event Action<(ItemInstance Item, InventoryResult Result)> PickupCompleted;
+        event Action<ItemInstance> PickupSucceeded;
     }
 }

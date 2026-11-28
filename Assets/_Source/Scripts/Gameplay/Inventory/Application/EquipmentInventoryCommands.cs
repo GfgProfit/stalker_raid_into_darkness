@@ -39,9 +39,54 @@ namespace RaidIntoDarkness.Inventory.Application
 
         public bool CanEquip(ItemInstance item) => _model.CanEquipItem(item, _equipmentContainerId, _primaryContainerId);
 
-        public InventoryResult Equip(ItemInstance item, SlotId slotId) => _model.TryEquipItem(item, _equipmentContainerId, slotId, _primaryContainerId);
+        public InventoryResult Equip(ItemInstance item, SlotId slotId) => Equip(_model, item, _equipmentContainerId, slotId, _primaryContainerId);
 
-        public InventoryResult Unequip(ItemInstance item, InventoryUnequipTarget target) => _model.TryUnequipItem(item, target.ContainerId, target.Origin, target.Rotated, target.AutoPlace);
+        public InventoryResult Unequip(ItemInstance item, InventoryUnequipTarget target) => Unequip(_model, item, target);
+
+        public static bool IsEquipped(InventoryModel model, ItemInstance item, string equipmentId)
+        {
+            return item != null && item.ContainerId == equipmentId && model.GetContainer(equipmentId) is SlottedContainer;
+        }
+
+        public static InventoryResult Equip(InventoryModel model, ItemInstance item, string equipmentId, SlotId slotId, string primaryId)
+        {
+            return model.TryEquipItem(item, equipmentId, slotId, primaryId);
+        }
+
+        public static InventoryResult Unequip(InventoryModel model, ItemInstance item, InventoryUnequipTarget target)
+        {
+            return model.TryUnequipItem(item, target.ContainerId, target.Origin, target.Rotated, target.AutoPlace);
+        }
+
+        public static (InventoryResult Result, bool Queued, bool Dispatched) RequestEquip(InventoryModel model, ItemInstance item, string equipmentId, string primaryId, SlotDefinition slot, IEquipmentAnimationRequests equipment)
+        {
+            if (equipment?.HandleEquip(item, slot) == true)
+            {
+                return (InventoryResult.Ok(item, item.Amount), true, true);
+            }
+
+            if (model.ContainsItem(item) == false)
+            {
+                return (InventoryResult.Fail(InventoryFailure.ItemNotFound), false, false);
+            }
+
+            return (Equip(model, item, equipmentId, slot?.Id ?? SlotId.None, primaryId), false, true);
+        }
+
+        public static (InventoryResult Result, bool Queued, bool Dispatched) RequestUnequip(InventoryModel model, ItemInstance item, InventoryUnequipTarget target, IEquipmentAnimationRequests equipment)
+        {
+            if (equipment?.HandleUnequip(item, target) == true)
+            {
+                return (InventoryResult.Ok(item, item.Amount), true, true);
+            }
+
+            if (model.ContainsItem(item) == false)
+            {
+                return (InventoryResult.Fail(InventoryFailure.ItemNotFound), false, false);
+            }
+
+            return (Unequip(model, item, target), false, true);
+        }
 
         public InventoryResult Drop(ItemInstance item) => _drop(item);
 

@@ -80,7 +80,7 @@ MonoBehaviour:
         _damagePerProjectile: -1
         _hasTooltipParameters: 0
     - rid: 115149063313949009
-      type: {class: ItemTakeSoundComponent, ns: RaidIntoDarkness.Inventory.Infrastructure, asm: RaidIntoDarkness.Inventory}
+      type: {class: ItemTakeSoundComponent, ns: RaidIntoDarkness.Inventory.Domain, asm: RaidIntoDarkness.Inventory}
       data:
         _category: ammolarge
         _clips:

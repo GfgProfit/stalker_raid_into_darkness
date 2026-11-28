@@ -119,9 +119,9 @@ namespace RaidIntoDarkness.Inventory.Tests
             yield return new WaitForSeconds(0.6f);
             InventoryWindowController controller = Object.FindAnyObjectByType<InventoryWindowController>();
             InventoryWindow window = controller.Window;
-            InventoryModel model = controller.Inventory.Model;
-            ItemDefinition outfitDefinition = controller.Inventory.Database.Definitions.Single(definition => definition.GetComponent<EquipmentStatsComponent>()?.Section == "dolg_exo_outfit");
-            ItemDefinition patchDefinition = controller.Inventory.Database.Definitions.Single(definition => definition.name == "dolg_patch");
+            InventoryModel model = controller.Runtime().Model;
+            ItemDefinition outfitDefinition = controller.Runtime().Database.Definitions.Single(definition => definition.GetComponent<EquipmentStatsComponent>()?.Section == "dolg_exo_outfit");
+            ItemDefinition patchDefinition = controller.Runtime().Database.Definitions.Single(definition => definition.name == "dolg_patch");
             ItemInstance originalOutfit = EquipmentItemStats.FindEquipped(window.Model?.GetContainer(window.EquipmentContainerId), EquipmentStatsFormatter.OUTFIT_CATEGORY);
             if (originalOutfit != null)
             {
@@ -197,10 +197,10 @@ namespace RaidIntoDarkness.Inventory.Tests
             yield return new WaitForSeconds(0.6f);
             InventoryWindowController controller = Object.FindAnyObjectByType<InventoryWindowController>();
             InventoryWindow window = controller.Window;
-            InventoryModel model = controller.Inventory.Model;
+            InventoryModel model = controller.Runtime().Model;
             ItemDefinition definition = null;
 
-            foreach (ItemDefinition candidate in controller.Inventory.Database.Definitions)
+            foreach (ItemDefinition candidate in controller.Runtime().Database.Definitions)
             {
                 if (candidate.name == "ammo_5.56x45_ss190")
                 {
@@ -242,8 +242,8 @@ namespace RaidIntoDarkness.Inventory.Tests
             yield return new WaitForSeconds(0.6f);
             InventoryWindowController controller = Object.FindAnyObjectByType<InventoryWindowController>();
             InventoryWindow window = controller.Window;
-            InventoryModel model = controller.Inventory.Model;
-            ItemDefinition definition = FindDefinition(controller.Inventory.Database, "ammo_5.56x45_ss190");
+            InventoryModel model = controller.Runtime().Model;
+            ItemDefinition definition = FindDefinition(controller.Runtime().Database, "ammo_5.56x45_ss190");
             ItemInstance item = model.CreateItem(definition);
             Assert.That(model.TryAddAuto(item, BACKPACK, mergeStacks: false).Success, Is.True);
             controller.Sorting.SetFavorite(definition, true);
@@ -332,7 +332,7 @@ namespace RaidIntoDarkness.Inventory.Tests
             {
                 ItemDefinition definition = null;
 
-                foreach (ItemDefinition candidate in controller.Inventory.Database.Definitions)
+                foreach (ItemDefinition candidate in controller.Runtime().Database.Definitions)
                 {
                     if (DefinitionSection(candidate) == section)
                     {
@@ -370,11 +370,11 @@ namespace RaidIntoDarkness.Inventory.Tests
             yield return null;
 
             InventoryWindow window = controller.Window;
-            InventoryModel model = controller.Inventory.Model;
+            InventoryModel model = controller.Runtime().Model;
             CanvasGroup area = window.Content.GetComponentsInChildren<CanvasGroup>(true).Single(group => group.name == "Drop Item Area");
             var areaRect = (RectTransform)area.transform;
             Vector2 dropPoint = RectTransformUtility.WorldToScreenPoint(null, areaRect.TransformPoint(areaRect.rect.center));
-            ItemDefinition definition = controller.Inventory.Database.Definitions.First(item => DefinitionSection(item) == "ammo_5.56x45_ss190");
+            ItemDefinition definition = controller.Runtime().Database.Definitions.First(item => DefinitionSection(item) == "ammo_5.56x45_ss190");
             ItemInstance item = model.CreateItem(definition, 4);
             Assert.That(model.TryAddAuto(item, BACKPACK, mergeStacks: false).Success, Is.True);
             InventoryGridViewBase bag = window.FindGrid(BACKPACK);
@@ -435,10 +435,10 @@ namespace RaidIntoDarkness.Inventory.Tests
             yield return null;
 
             InventoryWindow window = controller.Window;
-            InventoryModel model = controller.Inventory.Model;
+            InventoryModel model = controller.Runtime().Model;
             InventoryGridViewBase bag = window.FindGrid(BACKPACK);
             InventoryGridViewBase stash = window.FindGrid(STASH);
-            ItemDefinition definition = controller.Inventory.Database.Definitions.First(item => DefinitionSection(item) == "ammo_5.56x45_ss190");
+            ItemDefinition definition = controller.Runtime().Database.Definitions.First(item => DefinitionSection(item) == "ammo_5.56x45_ss190");
             ItemInstance dragged = model.CreateItem(definition);
             Assert.That(model.TryAddAuto(dragged, BACKPACK, mergeStacks: false).Success, Is.True);
             Vector2 start = RectTransformUtility.WorldToScreenPoint(null, bag.GetItemView(dragged).RectTransform.position);
@@ -474,14 +474,14 @@ namespace RaidIntoDarkness.Inventory.Tests
             controller.Open();
             yield return null;
 
-            InventoryModel model = controller.Inventory.Model;
+            InventoryModel model = controller.Runtime().Model;
             Transform view = controller.Player.CameraController.Camera.transform;
             Vector3 forward = Vector3.ProjectOnPlane(controller.Player.transform.forward, Vector3.up).normalized;
             CharacterController character = controller.Player.GetComponent<CharacterController>();
 
             foreach (string section in new[] { "ammo_5.56x45_ss190", "wpn_aug_a3" })
             {
-                ItemDefinition definition = controller.Inventory.Database.Definitions.First(item => DefinitionSection(item) == section);
+                ItemDefinition definition = controller.Runtime().Database.Definitions.First(item => DefinitionSection(item) == section);
                 ItemInstance item = model.CreateItem(definition);
                 Assert.That(model.TryAddAuto(item, BACKPACK, mergeStacks: false).Success, Is.True, section);
                 controller.Window.DropItem(item);
@@ -527,13 +527,13 @@ namespace RaidIntoDarkness.Inventory.Tests
             controller.Open();
             yield return null;
 
-            InventoryModel model = controller.Inventory.Model;
+            InventoryModel model = controller.Runtime().Model;
             Transform view = controller.Player.CameraController.Camera.transform;
             Vector3 forward = Vector3.ProjectOnPlane(view.forward, Vector3.up).normalized;
             Vector3 right = Vector3.Cross(Vector3.up, forward);
             Vector3 dropCenter = view.position - Vector3.up * 0.3f;
             BoxCollider wall = CreateWall(forward, 0.52f);
-            ItemDefinition definition = controller.Inventory.Database.Definitions.First(item => DefinitionSection(item) == "ammo_5.56x45_ss190");
+            ItemDefinition definition = controller.Runtime().Database.Definitions.First(item => DefinitionSection(item) == "ammo_5.56x45_ss190");
             ItemInstance first = model.CreateItem(definition, 4);
             Assert.That(model.TryAddAuto(first, BACKPACK, mergeStacks: false).Success, Is.True);
             controller.Window.DropItem(first);
@@ -584,8 +584,8 @@ namespace RaidIntoDarkness.Inventory.Tests
             controller.Open();
             yield return null;
 
-            InventoryModel model = controller.Inventory.Model;
-            ItemDefinition definition = controller.Inventory.Database.Definitions.First(item => DefinitionSection(item) == "ac10632");
+            InventoryModel model = controller.Runtime().Model;
+            ItemDefinition definition = controller.Runtime().Database.Definitions.First(item => DefinitionSection(item) == "ac10632");
             Transform view = controller.Player.CameraController.Camera.transform;
             Vector3 forward = Vector3.ProjectOnPlane(view.forward, Vector3.up).normalized;
             GameObject plate = new GameObject("Inventory drop sound surface");
@@ -650,8 +650,8 @@ namespace RaidIntoDarkness.Inventory.Tests
             Assert.That(Cursor.visible, Is.True);
             Assert.That(Time.timeScale, Is.EqualTo(1f));
 
-            InventoryModel model = controller.Inventory.Model;
-            Assert.That(controller.Inventory.IsSeeded, Is.True);
+            InventoryModel model = controller.Runtime().Model;
+            Assert.That(controller.Runtime().IsSeeded, Is.True);
             InventoryGridViewBase backpackGrid = window.FindGrid(BACKPACK);
             InventoryGridViewBase stashGrid = window.FindGrid(STASH);
             InventoryGridViewBase equipmentGrid = window.FindGrid(EQUIPMENT);
@@ -731,7 +731,7 @@ namespace RaidIntoDarkness.Inventory.Tests
             Assert.That(interactor, Is.Not.Null, "OutdoorsScene has no WorldItemInteractor");
             ItemDefinition pickedDefinition = null;
 
-            foreach (ItemDefinition definition in controller.Inventory.Database.Definitions)
+            foreach (ItemDefinition definition in controller.Runtime().Database.Definitions)
             {
                 if (definition.TryGetComponent(out WorldItemComponent worldComponent) && worldComponent.Prefab != null)
                 {
@@ -811,7 +811,7 @@ namespace RaidIntoDarkness.Inventory.Tests
             Assert.That(stats[0].Value.EndsWith("%") && stats[0].Icon != null, Is.True);
             ItemDefinition nosorog = null;
 
-            foreach (ItemDefinition definition in controller.Inventory.Database.Definitions)
+            foreach (ItemDefinition definition in controller.Runtime().Database.Definitions)
             {
                 if (definition.GetComponent<EquipmentStatsComponent>()?.Section == "army_nosorog_outfit")
                 {
@@ -883,8 +883,8 @@ namespace RaidIntoDarkness.Inventory.Tests
             StalkerPlayerController player = Object.FindAnyObjectByType<StalkerPlayerController>();
             yield return Tap(_keyboard.tabKey);
             InventoryWindow window = controller.Window;
-            InventoryModel model = controller.Inventory.Model;
-            EquipmentAnimationQueue queue = controller.EquipmentAnimations;
+            InventoryModel model = controller.Runtime().Model;
+            EquipmentAnimationQueue queue = controller.Runtime().EquipmentAnimations;
             Assert.That(queue, Is.Not.Null, "equipment animations are not bound");
             Assert.That(player.HudAnimator, Is.Not.Null, "FPS_Player has no FirstPersonHudAnimator");
             Assert.That(player.ScreenFade, Is.Not.Null, "FPS_Player has no StalkerScreenFade");
@@ -907,7 +907,7 @@ namespace RaidIntoDarkness.Inventory.Tests
             window.EquipItem(hat);
             Assert.That(hat.ContainerId, Is.Not.EqualTo(EQUIPMENT), "helmet was equipped before its animation");
             Assert.That(queue.IsInUse(hat), Is.True);
-            Assert.That(window.FindGrid(BACKPACK).GetItemView(hat).Background.color, Is.EqualTo(EquipmentAnimationQueue.IN_USE_TINT), "queued helmet is not highlighted");
+            Assert.That(window.FindGrid(BACKPACK).GetItemView(hat).Background.color, Is.EqualTo(InventoryWindowController.EQUIPMENT_IN_USE_TINT), "queued helmet is not highlighted");
             Assert.That(player.HudAnimator.IsPlaying, Is.True, "helmet equip animation did not start");
             Assert.That(player.HudAnimator.Item, Is.Not.Null, "helmet hud model is not shown");
             Assert.That(player.CameraEffects.IsItemEffectPlaying, Is.True, "helmet camera effect did not start");
@@ -940,6 +940,63 @@ namespace RaidIntoDarkness.Inventory.Tests
         }
 
         [UnityTest]
+        public IEnumerator PickupSoundSurvivesDisablingAndReenablingBoundController()
+        {
+            SceneManager.LoadScene(SCENE, LoadSceneMode.Single);
+            yield return null;
+
+            InventoryWindowController controller = Object.FindAnyObjectByType<InventoryWindowController>();
+            WorldItemInteractor interactor = Object.FindAnyObjectByType<WorldItemInteractor>();
+            InventoryItemSounds sounds = controller.ItemSounds;
+            Assert.That(sounds, Is.Not.Null);
+            ItemDefinition helmet = controller.Runtime().Database.Definitions.First(definition => definition.name == "helm_hardhat");
+            Assert.That(helmet.GetComponent<ItemTakeSoundComponent>().Clips.Count, Is.Positive);
+            int played = sounds.PlayedCount;
+            controller.enabled = false;
+            yield return new WaitForSecondsRealtime(0.1f);
+
+            WorldItem first = interactor.Spawn(helmet, 1);
+            Assert.That(first, Is.Not.Null);
+            Assert.That(interactor.TryPickUp(first), Is.True);
+            Assert.That(sounds.PlayedCount, Is.EqualTo(++played));
+            Assert.That(sounds.LastVolume, Is.EqualTo(InventoryItemSounds.TAKE_VOLUME));
+            Assert.That(helmet.GetComponent<ItemTakeSoundComponent>().Clips, Does.Contain(sounds.LastClip));
+
+            controller.enabled = true;
+            yield return new WaitForSecondsRealtime(0.1f);
+
+            WorldItem second = interactor.Spawn(helmet, 1);
+            Assert.That(second, Is.Not.Null);
+            Assert.That(interactor.TryPickUp(second), Is.True);
+            Assert.That(sounds.PlayedCount, Is.EqualTo(++played));
+
+            InventoryWindow window = controller.Window;
+            StalkerPlayerController player = controller.Player;
+            PlayerInventoryRuntime runtime = controller.Runtime();
+            controller.Configure(window, null, player, null, null);
+            yield return new WaitForSecondsRealtime(0.1f);
+            Assert.That(interactor.TryPickUp(interactor.Spawn(helmet, 1)), Is.True);
+            Assert.That(sounds.PlayedCount, Is.EqualTo(played), "the old pickup sound subscription survived unbind");
+
+            controller.Configure(window, runtime, player, null, null);
+            controller.Open();
+            controller.Close();
+            yield return new WaitForSecondsRealtime(0.1f);
+            InventoryItemSounds rebound = controller.ItemSounds;
+            Assert.That(rebound, Is.Not.SameAs(sounds));
+            int reboundPlayed = rebound.PlayedCount;
+            Assert.That(interactor.TryPickUp(interactor.Spawn(helmet, 1)), Is.True);
+            Assert.That(rebound.PlayedCount, Is.EqualTo(reboundPlayed + 1));
+            Assert.That(sounds.PlayedCount, Is.EqualTo(played));
+
+            Object.Destroy(controller);
+            yield return null;
+            yield return new WaitForSecondsRealtime(0.1f);
+            Assert.That(interactor.TryPickUp(interactor.Spawn(helmet, 1)), Is.True);
+            Assert.That(rebound.PlayedCount, Is.EqualTo(reboundPlayed + 1), "the pickup sound subscription survived controller destruction");
+        }
+
+        [UnityTest]
         public IEnumerator InventoryWorldAndStashSoundsFollowGra()
         {
             SceneManager.LoadScene(SCENE, LoadSceneMode.Single);
@@ -949,7 +1006,7 @@ namespace RaidIntoDarkness.Inventory.Tests
             InventoryWindowController controller = Object.FindAnyObjectByType<InventoryWindowController>();
             WorldItemInteractor interactor = Object.FindAnyObjectByType<WorldItemInteractor>();
             InventoryWindow window = controller.Window;
-            InventoryModel model = controller.Inventory.Model;
+            InventoryModel model = controller.Runtime().Model;
             var sounds = new List<InventorySound>();
             window.SoundPlayed += sounds.Add;
             Assert.That(window.Theme != null && window.Theme.Sounds != null, Is.True, "GRA theme has no inventory sound set");
@@ -1059,7 +1116,7 @@ namespace RaidIntoDarkness.Inventory.Tests
             InventoryWindowController controller = Object.FindAnyObjectByType<InventoryWindowController>();
             WorldItemInteractor interactor = Object.FindAnyObjectByType<WorldItemInteractor>();
             InventoryWindow window = controller.Window;
-            ItemDefinition definition = FindDefinition(controller.Inventory.Database, "wpn_aug_a3");
+            ItemDefinition definition = FindDefinition(controller.Runtime().Database, "wpn_aug_a3");
             WorldItem aug = interactor.Spawn(definition, 1);
             Assert.That(aug, Is.Not.Null, "the AUG world prefab could not be placed in the test scene");
             Assert.That(aug.Definition, Is.SameAs(definition));
@@ -1145,10 +1202,10 @@ namespace RaidIntoDarkness.Inventory.Tests
 
             InventoryWindowController controller = Object.FindAnyObjectByType<InventoryWindowController>();
             Assert.That(controller, Is.Not.Null);
-            ItemDatabase database = controller.Inventory.Database;
+            ItemDatabase database = controller.Runtime().Database;
             var addons = new Dictionary<string, ItemDefinition>();
-            IItemIconProvider provider = controller.Inventory.IconProvider;
-            ItemIconCache iconCache = controller.Inventory.Icons;
+            IItemIconProvider provider = controller.Runtime().IconProvider;
+            ItemIconCache iconCache = controller.Runtime().Icons;
 
             foreach (ItemDefinition definition in database.Definitions)
             {
@@ -1246,7 +1303,7 @@ namespace RaidIntoDarkness.Inventory.Tests
                 WorldItem silencer = fixtures.Single(worldItem => worldItem.Definition == nato);
                 Assert.That(silencer.transform.position.y, Is.GreaterThan(-5f), "the silencer fell through the ground");
                 Assert.That(interactor.TryPickUp(silencer), Is.True);
-                InventoryContainer backpack = controller.Inventory.Model.GetContainer(BACKPACK);
+                InventoryContainer backpack = controller.Runtime().Model.GetContainer(BACKPACK);
                 Assert.That(backpack.Items.Any(item => item.Definition == nato), Is.True, "the picked silencer did not reach the backpack");
 
                 double deadline = Time.realtimeSinceStartupAsDouble + ICON_TIMEOUT_SECONDS;
@@ -1325,7 +1382,7 @@ namespace RaidIntoDarkness.Inventory.Tests
         {
             ItemDefinition found = null;
 
-            foreach (ItemDefinition definition in controller.Inventory.Database.Definitions)
+            foreach (ItemDefinition definition in controller.Runtime().Database.Definitions)
             {
                 if (DefinitionSection(definition) == definitionName)
                 {

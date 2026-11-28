@@ -1,8 +1,7 @@
-using RaidIntoDarkness.Inventory.Domain;
 using System;
 using UnityEngine;
 
-namespace RaidIntoDarkness.Inventory.Infrastructure
+namespace RaidIntoDarkness.Inventory.Domain
 {
     [Serializable]
     internal struct ScopeAimOffset

@@ -476,9 +476,31 @@ namespace Inventory
             return TryMove(instanceId, item.ContainerId, item.Location.Position, item.Location.Rotated == false, false);
         }
 
+        public InventoryResult CanMerge(string sourceId, string targetId, int amount = int.MaxValue)
+        {
+            return PlanMerge(sourceId, targetId, amount, out _);
+        }
+
         public InventoryResult TryMerge(string sourceId, string targetId, int amount = int.MaxValue)
         {
-            ItemInstance source = GetItem(sourceId);
+            InventoryResult plan = PlanMerge(sourceId, targetId, amount, out ItemInstance source);
+
+            if (plan.Success == false)
+            {
+                return plan;
+            }
+
+            ItemInstance target = plan.Item;
+            target.Amount += plan.Amount;
+            Emit(new InventoryChange(InventoryChangeKind.AmountChanged, target, target.ContainerId, target.Location));
+            ReduceOrRemove(source, plan.Amount);
+            Flush();
+            return plan;
+        }
+
+        private InventoryResult PlanMerge(string sourceId, string targetId, int amount, out ItemInstance source)
+        {
+            source = GetItem(sourceId);
             ItemInstance target = GetItem(targetId);
 
             if (source == null || target == null)
@@ -511,10 +533,6 @@ namespace Inventory
                 return InventoryResult.Fail(releaseFailure);
             }
 
-            target.Amount += moved;
-            Emit(new InventoryChange(InventoryChangeKind.AmountChanged, target, target.ContainerId, target.Location));
-            ReduceOrRemove(source, moved);
-            Flush();
             return InventoryResult.Ok(target, moved);
         }
 

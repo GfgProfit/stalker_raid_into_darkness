@@ -1,9 +1,7 @@
 using System;
-using System.Collections.Generic;
-using System.Text;
+using R3;
 using TMPro;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace Inventory.UI
@@ -16,6 +14,7 @@ namespace Inventory.UI
         private TextMeshProUGUI _amountText;
         private Slider _slider;
         private Action<int> _onConfirm;
+        private IDisposable _amountBinding;
 
         public InventoryTheme Theme { get; set; }
         public bool IsVisible => gameObject.activeSelf;
@@ -23,6 +22,7 @@ namespace Inventory.UI
 
         public void Show(ItemInstance item, Action<int> onConfirm)
         {
+            ClearBinding();
             EnsureBuilt();
             _onConfirm = onConfirm;
             _title.text = InventoryTheme.Resolve(Theme, "split_title", "Split ") + item.Definition.DisplayName;
@@ -32,6 +32,25 @@ namespace Inventory.UI
             UpdateAmount(_slider.value);
             gameObject.SetActive(true);
             transform.SetAsLastSibling();
+        }
+
+        internal void Show(InventoryModel model, ItemInstance item, Action<int> onConfirm)
+        {
+            Show(item, onConfirm);
+            var viewModel = new InventorySplitDialogViewModel(model, item);
+
+            if (isActiveAndEnabled == false)
+            {
+                Hide();
+                return;
+            }
+
+            ApplyMaximumAmount(viewModel.GetMaximumAmount());
+
+            if (IsVisible)
+            {
+                _amountBinding = viewModel.MaximumAmountChanges.Subscribe(ApplyMaximumAmount);
+            }
         }
 
         public void SetAmount(int amount)
@@ -50,11 +69,34 @@ namespace Inventory.UI
 
         public void Hide()
         {
-            _onConfirm = null;
-            gameObject.SetActive(false);
+            ClearBinding();
+
+            if (gameObject.activeSelf)
+            {
+                gameObject.SetActive(false);
+            }
         }
 
         private void Awake() => EnsureBuilt();
+        private void OnDisable() => Hide();
+
+        private void ClearBinding()
+        {
+            _onConfirm = null;
+            _amountBinding?.Dispose();
+            _amountBinding = null;
+        }
+
+        private void ApplyMaximumAmount(int maximum)
+        {
+            if (maximum < 1)
+            {
+                Hide();
+                return;
+            }
+
+            _slider.maxValue = maximum;
+        }
 
         private void UpdateAmount(float value) => _amountText.text = Mathf.RoundToInt(value).ToString();
 

@@ -120,6 +120,116 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
         }
 
         [UnityTest]
+        public IEnumerator DraggingSplitAmmoStackOntoMatchingAmmoMergesInBackpack()
+        {
+            SceneManager.LoadScene("TEST_SCENE", LoadSceneMode.Single);
+            yield return new WaitForSeconds(0.5f);
+            InventoryWindowController controller = Object.FindAnyObjectByType<InventoryWindowController>();
+            InventoryWindow window = controller.Window;
+            InventoryModel model = controller.Inventory.Model;
+            ItemInstance destination = AddItem(controller, "ammo_5.56x45_ss190", window.PrimaryContainerId, 30);
+            InventoryResult split = model.TrySplitAuto(destination.InstanceId, 12);
+            Assert.That(split.Success, Is.True);
+            ItemInstance source = split.Item;
+            ItemInstance incompatible = AddItem(controller, "ammo_5.56x45_ap", window.PrimaryContainerId);
+            controller.Open();
+            yield return null;
+            yield return null;
+
+            InventoryGridViewBase grid = window.FindGrid(window.PrimaryContainerId);
+            InventoryItemView sourceView = grid.GetItemView(source);
+            var pointer = new PointerEventData(EventSystem.current) { button = PointerEventData.InputButton.Left, position = ScreenPoint(sourceView) };
+            ExecuteEvents.Execute(sourceView.gameObject, pointer, ExecuteEvents.beginDragHandler);
+            pointer.position = ScreenPoint(grid.GetItemView(incompatible));
+            ExecuteEvents.Execute(sourceView.gameObject, pointer, ExecuteEvents.dragHandler);
+            Assert.That(window.Drag.Kind, Is.EqualTo(InventoryDropKind.None));
+            ExecuteEvents.Execute(sourceView.gameObject, pointer, ExecuteEvents.endDragHandler);
+            Assert.That(source.Amount, Is.EqualTo(12));
+            Assert.That(incompatible.Amount, Is.EqualTo(1));
+
+            pointer.position = ScreenPoint(sourceView);
+            ExecuteEvents.Execute(sourceView.gameObject, pointer, ExecuteEvents.beginDragHandler);
+            pointer.position = ScreenPoint(grid.GetItemView(destination));
+            ExecuteEvents.Execute(sourceView.gameObject, pointer, ExecuteEvents.dragHandler);
+            Assert.That(window.Drag.Kind, Is.EqualTo(InventoryDropKind.Merge));
+            Assert.That(window.Drag.TargetItem, Is.SameAs(destination));
+            Assert.That(destination.Amount, Is.EqualTo(18));
+            ItemLocation destinationLocation = destination.Location;
+            ExecuteEvents.Execute(sourceView.gameObject, pointer, ExecuteEvents.endDragHandler);
+            Assert.That(model.GetItem(source.InstanceId), Is.Null);
+            Assert.That(destination.Amount, Is.EqualTo(30));
+            Assert.That(destination.Location, Is.EqualTo(destinationLocation));
+            Assert.That(grid.GetItemView(source), Is.Null);
+            controller.Close();
+        }
+
+        [UnityTest]
+        public IEnumerator SplitDialogTracksStackAmountAndClosesWhenUnavailable()
+        {
+            SceneManager.LoadScene("TEST_SCENE", LoadSceneMode.Single);
+            yield return new WaitForSeconds(0.5f);
+            InventoryWindowController controller = Object.FindAnyObjectByType<InventoryWindowController>();
+            InventoryWindow window = controller.Window;
+            InventoryModel model = controller.Inventory.Model;
+            string backpack = window.PrimaryContainerId;
+            ItemInstance source = AddItem(controller, "ammo_5.56x45_ss190", backpack, 12);
+            ItemInstance destination = AddItem(controller, "ammo_5.56x45_ss190", backpack, 20);
+            ItemInstance other = AddItem(controller, "ammo_5.56x45_ap", backpack, 4);
+            ItemInstance refill = AddItem(controller, "ammo_5.56x45_ss190", backpack, 2);
+            controller.Open();
+            yield return null;
+
+            OpenSplit(source);
+            window.SplitDialog.SetAmount(11);
+            Assert.That(model.TryRemove(other.InstanceId).Success, Is.True);
+            Assert.That(window.SplitDialog.IsVisible, Is.True);
+            Assert.That(window.SplitDialog.SelectedAmount, Is.EqualTo(11));
+            Assert.That(model.TryRemove(source.InstanceId, 3).Success, Is.True);
+            Assert.That(window.SplitDialog.IsVisible, Is.True);
+            Assert.That(window.SplitDialog.SelectedAmount, Is.EqualTo(8));
+            TMP_Text amountLabel = window.SplitDialog.transform.Find("Panel/Amount").GetComponent<TMP_Text>();
+            Assert.That(amountLabel.text, Is.EqualTo("8"));
+            Assert.That(model.TryMerge(refill.InstanceId, source.InstanceId).Success, Is.True);
+            Assert.That(window.SplitDialog.SelectedAmount, Is.EqualTo(8));
+            window.SplitDialog.SetAmount(20);
+            Assert.That(window.SplitDialog.SelectedAmount, Is.EqualTo(10));
+            Assert.That(model.TryMerge(source.InstanceId, destination.InstanceId).Success, Is.True);
+            Assert.That(window.SplitDialog.IsVisible, Is.False);
+
+            OpenSplit(destination);
+            Assert.That(model.TryTransfer(destination.InstanceId, window.SecondaryContainerId, mergeStacks: false).Success, Is.True);
+            Assert.That(window.SplitDialog.IsVisible, Is.False);
+            Assert.That(model.ContainsItem(destination), Is.True);
+            Assert.That(model.TryTransfer(destination.InstanceId, backpack, mergeStacks: false).Success, Is.True);
+            OpenSplit(destination);
+            window.SplitDialog.SetAmount(5);
+            window.SplitDialog.Confirm();
+            Assert.That(window.SplitDialog.IsVisible, Is.False);
+            Assert.That(destination.Amount, Is.EqualTo(26));
+
+            OpenSplit(destination);
+            Assert.That(model.TryRemove(destination.InstanceId).Success, Is.True);
+            Assert.That(window.SplitDialog.IsVisible, Is.False);
+            ItemInstance remaining = AddItem(controller, "ammo_5.56x45_ss190", backpack, 8);
+            OpenSplit(remaining);
+            Assert.That(model.TryRemove(remaining.InstanceId, 7).Success, Is.True);
+            Assert.That(remaining.Amount, Is.EqualTo(1));
+            Assert.That(window.SplitDialog.IsVisible, Is.False);
+            ItemInstance cleared = AddItem(controller, "ammo_5.56x45_ss190", backpack, 8);
+            OpenSplit(cleared);
+            model.Clear();
+            Assert.That(window.SplitDialog.IsVisible, Is.False);
+            controller.Close();
+
+            void OpenSplit(ItemInstance item)
+            {
+                window.OpenContextMenu(item, window.FindGrid(item.ContainerId), new Vector2(400f, 400f), null);
+                Assert.That(window.ContextMenu.Invoke(window.Label(InventoryBuiltInActions.SPLIT, "Split")), Is.True);
+                Assert.That(window.SplitDialog.IsVisible, Is.True);
+            }
+        }
+
+        [UnityTest]
         public IEnumerator WeaponAmmoHoverHighlightsBothInventoriesAndEquipment()
         {
             SceneManager.LoadScene("TEST_SCENE", LoadSceneMode.Single);
@@ -503,12 +613,17 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             return null;
         }
 
-        private IEnumerator Hover(InventoryItemView view)
+        private static Vector2 ScreenPoint(InventoryItemView view)
         {
             RectTransform rect = view.RectTransform;
             Canvas canvas = view.GetComponentInParent<Canvas>();
             Camera camera = canvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : canvas.worldCamera;
-            Vector2 position = RectTransformUtility.WorldToScreenPoint(camera, rect.TransformPoint(rect.rect.center));
+            return RectTransformUtility.WorldToScreenPoint(camera, rect.TransformPoint(rect.rect.center));
+        }
+
+        private IEnumerator Hover(InventoryItemView view)
+        {
+            Vector2 position = ScreenPoint(view);
             Set(Mouse.current.position, position);
             var pointer = new PointerEventData(EventSystem.current) { position = position };
 

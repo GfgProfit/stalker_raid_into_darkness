@@ -6,33 +6,6 @@ using UnityEngine.EventSystems;
 
 namespace Inventory.UI
 {
-    public enum InventoryDropKind
-    {
-        None,
-        Valid,
-        Merge,
-        Invalid
-    }
-
-    public sealed class InventoryDragState
-    {
-        public ItemInstance Item;
-        public InventoryGridViewBase SourceGrid;
-        public InventoryItemView SourceView;
-        public InventoryItemView Ghost;
-        public bool Rotated;
-        public int Amount;
-        public bool IsSplit;
-        public Vector2 LastScreenPosition;
-        public Camera EventCamera;
-        public InventoryGridViewBase TargetGrid;
-        public Vector2Int TargetOrigin;
-        public InventoryDropKind Kind;
-        public InventoryFailure Failure;
-        public bool AutoPlace;
-        public ItemInstance TargetItem { get; set; }
-    }
-
     [DisallowMultipleComponent]
     [AddComponentMenu("Inventory/Inventory Window")]
     public sealed class InventoryWindow : MonoBehaviour
@@ -232,6 +205,11 @@ namespace Inventory.UI
         public void Unbind()
         {
             CancelDrag();
+
+            if (_splitDialog != null)
+            {
+                _splitDialog.Hide();
+            }
 
             if (Model != null)
             {
@@ -582,7 +560,7 @@ namespace Inventory.UI
             {
                 InventoryContainer target = drag.TargetGrid.Container;
 
-                if (drag.TargetItem != null && ItemDropHandler != null)
+                if (drag.TargetItem != null && drag.IsSplit == false && ItemDropHandler?.Handles(drag.Item, drag.TargetItem) == true)
                 {
                     return ItemDropHandler.Apply(drag.Item, drag.TargetItem);
                 }
@@ -592,7 +570,11 @@ namespace Inventory.UI
                     return InventoryResult.Ok(drag.Item, drag.Item.Amount);
                 }
 
-                if (drag.AutoPlace)
+                if (drag.TargetItem != null)
+                {
+                    result = Model.TryMerge(drag.Item.InstanceId, drag.TargetItem.InstanceId, drag.Amount);
+                }
+                else if (drag.AutoPlace)
                 {
                     result = Model.TryTransfer(drag.Item.InstanceId, target.Id);
                 }
@@ -825,12 +807,12 @@ namespace Inventory.UI
 
         public void OpenSplitDialog(ItemInstance item)
         {
-            if (_splitDialog == null || item.Amount < 2)
+            if (_splitDialog == null || Model == null || Model.ContainsItem(item) == false || item.Amount < 2)
             {
                 return;
             }
 
-            _splitDialog.Show(item, amount => Report(Model.TrySplitAuto(item.InstanceId, amount), FormatLabel("status_split", "Split {0} x {1}", amount, item.Definition.DisplayName)));
+            _splitDialog.Show(Model, item, amount => Report(Model.TrySplitAuto(item.InstanceId, amount), FormatLabel("status_split", "Split {0} x {1}", amount, item.Definition.DisplayName)));
             ApplyThemeTo(_splitDialog);
         }
 
@@ -1335,18 +1317,25 @@ namespace Inventory.UI
             area = default;
             failure = InventoryFailure.None;
 
-            if (_drag.IsSplit == false && ItemDropHandler != null && target.TryGetCellAtScreen(screenPosition, eventCamera, out Vector2Int targetCell))
+            if (target.TryGetCellAtScreen(screenPosition, eventCamera, out Vector2Int targetCell))
             {
                 ItemInstance targetItem = container.GetItemAt(targetCell);
+                bool handledByAttachment = _drag.IsSplit == false && ItemDropHandler?.Handles(item, targetItem) == true;
 
-                if (ItemDropHandler.Handles(item, targetItem))
+                if (handledByAttachment || item.CanStackWith(targetItem))
                 {
                     _drag.TargetItem = targetItem;
-                    InventoryResult preview = ItemDropHandler.Preview(item, targetItem);
+                    InventoryResult preview = handledByAttachment ? ItemDropHandler.Preview(item, targetItem) : Model.CanMerge(item.InstanceId, targetItem.InstanceId, _drag.Amount);
                     origin = targetItem.Location.Position;
                     area = container.GetItemArea(targetItem);
                     failure = preview.Failure;
-                    kind = preview.Success ? InventoryDropKind.Valid : InventoryDropKind.Invalid;
+                    kind = handledByAttachment ? InventoryDropKind.Valid : InventoryDropKind.Merge;
+
+                    if (preview.Success == false)
+                    {
+                        kind = InventoryDropKind.Invalid;
+                    }
+
                     return;
                 }
             }

@@ -25,7 +25,7 @@ namespace RaidIntoDarkness.UI
             rect.anchoredPosition = new Vector2(area.x, -area.y);
             rect.sizeDelta = area.size;
             ItemDefinition definition = entry.Definition;
-            string shortName = InventoryWindowController.FormatDefinitionShortName(definition);
+            string shortName = InventoryWindowController.FormatAmmoShortName(definition);
             if (shortName == null)
             {
                 shortName = string.IsNullOrEmpty(definition.ShortName) ? definition.DisplayName : definition.ShortName;

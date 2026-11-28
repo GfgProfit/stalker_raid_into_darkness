@@ -61,12 +61,12 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             InventoryItemView view = window.FindGrid(first.ContainerId).GetItemView(first);
             TMP_Text label = view.transform.Find("Overlay/Name").GetComponent<TMP_Text>();
             label.ForceMeshUpdate();
-            Assert.That(label.GetParsedText(), Is.EqualTo("M855"));
+            Assert.That(label.GetParsedText(), Is.EqualTo(definition.ShortName));
             Assert.That(label.alignment, Is.EqualTo(TextAlignmentOptions.BottomRight));
-            Assert.That(label.textInfo.characterCount, Is.EqualTo(4));
+            Assert.That(label.textInfo.characterCount, Is.EqualTo(definition.ShortName.Length));
             Assert.That(label.textInfo.characterInfo[0].pointSize, Is.EqualTo(16f).Within(0.001f));
             Assert.That(label.textInfo.characterInfo[0].color, Is.EqualTo(new Color32(255, 255, 255, 255)));
-            AssertNameBackground(view, "M855");
+            AssertNameBackground(view, definition.ShortName);
             InventorySaveData saved = InventorySerializer.Capture(model, new[] { window.PrimaryContainerId, window.SecondaryContainerId });
             var restored = new InventoryModel(model.Resolver);
             InventoryContainer backpack = model.GetContainer(window.PrimaryContainerId);
@@ -75,6 +75,47 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             restored.AddContainer(new GridContainer(stash.Id, stash.Width, stash.Height));
             Assert.That(InventorySerializer.Restore(restored, saved).IsClean, Is.True);
             Assert.That(restored.GetItem(first.InstanceId).Amount, Is.EqualTo(1516));
+            controller.Close();
+        }
+
+        [UnityTest]
+        public IEnumerator InventoryCellsShowStoredShortNamesAndKeepTheKnifeSlotUnlabeled()
+        {
+            SceneManager.LoadScene("TEST_SCENE", LoadSceneMode.Single);
+            yield return new WaitForSeconds(0.5f);
+            InventoryWindowController controller = Object.FindAnyObjectByType<InventoryWindowController>();
+            InventoryWindow window = controller.Window;
+            InventoryModel model = controller.Inventory.Model;
+            string bag = window.PrimaryContainerId;
+            string stash = window.SecondaryContainerId;
+            ItemInstance pmm = AddItem(controller, "ammo_9x18_pmm", bag);
+            ItemInstance magnum = AddItem(controller, "ammo_44mag", bag);
+            ItemInstance addon = AddItem(controller, "sil_pbs1", stash);
+            ItemInstance backpack = AddItem(controller, "itm_backpack", bag);
+            ItemInstance patch = AddItem(controller, "dolg_patch", bag);
+            ItemInstance grenade = AddItem(controller, "grenade_rgd5", bag);
+            ItemInstance outfit = AddItem(controller, "dolg_outfit", bag);
+            ItemInstance knife = AddItem(controller, "wpn_knife_m9", bag);
+            controller.Open(true);
+            yield return null;
+            yield return null;
+
+            AssertNameBackground(window.FindGrid(bag).GetItemView(pmm), "ПММ");
+
+            foreach (ItemInstance item in new[] { magnum, addon, backpack, patch, grenade, outfit, knife })
+            {
+                InventoryItemView view = window.FindGrid(item.ContainerId).GetItemView(item);
+                TMP_Text label = view.transform.Find("Overlay/Name").GetComponent<TMP_Text>();
+                label.ForceMeshUpdate();
+                Assert.That(label.isActiveAndEnabled, Is.True, item.Definition.DisplayName);
+                Assert.That(label.text, Does.Contain(item.Definition.ShortName), item.Definition.DisplayName);
+                Assert.That(label.GetParsedText(), Is.Not.Empty, item.Definition.DisplayName);
+            }
+
+            Assert.That(model.TryEquip(knife.InstanceId, window.EquipmentContainerId).Success, Is.True);
+            Assert.That(knife.Location.SlotId, Is.EqualTo(FirstPersonWeaponBinder.KNIFE_SLOT));
+            InventoryItemView equipped = window.FindGrid(knife.ContainerId).GetItemView(knife);
+            Assert.That(equipped.transform.Find("Overlay/Name").GetComponent<TMP_Text>().enabled, Is.False);
             controller.Close();
         }
 
@@ -123,8 +164,8 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             AssertNameBackground(equippedView, equippedWeapon.Definition.ShortName);
             InventoryItemView outfitView = window.FindGrid(outfit.ContainerId).GetItemView(outfit);
             InventoryItemView helmetView = window.FindGrid(helmet.ContainerId).GetItemView(helmet);
-            AssertNameBackground(outfitView, "MEDIUM");
-            AssertNameBackground(helmetView, "HEAVY");
+            AssertNameBackground(outfitView, outfit.Definition.ShortName, true);
+            AssertNameBackground(helmetView, helmet.Definition.ShortName, true);
             TMP_Text equippedName = equippedView.transform.Find("Overlay/Name").GetComponent<TMP_Text>();
             Assert.That(equippedName.alignment, Is.EqualTo(TextAlignmentOptions.Top));
             Assert.That(equippedName.canvasRenderer.absoluteDepth, Is.GreaterThan(weaponSlot.Icon.canvasRenderer.absoluteDepth));
@@ -405,12 +446,12 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             controller.Close();
         }
 
-        private static void AssertNameBackground(InventoryItemView view, string expected)
+        private static void AssertNameBackground(InventoryItemView view, string expected, bool compareSource = false)
         {
             TMP_Text label = view.transform.Find("Overlay/Name").GetComponent<TMP_Text>();
             Image background = view.transform.Find("Overlay/NameBackground").GetComponent<Image>();
             label.ForceMeshUpdate();
-            Assert.That(label.GetParsedText(), Is.EqualTo(expected));
+            Assert.That(compareSource ? label.text : label.GetParsedText(), Is.EqualTo(expected));
             Assert.That(label.isActiveAndEnabled, Is.True);
             Assert.That(label.canvasRenderer.GetInheritedAlpha(), Is.GreaterThan(0f));
             Assert.That(background.isActiveAndEnabled, Is.True);
@@ -439,13 +480,20 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             }
         }
 
-        private static ItemInstance AddItem(InventoryWindowController controller, string section, string containerId)
+        private static ItemInstance AddItem(InventoryWindowController controller, string section, string containerId, int amount = 1)
         {
             foreach (ItemDefinition definition in controller.Inventory.Database.Definitions)
             {
-                if (DefinitionSection(definition) == section)
+                if (definition == null)
                 {
-                    ItemInstance item = controller.Inventory.Model.CreateItem(definition);
+                    continue;
+                }
+
+                string definitionSection = definition.GetComponent<AmmoStatsComponent>()?.Section ?? definition.GetComponent<WeaponAddonComponent>()?.Section ?? DefinitionSection(definition);
+
+                if (definitionSection == section || definition.name == section || definition.name == section + "_definition")
+                {
+                    ItemInstance item = controller.Inventory.Model.CreateItem(definition, amount);
                     Assert.That(controller.Inventory.Model.TryAddAuto(item, containerId, false).Success, Is.True, section);
                     return item;
                 }

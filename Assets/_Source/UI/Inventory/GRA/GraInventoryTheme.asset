@@ -45,8 +45,7 @@ MonoBehaviour:
   _conditionColor: {r: 0.39215687, g: 1, b: 0.5882353, a: 1}
   _itemWeightColor: {r: 0.9411765, g: 0.8509804, b: 0.7137255, a: 1}
   _itemInfoBackground: {r: 0, g: 0, b: 0, a: 0.75}
-  _shortNameCategories:
-  - Weapon
+  _shortNameCategories: []
   _labels:
   - _key: use
     _text: "\u0418\u0441\u043F\u043E\u043B\u044C\u0437\u043E\u0432\u0430\u0442\u044C"

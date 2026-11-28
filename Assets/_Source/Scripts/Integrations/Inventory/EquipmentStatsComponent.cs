@@ -5,41 +5,6 @@ using XRay.Importer.Levels;
 
 namespace RaidIntoDarkness.Integrations.Inventory
 {
-    public enum EquipmentStat
-    {
-        FireWound = 0,
-        HelmetFireWound = 1,
-        Wound = 2,
-        Strike = 3,
-        Explosion = 4,
-        Radiation = 5,
-        Telepatic = 6,
-        Burn = 7,
-        Shock = 8,
-        ChemicalBurn = 9,
-        ArtefactCount = 10,
-        AdditionalWeight = 11,
-        Speed = 12,
-        PhysicalDurability = 13,
-        AnomalyDurability = 14
-    }
-
-    [Serializable]
-    public struct AnomalyEquipmentProtectionEntry
-    {
-        [SerializeField] private AnomalyDamageType _type;
-        [SerializeField] private AnomalyProtectionValues _values;
-
-        public AnomalyDamageType Type => _type;
-        public AnomalyProtectionValues Values => _values;
-
-        public AnomalyEquipmentProtectionEntry(AnomalyDamageType type, AnomalyProtectionValues values)
-        {
-            _type = type;
-            _values = values;
-        }
-    }
-
     [Serializable]
     public sealed class EquipmentStatsComponent : ItemDefinitionComponent
     {
@@ -78,21 +43,6 @@ namespace RaidIntoDarkness.Integrations.Inventory
         public string Community => _community ?? string.Empty;
         public Sprite CommunityIcon => _communityIcon;
         public Vector2 CommunityIconSize => _communityIconSize * COMMUNITY_ICON_SCALE;
-        public string ArmorTypeLabel => RepairType switch
-        {
-            "outfit_novice" or "outfit_light" or "helmet_light" => "LIGHT",
-            "outfit_medium" or "helmet_medium" => "MEDIUM",
-            "outfit_heavy" or "helmet_heavy" => "HEAVY",
-            "outfit_exo" or "helmet_exo" => "EXO",
-            _ => Section switch
-            {
-                "helm_hardhat" or "helm_hardhat_snag" => "LIGHT",
-                "helm_m40" or "helm_ach7" or "helm_ach7ex" or "helm_protective" or "helm_ppm88" => "MEDIUM",
-                "helm_tactic" or "helm_m50" or "helm_ranger" or "helm_battle" or "helm_metro" => "HEAVY",
-                "helm_exo" or "helm_spartan" => "EXO",
-                _ => null
-            }
-        };
         public float BurnProtection => _burnProtection;
         public float ShockProtection => _shockProtection;
         public float ChemicalBurnProtection => _chemicalBurnProtection;

@@ -574,48 +574,35 @@ namespace RaidIntoDarkness.Integrations.Inventory
 
         private string FormatItemShortName(ItemInstance item)
         {
-            if (item != null && item.Location.SlotId == FirstPersonWeaponBinder.KNIFE_SLOT && item.ContainerId == _window.EquipmentContainerId)
+            if (item != null && item.ContainerId == _window.EquipmentContainerId)
             {
-                return string.Empty;
+                switch (item.Location.SlotId)
+                {
+                    case FirstPersonWeaponBinder.KNIFE_SLOT:
+                    case "Binocular":
+                    case "Detector":
+                    case "Device":
+                    case "Pda":
+                        return string.Empty;
+                    case OutfitSlotRules.HELMET_SLOT:
+                    case "Outfit":
+                    case OutfitSlotRules.BACKPACK_SLOT:
+                        return item.Definition.ShortName;
+                }
             }
 
-            return FormatDefinitionShortName(item?.Definition);
+            return FormatAmmoShortName(item?.Definition);
         }
 
-        internal static string FormatDefinitionShortName(ItemDefinition definition)
+        internal static string FormatAmmoShortName(ItemDefinition definition)
         {
-            string armorType = definition != null ? definition.GetComponent<EquipmentStatsComponent>()?.ArmorTypeLabel : null;
-
-            if (armorType != null)
-            {
-                return FormatShortNameLabel(armorType);
-            }
-
-            if (definition == null || definition.GetComponent<AmmoStatsComponent>() == null)
+            if (definition == null || definition.GetComponent<AmmoStatsComponent>() == null || string.IsNullOrEmpty(definition.ShortName))
             {
                 return null;
             }
 
-            string name = definition.ShortName;
-            int unit = name.IndexOf("мм", System.StringComparison.OrdinalIgnoreCase);
-            unit = unit >= 0 ? unit : name.IndexOf("mm", System.StringComparison.OrdinalIgnoreCase);
-            string label = unit >= 0 ? name.Substring(unit + 2).Trim() : name;
-
-            if (unit < 0 && name.Length > 0 && (char.IsDigit(name[0]) || name[0] == '.'))
-            {
-                int separator = name.IndexOf(' ');
-                label = separator >= 0 ? name.Substring(separator + 1).Trim() : name;
-            }
-
-            if (label.EndsWith(" FMJ", System.StringComparison.Ordinal))
-            {
-                label = "FMJ";
-            }
-
-            return FormatShortNameLabel(label);
+            return "<size=16><color=#FFFFFF>" + definition.ShortName + "</color></size>";
         }
-
-        private static string FormatShortNameLabel(string label) => "<size=16><color=#FFFFFF>" + label + "</color></size>";
 
         private static float? GetItemCondition(ItemInstance item)
         {

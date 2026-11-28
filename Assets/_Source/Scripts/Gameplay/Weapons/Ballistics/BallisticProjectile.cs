@@ -8,8 +8,6 @@ namespace RaidIntoDarkness.Weapons
     {
         private const int HIT_BUFFER_SIZE = 64;
         private const float MIN_SPEED_SQUARED = 0.0001f;
-        private const float MUZZLE_DEBUG_SIZE = 0.025f;
-        private const float IMPACT_DEBUG_SIZE = 0.035f;
 
         private readonly HashSet<Collider> _ignoredColliders = new HashSet<Collider>();
         private readonly RaycastHit[] _hitBuffer = new RaycastHit[HIT_BUFFER_SIZE];
@@ -35,6 +33,11 @@ namespace RaidIntoDarkness.Weapons
         public Vector3 Velocity => _velocity;
         public float SpeedMetersPerSecond => _velocity.magnitude;
         public float DistanceTravelledMeters => _distanceTravelled;
+
+#if UNITY_EDITOR
+        public static event Action<Ray> EditorShotLaunched;
+        public static event Action<Vector3, Vector3, bool> EditorSegmentSimulated;
+#endif
 
         internal event Action<Vector3> Impacted;
 
@@ -71,11 +74,9 @@ namespace RaidIntoDarkness.Weapons
 
             _tracerView = BallisticTracerView.Create(_ammoData, _position);
 
-            if (_weaponData.DrawBallisticDebug)
-            {
-                DrawMarker(_position, MUZZLE_DEBUG_SIZE, Color.cyan);
-                Debug.DrawLine(_position, _position + direction.normalized * 0.25f, Color.cyan, _weaponData.BallisticDebugDurationSeconds);
-            }
+#if UNITY_EDITOR
+            EditorShotLaunched?.Invoke(new Ray(LaunchPosition, LaunchDirection));
+#endif
         }
 
         private void Update()
@@ -142,6 +143,10 @@ namespace RaidIntoDarkness.Weapons
                 return true;
             }
 
+#if UNITY_EDITOR
+            Vector3 segmentStart = _position;
+#endif
+
             if (TryGetClosestHit(_position, displacement / travelDistance, travelDistance, out RaycastHit hit))
             {
                 float impactFraction = Mathf.Clamp01(hit.distance / travelDistance);
@@ -149,19 +154,12 @@ namespace RaidIntoDarkness.Weapons
                 _distanceTravelled += hit.distance;
                 MoveTracer(hit.point);
 
-                if (_weaponData.DrawBallisticDebug)
-                {
-                    Debug.DrawLine(_position, hit.point, Color.yellow, _weaponData.BallisticDebugDurationSeconds);
-                }
-
                 bool continues = ResolveImpact(hit, impactVelocity);
+#if UNITY_EDITOR
+                EditorSegmentSimulated?.Invoke(segmentStart, hit.point, true);
+#endif
                 Impacted?.Invoke(hit.point);
                 return continues;
-            }
-
-            if (_weaponData.DrawBallisticDebug)
-            {
-                Debug.DrawLine(_position, nextPosition, Color.green, _weaponData.BallisticDebugDurationSeconds);
             }
 
             _distanceTravelled += travelDistance;
@@ -169,6 +167,9 @@ namespace RaidIntoDarkness.Weapons
             _velocity = nextVelocity;
             transform.SetPositionAndRotation(_position, ResolveRotation(_velocity, transform.rotation));
             MoveTracer(_position);
+#if UNITY_EDITOR
+            EditorSegmentSimulated?.Invoke(segmentStart, _position, false);
+#endif
             return true;
         }
 
@@ -187,11 +188,6 @@ namespace RaidIntoDarkness.Weapons
                 transform.SetPositionAndRotation(_position, ResolveRotation(_velocity, transform.rotation));
                 MoveTracer(_position);
 
-                if (_weaponData.DrawBallisticDebug)
-                {
-                    DrawMarker(_position, IMPACT_DEBUG_SIZE, Color.blue);
-                }
-
                 return true;
             }
 
@@ -202,11 +198,6 @@ namespace RaidIntoDarkness.Weapons
 
             _position = hit.point;
             transform.position = _position;
-
-            if (_weaponData.DrawBallisticDebug)
-            {
-                DrawMarker(_position, IMPACT_DEBUG_SIZE, Color.red);
-            }
 
             CompleteTracer();
             Destroy(gameObject);
@@ -339,14 +330,6 @@ namespace RaidIntoDarkness.Weapons
 
             _tracerView.Complete();
             _tracerView = null;
-        }
-
-        private void DrawMarker(Vector3 position, float size, Color color)
-        {
-            float duration = _weaponData.BallisticDebugDurationSeconds;
-            Debug.DrawLine(position - Vector3.right * size, position + Vector3.right * size, color, duration);
-            Debug.DrawLine(position - Vector3.up * size, position + Vector3.up * size, color, duration);
-            Debug.DrawLine(position - Vector3.forward * size, position + Vector3.forward * size, color, duration);
         }
 
         private static Quaternion ResolveRotation(Vector3 velocity, Quaternion fallback)

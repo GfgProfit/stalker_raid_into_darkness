@@ -83,24 +83,45 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             }
         }
 
+#if UNITY_EDITOR
         [UnityTest]
-        public IEnumerator BulletImpactDebugMarksTheSurfaceAndClearsWhenDisabled()
+        public IEnumerator WeaponShotReportsSimulatedTrajectoryToEditorGizmos()
         {
             Vector3 origin = new Vector3(10000f, 10000f, 10000f);
-            var owner = new GameObject("Impact Debug Test Weapon");
-            var muzzleModel = new GameObject("Impact Debug Test Model");
+            var owner = new GameObject("Bullet Gizmo Test Weapon");
+            var muzzleModel = new GameObject("Bullet Gizmo Test Model");
             muzzleModel.transform.SetParent(owner.transform, false);
-            var prefab = new GameObject("Impact Debug Test Bullet");
+            var prefab = new GameObject("Bullet Gizmo Test Bullet");
             GameObject wall = GameObject.CreatePrimitive(PrimitiveType.Cube);
             wall.transform.position = origin + Vector3.forward * 5f;
             var weapon = owner.AddComponent<FirstPersonWeaponController>();
             weapon.enabled = false;
-            var debug = owner.AddComponent<BulletImpactDebug>();
+            Ray? launch = null;
+            Vector3? airborneEnd = null;
+            Vector3? impactStart = null;
+            Vector3? impactEnd = null;
+
+            void RecordLaunch(Ray ray) => launch = ray;
+
+            void RecordSegment(Vector3 start, Vector3 end, bool impact)
+            {
+                if (impact)
+                {
+                    impactStart = start;
+                    impactEnd = end;
+                }
+                else
+                {
+                    airborneEnd = end;
+                }
+            }
+
+            BallisticProjectile.EditorShotLaunched += RecordLaunch;
+            BallisticProjectile.EditorSegmentSimulated += RecordSegment;
 
             try
             {
                 const BindingFlags FLAGS = BindingFlags.Instance | BindingFlags.NonPublic;
-                typeof(BulletImpactDebug).GetField("_lifetime", FLAGS).SetValue(debug, 0.35f);
                 typeof(FirstPersonWeaponController).GetField("_model", FLAGS).SetValue(weapon, muzzleModel);
                 var settings = new WeaponBallisticsSettings();
                 typeof(WeaponBallisticsSettings).GetField("_bulletPrefab", FLAGS).SetValue(settings, prefab);
@@ -108,32 +129,30 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
 
                 Physics.SyncTransforms();
                 shoot.Invoke(weapon, new object[] { settings, new BallisticAmmoData(), origin, Quaternion.identity, 950f, 30f, 0f });
-                GameObject marker = null;
                 float deadline = Time.realtimeSinceStartup + 2f;
-                while (marker == null && Time.realtimeSinceStartup < deadline)
+                while (!impactEnd.HasValue && Time.realtimeSinceStartup < deadline)
                 {
                     yield return null;
-                    marker = GameObject.Find("Bullet Impact Marker");
                 }
 
-                Assert.That(marker, Is.Not.Null);
-                Assert.That(marker.transform.position.z, Is.EqualTo(wall.transform.position.z - 0.5f).Within(0.002f));
-                Assert.That(marker.GetComponent<Collider>(), Is.Null);
-                Assert.That(marker.GetComponent<MeshRenderer>().sharedMaterial.GetColor("_UnlitColor"), Is.EqualTo(Color.red));
-                yield return new WaitForSecondsRealtime(0.4f);
-                Assert.That(marker.activeSelf, Is.False);
-
-                debug.enabled = false;
-                yield return null;
-                Assert.That(marker == null, Is.True);
+                Assert.That(launch.HasValue, Is.True);
+                Assert.That(launch.Value.origin, Is.EqualTo(origin));
+                Assert.That(launch.Value.direction, Is.EqualTo(Vector3.forward));
+                Assert.That(airborneEnd.HasValue, Is.True);
+                Assert.That(impactStart, Is.EqualTo(airborneEnd));
+                Assert.That(impactEnd.HasValue, Is.True);
+                Assert.That(impactEnd.Value.z, Is.EqualTo(wall.transform.position.z - 0.5f).Within(0.002f));
             }
             finally
             {
+                BallisticProjectile.EditorShotLaunched -= RecordLaunch;
+                BallisticProjectile.EditorSegmentSimulated -= RecordSegment;
                 Object.Destroy(owner);
                 Object.Destroy(prefab);
                 Object.Destroy(wall);
             }
         }
+#endif
 
         [UnityTest]
         public IEnumerator TracerIgnitesAtItsDistanceBurnsOutAndRemovesTheTail()

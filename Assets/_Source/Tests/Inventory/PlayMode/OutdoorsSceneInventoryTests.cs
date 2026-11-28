@@ -42,6 +42,74 @@ namespace RaidIntoDarkness.Inventory.Tests
         }
 
         [UnityTest]
+        public IEnumerator ReopenedInventoryShowsStaminaWhenItReturnsToAnEarlierValue()
+        {
+            SceneManager.LoadScene(SCENE, LoadSceneMode.Single);
+            yield return null;
+
+            var controller = Object.FindAnyObjectByType<InventoryWindowController>();
+            var player = Object.FindAnyObjectByType<StalkerPlayerController>();
+            var panel = Object.FindAnyObjectByType<InventoryStatusPanel>(FindObjectsInactive.Include);
+            Assert.That(controller, Is.Not.Null);
+            Assert.That(player, Is.Not.Null);
+            Assert.That(panel, Is.Not.Null);
+
+            StalkerActorCondition condition = player.Motor.Condition;
+            float capacity = condition.PowerCapacity;
+            condition.SetMaxPower(capacity);
+            var changed = typeof(StalkerActorCondition).GetField(nameof(StalkerActorCondition.StatChanged), System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+            Assert.That(changed, Is.Not.Null);
+            int SubscriberCount() => (changed.GetValue(condition) as System.Delegate)?.GetInvocationList().Length ?? 0;
+
+            int closedSubscribers = SubscriberCount();
+            controller.Open();
+            Assert.That(controller.IsOpen, Is.True);
+            Assert.That(SubscriberCount(), Is.EqualTo(closedSubscribers + 1));
+            condition.SetPower(capacity * 0.7f);
+
+            for (int i = 0; i < 2; i++)
+            {
+                Assert.That(panel.GetValue(InventoryWindowController.STATUS_POWER), Is.EqualTo(0.7f).Within(0.0001f));
+                controller.Close();
+                Assert.That(SubscriberCount(), Is.EqualTo(closedSubscribers));
+                condition.SetPower(capacity * 0.3f);
+                Assert.That(panel.GetValue(InventoryWindowController.STATUS_POWER), Is.EqualTo(0.7f).Within(0.0001f));
+
+                controller.Open();
+                Assert.That(SubscriberCount(), Is.EqualTo(closedSubscribers + 1));
+                Assert.That(panel.GetValue(InventoryWindowController.STATUS_POWER), Is.EqualTo(0.3f).Within(0.0001f));
+                Assert.That(panel.GetMaximum(InventoryWindowController.STATUS_POWER), Is.EqualTo(1f));
+                condition.SetPower(capacity * 0.7f);
+                Assert.That(panel.GetValue(InventoryWindowController.STATUS_POWER), Is.EqualTo(0.7f).Within(0.0001f), "returning to the previously published value must update the reopened panel");
+            }
+
+            int staminaNotifications = 0;
+            void CountStamina(StalkerStatKind kind)
+            {
+                if (kind == StalkerStatKind.Stamina)
+                {
+                    staminaNotifications++;
+                }
+            }
+
+            condition.StatChanged += CountStamina;
+            try
+            {
+                condition.SetPower(capacity * 0.7f);
+                condition.SetPower(capacity * 0.6f);
+                condition.SetPower(capacity * 0.6f);
+                Assert.That(staminaNotifications, Is.EqualTo(1));
+            }
+            finally
+            {
+                condition.StatChanged -= CountStamina;
+                controller.Close();
+            }
+
+            Assert.That(SubscriberCount(), Is.EqualTo(closedSubscribers));
+        }
+
+        [UnityTest]
         public IEnumerator ExoskeletonShowsBackpackLockAndPatchRemovalJoinsExistingStack()
         {
             SceneManager.LoadScene(SCENE, LoadSceneMode.Single);

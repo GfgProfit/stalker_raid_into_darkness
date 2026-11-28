@@ -137,12 +137,9 @@ namespace RaidIntoDarkness.Player
                 _statsInitialized = true;
             }
 
-            if (StatChanged != null)
+            for (int index = 0; index < _stats.Length; index++)
             {
-                for (int index = 0; index < _stats.Length; index++)
-                {
-                    PublishStat((StalkerStatKind)index);
-                }
+                PublishStat((StalkerStatKind)index);
             }
         }
 
@@ -380,18 +377,12 @@ namespace RaidIntoDarkness.Player
 
         private void PublishStat(StalkerStatKind kind)
         {
-            System.Action<StalkerStatKind> changed = StatChanged;
-            if (changed == null)
-            {
-                return;
-            }
-
             int index = (int)kind;
             var current = ReadStat(kind);
             if (_publishedStats[index] != current)
             {
                 _publishedStats[index] = current;
-                changed(kind);
+                StatChanged?.Invoke(kind);
             }
         }
 

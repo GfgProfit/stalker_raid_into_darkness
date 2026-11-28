@@ -166,7 +166,7 @@ namespace RaidIntoDarkness.Inventory
                 return;
             }
 
-            RefreshPresentation();
+            RefreshHeader();
             _window.Open();
             _restoreFrame = -1;
             BlockGameplay();
@@ -295,6 +295,12 @@ namespace RaidIntoDarkness.Inventory
 
         public void RefreshPresentation()
         {
+            RefreshHeader();
+            RefreshConditionStatus();
+        }
+
+        private void RefreshHeader()
+        {
             if (_header != null)
             {
                 _header.SetCharacter(_characterName, _community, _portrait, _rank);
@@ -302,13 +308,6 @@ namespace RaidIntoDarkness.Inventory
             }
 
             _statsDirty = true;
-
-            if (_status == null)
-            {
-                return;
-            }
-
-            RefreshConditionStatus();
         }
 
         private void RefreshConditionStatus()

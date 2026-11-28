@@ -180,7 +180,7 @@ namespace RaidIntoDarkness.Inventory.Tests
             var presenter = new EquipmentStatusPresenter(_window, panel, _anomalyConfig);
             presenter.Refresh(null, false);
             Assert.That(text.text, Is.EqualTo("54 / 100 %"));
-            outfit.SetState(EquipmentStatsFormatter.CONDITION_STATE, "0.5");
+            Assert.That(model.TrySetItemStateInPlace(outfit, EquipmentStatsFormatter.CONDITION_STATE, "0.5"), Is.True);
             presenter.Refresh(null, false);
             Assert.That(text.text, Is.EqualTo("19 / 100 %"));
             Assert.That(panel.GetValue(EquipmentStatusPresenter.STATUS_SHOCK), Is.EqualTo(0.189f).Within(0.000001f));

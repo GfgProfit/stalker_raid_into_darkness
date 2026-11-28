@@ -197,7 +197,7 @@ namespace RaidIntoDarkness.Inventory.Tests
         {
             InventoryModel model = CreateModel();
             ItemInstance outfit = Add(model, CreateDefinition(AnomalyEquipmentProtection.OUTFIT_CATEGORY, AnomalyDamageType.Radiation, new AnomalyProtectionValues(70f, 70f, 70f)), Vector2Int.zero);
-            outfit.SetState(AnomalyEquipmentProtection.CONDITION_STATE, "0.5");
+            Assert.That(model.TrySetItemStateInPlace(outfit, AnomalyEquipmentProtection.CONDITION_STATE, "0.5"), Is.True);
             ItemInstance helmet = Add(model, CreateDefinition(AnomalyEquipmentProtection.HELMET_CATEGORY, AnomalyDamageType.Radiation, new AnomalyProtectionValues(20f, 20f, 20f)), Vector2Int.right);
             InventoryContainer equipment = model.GetContainer("Equipment");
             Assert.That(AnomalyEquipmentProtection.GetCombinedProtection(equipment, AnomalyDamageType.Radiation, AnomalyStrength.Average, _config), Is.EqualTo(0.396f).Within(0.000001f));
@@ -214,8 +214,8 @@ namespace RaidIntoDarkness.Inventory.Tests
             InventoryModel model = CreateModel();
             ItemInstance outfit = Add(model, CreateDefinition(AnomalyEquipmentProtection.OUTFIT_CATEGORY, AnomalyDamageType.Radiation, new AnomalyProtectionValues(70f, 70f, 70f)), Vector2Int.zero);
             ItemInstance helmet = Add(model, CreateDefinition(AnomalyEquipmentProtection.HELMET_CATEGORY, AnomalyDamageType.Radiation, new AnomalyProtectionValues(20f, 20f, 20f)), Vector2Int.right);
-            outfit.SetState(AnomalyEquipmentProtection.CONDITION_STATE, "0.5");
-            helmet.SetState(AnomalyEquipmentProtection.CONDITION_STATE, "0.5");
+            Assert.That(model.TrySetItemStateInPlace(outfit, AnomalyEquipmentProtection.CONDITION_STATE, "0.5"), Is.True);
+            Assert.That(model.TrySetItemStateInPlace(helmet, AnomalyEquipmentProtection.CONDITION_STATE, "0.5"), Is.True);
             InventoryContainer equipment = model.GetContainer("Equipment");
             Assert.That(AnomalyEquipmentProtection.GetCombinedProtection(equipment, AnomalyDamageType.Radiation, AnomalyStrength.Average, _config, repaired: outfit), Is.EqualTo(0.721f).Within(0.000001f));
             Assert.That(AnomalyEquipmentProtection.GetCombinedProtection(equipment, AnomalyDamageType.Radiation, AnomalyStrength.Average, _config, repaired: outfit, repairedCondition: 0.8f), Is.EqualTo(0.57778f).Within(0.000001f));
@@ -246,7 +246,7 @@ namespace RaidIntoDarkness.Inventory.Tests
             model.AddContainer(new GridContainer("Equipment", 3, 1));
             ItemInstance outfit = Add(model, CreateDefinition(AnomalyEquipmentProtection.OUTFIT_CATEGORY, AnomalyDamageType.Shock, new AnomalyProtectionValues(80f, 60f, 40f)), Vector2Int.zero);
             Assert.That(runtime.GetAnomalyProtection(AnomalyDamageType.Shock, AnomalyStrength.Weak, _config), Is.EqualTo(0.8f).Within(0.000001f));
-            outfit.SetState(AnomalyEquipmentProtection.CONDITION_STATE, "0.5");
+            Assert.That(model.TrySetItemStateInPlace(outfit, AnomalyEquipmentProtection.CONDITION_STATE, "0.5"), Is.True);
             Assert.That(runtime.GetAnomalyProtection(AnomalyDamageType.Shock, AnomalyStrength.Weak, _config), Is.EqualTo(0.28f).Within(0.000001f));
         }
 

@@ -177,8 +177,7 @@ namespace RaidIntoDarkness.Inventory
                 return false;
             }
 
-            weapon.SetState(AMMO_SECTION_STATE, section);
-            return true;
+            return _model.TrySetItemStateInPlace(weapon, AMMO_SECTION_STATE, section);
         }
 
         public bool TrySwitchAmmo(object weaponKey)
@@ -249,9 +248,7 @@ namespace RaidIntoDarkness.Inventory
                 return _model.TryReconfigureItem(weapon, updated, weapon.Location.Position).Success;
             }
 
-            weapon.SetState(MAGAZINE_STATE, remaining);
-            _model.NotifyItemChanged(weapon);
-            return true;
+            return _model.TrySetItemStateInPlace(weapon, MAGAZINE_STATE, remaining);
         }
 
         public bool CanReloadGrenade(object weaponKey) => FindGrenadeStack(GetWeapon(weaponKey)) != null;
@@ -264,9 +261,7 @@ namespace RaidIntoDarkness.Inventory
                 return false;
             }
 
-            weapon.SetState(InventoryWeaponAttachments.GRENADE_ROUND_STATE, null);
-            _model.NotifyItemChanged(weapon);
-            return true;
+            return _model.TrySetItemStateInPlace(weapon, InventoryWeaponAttachments.GRENADE_ROUND_STATE, null);
         }
 
         public bool ReloadGrenade(object weaponKey)

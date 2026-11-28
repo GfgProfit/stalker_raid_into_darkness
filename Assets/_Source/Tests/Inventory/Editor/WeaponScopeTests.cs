@@ -63,9 +63,11 @@ namespace RaidIntoDarkness.Inventory.Tests
             ItemInstance first = Add(_first, "loot");
             ItemInstance second = Add(_second, "loot");
             ItemInstance silencer = Add(LoadSilencer(), "bag");
-            first.SetState("condition", "0.63");
-            second.SetState("condition", "0.42");
-            weapon.SetState(InventoryWeaponAmmoSource.MAGAZINE_STATE, "17");
+            Assert.That(_model.TrySetItemStateInPlace(first, "condition", "0.63"), Is.True);
+            Assert.That(_model.TrySetItemStateInPlace(second, "condition", "0.42"), Is.True);
+            ItemInstance loaded = weapon.CreateDraft();
+            loaded.SetState(InventoryWeaponAmmoSource.MAGAZINE_STATE, "17");
+            Assert.That(_model.TryReconfigureItem(weapon, loaded, weapon.Location.Position).Success, Is.True);
             Assert.That(_attachments.Install(silencer, weapon).Success, Is.True);
             Vector2Int size = weapon.GetSize(false);
             float total = _model.GetContainer("bag").TotalWeight + _model.GetContainer("loot").TotalWeight;
@@ -100,7 +102,7 @@ namespace RaidIntoDarkness.Inventory.Tests
             ItemInstance weapon = Add(_weapon, "tight");
             ItemInstance first = Add(_first, "loot");
             ItemInstance second = Add(_second, "small");
-            first.SetState("condition", "0.57");
+            Assert.That(_model.TrySetItemStateInPlace(first, "condition", "0.57"), Is.True);
             Assert.That(_attachments.Install(first, weapon).Success, Is.True);
             ItemInstance original = weapon.CreateDraft();
             ItemLocation originalLocation = weapon.Location;
@@ -170,8 +172,10 @@ namespace RaidIntoDarkness.Inventory.Tests
         {
             ItemInstance weapon = Add(_weapon, "bag");
             ItemInstance scope = Add(_first, "loot");
-            scope.SetState("condition", "0.57");
-            scope.SetVisualVariant(new[] { "scope-test-variant" });
+            ItemInstance scopeDraft = scope.CreateDraft();
+            scopeDraft.SetState("condition", "0.57");
+            scopeDraft.SetVisualVariant(new[] { "scope-test-variant" });
+            Assert.That(_model.TryReconfigureItem(scope, scopeDraft, scope.Location.Position).Success, Is.True);
             float totalWeight = weapon.TotalWeight + scope.TotalWeight;
             Assert.That(_attachments.Install(scope, weapon).Success, Is.True);
             Assert.That(weapon.TotalWeight, Is.EqualTo(totalWeight).Within(0.0001f));

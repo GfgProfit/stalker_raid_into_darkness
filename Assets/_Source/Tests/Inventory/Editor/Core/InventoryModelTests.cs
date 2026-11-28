@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using NUnit.Framework;
 using UnityEngine;
+using UnityEngine.TestTools;
 
 namespace RaidIntoDarkness.Inventory.Core.Tests
 {
@@ -33,6 +34,94 @@ namespace RaidIntoDarkness.Inventory.Core.Tests
         public void TearDown()
         {
             _items.Dispose();
+        }
+
+        [Test]
+        public void ObserverFailuresAndNestedCommandsPreserveTheOrderOfCommittedBatches()
+        {
+            _model.Changed -= _changes.Add;
+            var slots = new[]
+            {
+                new SlotDefinition(SlotId.Head, "Head", new RectInt(0, 0, 1, 1), SlotMode.Single, new SlotRule()),
+                new SlotDefinition(SlotId.Detector, "Detector", new RectInt(1, 0, 1, 1), SlotMode.Single, new SlotRule())
+            };
+            var equipment = _model.AddContainer(new SlottedContainer("Equipment", slots, 2, 1, true));
+            ItemInstance outer = _model.CreateItem(_medkit);
+            ItemInstance nestedTransfer = _model.CreateItem(_medkit);
+            ItemInstance nestedEquip = _model.CreateItem(_medkit);
+            ItemInstance next = _model.CreateItem(_medkit);
+            var deliveries = new List<string>();
+            bool nestedCommitted = false;
+            int deliveriesAtNestedReturn = -1;
+
+            _model.ItemEquipped += (_, _, slot) =>
+            {
+                if (slot.Id == SlotId.Head)
+                {
+                    throw new System.InvalidOperationException("equip observer failed");
+                }
+            };
+            _model.ItemEquipped += (_, _, slot) => deliveries.Add("equip:" + slot.Id);
+            _model.Changed += change =>
+            {
+                if (change.Kind == InventoryChangeKind.SlotStateChanged && change.SlotId == SlotId.Head)
+                {
+                    InventoryResult first = _model.TryAdd(nestedTransfer, "Stash", Vector2Int.zero, false);
+                    InventoryResult second = _model.TryAdd(nestedEquip, equipment.Id, Vector2Int.right, false);
+                    nestedCommitted = first.Success && second.Success && nestedTransfer.ContainerId == "Stash" && nestedEquip.Location.SlotId == SlotId.Detector;
+                    deliveriesAtNestedReturn = deliveries.Count;
+                    throw new System.InvalidOperationException("change observer failed");
+                }
+            };
+            _model.Changed += change => deliveries.Add($"{change.Kind}:{change.SlotId}:{change.ContainerId}");
+
+            LogAssert.Expect(LogType.Exception, "InvalidOperationException: equip observer failed");
+            LogAssert.Expect(LogType.Exception, "InvalidOperationException: change observer failed");
+            Assert.That(_model.TryAdd(outer, equipment.Id, Vector2Int.zero, false).Success, Is.True);
+            Assert.That(nestedCommitted, Is.True);
+            Assert.That(deliveriesAtNestedReturn, Is.EqualTo(1));
+            Assert.That(outer.Location.SlotId, Is.EqualTo(SlotId.Head));
+            Assert.That(_model.ItemCount, Is.EqualTo(3));
+            Assert.That(_model.TryAdd(next, "Backpack", Vector2Int.zero, false).Success, Is.True);
+            Assert.That(_model.ItemCount, Is.EqualTo(4));
+            Assert.That(deliveries, Is.EqualTo(new[]
+            {
+                "equip:Head",
+                "SlotStateChanged:Head:Equipment",
+                "ItemAdded:Head:Equipment",
+                "ItemAdded:None:Stash",
+                "equip:Detector",
+                "SlotStateChanged:Detector:Equipment",
+                "ItemAdded:Detector:Equipment",
+                "ItemAdded:None:Backpack"
+            }));
+        }
+
+        [Test]
+        public void LiveItemAndCollectionQueriesRequireModelCommandsForChanges()
+        {
+            ItemInstance item = _model.CreateItem(_rifle);
+            item.SetState("condition", "1");
+            item.SetVisualVariant(new[] { "original" });
+            Assert.That(_model.TryAdd(item, "Backpack", Vector2Int.zero, false).Success, Is.True);
+            Assert.Throws<System.InvalidOperationException>(() => item.SetState("condition", "0"));
+            Assert.Throws<System.InvalidOperationException>(() => item.SetVisualVariant(null));
+            Assert.Throws<System.NotSupportedException>(() => ((IDictionary<string, string>)item.State)["condition"] = "0");
+            Assert.Throws<System.NotSupportedException>(() => ((IList<string>)item.VisualVariant).Clear());
+            Assert.Throws<System.NotSupportedException>(() => ((IList<ItemInstance>)_model.GetContainer("Backpack").Items).Clear());
+            Assert.Throws<System.NotSupportedException>(() => ((IList<InventoryContainer>)_model.Containers).Clear());
+            Assert.That(_model.TryReconfigureItem(item, item, item.Location.Position).Failure, Is.EqualTo(InventoryFailure.InvalidItem));
+
+            ItemInstance draft = item.CreateDraft();
+            draft.SetState("condition", "0.5");
+            draft.SetVisualVariant(new[] { "updated" });
+            Assert.That(item.GetState("condition"), Is.EqualTo("1"));
+            Assert.That(item.VisualVariant, Is.EqualTo(new[] { "original" }));
+            Assert.That(_model.TryReconfigureItem(item, draft, item.Location.Position).Success, Is.True);
+            Assert.That(item.GetState("condition"), Is.EqualTo("0.5"));
+            Assert.That(item.VisualVariant, Is.EqualTo(new[] { "updated" }));
+            Assert.That(_model.TryRemove(item.InstanceId).Success, Is.True);
+            Assert.DoesNotThrow(() => item.SetState("condition", "0.25"));
         }
 
         [Test]
@@ -189,8 +278,8 @@ namespace RaidIntoDarkness.Inventory.Core.Tests
             }
 
             ItemInstance rifle = _model.CreateItem(_rifle);
-            Assert.That(_model.TryAdd(rifle, "Backpack", Vector2Int.zero, false).Success, Is.True);
             rifle.SetState("round", "loaded");
+            Assert.That(_model.TryAdd(rifle, "Backpack", Vector2Int.zero, false).Success, Is.True);
             var updated = new ItemInstance(_rifle, rifle.Amount, rifle.InstanceId);
             ItemInstance addon = _model.CreateItem(_square);
             ItemInstance round = _model.CreateItem(_ammo);

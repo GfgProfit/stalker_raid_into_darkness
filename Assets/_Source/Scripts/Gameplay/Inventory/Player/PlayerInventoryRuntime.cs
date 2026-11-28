@@ -25,6 +25,8 @@ namespace RaidIntoDarkness.Inventory
         [SerializeField] private FirstPersonWeaponController _weapons;
         [SerializeField] private WorldItemInteractor _worldItems;
 
+        private readonly InventoryObservers<Action<ItemInstance, InventoryResult>> _forcedDropCompleted = new();
+
         private InventoryModel _model;
         private AnomalyDamageReceiver _damageReceiver;
         private FirstPersonOutfitBinder _outfitBinder;
@@ -32,7 +34,11 @@ namespace RaidIntoDarkness.Inventory
         private bool _initialized;
         private bool _initializationAttempted;
 
-        internal event Action<ItemInstance, InventoryResult> ForcedDropCompleted;
+        internal event Action<ItemInstance, InventoryResult> ForcedDropCompleted
+        {
+            add => _forcedDropCompleted.Add(value);
+            remove => _forcedDropCompleted.Remove(value);
+        }
 
         internal string PrimaryContainerId => _backpack?.Id;
         internal string EquipmentContainerId => _equipmentContainerId;
@@ -168,7 +174,7 @@ namespace RaidIntoDarkness.Inventory
             GridContainer backpack = model.AddContainer(_backpack.CreateContainer());
             SlottedContainer equipment = model.AddContainer(new SlottedContainer(_equipmentContainerId, slots, width, height, true, _ownerId, _equipmentDisplayName));
             model.AddContainer(_stash.CreateContainer());
-            model.BindOutfitSlotRules(new OutfitSlotRules(equipment, backpack, _worldItems, _player, (item, result) => ForcedDropCompleted?.Invoke(item, result)));
+            model.BindOutfitSlotRules(new OutfitSlotRules(equipment, backpack, _worldItems, _player, PublishForcedDrop));
             SeedOnce();
 
             WeaponAmmo = new InventoryWeaponAmmoSource(model, _backpack.Id);
@@ -218,6 +224,11 @@ namespace RaidIntoDarkness.Inventory
             }
 
             return _worldItems != null && _worldItems.isActiveAndEnabled ? _worldItems.TryDropToWorld(this, item) : Model.TryRemove(item.InstanceId);
+        }
+
+        private void PublishForcedDrop(ItemInstance item, InventoryResult result)
+        {
+            _forcedDropCompleted.Publish((Item: item, Result: result), static (observer, value) => observer(value.Item, value.Result), static value => $"{nameof(ForcedDropCompleted)} for item '{value.Item.InstanceId}'");
         }
 
         public float GetAnomalyProtection(AnomalyDamageType type, AnomalyStrength strength, AnomalyBalanceConfig config)

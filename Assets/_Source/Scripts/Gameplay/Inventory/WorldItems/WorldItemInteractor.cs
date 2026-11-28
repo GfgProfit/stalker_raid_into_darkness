@@ -146,16 +146,7 @@ namespace RaidIntoDarkness.Inventory
             {
                 InventoryModel model = inventory.Model;
                 ItemInstance item = worldItem.Instance ?? model.CreateItem(worldItem.Definition, worldItem.Amount);
-                InventoryResult result = default;
-                Exception notificationError = null;
-                try
-                {
-                    model.TryAddAuto(item, inventory.PrimaryContainerId, out result);
-                }
-                catch (Exception exception) when (result.Success)
-                {
-                    notificationError = exception;
-                }
+                InventoryResult result = model.TryAddAuto(item, inventory.PrimaryContainerId);
 
                 InventoryWindow window = _controller != null ? _controller.Window : null;
                 if (result.Success == false)
@@ -174,11 +165,6 @@ namespace RaidIntoDarkness.Inventory
                     GameObject pickedObject = worldItem.gameObject;
                     pickedObject.SetActive(false);
                     Destroy(pickedObject);
-                }
-
-                if (notificationError != null)
-                {
-                    Debug.LogException(notificationError, this);
                 }
 
                 if (window != null)

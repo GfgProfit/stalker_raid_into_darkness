@@ -168,11 +168,12 @@ namespace RaidIntoDarkness.Inventory.Tests
                 serialized.ApplyModifiedPropertiesWithoutUndo();
             }
             ItemInstance item = runtime.Model.CreateItem(definition);
-            Assert.That(runtime.Model.TryAdd(item, "Equipment", Vector2Int.zero, false).Success, Is.True);
             if (condition != null)
             {
                 item.SetState(AnomalyEquipmentProtection.CONDITION_STATE, condition);
             }
+
+            Assert.That(runtime.Model.TryAdd(item, "Equipment", Vector2Int.zero, false).Success, Is.True);
             return runtime;
         }
 

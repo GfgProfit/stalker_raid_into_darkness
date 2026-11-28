@@ -55,7 +55,7 @@ namespace RaidIntoDarkness.Inventory.Tests
         public void DetailsExplainCombinedTriplesConditionAndBothEquipmentContributions()
         {
             ItemInstance outfit = Add(CreateDefinition("Armor", "Тестовая броня", new AnomalyProtectionValues(80f, 40f, 20f)), Vector2Int.zero);
-            outfit.SetState(EquipmentStatsFormatter.CONDITION_STATE, "0.5");
+            Assert.That(_window.Model.TrySetItemStateInPlace(outfit, EquipmentStatsFormatter.CONDITION_STATE, "0.5"), Is.True);
             Add(CreateDefinition("Head", "Тестовый шлем", new AnomalyProtectionValues(20f, 30f, 40f)), Vector2Int.right);
             var formatter = new EquipmentStatusDetailsFormatter(_window, _config);
             Assert.That(formatter.TryDescribe(EquipmentStatusPresenter.STATUS_SHOCK, false, out string title, out string description), Is.True);
@@ -88,7 +88,7 @@ namespace RaidIntoDarkness.Inventory.Tests
                 serialized.ApplyModifiedPropertiesWithoutUndo();
             }
             ItemInstance outfit = Add(definition, Vector2Int.zero);
-            outfit.SetState(EquipmentStatsFormatter.CONDITION_STATE, "0.5");
+            Assert.That(_window.Model.TrySetItemStateInPlace(outfit, EquipmentStatsFormatter.CONDITION_STATE, "0.5"), Is.True);
             Add(CreateDefinition("Head", "Отдельный шлем", new AnomalyProtectionValues(90f, 90f, 90f)), Vector2Int.right);
             var formatter = new EquipmentStatusDetailsFormatter(_window, _config);
             formatter.TryDescribe(EquipmentStatusPresenter.STATUS_SHOCK, false, out _, out string description);
@@ -140,7 +140,7 @@ namespace RaidIntoDarkness.Inventory.Tests
                 }
                 _window.ConfigurePresentation(theme, null, string.Empty, string.Empty, Color.red);
                 ItemInstance outfit = Add(CreateDefinition("Armor", "Тестовая броня", new AnomalyProtectionValues(80f, 40f, 20f)), Vector2Int.zero);
-                outfit.SetState(EquipmentStatsFormatter.CONDITION_STATE, "0.5");
+                Assert.That(_window.Model.TrySetItemStateInPlace(outfit, EquipmentStatsFormatter.CONDITION_STATE, "0.5"), Is.True);
                 Add(CreateDefinition("Head", "Тестовый шлем", new AnomalyProtectionValues(20f, 30f, 40f)), Vector2Int.right);
                 var formatter = new EquipmentStatusDetailsFormatter(_window, _config);
                 formatter.TryDescribe(EquipmentStatusPresenter.STATUS_SHOCK, false, out _, out string description);
@@ -166,7 +166,7 @@ namespace RaidIntoDarkness.Inventory.Tests
         public void ItemConditionUsesOneOptionalDecimal(string state, string expected)
         {
             ItemInstance outfit = Add(CreateDefinition("Armor", "Тестовая броня", new AnomalyProtectionValues(80f, 40f, 20f)), Vector2Int.zero);
-            outfit.SetState(EquipmentStatsFormatter.CONDITION_STATE, state);
+            Assert.That(_window.Model.TrySetItemStateInPlace(outfit, EquipmentStatsFormatter.CONDITION_STATE, state), Is.True);
             var formatter = new EquipmentStatusDetailsFormatter(_window, _config);
             formatter.TryDescribe(EquipmentStatusPresenter.STATUS_SHOCK, false, out _, out string description);
             Assert.That(Plain(description), Does.Contain("Состояние предмета: " + expected));

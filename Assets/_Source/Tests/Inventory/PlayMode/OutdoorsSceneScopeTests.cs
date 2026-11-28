@@ -81,7 +81,7 @@ namespace RaidIntoDarkness.Inventory.Tests
             ItemInstance first = Add(inventory, "acog");
             ItemInstance second = Add(inventory, "leupold");
             ItemInstance silencer = Add(inventory, "wpn_sil_nato");
-            first.SetState("condition", "0.68");
+            Assert.That(model.TrySetItemStateInPlace(first, "condition", "0.68"), Is.True);
             Assert.That(model.TryEquip(weapon.InstanceId, window.EquipmentContainerId).Success, Is.True);
             Assert.That(controller.Select(FirstPersonWeaponController.PRIMARY_SLOT), Is.True);
             float timeout = Time.time + 6f;
@@ -190,9 +190,11 @@ namespace RaidIntoDarkness.Inventory.Tests
             ItemInstance scope = Add(inventory, "specter");
             string ammoSection = weapon.Definition.GetComponent<WeaponStatsComponent>().AmmoClasses[0];
             ItemDefinition ammo = inventory.Inventory.Database.Definitions.Single(item => item.GetComponent<AmmoStatsComponent>()?.Section == ammoSection);
-            weapon.SetState(InventoryWeaponAmmoSource.AMMO_SECTION_STATE, ammoSection);
-            weapon.SetState(InventoryWeaponAmmoSource.MAGAZINE_STATE, "2");
             InventoryModel model = inventory.Inventory.Model;
+            ItemInstance loaded = weapon.CreateDraft();
+            loaded.SetState(InventoryWeaponAmmoSource.AMMO_SECTION_STATE, ammoSection);
+            loaded.SetState(InventoryWeaponAmmoSource.MAGAZINE_STATE, "2");
+            Assert.That(model.TryReconfigureItem(weapon, loaded, weapon.Location.Position).Success, Is.True);
             Assert.That(model.TryEquip(weapon.InstanceId, inventory.Window.EquipmentContainerId).Success, Is.True);
             int slot = weapon.Location.SlotId == SlotId.Primary ? FirstPersonWeaponController.PRIMARY_SLOT : FirstPersonWeaponController.SECONDARY_SLOT;
             Assert.That(controller.Select(slot), Is.True);

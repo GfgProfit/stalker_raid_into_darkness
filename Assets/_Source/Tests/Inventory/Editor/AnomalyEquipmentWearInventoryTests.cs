@@ -62,7 +62,7 @@ namespace RaidIntoDarkness.Inventory.Tests
             Assert.That(targets[0].ItemId, Is.EqualTo(outfit.InstanceId));
             Assert.That(targets[0].Condition, Is.EqualTo(0.5f));
             Assert.That(targets[0].AnomalyDurability, Is.EqualTo(63f));
-            outfit.SetState(AnomalyEquipmentProtection.CONDITION_STATE, "0.2");
+            runtime.ApplyEquipmentWear(targets[0], 0.2f);
             SetStat(outfitDefinition, "_anomalyDurability", 100f);
             Assert.That(targets[0].Condition, Is.EqualTo(0.5f));
             Assert.That(targets[0].AnomalyDurability, Is.EqualTo(63f));
@@ -299,11 +299,12 @@ namespace RaidIntoDarkness.Inventory.Tests
         private static ItemInstance Add(PlayerInventoryRuntime runtime, ItemDefinition definition, string containerId, int x, string condition = null)
         {
             ItemInstance item = runtime.Model.CreateItem(definition);
-            Assert.That(runtime.Model.TryAdd(item, containerId, new Vector2Int(x, 0), false).Success, Is.True);
             if (condition != null)
             {
                 item.SetState(AnomalyEquipmentProtection.CONDITION_STATE, condition);
             }
+
+            Assert.That(runtime.Model.TryAdd(item, containerId, new Vector2Int(x, 0), false).Success, Is.True);
             return item;
         }
 

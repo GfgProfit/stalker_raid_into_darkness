@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using UnityEngine;
 
 namespace RaidIntoDarkness.Inventory
@@ -8,6 +9,7 @@ namespace RaidIntoDarkness.Inventory
     {
         private readonly List<ItemInstance> _items = new();
         private readonly Dictionary<string, RectInt> _areas = new();
+        private readonly ReadOnlyCollection<ItemInstance> _itemsView;
 
         private ItemInstance[,] _cells;
         private float _maxWeight = -1f;
@@ -20,6 +22,7 @@ namespace RaidIntoDarkness.Inventory
             Width = Mathf.Max(1, width);
             Height = Mathf.Max(1, height);
             _cells = new ItemInstance[Height, Width];
+            _itemsView = _items.AsReadOnly();
         }
 
         public string Id { get; }
@@ -27,7 +30,7 @@ namespace RaidIntoDarkness.Inventory
         public string DisplayName { get; }
         public int Width { get; }
         public int Height { get; protected set; }
-        public IReadOnlyList<ItemInstance> Items => _items;
+        public IReadOnlyList<ItemInstance> Items => _itemsView;
         public InventoryModel Model { get; internal set; }
 
         protected int MaximumStorageHeight => int.MaxValue / Width;

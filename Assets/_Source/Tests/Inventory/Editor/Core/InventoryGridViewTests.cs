@@ -179,7 +179,7 @@ namespace RaidIntoDarkness.Inventory.Core.Tests
                 return InventoryItemDecoration.None;
             };
 
-            model.NotifyItemChanged(second);
+            Assert.That(model.TrySetItemStateInPlace(second, "condition", "0.5"), Is.True);
 
             Assert.That(firstRefreshes, Is.Zero);
             Assert.That(secondRefreshes, Is.EqualTo(1));

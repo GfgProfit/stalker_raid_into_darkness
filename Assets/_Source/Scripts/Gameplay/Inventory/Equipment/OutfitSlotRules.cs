@@ -29,7 +29,7 @@ namespace RaidIntoDarkness.Inventory
 
         public void CancelDrop(PreparedWorldItemDrop drop) => WorldItemInteractor.CancelOutfitDrop(drop);
 
-        public void ReportDrop(ItemInstance item) => _dropCompleted?.Invoke(item, InventoryResult.Ok(item, item.Amount));
+        public void ReportDrop(ItemInstance item, int amount) => _dropCompleted?.Invoke(item, InventoryResult.Ok(item, amount));
 
         public static bool ShouldLock(ItemInstance outfit, SlotId slotId)
         {

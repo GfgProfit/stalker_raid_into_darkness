@@ -109,10 +109,20 @@ namespace RaidIntoDarkness.Inventory.Tests
                     }
                 };
 
+                int deliveredToNext = 0;
+                model.Changed += change =>
+                {
+                    if (change.Kind == expectedChange && change.Item == retained)
+                    {
+                        deliveredToNext++;
+                    }
+                };
+
                 LogAssert.Expect(LogType.Exception, new Regex("InvalidOperationException: Pickup test subscriber threw after inventory commit"));
                 Assert.That(interactor.TryPickUp(worldItem), Is.True);
 
                 Assert.That(notifications, Is.EqualTo(1));
+                Assert.That(deliveredToNext, Is.EqualTo(1));
                 Assert.That(observedAmount, Is.EqualTo(expected));
                 Assert.That(attemptedDuringNotification, Is.False);
                 Assert.That(model.GetItem(retained.InstanceId), Is.SameAs(retained));

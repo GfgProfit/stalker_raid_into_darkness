@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using RaidIntoDarkness.Inventory;
 using RaidIntoDarkness.Inventory.UI;
 using NUnit.Framework;
@@ -675,7 +676,18 @@ namespace RaidIntoDarkness.Inventory.Tests
             Assert.That(weapons.Magazine, Is.EqualTo(30));
             Assert.That(weapons.Reserve, Is.EqualTo(30));
 
+            var observedShots = new List<(int Magazine, int Reserve, string Section)>();
+            void ObserveShot(InventoryChange change)
+            {
+                if (change.Item == item && change.Kind == InventoryChangeKind.ItemStateChanged)
+                {
+                    observedShots.Add((InventoryWeaponAmmoSource.GetLoadedMagazine(item), weapons.Reserve, item.GetState(InventoryWeaponAmmoSource.AMMO_SECTION_STATE)));
+                }
+            }
+
+            string loadedSection = item.GetState(InventoryWeaponAmmoSource.AMMO_SECTION_STATE);
             float previousCaptureDeltaTime = Time.captureDeltaTime;
+            controller.Inventory.Model.Changed += ObserveShot;
             try
             {
                 Time.captureDeltaTime = 1f / 60f;
@@ -683,11 +695,13 @@ namespace RaidIntoDarkness.Inventory.Tests
                 yield return Tap(_mouse.leftButton);
                 yield return null;
                 Assert.That(weapons.Magazine, Is.EqualTo(29));
+                Assert.That(observedShots, Is.EqualTo(new[] { (29, 30, loadedSection) }));
                 Assert.That(ammoView.Text.text, Does.StartWith("29/30 "));
                 Assert.That(Quaternion.Angle(player.CameraController.Recoil.Rotation, Quaternion.identity), Is.GreaterThan(0.01f), "recoil did not move the camera");
             }
             finally
             {
+                controller.Inventory.Model.Changed -= ObserveShot;
                 Time.captureDeltaTime = previousCaptureDeltaTime;
             }
 
@@ -1086,9 +1100,11 @@ namespace RaidIntoDarkness.Inventory.Tests
 
             ItemInstance weapon = AddItem(model, weaponDefinition, window.PrimaryContainerId, 1);
             ItemInstance launcher = AddItem(model, launcherDefinition, window.PrimaryContainerId, 1);
-            launcher.SetState("condition", "0.63");
-            weapon.SetState(InventoryWeaponAmmoSource.AMMO_SECTION_STATE, stats.AmmoClasses[0]);
-            weapon.SetState(InventoryWeaponAmmoSource.MAGAZINE_STATE, "3");
+            Assert.That(model.TrySetItemStateInPlace(launcher, "condition", "0.63"), Is.True);
+            ItemInstance loaded = weapon.CreateDraft();
+            loaded.SetState(InventoryWeaponAmmoSource.AMMO_SECTION_STATE, stats.AmmoClasses[0]);
+            loaded.SetState(InventoryWeaponAmmoSource.MAGAZINE_STATE, "3");
+            Assert.That(model.TryReconfigureItem(weapon, loaded, weapon.Location.Position).Success, Is.True);
             float weaponWeight = weapon.UnitWeight;
             Assert.That(model.TryEquip(weapon.InstanceId, window.EquipmentContainerId).Success, Is.True);
             player.CameraController.SetCursorLocked(true);

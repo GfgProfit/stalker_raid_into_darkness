@@ -47,8 +47,7 @@ namespace RaidIntoDarkness.Inventory
             {
                 return;
             }
-            item.SetState(AnomalyEquipmentProtection.CONDITION_STATE, remainingCondition.ToString("R", CultureInfo.InvariantCulture));
-            model.NotifyItemChanged(item);
+            model.TrySetItemStateInPlace(item, AnomalyEquipmentProtection.CONDITION_STATE, remainingCondition.ToString("R", CultureInfo.InvariantCulture));
         }
     }
 }

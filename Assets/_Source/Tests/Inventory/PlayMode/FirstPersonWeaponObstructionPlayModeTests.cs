@@ -47,12 +47,15 @@ namespace RaidIntoDarkness.Inventory.Tests
 
             Assert.That(controller.State, Is.EqualTo(FirstPersonWeaponState.Ready));
             ItemDefinition dropDefinition = inventory.Inventory.Database.Definitions.First(item => item?.GetComponent<EquipmentStatsComponent>()?.Section == "dolg_outfit");
-            weapon.SetState(InventoryWeaponAmmoSource.AMMO_SECTION_STATE, weaponDefinition.GetComponent<WeaponStatsComponent>().AmmoClasses[0]);
+            string ammoSection = weaponDefinition.GetComponent<WeaponStatsComponent>().AmmoClasses[0];
             inventory.Open();
 
             foreach (int rounds in new[] { 0, 1 })
             {
-                weapon.SetState(InventoryWeaponAmmoSource.MAGAZINE_STATE, rounds.ToString());
+                ItemInstance loaded = weapon.CreateDraft();
+                loaded.SetState(InventoryWeaponAmmoSource.AMMO_SECTION_STATE, ammoSection);
+                loaded.SetState(InventoryWeaponAmmoSource.MAGAZINE_STATE, rounds.ToString());
+                Assert.That(model.TryReconfigureItem(weapon, loaded, weapon.Location.Position).Success, Is.True);
                 ItemInstance itemToDrop = model.CreateItem(dropDefinition);
                 Assert.That(model.TryAddAuto(itemToDrop, window.PrimaryContainerId, false).Success, Is.True);
                 yield return new WaitForSeconds(0.3f);

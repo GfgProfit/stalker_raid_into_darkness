@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using UnityEngine;
 
 namespace RaidIntoDarkness.Inventory
@@ -8,6 +9,8 @@ namespace RaidIntoDarkness.Inventory
     {
         private readonly Dictionary<string, string> _state = new(StringComparer.Ordinal);
         private readonly List<string> _visualVariant = new();
+        private ReadOnlyDictionary<string, string> _stateView;
+        private ReadOnlyCollection<string> _visualVariantView;
         private Dictionary<WeaponAddonKind, ItemInstance> _mountedWeaponAttachments;
 
         public ItemInstance(ItemDefinition definition, int amount, string instanceId = null)
@@ -24,8 +27,8 @@ namespace RaidIntoDarkness.Inventory
         public ItemDefinition Definition { get; }
         public int Amount { get; internal set; }
         public ItemLocation Location { get; internal set; }
-        public IReadOnlyDictionary<string, string> State => _state;
-        public IReadOnlyList<string> VisualVariant => _visualVariant;
+        public IReadOnlyDictionary<string, string> State => _stateView ??= new ReadOnlyDictionary<string, string>(_state);
+        public IReadOnlyList<string> VisualVariant => _visualVariantView ??= _visualVariant.AsReadOnly();
         public int MaxStack => Definition.MaxStack;
         public bool IsStackable => Definition.IsStackable;
         public bool IsFullStack => Amount >= MaxStack;
@@ -33,6 +36,8 @@ namespace RaidIntoDarkness.Inventory
         public IItemDefinitionResolver Resolver { get; internal set; }
         public float TotalWeight => UnitWeight * Amount;
         public string ContainerId => Location.ContainerId;
+
+        internal InventoryModel Owner { get; set; }
 
         public float UnitWeight
         {
@@ -71,27 +76,44 @@ namespace RaidIntoDarkness.Inventory
 
         public void SetState(string key, string value)
         {
+            RequireDetached();
+            WriteState(key, value);
+        }
+
+        internal bool CommitStateValue(InventoryModel owner, string key, string value)
+        {
+            if (owner == null || Owner != owner)
+            {
+                throw new InvalidOperationException($"Item '{InstanceId}' can only be changed by its owning inventory.");
+            }
+
+            return WriteState(key, value);
+        }
+
+        private bool WriteState(string key, string value)
+        {
             if (string.IsNullOrEmpty(key))
             {
-                return;
+                return false;
             }
 
             if (value == null)
             {
-                _state.Remove(key);
-                return;
+                return _state.Remove(key);
             }
 
             if (_state.TryGetValue(key, out string current) && current == value)
             {
-                return;
+                return false;
             }
 
             _state[key] = value;
+            return true;
         }
 
         public void SetVisualVariant(IEnumerable<string> definitionIds)
         {
+            RequireDetached();
             _visualVariant.Clear();
 
             if (definitionIds != null)
@@ -114,6 +136,7 @@ namespace RaidIntoDarkness.Inventory
 
         internal void SetMountedWeaponAttachment(WeaponAddonKind kind, ItemInstance attachment)
         {
+            RequireDetached();
             if (attachment == null && _mountedWeaponAttachments == null)
             {
                 return;
@@ -156,6 +179,14 @@ namespace RaidIntoDarkness.Inventory
 
             _visualVariant.Clear();
             _visualVariant.AddRange(source._visualVariant);
+        }
+
+        private void RequireDetached()
+        {
+            if (Owner != null)
+            {
+                throw new InvalidOperationException($"Item '{InstanceId}' belongs to an inventory. Change it through an inventory command.");
+            }
         }
 
         private bool HasSameState(ItemInstance other)

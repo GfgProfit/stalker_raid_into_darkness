@@ -45,7 +45,7 @@ namespace RaidIntoDarkness.Inventory.Tests
                 InventoryContainer grid = model.AddContainer(new GridContainer("SilencerTest" + i, rotated ? 2 : length, rotated ? length : 2));
                 ItemInstance weapon = model.CreateItem(weaponDefinition);
                 ItemInstance silencer = Add(controller, silencerDefinition, controller.Window.SecondaryContainerId);
-                silencer.SetState("condition", "0.67");
+                Assert.That(model.TrySetItemStateInPlace(silencer, "condition", "0.67"), Is.True);
                 Vector2Int position = left ? rotated ? Vector2Int.up : Vector2Int.right : Vector2Int.zero;
                 Assert.That(model.TryAdd(weapon, grid.Id, position, rotated).Success, Is.True);
 

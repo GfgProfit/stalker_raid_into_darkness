@@ -280,6 +280,39 @@ namespace RaidIntoDarkness.Inventory.Core.Tests
             Assert.That(tooltip.IsVisible, Is.False);
         }
 
+        [Test]
+        public void RebindingToAnotherModelClearsDragAndRejectsHoverFromTheOldView()
+        {
+            InventoryWindow window = CreateWindow(out InventoryTooltip tooltip, out InventoryModel oldModel);
+            ItemDefinition definition = _items.Create("item", Vector2Int.one);
+            ItemInstance oldItem = oldModel.CreateItem(definition);
+            Assert.That(oldModel.TryAdd(oldItem, "Backpack", Vector2Int.zero, false).Success, Is.True);
+            InventoryGridViewBase grid = window.Grids[0];
+            InventoryItemView oldView = grid.GetItemView(oldItem);
+            Assert.That(window.BeginDrag(oldItem, grid, oldItem.Amount, Vector2.zero, null), Is.True);
+            InventoryItemDragGhost oldGhost = window.Drag.Ghost;
+
+            var model = new InventoryModel(_items.Database);
+            model.AddContainer(new GridContainer("Backpack", 10, 8, "Player", "Backpack"));
+            ItemInstance item = model.CreateItem(definition);
+            Assert.That(model.TryAdd(item, "Backpack", Vector2Int.zero, false).Success, Is.True);
+            window.Bind(model, null);
+
+            var pointer = new PointerEventData(EventSystem.current);
+            window.HandleItemPointerEnter(oldView, pointer);
+            Assert.That(window.Drag, Is.Null);
+            Assert.That(oldGhost == null, Is.True);
+            Assert.That(window.HoveredItem, Is.Null);
+            Assert.That(tooltip.IsVisible, Is.False);
+            Assert.That(oldModel.TryRemove(oldItem.InstanceId).Success, Is.True);
+            InventoryItemView view = grid.GetItemView(item);
+            window.HandleItemPointerEnter(view, pointer);
+            Assert.That(window.HoveredItem, Is.SameAs(item));
+            window.Unbind();
+            window.Unbind();
+            Assert.That(window.HoveredItem, Is.Null);
+        }
+
         private InventoryWindow CreateWindow(out InventoryTooltip tooltip, out InventoryModel model)
         {
             InventoryGridView grid = CreateGrid();

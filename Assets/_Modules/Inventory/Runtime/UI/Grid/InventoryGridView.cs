@@ -13,6 +13,7 @@ namespace Inventory.UI
 
         private int _resolvedColumns = 1;
         private int _resolvedRows = 1;
+        private int _contentRows;
         private string _layoutWarning = string.Empty;
 
         public InventoryGridSizeMode SizeMode => _sizeMode;
@@ -34,10 +35,24 @@ namespace Inventory.UI
             Rebuild();
         }
 
-        public override InventoryContainer CreateContainer()
+        public override InventoryContainer CreateContainer() => CreateContainer(0);
+
+        public GridContainer CreateContainer(int rowGrowth)
         {
             ComputeLayout();
-            return new GridContainer(ContainerId, _resolvedColumns, _resolvedRows, OwnerId, DisplayName);
+            int rows = _sizeMode == InventoryGridSizeMode.AutoSize ? Mathf.Max(1, _rows) : _resolvedRows;
+            return new GridContainer(ContainerId, _resolvedColumns, rows, OwnerId, DisplayName, rowGrowth);
+        }
+
+        public void SetContentRows(int rows)
+        {
+            if (_contentRows == rows)
+            {
+                return;
+            }
+
+            _contentRows = rows;
+            Rebuild();
         }
 
         public override bool TryGetCellAtLocal(Vector2 topLeftLocal, out Vector2Int cell)
@@ -60,7 +75,7 @@ namespace Inventory.UI
             if (_sizeMode == InventoryGridSizeMode.AutoSize)
             {
                 _resolvedColumns = Mathf.Max(1, _columns);
-                _resolvedRows = Mathf.Max(1, _rows);
+                _resolvedRows = Mathf.Max(1, _contentRows > 0 ? _contentRows : _rows);
                 return;
             }
 

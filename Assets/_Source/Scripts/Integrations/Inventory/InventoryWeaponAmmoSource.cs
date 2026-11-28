@@ -427,13 +427,13 @@ namespace RaidIntoDarkness.Integrations.Inventory
             ItemDefinition definition = FindDefinition(GetAmmoSection(weaponKey));
             InventoryContainer container = _model.GetContainer(_containerId);
 
-            if (definition == null || container is not GridContainer)
+            if (definition == null || container is not GridContainer grid)
             {
                 return false;
             }
 
             var plan = new InventoryModel(_model.Resolver);
-            plan.AddContainer(new GridContainer(container.Id, container.Width, container.Height) { MaxWeight = container.MaxWeight });
+            plan.AddContainer(new GridContainer(grid.Id, grid.Width, grid.Height, grid.OwnerId, grid.DisplayName, grid.RowGrowth) { MaxWeight = grid.MaxWeight });
             InventorySaveData snapshot = InventorySerializer.Capture(_model, new[] { _containerId });
 
             if (InventorySerializer.Restore(plan, snapshot).IsClean == false)

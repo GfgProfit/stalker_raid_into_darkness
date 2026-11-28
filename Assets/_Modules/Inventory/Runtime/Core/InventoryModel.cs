@@ -249,7 +249,7 @@ namespace Inventory
 
             container.Release(item);
             item.CopyStateFrom(updated);
-            container.Occupy(item, placement);
+            container.CommitPlacement(item, placement);
 
             CommitReturn(returned, returnedAmount, returnMerges, destination, returnedPlacement);
             CommitReturn(returnedStack, stackAmount, stackMerges, destination, stackPlacement);
@@ -1253,7 +1253,7 @@ namespace Inventory
         private void OccupyInternal(ItemInstance item, InventoryContainer container, ItemPlacement placement)
         {
             item.Resolver = Resolver;
-            container.Occupy(item, placement);
+            container.CommitPlacement(item, placement);
 
             if (container is SlottedContainer slotted)
             {
@@ -1324,22 +1324,6 @@ namespace Inventory
             {
                 Changed?.Invoke(changes[i]);
             }
-        }
-
-        private readonly struct EquipEvent
-        {
-            public EquipEvent(bool equipped, ItemInstance item, SlottedContainer container, SlotDefinition slot)
-            {
-                Equipped = equipped;
-                Item = item;
-                Container = container;
-                Slot = slot;
-            }
-
-            public bool Equipped { get; }
-            public ItemInstance Item { get; }
-            public SlottedContainer Container { get; }
-            public SlotDefinition Slot { get; }
         }
     }
 }

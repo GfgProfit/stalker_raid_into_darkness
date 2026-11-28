@@ -28,6 +28,8 @@ namespace RaidIntoDarkness.Integrations.Inventory
         public const string OUTFIT_PATCH_ACTION = "outfit_patch";
         public const string UNLOAD_WEAPON_ACTION = "unload_weapon";
 
+        private const int BACKPACK_ROW_GROWTH = 2;
+
         private static readonly Color _compatibleAmmoTint = new(0f, 1f, 0.35f, 0.22f);
 
         [SerializeField] private InventoryWindow _window;
@@ -52,6 +54,8 @@ namespace RaidIntoDarkness.Integrations.Inventory
 
         [Inject] private IGameSettings _gameSettings;
         private InventorySortingPlus _sorting;
+        private InventoryBackpackLayoutViewModel _backpackLayout;
+        private IDisposable _backpackRowsBinding;
         private EquipmentStatsFormatter _statsFormatter;
         private IDisposable _descriptionBinding;
         private EquipmentStatusPresenter _statusPresenter;
@@ -188,6 +192,11 @@ namespace RaidIntoDarkness.Integrations.Inventory
         private void OnEnable()
         {
             BindStatusHover();
+            if (_bound && IsOpen)
+            {
+                BindBackpackLayout();
+            }
+
             Enable(_toggleInventory);
             Enable(_closeInventory);
             Enable(_toggleStash);
@@ -344,6 +353,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
 
         private void OnDisable()
         {
+            UnbindBackpackLayout();
             UnbindStatusHover();
             if (_gameplayBlocked)
             {
@@ -358,6 +368,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
 
         private void OnDestroy()
         {
+            UnbindBackpackLayout();
             _descriptionBinding?.Dispose();
             UnbindStatusHover();
             if (_window != null && _window.ItemShortNameProvider == FormatItemShortName)
@@ -379,6 +390,12 @@ namespace RaidIntoDarkness.Integrations.Inventory
             if (_bound && _inventory != null)
             {
                 _inventory.Model.Changed -= OnModelChanged;
+            }
+
+            if (_bound && _window != null)
+            {
+                _window.Opened -= OnInventoryOpened;
+                _window.Closed -= OnInventoryClosed;
             }
 
             if (_outfitBinder != null)
@@ -439,7 +456,23 @@ namespace RaidIntoDarkness.Integrations.Inventory
 
             _bound = true;
             _window.ItemConditionProvider = GetItemCondition;
+            if (_window.FindGrid(_window.PrimaryContainerId) is InventoryGridView backpackGrid)
+            {
+                InventoryBackpackViewport.Ensure(backpackGrid);
+                if (_inventory.Model.GetContainer(backpackGrid.ContainerId) == null)
+                {
+                    _inventory.Model.AddContainer(backpackGrid.CreateContainer(BACKPACK_ROW_GROWTH));
+                }
+            }
+
             _window.Bind(_inventory.Model, new ItemIconCacheProvider());
+            _window.Opened += OnInventoryOpened;
+            _window.Closed += OnInventoryClosed;
+            if (_window.IsOpen)
+            {
+                BindBackpackLayout();
+            }
+
             BindBackpackLockSprite();
             _inventory.SeedOnce();
             BindSorting();
@@ -485,6 +518,27 @@ namespace RaidIntoDarkness.Integrations.Inventory
 
             UpdateMaxCarryWeight();
         }
+
+        private void BindBackpackLayout()
+        {
+            if (isActiveAndEnabled && _backpackLayout == null && _window.FindGrid(_window.PrimaryContainerId) is InventoryGridView grid && grid.Container is GridContainer { RowGrowth: > 0 } backpack)
+            {
+                _backpackLayout = new InventoryBackpackLayoutViewModel(backpack);
+                _backpackRowsBinding = _backpackLayout.Rows.Subscribe(grid.SetContentRows);
+            }
+        }
+
+        private void UnbindBackpackLayout()
+        {
+            _backpackRowsBinding?.Dispose();
+            _backpackLayout?.Dispose();
+            _backpackRowsBinding = null;
+            _backpackLayout = null;
+        }
+
+        private void OnInventoryOpened(InventoryWindow window) => BindBackpackLayout();
+
+        private void OnInventoryClosed(InventoryWindow window) => UnbindBackpackLayout();
 
         private void BindItemDescriptions()
         {

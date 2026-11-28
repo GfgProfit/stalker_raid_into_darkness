@@ -1,51 +1,15 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace Inventory
 {
-    public enum InventoryFailure
-    {
-        None,
-        InvalidItem,
-        ItemNotFound,
-        ContainerNotFound,
-        OutOfBounds,
-        Occupied,
-        NoSlot,
-        SlotUnavailable,
-        SlotRejected,
-        ValidatorRejected,
-        RotationNotAllowed,
-        NotStackable,
-        StackFull,
-        InvalidAmount,
-        NoSpace,
-        AlreadyInInventory,
-        DependentSlotOccupied,
-        Duplicate
-    }
-
-    public readonly struct ItemPlacement
-    {
-        public ItemPlacement(Vector2Int position, RectInt area, bool rotated, string slotId)
-        {
-            Position = position;
-            Area = area;
-            Rotated = rotated;
-            SlotId = slotId ?? string.Empty;
-        }
-
-        public Vector2Int Position { get; }
-        public RectInt Area { get; }
-        public bool Rotated { get; }
-        public string SlotId { get; }
-    }
-
     public abstract class InventoryContainer
     {
-        private readonly ItemInstance[,] _cells;
         private readonly List<ItemInstance> _items = new();
         private readonly Dictionary<string, RectInt> _areas = new();
+
+        private ItemInstance[,] _cells;
 
         protected InventoryContainer(string id, string ownerId, string displayName, int width, int height)
         {
@@ -54,17 +18,20 @@ namespace Inventory
             DisplayName = string.IsNullOrEmpty(displayName) ? id : displayName;
             Width = Mathf.Max(1, width);
             Height = Mathf.Max(1, height);
-            _cells = new ItemInstance[Width, Height];
+            _cells = new ItemInstance[Height, Width];
         }
 
         public string Id { get; }
         public string OwnerId { get; }
         public string DisplayName { get; }
         public int Width { get; }
-        public int Height { get; }
+        public int Height { get; protected set; }
         public float MaxWeight { get; set; } = -1f;
         public IReadOnlyList<ItemInstance> Items => _items;
         public InventoryModel Model { get; internal set; }
+
+        protected int MaximumStorageHeight => int.MaxValue / Width;
+        protected virtual int PlacementHeight => Height;
 
         public float TotalWeight
         {
@@ -83,7 +50,7 @@ namespace Inventory
 
         public bool Contains(ItemInstance item) => item != null && _areas.ContainsKey(item.InstanceId);
 
-        public ItemInstance GetItemAt(Vector2Int cell) => IsInside(cell) ? _cells[cell.x, cell.y] : null;
+        public ItemInstance GetItemAt(Vector2Int cell) => IsInside(cell) && cell.y < _cells.GetLength(0) ? _cells[cell.y, cell.x] : null;
 
         public RectInt GetItemArea(ItemInstance item) => item != null && _areas.TryGetValue(item.InstanceId, out RectInt area) ? area : default;
 
@@ -133,16 +100,17 @@ namespace Inventory
 
         public bool IsAreaFree(RectInt area, ItemInstance self, ICollection<ItemInstance> ignored = null)
         {
-            if (area.xMin < 0 || area.yMin < 0 || area.xMax > Width || area.yMax > Height)
+            if (area.xMin < 0 || area.yMin < 0 || area.xMax > Width || area.yMax > PlacementHeight)
             {
                 return false;
             }
 
+            int occupiedBottom = Mathf.Min(area.yMax, _cells.GetLength(0));
             for (int x = area.xMin; x < area.xMax; x++)
             {
-                for (int y = area.yMin; y < area.yMax; y++)
+                for (int y = area.yMin; y < occupiedBottom; y++)
                 {
-                    ItemInstance occupant = _cells[x, y];
+                    ItemInstance occupant = _cells[y, x];
 
                     if (occupant != null && occupant != self && (ignored == null || ignored.Contains(occupant) == false))
                     {
@@ -191,13 +159,24 @@ namespace Inventory
             }
         }
 
+        internal virtual void CommitPlacement(ItemInstance item, ItemPlacement placement) => Occupy(item, placement);
+
         internal virtual void Occupy(ItemInstance item, ItemPlacement placement)
         {
+            int capacity = _cells.GetLength(0);
+            if (placement.Area.yMax > capacity)
+            {
+                int rows = (int)Math.Min(MaximumStorageHeight, Math.Max(placement.Area.yMax, 2L * capacity));
+                var cells = new ItemInstance[rows, Width];
+                Array.Copy(_cells, cells, _cells.Length);
+                _cells = cells;
+            }
+
             for (int x = placement.Area.xMin; x < placement.Area.xMax; x++)
             {
                 for (int y = placement.Area.yMin; y < placement.Area.yMax; y++)
                 {
-                    _cells[x, y] = item;
+                    _cells[y, x] = item;
                 }
             }
 
@@ -219,9 +198,9 @@ namespace Inventory
                 {
                     for (int y = area.yMin; y < area.yMax; y++)
                     {
-                        if (_cells[x, y] == item)
+                        if (_cells[y, x] == item)
                         {
-                            _cells[x, y] = null;
+                            _cells[y, x] = null;
                         }
                     }
                 }
@@ -239,43 +218,6 @@ namespace Inventory
 
         internal virtual bool CanRelease(ItemInstance item, out InventoryFailure failure)
         {
-            failure = InventoryFailure.None;
-            return true;
-        }
-    }
-
-    public sealed class GridContainer : InventoryContainer
-    {
-        public GridContainer(string id, int width, int height, string ownerId = null, string displayName = null) : base(id, ownerId, displayName, width, height)
-        {
-        }
-
-        public override bool TryResolvePlacement(ItemInstance item, Vector2Int position, bool rotated, out ItemPlacement placement, out InventoryFailure failure)
-        {
-            placement = default;
-
-            if (item == null || item.Definition == null)
-            {
-                failure = InventoryFailure.InvalidItem;
-                return false;
-            }
-
-            if (rotated && item.Definition.AllowRotation == false && item.Definition.Width != item.Definition.Height)
-            {
-                failure = InventoryFailure.RotationNotAllowed;
-                return false;
-            }
-
-            Vector2Int size = item.GetSize(rotated);
-            var area = new RectInt(position, size);
-
-            if (area.xMin < 0 || area.yMin < 0 || area.xMax > Width || area.yMax > Height)
-            {
-                failure = InventoryFailure.OutOfBounds;
-                return false;
-            }
-
-            placement = new ItemPlacement(position, area, rotated, string.Empty);
             failure = InventoryFailure.None;
             return true;
         }

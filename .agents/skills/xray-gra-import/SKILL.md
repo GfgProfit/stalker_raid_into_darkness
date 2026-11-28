@@ -15,7 +15,7 @@ You MUST NOT change these parts of the importer unless the task directly require
 
 ## Project asset locations
 
-> New items MUST use the item layout in [Game Assets](../../../AGENTS.md#game-assets). The two rows marked legacy describe older setup destinations. Verify destinations before running a setup.
+> New items MUST use the item layout in [Game Assets](../../../AGENTS.md#game-assets). Verify actual destinations before running a setup.
 
 | Asset | Path |
 |---|---|
@@ -26,9 +26,8 @@ You MUST NOT change these parts of the importer unless the task directly require
 | Hand HUD motions (pickup and equip) | `Assets/_Source/FirstPerson/Animations/Hands/` |
 | Equipment animations | `Assets/_Source/FirstPerson/Equipment/` (HUD models, item OMF, `.anm`, sounds, and `EquipmentAnimationLibrary.asset`) |
 | Outfit-to-hands/body catalog | `Assets/_Source/FirstPerson/Outfits/OutfitCatalog.asset` |
-| World item models and prefabs (legacy) | `Assets/_Source/Items/{Outfits,Helmets,Backpacks}/{Models,Prefabs}` |
-| Item definitions (legacy) | `Assets/_Source/Items/Definitions/{Armor,Head,Backpack}` |
-| Icons (weapons and attachments follow `weapon-iwp`) | `Assets/_Source/Items/Icons` uses 2D Sprite slices from `[Интерфейс] HD GRA Иконки`. `ItemDefinition` has an icon override field |
+| World item models, prefabs, and definitions | The item folder specified in [Game Assets](../../../AGENTS.md#game-assets). |
+| Icons (weapons and attachments follow `weapon-iwp`) | Use 2D Sprite slices from `[Интерфейс] HD GRA Иконки` in the shared item atlases specified in [Game Assets](../../../AGENTS.md#game-assets). Set the `ItemDefinition` icon override. |
 | Camera `.anm` motions | `Assets/_Source/Settings/Player/Camera/Anm/` |
 
 The importer generates `Textures/` and `Materials/` beside the model. You MUST reuse those assets or keep an item-local copy when independent edits are required under [Game Assets](../../../AGENTS.md#game-assets).

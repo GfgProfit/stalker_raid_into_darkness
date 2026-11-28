@@ -14,7 +14,7 @@ This skill is REQUIRED before creating or directly editing project-owned handwri
 - Nested types, multiple namespaces or conditional branches used to hide extra declarations, and handwritten partial fragmentation are FORBIDDEN. Files with role suffixes such as `PlayerController.Input.cs`, `PlayerController.Lifecycle.cs`, and `PlayerController.Part1.cs` MUST NOT store fragments. Regions MAY organize one cohesive type within its file. They do not split responsibilities.
 - A single handwritten `partial` declaration is permitted only when an existing compiler, source generator, or tooling contract requires generated counterparts. You MUST verify that contract. New handwritten fragments, new generation to evade the rule, and hand edits to generated or third-party files for style compliance are FORBIDDEN. Assembly/module attributes, global usings and other legitimate non-type directives require no artificial type.
 - Members, constructors, properties, fields, methods, local functions, and events using existing delegates MUST remain in their owning type. Generic parameters are not types declared by a file. Related declarations MUST stay in the owning feature/domain folder without new global DTO/helper folders, forwarding-only wrappers or layers.
-- You SHOULD prefer the existing folders under `Assets/_Source/Scripts`: `Gameplay`, `Inventory`, `Items`, `UI`, `Rendering`, `Editor`, `Services`, `Infrastructure` and `Configs`. A clear reason is REQUIRED for a new top-level architecture folder.
+- Follow [Project Folder Layout](../../../AGENTS.md#project-folder-layout) when placing C# files and checking assembly membership.
 
 ## Safe legacy changes
 

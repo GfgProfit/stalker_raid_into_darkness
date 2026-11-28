@@ -76,22 +76,39 @@
 ```text
 Assets/
 ├── _Source/
-│   ├── Anomalies/          # Аномалии и их ресурсы
-│   ├── Items/              # Оружие, снаряжение, определения предметов
-│   ├── Levels/             # Импортированные локации
-│   ├── Scripts/            # Игровая логика и интеграции
-│   └── Shaders/            # Шейдеры и графические эффекты
-├── _Modules/
-│   └── Inventory/          # Независимый модуль инвентаря
-├── _Tools/
-│   └── X-Ray OGF OMG Importer/  # Инструменты импорта X-Ray
-└── _BENCHMARK/              # Бенчмарки, сценарии, проверки
+│   ├── Scripts/
+│   │   ├── DI/Runtime/
+│   │   ├── Editor/
+│   │   ├── Gameplay/
+│   │   │   ├── Effects/
+│   │   │   ├── FirstPerson/
+│   │   │   ├── Inventory/
+│   │   │   ├── Player/
+│   │   │   └── Weapons/
+│   │   ├── Graphics/
+│   │   ├── UI/
+│   │   └── Utils/
+│   ├── Resources/Items/
+│   ├── Levels/
+│   ├── Settings/
+│   ├── Tests/
+│   ├── UI/
+│   ├── Anomalies/
+│   ├── Effects/
+│   ├── FirstPerson/
+│   └── Shaders/
+├── _Tools/X-Ray OGF OMG Importer/
+├── _BENCHMARK/
+├── MainMenu.unity
+└── TEST_SCENE.unity
 
-Packages/                   # Зависимости Unity Package Manager
-ProjectSettings/            # Настройки проекта Unity
+Packages/
+ProjectSettings/
 ```
 
-Игровой код и интеграции находятся преимущественно в `Assets/_Source/Scripts`. Инструменты переноса ресурсов и вспомогательные модули вынесены отдельно, чтобы ими было проще управлять и тестировать.
+В дереве показаны основные папки. Внутри `Assets/_Source/` логика инвентаря лежит в `Scripts/Gameplay/Inventory/`, интерфейс в её подпапке `UI/`, редакторские инструменты в `Scripts/Editor/Inventory/`, а тесты в `Tests/Inventory/`. Игровые ассеты лежат у своего владельца. Общие атласы предметов находятся в `Assets/_Source/UI/Item Icons/`.
+
+Правила размещения файлов и границы сборок описаны в [AGENTS.md](AGENTS.md#project-folder-layout).
 
 ## Как открыть проект
 
@@ -144,7 +161,7 @@ git lfs pull
 Технические детали вынесены в документацию соответствующих подсистем:
 
 - **[X-Ray OGF/OMF Importer](Assets/_Tools/X-Ray%20OGF%20OMG%20Importer/README.md)** — форматы, импорт моделей и анимаций, текстуры, материалы, источники MO2.
-- **[Inventory](Assets/_Modules/Inventory/Documentation/README.md)** — устройство инвентаря, операции, экипировка, интерфейс и сериализация.
+- **[Исходный код инвентаря](Assets/_Source/Scripts/Gameplay/Inventory)** — модель, операции, экипировка и интерфейс.
 - **[Бенчмарки](Assets/_BENCHMARK/README.md)** — замеры производительности и воспроизводимые сценарии.
 - **[Маршруты измерений](Assets/_BENCHMARK/ROUTES.md)** — сценарии Player и правила сопоставления результатов.
 - **[AGENTS.md](AGENTS.md)** — архитектурные правила и соглашения для разработки.

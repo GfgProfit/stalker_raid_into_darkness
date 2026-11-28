@@ -6,7 +6,7 @@ Raid Into Darkness uses Unity 6000.6.7f1, C#, HDRP 17.6.0, TextMeshPro, R3 and t
 
 - Production and authoritative code/assets live at `E:\Projects\stalker_raid_into_darkness`.
 - Archive lives at `E:\Projects\stalker_raid_into_darkness_Archive`.
-- Main code lives under `Assets/_Source/Scripts`. Files MUST stay with their owning feature or domain.
+- See [Project Folder Layout](#project-folder-layout) for code and asset placement.
 
 ## Instruction Priority
 
@@ -43,10 +43,43 @@ Agents MUST follow documented client discovery and read governing `AGENTS.md` fi
 - Simulation, authoritative state, read-only config, persistence and presentation MUST be separate. Command → owner → committed state → notification/snapshot → visualization. Culling, hidden visuals, streaming and closed UI MUST NOT implicitly affect unrelated simulation. Activation, sleep and scheduling MUST stay with its owner.
 - Each mutable gameplay fact MUST have one owner. Agents MUST reuse it and write through commands or controlled initialization, including inventory membership, quantity, equipment, durability and ammo. Caches, snapshots, reactive projections and indices or render/native buffers MUST define owner, sync direction, invalidation and lifetime. UI owns UI-local state. Save/restore and potential networking MUST stay at explicit boundaries. Save schemas MUST stay unless explicitly required to change.
 
+### Feature layers
+
+Each feature MUST organize its runtime code by the responsibilities below. Place new code under the owning feature's `Domain/`, `Application/`, `Infrastructure/`, or `Presentation/` folder, or reuse an existing folder with the same responsibility, such as `Core/` for domain logic and `UI/` for presentation. Create a layer folder only when it has code to own. Existing files, folders, namespaces, and assemblies MUST stay in place unless a separate task authorizes a migration.
+
+| Layer | Responsibility |
+|---|---|
+| `Domain` | Own gameplay rules, invariants, authoritative state, and state transitions. Expose operations and read-only queries through the domain owner. |
+| `Application` | Orchestrate feature use cases, commands, and queries. Invoke domain operations, coordinate external work through explicit contracts, and return results or committed state to callers. The domain owner remains responsible for gameplay decisions and state changes. |
+| `Infrastructure` | Implement external dependencies such as file persistence, platform APIs, and non-visual Unity integrations. Map external data to and from the contracts of the feature. |
+| `Presentation` | Own Views, ViewModels, user input, visual adapters, and UI-local state. Forward user intent to application commands and render committed state through read-only queries or notifications. |
+
+- Source dependencies MUST point inward. `Presentation` depends on `Application` contracts, and `Application` depends on `Domain`. `Presentation` MAY consume existing read-only domain contracts. `Domain` MUST remain independent of the other feature layers, DI resolution, file I/O, and Unity presentation and scene lifecycles.
+- `Infrastructure` depends on the inner contracts it implements. The layer that needs an external capability MUST own its contract. `Application` and `Presentation` MUST NOT depend on concrete infrastructure implementations. The existing DI composition roots wire implementations to contracts and own their lifetimes. Cyclic dependencies are FORBIDDEN.
+- Layers define source responsibilities. Reuse current assembly boundaries and the public contracts of other features. A separate assembly is justified only by the dependency, test, or platform boundary rules in [Project Folder Layout](#project-folder-layout).
+
 ### Configuration and Unity adapters
 
 - Exactly one `GameConfig` ScriptableObject is REQUIRED for shared runtime config. It and referenced domain configs MUST stay read-only at runtime. Location values, runtime state, saves and Editor/importer settings MUST stay with their owners. Precedence MUST be global defaults → explicitly enabled location overrides → runtime/session overrides → applicable restored state. Legacy serialized values alone MUST NOT enable overrides. Agents MUST reuse settings and preserve authored overrides and references.
 - MonoBehaviours MUST focus on Unity lifecycle, explicit references and adapter/presentation duties. Inventory, equipment, item config and persistence logic MUST stay out of UI. Agents MUST use existing owner contracts and MUST NOT introduce hidden scene dependencies.
+
+## Project Folder Layout
+
+Files MUST stay with their owning feature, domain, or tool. Use the smallest existing folder that fits the work. Subfolders SHOULD reflect a distinct responsibility, such as inventory transactions or optics. A new top-level code or asset folder requires a concrete ownership or Unity integration reason.
+
+| Area | Placement |
+|---|---|
+| Gameplay code and feature-specific UI | `Assets/_Source/Scripts/Gameplay/<Feature>/`. Apply [Feature layers](#feature-layers) within the owning feature. Keep inventory views and ViewModels under `Assets/_Source/Scripts/Gameplay/Inventory/UI/`. |
+| Composition, graphics, and application menus | Reuse `Assets/_Source/Scripts/DI/Runtime/`, `Assets/_Source/Scripts/Graphics/`, or `Assets/_Source/Scripts/UI/` for their respective responsibilities. Use `Assets/_Source/Scripts/Utils/` only for genuinely shared utilities. |
+| Editor code | Reuse `Assets/_Source/Scripts/Editor/<Feature>/` or an existing feature-local `Editor/` assembly. Under a runtime `.asmdef`, route Editor scripts to an Editor-only assembly using an `.asmdef` with only `Editor` in `includePlatforms`, or an `.asmref` to an existing Editor-only assembly. |
+| Game content | Place new location scenes and their content under `Assets/_Source/Levels/<Location>/`, following the existing hierarchy for imported locations. Keep menus, previews, and fixtures with their respective owners. Preserve existing build-scene paths. Reuse existing content owners under `Assets/_Source/`, such as `Anomalies/`, `Effects/`, `FirstPerson/`, `UI/` and `Shaders/`. Item content follows [Game Assets](#game-assets). |
+| Settings | Keep shared runtime configuration assets under `Assets/_Source/Settings/` with their owner. The existing bootstrap asset is `Assets/_Source/Settings/Resources/GameConfig.asset`. Unity project settings belong under the repository root's `ProjectSettings/`. |
+| Tests and fixtures | Reuse `Assets/_Source/Tests/<Feature>/Editor/` and `Assets/_Source/Tests/<Feature>/PlayMode/` as applicable. Tools with their own test assemblies keep their tests and fixtures with the tool. |
+| Tools and dependencies | Project-owned import tooling and its runtime support stay under `Assets/_Tools/`. Unity Package Manager packages and manifests belong under `Packages/`. Preserve third-party import roots. `Assets/_BENCHMARK/` contains checked-in benchmark sources and scenarios. Generated outputs follow [Archive Safety](#archive-safety). |
+
+- Agents MUST verify the enclosing `.asmdef` or `.asmref`, platform filters, and dependency direction before adding or moving C# files. Introduce an assembly only for a concrete dependency, test, or platform boundary. Runtime and test assemblies MUST preserve their existing dependency contracts.
+- Unity includes content under `Resources/` in Player builds. Preserve the existing item root and runtime lookup keys. Elsewhere, prefer serialized references or the owning catalog. A new `Resources/` folder or path-based lookup requires a concrete loader contract.
+- Before an authorized move, agents MUST check GUID and serialized references, string-based paths (including `Resources.Load`, `AssetDatabase`, and importer destinations), scene/build configuration, and assembly membership where applicable. Move Unity assets with their `.meta` files. A folder convention alone grants no migration authorization.
 
 ## C# Source and Style
 
@@ -74,8 +107,8 @@ Agents MUST follow documented client discovery and read governing `AGENTS.md` fi
 
 ## Game Assets
 
-- Game assets MUST live with the feature, location, or item that owns them. Each new item or item being migrated MUST have an item folder under `Assets/_Source/Resources/Items/<Category>/<ItemName>/`. Reuse the existing category and subcategory structure. Keep the definition, source models, prefabs, and other item-specific files in that folder. Store textures and materials in `Textures/` and `Materials/` within the item folder, including folders generated beside source models. Moving existing assets or changing importer outputs requires authorization within the task scope.
-- Shared assets MUST have one maintained copy with their owning feature or category. Store shared item sounds in the owning category's `_Shared Audio/` folder. Keep atlas-backed icons in their existing atlases. If an item needs independent material or texture edits, keep the item-specific asset in its own folder.
+- Game assets MUST live with the feature, location, or item that owns them. Each new item or item being migrated MUST have an item folder under `Assets/_Source/Resources/Items/<Category>/`. Reuse the existing category and applicable subcategory path, then use `<ItemName>/` for the item. Keep the definition, source models, prefabs, and other item-specific files in that folder. Store textures and materials in `Textures/` and `Materials/` within the item folder, including folders generated beside source models. Moving existing assets or changing importer outputs requires authorization within the task scope.
+- Shared assets MUST have one maintained copy with their owning feature or category. Store shared item sounds in the owning category's `_Shared Audio/` folder. Keep atlas-backed icons in their existing atlases. The shared item atlas location is `Assets/_Source/UI/Item Icons/`. If an item needs independent material or texture edits, keep the item-specific asset in its own folder.
 - World, first-person, inventory, and preview views MUST reuse one source visual prefab when they show the same model. Views can reference or nest it and set their own pose, camera, visibility, and view-specific components. Distinct geometry or rigging may use a variant with the same owner. Variants MUST reuse compatible shared assets. Edits to the source visual MUST reach each view that uses it.
 - Runtime systems MUST resolve assets through the owning definition, catalog, or explicit serialized references. Definitions MUST remain read-only at runtime. Mutable item state MUST belong to the runtime instance and be saved through the existing persistence system.
 - Agents MUST preserve `.meta` files, GUIDs, and serialized references when moving or renaming assets. Before deletion, agents MUST check consumers. Feature and item removal MUST preserve shared assets and unrelated atlas entries and remove only assets exclusive to the removed owner.

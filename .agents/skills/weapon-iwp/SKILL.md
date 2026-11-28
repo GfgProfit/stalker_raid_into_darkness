@@ -64,7 +64,7 @@ The project attaches modules to the weapon bones at runtime. This avoids a separ
 - Attachment bones are `wpn_scope`, `wpn_silencer`, and `wpn_launcher`, defined in `WeaponHudComponent`. AUG A3 has `wpn_scope` and `wpn_silencer`. You MUST record the bones found in `WeaponHudComponent._attachmentBones`.
 - If the clean model lacks a required attachment bone, you MUST report it to the user. You MUST NOT substitute a preassembled variant.
 - Clean IWP files can contain a built-in attachment mesh skinned to an attachment bone. For example, `wpn_aug_a3.ogf` contains a suppressor with texture `wpn_addon_sil_nato`. X-Ray hides it until the attachment is fitted.
-- You MUST disable meshes whose weights are all assigned to attachment bones in `Items/Weapons/Visuals/<section>[_hud].prefab`. Leave the source model unchanged. `ItemDefinition._visualPrefab` and `WeaponHudComponent._hudModel` MUST reference these prefabs instead of the `.ogf` files.
+- You MUST disable meshes whose weights are all assigned to attachment bones in the item-owned visual prefabs. Leave the source model unchanged. `ItemDefinition._visualPrefab` and `WeaponHudComponent._hudModel` MUST reference these prefabs instead of the `.ogf` files.
 
 ## Icons
 
@@ -74,7 +74,7 @@ The project attaches modules to the weapon bones at runtime. This avoids a separ
 
 - Atlas: Read `icons_texture` from the attachment section and remove spaces from the value. GRA has the typo `ui\ui_ raid_hd_aattachments`. If the key is absent, use `ui\ui_icon_equipment`.
 - Rectangle: Use `inv_grid_x/y/width/height` x 50 px. Measure `y` from the top.
-- Convert the atlas to PNG at `Assets/_Source/Items/Icons/<name>.png` and create sprites named after the sections with `ISpriteEditorDataProvider`. Reference each sprite through `ItemDefinition._iconOverride` and set `_generateIcon = false`.
+- Use the existing shared item atlas when available. If the selected atlas must be imported, convert it to PNG in the shared item atlas folder defined in [Game Assets](../../../AGENTS.md#game-assets). Create sprites named after the sections with `ISpriteEditorDataProvider`. Reference each sprite through `ItemDefinition._iconOverride` and set `_generateIcon = false`.
 
 The project icon generator is at `Assets/_Source/Scripts/Gameplay/Inventory/IconGeneration`. Its window is `Assets/_Source/Scripts/Editor/Inventory/IconGeneration/ItemIconGeneratorWindow.cs`. Attachment variants use `ItemIconVariantPart` in the item's visual prefab with `_part`, `_group`, `_installedObjects`, `_defaultObjects`, `_requiredParts`, `_incompatibleParts`, and `_sizeDelta`.
 
@@ -167,7 +167,7 @@ Run `node .agents/skills/weapon-iwp/scripts/iwp.js <command>` from the project r
 - You MUST run setups and tests through Unity Open MCP. For batch mode, follow `unity-batch-mirror`.
 - Weapon and attachment data MUST live in `ItemDefinition` and its components, as with equipment. Weapon rules MUST NOT live in the UI.
 - Attachment compatibility MUST come from GRA sections. You MUST NOT infer it from filenames.
-- New weapons and attachments MUST use the item layout in [Game Assets](../../../AGENTS.md#game-assets). The reference setups may still use legacy paths under `Assets/_Source/Items/`. Verify the setup destinations before running it and change those destinations only within the authorized task scope.
+- New weapons and attachments MUST use the item layout in [Game Assets](../../../AGENTS.md#game-assets). Verify the actual setup destinations before running a setup and change them only within the authorized task scope.
 
 ## GRA attachments
 
@@ -181,9 +181,9 @@ Setup: `Assets/_Source/Scripts/Editor/Inventory/GraWeaponAddonSetup.cs`. Menu `T
   - Conversion kits (`II_FOOD`, including `archangel`, `pn23fore`, and `susatov`) in `scopes` lists do not qualify as attachments. You MUST report them in the log.
   - A previous scan found 146 attachments, including standard, night-vision, and thermal scopes, suppressors, and underbarrel launchers.
 - You MUST use the model that mounts to the weapon: `hud = <section>_hud` → `item_visual` (`attachments\scopes\<name>`, Pizza's Ultimate Sight / MAS). Use `visual` only when that file is absent. Some scopes use `visual` for a box (`wpn_case_*`) or a different model. For example, `ekp8_18` uses the ЕКП-8-02 model, and `0kp2` / `rmr` use an untextured box.
-- Correct source model defects via the setup's `MESH_ONLY` table, which maps the section to the material to keep. Disable other meshes in the attachment visual prefab. The legacy setup uses `Items/Addons/Visuals/<section>.prefab`. For example, Boomsticks gives `wpn_sil_spec_isg` a full AK world model. Keep only its `wpn_silencer_hexagon12` suppressor mesh. You MUST check every attachment for which `ogftex` shows weapon textures such as `receiver`, `stock`, `magazine`, or `handguard`.
-- Attachment textures are generated normally by the importer through GRA MO2. The legacy layout uses `Assets/_Source/Items/Addons/{Models,Prefabs}` (approximately 1.1 GB, including approximately 540 MB of normal maps stored by the importer as uncompressed PNG).
-- Definitions in the legacy layout use `Assets/_Source/Items/Definitions/Addons/<section>.asset`. Each definition includes:
+- Correct source model defects via the setup's `MESH_ONLY` table, which maps the section to the material to keep. Disable other meshes in the attachment visual prefab. For example, Boomsticks gives `wpn_sil_spec_isg` a full AK world model. Keep only its `wpn_silencer_hexagon12` suppressor mesh. You MUST check every attachment for which `ogftex` shows weapon textures such as `receiver`, `stock`, `magazine`, or `handguard`.
+- Attachment textures are generated normally by the importer through GRA MO2.
+- Each attachment definition in its item folder includes:
   - `Attachment` category and `Silencer`, `Scope`, or `GrenadeLauncher` tag.
   - `WeaponAddonComponent` with type, price, `*_k` multipliers, and `scope_zoom_factor`.
   - `snd_on_take` sound (`attchsilen`, `attchscope`, `attchscopenv`, `attchgl`, and others).
@@ -195,7 +195,7 @@ Setup: `Assets/_Source/Scripts/Editor/Inventory/GraWeaponAddonSetup.cs`. Menu `T
 The project owns its firing logic. IWP supplies only the animations, sounds, particles, and camera `.anm` effects for that logic.
 
 - Runtime assembly `RaidIntoDarkness.Weapons` (`Assets/_Source/Scripts/Gameplay/Weapons`):
-  - `FirstPersonWeaponAsset` is a ScriptableObject at `Items/Weapons/FirstPerson/<section>.asset`. It contains the HUD prefab, hand offsets, sight calibration, motions by `FirstPersonWeaponMotionKind`, aiming blend `.anm`, RPM, fire modes, magazine, flash and smoke prefabs, recoil, and sounds. `WeaponHudComponent._firstPersonWeapon` references it.
+  - `FirstPersonWeaponAsset` is a ScriptableObject in the weapon's item folder. It contains the HUD prefab, hand offsets, sight calibration, motions by `FirstPersonWeaponMotionKind`, aiming blend `.anm`, RPM, fire modes, magazine, flash and smoke prefabs, recoil, and sounds. `WeaponHudComponent._firstPersonWeapon` references it.
   - `FirstPersonWeaponController` on `FPS_Player` uses Hidden/Drawing/Ready/Reloading/SwitchingMode/Holstering. Slots are Primary (`3`) and Secondary (`2`). Left mouse fires, holding right mouse aims, `R` reloads, and `X` switches fire mode. The controller acquires hands through `FirstPersonRig.TryAcquireHands`.
   - `FirstPersonWeaponGraph` uses Playables with a cross-faded hand layer, a left-hand overlay masked to `l_*` bone subtrees, and a weapon mixer. The `bip01_l_finger*` bones are included as descendants of `l_hand`. `wpn_hand_01` has one bone part named `default`. FDDA pickup `liz_pickup_left_wpn_hands` plays as an overlay when the weapon owns the hands (`IFirstPersonHandsOverlay`).
   - Equipment animations (`EquipmentAnimationQueue`) call `FirstPersonRig.RequestHands`. The weapon holsters and draws again after the hands have been free for 0.5 seconds.
@@ -214,7 +214,7 @@ The project owns its firing logic. IWP supplies only the animations, sounds, par
 - Runtime assembly `RaidIntoDarkness.Effects` uses `XRayParticleSimulation`, a CParticleEffect port with a 0.033 s step and Source/KillOld/Move/Target*/Gravity actions, and `XRayParticleGroupPlayer` for the CParticleGroup timeline (t0/t1, deferred stop). It renders with `ParticleSystem.SetParticles` and `RaidIntoDarkness/XRayParticle`, with atlas frames selected in the vertex shader. `xdistort` is not rendered.
 - `ALIGN_TO_PATH` MUST follow `CParticleEffect::Render`. Unity Stretch billboards are unsuitable because they stretched the `weapon_shot_invert_*` star backward along the barrel into the fore-end. With speed greater than zero and `FACE_ALIGN` enabled, use a plane perpendicular to velocity and rotate it by `rot.x`. Otherwise use a sprite aligned to velocity or `m_APDefaultRotation` (PED chunk `0x25`), facing the camera. The particles use world-aligned billboards with `rotation3D`.
 - Additive materials MUST use `_Intensity = 4` for visible HDRP muzzle flash.
-- The flash origin is `FirstPersonWeaponView._muzzle`, a Transform on the HUD prefab (`Items/Weapons/Visuals/<section>_hud.prefab`). `MuzzlePoint` is parented to `wpn_silencer`, and its forward axis is the flame direction. Move it manually in the prefab. `IwpFirstPersonWeaponSetup` creates it only when missing. `IwpWeaponSetup` preserves its parent and local pose when rebuilding the visual. Without the component, use `FirstPersonWeaponAsset._muzzleBone`.
+- The flash origin is `FirstPersonWeaponView._muzzle`, a Transform on the item's HUD visual. `MuzzlePoint` is parented to `wpn_silencer`, and its forward axis is the flame direction. Move it manually in the prefab. `IwpFirstPersonWeaponSetup` creates it only when missing. `IwpWeaponSetup` preserves its parent and local pose when rebuilding the visual. Without the component, use `FirstPersonWeaponAsset._muzzleBone`.
 - Muzzle effects MUST follow X-Ray orientation (`setup_firedeps` and `generate_orthonormal_basis_normalized`). Z follows the visible barrel direction using `TransformVector` with `HandsRoot` nonuniform scaling under `hud_fov`. Up is world up, independent of weapon roll. A muzzle flash that follows the barrel MUST update its orientation each frame.
 - AUG uses `flame_particles = weapons\generic_weapon05` following the `wpn_silencer` bone and `smoke_particles = weapons\generic_shoot_00` at the point of firing. The suppressor's empty `silencer_flame_particles` means no suppressed flash.
 

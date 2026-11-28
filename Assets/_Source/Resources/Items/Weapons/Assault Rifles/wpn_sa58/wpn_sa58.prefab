@@ -10317,6 +10317,11 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 3048268272409702021}
   m_SourcePrefab: {fileID: -9137962142385034750, guid: 34c3b2ebac1094947964363d485b3cc9, type: 3}
+--- !u!137 &9934560810601691 stripped
+SkinnedMeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 7023145931499768148, guid: 34c3b2ebac1094947964363d485b3cc9, type: 3}
+  m_PrefabInstance: {fileID: 7013355234917057935}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &345301264720141884 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7322484409623944115, guid: 34c3b2ebac1094947964363d485b3cc9, type: 3}
@@ -10377,7 +10382,17 @@ MonoBehaviour:
   _muzzle: {fileID: 3168827119343671284}
   _silencerVisual: {fileID: 5083793876624018330}
   _silencedMuzzle: {fileID: 2493318579690894680}
+  _grenadeMuzzle: {fileID: 0}
   _launcherRound: {fileID: 0}
+  _underbarrelRoundRevealFrame: 0
+  _underbarrelRoundBone: {fileID: 0}
+  _underbarrelShellBone: {fileID: 0}
+  _underbarrelShellFrames: {x: 0, y: 0}
+  _launcherChambers: []
+  _launcherReloadRounds: []
+  _unfoldedLauncherSights: []
+  _fixedLauncherPart: {fileID: 0}
+  _fixedLauncherPartRotation: {x: 0, y: 0, z: 0, w: 1}
   _magazineSwapObjects: {fileID: 5801734752004982656}
   _magazineSwapClips:
   - {fileID: -5802557976399934464, guid: 51bf0ffe08ac3784d9ed663c07f56bea, type: 3}
@@ -10395,11 +10410,9 @@ MonoBehaviour:
     _replacement: {fileID: 895560751719798580}
   - _installed: {fileID: 3538910378321599924}
     _replacement: {fileID: 6693768395672038305}
---- !u!137 &9934560810601691 stripped
-SkinnedMeshRenderer:
-  m_CorrespondingSourceObject: {fileID: 7023145931499768148, guid: 34c3b2ebac1094947964363d485b3cc9, type: 3}
-  m_PrefabInstance: {fileID: 7013355234917057935}
-  m_PrefabAsset: {fileID: 0}
+  _installedMagazineRound: {fileID: 0}
+  _replacementMagazineRound: {fileID: 0}
+  _hipBackOffset: 0
 --- !u!137 &2911214210010656123 stripped
 SkinnedMeshRenderer:
   m_CorrespondingSourceObject: {fileID: 5274494218375178484, guid: 34c3b2ebac1094947964363d485b3cc9, type: 3}

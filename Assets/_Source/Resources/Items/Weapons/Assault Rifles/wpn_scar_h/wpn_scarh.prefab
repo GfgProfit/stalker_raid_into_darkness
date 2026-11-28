@@ -742,6 +742,9 @@ MonoBehaviour:
     _replacement: {fileID: 5675345043137414499}
   - _installed: {fileID: 7387388453586085378}
     _replacement: {fileID: 9184544817121074569}
+  _installedMagazineRound: {fileID: 0}
+  _replacementMagazineRound: {fileID: 0}
+  _hipBackOffset: 0
 --- !u!1 &168871523379091347
 GameObject:
   m_ObjectHideFlags: 0

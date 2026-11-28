@@ -18314,6 +18314,9 @@ MonoBehaviour:
   _installedMagazineRenderers: []
   _replacementMagazineRenderers: []
   _magazineBonePairs: []
+  _installedMagazineRound: {fileID: 0}
+  _replacementMagazineRound: {fileID: 0}
+  _hipBackOffset: 0
 --- !u!95 &1567326017909147727
 Animator:
   serializedVersion: 7

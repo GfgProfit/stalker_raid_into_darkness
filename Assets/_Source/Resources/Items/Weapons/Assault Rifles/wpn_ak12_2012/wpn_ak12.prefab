@@ -7047,6 +7047,9 @@ MonoBehaviour:
   _grenadeMuzzle: {fileID: 8821208677746194927}
   _launcherRound: {fileID: 1162334369035565064}
   _underbarrelRoundRevealFrame: 13
+  _underbarrelRoundBone: {fileID: 0}
+  _underbarrelShellBone: {fileID: 0}
+  _underbarrelShellFrames: {x: 0, y: 0}
   _launcherChambers: []
   _launcherReloadRounds: []
   _unfoldedLauncherSights: []
@@ -7057,6 +7060,9 @@ MonoBehaviour:
   _installedMagazineRenderers: []
   _replacementMagazineRenderers: []
   _magazineBonePairs: []
+  _installedMagazineRound: {fileID: 0}
+  _replacementMagazineRound: {fileID: 0}
+  _hipBackOffset: 0
 --- !u!1 &6476253164063275821 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -70574290758936886, guid: 2e219ff8488837440b34907b89a1b154, type: 3}

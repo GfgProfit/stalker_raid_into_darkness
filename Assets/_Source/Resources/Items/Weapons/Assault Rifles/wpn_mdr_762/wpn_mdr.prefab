@@ -25666,7 +25666,25 @@ MonoBehaviour:
   _muzzle: {fileID: 387302005358075787}
   _silencerVisual: {fileID: 1933740958415333926}
   _silencedMuzzle: {fileID: 8645986917472959643}
+  _grenadeMuzzle: {fileID: 0}
   _launcherRound: {fileID: 0}
+  _underbarrelRoundRevealFrame: 0
+  _underbarrelRoundBone: {fileID: 0}
+  _underbarrelShellBone: {fileID: 0}
+  _underbarrelShellFrames: {x: 0, y: 0}
+  _launcherChambers: []
+  _launcherReloadRounds: []
+  _unfoldedLauncherSights: []
+  _fixedLauncherPart: {fileID: 0}
+  _fixedLauncherPartRotation: {x: 0, y: 0, z: 0, w: 1}
+  _magazineSwapObjects: {fileID: 0}
+  _magazineSwapClips: []
+  _installedMagazineRenderers: []
+  _replacementMagazineRenderers: []
+  _magazineBonePairs: []
+  _installedMagazineRound: {fileID: 0}
+  _replacementMagazineRound: {fileID: 0}
+  _hipBackOffset: 0
 --- !u!4 &3690870853275369050 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8648371968516023676, guid: 6d10e163d8acfbb4ea31e5bbd0771252, type: 3}

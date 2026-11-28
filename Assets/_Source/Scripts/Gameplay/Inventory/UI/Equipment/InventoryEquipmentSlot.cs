@@ -1,3 +1,4 @@
+using RaidIntoDarkness.Inventory.Domain;
 using UnityEngine;
 using UnityEngine.UI;
 

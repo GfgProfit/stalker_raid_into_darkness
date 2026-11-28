@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace RaidIntoDarkness.Inventory
+namespace RaidIntoDarkness.Inventory.Domain
 {
     internal readonly struct InventoryTransferPlan
     {

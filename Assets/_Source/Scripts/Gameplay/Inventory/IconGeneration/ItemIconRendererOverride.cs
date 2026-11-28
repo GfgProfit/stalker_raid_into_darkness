@@ -1,7 +1,8 @@
+using RaidIntoDarkness.Inventory.Domain;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace RaidIntoDarkness.Inventory.IconGeneration
+namespace RaidIntoDarkness.Inventory.Infrastructure.IconGeneration
 {
     [DisallowMultipleComponent]
     public sealed class ItemIconRendererOverride : MonoBehaviour, IItemIconVisualConfigurator

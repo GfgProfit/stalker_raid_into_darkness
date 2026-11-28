@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace RaidIntoDarkness.Inventory
+namespace RaidIntoDarkness.Inventory.Domain
 {
     [CreateAssetMenu(menuName = "Inventory/Item Database", fileName = "ItemDatabase")]
     public sealed class ItemDatabase : ScriptableObject, IItemDefinitionResolver

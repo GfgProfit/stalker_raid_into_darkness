@@ -1,3 +1,4 @@
+using RaidIntoDarkness.Inventory.Domain;
 using System;
 
 namespace RaidIntoDarkness.Inventory.Core.Tests

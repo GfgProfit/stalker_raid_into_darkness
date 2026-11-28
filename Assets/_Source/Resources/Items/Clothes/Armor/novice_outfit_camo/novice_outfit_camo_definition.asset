@@ -11,7 +11,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: da0f90c2955673d46b25d465cbe44ed0, type: 3}
   m_Name: novice_outfit_camo_definition
-  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.ItemDefinition
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.Domain.ItemDefinition
   _definitionId: 18402c1da25269947b698208614ffd41
   _displayName: "\u041A\u0443\u0440\u0442\u043A\u0430 \u0441\u0442\u0440\u0435\u043B\u043A\u0430"
   _shortName: LIGHT
@@ -60,11 +60,11 @@ MonoBehaviour:
     version: 2
     RefIds:
     - rid: 3479885471900762364
-      type: {class: EquippableItemComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
+      type: {class: EquippableItemComponent, ns: RaidIntoDarkness.Inventory.Domain, asm: RaidIntoDarkness.Inventory}
       data:
         _preferredSlotIds: 04000000i
     - rid: 3479885471900762365
-      type: {class: EquipmentStatsComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
+      type: {class: EquipmentStatsComponent, ns: RaidIntoDarkness.Inventory.Domain, asm: RaidIntoDarkness.Inventory}
       data:
         _section: novice_outfit_camo
         _cost: 8230
@@ -133,11 +133,11 @@ MonoBehaviour:
             _average: 8
             _strong: 5
     - rid: 3479885472039698558
-      type: {class: WorldItemComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
+      type: {class: WorldItemComponent, ns: RaidIntoDarkness.Inventory.Infrastructure, asm: RaidIntoDarkness.Inventory}
       data:
         _prefab: {fileID: 1165353695215425329, guid: b0934e6700afcc34bb15fa36fa5ac6e6, type: 3}
     - rid: 3479885488572596347
-      type: {class: ItemTakeSoundComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
+      type: {class: ItemTakeSoundComponent, ns: RaidIntoDarkness.Inventory.Infrastructure, asm: RaidIntoDarkness.Inventory}
       data:
         _category: lightarmor
         _clips:

@@ -1,6 +1,8 @@
+using RaidIntoDarkness.Inventory.Domain;
+using RaidIntoDarkness.Inventory.Application;
 using UnityEngine;
 
-namespace RaidIntoDarkness.Inventory.IconGeneration
+namespace RaidIntoDarkness.Inventory.Infrastructure.IconGeneration
 {
     public readonly struct IconRenderProfile
     {

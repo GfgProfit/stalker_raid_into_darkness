@@ -1,8 +1,9 @@
+using RaidIntoDarkness.Inventory.Domain;
 using System;
 using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using RaidIntoDarkness.Inventory.IconGeneration;
+using RaidIntoDarkness.Inventory.Infrastructure.IconGeneration;
 using UnityEditor;
 using UnityEngine;
 
@@ -135,7 +136,7 @@ namespace RaidIntoDarkness.Inventory.Editor
 
                 if (GUILayout.Button("Clear Cache", EditorStyles.toolbarButton, GUILayout.Width(86f)))
                 {
-                    ItemIconCache.Clear();
+                    InventoryRuntimeIconInvalidation.ClearActiveCaches();
                     RequestPreviewRender();
                 }
 
@@ -207,7 +208,7 @@ namespace RaidIntoDarkness.Inventory.Editor
                     EditorUtility.SetDirty(_settings);
                     AssetDatabase.SaveAssets();
                     ItemIconGeneratorSettings.ResetDefaultCache();
-                    ItemIconCache.Clear();
+                    InventoryRuntimeIconInvalidation.ClearActiveCaches();
                     RefreshVariantAnalysis();
 
                     if (_autoRefresh)
@@ -452,7 +453,7 @@ namespace RaidIntoDarkness.Inventory.Editor
             string label = variant == null ? "Saving catalog" : variant.DisplayName;
             _bakeStatus = $"Baking {Mathf.Min(completed + 1, total)}/{total}: {label}";
 
-            if (Application.isBatchMode == false && EditorUtility.DisplayCancelableProgressBar("Baking Item Icons", label, Mathf.Clamp01((float)completed / total)))
+            if (UnityEngine.Application.isBatchMode == false && EditorUtility.DisplayCancelableProgressBar("Baking Item Icons", label, Mathf.Clamp01((float)completed / total)))
             {
                 _bakeCancellation?.Cancel();
             }
@@ -534,7 +535,7 @@ namespace RaidIntoDarkness.Inventory.Editor
             _selectedVariantIndex = Mathf.Clamp(_selectedVariantIndex, 0, Mathf.Max(0, count - 1));
         }
 
-        private static bool RequiresLargeBakeConfirmation(ItemIconVariantAnalysis analysis) => Application.isBatchMode == false && (analysis.Variants.Count >= LARGE_BAKE_CONFIRMATION_THRESHOLD || analysis.ExcessiveVariantItems.Count > 0);
+        private static bool RequiresLargeBakeConfirmation(ItemIconVariantAnalysis analysis) => UnityEngine.Application.isBatchMode == false && (analysis.Variants.Count >= LARGE_BAKE_CONFIRMATION_THRESHOLD || analysis.ExcessiveVariantItems.Count > 0);
 
         private void CancelBake() => _bakeCancellation?.Cancel();
 

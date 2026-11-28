@@ -1,9 +1,12 @@
+using RaidIntoDarkness.Inventory.Infrastructure;
+using RaidIntoDarkness.Inventory.Domain;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using RaidIntoDarkness.Inventory.Application;
 using RaidIntoDarkness.Inventory;
-using RaidIntoDarkness.Inventory.IconGeneration;
+using RaidIntoDarkness.Inventory.Infrastructure.IconGeneration;
 using RaidIntoDarkness.Inventory.UI;
 using NUnit.Framework;
 using RaidIntoDarkness.FirstPerson;
@@ -36,7 +39,7 @@ namespace RaidIntoDarkness.Inventory.Tests
         public override void Setup()
         {
             base.Setup();
-            InputSystem.runInBackground = Application.runInBackground;
+            InputSystem.runInBackground = UnityEngine.Application.runInBackground;
             _keyboard = InputSystem.AddDevice<Keyboard>();
             _mouse = InputSystem.AddDevice<Mouse>();
         }
@@ -119,7 +122,7 @@ namespace RaidIntoDarkness.Inventory.Tests
             InventoryModel model = controller.Inventory.Model;
             ItemDefinition outfitDefinition = controller.Inventory.Database.Definitions.Single(definition => definition.GetComponent<EquipmentStatsComponent>()?.Section == "dolg_exo_outfit");
             ItemDefinition patchDefinition = controller.Inventory.Database.Definitions.Single(definition => definition.name == "dolg_patch");
-            ItemInstance originalOutfit = EquipmentStatsFormatter.FindEquipped(window, EquipmentStatsFormatter.OUTFIT_CATEGORY);
+            ItemInstance originalOutfit = EquipmentItemStats.FindEquipped(window.Model?.GetContainer(window.EquipmentContainerId), EquipmentStatsFormatter.OUTFIT_CATEGORY);
             if (originalOutfit != null)
             {
                 Assert.That(model.TryRemove(originalOutfit.InstanceId).Success, Is.True);
@@ -148,7 +151,7 @@ namespace RaidIntoDarkness.Inventory.Tests
             action.Execute(context);
             Assert.That(controller.IsOpen, Is.True);
             Assert.That(controller.EquipmentAnimations.IsBusy, Is.False);
-            Assert.That(EquipmentAnimationQueue.IsPatchRemoved(outfit), Is.False);
+            Assert.That(EquipmentInventoryCommands.IsPatchRemoved(outfit), Is.False);
             Assert.That(bag.Items.Any(item => item.Definition == patchDefinition), Is.False);
             bag.MaxWeight = capacity;
 
@@ -157,7 +160,7 @@ namespace RaidIntoDarkness.Inventory.Tests
             Assert.That(controller.Player.HudAnimator.Current, Is.SameAs(controller.Player.HudAnimator.Library.FindPatch("dolg", false, true)));
             controller.Player.HudAnimator.Cancel();
             yield return WaitForEquipmentAnimations(controller);
-            Assert.That(EquipmentAnimationQueue.IsPatchRemoved(outfit), Is.False);
+            Assert.That(EquipmentInventoryCommands.IsPatchRemoved(outfit), Is.False);
             Assert.That(bag.Items.Any(item => item.Definition == patchDefinition), Is.False);
 
             ItemInstance patch = model.CreateItem(patchDefinition);
@@ -165,7 +168,7 @@ namespace RaidIntoDarkness.Inventory.Tests
             controller.Open();
             action.Execute(context);
             yield return WaitForEquipmentAnimations(controller);
-            Assert.That(EquipmentAnimationQueue.IsPatchRemoved(outfit), Is.True);
+            Assert.That(EquipmentInventoryCommands.IsPatchRemoved(outfit), Is.True);
             Assert.That(window.CollectDescription(outfit), Does.Contain("Нашивка группировки отсутствует"));
             Assert.That(action.IsVisible(context), Is.False);
             action.Execute(context);
@@ -181,7 +184,7 @@ namespace RaidIntoDarkness.Inventory.Tests
             Assert.That(model.TryTransfer(outfit.InstanceId, window.PrimaryContainerId).Success, Is.True);
             controller.Open();
             Assert.That(backpackSlot.IsLockVisible, Is.False);
-            Assert.That(EquipmentAnimationQueue.IsPatchRemoved(model.GetItem(outfit.InstanceId)), Is.True);
+            Assert.That(EquipmentInventoryCommands.IsPatchRemoved(model.GetItem(outfit.InstanceId)), Is.True);
             Assert.That(model.GetItem(patch.InstanceId).Definition, Is.SameAs(patchDefinition));
             Assert.That(model.GetItem(patch.InstanceId).Amount, Is.EqualTo(3));
             controller.Close();
@@ -698,7 +701,7 @@ namespace RaidIntoDarkness.Inventory.Tests
             yield return null;
             Assert.That(player.GameplayInputBlocked, Is.False, "gameplay input was not restored");
 
-            if (Application.isBatchMode == false)
+            if (UnityEngine.Application.isBatchMode == false)
             {
                 Assert.That(Cursor.lockState, Is.EqualTo(CursorLockMode.Locked));
             }
@@ -717,7 +720,7 @@ namespace RaidIntoDarkness.Inventory.Tests
             Release(_keyboard.wKey, queueEventOnly: true);
             yield return null;
 
-            if (Application.isBatchMode == false)
+            if (UnityEngine.Application.isBatchMode == false)
             {
                 Assert.That(Mathf.Abs(Mathf.DeltaAngle(player.CameraController.YawDegrees, yaw)), Is.GreaterThan(1f), "mouse look did not resume after closing");
             }
@@ -886,14 +889,14 @@ namespace RaidIntoDarkness.Inventory.Tests
             Assert.That(player.HudAnimator, Is.Not.Null, "FPS_Player has no FirstPersonHudAnimator");
             Assert.That(player.ScreenFade, Is.Not.Null, "FPS_Player has no StalkerScreenFade");
             yield return WaitForEquipmentAnimations(controller);
-            ItemInstance outfit = EquipmentStatsFormatter.FindEquipped(window, EquipmentStatsFormatter.OUTFIT_CATEGORY);
+            ItemInstance outfit = EquipmentItemStats.FindEquipped(window.Model?.GetContainer(window.EquipmentContainerId), EquipmentStatsFormatter.OUTFIT_CATEGORY);
 
             if (outfit != null)
             {
                 window.UnequipItemNow(outfit, InventoryUnequipTarget.Auto(window.PrimaryContainerId));
             }
 
-            ItemInstance oldHat = EquipmentStatsFormatter.FindEquipped(window, EquipmentStatsFormatter.HELMET_CATEGORY);
+            ItemInstance oldHat = EquipmentItemStats.FindEquipped(window.Model?.GetContainer(window.EquipmentContainerId), EquipmentStatsFormatter.HELMET_CATEGORY);
 
             if (oldHat != null)
             {
@@ -955,14 +958,14 @@ namespace RaidIntoDarkness.Inventory.Tests
             yield return Tap(_keyboard.tabKey);
             Assert.That(sounds, Is.EqualTo(new[] { InventorySound.Open }), "opening the inventory must play inv_open");
             yield return WaitForEquipmentAnimations(controller);
-            ItemInstance oldHat = EquipmentStatsFormatter.FindEquipped(window, EquipmentStatsFormatter.HELMET_CATEGORY);
+            ItemInstance oldHat = EquipmentItemStats.FindEquipped(window.Model?.GetContainer(window.EquipmentContainerId), EquipmentStatsFormatter.HELMET_CATEGORY);
 
             if (oldHat != null)
             {
                 window.UnequipItemNow(oldHat, InventoryUnequipTarget.Auto(window.PrimaryContainerId), false);
             }
 
-            ItemInstance outfit = EquipmentStatsFormatter.FindEquipped(window, EquipmentStatsFormatter.OUTFIT_CATEGORY);
+            ItemInstance outfit = EquipmentItemStats.FindEquipped(window.Model?.GetContainer(window.EquipmentContainerId), EquipmentStatsFormatter.OUTFIT_CATEGORY);
 
             if (outfit != null)
             {
@@ -1127,7 +1130,7 @@ namespace RaidIntoDarkness.Inventory.Tests
             string hits = string.Join(", ", raycasts.Take(4).Select(DescribeHoverHit));
             string moduleHit = uiInput != null ? DescribeHoverHit(uiInput.GetLastRaycastResult(_mouse.deviceId)) : "none";
             string controls = pointAction == null ? "none" : string.Join(", ", pointAction.controls.Select(control => control.path + "@" + control.device.deviceId));
-            string input = $"Mouse {_mouse.deviceId}: {before}->{actual}, requested {requested}, current center {currentCenter}, current mouse {Mouse.current?.deviceId}, pointer {Pointer.current?.deviceId}/{Pointer.current?.position.ReadValue()}. Cursor {Cursor.lockState}, application focus {Application.isFocused}, EventSystem focus {(events != null ? events.isFocused : (bool?)null)}, run in background application/input {Application.runInBackground}/{InputSystem.runInBackground}, input background behavior {InputSystem.settings.backgroundBehavior}.";
+            string input = $"Mouse {_mouse.deviceId}: {before}->{actual}, requested {requested}, current center {currentCenter}, current mouse {Mouse.current?.deviceId}, pointer {Pointer.current?.deviceId}/{Pointer.current?.position.ReadValue()}. Cursor {Cursor.lockState}, application focus {UnityEngine.Application.isFocused}, EventSystem focus {(events != null ? events.isFocused : (bool?)null)}, run in background application/input {UnityEngine.Application.runInBackground}/{InputSystem.runInBackground}, input background behavior {InputSystem.settings.backgroundBehavior}.";
             string viewState = $"Window open {window.IsOpen}, dragging {window.IsDragging}, modal {window.HasModalWidget}, hovered {window.HoveredItem?.InstanceId}, view active {view.isActiveAndEnabled}, item {view.Item?.InstanceId} in {view.Item?.ContainerId}, view bound {view.Grid != null && view.Grid.GetItemView(view.Item) == view}, canvas {canvas?.renderMode}/{canvas?.worldCamera?.name}, mask {mask?.canvasRect}.";
             return $"hovered favorite item is not highlighted. Frame {frameBefore}->{Time.frameCount}, screen {Screen.width}x{Screen.height}. {input} {viewState} Module {uiInput?.name}, point enabled {pointAction?.enabled}, controls [{controls}], input ray [{moduleHit}], manual rays [{hits}].";
         }
@@ -1144,7 +1147,8 @@ namespace RaidIntoDarkness.Inventory.Tests
             Assert.That(controller, Is.Not.Null);
             ItemDatabase database = controller.Inventory.Database;
             var addons = new Dictionary<string, ItemDefinition>();
-            var provider = new ItemIconCacheProvider();
+            IItemIconProvider provider = controller.Inventory.IconProvider;
+            ItemIconCache iconCache = controller.Inventory.Icons;
 
             foreach (ItemDefinition definition in database.Definitions)
             {
@@ -1246,12 +1250,12 @@ namespace RaidIntoDarkness.Inventory.Tests
                 Assert.That(backpack.Items.Any(item => item.Definition == nato), Is.True, "the picked silencer did not reach the backpack");
 
                 double deadline = Time.realtimeSinceStartupAsDouble + ICON_TIMEOUT_SECONDS;
-                while ((ItemIconCache.IsPrewarmed == false || ItemIconCache.IsWorking) && Time.realtimeSinceStartupAsDouble < deadline)
+                while ((iconCache.IsPrewarmed == false || iconCache.IsWorking) && Time.realtimeSinceStartupAsDouble < deadline)
                 {
                     yield return null;
                 }
 
-                Assert.That(ItemIconCache.IsPrewarmed && ItemIconCache.IsWorking == false, Is.True, "scene icon prewarm and queued requests must finish before leaving PlayMode");
+                Assert.That(iconCache.IsPrewarmed && iconCache.IsWorking == false, Is.True, "scene icon prewarm and queued requests must finish before leaving PlayMode");
             }
             finally
             {

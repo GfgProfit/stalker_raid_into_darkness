@@ -1,12 +1,13 @@
+using RaidIntoDarkness.Inventory.Application;
+using RaidIntoDarkness.Inventory.Domain;
 using System;
 using System.Collections.Generic;
-using RaidIntoDarkness.Inventory;
-using RaidIntoDarkness.Inventory.IconGeneration;
+using RaidIntoDarkness.Inventory.Infrastructure.IconGeneration;
 using RaidIntoDarkness.FirstPerson;
 using RaidIntoDarkness.Weapons;
 using UnityEngine;
 
-namespace RaidIntoDarkness.Inventory
+namespace RaidIntoDarkness.Inventory.Infrastructure
 {
     public sealed class FirstPersonWeaponBinder : IInventoryPlacementValidator, IDisposable
     {

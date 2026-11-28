@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using UnityEngine;
 
-namespace RaidIntoDarkness.Inventory
+namespace RaidIntoDarkness.Inventory.Domain
 {
     public abstract class InventoryContainer
     {
@@ -142,6 +142,21 @@ namespace RaidIntoDarkness.Inventory
             }
 
             return true;
+        }
+
+        internal bool WeightAllows(float addedWeight) => MaxWeight < 0f || TotalWeight + addedWeight <= MaxWeight + 0.0001f;
+
+        internal bool TryFindSpaceForAmount(ItemInstance item, int amount, bool allowRotation, out ItemPlacement placement, in InventoryPlacementPreview preview = default)
+        {
+            if (item.Amount != amount)
+            {
+                ItemInstance draft = item.CreateDraft();
+                draft.Amount = amount;
+                draft.Location = item.Location;
+                return TryFindSpace(draft, allowRotation, out placement, preview);
+            }
+
+            return TryFindSpace(item, allowRotation, out placement, preview);
         }
 
         public bool TryFindSpace(ItemInstance item, bool allowRotation, out ItemPlacement placement) => TryFindSpace(item, allowRotation, out placement, default);

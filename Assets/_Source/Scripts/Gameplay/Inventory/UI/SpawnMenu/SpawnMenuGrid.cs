@@ -1,9 +1,8 @@
 using System.Collections.Generic;
-using RaidIntoDarkness.Inventory.UI;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace RaidIntoDarkness.UI
+namespace RaidIntoDarkness.Inventory.UI
 {
     public sealed class SpawnMenuGrid : MonoBehaviour
     {

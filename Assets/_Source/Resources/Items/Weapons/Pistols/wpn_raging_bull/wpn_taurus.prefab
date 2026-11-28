@@ -193,7 +193,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 961b8a141a69bb848aa62c047444203e, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.IconGeneration.ItemIconRendererOverride
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.Infrastructure.IconGeneration.ItemIconRendererOverride
   _renderer: {fileID: 7231028669855779444}
   _hide: 1
   _localBounds:
@@ -867,7 +867,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 25c03444ebcfb0547920e18911b845b0, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.WorldItem
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.Infrastructure.WorldItem
   _definition: {fileID: 11400000, guid: 692c703b3a25ed742a106e27b525807b, type: 2}
   _amount: 1
   _silencerVisual: {fileID: 0}
@@ -980,7 +980,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2c13d2019e85820c094ef1abe1e9662a, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.WorldItemImpactSound
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.Infrastructure.WorldItemImpactSound
   _sounds: {fileID: 11400000, guid: 1e285ccc107e6e34694ef08b5e92376f, type: 2}
   _surfaces: {fileID: 11400000, guid: 1737dfeac290608458356e19a4b264cd, type: 2}
   _audio: {fileID: 7956217826207140881}
@@ -1301,7 +1301,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 961b8a141a69bb848aa62c047444203e, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.IconGeneration.ItemIconRendererOverride
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.Infrastructure.IconGeneration.ItemIconRendererOverride
   _renderer: {fileID: 390414040719328549}
   _hide: 1
   _localBounds:
@@ -1531,7 +1531,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 961b8a141a69bb848aa62c047444203e, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.IconGeneration.ItemIconRendererOverride
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.Infrastructure.IconGeneration.ItemIconRendererOverride
   _renderer: {fileID: 3050004845676008680}
   _hide: 1
   _localBounds:

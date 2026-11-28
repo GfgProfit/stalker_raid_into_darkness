@@ -1,3 +1,4 @@
+using RaidIntoDarkness.Inventory.UI;
 using System.Collections;
 using System.Reflection;
 using NUnit.Framework;

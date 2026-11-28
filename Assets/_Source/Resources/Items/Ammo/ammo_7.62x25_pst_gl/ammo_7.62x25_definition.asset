@@ -11,7 +11,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: da0f90c2955673d46b25d465cbe44ed0, type: 3}
   m_Name: ammo_7.62x25
-  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.ItemDefinition
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.Domain.ItemDefinition
   _definitionId: 9d014a595af7dd44a8a7532d4085ae30
   _displayName: "\u041F\u0430\u0442\u0440\u043E\u043D\u044B 7,62x25 \u043C\u043C \u041F\u0421\u0422 \u0433\u043B"
   _shortName: "\u041F\u0421\u0422"
@@ -61,7 +61,7 @@ MonoBehaviour:
     version: 2
     RefIds:
     - rid: 115149063313948988
-      type: {class: AmmoStatsComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
+      type: {class: AmmoStatsComponent, ns: RaidIntoDarkness.Inventory.Domain, asm: RaidIntoDarkness.Inventory}
       data:
         _section: ammo_7.62x25
         _boxSize: 20
@@ -80,7 +80,7 @@ MonoBehaviour:
         _damagePerProjectile: -1
         _hasTooltipParameters: 0
     - rid: 115149063313948989
-      type: {class: ItemTakeSoundComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
+      type: {class: ItemTakeSoundComponent, ns: RaidIntoDarkness.Inventory.Infrastructure, asm: RaidIntoDarkness.Inventory}
       data:
         _category: ammosmall
         _clips:
@@ -89,11 +89,11 @@ MonoBehaviour:
         - {fileID: 8300000, guid: c5d1a105e54168a4f9c985446ff0cfb3, type: 3}
         - {fileID: 8300000, guid: 278278c282293684bb7769060b5ea82d, type: 3}
     - rid: 115149063313949072
-      type: {class: WorldItemComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
+      type: {class: WorldItemComponent, ns: RaidIntoDarkness.Inventory.Infrastructure, asm: RaidIntoDarkness.Inventory}
       data:
         _prefab: {fileID: 2538068153387812786, guid: 13da8cd688a3f5f4982ca270870ad8ab, type: 3}
     - rid: 115149063313949098
-      type: {class: AmmoBallisticsComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
+      type: {class: AmmoBallisticsComponent, ns: RaidIntoDarkness.Inventory.Domain, asm: RaidIntoDarkness.Inventory}
       data:
         _data:
           _allowRicochet: 1

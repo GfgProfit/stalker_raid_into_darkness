@@ -1,3 +1,4 @@
+using RaidIntoDarkness.Inventory.Domain;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -39,7 +40,7 @@ namespace RaidIntoDarkness.Inventory.Editor
         public static string MigrateLightIntensity(string archive)
         {
             archive = NormalizePath(archive);
-            if (!archive.StartsWith(NormalizePath(ARCHIVE_ROOT) + "/", StringComparison.OrdinalIgnoreCase) || !string.Equals(NormalizePath(Application.dataPath), NormalizePath(PRODUCTION_ROOT + "/Assets"), StringComparison.OrdinalIgnoreCase))
+            if (!archive.StartsWith(NormalizePath(ARCHIVE_ROOT) + "/", StringComparison.OrdinalIgnoreCase) || !string.Equals(NormalizePath(UnityEngine.Application.dataPath), NormalizePath(PRODUCTION_ROOT + "/Assets"), StringComparison.OrdinalIgnoreCase))
             {
                 throw new InvalidOperationException("Item icon migration requires Production and a task directory under the canonical Archive.");
             }

@@ -1,11 +1,9 @@
-using RaidIntoDarkness.Inventory;
-using RaidIntoDarkness.Inventory.UI;
-using RaidIntoDarkness.Inventory;
+using RaidIntoDarkness.Inventory.Domain;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-namespace RaidIntoDarkness.UI
+namespace RaidIntoDarkness.Inventory.UI
 {
     public sealed class SpawnMenuItemCell : MonoBehaviour, IPointerDownHandler, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
     {

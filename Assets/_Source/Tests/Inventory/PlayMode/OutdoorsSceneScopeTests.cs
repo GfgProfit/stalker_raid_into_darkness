@@ -1,7 +1,10 @@
+using RaidIntoDarkness.Inventory.Infrastructure;
+using RaidIntoDarkness.Inventory.Application;
+using RaidIntoDarkness.Inventory.Domain;
 using System.Collections;
 using System.Linq;
 using RaidIntoDarkness.Inventory;
-using RaidIntoDarkness.Inventory.IconGeneration;
+using RaidIntoDarkness.Inventory.Infrastructure.IconGeneration;
 using RaidIntoDarkness.Inventory.UI;
 using NUnit.Framework;
 using RaidIntoDarkness.Weapons;
@@ -192,8 +195,8 @@ namespace RaidIntoDarkness.Inventory.Tests
             ItemDefinition ammo = inventory.Inventory.Database.Definitions.Single(item => item.GetComponent<AmmoStatsComponent>()?.Section == ammoSection);
             InventoryModel model = inventory.Inventory.Model;
             ItemInstance loaded = weapon.CreateDraft();
-            loaded.SetState(InventoryWeaponAmmoSource.AMMO_SECTION_STATE, ammoSection);
-            loaded.SetState(InventoryWeaponAmmoSource.MAGAZINE_STATE, "2");
+            loaded.SetState(WeaponMagazineState.AMMO_SECTION_STATE, ammoSection);
+            loaded.SetState(WeaponMagazineState.MAGAZINE_STATE, "2");
             Assert.That(model.TryReconfigureItem(weapon, loaded, weapon.Location.Position).Success, Is.True);
             Assert.That(model.TryEquip(weapon.InstanceId, inventory.Window.EquipmentContainerId).Success, Is.True);
             int slot = weapon.Location.SlotId == SlotId.Primary ? FirstPersonWeaponController.PRIMARY_SLOT : FirstPersonWeaponController.SECONDARY_SLOT;

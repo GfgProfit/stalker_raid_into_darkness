@@ -1,3 +1,4 @@
+using RaidIntoDarkness.Inventory.Domain;
 namespace RaidIntoDarkness.Inventory.UI
 {
     public sealed class InventoryActionContext

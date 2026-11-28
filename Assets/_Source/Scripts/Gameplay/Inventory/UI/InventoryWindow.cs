@@ -1,8 +1,9 @@
+using RaidIntoDarkness.Inventory.Domain;
+using RaidIntoDarkness.Inventory.Application;
 using System;
 using System.Collections.Generic;
 using R3;
 using TMPro;
-using RaidIntoDarkness.Inventory;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -40,7 +41,6 @@ namespace RaidIntoDarkness.Inventory.UI
         [SerializeField] private Color _overweightColor = new(1f, 0.55f, 0.2f, 1f);
 
         private readonly List<RaycastResult> _raycastResults = new();
-        private readonly List<IInventoryItemAction> _visibleActions = new();
         private readonly List<InventoryItemStat> _tooltipStats = new();
         private readonly List<InventoryContextMenuEntry> _menuEntries = new();
         private readonly List<RectInt> _compatibleAreas = new();
@@ -90,7 +90,7 @@ namespace RaidIntoDarkness.Inventory.UI
         public Func<ItemInstance, string> ItemShortNameProvider { get; set; }
         public Func<ItemInstance, float?> ItemConditionProvider { get; set; }
         public Func<InventoryActionContext, IInventoryItemAction, InventoryActionStyle> ActionStyleProvider { get; set; }
-        public EquipmentAnimationQueue EquipmentGate { get; set; }
+        public IEquipmentAnimationRequests EquipmentGate { get; set; }
         public InventoryWeaponAttachments ItemDropHandler { get; set; }
         public Func<ItemInstance, InventoryResult> DropToWorld { get; set; }
         public ItemInstance HoveredItem => _hovered != null ? _hovered.Item : null;
@@ -353,7 +353,7 @@ namespace RaidIntoDarkness.Inventory.UI
 
         public void HandleItemPointerEnter(InventoryItemView view, PointerEventData eventData)
         {
-            if (IsCurrentItemView(view) == false || view.IsGhost)
+            if (IsCurrentItemView(view) == false)
             {
                 return;
             }
@@ -492,9 +492,7 @@ namespace RaidIntoDarkness.Inventory.UI
             };
 
             RectTransform layer = _dragLayer != null ? _dragLayer : (RectTransform)transform;
-            _drag.Ghost = InventoryItemView.Create(layer, HideFlags.DontSave);
-            _drag.Ghost.name = "Dragged Item";
-            _drag.Ghost.BindGhost(item, sourceGrid, sourceGrid.CellSize, _drag.Rotated, resolvedAmount);
+            _drag.Ghost = InventoryItemDragGhost.Create(layer, item, sourceGrid.CellSize, _drag.Rotated, Theme, IconProvider);
             _drag.Ghost.transform.SetAsLastSibling();
 
             if (_drag.IsSplit == false)
@@ -571,7 +569,7 @@ namespace RaidIntoDarkness.Inventory.UI
             }
 
             _drag.Rotated = _drag.Rotated == false;
-            _drag.Ghost.SetGhostRotation(_drag.Rotated, _drag.SourceGrid.CellSize);
+            _drag.Ghost.SetRotation(_drag.Rotated, _drag.SourceGrid.CellSize);
             UpdateDrag(_drag.LastScreenPosition, _drag.EventCamera);
         }
 
@@ -598,34 +596,17 @@ namespace RaidIntoDarkness.Inventory.UI
             {
                 InventoryContainer target = drag.TargetGrid.Container;
 
-                if (drag.TargetItem != null && drag.IsSplit == false && ItemDropHandler?.Handles(drag.Item, drag.TargetItem) == true)
+                var applied = InventoryDragOperations.Apply(Model, ItemDropHandler, EquipmentGate, drag.Item, target, drag.TargetItem, drag.TargetOrigin, drag.Rotated, drag.IsSplit, drag.Amount, drag.AutoPlace, drag.Kind != InventoryDropKind.Invalid, _equipmentContainerId, _primaryContainerId);
+                result = applied.Result;
+                if (applied.Attachment)
                 {
-                    InventoryResult applied = ItemDropHandler.Apply(drag.Item, drag.TargetItem);
-                    ReportAttachmentResult(applied, drag.Item);
-                    return applied;
+                    ReportAttachmentResult(result, drag.Item);
+                    return result;
                 }
 
-                if ((drag.AutoPlace == false || drag.Kind != InventoryDropKind.Invalid) && TryGateDrag(drag, target))
+                if (applied.Queued)
                 {
-                    return InventoryResult.Ok(drag.Item, drag.Item.Amount);
-                }
-
-                if (drag.TargetItem != null)
-                {
-                    result = Model.TryMerge(drag.Item.InstanceId, drag.TargetItem.InstanceId, drag.Amount);
-                }
-                else if (drag.AutoPlace)
-                {
-                    result = Model.TryTransfer(drag.Item.InstanceId, target.Id);
-                }
-                else
-                {
-                    result = drag.IsSplit ? Model.TrySplit(drag.Item.InstanceId, drag.Amount, target.Id, drag.TargetOrigin, drag.Rotated) : Model.TryMove(drag.Item.InstanceId, target.Id, drag.TargetOrigin, drag.Rotated);
-
-                    if (result.Success == false && drag.IsSplit == false && target is SlottedContainer && Model.CanSwapIntoSlot(drag.Item, target.Id, drag.TargetOrigin, _primaryContainerId))
-                    {
-                        result = Model.TrySwapIntoSlot(drag.Item, target.Id, drag.TargetOrigin, _primaryContainerId);
-                    }
+                    return result;
                 }
 
                 if (result.Success == false)
@@ -662,22 +643,7 @@ namespace RaidIntoDarkness.Inventory.UI
 
             _tooltip?.Hide();
             var context = new InventoryActionContext(this, item, grid);
-            Actions.CollectVisible(context, _visibleActions);
-            _menuEntries.Clear();
-
-            foreach (IInventoryItemAction action in _visibleActions)
-            {
-                IInventoryItemAction captured = action;
-                InventoryActionStyle style = ActionStyleProvider != null ? ActionStyleProvider(context, action) : default;
-                _menuEntries.Add(new InventoryContextMenuEntry(action.GetLabel(context), action.IsEnabled(context), () =>
-                {
-                    if (Model != null && Model.ContainsItem(item))
-                    {
-                        captured.Execute(context);
-                    }
-                }, style.Icon, style.Group));
-            }
-
+            Actions.BuildMenu(context, ActionStyleProvider, _menuEntries);
             _contextMenu.Show(screenPosition, eventCamera, _menuEntries);
             ApplyThemeTo(_contextMenu);
 
@@ -1384,22 +1350,11 @@ namespace RaidIntoDarkness.Inventory.UI
             if (target.TryGetCellAtScreen(screenPosition, eventCamera, out Vector2Int targetCell))
             {
                 ItemInstance targetItem = container.GetItemAt(targetCell);
-                bool handledByAttachment = _drag.IsSplit == false && ItemDropHandler?.Handles(item, targetItem) == true;
-
-                if (handledByAttachment || item.CanStackWith(targetItem))
+                if (InventoryDragOperations.TryPreviewItemTarget(Model, ItemDropHandler, item, targetItem, _drag.IsSplit, _drag.Amount, out kind, out failure))
                 {
                     _drag.TargetItem = targetItem;
-                    InventoryResult preview = handledByAttachment ? ItemDropHandler.Preview(item, targetItem) : Model.CanMerge(item.InstanceId, targetItem.InstanceId, _drag.Amount);
                     origin = targetItem.Location.Position;
                     area = container.GetItemArea(targetItem);
-                    failure = preview.Failure;
-                    kind = handledByAttachment ? InventoryDropKind.Valid : InventoryDropKind.Merge;
-
-                    if (preview.Success == false)
-                    {
-                        kind = InventoryDropKind.Invalid;
-                    }
-
                     return;
                 }
             }
@@ -1420,74 +1375,15 @@ namespace RaidIntoDarkness.Inventory.UI
                 area = placement.Area;
             }
 
-            InventoryResult result = _drag.IsSplit ? Model.CanSplit(item.InstanceId, _drag.Amount, container.Id, origin, _drag.Rotated) : Model.CanMove(item.InstanceId, container.Id, origin, _drag.Rotated);
-
-            if (result.Success)
+            var preview = InventoryDragOperations.PreviewPlacement(Model, item, container, origin, _drag.Rotated, _drag.IsSplit, _drag.Amount, _primaryContainerId, area);
+            area = preview.Area;
+            kind = preview.Kind;
+            failure = preview.Failure;
+            _drag.AutoPlace = preview.AutoPlace;
+            if (kind == InventoryDropKind.Invalid)
             {
-                failure = InventoryFailure.None;
-                ItemInstance occupant = container.GetItemAt(origin);
-
-                if (result.Item != null && result.Item != item && result.Item.CanStackWith(item))
-                {
-                    kind = InventoryDropKind.Merge;
-                    area = container.GetItemArea(result.Item);
-                }
-                else if (occupant != null && occupant != item && occupant.CanStackWith(item))
-                {
-                    kind = InventoryDropKind.Merge;
-                    area = container.GetItemArea(occupant);
-                }
-                else
-                {
-                    kind = InventoryDropKind.Valid;
-                }
-
-                return;
+                ClipToContainer(ref area, container);
             }
-
-            if (slotTarget && _drag.IsSplit == false && Model.CanSwapIntoSlot(item, container.Id, origin, _primaryContainerId))
-            {
-                kind = InventoryDropKind.Valid;
-                failure = InventoryFailure.None;
-                return;
-            }
-
-            if (slotTarget == false && _drag.IsSplit == false)
-            {
-                _drag.AutoPlace = true;
-                result = Model.CanTransfer(item.InstanceId, container.Id, out ItemPlacement transferPlacement, out ItemInstance firstMerge);
-
-                if (result.Success)
-                {
-                    area = firstMerge != null ? container.GetItemArea(firstMerge) : transferPlacement.Area;
-                    kind = firstMerge != null ? InventoryDropKind.Merge : InventoryDropKind.Valid;
-                    failure = InventoryFailure.None;
-                    return;
-                }
-            }
-
-            kind = InventoryDropKind.Invalid;
-            failure = result.Failure;
-            ClipToContainer(ref area, container);
-        }
-
-        private bool TryGateDrag(InventoryDragState drag, InventoryContainer target)
-        {
-            if (EquipmentGate == null || drag.IsSplit || drag.Item == null)
-            {
-                return false;
-            }
-
-            bool fromEquipment = drag.Item.ContainerId == _equipmentContainerId;
-            bool toEquipment = target.Id == _equipmentContainerId;
-
-            if (toEquipment && fromEquipment == false && target is SlottedContainer slotted)
-            {
-                SlotDefinition slot = slotted.GetSlotAt(drag.TargetOrigin);
-                return slot != null && slot.Mode == SlotMode.Single && slot.Rule.AcceptsDefinition(drag.Item.Definition) && EquipmentGate.HandleEquip(drag.Item, slot);
-            }
-
-            return fromEquipment && toEquipment == false && EquipmentGate.HandleUnequip(drag.Item, new InventoryUnequipTarget(target.Id, drag.TargetOrigin, drag.Rotated, drag.AutoPlace));
         }
 
         private static void ClipToContainer(ref RectInt area, InventoryContainer container)

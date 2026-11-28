@@ -1,9 +1,10 @@
+using RaidIntoDarkness.Inventory.Domain;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.HighDefinition;
 
-namespace RaidIntoDarkness.Inventory.IconGeneration
+namespace RaidIntoDarkness.Inventory.Infrastructure.IconGeneration
 {
     [CreateAssetMenu(fileName = DEFAULT_RESOURCE_PATH, menuName = "Inventory/Item Icon Generator Settings")]
     public class ItemIconGeneratorSettings : ScriptableObject

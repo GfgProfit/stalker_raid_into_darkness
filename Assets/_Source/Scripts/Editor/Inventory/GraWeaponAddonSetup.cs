@@ -1,3 +1,5 @@
+using RaidIntoDarkness.Inventory.Infrastructure;
+using RaidIntoDarkness.Inventory.Domain;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -6,7 +8,6 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using RaidIntoDarkness.Inventory;
-using RaidIntoDarkness.Inventory.Editor;
 using RaidIntoDarkness.Player;
 using RaidIntoDarkness.Player.Editor;
 using UnityEditor;

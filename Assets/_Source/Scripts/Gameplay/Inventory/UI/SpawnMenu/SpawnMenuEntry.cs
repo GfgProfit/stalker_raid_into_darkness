@@ -1,6 +1,6 @@
-using RaidIntoDarkness.Inventory;
+using RaidIntoDarkness.Inventory.Domain;
 
-namespace RaidIntoDarkness.UI
+namespace RaidIntoDarkness.Inventory.UI
 {
     internal sealed class SpawnMenuEntry
     {
@@ -8,7 +8,7 @@ namespace RaidIntoDarkness.UI
         {
             Definition = definition;
             Category = category;
-            Group = (InventorySortingPlus.GetKindOrder(definition), category.Order);
+            Group = (InventoryCategoryOrder.Get(definition), category.Order);
             Price = price;
             SupportsCondition = supportsCondition;
             PackSize = packSize;

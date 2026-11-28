@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.Rendering.HighDefinition;
 
-namespace RaidIntoDarkness.Inventory.IconGeneration
+namespace RaidIntoDarkness.Inventory.Infrastructure.IconGeneration
 {
     internal static class ItemIconCameraConfigurator
     {

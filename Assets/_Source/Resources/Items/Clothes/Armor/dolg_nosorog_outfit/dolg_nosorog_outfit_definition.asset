@@ -11,7 +11,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: da0f90c2955673d46b25d465cbe44ed0, type: 3}
   m_Name: dolg_nosorog_outfit_definition
-  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.ItemDefinition
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.Domain.ItemDefinition
   _definitionId: b92439bf00996b944af94a41527523c4
   _displayName: "\u041F\u0421\u0417-10\u0414 \xAB\u041D\u043E\u0441\u043E\u0440\u043E\u0433\xBB"
   _shortName: EXO
@@ -60,11 +60,11 @@ MonoBehaviour:
     version: 2
     RefIds:
     - rid: 3479885471900762170
-      type: {class: EquippableItemComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
+      type: {class: EquippableItemComponent, ns: RaidIntoDarkness.Inventory.Domain, asm: RaidIntoDarkness.Inventory}
       data:
         _preferredSlotIds: 04000000i
     - rid: 3479885471900762171
-      type: {class: EquipmentStatsComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
+      type: {class: EquipmentStatsComponent, ns: RaidIntoDarkness.Inventory.Domain, asm: RaidIntoDarkness.Inventory}
       data:
         _section: dolg_nosorog_outfit
         _cost: 185400
@@ -133,11 +133,11 @@ MonoBehaviour:
             _average: 38
             _strong: 29
     - rid: 3479885472039698461
-      type: {class: WorldItemComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
+      type: {class: WorldItemComponent, ns: RaidIntoDarkness.Inventory.Infrastructure, asm: RaidIntoDarkness.Inventory}
       data:
         _prefab: {fileID: 2728116802229169218, guid: e3b2905d617950440a5180e22fa9145e, type: 3}
     - rid: 3479885488572596253
-      type: {class: ItemTakeSoundComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
+      type: {class: ItemTakeSoundComponent, ns: RaidIntoDarkness.Inventory.Infrastructure, asm: RaidIntoDarkness.Inventory}
       data:
         _category: exoarmor
         _clips:

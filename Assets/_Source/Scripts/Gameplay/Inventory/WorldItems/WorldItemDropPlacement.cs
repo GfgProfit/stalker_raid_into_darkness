@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace RaidIntoDarkness.Inventory
+namespace RaidIntoDarkness.Inventory.Infrastructure
 {
     internal sealed class WorldItemDropPlacement
     {

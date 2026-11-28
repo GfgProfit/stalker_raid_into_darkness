@@ -1,3 +1,4 @@
+using RaidIntoDarkness.Inventory.Domain;
 using System;
 using System.Collections.Generic;
 using R3;
@@ -91,7 +92,6 @@ namespace RaidIntoDarkness.Inventory.UI
             LayoutRebuilt?.Invoke(this);
         }
 
-        public abstract InventoryContainer CreateContainer();
         public abstract bool TryGetCellAtLocal(Vector2 topLeftLocal, out Vector2Int cell);
         public abstract Rect GetAreaRect(RectInt area);
 
@@ -319,7 +319,7 @@ namespace RaidIntoDarkness.Inventory.UI
 
         protected virtual void OnDisable()
         {
-            if (Application.isPlaying == false)
+            if (UnityEngine.Application.isPlaying == false)
             {
                 return;
             }
@@ -382,7 +382,7 @@ namespace RaidIntoDarkness.Inventory.UI
 
         private void BindItems()
         {
-            if (_containerBinding != null || _container?.Model == null || Application.isPlaying && isActiveAndEnabled == false)
+            if (_containerBinding != null || _container?.Model == null || UnityEngine.Application.isPlaying && isActiveAndEnabled == false)
             {
                 return;
             }
@@ -526,7 +526,7 @@ namespace RaidIntoDarkness.Inventory.UI
                 return;
             }
 
-            if (Application.isPlaying)
+            if (UnityEngine.Application.isPlaying)
             {
                 Destroy(target);
             }

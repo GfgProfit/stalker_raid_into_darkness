@@ -1,3 +1,5 @@
+using RaidIntoDarkness.Inventory.Infrastructure;
+using RaidIntoDarkness.Inventory.Domain;
 using System.Collections;
 using System.Text.RegularExpressions;
 using NUnit.Framework;

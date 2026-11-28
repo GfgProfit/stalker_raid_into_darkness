@@ -3452,7 +3452,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 25c03444ebcfb0547920e18911b845b0, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.WorldItem
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.Infrastructure.WorldItem
   _definition: {fileID: 11400000, guid: a5283911566d5ea4f839695dd500a7f6, type: 2}
   _amount: 1
   _silencerVisual: {fileID: 5742587644923235671}
@@ -3565,7 +3565,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2c13d2019e85820c094ef1abe1e9662a, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.WorldItemImpactSound
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.Infrastructure.WorldItemImpactSound
   _sounds: {fileID: 11400000, guid: 1e285ccc107e6e34694ef08b5e92376f, type: 2}
   _surfaces: {fileID: 11400000, guid: 1737dfeac290608458356e19a4b264cd, type: 2}
   _audio: {fileID: 8303907923985581756}
@@ -7342,7 +7342,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9c9757ce76109a545a89455546c23e0a, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.IconGeneration.ItemIconVariantPart
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.Infrastructure.IconGeneration.ItemIconVariantPart
   _part: {fileID: 11400000, guid: 94ac679431fcc2a48b2a24eeb4b81580, type: 2}
   _group: scope
   _installedObjects:
@@ -7487,7 +7487,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9c9757ce76109a545a89455546c23e0a, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.IconGeneration.ItemIconVariantPart
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.Infrastructure.IconGeneration.ItemIconVariantPart
   _part: {fileID: 11400000, guid: c7cb16990af3cc2419e8e6cf167b9836, type: 2}
   _group: scope
   _installedObjects:
@@ -7625,7 +7625,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9c9757ce76109a545a89455546c23e0a, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.IconGeneration.ItemIconVariantPart
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.Infrastructure.IconGeneration.ItemIconVariantPart
   _part: {fileID: 11400000, guid: 2e7d984e83db37e4eb8aff33f32934a2, type: 2}
   _group: scope
   _installedObjects:
@@ -7785,7 +7785,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9c9757ce76109a545a89455546c23e0a, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.IconGeneration.ItemIconVariantPart
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.Infrastructure.IconGeneration.ItemIconVariantPart
   _part: {fileID: 11400000, guid: d9bd33fd398d5a4439fdf610f79bfd39, type: 2}
   _group: scope
   _installedObjects:
@@ -7943,7 +7943,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9c9757ce76109a545a89455546c23e0a, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.IconGeneration.ItemIconVariantPart
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.Infrastructure.IconGeneration.ItemIconVariantPart
   _part: {fileID: 11400000, guid: 0b165be4bec43654eaa5b3c10030535a, type: 2}
   _group: scope
   _installedObjects:
@@ -8153,7 +8153,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9c9757ce76109a545a89455546c23e0a, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.IconGeneration.ItemIconVariantPart
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.Infrastructure.IconGeneration.ItemIconVariantPart
   _part: {fileID: 11400000, guid: ab381d6cdabfee4499e0bb853e070ce2, type: 2}
   _group: scope
   _installedObjects:
@@ -8365,7 +8365,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9c9757ce76109a545a89455546c23e0a, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.IconGeneration.ItemIconVariantPart
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.Infrastructure.IconGeneration.ItemIconVariantPart
   _part: {fileID: 11400000, guid: 6e7cc0c05a37df24abfa823d367bb86f, type: 2}
   _group: scope
   _installedObjects:
@@ -8533,7 +8533,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9c9757ce76109a545a89455546c23e0a, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.IconGeneration.ItemIconVariantPart
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.Infrastructure.IconGeneration.ItemIconVariantPart
   _part: {fileID: 11400000, guid: b0e5637f4426a474c93c2d2bf6ddccb8, type: 2}
   _group: scope
   _installedObjects:
@@ -8869,7 +8869,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9c9757ce76109a545a89455546c23e0a, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.IconGeneration.ItemIconVariantPart
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.Infrastructure.IconGeneration.ItemIconVariantPart
   _part: {fileID: 11400000, guid: 66571bb2a9dd55c4c8ec3c7df9b906fc, type: 2}
   _group: silencer
   _installedObjects:
@@ -9019,7 +9019,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9c9757ce76109a545a89455546c23e0a, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.IconGeneration.ItemIconVariantPart
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.Infrastructure.IconGeneration.ItemIconVariantPart
   _part: {fileID: 11400000, guid: 0b93f4aac0bbd7944b0047106f240e27, type: 2}
   _group: scope
   _installedObjects:
@@ -9193,7 +9193,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9c9757ce76109a545a89455546c23e0a, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.IconGeneration.ItemIconVariantPart
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.Infrastructure.IconGeneration.ItemIconVariantPart
   _part: {fileID: 11400000, guid: 3f2facb1660da024baee567fb8ef6225, type: 2}
   _group: scope
   _installedObjects:
@@ -9325,7 +9325,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9c9757ce76109a545a89455546c23e0a, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.IconGeneration.ItemIconVariantPart
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.Infrastructure.IconGeneration.ItemIconVariantPart
   _part: {fileID: 11400000, guid: e95ace63b43e2ad478d34913a79b2c68, type: 2}
   _group: scope
   _installedObjects:
@@ -9483,7 +9483,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9c9757ce76109a545a89455546c23e0a, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.IconGeneration.ItemIconVariantPart
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.Infrastructure.IconGeneration.ItemIconVariantPart
   _part: {fileID: 11400000, guid: 8181cebeead0e5340b5f73ba278b07f4, type: 2}
   _group: scope
   _installedObjects:
@@ -9695,7 +9695,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9c9757ce76109a545a89455546c23e0a, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.IconGeneration.ItemIconVariantPart
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.Infrastructure.IconGeneration.ItemIconVariantPart
   _part: {fileID: 11400000, guid: 141ad6a26409c1440ae80f784d023420, type: 2}
   _group: scope
   _installedObjects:
@@ -9912,7 +9912,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9c9757ce76109a545a89455546c23e0a, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.IconGeneration.ItemIconVariantPart
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.Infrastructure.IconGeneration.ItemIconVariantPart
   _part: {fileID: 11400000, guid: a08c4da657995d74489000a84549d9b9, type: 2}
   _group: scope
   _installedObjects:
@@ -10091,7 +10091,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9c9757ce76109a545a89455546c23e0a, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.IconGeneration.ItemIconVariantPart
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.Infrastructure.IconGeneration.ItemIconVariantPart
   _part: {fileID: 11400000, guid: 101eee143b83c0144a7a1d6a672fbc8a, type: 2}
   _group: scope
   _installedObjects:
@@ -10294,7 +10294,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9c9757ce76109a545a89455546c23e0a, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.IconGeneration.ItemIconVariantPart
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.Infrastructure.IconGeneration.ItemIconVariantPart
   _part: {fileID: 11400000, guid: d855bb1f921169747b0732aaaa6a69a5, type: 2}
   _group: scope
   _installedObjects:
@@ -10460,7 +10460,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9c9757ce76109a545a89455546c23e0a, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.IconGeneration.ItemIconVariantPart
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.Infrastructure.IconGeneration.ItemIconVariantPart
   _part: {fileID: 11400000, guid: 08d2445712ad56048aadf75a7e8f2979, type: 2}
   _group: scope
   _installedObjects:
@@ -10648,7 +10648,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9c9757ce76109a545a89455546c23e0a, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.IconGeneration.ItemIconVariantPart
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.Infrastructure.IconGeneration.ItemIconVariantPart
   _part: {fileID: 11400000, guid: 09126018d7d4a9d4fa72717db2fd42aa, type: 2}
   _group: scope
   _installedObjects:
@@ -10838,7 +10838,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9c9757ce76109a545a89455546c23e0a, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.IconGeneration.ItemIconVariantPart
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.Infrastructure.IconGeneration.ItemIconVariantPart
   _part: {fileID: 11400000, guid: b2160470b0f80c6469c672ec17e100b5, type: 2}
   _group: scope
   _installedObjects:
@@ -11006,7 +11006,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9c9757ce76109a545a89455546c23e0a, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.IconGeneration.ItemIconVariantPart
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.Infrastructure.IconGeneration.ItemIconVariantPart
   _part: {fileID: 11400000, guid: 47f9977e8eb796245ab8518ef902a33e, type: 2}
   _group: scope
   _installedObjects:
@@ -11190,7 +11190,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9c9757ce76109a545a89455546c23e0a, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.IconGeneration.ItemIconVariantPart
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.Infrastructure.IconGeneration.ItemIconVariantPart
   _part: {fileID: 11400000, guid: a0811b3d53d02aa4a8fd9b073b6e17d8, type: 2}
   _group: scope
   _installedObjects:
@@ -11328,7 +11328,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9c9757ce76109a545a89455546c23e0a, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.IconGeneration.ItemIconVariantPart
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.Infrastructure.IconGeneration.ItemIconVariantPart
   _part: {fileID: 11400000, guid: f4aeb693dd011044bb3f07fba5b1ace4, type: 2}
   _group: scope
   _installedObjects:
@@ -11462,7 +11462,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9c9757ce76109a545a89455546c23e0a, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.IconGeneration.ItemIconVariantPart
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.Infrastructure.IconGeneration.ItemIconVariantPart
   _part: {fileID: 11400000, guid: 9f2fc43076f60a5459bd673f5547bd94, type: 2}
   _group: scope
   _installedObjects:
@@ -11612,7 +11612,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9c9757ce76109a545a89455546c23e0a, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.IconGeneration.ItemIconVariantPart
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.Infrastructure.IconGeneration.ItemIconVariantPart
   _part: {fileID: 11400000, guid: 116d06cec93c73748938e8e7c294e0d0, type: 2}
   _group: scope
   _installedObjects:
@@ -11810,7 +11810,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9c9757ce76109a545a89455546c23e0a, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.IconGeneration.ItemIconVariantPart
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.Infrastructure.IconGeneration.ItemIconVariantPart
   _part: {fileID: 11400000, guid: a81ed245a31667c438ad7bafda8e0e8e, type: 2}
   _group: scope
   _installedObjects:
@@ -11932,7 +11932,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9c9757ce76109a545a89455546c23e0a, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.IconGeneration.ItemIconVariantPart
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.Infrastructure.IconGeneration.ItemIconVariantPart
   _part: {fileID: 11400000, guid: f31be855ebfe15642a9e098be2a2bd71, type: 2}
   _group: scope
   _installedObjects:
@@ -12088,7 +12088,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9c9757ce76109a545a89455546c23e0a, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.IconGeneration.ItemIconVariantPart
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.Infrastructure.IconGeneration.ItemIconVariantPart
   _part: {fileID: 11400000, guid: 867a7f373388760469fc24ccebf9f005, type: 2}
   _group: scope
   _installedObjects:
@@ -12255,7 +12255,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9c9757ce76109a545a89455546c23e0a, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.IconGeneration.ItemIconVariantPart
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.Infrastructure.IconGeneration.ItemIconVariantPart
   _part: {fileID: 11400000, guid: bb42dc9b48c7cee4e82a8b3b37f82fe9, type: 2}
   _group: scope
   _installedObjects:
@@ -12500,7 +12500,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9c9757ce76109a545a89455546c23e0a, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.IconGeneration.ItemIconVariantPart
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.Infrastructure.IconGeneration.ItemIconVariantPart
   _part: {fileID: 11400000, guid: b8f7a32877cf9f944a197c0a2dea0985, type: 2}
   _group: scope
   _installedObjects:
@@ -12646,7 +12646,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9c9757ce76109a545a89455546c23e0a, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.IconGeneration.ItemIconVariantPart
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.Infrastructure.IconGeneration.ItemIconVariantPart
   _part: {fileID: 11400000, guid: 22cb15100d34bc845a2f8f79cdbf0e0a, type: 2}
   _group: scope
   _installedObjects:
@@ -12803,7 +12803,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9c9757ce76109a545a89455546c23e0a, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.IconGeneration.ItemIconVariantPart
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.Infrastructure.IconGeneration.ItemIconVariantPart
   _part: {fileID: 11400000, guid: 0aea60fd72bbf20439531fbef8d7f762, type: 2}
   _group: scope
   _installedObjects:
@@ -13010,7 +13010,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9c9757ce76109a545a89455546c23e0a, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.IconGeneration.ItemIconVariantPart
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.Infrastructure.IconGeneration.ItemIconVariantPart
   _part: {fileID: 11400000, guid: d1f87ac9d7885eb42a25b190eb0bc0e8, type: 2}
   _group: scope
   _installedObjects:
@@ -13173,7 +13173,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9c9757ce76109a545a89455546c23e0a, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.IconGeneration.ItemIconVariantPart
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.Infrastructure.IconGeneration.ItemIconVariantPart
   _part: {fileID: 11400000, guid: b9d1937130e564645a59b1fdb0588f4e, type: 2}
   _group: scope
   _installedObjects:
@@ -13346,7 +13346,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9c9757ce76109a545a89455546c23e0a, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.IconGeneration.ItemIconVariantPart
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.Infrastructure.IconGeneration.ItemIconVariantPart
   _part: {fileID: 11400000, guid: 3692a31afb1686341add931beeea3d2c, type: 2}
   _group: scope
   _installedObjects:
@@ -13531,7 +13531,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9c9757ce76109a545a89455546c23e0a, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.IconGeneration.ItemIconVariantPart
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.Infrastructure.IconGeneration.ItemIconVariantPart
   _part: {fileID: 11400000, guid: e860adc23efd2e540911e3efa1c65bf2, type: 2}
   _group: scope
   _installedObjects:
@@ -13664,7 +13664,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9c9757ce76109a545a89455546c23e0a, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.IconGeneration.ItemIconVariantPart
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.Infrastructure.IconGeneration.ItemIconVariantPart
   _part: {fileID: 11400000, guid: 1525e10127d18f242aba1fc3711ae389, type: 2}
   _group: scope
   _installedObjects:
@@ -13774,7 +13774,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9c9757ce76109a545a89455546c23e0a, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.IconGeneration.ItemIconVariantPart
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.Infrastructure.IconGeneration.ItemIconVariantPart
   _part: {fileID: 11400000, guid: 47a9dcca3036c484a875295e2c1a2df4, type: 2}
   _group: scope
   _installedObjects:
@@ -13939,7 +13939,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9c9757ce76109a545a89455546c23e0a, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.IconGeneration.ItemIconVariantPart
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.Infrastructure.IconGeneration.ItemIconVariantPart
   _part: {fileID: 11400000, guid: fda774a86032cfa49bb671d46146021c, type: 2}
   _group: scope
   _installedObjects:
@@ -14071,7 +14071,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9c9757ce76109a545a89455546c23e0a, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.IconGeneration.ItemIconVariantPart
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.Infrastructure.IconGeneration.ItemIconVariantPart
   _part: {fileID: 11400000, guid: 0e4b9929963f1a040b8db026e6921bbf, type: 2}
   _group: scope
   _installedObjects:
@@ -14244,7 +14244,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9c9757ce76109a545a89455546c23e0a, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.IconGeneration.ItemIconVariantPart
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.Infrastructure.IconGeneration.ItemIconVariantPart
   _part: {fileID: 11400000, guid: 95347acdc8dd3584c9538dac3fa17378, type: 2}
   _group: scope
   _installedObjects:
@@ -14354,7 +14354,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9c9757ce76109a545a89455546c23e0a, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.IconGeneration.ItemIconVariantPart
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.Infrastructure.IconGeneration.ItemIconVariantPart
   _part: {fileID: 11400000, guid: 55b9e4df57ad16643ae21c0c2a23725e, type: 2}
   _group: scope
   _installedObjects:
@@ -14492,7 +14492,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9c9757ce76109a545a89455546c23e0a, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.IconGeneration.ItemIconVariantPart
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.Infrastructure.IconGeneration.ItemIconVariantPart
   _part: {fileID: 11400000, guid: 221259caddfe3c842a416289d818380e, type: 2}
   _group: scope
   _installedObjects:
@@ -14685,7 +14685,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9c9757ce76109a545a89455546c23e0a, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.IconGeneration.ItemIconVariantPart
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.Infrastructure.IconGeneration.ItemIconVariantPart
   _part: {fileID: 11400000, guid: bc51d0c36a074b842b48c995f834c171, type: 2}
   _group: scope
   _installedObjects:
@@ -14845,7 +14845,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9c9757ce76109a545a89455546c23e0a, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.IconGeneration.ItemIconVariantPart
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.Infrastructure.IconGeneration.ItemIconVariantPart
   _part: {fileID: 11400000, guid: fc1a4cfb4771da944a45b0e79530107d, type: 2}
   _group: scope
   _installedObjects:
@@ -15026,7 +15026,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9c9757ce76109a545a89455546c23e0a, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.IconGeneration.ItemIconVariantPart
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.Infrastructure.IconGeneration.ItemIconVariantPart
   _part: {fileID: 11400000, guid: c102ea3c0364621469b4fd611e1636ec, type: 2}
   _group: scope
   _installedObjects:
@@ -15179,7 +15179,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9c9757ce76109a545a89455546c23e0a, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.IconGeneration.ItemIconVariantPart
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.Infrastructure.IconGeneration.ItemIconVariantPart
   _part: {fileID: 11400000, guid: 2183aad17ad3305499c981375cd92cb3, type: 2}
   _group: scope
   _installedObjects:
@@ -15347,7 +15347,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9c9757ce76109a545a89455546c23e0a, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.IconGeneration.ItemIconVariantPart
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.Infrastructure.IconGeneration.ItemIconVariantPart
   _part: {fileID: 11400000, guid: 43fb054a0e26ab0488efc9929d2c2d00, type: 2}
   _group: scope
   _installedObjects:
@@ -15443,7 +15443,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9c9757ce76109a545a89455546c23e0a, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.IconGeneration.ItemIconVariantPart
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.Infrastructure.IconGeneration.ItemIconVariantPart
   _part: {fileID: 11400000, guid: 2fb8162459955f041b6d7aa702b3cc65, type: 2}
   _group: scope
   _installedObjects:
@@ -15593,7 +15593,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9c9757ce76109a545a89455546c23e0a, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.IconGeneration.ItemIconVariantPart
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.Infrastructure.IconGeneration.ItemIconVariantPart
   _part: {fileID: 11400000, guid: 64e43c14e80127c4992bb32249221943, type: 2}
   _group: scope
   _installedObjects:

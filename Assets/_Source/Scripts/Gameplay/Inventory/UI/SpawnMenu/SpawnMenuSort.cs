@@ -1,4 +1,4 @@
-namespace RaidIntoDarkness.UI
+namespace RaidIntoDarkness.Inventory.UI
 {
     internal enum SpawnMenuSort
     {

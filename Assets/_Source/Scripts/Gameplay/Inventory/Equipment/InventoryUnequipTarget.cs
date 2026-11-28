@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace RaidIntoDarkness.Inventory
+namespace RaidIntoDarkness.Inventory.Application
 {
     public readonly struct InventoryUnequipTarget
     {

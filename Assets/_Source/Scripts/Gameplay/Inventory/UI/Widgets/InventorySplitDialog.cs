@@ -1,3 +1,4 @@
+using RaidIntoDarkness.Inventory.Domain;
 using System;
 using R3;
 using TMPro;

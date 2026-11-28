@@ -11,7 +11,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: da0f90c2955673d46b25d465cbe44ed0, type: 3}
   m_Name: exo_dolg_urban_outfit_definition
-  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.ItemDefinition
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.Domain.ItemDefinition
   _definitionId: a9685b6bd59db3a4996de6f8e444611e
   _displayName: "\u041F\u0421\u0417-10\u0433 \xAB\u0411\u043E\u0435\u0432\u0430\u044F \u0437\u0430\u0449\u0438\u0442\u0430\xBB"
   _shortName: HEAVY
@@ -60,11 +60,11 @@ MonoBehaviour:
     version: 2
     RefIds:
     - rid: 3479885471900762216
-      type: {class: EquippableItemComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
+      type: {class: EquippableItemComponent, ns: RaidIntoDarkness.Inventory.Domain, asm: RaidIntoDarkness.Inventory}
       data:
         _preferredSlotIds: 04000000i
     - rid: 3479885471900762217
-      type: {class: EquipmentStatsComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
+      type: {class: EquipmentStatsComponent, ns: RaidIntoDarkness.Inventory.Domain, asm: RaidIntoDarkness.Inventory}
       data:
         _section: exo_dolg_urban_outfit
         _cost: 78350
@@ -133,11 +133,11 @@ MonoBehaviour:
             _average: 47
             _strong: 37
     - rid: 3479885472039698484
-      type: {class: WorldItemComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
+      type: {class: WorldItemComponent, ns: RaidIntoDarkness.Inventory.Infrastructure, asm: RaidIntoDarkness.Inventory}
       data:
         _prefab: {fileID: 1116413734460007816, guid: a33023f73ca370c478845662afd68a87, type: 3}
     - rid: 3479885488572596276
-      type: {class: ItemTakeSoundComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
+      type: {class: ItemTakeSoundComponent, ns: RaidIntoDarkness.Inventory.Infrastructure, asm: RaidIntoDarkness.Inventory}
       data:
         _category: armor
         _clips:

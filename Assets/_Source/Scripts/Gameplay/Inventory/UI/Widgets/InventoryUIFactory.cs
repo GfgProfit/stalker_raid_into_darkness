@@ -1,3 +1,4 @@
+using RaidIntoDarkness.Inventory.Domain;
 using System;
 using TMPro;
 using UnityEngine;
@@ -145,7 +146,7 @@ namespace RaidIntoDarkness.Inventory.UI
                 return;
             }
 
-            if (Application.isPlaying)
+            if (UnityEngine.Application.isPlaying)
             {
                 UnityEngine.Object.Destroy(target);
             }

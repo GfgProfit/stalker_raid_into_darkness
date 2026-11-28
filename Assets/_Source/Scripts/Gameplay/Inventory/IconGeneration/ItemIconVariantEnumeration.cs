@@ -1,8 +1,9 @@
+using RaidIntoDarkness.Inventory.Domain;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace RaidIntoDarkness.Inventory.IconGeneration
+namespace RaidIntoDarkness.Inventory.Infrastructure.IconGeneration
 {
     public static class ItemIconVariantEnumeration
     {

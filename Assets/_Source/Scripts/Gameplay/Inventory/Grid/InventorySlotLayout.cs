@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace RaidIntoDarkness.Inventory
+namespace RaidIntoDarkness.Inventory.Domain
 {
     [CreateAssetMenu(menuName = "Inventory/Slot Layout", fileName = "SlotLayout")]
     public sealed class InventorySlotLayout : ScriptableObject

@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace RaidIntoDarkness.UI
+namespace RaidIntoDarkness.Inventory.UI
 {
     internal sealed class SpawnMenuCategory
     {

@@ -11,7 +11,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: da0f90c2955673d46b25d465cbe44ed0, type: 3}
   m_Name: wpn_m320_definition
-  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.ItemDefinition
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.Domain.ItemDefinition
   _definitionId: 9e53ede77812c7548bd6df465ebb8258
   _displayName: "40-\u043C\u043C \u0433\u0440\u0430\u043D\u0430\u0442\u043E\u043C\u0451\u0442 Heckler & Koch M320"
   _shortName: M320
@@ -61,11 +61,11 @@ MonoBehaviour:
     version: 2
     RefIds:
     - rid: 115149112346673466
-      type: {class: EquippableItemComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
+      type: {class: EquippableItemComponent, ns: RaidIntoDarkness.Inventory.Domain, asm: RaidIntoDarkness.Inventory}
       data:
         _preferredSlotIds: 090000000a000000i
     - rid: 115149112346673467
-      type: {class: WeaponStatsComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
+      type: {class: WeaponStatsComponent, ns: RaidIntoDarkness.Inventory.Domain, asm: RaidIntoDarkness.Inventory}
       data:
         _section: wpn_m320
         _weaponClass: grenade_launcher
@@ -96,7 +96,7 @@ MonoBehaviour:
         _blockSilencerWithGrenadeLauncher: 0
         _exposedRound: {fileID: 0}
     - rid: 115149112346673468
-      type: {class: WeaponHudComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
+      type: {class: WeaponHudComponent, ns: RaidIntoDarkness.Inventory.Infrastructure, asm: RaidIntoDarkness.Inventory}
       data:
         _hudModel: {fileID: 4167472720972581360, guid: 0d7e4d46abe929c4f8c25db2fc8f179d, type: 3}
         _weaponMotions: {fileID: 8815230551390286010, guid: 94fb92bfaaa4db04b97e806844d9a178, type: 3}
@@ -106,6 +106,6 @@ MonoBehaviour:
         _firstPersonWeapon: {fileID: 11400000, guid: c3ed0ccfbe1bdac408c674fd7864f90d, type: 2}
         _scopeAimOffsets: []
     - rid: 115149112346673469
-      type: {class: WorldItemComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
+      type: {class: WorldItemComponent, ns: RaidIntoDarkness.Inventory.Infrastructure, asm: RaidIntoDarkness.Inventory}
       data:
         _prefab: {fileID: 2611378399968998978, guid: 0d7e4d46abe929c4f8c25db2fc8f179d, type: 3}

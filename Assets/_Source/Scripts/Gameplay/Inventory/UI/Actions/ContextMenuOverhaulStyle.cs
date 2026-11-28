@@ -1,7 +1,7 @@
-using RaidIntoDarkness.Inventory;
-using RaidIntoDarkness.Inventory.UI;
+using RaidIntoDarkness.Inventory.Domain;
+using RaidIntoDarkness.Inventory.Application;
 
-namespace RaidIntoDarkness.Inventory
+namespace RaidIntoDarkness.Inventory.UI
 {
     public sealed class ContextMenuOverhaulStyle
     {
@@ -36,9 +36,9 @@ namespace RaidIntoDarkness.Inventory
         private const string TAG_SMOKE = "smoke";
 
         private readonly InventoryWindow _window;
-        private readonly InventorySortingPlus _sorting;
+        private readonly InventorySortViewModel _sorting;
 
-        public ContextMenuOverhaulStyle(InventoryWindow window, InventorySortingPlus sorting)
+        public ContextMenuOverhaulStyle(InventoryWindow window, InventorySortViewModel sorting)
         {
             _window = window;
             _sorting = sorting;

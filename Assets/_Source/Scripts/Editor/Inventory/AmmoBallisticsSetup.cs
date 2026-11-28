@@ -1,3 +1,4 @@
+using RaidIntoDarkness.Inventory.Domain;
 using System;
 using System.IO;
 using RaidIntoDarkness.Inventory;

@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace RaidIntoDarkness.Inventory
+namespace RaidIntoDarkness.Inventory.Domain
 {
     public readonly struct ItemLocation : IEquatable<ItemLocation>
     {

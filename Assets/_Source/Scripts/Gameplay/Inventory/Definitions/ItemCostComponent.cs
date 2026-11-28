@@ -1,8 +1,7 @@
 using System;
-using RaidIntoDarkness.Inventory;
 using UnityEngine;
 
-namespace RaidIntoDarkness.Inventory
+namespace RaidIntoDarkness.Inventory.Domain
 {
     [Serializable]
     public sealed class ItemCostComponent : ItemDefinitionComponent

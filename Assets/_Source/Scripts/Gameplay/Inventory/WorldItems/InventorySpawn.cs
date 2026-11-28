@@ -1,15 +1,15 @@
+using RaidIntoDarkness.Inventory.Domain;
 using System;
 using System.Globalization;
-using RaidIntoDarkness.Inventory;
 using UnityEngine;
 
-namespace RaidIntoDarkness.Inventory
+namespace RaidIntoDarkness.Inventory.Application
 {
     internal static class InventorySpawn
     {
-        public static int Grant(PlayerInventoryRuntime inventory, string containerId, ItemDefinition definition, int quantity, int condition, out InventoryFailure failure)
+        public static int Grant(InventoryModel model, string containerId, ItemDefinition definition, int quantity, int condition, out InventoryFailure failure)
         {
-            if (inventory == null || !inventory.isActiveAndEnabled || inventory.Model.GetContainer(containerId) == null)
+            if (model?.GetContainer(containerId) == null)
             {
                 failure = InventoryFailure.ContainerNotFound;
                 return 0;
@@ -20,7 +20,6 @@ namespace RaidIntoDarkness.Inventory
                 return 0;
             }
 
-            InventoryModel model = inventory.Model;
             string conditionState = condition < 100 && !definition.IsCategory("Grenade") ? (Math.Clamp(condition, 0, 100) / 100f).ToString("R", CultureInfo.InvariantCulture) : null;
             int added = 0;
             failure = InventoryFailure.None;
@@ -37,7 +36,7 @@ namespace RaidIntoDarkness.Inventory
                 }
                 catch (Exception exception)
                 {
-                    Debug.LogException(exception, inventory);
+                    Debug.LogException(exception);
                     failure = InventoryFailure.InvalidItem;
                     break;
                 }

@@ -1,3 +1,4 @@
+using RaidIntoDarkness.Inventory.Domain;
 using System;
 using System.Collections.Generic;
 using TMPro;
@@ -31,7 +32,7 @@ namespace RaidIntoDarkness.Inventory.UI
         [SerializeField] private List<InventorySlotVisual> _slotVisuals = new();
 
         private readonly List<SlotDefinition> _slots = new();
-        private readonly Dictionary<SlotId, Rect> _slotRects = new();
+        private readonly InventorySlotGridGeometry _geometry = new();
         private readonly Dictionary<SlotId, InventorySlotVisual> _visualsById = new();
         private readonly Dictionary<SlotId, Image> _lockImages = new();
         private readonly Dictionary<SlotId, Image> _highlightImages = new();
@@ -39,19 +40,15 @@ namespace RaidIntoDarkness.Inventory.UI
         private readonly List<SlotId> _staleDecorations = new();
         private readonly List<TMP_Text> _labels = new();
         private RectTransform _decorationRoot;
-        private SlotDefinition[,] _slotByCell = new SlotDefinition[0, 0];
-        private int _gridWidth;
-        private int _gridHeight;
-        private Vector2 _contentSize;
         private string _layoutWarning = string.Empty;
 
         public InventorySlotLayout Layout => _layout;
         public IReadOnlyList<SlotDefinition> Slots => _slots;
         public IReadOnlyList<InventorySlotVisual> SlotVisuals => _slotVisuals;
         public bool IsEquipment => _isEquipment;
-        public override int Columns => _gridWidth;
-        public override int Rows => _gridHeight;
-        public override Vector2 ContentSize => _contentSize;
+        public override int Columns => _geometry.Columns;
+        public override int Rows => _geometry.Rows;
+        public override Vector2 ContentSize => _geometry.ContentSize;
         public override string LayoutWarning => _layoutWarning;
         public override bool UsesItemFilter => _isEquipment == false;
 
@@ -88,63 +85,13 @@ namespace RaidIntoDarkness.Inventory.UI
             Rebuild();
         }
 
-        public Vector2 GetSlotPosition(SlotId slotId) => _slotRects.TryGetValue(slotId, out Rect rect) ? rect.position : Vector2.zero;
+        public Vector2 GetSlotPosition(SlotId slotId) => _geometry.GetSlotRect(slotId).position;
 
-        public Rect GetSlotRect(SlotId slotId) => _slotRects.TryGetValue(slotId, out Rect rect) ? rect : default;
+        public Rect GetSlotRect(SlotId slotId) => _geometry.GetSlotRect(slotId);
 
-        public override InventoryContainer CreateContainer()
-        {
-            ComputeLayout();
-            return new SlottedContainer(ContainerId, _slots, Mathf.Max(1, _gridWidth), Mathf.Max(1, _gridHeight), _isEquipment, OwnerId, DisplayName);
-        }
-
-        public override bool TryGetCellAtLocal(Vector2 topLeftLocal, out Vector2Int cell)
-        {
-            SlotDefinition slot = GetSlotAtVisualPosition(topLeftLocal);
-
-            if (slot == null)
-            {
-                cell = new Vector2Int(-1, -1);
-                return false;
-            }
-
-            cell = CellInSlot(slot, topLeftLocal);
-            return true;
-        }
-
-        public override Vector2Int GetPlacementOrigin(Vector2 topLeftPointer, Vector2Int itemSize)
-        {
-            SlotDefinition hover = GetSlotAtVisualPosition(topLeftPointer);
-
-            if (hover != null && hover.Mode == SlotMode.Single)
-            {
-                return hover.Bounds.position;
-            }
-
-            Vector2 cell = hover != null ? SlotCellSize(hover) : CellSize;
-            Vector2 shifted = topLeftPointer - new Vector2((itemSize.x - 1) * cell.x * 0.5f, (itemSize.y - 1) * cell.y * 0.5f);
-            SlotDefinition slot = GetSlotAtVisualPosition(shifted) ?? hover;
-            return slot == null ? new Vector2Int(-1, -1) : CellInSlot(slot, shifted);
-        }
-
-        public override Rect GetAreaRect(RectInt area)
-        {
-            SlotDefinition slot = GetSlotAtCell(area.position);
-
-            if (slot == null || _slotRects.TryGetValue(slot.Id, out Rect slotRect) == false)
-            {
-                Vector2 size = CellSize;
-                return new Rect(area.x * size.x, area.y * size.y, area.width * size.x, area.height * size.y);
-            }
-
-            if (slot.Mode == SlotMode.Single)
-            {
-                return slotRect;
-            }
-
-            Vector2 cell = SlotCellSize(slot);
-            return new Rect(slotRect.x + (area.x - slot.X) * cell.x, slotRect.y + (area.y - slot.Y) * cell.y, area.width * cell.x, area.height * cell.y);
-        }
+        public override bool TryGetCellAtLocal(Vector2 topLeftLocal, out Vector2Int cell) => _geometry.TryGetCellAtLocal(topLeftLocal, out cell);
+        public override Vector2Int GetPlacementOrigin(Vector2 topLeftPointer, Vector2Int itemSize) => _geometry.GetPlacementOrigin(topLeftPointer, itemSize);
+        public override Rect GetAreaRect(RectInt area) => _geometry.GetAreaRect(area);
 
         public override bool UsesSlotIcon(ItemInstance item, out Vector2Int slotSize)
         {
@@ -169,34 +116,18 @@ namespace RaidIntoDarkness.Inventory.UI
         protected override void ComputeLayout()
         {
             _slots.Clear();
-            _slotRects.Clear();
             _visualsById.Clear();
             _layoutWarning = string.Empty;
-            bool parsed = _layout != null ? _layout.TryBuildSlots(out List<SlotDefinition> slots, out _gridWidth, out _gridHeight, out string error) : SlotMaskParser.TryParse(_inlineMask, _inlineBindings, out slots, out _gridWidth, out _gridHeight, out error);
+            bool parsed = _layout != null ? _layout.TryBuildSlots(out List<SlotDefinition> slots, out int width, out int height, out string error) : SlotMaskParser.TryParse(_inlineMask, _inlineBindings, out slots, out width, out height, out error);
 
             if (parsed == false)
             {
                 _layoutWarning = error;
-                _gridWidth = 1;
-                _gridHeight = 1;
-                _slotByCell = new SlotDefinition[1, 1];
-                _contentSize = CellSize;
+                _geometry.Reset(CellSize);
                 return;
             }
 
             _slots.AddRange(slots);
-            _slotByCell = new SlotDefinition[_gridWidth, _gridHeight];
-
-            foreach (SlotDefinition slot in _slots)
-            {
-                for (int x = slot.Bounds.xMin; x < slot.Bounds.xMax; x++)
-                {
-                    for (int y = slot.Bounds.yMin; y < slot.Bounds.yMax; y++)
-                    {
-                        _slotByCell[x, y] = slot;
-                    }
-                }
-            }
 
             if (_slotVisuals != null)
             {
@@ -218,7 +149,7 @@ namespace RaidIntoDarkness.Inventory.UI
                 }
             }
 
-            ComputeGeometry();
+            _geometry.Build(_slots, _visualsById, width, height, CellSize, _slotSpacing, _centerRows);
         }
 
         protected override void ApplySize() => ApplyContentSize(InventoryGridSizeMode.AutoSize);
@@ -227,7 +158,7 @@ namespace RaidIntoDarkness.Inventory.UI
         {
             foreach (SlotDefinition slot in _slots)
             {
-                Rect region = _slotRects[slot.Id];
+                Rect region = _geometry.GetSlotRect(slot.Id);
 
                 if (slot.Mode == SlotMode.Single)
                 {
@@ -235,7 +166,7 @@ namespace RaidIntoDarkness.Inventory.UI
                 }
                 else
                 {
-                    DrawCellRegion(graphic, region, slot.Width, slot.Height, SlotCellSize(slot));
+                    DrawCellRegion(graphic, region, slot.Width, slot.Height, _geometry.SlotCellSize(slot));
                 }
             }
         }
@@ -256,7 +187,7 @@ namespace RaidIntoDarkness.Inventory.UI
 
                 if (locked && slotted != null)
                 {
-                    graphic.AddQuad(_slotRects[slot.Id], Style.LockedSlotColor);
+                    graphic.AddQuad(_geometry.GetSlotRect(slot.Id), Style.LockedSlotColor);
                 }
             }
         }
@@ -280,7 +211,7 @@ namespace RaidIntoDarkness.Inventory.UI
 
             for (int i = 0; i < areas.Count; i++)
             {
-                SlotDefinition slot = GetSlotAtCell(areas[i].position);
+                SlotDefinition slot = _geometry.GetSlotAtCell(areas[i].position);
 
                 if (slot != null && _highlightImages.TryGetValue(slot.Id, out Image image) && image != null)
                 {
@@ -336,7 +267,7 @@ namespace RaidIntoDarkness.Inventory.UI
                     continue;
                 }
 
-                Rect rect = _slotRects[slot.Id];
+                Rect rect = _geometry.GetSlotRect(slot.Id);
                 RectTransform labelRect = label.rectTransform;
                 labelRect.SetAsLastSibling();
                 labelRect.anchorMin = new Vector2(0f, 1f);
@@ -394,7 +325,7 @@ namespace RaidIntoDarkness.Inventory.UI
 
         private Rect LockedRect(SlotDefinition slot, InventorySlotVisual visual)
         {
-            Rect slotRect = _slotRects[slot.Id];
+            Rect slotRect = _geometry.GetSlotRect(slot.Id);
             Rect locked = visual.LockedRect;
             return locked.width > 0f && locked.height > 0f ? new Rect(slotRect.x + locked.x, slotRect.y + locked.y, locked.width, locked.height) : slotRect;
         }
@@ -430,7 +361,7 @@ namespace RaidIntoDarkness.Inventory.UI
                     images[slot.Id] = image;
                 }
 
-                Rect rect = locked ? LockedRect(slot, visual) : _slotRects[slot.Id];
+                Rect rect = locked ? LockedRect(slot, visual) : _geometry.GetSlotRect(slot.Id);
                 RectTransform imageRect = image.rectTransform;
                 imageRect.anchorMin = new Vector2(0f, 1f);
                 imageRect.anchorMax = new Vector2(0f, 1f);
@@ -455,198 +386,6 @@ namespace RaidIntoDarkness.Inventory.UI
             {
                 images.Remove(slotId);
             }
-        }
-
-        private Vector2 SlotCellSize(SlotDefinition slot)
-        {
-            Rect rect = _slotRects[slot.Id];
-            return new Vector2(rect.width / Mathf.Max(1, slot.Width), rect.height / Mathf.Max(1, slot.Height));
-        }
-
-        private Vector2Int CellInSlot(SlotDefinition slot, Vector2 topLeftLocal)
-        {
-            Rect rect = _slotRects[slot.Id];
-            Vector2 cell = SlotCellSize(slot);
-            int x = Mathf.Clamp(Mathf.FloorToInt((topLeftLocal.x - rect.x) / cell.x), 0, slot.Width - 1);
-            int y = Mathf.Clamp(Mathf.FloorToInt((topLeftLocal.y - rect.y) / cell.y), 0, slot.Height - 1);
-            return new Vector2Int(slot.X + x, slot.Y + y);
-        }
-
-        private SlotDefinition GetSlotAtCell(Vector2Int cell)
-        {
-            if (cell.x < 0 || cell.y < 0 || cell.x >= _gridWidth || cell.y >= _gridHeight)
-            {
-                return null;
-            }
-
-            return _slotByCell[cell.x, cell.y];
-        }
-
-        private SlotDefinition GetSlotAtVisualPosition(Vector2 visualPosition)
-        {
-            foreach (SlotDefinition slot in _slots)
-            {
-                if (_slotRects.TryGetValue(slot.Id, out Rect rect) && rect.Contains(visualPosition))
-                {
-                    return slot;
-                }
-            }
-
-            return null;
-        }
-
-        private void ComputeGeometry()
-        {
-            Vector2 cell = CellSize;
-            var rowPositions = new float[_gridHeight];
-            var rowWidths = new float[_gridHeight];
-            float maxRowWidth = 0f;
-
-            for (int y = 0; y < _gridHeight; y++)
-            {
-                rowWidths[y] = CalculateRowLocalWidth(y, cell.x);
-                maxRowWidth = Mathf.Max(maxRowWidth, rowWidths[y]);
-            }
-
-            for (int y = 1; y < _gridHeight; y++)
-            {
-                float gap = HasRowBoundary(y - 1) ? _slotSpacing : 0f;
-                rowPositions[y] = rowPositions[y - 1] + cell.y + gap;
-            }
-
-            _contentSize = Vector2.zero;
-
-            foreach (SlotDefinition slot in _slots)
-            {
-                Rect rect;
-
-                if (_visualsById.TryGetValue(slot.Id, out InventorySlotVisual visual) && visual.OverrideRect)
-                {
-                    rect = visual.Rect;
-                }
-                else
-                {
-                    float x = 0f;
-
-                    for (int y = slot.Y; y < slot.Y + slot.Height; y++)
-                    {
-                        float offset = _centerRows ? (maxRowWidth - rowWidths[y]) * 0.5f : 0f;
-                        x = Mathf.Max(x, CalculateSlotLocalX(slot.X, y, cell.x) + offset);
-                    }
-
-                    rect = new Rect(x, rowPositions[slot.Y], slot.Width * cell.x, slot.Height * cell.y);
-                }
-
-                _slotRects[slot.Id] = rect;
-                _contentSize.x = Mathf.Max(_contentSize.x, rect.xMax);
-                _contentSize.y = Mathf.Max(_contentSize.y, rect.yMax);
-            }
-        }
-
-        private float CalculateRowLocalWidth(int y, float cellWidth)
-        {
-            float width = 0f;
-            bool hasVisibleRun = false;
-            SlotDefinition previousRun = null;
-
-            for (int x = 0; x < _gridWidth; x++)
-            {
-                SlotDefinition current = GetSlotAtCell(new Vector2Int(x, y));
-
-                if (current == null)
-                {
-                    previousRun = null;
-                    continue;
-                }
-
-                if (current == previousRun)
-                {
-                    continue;
-                }
-
-                if (hasVisibleRun)
-                {
-                    width += _slotSpacing;
-                }
-
-                width += CountRunWidthInRow(x, y, current) * cellWidth;
-                hasVisibleRun = true;
-                previousRun = current;
-            }
-
-            return width;
-        }
-
-        private float CalculateSlotLocalX(int targetX, int y, float cellWidth)
-        {
-            float xPosition = 0f;
-            bool hasVisibleRun = false;
-            SlotDefinition previousRun = null;
-
-            for (int x = 0; x < _gridWidth; x++)
-            {
-                SlotDefinition current = GetSlotAtCell(new Vector2Int(x, y));
-
-                if (current == null)
-                {
-                    previousRun = null;
-                    continue;
-                }
-
-                if (current == previousRun)
-                {
-                    continue;
-                }
-
-                if (hasVisibleRun)
-                {
-                    xPosition += _slotSpacing;
-                }
-
-                if (x == targetX)
-                {
-                    return xPosition;
-                }
-
-                xPosition += CountRunWidthInRow(x, y, current) * cellWidth;
-                hasVisibleRun = true;
-                previousRun = current;
-            }
-
-            return targetX * cellWidth;
-        }
-
-        private int CountRunWidthInRow(int startX, int y, SlotDefinition slot)
-        {
-            int width = 0;
-
-            for (int x = startX; x < _gridWidth; x++)
-            {
-                if (GetSlotAtCell(new Vector2Int(x, y)) != slot)
-                {
-                    break;
-                }
-
-                width++;
-            }
-
-            return width;
-        }
-
-        private bool HasRowBoundary(int topRow)
-        {
-            for (int x = 0; x < _gridWidth; x++)
-            {
-                SlotDefinition first = GetSlotAtCell(new Vector2Int(x, topRow));
-                SlotDefinition second = GetSlotAtCell(new Vector2Int(x, topRow + 1));
-
-                if (first != second && (first != null || second != null))
-                {
-                    return true;
-                }
-            }
-
-            return false;
         }
     }
 }

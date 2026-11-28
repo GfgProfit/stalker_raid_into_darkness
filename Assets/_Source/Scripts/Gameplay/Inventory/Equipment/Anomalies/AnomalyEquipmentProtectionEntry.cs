@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using XRay.Importer.Levels;
 
-namespace RaidIntoDarkness.Inventory
+namespace RaidIntoDarkness.Inventory.Domain
 {
     [Serializable]
     public struct AnomalyEquipmentProtectionEntry

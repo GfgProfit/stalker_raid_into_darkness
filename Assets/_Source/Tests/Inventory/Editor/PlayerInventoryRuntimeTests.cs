@@ -1,3 +1,5 @@
+using RaidIntoDarkness.Inventory.Infrastructure;
+using RaidIntoDarkness.Inventory.Domain;
 using System.Reflection;
 using RaidIntoDarkness.Inventory;
 using RaidIntoDarkness.Player;

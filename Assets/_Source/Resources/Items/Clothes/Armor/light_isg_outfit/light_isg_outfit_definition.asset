@@ -11,7 +11,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: da0f90c2955673d46b25d465cbe44ed0, type: 3}
   m_Name: light_isg_outfit_definition
-  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.ItemDefinition
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.Domain.ItemDefinition
   _definitionId: 901e3108635aef94a887c0bacbaccdaf
   _displayName: "\u0411\u0440\u043E\u043D\u0435\u0436\u0438\u043B\u0435\u0442 IBA-\u0417 \u0418\u0418\u0413"
   _shortName: MEDIUM
@@ -60,11 +60,11 @@ MonoBehaviour:
     version: 2
     RefIds:
     - rid: 3479885471900762274
-      type: {class: EquippableItemComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
+      type: {class: EquippableItemComponent, ns: RaidIntoDarkness.Inventory.Domain, asm: RaidIntoDarkness.Inventory}
       data:
         _preferredSlotIds: 04000000i
     - rid: 3479885471900762275
-      type: {class: EquipmentStatsComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
+      type: {class: EquipmentStatsComponent, ns: RaidIntoDarkness.Inventory.Domain, asm: RaidIntoDarkness.Inventory}
       data:
         _section: light_isg_outfit
         _cost: 52830
@@ -133,11 +133,11 @@ MonoBehaviour:
             _average: 28
             _strong: 21
     - rid: 3479885472039698513
-      type: {class: WorldItemComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
+      type: {class: WorldItemComponent, ns: RaidIntoDarkness.Inventory.Infrastructure, asm: RaidIntoDarkness.Inventory}
       data:
         _prefab: {fileID: 8538444500778261856, guid: 2f62e418263a08245931f250ac9e4359, type: 3}
     - rid: 3479885488572596304
-      type: {class: ItemTakeSoundComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
+      type: {class: ItemTakeSoundComponent, ns: RaidIntoDarkness.Inventory.Infrastructure, asm: RaidIntoDarkness.Inventory}
       data:
         _category: armor
         _clips:

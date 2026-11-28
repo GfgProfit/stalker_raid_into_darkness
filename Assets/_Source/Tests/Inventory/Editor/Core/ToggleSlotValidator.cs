@@ -1,3 +1,4 @@
+using RaidIntoDarkness.Inventory.Domain;
 namespace RaidIntoDarkness.Inventory.Core.Tests
 {
     internal sealed class ToggleSlotValidator : ISlotValidator

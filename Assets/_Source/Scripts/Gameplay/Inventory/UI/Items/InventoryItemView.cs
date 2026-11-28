@@ -1,4 +1,5 @@
-using System.Threading;
+using RaidIntoDarkness.Inventory.Application;
+using RaidIntoDarkness.Inventory.Domain;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -39,11 +40,7 @@ namespace RaidIntoDarkness.Inventory.UI
         private Image _backgroundTarget;
         private CanvasGroup _canvasGroup;
         private InventoryGridViewBase _grid;
-        private CancellationTokenSource _iconCancellation;
-        private int _iconVersion;
-        private ItemIconRequest _currentRequest;
-        private bool _hasRequest;
-        private bool _ghost;
+        private InventoryItemIconBinding _iconBinding;
         private bool _dimmed;
         private bool _dragSource;
         private bool _hovered;
@@ -54,8 +51,7 @@ namespace RaidIntoDarkness.Inventory.UI
         public Image Icon => _icon;
         public Image Background => _backgroundTarget != null ? _backgroundTarget : _background;
         public Sprite IconSprite => _icon != null ? _icon.sprite : null;
-        public bool IsIconLoading { get; private set; }
-        public bool IsGhost => _ghost;
+        public bool IsIconLoading => _iconBinding?.IsLoading == true;
         public string CountText => _appliedTheme != null ? _infoText.text : _countText != null ? _countText.text : string.Empty;
         public bool IsDimmed => _dimmed;
         private InventoryTheme Theme => _grid != null && _grid.Window != null ? _grid.Window.Theme : null;
@@ -77,7 +73,6 @@ namespace RaidIntoDarkness.Inventory.UI
 
         public void Bind(ItemInstance item, InventoryGridViewBase grid)
         {
-            _ghost = false;
             Item = item;
             _grid = grid;
             _canvasGroup.blocksRaycasts = true;
@@ -100,23 +95,6 @@ namespace RaidIntoDarkness.Inventory.UI
             RequestIcon(new ItemIconRequest(definition, null, definition.Width, definition.Height, ItemIconProfileType.Default), window.IconProvider);
         }
 
-        public void BindGhost(ItemInstance item, InventoryGridViewBase grid, Vector2 cellSize, bool rotated, int amount)
-        {
-            _ghost = true;
-            Item = item;
-            _grid = grid;
-            _canvasGroup.blocksRaycasts = false;
-            _canvasGroup.alpha = 0.85f;
-            ApplyTheme(Theme);
-            Vector2Int size = item.GetSize(rotated);
-            _rectTransform.sizeDelta = new Vector2(size.x * cellSize.x, size.y * cellSize.y);
-            ApplyContent(item.GetSize(false), cellSize, rotated);
-            ApplyTexts(amount);
-            HideTexts();
-            _background.color = BackgroundColor(item.Definition);
-            RequestIcon(ItemIconRequest.ForItem(item));
-        }
-
         public void Refresh()
         {
             if (Item == null || _grid == null)
@@ -131,7 +109,7 @@ namespace RaidIntoDarkness.Inventory.UI
             ItemIconRequest request = slotIcon ? ItemIconRequest.ForSlot(Item, slotSize.x, slotSize.y) : ItemIconRequest.ForItem(Item);
             RequestIcon(request);
 
-            if (_ghost == false && _grid.Container != null && _grid.Container.Contains(Item))
+            if (_grid.Container != null && _grid.Container.Contains(Item))
             {
                 Layout(_grid.GetAreaRect(_grid.Container.GetItemArea(Item)));
             }
@@ -216,18 +194,6 @@ namespace RaidIntoDarkness.Inventory.UI
             _indicator.color = indicatorColor;
         }
 
-        public void SetGhostRotation(bool rotated, Vector2 cellSize)
-        {
-            if (Item == null)
-            {
-                return;
-            }
-
-            Vector2Int size = Item.GetSize(rotated);
-            _rectTransform.sizeDelta = new Vector2(size.x * cellSize.x, size.y * cellSize.y);
-            ApplyContent(Item.GetSize(false), cellSize, rotated);
-        }
-
         public void OnPointerEnter(PointerEventData eventData)
         {
             SetHovered(true);
@@ -249,10 +215,9 @@ namespace RaidIntoDarkness.Inventory.UI
 
         private void OnDisable()
         {
-            if (_grid == null && _hasRequest)
+            if (_grid == null && _iconBinding?.HasRequest == true)
             {
-                CancelIcon();
-                _hasRequest = false;
+                _iconBinding.Reset();
                 SetIcon(null);
             }
 
@@ -265,7 +230,7 @@ namespace RaidIntoDarkness.Inventory.UI
             }
         }
 
-        private void OnDestroy() => CancelIcon();
+        private void OnDestroy() => _iconBinding?.Cancel();
 
         private void ApplyContent(Vector2Int baseSize, Vector2 cellSize, bool rotated)
         {
@@ -279,7 +244,7 @@ namespace RaidIntoDarkness.Inventory.UI
             ItemDefinition definition = Item.Definition;
             InventoryWindow window = _grid != null ? _grid.Window : null;
             string customName = window != null && window.ItemShortNameProvider != null ? window.ItemShortNameProvider(Item) : null;
-            bool inSlot = _ghost == false && _grid != null && _grid.UsesSlotIcon(Item, out _);
+            bool inSlot = _grid != null && _grid.UsesSlotIcon(Item, out _);
             float weight = _appliedTheme != null && _appliedTheme.ShowItemWeight ? Item.UnitWeight * amount : 0f;
             ApplyTexts(definition, amount, customName, inSlot, weight, _appliedTheme != null ? GetCondition(window) : null);
         }
@@ -459,22 +424,10 @@ namespace RaidIntoDarkness.Inventory.UI
             }
         }
 
-        private void HideTexts()
-        {
-            _infoText.enabled = false;
-            _infoShadow.enabled = false;
-            _nameText.enabled = false;
-            _nameShadow.enabled = false;
-            _conditionText.enabled = false;
-            _conditionShadow.enabled = false;
-            _countText.enabled = false;
-            HideTextBackgrounds();
-        }
-
         private void ApplyDecoration()
         {
             InventoryWindow window = _grid != null ? _grid.Window : null;
-            InventoryItemDecoration decoration = _ghost == false && window != null && window.ItemDecorator != null ? window.ItemDecorator(Item) : InventoryItemDecoration.None;
+            InventoryItemDecoration decoration = window != null && window.ItemDecorator != null ? window.ItemDecorator(Item) : InventoryItemDecoration.None;
             ApplyDecoration(Item.Definition, decoration);
         }
 
@@ -484,7 +437,7 @@ namespace RaidIntoDarkness.Inventory.UI
             _communityIcon.rectTransform.sizeDelta = decoration.CommunityIconSize;
             _communityIcon.enabled = decoration.CommunityIcon != null;
             Color background = decoration.HasTint ? decoration.Tint : BackgroundColor(definition);
-            _background.color = _hovered && _ghost == false ? HoverColor(background, decoration.HasTint) : background;
+            _background.color = _hovered ? HoverColor(background, decoration.HasTint) : background;
             _background.enabled = _iconTarget == null;
 
             if (_backgroundTarget != null)
@@ -524,11 +477,6 @@ namespace RaidIntoDarkness.Inventory.UI
 
         private void UpdateAlpha()
         {
-            if (_ghost)
-            {
-                return;
-            }
-
             _canvasGroup.alpha = _dragSource ? DRAGGED_SOURCE_ALPHA : _dimmed ? DIMMED_ALPHA : 1f;
 
             if (_iconTarget != null)
@@ -544,52 +492,9 @@ namespace RaidIntoDarkness.Inventory.UI
 
         private void RequestIcon(ItemIconRequest request, IItemIconProvider provider = null)
         {
-            if (_hasRequest && SameRequest(request, _currentRequest) && (_icon.sprite != null || IsIconLoading))
-            {
-                return;
-            }
-
-            CancelIcon();
-            var variantIds = new string[request.VariantIds.Count];
-
-            for (int i = 0; i < variantIds.Length; i++)
-            {
-                variantIds[i] = request.VariantIds[i];
-            }
-
-            request = new ItemIconRequest(request.Definition, variantIds, request.Width, request.Height, request.ProfileType);
-            _currentRequest = request;
-            _hasRequest = true;
             provider ??= _grid != null && _grid.Window != null ? _grid.Window.IconProvider : null;
-
-            if (provider == null)
-            {
-                SetIcon(request.Definition.FallbackIcon);
-                return;
-            }
-
-            if (provider.TryGetIcon(request, out Sprite cached))
-            {
-                SetIcon(cached);
-                return;
-            }
-
-            SetIcon(request.Definition.FallbackIcon);
-            IsIconLoading = true;
-            int version = ++_iconVersion;
-            _iconCancellation = new CancellationTokenSource();
-            provider.RequestIcon(request, sprite => OnIconReady(version, sprite), _iconCancellation.Token);
-        }
-
-        private void OnIconReady(int version, Sprite sprite)
-        {
-            if (this == null || version != _iconVersion)
-            {
-                return;
-            }
-
-            IsIconLoading = false;
-            SetIcon(sprite != null ? sprite : _currentRequest.Definition.FallbackIcon);
+            _iconBinding ??= new InventoryItemIconBinding(SetIcon);
+            _iconBinding.Request(request, provider, _icon.sprite != null);
         }
 
         private void SetIcon(Sprite sprite)
@@ -603,37 +508,6 @@ namespace RaidIntoDarkness.Inventory.UI
                 _iconTarget.enabled = true;
                 _iconTarget.gameObject.SetActive(sprite != null);
             }
-        }
-
-        private void CancelIcon()
-        {
-            IsIconLoading = false;
-            _iconVersion++;
-
-            if (_iconCancellation != null)
-            {
-                _iconCancellation.Cancel();
-                _iconCancellation.Dispose();
-                _iconCancellation = null;
-            }
-        }
-
-        private static bool SameRequest(ItemIconRequest left, ItemIconRequest right)
-        {
-            if (left.Definition != right.Definition || left.Width != right.Width || left.Height != right.Height || left.ProfileType != right.ProfileType || left.VariantIds.Count != right.VariantIds.Count)
-            {
-                return false;
-            }
-
-            for (int i = 0; i < left.VariantIds.Count; i++)
-            {
-                if (left.VariantIds[i] != right.VariantIds[i])
-                {
-                    return false;
-                }
-            }
-
-            return true;
         }
 
         private void Build(HideFlags hideFlags)

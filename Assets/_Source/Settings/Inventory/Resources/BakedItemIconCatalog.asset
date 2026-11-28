@@ -11,5 +11,5 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 10c7e266b7f82244c830adbadb6f791f, type: 3}
   m_Name: BakedItemIconCatalog
-  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.IconGeneration.BakedItemIconCatalog
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.Infrastructure.IconGeneration.BakedItemIconCatalog
   _entries: []

@@ -11,7 +11,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: da0f90c2955673d46b25d465cbe44ed0, type: 3}
   m_Name: killer_patch
-  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.ItemDefinition
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.Domain.ItemDefinition
   _definitionId: 54d7e6ca481be3c47be719c29fcff9a0
   _displayName: "\u041D\u0430\u0448\u0438\u0432\u043A\u0430 \u043D\u0430\u0451\u043C\u043D\u0438\u043A\u043E\u0432"
   _shortName: "\u041D\u0430\u0451\u043C."
@@ -59,16 +59,16 @@ MonoBehaviour:
     version: 2
     RefIds:
     - rid: 115149081108283497
-      type: {class: ItemTakeSoundComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
+      type: {class: ItemTakeSoundComponent, ns: RaidIntoDarkness.Inventory.Infrastructure, asm: RaidIntoDarkness.Inventory}
       data:
         _category: patch
         _clips:
         - {fileID: 8300000, guid: 8d56aac9d6a494c49bb0c2030218fe61, type: 3}
     - rid: 115149081108283509
-      type: {class: WorldItemComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
+      type: {class: WorldItemComponent, ns: RaidIntoDarkness.Inventory.Infrastructure, asm: RaidIntoDarkness.Inventory}
       data:
         _prefab: {fileID: 2337294871447824898, guid: 977fc203dd0f197439fa186021e0e2ed, type: 3}
     - rid: 115149129516056680
-      type: {class: ItemCostComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
+      type: {class: ItemCostComponent, ns: RaidIntoDarkness.Inventory.Domain, asm: RaidIntoDarkness.Inventory}
       data:
         _cost: 650

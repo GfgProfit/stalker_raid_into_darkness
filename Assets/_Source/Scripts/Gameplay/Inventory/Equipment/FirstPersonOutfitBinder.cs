@@ -1,9 +1,9 @@
+using RaidIntoDarkness.Inventory.Domain;
 using System;
-using RaidIntoDarkness.Inventory;
 using RaidIntoDarkness.FirstPerson;
 using RaidIntoDarkness.Player;
 
-namespace RaidIntoDarkness.Inventory
+namespace RaidIntoDarkness.Inventory.Infrastructure
 {
     public sealed class FirstPersonOutfitBinder : IDisposable
     {
@@ -23,7 +23,7 @@ namespace RaidIntoDarkness.Inventory
 
         public void Refresh()
         {
-            ItemInstance outfit = OutfitSlotRules.FindEquipped(_model.GetContainer(_equipmentContainerId), AnomalyEquipmentProtection.OUTFIT_CATEGORY);
+            ItemInstance outfit = EquipmentItemStats.FindEquipped(_model.GetContainer(_equipmentContainerId), AnomalyEquipmentProtection.OUTFIT_CATEGORY);
             EquipmentStatsComponent stats = outfit != null ? outfit.Definition.GetComponent<EquipmentStatsComponent>() : null;
             string section = stats != null && stats.Section.Length > 0 ? stats.Section : FirstPersonOutfitCatalog.NO_OUTFIT_SECTION;
 

@@ -1,6 +1,7 @@
+using RaidIntoDarkness.Inventory.Application;
+using RaidIntoDarkness.Inventory.Domain;
 using System;
 using System.Collections.Generic;
-using RaidIntoDarkness.Inventory;
 using UnityEngine;
 
 namespace RaidIntoDarkness.Inventory.UI

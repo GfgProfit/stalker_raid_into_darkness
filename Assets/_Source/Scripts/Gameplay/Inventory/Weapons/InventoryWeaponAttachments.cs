@@ -1,9 +1,9 @@
+using RaidIntoDarkness.Inventory.Domain;
 using System;
 using System.Collections.Generic;
-using RaidIntoDarkness.Inventory;
 using UnityEngine;
 
-namespace RaidIntoDarkness.Inventory
+namespace RaidIntoDarkness.Inventory.Application
 {
     public sealed class InventoryWeaponAttachments
     {
@@ -11,7 +11,6 @@ namespace RaidIntoDarkness.Inventory
         public const string DETACH_ACTION = "detach_silencer";
         public const string ATTACH_ACTION = "attach_silencer_";
         public const string DETACH_SCOPE_ACTION = "detach_scope";
-        public const string GRENADE_ROUND_STATE = "weapon.grenade_launcher.round";
         public const string DETACH_GRENADE_LAUNCHER_ACTION = "detach_grenade_launcher";
 
         private readonly InventoryModel _model;
@@ -159,9 +158,9 @@ namespace RaidIntoDarkness.Inventory
             }
 
             ItemInstance launcherDraft = launcher.CreateDraft();
-            launcherDraft.SetState(GRENADE_ROUND_STATE, null);
+            launcherDraft.SetState(WeaponAddonComponent.GRENADE_ROUND_STATE, null);
             ItemInstance updated = weapon.CreateDraft();
-            updated.SetState(GRENADE_ROUND_STATE, launcher.Definition.GetComponent<WeaponAddonComponent>().GetLoadedGrenade(launcher)?.DefinitionId);
+            updated.SetState(WeaponAddonComponent.GRENADE_ROUND_STATE, launcher.Definition.GetComponent<WeaponAddonComponent>().GetLoadedGrenade(launcher)?.DefinitionId);
             updated.SetMountedWeaponAttachment(WeaponAddonKind.GrenadeLauncher, launcherDraft);
             updated.SetVisualVariant(new List<string>(weapon.VisualVariant) { launcher.DefinitionId });
             return InstallWithPlacement(weapon, updated, launcher, apply);
@@ -181,7 +180,7 @@ namespace RaidIntoDarkness.Inventory
             ItemInstance returnedGrenade = loadedGrenade != null ? _model.CreateItem(loadedGrenade, 1) : null;
             ItemInstance updated = weapon.CreateDraft();
             updated.SetMountedWeaponAttachment(WeaponAddonKind.GrenadeLauncher, null);
-            updated.SetState(GRENADE_ROUND_STATE, null);
+            updated.SetState(WeaponAddonComponent.GRENADE_ROUND_STATE, null);
             var variants = new List<string>(weapon.VisualVariant);
             variants.Remove(definition.DefinitionId);
             updated.SetVisualVariant(variants);

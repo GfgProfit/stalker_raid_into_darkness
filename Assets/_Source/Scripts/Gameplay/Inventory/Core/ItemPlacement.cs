@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace RaidIntoDarkness.Inventory
+namespace RaidIntoDarkness.Inventory.Domain
 {
     public readonly struct ItemPlacement
     {

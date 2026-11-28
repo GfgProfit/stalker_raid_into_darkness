@@ -1,8 +1,9 @@
+using RaidIntoDarkness.Inventory.Domain;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using RaidIntoDarkness.Inventory.IconGeneration;
+using RaidIntoDarkness.Inventory.Infrastructure.IconGeneration;
 using UnityEditor;
 using UnityEngine;
 
@@ -126,7 +127,7 @@ namespace RaidIntoDarkness.Inventory.Editor
 
             AssetDatabase.SaveAssets();
             BakedItemIconCatalog.ResetDefaultCache();
-            ItemIconCache.Clear();
+            InventoryRuntimeIconInvalidation.ClearActiveCaches();
         }
 
         public static void DeleteGeneratedAssetsExcept(IReadOnlyList<BakedItemIconEntry> retainedEntries)

@@ -1,6 +1,7 @@
+using RaidIntoDarkness.Inventory.Application;
 using System;
 
-namespace RaidIntoDarkness.Inventory.IconGeneration
+namespace RaidIntoDarkness.Inventory.Infrastructure.IconGeneration
 {
     internal readonly struct IconCacheKey : IEquatable<IconCacheKey>
     {

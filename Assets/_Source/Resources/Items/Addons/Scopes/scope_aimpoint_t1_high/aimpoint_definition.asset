@@ -11,7 +11,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: da0f90c2955673d46b25d465cbe44ed0, type: 3}
   m_Name: aimpoint
-  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.ItemDefinition
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.Domain.ItemDefinition
   _definitionId: fc1a4cfb4771da944a45b0e79530107d
   _displayName: "\u041A\u043E\u043B\u043B\u0438\u043C\u0430\u0442\u043E\u0440\u043D\u044B\u0439 \u043F\u0440\u0438\u0446\u0435\u043B Aimpoint Micro T-1"
   _shortName: Micro T1
@@ -60,7 +60,7 @@ MonoBehaviour:
     version: 2
     RefIds:
     - rid: 3479885496768528399
-      type: {class: WeaponAddonComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
+      type: {class: WeaponAddonComponent, ns: RaidIntoDarkness.Inventory.Domain, asm: RaidIntoDarkness.Inventory}
       data:
         _section: aimpoint
         _kind: 1
@@ -82,11 +82,11 @@ MonoBehaviour:
         _recoilSnappinessIncreasePercent: 0
         _recoilDampingPercent: 0
     - rid: 3479885496768528545
-      type: {class: WorldItemComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
+      type: {class: WorldItemComponent, ns: RaidIntoDarkness.Inventory.Infrastructure, asm: RaidIntoDarkness.Inventory}
       data:
         _prefab: {fileID: 8239644991846385067, guid: b353399947ca2ff4fa6beb3a0fa95f98, type: 3}
     - rid: 3479885496768528691
-      type: {class: ItemTakeSoundComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
+      type: {class: ItemTakeSoundComponent, ns: RaidIntoDarkness.Inventory.Infrastructure, asm: RaidIntoDarkness.Inventory}
       data:
         _category: attchscope
         _clips:

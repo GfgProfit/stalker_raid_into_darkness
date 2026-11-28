@@ -11,7 +11,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: da0f90c2955673d46b25d465cbe44ed0, type: 3}
   m_Name: wpn_mp5_nimble_definition
-  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.ItemDefinition
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.Domain.ItemDefinition
   _definitionId: 3ecb17cc862e5024caf4d92761f7cf02
   _displayName: "\u041F\u0438\u0441\u0442\u043E\u043B\u0435\u0442-\u043F\u0443\u043B\u0435\u043C\u0451\u0442 Heckler & Koch UMP45"
   _shortName: H&K UMP45
@@ -62,7 +62,7 @@ MonoBehaviour:
     version: 2
     RefIds:
     - rid: 115149063313949397
-      type: {class: WeaponStatsComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
+      type: {class: WeaponStatsComponent, ns: RaidIntoDarkness.Inventory.Domain, asm: RaidIntoDarkness.Inventory}
       data:
         _section: wpn_mp5_nimble
         _weaponClass: smg
@@ -129,11 +129,11 @@ MonoBehaviour:
         _blockSilencerWithGrenadeLauncher: 0
         _exposedRound: {fileID: 0}
     - rid: 115149063313949398
-      type: {class: EquippableItemComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
+      type: {class: EquippableItemComponent, ns: RaidIntoDarkness.Inventory.Domain, asm: RaidIntoDarkness.Inventory}
       data:
         _preferredSlotIds: 090000000a000000i
     - rid: 115149063313949399
-      type: {class: WeaponHudComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
+      type: {class: WeaponHudComponent, ns: RaidIntoDarkness.Inventory.Infrastructure, asm: RaidIntoDarkness.Inventory}
       data:
         _hudModel: {fileID: 3077607503249076509, guid: b69c880117b1fb74981bb3831a94fa85, type: 3}
         _weaponMotions: {fileID: 8815230551390286010, guid: b9416da62c6b2304bbc333211594b59d, type: 3}
@@ -199,13 +199,13 @@ MonoBehaviour:
           _position: {x: 0.004882355, y: -0.000991626, z: -0.1423609}
           _depthOffset: 0
     - rid: 115149063313949400
-      type: {class: ItemTakeSoundComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
+      type: {class: ItemTakeSoundComponent, ns: RaidIntoDarkness.Inventory.Infrastructure, asm: RaidIntoDarkness.Inventory}
       data:
         _category: weapon
         _clips:
         - {fileID: 8300000, guid: ffaa18b396584214484ce81b26793ce4, type: 3}
         - {fileID: 8300000, guid: 5a49c4bfd5dafa843969f2f14f2bac47, type: 3}
     - rid: 115149063313949401
-      type: {class: WorldItemComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
+      type: {class: WorldItemComponent, ns: RaidIntoDarkness.Inventory.Infrastructure, asm: RaidIntoDarkness.Inventory}
       data:
         _prefab: {fileID: 5604930779919950093, guid: b69c880117b1fb74981bb3831a94fa85, type: 3}

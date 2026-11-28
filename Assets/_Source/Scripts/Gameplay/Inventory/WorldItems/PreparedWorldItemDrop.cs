@@ -1,18 +1,31 @@
+using RaidIntoDarkness.Inventory.Domain;
+using RaidIntoDarkness.Player;
 using UnityEngine;
 
-namespace RaidIntoDarkness.Inventory
+namespace RaidIntoDarkness.Inventory.Infrastructure
 {
-    internal readonly struct PreparedWorldItemDrop
+    internal sealed class PreparedWorldItemDrop : IPreparedOutfitDrop
     {
-        public PreparedWorldItemDrop(WorldItem worldItem, Collider[] colliders, Vector3 direction)
+        private readonly StalkerPlayerController _owner;
+        private readonly WorldItem _worldItem;
+        private readonly Collider[] _colliders;
+        private readonly Vector3 _direction;
+
+        public PreparedWorldItemDrop(StalkerPlayerController owner, WorldItem worldItem, Collider[] colliders, Vector3 direction)
         {
-            WorldItem = worldItem;
-            Colliders = colliders;
-            Direction = direction;
+            _owner = owner;
+            _worldItem = worldItem;
+            _colliders = colliders;
+            _direction = direction;
         }
 
-        public WorldItem WorldItem { get; }
-        public Collider[] Colliders { get; }
-        public Vector3 Direction { get; }
+        public void Complete(ItemInstance item)
+        {
+            _worldItem.CompleteDrop(item);
+            WorldItemDrop.ApplyMotion(_owner, _worldItem, _colliders, _direction);
+            _worldItem.enabled = true;
+        }
+
+        public void Cancel() => WorldItemDrop.Cancel(_worldItem);
     }
 }

@@ -1,8 +1,7 @@
-using RaidIntoDarkness.Inventory.UI;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace RaidIntoDarkness.Inventory
+namespace RaidIntoDarkness.Inventory.UI
 {
     public static class InventoryBackpackViewport
     {

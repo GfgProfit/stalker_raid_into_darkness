@@ -1,3 +1,5 @@
+using RaidIntoDarkness.Inventory.Domain;
+using RaidIntoDarkness.Inventory.Application;
 using UnityEngine;
 
 namespace RaidIntoDarkness.Inventory.UI
@@ -7,7 +9,7 @@ namespace RaidIntoDarkness.Inventory.UI
         public ItemInstance Item;
         public InventoryGridViewBase SourceGrid;
         public InventoryItemView SourceView;
-        public InventoryItemView Ghost;
+        public InventoryItemDragGhost Ghost { get; internal set; }
         public bool Rotated;
         public int Amount;
         public bool IsSplit;

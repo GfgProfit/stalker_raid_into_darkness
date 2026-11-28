@@ -1,12 +1,11 @@
+using RaidIntoDarkness.Inventory.Domain;
 using System.Globalization;
 using System.Text;
-using RaidIntoDarkness.Inventory;
-using RaidIntoDarkness.Inventory.UI;
 using RaidIntoDarkness.Player;
 using UnityEngine;
 using XRay.Importer.Levels;
 
-namespace RaidIntoDarkness.Inventory
+namespace RaidIntoDarkness.Inventory.UI
 {
     public sealed class EquipmentStatusDetailsFormatter
     {
@@ -51,8 +50,8 @@ namespace RaidIntoDarkness.Inventory
                     continue;
                 }
                 title = Label(row.Key, row.Title);
-                ItemInstance outfit = EquipmentStatsFormatter.FindEquipped(_window, EquipmentStatsFormatter.OUTFIT_CATEGORY);
-                ItemInstance helmet = EquipmentStatsFormatter.FindEquipped(_window, EquipmentStatsFormatter.HELMET_CATEGORY);
+                ItemInstance outfit = EquipmentItemStats.FindEquipped(_window.Model?.GetContainer(_window.EquipmentContainerId), EquipmentStatsFormatter.OUTFIT_CATEGORY);
+                ItemInstance helmet = EquipmentItemStats.FindEquipped(_window.Model?.GetContainer(_window.EquipmentContainerId), EquipmentStatsFormatter.HELMET_CATEGORY);
                 EquipmentStatsComponent outfitStats = GetStats(outfit);
                 bool helmetAvailable = outfitStats == null || outfitStats.HelmetAvailable;
                 _builder.Clear();

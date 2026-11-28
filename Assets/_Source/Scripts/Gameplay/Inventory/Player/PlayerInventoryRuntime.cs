@@ -1,12 +1,17 @@
+using System.Threading;
+using Cysharp.Threading.Tasks;
+using RaidIntoDarkness.Inventory.Infrastructure.IconGeneration;
+using RaidIntoDarkness.Inventory.Domain;
 using System;
 using System.Collections.Generic;
-using RaidIntoDarkness.Inventory;
+using RaidIntoDarkness.DI;
+using RaidIntoDarkness.Inventory.Application;
 using RaidIntoDarkness.Player;
 using RaidIntoDarkness.Weapons;
 using UnityEngine;
 using XRay.Importer.Levels;
 
-namespace RaidIntoDarkness.Inventory
+namespace RaidIntoDarkness.Inventory.Infrastructure
 {
     [DefaultExecutionOrder(-201)]
     [DisallowMultipleComponent]
@@ -28,6 +33,8 @@ namespace RaidIntoDarkness.Inventory
         private readonly InventoryObservers<Action<ItemInstance, InventoryResult>> _forcedDropCompleted = new();
 
         private InventoryModel _model;
+        private WorldItemDrop _worldDrop;
+        private IContainer _services;
         private AnomalyDamageReceiver _damageReceiver;
         private FirstPersonOutfitBinder _outfitBinder;
         private bool _seeded;
@@ -48,6 +55,9 @@ namespace RaidIntoDarkness.Inventory
         internal InventoryWeaponAmmoSource WeaponAmmo { get; private set; }
         internal InventoryWeaponAttachments WeaponAttachments { get; private set; }
         internal EquipmentAnimationQueue EquipmentAnimations { get; private set; }
+        internal ItemIconCache Icons { get; private set; }
+        internal IItemIconProvider IconProvider { get; private set; }
+        internal IWorldItemInteraction WorldInteraction => _worldItems != null ? _worldItems : null;
 
         public ItemDatabase Database => _database;
         public InventorySeed Seed => _seed;
@@ -174,7 +184,8 @@ namespace RaidIntoDarkness.Inventory
             GridContainer backpack = model.AddContainer(_backpack.CreateContainer());
             SlottedContainer equipment = model.AddContainer(new SlottedContainer(_equipmentContainerId, slots, width, height, true, _ownerId, _equipmentDisplayName));
             model.AddContainer(_stash.CreateContainer());
-            model.BindOutfitSlotRules(new OutfitSlotRules(equipment, backpack, _worldItems, _player, PublishForcedDrop));
+            _worldDrop = _worldItems != null ? new WorldItemDrop(_worldItems, _player) : null;
+            model.BindOutfitSlotRules(new OutfitSlotRules(equipment, backpack, _worldDrop, PublishForcedDrop));
             SeedOnce();
 
             WeaponAmmo = new InventoryWeaponAmmoSource(model, _backpack.Id);
@@ -202,9 +213,17 @@ namespace RaidIntoDarkness.Inventory
                 }
             }
 
+            _services = new DiContainer();
+            _services.Bind<ItemIconCache>(_ => new ItemIconCache()).AsSingle();
+            _services.Bind<IItemIconProvider>(scope => new ItemIconCacheProvider(scope.Resolve<ItemIconCache>())).AsSingle();
+            Icons = _services.Resolve<ItemIconCache>();
+            IconProvider = _services.Resolve<IItemIconProvider>();
+
             if (_weapons != null || _player != null && _player.HudAnimator != null && _player.HudAnimator.Library != null)
             {
-                EquipmentAnimations = new EquipmentAnimationQueue(this, _player, _weapons);
+                _services.Bind<EquipmentInventoryCommands>(_ => new EquipmentInventoryCommands(model, _equipmentContainerId, _backpack.Id, TryDrop)).AsSingle();
+                _services.Bind<EquipmentAnimationQueue>(scope => new EquipmentAnimationQueue(scope.Resolve<EquipmentInventoryCommands>(), model, _equipmentContainerId, _backpack.Id, _player, _weapons)).AsSingle();
+                EquipmentAnimations = _services.Resolve<EquipmentAnimationQueue>();
             }
 
             _initialized = true;
@@ -223,7 +242,7 @@ namespace RaidIntoDarkness.Inventory
                 return InventoryResult.Fail(InventoryFailure.ItemNotFound);
             }
 
-            return _worldItems != null && _worldItems.isActiveAndEnabled ? _worldItems.TryDropToWorld(this, item) : Model.TryRemove(item.InstanceId);
+            return _worldDrop?.Available == true ? _worldDrop.TryDrop(Model, item) : Model.TryRemove(item.InstanceId);
         }
 
         private void PublishForcedDrop(ItemInstance item, InventoryResult result)
@@ -266,7 +285,7 @@ namespace RaidIntoDarkness.Inventory
                 _worldItems.UnbindInventory(this);
             }
 
-            EquipmentAnimations?.Dispose();
+            _services?.Dispose();
             WeaponBinder?.Dispose();
             WeaponAmmo?.Dispose();
             _outfitBinder?.Dispose();
@@ -293,6 +312,11 @@ namespace RaidIntoDarkness.Inventory
 
             _seeded = true;
             _seed.Apply(Model);
+        }
+
+        internal UniTask PrewarmIconsAsync(CancellationToken cancellationToken)
+        {
+            return Icons != null ? Icons.PrewarmAsync(CollectDefinitionsInUse(), cancellationToken) : UniTask.CompletedTask;
         }
 
         public IReadOnlyList<ItemDefinition> CollectDefinitionsInUse()

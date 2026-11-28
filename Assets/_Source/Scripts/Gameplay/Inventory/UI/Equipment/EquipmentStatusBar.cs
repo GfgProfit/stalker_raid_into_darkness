@@ -1,4 +1,5 @@
-namespace RaidIntoDarkness.Inventory
+using RaidIntoDarkness.Inventory.Domain;
+namespace RaidIntoDarkness.Inventory.UI
 {
     internal readonly struct EquipmentStatusBar
     {

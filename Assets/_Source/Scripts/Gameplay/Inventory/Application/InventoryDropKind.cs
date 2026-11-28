@@ -1,4 +1,4 @@
-namespace RaidIntoDarkness.Inventory.UI
+namespace RaidIntoDarkness.Inventory.Application
 {
     public enum InventoryDropKind
     {

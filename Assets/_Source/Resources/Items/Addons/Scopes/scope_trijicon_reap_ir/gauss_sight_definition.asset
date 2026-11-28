@@ -11,7 +11,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: da0f90c2955673d46b25d465cbe44ed0, type: 3}
   m_Name: gauss_sight
-  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.ItemDefinition
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.Domain.ItemDefinition
   _definitionId: 8181cebeead0e5340b5f73ba278b07f4
   _displayName: "\u0422\u0435\u043F\u043B\u043E\u0432\u0438\u0437\u0438\u043E\u043D\u043D\u044B\u0439 \u043F\u0440\u0438\u0446\u0435\u043B Trijicon REAP-IR"
   _shortName: REAP-IR
@@ -60,7 +60,7 @@ MonoBehaviour:
     version: 2
     RefIds:
     - rid: 3479885496768528420
-      type: {class: WeaponAddonComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
+      type: {class: WeaponAddonComponent, ns: RaidIntoDarkness.Inventory.Domain, asm: RaidIntoDarkness.Inventory}
       data:
         _section: gauss_sight
         _kind: 1
@@ -82,11 +82,11 @@ MonoBehaviour:
         _recoilSnappinessIncreasePercent: 0
         _recoilDampingPercent: 0
     - rid: 3479885496768528566
-      type: {class: WorldItemComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
+      type: {class: WorldItemComponent, ns: RaidIntoDarkness.Inventory.Infrastructure, asm: RaidIntoDarkness.Inventory}
       data:
         _prefab: {fileID: 2535294743949120192, guid: ac21bf93cca9bbc448c11f72e5d1b8fb, type: 3}
     - rid: 3479885496768528712
-      type: {class: ItemTakeSoundComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
+      type: {class: ItemTakeSoundComponent, ns: RaidIntoDarkness.Inventory.Infrastructure, asm: RaidIntoDarkness.Inventory}
       data:
         _category: attchscopenv
         _clips:

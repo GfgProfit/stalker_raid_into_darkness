@@ -1,19 +1,18 @@
+using RaidIntoDarkness.Inventory.Infrastructure;
+using RaidIntoDarkness.Inventory.Domain;
 using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
-using RaidIntoDarkness.Inventory;
-using RaidIntoDarkness.Inventory.IconGeneration;
-using RaidIntoDarkness.Inventory.UI;
+using RaidIntoDarkness.Inventory.Application;
 using R3;
 using RaidIntoDarkness.DI;
 using RaidIntoDarkness.Player;
 using RaidIntoDarkness.Settings;
-using RaidIntoDarkness.UI;
 using RaidIntoDarkness.Weapons;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace RaidIntoDarkness.Inventory
+namespace RaidIntoDarkness.Inventory.UI
 {
     [DefaultExecutionOrder(-200)]
     [DisallowMultipleComponent]
@@ -52,46 +51,40 @@ namespace RaidIntoDarkness.Inventory
         [SerializeField] private bool _prewarmIcons = true;
         [SerializeField] private InputActionReference _fullStatsModifier;
 
+        private readonly InventoryGameplayInputLock _inputLock = new();
+
         [Inject] private IGameSettings _gameSettings;
-        private InventorySortingPlus _sorting;
+        private InventorySortViewModel _sorting;
         private InventoryBackpackLayoutViewModel _backpackLayout;
         private IDisposable _backpackRowsBinding;
         private EquipmentStatsFormatter _statsFormatter;
         private IDisposable _descriptionBinding;
         private IDisposable _conditionBinding;
         private EquipmentStatusPresenter _statusPresenter;
-        private EquipmentStatusDetailsFormatter _statusDetails;
-        private InventoryStatusPanel _hoverStatusPanel;
+        private InventoryStatusTooltipBinding _statusTooltip;
         private FirstPersonWeaponController _weapons;
         private InventoryWeaponAmmoSource _weaponAmmo;
         private InventoryWeaponAttachments _weaponAttachments;
         private InventoryAttachmentActions _attachmentActions;
         private EquipmentAnimationQueue _equipmentAnimations;
         private InventoryItemSounds _itemSounds;
+        private InventoryWorldItemBinding _worldItemBinding;
         private ItemInstance _statsHovered;
         private ItemInstance _compatibilityHovered;
         private string _compatibilityLauncherId;
         private bool _compatibilityDirty;
-        private int _restoreFrame = -1;
-        private bool _gameplayBlocked;
         private bool _bound;
         private bool _showItemDescriptions = GameSettingsStore.DEFAULT_SHOW_ITEM_DESCRIPTIONS;
         private bool _fullCondition;
         private bool _statsDirty = true;
-        private string _statusHovered;
-        private Vector2 _statusHoverPosition;
-        private Camera _statusHoverCamera;
-        private float _statusTooltipValue;
-        private float _statusTooltipMaximum;
-        private bool _statusTooltipDirty;
 
         public InventoryWindow Window => _window;
         public PlayerInventoryRuntime Inventory => _inventory;
         public StalkerPlayerController Player => _player;
         public bool IsOpen => _window != null && _window.IsOpen;
-        public bool GameplayBlocked => _gameplayBlocked;
+        public bool GameplayBlocked => _inputLock.IsBlocked;
         public bool IsStashVisible => IsOpen && _window.SecondaryVisible;
-        public InventorySortingPlus Sorting => _sorting;
+        public InventorySortViewModel Sorting => _sorting;
         public EquipmentAnimationQueue EquipmentAnimations => _equipmentAnimations;
         public InventoryItemSounds ItemSounds => _itemSounds;
         public InventoryWeaponAttachments WeaponAttachments => _weaponAttachments;
@@ -101,7 +94,7 @@ namespace RaidIntoDarkness.Inventory
             if (_bound && (_window != window || _inventory != inventory || _player != player))
             {
                 Close();
-                RestoreGameplay();
+                _inputLock.Restore(_player);
                 Unbind();
             }
             _window = window;
@@ -110,6 +103,10 @@ namespace RaidIntoDarkness.Inventory
             _spawnMenu = spawnMenu;
             _toggleInventory = toggleInventory;
             _closeInventory = closeInventory;
+            if (isActiveAndEnabled)
+            {
+                BindStatusHover();
+            }
         }
 
         public void ConfigurePresentation(InputActionReference toggleStash, InventoryCharacterHeader header, InventoryStatusPanel status, string characterName, string community, long money, Sprite portrait, Sprite rank)
@@ -168,8 +165,7 @@ namespace RaidIntoDarkness.Inventory
 
             RefreshHeader();
             _window.Open();
-            _restoreFrame = -1;
-            BlockGameplay();
+            _inputLock.Block(_player);
         }
 
         public void Close()
@@ -180,7 +176,7 @@ namespace RaidIntoDarkness.Inventory
             }
 
             _window.Close();
-            _restoreFrame = Time.frameCount;
+            _inputLock.ScheduleRestore();
         }
 
         public void Toggle()
@@ -198,6 +194,7 @@ namespace RaidIntoDarkness.Inventory
         private void OnEnable()
         {
             BindStatusHover();
+            BindWorldItems();
             if (_bound && IsOpen)
             {
                 BindBackpackLayout();
@@ -226,7 +223,7 @@ namespace RaidIntoDarkness.Inventory
 
             if (_prewarmIcons && _inventory != null)
             {
-                PrewarmAsync(_inventory.CollectDefinitionsInUse()).Forget();
+                _inventory.PrewarmIconsAsync(destroyCancellationToken).Forget();
             }
         }
 
@@ -236,10 +233,7 @@ namespace RaidIntoDarkness.Inventory
             {
                 return;
             }
-            if (_restoreFrame >= 0 && Time.frameCount > _restoreFrame)
-            {
-                RestoreGameplay();
-            }
+            _inputLock.Tick(_player);
 
             if (_window == null)
             {
@@ -272,13 +266,10 @@ namespace RaidIntoDarkness.Inventory
             if (IsOpen)
             {
                 UpdateStats();
-                RefreshStatusTooltip();
+                _statusTooltip?.Refresh(_fullCondition);
             }
 
-            if (IsOpen && _gameplayBlocked && Cursor.lockState != CursorLockMode.None)
-            {
-                ReleaseCursor();
-            }
+            _inputLock.KeepCursorReleased(_player, IsOpen);
         }
 
         public void ToggleStash()
@@ -354,10 +345,9 @@ namespace RaidIntoDarkness.Inventory
                 return;
             }
 
-            _status.SetValue(value.Id, value.Current, value.Maximum);
-            if (_statusHovered == value.Id)
+            if (_status.SetValue(value.Id, value.Current, value.Maximum))
             {
-                _statusTooltipDirty = true;
+                _statusTooltip?.Invalidate(value.Id);
             }
         }
 
@@ -365,7 +355,7 @@ namespace RaidIntoDarkness.Inventory
         {
             if (hasFocus && IsOpen)
             {
-                ReleaseCursor();
+                _inputLock.ReleaseCursor(_player);
             }
         }
 
@@ -374,21 +364,22 @@ namespace RaidIntoDarkness.Inventory
             UnbindBackpackLayout();
             UnbindConditionStatus();
             UnbindStatusHover();
-            if (_gameplayBlocked)
+            UnbindWorldItems();
+            if (_inputLock.IsBlocked)
             {
                 if (_window != null)
                 {
                     _window.Close();
                 }
 
-                RestoreGameplay();
+                _inputLock.Restore(_player);
             }
         }
 
         private void OnDestroy()
         {
             UnbindStatusHover();
-            RestoreGameplay();
+            _inputLock.Restore(_player);
             Unbind();
         }
 
@@ -452,10 +443,11 @@ namespace RaidIntoDarkness.Inventory
             _weaponAttachments = null;
             _weapons = null;
             _equipmentAnimations = null;
+            UnbindWorldItems();
             _itemSounds = null;
             _statsFormatter = null;
             _statusPresenter = null;
-            _statusDetails = null;
+            UnbindStatusHover();
             _statsHovered = null;
             _compatibilityHovered = null;
             _compatibilityLauncherId = null;
@@ -481,7 +473,7 @@ namespace RaidIntoDarkness.Inventory
                 InventoryBackpackViewport.Ensure(backpackGrid);
             }
 
-            _window.Bind(_inventory.Model, new ItemIconCacheProvider());
+            _window.Bind(_inventory.Model, _inventory.IconProvider);
             _window.Opened += OnInventoryOpened;
             _window.Closed += OnInventoryClosed;
             if (_window.IsOpen)
@@ -500,10 +492,11 @@ namespace RaidIntoDarkness.Inventory
             BindItemDescriptions();
             _window.ItemShortNameProvider = FormatItemShortName;
             _statusPresenter = _status != null ? new EquipmentStatusPresenter(_window, _status) : null;
-            _statusDetails = new EquipmentStatusDetailsFormatter(_window);
+            BindStatusHover();
             _inventory.Model.Changed += OnModelChanged;
             _inventory.ForcedDropCompleted += OnForcedDropCompleted;
             _itemSounds = new InventoryItemSounds(_window);
+            BindWorldItems();
             _attachmentActions = new InventoryAttachmentActions(_window, _weaponAttachments);
             _window.Actions.Register(new InventoryDelegateAction(UNLOAD_WEAPON_ACTION, 24, context => _window.Label(UNLOAD_WEAPON_ACTION, "Разрядить"), UnloadWeapon, context => _weaponAmmo.HasLoadedAmmo(context.Item), CanUnloadWeapon));
 
@@ -627,7 +620,7 @@ namespace RaidIntoDarkness.Inventory
 
         private void BindSorting()
         {
-            _sorting = new InventorySortingPlus(_inventory.Model, new[] { _window.PrimaryContainerId, _window.SecondaryContainerId }, _favoriteBadge, _junkBadge);
+            _sorting = new InventorySortViewModel(_inventory.Model, new[] { _window.PrimaryContainerId, _window.SecondaryContainerId }, _favoriteBadge, _junkBadge);
             _sorting.Changed += OnSortingChanged;
             _window.ItemDecorator = DecorateItem;
             _window.ActionStyleProvider = new ContextMenuOverhaulStyle(_window, _sorting).Resolve;
@@ -705,13 +698,13 @@ namespace RaidIntoDarkness.Inventory
 
         private static float? GetItemCondition(ItemInstance item)
         {
-            return EquipmentStatsFormatter.SupportsCondition(item?.Definition) ? EquipmentStatsFormatter.GetCondition(item) : null;
+            return EquipmentItemStats.SupportsCondition(item?.Definition) ? AnomalyEquipmentProtection.GetCondition(item) : null;
         }
 
         private InventoryItemDecoration DecorateItem(ItemInstance item)
         {
             InventoryItemDecoration decoration = _sorting != null ? _sorting.Decorate(item) : InventoryItemDecoration.None;
-            if (!EquipmentAnimationQueue.IsPatchRemoved(item))
+            if (!EquipmentInventoryCommands.IsPatchRemoved(item))
             {
                 decoration = AddCommunityIcon(item?.Definition, decoration);
             }
@@ -785,7 +778,7 @@ namespace RaidIntoDarkness.Inventory
             _fullCondition = fullCondition;
             _statsHovered = hovered;
             _statsDirty = false;
-            _statusTooltipDirty = true;
+            _statusTooltip?.Invalidate();
 
             if (_statsFormatter != null)
             {
@@ -803,89 +796,39 @@ namespace RaidIntoDarkness.Inventory
             }
         }
 
+        private void BindWorldItems()
+        {
+            if (_worldItemBinding == null && _bound && _inventory.WorldInteraction is { } interaction)
+            {
+                _worldItemBinding = new InventoryWorldItemBinding(_window, interaction, _inventory.TryDrop, _itemSounds);
+            }
+        }
+
+        private void UnbindWorldItems()
+        {
+            _worldItemBinding?.Dispose();
+            _worldItemBinding = null;
+        }
+
         private void BindStatusHover()
         {
-            if (_hoverStatusPanel == _status)
+            if (_status == null || _window == null)
             {
+                UnbindStatusHover();
                 return;
             }
-            UnbindStatusHover();
-            _hoverStatusPanel = _status;
-            if (_hoverStatusPanel != null)
+
+            if (_statusTooltip?.Matches(_window, _status) != true)
             {
-                _hoverStatusPanel.PointerEntered += OnStatusPointerEnter;
-                _hoverStatusPanel.PointerMoved += OnStatusPointerMove;
-                _hoverStatusPanel.PointerExited += OnStatusPointerExit;
+                UnbindStatusHover();
+                _statusTooltip = new InventoryStatusTooltipBinding(_window, _status, GetCondition);
             }
         }
 
         private void UnbindStatusHover()
         {
-            if (_hoverStatusPanel != null)
-            {
-                _hoverStatusPanel.PointerEntered -= OnStatusPointerEnter;
-                _hoverStatusPanel.PointerMoved -= OnStatusPointerMove;
-                _hoverStatusPanel.PointerExited -= OnStatusPointerExit;
-            }
-            _hoverStatusPanel = null;
-            OnStatusPointerExit();
-        }
-
-        private void OnStatusPointerEnter(string id, Vector2 position, Camera eventCamera)
-        {
-            _statusHovered = id;
-            _statusHoverPosition = position;
-            _statusHoverCamera = eventCamera;
-            _statusTooltipDirty = true;
-            RefreshStatusTooltip();
-        }
-
-        private void OnStatusPointerMove(Vector2 position, Camera eventCamera)
-        {
-            _statusHoverPosition = position;
-            _statusHoverCamera = eventCamera;
-            if (string.IsNullOrEmpty(_statusHovered) == false && _window != null && _window.Tooltip != null)
-            {
-                _window.Tooltip.Follow(position, eventCamera);
-            }
-        }
-
-        private void OnStatusPointerExit()
-        {
-            _statusHovered = null;
-            _statusTooltipDirty = false;
-            if (_window != null)
-            {
-                _window.HideTooltip();
-            }
-        }
-
-        private void RefreshStatusTooltip()
-        {
-            if (string.IsNullOrEmpty(_statusHovered) || _window == null || _status == null)
-            {
-                return;
-            }
-            if (IsOpen == false || _window.IsDragging || _window.HasModalWidget)
-            {
-                OnStatusPointerExit();
-                return;
-            }
-            float value = _status.GetValue(_statusHovered);
-            float maximum = _status.GetMaximum(_statusHovered);
-            if (_statusTooltipDirty == false && value == _statusTooltipValue && maximum == _statusTooltipMaximum)
-            {
-                return;
-            }
-            _statusDetails ??= new EquipmentStatusDetailsFormatter(_window);
-            StalkerActorCondition condition = _player != null && _player.Motor != null ? _player.Motor.Condition : null;
-            if (_statusDetails.TryDescribe(_statusHovered, _fullCondition, out string title, out string description) || _statusDetails.TryDescribeCondition(_statusHovered, condition, out title, out description))
-            {
-                _window.ShowTooltip(title, description, _statusHoverPosition, _statusHoverCamera);
-            }
-            _statusTooltipValue = value;
-            _statusTooltipMaximum = maximum;
-            _statusTooltipDirty = false;
+            _statusTooltip?.Dispose();
+            _statusTooltip = null;
         }
 
         private void OnModelChanged(InventoryChange change)
@@ -912,67 +855,6 @@ namespace RaidIntoDarkness.Inventory
             if (_window != null)
             {
                 _window.RefreshItems();
-            }
-        }
-
-        private void BlockGameplay()
-        {
-            _gameplayBlocked = true;
-
-            if (_player != null)
-            {
-                _player.GameplayInputBlocked = true;
-            }
-
-            ReleaseCursor();
-        }
-
-        private void RestoreGameplay()
-        {
-            _restoreFrame = -1;
-
-            if (_gameplayBlocked == false)
-            {
-                return;
-            }
-
-            _gameplayBlocked = false;
-
-            if (_player != null)
-            {
-                _player.GameplayInputBlocked = false;
-
-                if (_player.CameraController != null)
-                {
-                    _player.CameraController.SetCursorLocked(true);
-                }
-            }
-        }
-
-        private void ReleaseCursor()
-        {
-            if (_player != null && _player.CameraController != null)
-            {
-                _player.CameraController.SetCursorLocked(false);
-            }
-            else
-            {
-                Cursor.lockState = CursorLockMode.None;
-                Cursor.visible = true;
-            }
-        }
-
-        private async UniTaskVoid PrewarmAsync(IReadOnlyList<ItemDefinition> definitions)
-        {
-            await UniTask.Yield(PlayerLoopTiming.Update, destroyCancellationToken);
-            ItemIconGeneratorSettings settings = ItemIconGeneratorSettings.LoadDefault();
-
-            try
-            {
-                await ItemIconCache.PrewarmAsync(definitions, settings.PrewarmSlotProfiles, null, destroyCancellationToken);
-            }
-            catch (System.OperationCanceledException)
-            {
             }
         }
 

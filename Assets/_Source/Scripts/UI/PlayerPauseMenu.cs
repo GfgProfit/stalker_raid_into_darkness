@@ -1,3 +1,4 @@
+using RaidIntoDarkness.Inventory.UI;
 using Cysharp.Threading.Tasks;
 using RaidIntoDarkness.GraphicsOptions;
 using RaidIntoDarkness.Player;

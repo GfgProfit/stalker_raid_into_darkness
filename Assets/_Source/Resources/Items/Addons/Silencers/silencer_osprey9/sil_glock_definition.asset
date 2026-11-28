@@ -11,7 +11,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: da0f90c2955673d46b25d465cbe44ed0, type: 3}
   m_Name: sil_glock_definition
-  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.ItemDefinition
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.Domain.ItemDefinition
   _definitionId: 2cffb9e3276a5a240925df8721d3147b
   _displayName: "\u0413\u043B\u0443\u0448\u0438\u0442\u0435\u043B\u044C SilencerCo Osprey 9"
   _shortName: Osprey 9
@@ -60,7 +60,7 @@ MonoBehaviour:
     version: 2
     RefIds:
     - rid: 3479885496768528511
-      type: {class: WeaponAddonComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
+      type: {class: WeaponAddonComponent, ns: RaidIntoDarkness.Inventory.Domain, asm: RaidIntoDarkness.Inventory}
       data:
         _section: sil_glock
         _kind: 0
@@ -82,11 +82,11 @@ MonoBehaviour:
         _recoilSnappinessIncreasePercent: 0
         _recoilDampingPercent: 16
     - rid: 3479885496768528657
-      type: {class: WorldItemComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
+      type: {class: WorldItemComponent, ns: RaidIntoDarkness.Inventory.Infrastructure, asm: RaidIntoDarkness.Inventory}
       data:
         _prefab: {fileID: 4537489714169744232, guid: 7db7950139ad7bf4899e915d7bdaa5d6, type: 3}
     - rid: 3479885496768528803
-      type: {class: ItemTakeSoundComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
+      type: {class: ItemTakeSoundComponent, ns: RaidIntoDarkness.Inventory.Infrastructure, asm: RaidIntoDarkness.Inventory}
       data:
         _category: attchsilen
         _clips:

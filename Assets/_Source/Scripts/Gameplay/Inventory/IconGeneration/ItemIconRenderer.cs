@@ -1,10 +1,12 @@
+using RaidIntoDarkness.Inventory.Domain;
+using RaidIntoDarkness.Inventory.Application;
 using System;
 using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
-namespace RaidIntoDarkness.Inventory.IconGeneration
+namespace RaidIntoDarkness.Inventory.Infrastructure.IconGeneration
 {
     public static class ItemIconRenderer
     {
@@ -74,7 +76,7 @@ namespace RaidIntoDarkness.Inventory.IconGeneration
                 gameObject.SetActive(false);
             }
 
-            if (Application.isPlaying)
+            if (UnityEngine.Application.isPlaying)
             {
                 UnityEngine.Object.Destroy(target);
             }

@@ -1,3 +1,4 @@
+using RaidIntoDarkness.Inventory.Domain;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -33,7 +34,7 @@ namespace RaidIntoDarkness.Inventory.Editor
 
         public static string Run()
         {
-            string project = Path.GetFullPath(Path.Combine(Application.dataPath, "..")).Replace('\\', '/').TrimEnd('/');
+            string project = Path.GetFullPath(Path.Combine(UnityEngine.Application.dataPath, "..")).Replace('\\', '/').TrimEnd('/');
             if (!string.Equals(project, PRODUCTION_PATH, StringComparison.OrdinalIgnoreCase))
             {
                 throw new InvalidOperationException("Anomaly balance setup requires Production: " + PRODUCTION_PATH + ". Active project: " + project);
@@ -145,7 +146,7 @@ namespace RaidIntoDarkness.Inventory.Editor
 
         public static string ApplyArchetypeWear()
         {
-            string project = Path.GetFullPath(Path.Combine(Application.dataPath, "..")).Replace('\\', '/').TrimEnd('/');
+            string project = Path.GetFullPath(Path.Combine(UnityEngine.Application.dataPath, "..")).Replace('\\', '/').TrimEnd('/');
             if (!string.Equals(project, PRODUCTION_PATH, StringComparison.OrdinalIgnoreCase))
             {
                 throw new InvalidOperationException("Anomaly balance setup requires Production: " + PRODUCTION_PATH + ". Active project: " + project);
@@ -180,7 +181,7 @@ namespace RaidIntoDarkness.Inventory.Editor
 
         public static string ApplyEquipmentProtections()
         {
-            string project = Path.GetFullPath(Path.Combine(Application.dataPath, "..")).Replace('\\', '/').TrimEnd('/');
+            string project = Path.GetFullPath(Path.Combine(UnityEngine.Application.dataPath, "..")).Replace('\\', '/').TrimEnd('/');
             if (!string.Equals(project, PRODUCTION_PATH, StringComparison.OrdinalIgnoreCase))
             {
                 throw new InvalidOperationException("Anomaly balance setup requires Production: " + PRODUCTION_PATH + ". Active project: " + project);

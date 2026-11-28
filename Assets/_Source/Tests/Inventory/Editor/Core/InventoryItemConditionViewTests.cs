@@ -1,3 +1,4 @@
+using RaidIntoDarkness.Inventory.Domain;
 using RaidIntoDarkness.Inventory.UI;
 using NUnit.Framework;
 using TMPro;
@@ -45,7 +46,7 @@ namespace RaidIntoDarkness.Inventory.Core.Tests
             _window.Configure((RectTransform)_root.transform, null, null, null, null, null, null, null, new[] { _grid });
             _window.ConfigurePresentation(_theme, null, string.Empty, string.Empty, Color.white);
             _model = new InventoryModel(_items.Database);
-            _model.AddContainer(_grid.CreateContainer());
+            _model.AddContainer(new GridContainer("Backpack", 2, 1, "Player", "Backpack"));
             _window.Bind(_model, null);
         }
 
@@ -89,9 +90,11 @@ namespace RaidIntoDarkness.Inventory.Core.Tests
             Assert.That(background.rectTransform.rect.height, Is.GreaterThan(0f));
             Assert.That(view.transform.Find("Overlay/ConditionShadow").gameObject.activeSelf, Is.False);
             Assert.That(item.GetState("condition"), Is.EqualTo(condition));
-            view.BindGhost(item, _grid, _grid.CellSize, false, 1);
-            Assert.That(label.enabled, Is.False);
-            Assert.That(background.enabled, Is.False);
+            InventoryItemDragGhost ghost = InventoryItemDragGhost.Create((RectTransform)_root.transform, item, _grid.CellSize, false, _theme, _window.IconProvider);
+            Assert.That(ghost.GetComponentInChildren<TMP_Text>(true), Is.Null);
+            Assert.That(ghost.GetComponent<CanvasGroup>().blocksRaycasts, Is.False);
+            Assert.That(label.enabled, Is.True);
+            Assert.That(background.enabled, Is.True);
         }
 
         [Test]

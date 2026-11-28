@@ -1,6 +1,9 @@
+using RaidIntoDarkness.Inventory.Infrastructure;
+using RaidIntoDarkness.Inventory.Domain;
+using RaidIntoDarkness.Inventory.Application;
 using System.Collections;
 using RaidIntoDarkness.Inventory;
-using RaidIntoDarkness.Inventory.IconGeneration;
+using RaidIntoDarkness.Inventory.Infrastructure.IconGeneration;
 using RaidIntoDarkness.Inventory.UI;
 using NUnit.Framework;
 using RaidIntoDarkness.Effects;

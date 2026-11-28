@@ -11,7 +11,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: da0f90c2955673d46b25d465cbe44ed0, type: 3}
   m_Name: wpn_val_definition
-  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.ItemDefinition
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.Domain.ItemDefinition
   _definitionId: 899f79ae924a4dd7aca50de36add7725
   _displayName: "\u0410\u0432\u0442\u043E\u043C\u0430\u0442 \u0441\u043F\u0435\u0446\u0438\u0430\u043B\u044C\u043D\u044B\u0439 \u0410\u0421 \xAB\u0412\u0430\u043B\xBB (6\u041F30)"
   _shortName: "\u0410\u0421 \xAB\u0412\u0430\u043B\xBB"
@@ -62,7 +62,7 @@ MonoBehaviour:
     version: 2
     RefIds:
     - rid: 115149063313949397
-      type: {class: WeaponStatsComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
+      type: {class: WeaponStatsComponent, ns: RaidIntoDarkness.Inventory.Domain, asm: RaidIntoDarkness.Inventory}
       data:
         _section: wpn_val
         _weaponClass: assault_rifle
@@ -119,11 +119,11 @@ MonoBehaviour:
         _blockSilencerWithGrenadeLauncher: 0
         _exposedRound: {fileID: 0}
     - rid: 115149063313949398
-      type: {class: EquippableItemComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
+      type: {class: EquippableItemComponent, ns: RaidIntoDarkness.Inventory.Domain, asm: RaidIntoDarkness.Inventory}
       data:
         _preferredSlotIds: 090000000a000000i
     - rid: 115149063313949399
-      type: {class: WeaponHudComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
+      type: {class: WeaponHudComponent, ns: RaidIntoDarkness.Inventory.Infrastructure, asm: RaidIntoDarkness.Inventory}
       data:
         _hudModel: {fileID: 6934872078110242332, guid: 102a813d161f0c24ca92ddad4925e563, type: 3}
         _weaponMotions: {fileID: 8815230551390286010, guid: 8612c7e8515f3c644adcdf16c7258a97, type: 3}
@@ -173,13 +173,13 @@ MonoBehaviour:
           _position: {x: -0.001725592, y: -0.04391372, z: -0.013398483}
           _depthOffset: 0
     - rid: 115149063313949400
-      type: {class: ItemTakeSoundComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
+      type: {class: ItemTakeSoundComponent, ns: RaidIntoDarkness.Inventory.Infrastructure, asm: RaidIntoDarkness.Inventory}
       data:
         _category: weapon
         _clips:
         - {fileID: 8300000, guid: ffaa18b396584214484ce81b26793ce4, type: 3}
         - {fileID: 8300000, guid: 5a49c4bfd5dafa843969f2f14f2bac47, type: 3}
     - rid: 115149063313949401
-      type: {class: WorldItemComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
+      type: {class: WorldItemComponent, ns: RaidIntoDarkness.Inventory.Infrastructure, asm: RaidIntoDarkness.Inventory}
       data:
         _prefab: {fileID: 6249383633010286199, guid: 102a813d161f0c24ca92ddad4925e563, type: 3}

@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace RaidIntoDarkness.Inventory
+namespace RaidIntoDarkness.Inventory.Domain
 {
     internal readonly struct OutfitSlotRelocation
     {
@@ -10,10 +10,10 @@ namespace RaidIntoDarkness.Inventory
             Placement = placement;
             Merges = merges;
             Remainder = remainder;
-            Drop = default;
+            Drop = null;
         }
 
-        public OutfitSlotRelocation(ItemInstance item, PreparedWorldItemDrop drop)
+        public OutfitSlotRelocation(ItemInstance item, IPreparedOutfitDrop drop)
         {
             Item = item;
             Placement = default;
@@ -26,6 +26,6 @@ namespace RaidIntoDarkness.Inventory
         public ItemPlacement Placement { get; }
         public List<KeyValuePair<ItemInstance, int>> Merges { get; }
         public int Remainder { get; }
-        public PreparedWorldItemDrop Drop { get; }
+        public IPreparedOutfitDrop Drop { get; }
     }
 }

@@ -1,7 +1,8 @@
-using RaidIntoDarkness.Inventory;
+using RaidIntoDarkness.Inventory.Application;
+using RaidIntoDarkness.Inventory.Domain;
 using RaidIntoDarkness.Inventory.UI;
 
-namespace RaidIntoDarkness.Inventory
+namespace RaidIntoDarkness.Inventory.Infrastructure
 {
     internal sealed class EquipmentAnimationRequest
     {

@@ -1,9 +1,8 @@
 using System;
-using RaidIntoDarkness.Inventory;
 using RaidIntoDarkness.Weapons;
 using UnityEngine;
 
-namespace RaidIntoDarkness.Inventory
+namespace RaidIntoDarkness.Inventory.Domain
 {
     [Serializable]
     public sealed class AmmoBallisticsComponent : ItemDefinitionComponent

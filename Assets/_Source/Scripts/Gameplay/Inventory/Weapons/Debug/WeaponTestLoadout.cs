@@ -1,10 +1,12 @@
+using RaidIntoDarkness.Inventory.UI;
+using RaidIntoDarkness.Inventory.Application;
+using RaidIntoDarkness.Inventory.Domain;
 using System.Collections.Generic;
-using RaidIntoDarkness.Inventory;
 using RaidIntoDarkness.Weapons;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace RaidIntoDarkness.Inventory
+namespace RaidIntoDarkness.Inventory.Infrastructure
 {
     [DisallowMultipleComponent]
     public sealed class WeaponTestLoadout : MonoBehaviour
@@ -78,11 +80,11 @@ namespace RaidIntoDarkness.Inventory
 
             ItemDefinition ammoDefinition = compatibleAmmo ?? fallbackAmmo;
             int requestedRounds = ammoDefinition != null ? ammoDefinition.GetComponent<AmmoStatsComponent>().BoxSize * AMMO_BOX_COUNT : 0;
-            int roundsAdded = requestedRounds > 0 ? InventorySpawn.Grant(runtime, runtime.PrimaryContainerId, ammoDefinition, requestedRounds, FULL_CONDITION, out _) : 0;
+            int roundsAdded = requestedRounds > 0 ? InventorySpawn.Grant(runtime.isActiveAndEnabled ? runtime.Model : null, runtime.PrimaryContainerId, ammoDefinition, requestedRounds, FULL_CONDITION, out _) : 0;
             int addonsAdded = 0;
             foreach (ItemDefinition addon in addons)
             {
-                addonsAdded += InventorySpawn.Grant(runtime, runtime.PrimaryContainerId, addon, 1, FULL_CONDITION, out _);
+                addonsAdded += InventorySpawn.Grant(runtime.isActiveAndEnabled ? runtime.Model : null, runtime.PrimaryContainerId, addon, 1, FULL_CONDITION, out _);
             }
 
             string result = $"{held.DisplayName}: модули {addonsAdded}/{addons.Count}, патроны {roundsAdded}/{requestedRounds}.";

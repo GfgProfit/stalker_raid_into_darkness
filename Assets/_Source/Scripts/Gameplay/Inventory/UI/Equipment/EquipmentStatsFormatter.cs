@@ -1,14 +1,15 @@
+using RaidIntoDarkness.Inventory.Infrastructure;
+using RaidIntoDarkness.Inventory.Domain;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
-using RaidIntoDarkness.Inventory;
-using RaidIntoDarkness.Inventory.UI;
+using RaidIntoDarkness.Inventory.Application;
 using RaidIntoDarkness.Weapons;
 using UnityEngine;
 using XRay.Importer.Levels;
 
-namespace RaidIntoDarkness.Inventory
+namespace RaidIntoDarkness.Inventory.UI
 {
     public sealed class EquipmentStatsFormatter
     {
@@ -101,56 +102,6 @@ namespace RaidIntoDarkness.Inventory
 
         public bool FullCondition { get; set; }
 
-        public static float GetCondition(ItemInstance item)
-        {
-            return AnomalyEquipmentProtection.GetCondition(item);
-        }
-
-        public static bool SupportsCondition(ItemDefinition definition)
-        {
-            return definition != null && !definition.IsCategory("Grenade") && (definition.GetComponent<EquipmentStatsComponent>() != null || definition.GetComponent<WeaponStatsComponent>() != null);
-        }
-
-        public static string GetEquipmentCategory(ItemDefinition definition)
-        {
-            if (definition == null)
-            {
-                return null;
-            }
-
-            if (definition.IsCategory(OUTFIT_CATEGORY))
-            {
-                return OUTFIT_CATEGORY;
-            }
-
-            if (definition.IsCategory(HELMET_CATEGORY))
-            {
-                return HELMET_CATEGORY;
-            }
-
-            return definition.IsCategory(BACKPACK_CATEGORY) ? BACKPACK_CATEGORY : null;
-        }
-
-        public static ItemInstance FindEquipped(InventoryWindow window, string category)
-        {
-            InventoryContainer container = window != null && window.Model != null ? window.Model.GetContainer(window.EquipmentContainerId) : null;
-
-            if (container == null || category == null)
-            {
-                return null;
-            }
-
-            for (int i = 0; i < container.Items.Count; i++)
-            {
-                if (container.Items[i].Definition.IsCategory(category))
-                {
-                    return container.Items[i];
-                }
-            }
-
-            return null;
-        }
-
         public static string FormatNumber(double value, bool sign)
         {
             long rounded = (long)Math.Round(value);
@@ -160,7 +111,7 @@ namespace RaidIntoDarkness.Inventory
 
         public void Collect(ItemInstance item, List<InventoryItemStat> stats)
         {
-            CollectDefinition(item.Definition, GetCondition(item), FullCondition, stats, item);
+            CollectDefinition(item.Definition, AnomalyEquipmentProtection.GetCondition(item), FullCondition, stats, item);
         }
 
         internal void CollectDefinition(ItemDefinition definition, float condition, bool fullCondition, List<InventoryItemStat> stats, ItemInstance item = null)
@@ -198,16 +149,16 @@ namespace RaidIntoDarkness.Inventory
             }
 
             EquipmentStatsComponent component = definition.GetComponent<EquipmentStatsComponent>();
-            string category = GetEquipmentCategory(definition);
+            string category = EquipmentItemStats.GetCategory(definition);
 
             if (component == null || category == null)
             {
                 return;
             }
 
-            ItemInstance equipped = FindEquipped(_window, category);
+            ItemInstance equipped = EquipmentItemStats.FindEquipped(_window.Model?.GetContainer(_window.EquipmentContainerId), category);
             EquipmentStatsComponent other = equipped != null ? equipped.Definition.GetComponent<EquipmentStatsComponent>() : null;
-            float otherCondition = fullCondition ? 1f : GetCondition(equipped);
+            float otherCondition = fullCondition ? 1f : AnomalyEquipmentProtection.GetCondition(equipped);
             string kilograms = _window.Label(KILOGRAM_UNIT, "kg");
             StatRow[] rows = category == BACKPACK_CATEGORY ? BACKPACK_ROWS : OUTFIT_ROWS;
 
@@ -238,7 +189,7 @@ namespace RaidIntoDarkness.Inventory
 
         internal string Describe(ItemInstance item, bool showDescription)
         {
-            return DescribeDefinition(item.Definition, GetCondition(item), item.Amount, EquipmentAnimationQueue.IsPatchRemoved(item), showDescription);
+            return DescribeDefinition(item.Definition, AnomalyEquipmentProtection.GetCondition(item), item.Amount, EquipmentInventoryCommands.IsPatchRemoved(item), showDescription);
         }
 
         internal string DescribeDefinition(ItemDefinition definition, float condition, int amount, bool patchRemoved = false, bool showDescription = true)
@@ -251,7 +202,7 @@ namespace RaidIntoDarkness.Inventory
 
             int boxSize = Math.Max(1, definition.GetComponent<AmmoStatsComponent>()?.BoxSize ?? 1);
             decimal unitCost = (decimal)baseCost.Value / boxSize;
-            if (SupportsCondition(definition))
+            if (EquipmentItemStats.SupportsCondition(definition))
             {
                 unitCost *= (decimal)condition;
             }
@@ -266,7 +217,7 @@ namespace RaidIntoDarkness.Inventory
 
             EquipmentStatsComponent component = definition.GetComponent<EquipmentStatsComponent>();
             FirstPersonWeaponAsset firearm = GetFirearmProfile(definition);
-            if (firearm != null || (component != null && GetEquipmentCategory(definition) != null))
+            if (firearm != null || (component != null && EquipmentItemStats.GetCategory(definition) != null))
             {
                 double percent = (double)(decimal)condition * PERCENT;
                 Color fullConditionColor = _window.Theme != null ? _window.Theme.ConditionColor : GREEN_COLOR;
@@ -309,7 +260,7 @@ namespace RaidIntoDarkness.Inventory
             string section = InventoryWeaponAmmoSource.ResolveAmmoSection(item, stats);
             ItemDefinition ammo = _weaponAmmo?.FindDefinition(section);
             AmmoStatsComponent ammoStats = ammo?.GetComponent<AmmoStatsComponent>();
-            int loaded = InventoryWeaponAmmoSource.GetLoadedMagazine(item);
+            int loaded = WeaponMagazineState.GetLoadedRounds(item);
             ItemDefinition silencer = stats.GetSilencer(item);
             WeaponAddonComponent silencerStats = silencer?.GetComponent<WeaponAddonComponent>();
             ItemDefinition scope = stats.GetScope(item);
@@ -582,15 +533,14 @@ namespace RaidIntoDarkness.Inventory
 
         private void AddAnomalyProtection(List<InventoryItemStat> stats, StatRow row, ItemDefinition definition, EquipmentStatsComponent component, float condition, bool fullCondition, AnomalyDamageType type)
         {
-            float value = GetMeanProtection(AnomalyEquipmentProtection.GetDefinitionValues(component, fullCondition ? 1f : condition, type, _anomalyConfig));
-            if (value == 0f)
+            InventoryContainer equipment = _window.Model?.GetContainer(_window.EquipmentContainerId);
+            var protection = EquipmentItemStats.CompareAnomalyProtection(equipment, _anomalyConfig, definition, component, condition, fullCondition, type);
+            if (protection.Value == 0f)
             {
                 return;
             }
-            InventoryContainer equipment = _window.Model != null ? _window.Model.GetContainer(_window.EquipmentContainerId) : null;
-            AnomalyProtectionValues current = AnomalyEquipmentProtection.GetCombinedValues(equipment, type, _anomalyConfig, fullCondition: fullCondition);
-            AnomalyProtectionValues preview = AnomalyEquipmentProtection.GetPreviewValues(equipment, type, _anomalyConfig, definition, condition, fullCondition);
-            float difference = GetMeanProtection(preview) - GetMeanProtection(current);
+
+            float difference = protection.Difference;
             string comparison = null;
             InventoryStatTone tone = InventoryStatTone.Normal;
             if (difference != 0f)
@@ -598,11 +548,9 @@ namespace RaidIntoDarkness.Inventory
                 comparison = "(" + FormatProtectionDifference(difference) + ")";
                 tone = difference > 0f ? InventoryStatTone.Better : InventoryStatTone.Worse;
             }
-            string text = FormatProtection(value);
+            string text = FormatProtection(protection.Value);
             stats.Add(new InventoryItemStat(_window.Label(row.Key, row.Fallback), text, _window.Theme != null ? _window.Theme.Icon(row.Icon) : null, tone, comparison));
         }
-
-        private static float GetMeanProtection(AnomalyProtectionValues values) => (values.Get(AnomalyStrength.Weak) + values.Get(AnomalyStrength.Average) + values.Get(AnomalyStrength.Strong)) / 3f;
 
         private static string FormatProtection(float value) => value.ToString("0.##", CultureInfo.InvariantCulture) + PERCENT_UNIT;
 

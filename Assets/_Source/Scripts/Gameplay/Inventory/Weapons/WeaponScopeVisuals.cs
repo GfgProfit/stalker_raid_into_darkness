@@ -1,9 +1,9 @@
+using RaidIntoDarkness.Inventory.Domain;
 using System.Collections.Generic;
-using RaidIntoDarkness.Inventory;
-using RaidIntoDarkness.Inventory.IconGeneration;
+using RaidIntoDarkness.Inventory.Infrastructure.IconGeneration;
 using UnityEngine;
 
-namespace RaidIntoDarkness.Inventory
+namespace RaidIntoDarkness.Inventory.Infrastructure
 {
     [DisallowMultipleComponent]
     public sealed class WeaponScopeVisuals : MonoBehaviour, IItemIconVisualConfigurator

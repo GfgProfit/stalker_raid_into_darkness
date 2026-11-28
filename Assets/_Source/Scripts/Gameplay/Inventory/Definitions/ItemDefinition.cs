@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace RaidIntoDarkness.Inventory
+namespace RaidIntoDarkness.Inventory.Domain
 {
     [CreateAssetMenu(menuName = "Inventory/Item Definition", fileName = "ItemDefinition")]
     public class ItemDefinition : ScriptableObject

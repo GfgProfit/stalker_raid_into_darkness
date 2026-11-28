@@ -1,8 +1,8 @@
+using RaidIntoDarkness.Inventory.Domain;
 using System;
-using RaidIntoDarkness.Inventory;
 using RaidIntoDarkness.FirstPerson;
 
-namespace RaidIntoDarkness.Inventory
+namespace RaidIntoDarkness.Inventory.Infrastructure
 {
     internal sealed class EquipmentAnimationStep
     {

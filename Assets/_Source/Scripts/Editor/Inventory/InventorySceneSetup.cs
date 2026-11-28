@@ -1,3 +1,6 @@
+using RaidIntoDarkness.Inventory.Infrastructure;
+using RaidIntoDarkness.Inventory.Application;
+using RaidIntoDarkness.Inventory.Domain;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -5,8 +8,7 @@ using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using RaidIntoDarkness.Inventory;
-using RaidIntoDarkness.Inventory.Editor;
-using RaidIntoDarkness.Inventory.IconGeneration;
+using RaidIntoDarkness.Inventory.Infrastructure.IconGeneration;
 using RaidIntoDarkness.Inventory.UI;
 using RaidIntoDarkness.Player;
 using RaidIntoDarkness.Weapons;
@@ -210,7 +212,7 @@ namespace RaidIntoDarkness.Inventory.Editor
         {
             Scene scene = SceneManager.GetActiveScene();
 
-            if (Application.isBatchMode && scene.path != SCENE_PATH && scene.isDirty == false)
+            if (UnityEngine.Application.isBatchMode && scene.path != SCENE_PATH && scene.isDirty == false)
             {
                 scene = EditorSceneManager.OpenScene(SCENE_PATH, OpenSceneMode.Additive);
                 SceneManager.SetActiveScene(scene);
@@ -282,12 +284,12 @@ namespace RaidIntoDarkness.Inventory.Editor
             WorldItemInteractor interactor = GetOrAdd<WorldItemInteractor>(integration);
             ConfigureRuntime(window, runtime, player, interactor);
             Undo.RecordObject(controller, "Configure inventory window controller");
-            controller.Configure(window, runtime, player, FindReference("Inventory", "ToggleInventory"), FindReference("Inventory", "CloseInventory"), player.GetComponentInChildren<RaidIntoDarkness.UI.SpawnMenuView>(true));
+            controller.Configure(window, runtime, player, FindReference("Inventory", "ToggleInventory"), FindReference("Inventory", "CloseInventory"), player.GetComponentInChildren<RaidIntoDarkness.Inventory.UI.SpawnMenuView>(true));
             controller.ConfigurePresentation(FindReference("Inventory", "ToggleStash"), FindHeader(window), window.GetComponentInChildren<InventoryStatusPanel>(true), "Сталкер", "Одиночки", 5000, GraInventoryWindowBuilder.LoadSprite(GraInventoryWindowBuilder.PORTRAIT_SPRITE), GraInventoryWindowBuilder.LoadSprite(GraInventoryWindowBuilder.RANK_SPRITE));
             controller.ConfigureSorting(FindReference("Inventory", "ToggleFavorite"), FindReference("Inventory", "ToggleJunk"), GraInventoryWindowBuilder.LoadSprite(GraInventoryWindowBuilder.FAVORITE_SPRITE), GraInventoryWindowBuilder.LoadSprite(GraInventoryWindowBuilder.JUNK_SPRITE));
             controller.ConfigureStats(FindReference("Inventory", "FullStatsModifier"));
             Undo.RecordObject(interactor, "Configure world item interactor");
-            interactor.Configure(controller, FindReference("Inventory", "PickUp"));
+            interactor.Configure(FindReference("Inventory", "PickUp"));
 
             if (worldItems.Count > 0)
             {
@@ -315,11 +317,11 @@ namespace RaidIntoDarkness.Inventory.Editor
                 throw new InvalidOperationException("The inventory window requires a backpack grid, stash grid and equipment layout.");
             }
 
-            var backpack = (GridContainer)bagView.CreateContainer();
-            var stash = (GridContainer)stashView.CreateContainer();
+            Vector2Int backpackSize = bagView.GetConfiguredSize();
+            Vector2Int stashSize = stashView.GetConfiguredSize();
             SlotId[] equipmentSlots = equipment is InventoryEquipmentPanel equipmentPanel ? equipmentPanel.SlotViews.Select(slot => slot.SlotId).ToArray() : Array.Empty<SlotId>();
-            var backpackSettings = new InventoryGridSettings(backpack.Id, backpack.OwnerId, backpack.DisplayName, backpack.Width, backpack.Height, 2);
-            var stashSettings = new InventoryGridSettings(stash.Id, stash.OwnerId, stash.DisplayName, stash.Width, stash.Height, 0);
+            var backpackSettings = new InventoryGridSettings(bagView.ContainerId, bagView.OwnerId, bagView.DisplayName, backpackSize.x, backpackSize.y, 2);
+            var stashSettings = new InventoryGridSettings(stashView.ContainerId, stashView.OwnerId, stashView.DisplayName, stashSize.x, stashSize.y, 0);
             Undo.RecordObject(runtime, "Configure inventory containers");
             runtime.Configure(backpackSettings, stashSettings, equipment.ContainerId, equipment.DisplayName, layout, equipmentSlots, player, player.GetComponentInChildren<FirstPersonWeaponController>(true), interactor);
         }

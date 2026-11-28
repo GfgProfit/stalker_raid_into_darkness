@@ -1,8 +1,9 @@
+using RaidIntoDarkness.Inventory.Domain;
 using System;
 using RaidIntoDarkness.Inventory;
 using R3;
 
-namespace RaidIntoDarkness.Inventory
+namespace RaidIntoDarkness.Inventory.UI
 {
     internal sealed class InventoryBackpackLayoutViewModel : IDisposable
     {

@@ -1,6 +1,7 @@
+using RaidIntoDarkness.Inventory.Domain;
 using System.Collections.Generic;
 
-namespace RaidIntoDarkness.Inventory.IconGeneration
+namespace RaidIntoDarkness.Inventory.Infrastructure.IconGeneration
 {
     internal static class ItemIconStableKeyBuilder
     {

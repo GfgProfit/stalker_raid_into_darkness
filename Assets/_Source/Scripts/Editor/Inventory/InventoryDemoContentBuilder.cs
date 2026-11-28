@@ -1,7 +1,9 @@
+using RaidIntoDarkness.Inventory.Application;
+using RaidIntoDarkness.Inventory.Domain;
 using System.Collections.Generic;
 using System.IO;
 using RaidIntoDarkness.Inventory;
-using RaidIntoDarkness.Inventory.IconGeneration;
+using RaidIntoDarkness.Inventory.Infrastructure.IconGeneration;
 using UnityEditor;
 using UnityEngine;
 

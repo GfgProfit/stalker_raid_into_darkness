@@ -35,13 +35,11 @@ namespace RaidIntoDarkness.Inventory.UI
             Rebuild();
         }
 
-        public override InventoryContainer CreateContainer() => CreateContainer(0);
-
-        public GridContainer CreateContainer(int rowGrowth)
+        internal Vector2Int GetConfiguredSize()
         {
             ComputeLayout();
             int rows = _sizeMode == InventoryGridSizeMode.AutoSize ? Mathf.Max(1, _rows) : _resolvedRows;
-            return new GridContainer(ContainerId, _resolvedColumns, rows, OwnerId, DisplayName, rowGrowth);
+            return new Vector2Int(_resolvedColumns, rows);
         }
 
         public void SetContentRows(int rows)

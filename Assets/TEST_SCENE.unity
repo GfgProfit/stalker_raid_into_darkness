@@ -12453,7 +12453,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 73377eed0b4df2a46942a50b904666aa, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.WeaponTestLoadout
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.Infrastructure.WeaponTestLoadout
   _inventoryController: {fileID: 1503779140}
 --- !u!4 &1385747016
 Transform:
@@ -12976,7 +12976,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2b9149fefb7be7344a4636a5d1b9267e, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.UI.SpawnMenuView
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.UI.SpawnMenuView
 --- !u!1 &1487911001
 GameObject:
   m_ObjectHideFlags: 0
@@ -13166,7 +13166,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 89f1268ae77b44a42b7adef8cb36620c, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.InventoryWindowController
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.UI.InventoryWindowController
   _window: {fileID: 1471411355}
   _inventory: {fileID: 1503779141}
   _player: {fileID: 1482659390}
@@ -13198,7 +13198,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1b73d715f3610ff4faeb7cebcfb62a91, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.PlayerInventoryRuntime
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.Infrastructure.PlayerInventoryRuntime
   _database: {fileID: 11400000, guid: 746b11578b3206b46b058a112b593024, type: 2}
   _seed: {fileID: 11400000, guid: 26e71c23b4389ee429da6cfd4e7e11e4, type: 2}
   _ownerId: Player
@@ -13249,8 +13249,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 20464fab3eafe654999553d153d4f80c, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.WorldItemInteractor
-  _controller: {fileID: 1503779140}
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.Infrastructure.WorldItemInteractor
   _pickUp: {fileID: 226282700413933658, guid: 0259a467712c04343a8d48b8353c3e82, type: 3}
   _pickUpDistance: 2.5
   _aimRadius: 0.15

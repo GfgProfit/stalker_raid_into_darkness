@@ -1,3 +1,4 @@
+using RaidIntoDarkness.Inventory.Domain;
 using System.Collections.Generic;
 using NUnit.Framework;
 using UnityEngine;

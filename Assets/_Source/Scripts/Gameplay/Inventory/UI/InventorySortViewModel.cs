@@ -1,28 +1,13 @@
+using RaidIntoDarkness.Inventory.Domain;
 using System;
 using System.Collections.Generic;
-using RaidIntoDarkness.Inventory;
-using RaidIntoDarkness.Inventory.UI;
 using UnityEngine;
 
-namespace RaidIntoDarkness.Inventory
+namespace RaidIntoDarkness.Inventory.UI
 {
-    public sealed class InventorySortingPlus
+    public sealed class InventorySortViewModel
     {
         public const int FAVORITES_ORDER = -2;
-        public const int WEAPONS_ORDER = 1;
-        public const int OUTFITS_ORDER = 2;
-        public const int ARTIFACTS_ORDER = 3;
-        public const int DEVICES_ORDER = 4;
-        public const int TOOLS_ORDER = 5;
-        public const int MEDICAL_ORDER = 6;
-        public const int FOODS_ORDER = 7;
-        public const int QUEST_ORDER = 8;
-        public const int AMMO_ORDER = 9;
-        public const int MUTANT_PARTS_ORDER = 10;
-        public const int MISC_ORDER = 11;
-        public const int UPGRADES_ORDER = 12;
-        public const int PARTS_ORDER = 13;
-        public const int UNKNOWN_ORDER = 42;
         public const int JUNK_ORDER = 100;
 
         private static readonly Color _favoriteTint = new(176f / 255f, 238f / 255f, 26f / 255f, 10f / 255f);
@@ -37,7 +22,7 @@ namespace RaidIntoDarkness.Inventory
         private readonly Sprite _favoriteBadge;
         private readonly Sprite _junkBadge;
 
-        public InventorySortingPlus(InventoryModel model, IEnumerable<string> containerIds, Sprite favoriteBadge, Sprite junkBadge)
+        public InventorySortViewModel(InventoryModel model, IEnumerable<string> containerIds, Sprite favoriteBadge, Sprite junkBadge)
         {
             _model = model;
             _containerIds = new List<string>(containerIds);
@@ -119,77 +104,7 @@ namespace RaidIntoDarkness.Inventory
                 return FAVORITES_ORDER;
             }
 
-            return IsJunk(definition) ? JUNK_ORDER : GetKindOrder(definition);
-        }
-
-        public static int GetKindOrder(ItemDefinition definition)
-        {
-            if (definition == null)
-            {
-                return UNKNOWN_ORDER;
-            }
-
-            if (definition.IsCategory("Weapon") || definition.IsCategory("Attachment"))
-            {
-                return WEAPONS_ORDER;
-            }
-
-            if (definition.IsCategory("Armor") || definition.IsCategory("Head") || definition.IsCategory("Backpack"))
-            {
-                return OUTFITS_ORDER;
-            }
-
-            if (definition.IsCategory("Artifact"))
-            {
-                return ARTIFACTS_ORDER;
-            }
-
-            if (definition.IsCategory("Accessory") || definition.IsCategory("Device") || definition.IsCategory("Pda") || definition.IsCategory("Binocular"))
-            {
-                return DEVICES_ORDER;
-            }
-
-            if (definition.IsCategory("Tool"))
-            {
-                return TOOLS_ORDER;
-            }
-
-            if (definition.HasTag("Medical"))
-            {
-                return MEDICAL_ORDER;
-            }
-
-            if (definition.HasTag("Food") || definition.HasTag("Drink"))
-            {
-                return FOODS_ORDER;
-            }
-
-            if (definition.IsCategory("Quest"))
-            {
-                return QUEST_ORDER;
-            }
-
-            if (definition.IsCategory("Ammo"))
-            {
-                return AMMO_ORDER;
-            }
-
-            if (definition.IsCategory("MutantPart"))
-            {
-                return MUTANT_PARTS_ORDER;
-            }
-
-            if (definition.IsCategory("Misc"))
-            {
-                return MISC_ORDER;
-            }
-
-            if (definition.IsCategory("Upgrade"))
-            {
-                return UPGRADES_ORDER;
-            }
-
-            return definition.IsCategory("Part") ? PARTS_ORDER : UNKNOWN_ORDER;
+            return IsJunk(definition) ? JUNK_ORDER : InventoryCategoryOrder.Get(definition);
         }
 
         public int Compare(ItemInstance left, ItemInstance right)

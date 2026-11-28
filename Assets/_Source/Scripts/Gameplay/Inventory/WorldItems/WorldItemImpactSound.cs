@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using RaidIntoDarkness.Player;
 using UnityEngine;
 
-namespace RaidIntoDarkness.Inventory
+namespace RaidIntoDarkness.Inventory.Infrastructure
 {
     [DisallowMultipleComponent]
     [RequireComponent(typeof(Rigidbody))]

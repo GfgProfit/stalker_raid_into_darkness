@@ -1,12 +1,13 @@
 using System;
-using RaidIntoDarkness.Inventory;
 using UnityEngine;
 
-namespace RaidIntoDarkness.Inventory
+namespace RaidIntoDarkness.Inventory.Domain
 {
     [Serializable]
     public sealed class WeaponAddonComponent : ItemDefinitionComponent
     {
+        public const string GRENADE_ROUND_STATE = "weapon.grenade_launcher.round";
+
         [SerializeField] private string _section;
         [SerializeField] private WeaponAddonKind _kind;
         [SerializeField] private int _cost;
@@ -64,7 +65,7 @@ namespace RaidIntoDarkness.Inventory
 
         public ItemDefinition GetLoadedGrenade(ItemInstance item)
         {
-            string roundId = item?.GetState(InventoryWeaponAttachments.GRENADE_ROUND_STATE);
+            string roundId = item?.GetState(WeaponAddonComponent.GRENADE_ROUND_STATE);
 
             if (_grenadeAmmo != null && roundId == _grenadeAmmo.DefinitionId)
             {

@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using RaidIntoDarkness.Inventory.IconGeneration;
+using RaidIntoDarkness.Inventory.Infrastructure.IconGeneration;
 using UnityEditor;
 using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
@@ -86,7 +86,7 @@ namespace RaidIntoDarkness.Inventory.Editor
                     EditorUtility.SetDirty(catalog);
                     AssetDatabase.SaveAssets();
                     BakedItemIconCatalog.ResetDefaultCache();
-                    ItemIconCache.Clear();
+                    InventoryRuntimeIconInvalidation.ClearActiveCaches();
                 }
 
                 progress?.Invoke(variants.Count, variants.Count, null);

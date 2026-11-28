@@ -1,9 +1,8 @@
 using System.Globalization;
-using RaidIntoDarkness.Inventory;
 using UnityEngine;
 using XRay.Importer.Levels;
 
-namespace RaidIntoDarkness.Inventory
+namespace RaidIntoDarkness.Inventory.Domain
 {
     public static class AnomalyEquipmentProtection
     {

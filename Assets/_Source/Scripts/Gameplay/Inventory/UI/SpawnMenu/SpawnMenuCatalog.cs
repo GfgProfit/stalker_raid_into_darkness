@@ -1,9 +1,9 @@
+using RaidIntoDarkness.Inventory.Domain;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using RaidIntoDarkness.Inventory;
 
-namespace RaidIntoDarkness.UI
+namespace RaidIntoDarkness.Inventory.UI
 {
     internal sealed class SpawnMenuCatalog
     {
@@ -35,7 +35,7 @@ namespace RaidIntoDarkness.UI
             }
 
             int? price = ItemCostComponent.GetBaseCost(definition);
-            _entries.Add(new SpawnMenuEntry(definition, category, price, EquipmentStatsFormatter.SupportsCondition(definition), Math.Max(1, ammo?.BoxSize ?? 1)));
+            _entries.Add(new SpawnMenuEntry(definition, category, price, EquipmentItemStats.SupportsCondition(definition), Math.Max(1, ammo?.BoxSize ?? 1)));
             MaxWidth = Math.Max(MaxWidth, definition.Width);
         }
 

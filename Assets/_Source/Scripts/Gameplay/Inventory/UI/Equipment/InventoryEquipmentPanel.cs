@@ -1,3 +1,4 @@
+using RaidIntoDarkness.Inventory.Domain;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -34,12 +35,6 @@ namespace RaidIntoDarkness.Inventory.UI
         }
 
         public InventoryEquipmentSlot GetSlotView(SlotId slotId) => _viewsById.TryGetValue(slotId, out InventoryEquipmentSlot view) ? view : null;
-
-        public override InventoryContainer CreateContainer()
-        {
-            ComputeLayout();
-            return new SlottedContainer(ContainerId, _slots, Mathf.Max(1, _gridWidth), Mathf.Max(1, _gridHeight), true, OwnerId, DisplayName);
-        }
 
         public override bool TryGetCellAtLocal(Vector2 topLeftLocal, out Vector2Int cell)
         {
@@ -165,7 +160,7 @@ namespace RaidIntoDarkness.Inventory.UI
 
         protected override void OnItemsSynced()
         {
-            if (Application.isPlaying == false)
+            if (UnityEngine.Application.isPlaying == false)
             {
                 return;
             }

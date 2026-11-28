@@ -1,3 +1,4 @@
+using RaidIntoDarkness.Inventory.Domain;
 using R3;
 
 namespace RaidIntoDarkness.Inventory.UI

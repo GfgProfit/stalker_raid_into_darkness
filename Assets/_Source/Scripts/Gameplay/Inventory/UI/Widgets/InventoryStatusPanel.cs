@@ -22,7 +22,7 @@ namespace RaidIntoDarkness.Inventory.UI
         public void Configure(IEnumerable<InventoryStatusBar> bars)
         {
             _bars = bars == null ? new List<InventoryStatusBar>() : new List<InventoryStatusBar>(bars);
-            if (Application.isPlaying)
+            if (UnityEngine.Application.isPlaying)
             {
                 BindHoverTargets();
             }
@@ -109,7 +109,7 @@ namespace RaidIntoDarkness.Inventory.UI
 
         private void OnEnable()
         {
-            if (Application.isPlaying)
+            if (UnityEngine.Application.isPlaying)
             {
                 BindHoverTargets();
             }

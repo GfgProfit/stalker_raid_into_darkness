@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace RaidIntoDarkness.Inventory.IconGeneration
+namespace RaidIntoDarkness.Inventory.Infrastructure.IconGeneration
 {
     [CreateAssetMenu(fileName = DEFAULT_RESOURCE_PATH, menuName = "Inventory/Baked Item Icon Catalog")]
     public sealed class BakedItemIconCatalog : ScriptableObject

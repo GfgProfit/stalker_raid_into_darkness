@@ -1,9 +1,9 @@
+using RaidIntoDarkness.Inventory.Infrastructure;
+using RaidIntoDarkness.Inventory.Domain;
 using System;
-using RaidIntoDarkness.Inventory;
-using RaidIntoDarkness.Inventory.UI;
 using UnityEngine;
 
-namespace RaidIntoDarkness.Inventory
+namespace RaidIntoDarkness.Inventory.UI
 {
     public sealed class InventoryItemSounds : IDisposable
     {

@@ -1,3 +1,4 @@
+using RaidIntoDarkness.Inventory.Infrastructure;
 #if UNITY_EDITOR
 using NUnit.Framework;
 using RaidIntoDarkness.FirstPerson;

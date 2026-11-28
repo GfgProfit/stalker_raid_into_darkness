@@ -1,9 +1,11 @@
+using RaidIntoDarkness.Inventory.Domain;
+using RaidIntoDarkness.Inventory.Application;
 using System;
 using System.Collections;
 using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using RaidIntoDarkness.Inventory.IconGeneration;
+using RaidIntoDarkness.Inventory.Infrastructure.IconGeneration;
 using NUnit.Framework;
 using UnityEditor;
 using UnityEngine;

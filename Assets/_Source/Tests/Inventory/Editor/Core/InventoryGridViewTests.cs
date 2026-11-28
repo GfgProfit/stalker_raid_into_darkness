@@ -1,3 +1,4 @@
+using RaidIntoDarkness.Inventory.Domain;
 using RaidIntoDarkness.Inventory.UI;
 using NUnit.Framework;
 using TMPro;
@@ -73,7 +74,7 @@ namespace RaidIntoDarkness.Inventory.Core.Tests
             Assert.That(grid.Columns, Is.EqualTo(6));
             Assert.That(grid.LayoutWarning, Is.Not.Empty);
             Assert.That(_gridRect.sizeDelta, Is.EqualTo(new Vector2(400f, 256f)));
-            Assert.That(((GridContainer)grid.CreateContainer()).Width, Is.EqualTo(6));
+            Assert.That(grid.GetConfiguredSize(), Is.EqualTo(new Vector2Int(6, 4)));
         }
 
         [Test]
@@ -114,7 +115,7 @@ namespace RaidIntoDarkness.Inventory.Core.Tests
         }
 
         [Test]
-        public void SlotGridBuildsSlottedContainerFromInlineMask()
+        public void SlotGridBuildsLayoutFromInlineMask()
         {
             var view = _gridRect.gameObject.AddComponent<InventorySlotGridView>();
             view.Configure("Equipment", "Player", "Equipment", new Vector2(50f, 50f));
@@ -126,12 +127,13 @@ namespace RaidIntoDarkness.Inventory.Core.Tests
             });
             view.Rebuild();
 
-            var container = (SlottedContainer)view.CreateContainer();
-
-            Assert.That(container.Slots.Count, Is.EqualTo(3));
-            Assert.That(container.GetSlot(SlotId.Head).Bounds, Is.EqualTo(new RectInt(0, 0, 2, 2)));
-            Assert.That(container.GetSlot(SlotId.Outfit).Bounds, Is.EqualTo(new RectInt(3, 0, 1, 1)));
-            Assert.That(container.GetSlot(SlotId.Backpack).Bounds, Is.EqualTo(new RectInt(3, 1, 1, 1)));
+            Assert.That(view.Slots.Count, Is.EqualTo(3));
+            Assert.That(view.Slots[0].Id, Is.EqualTo(SlotId.Head));
+            Assert.That(view.Slots[0].Bounds, Is.EqualTo(new RectInt(0, 0, 2, 2)));
+            Assert.That(view.Slots[1].Id, Is.EqualTo(SlotId.Outfit));
+            Assert.That(view.Slots[1].Bounds, Is.EqualTo(new RectInt(3, 0, 1, 1)));
+            Assert.That(view.Slots[2].Id, Is.EqualTo(SlotId.Backpack));
+            Assert.That(view.Slots[2].Bounds, Is.EqualTo(new RectInt(3, 1, 1, 1)));
             Assert.That(view.Columns, Is.EqualTo(4));
             Assert.That(view.Rows, Is.EqualTo(2));
             Assert.That(view.LayoutWarning, Is.Empty);
@@ -288,7 +290,7 @@ namespace RaidIntoDarkness.Inventory.Core.Tests
             InventoryWindow window = _canvasObject.AddComponent<InventoryWindow>();
             window.Configure((RectTransform)_canvasObject.transform, null, tooltip, null, null, null, null, null, new[] { grid });
             model = new InventoryModel(_items.Database);
-            model.AddContainer(grid.CreateContainer());
+            model.AddContainer(new GridContainer("Backpack", 10, 8, "Player", "Backpack"));
             window.Bind(model, null);
             return window;
         }

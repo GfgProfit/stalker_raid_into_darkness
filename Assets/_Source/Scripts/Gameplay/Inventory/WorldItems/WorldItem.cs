@@ -1,9 +1,10 @@
+using RaidIntoDarkness.Inventory.Application;
+using RaidIntoDarkness.Inventory.Domain;
 using System;
-using RaidIntoDarkness.Inventory;
-using RaidIntoDarkness.Inventory.IconGeneration;
+using RaidIntoDarkness.Inventory.Infrastructure.IconGeneration;
 using UnityEngine;
 
-namespace RaidIntoDarkness.Inventory
+namespace RaidIntoDarkness.Inventory.Infrastructure
 {
     [DisallowMultipleComponent]
     [RequireComponent(typeof(Rigidbody))]
@@ -75,7 +76,7 @@ namespace RaidIntoDarkness.Inventory
                 return;
             }
 
-            bool empty = InventoryWeaponAmmoSource.GetLoadedMagazine(item) == 0;
+            bool empty = WeaponMagazineState.GetLoadedRounds(item) == 0;
             for (int i = 0; i < _weaponPose.Length; i++)
             {
                 _weaponPose[i].Apply(empty);

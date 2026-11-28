@@ -1,8 +1,8 @@
+using RaidIntoDarkness.Inventory.Domain;
 using System.Collections.Generic;
-using RaidIntoDarkness.Inventory;
 using UnityEngine;
 
-namespace RaidIntoDarkness.Inventory
+namespace RaidIntoDarkness.Inventory.Application
 {
     [CreateAssetMenu(menuName = "Raid Into Darkness/Inventory/Inventory Seed", fileName = "InventorySeed")]
     public sealed class InventorySeed : ScriptableObject

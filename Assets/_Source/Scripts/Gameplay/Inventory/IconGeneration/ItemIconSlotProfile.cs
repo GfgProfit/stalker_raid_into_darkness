@@ -1,7 +1,8 @@
+using RaidIntoDarkness.Inventory.Domain;
 using System;
 using UnityEngine;
 
-namespace RaidIntoDarkness.Inventory.IconGeneration
+namespace RaidIntoDarkness.Inventory.Infrastructure.IconGeneration
 {
     [Serializable]
     public struct ItemIconSlotProfile : IEquatable<ItemIconSlotProfile>

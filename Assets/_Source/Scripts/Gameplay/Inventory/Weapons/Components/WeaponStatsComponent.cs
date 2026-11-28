@@ -1,10 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using RaidIntoDarkness.Inventory;
 using UnityEngine;
 
-namespace RaidIntoDarkness.Inventory
+namespace RaidIntoDarkness.Inventory.Domain
 {
     [Serializable]
     public sealed class WeaponStatsComponent : ItemDefinitionComponent
@@ -70,9 +69,9 @@ namespace RaidIntoDarkness.Inventory
         {
             ItemDefinition launcher = GetGrenadeLauncher(item);
             float attachmentWeight = (GetSilencer(item)?.Weight ?? 0f) + (GetScope(item)?.Weight ?? 0f) + (launcher?.Weight ?? 0f) + (launcher?.GetComponent<WeaponAddonComponent>()?.GetAdditionalWeight(item, resolver) ?? 0f);
-            string section = item.GetState(InventoryWeaponAmmoSource.AMMO_SECTION_STATE);
+            string section = item.GetState(WeaponMagazineState.AMMO_SECTION_STATE);
 
-            if (SupportsAmmo(section) == false || int.TryParse(item.GetState(InventoryWeaponAmmoSource.MAGAZINE_STATE), NumberStyles.Integer, CultureInfo.InvariantCulture, out int magazine) == false || resolver is not ItemDatabase database)
+            if (SupportsAmmo(section) == false || int.TryParse(item.GetState(WeaponMagazineState.MAGAZINE_STATE), NumberStyles.Integer, CultureInfo.InvariantCulture, out int magazine) == false || resolver is not ItemDatabase database)
             {
                 return attachmentWeight;
             }
@@ -105,7 +104,7 @@ namespace RaidIntoDarkness.Inventory
 
         public override string GetIconVariantId(ItemInstance item)
         {
-            if (!HasExposedRound || _exposedRound.GetComponent<AmmoStatsComponent>()?.Section != item.GetState(InventoryWeaponAmmoSource.AMMO_SECTION_STATE) || InventoryWeaponAmmoSource.GetLoadedMagazine(item) == 0)
+            if (!HasExposedRound || _exposedRound.GetComponent<AmmoStatsComponent>()?.Section != item.GetState(WeaponMagazineState.AMMO_SECTION_STATE) || WeaponMagazineState.GetLoadedRounds(item) == 0)
             {
                 return null;
             }

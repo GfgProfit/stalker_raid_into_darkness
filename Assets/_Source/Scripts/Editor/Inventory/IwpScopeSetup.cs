@@ -1,9 +1,11 @@
+using RaidIntoDarkness.Inventory.Infrastructure;
+using RaidIntoDarkness.Inventory.Domain;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using RaidIntoDarkness.Inventory;
-using RaidIntoDarkness.Inventory.IconGeneration;
+using RaidIntoDarkness.Inventory.Infrastructure.IconGeneration;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -33,7 +35,7 @@ namespace RaidIntoDarkness.Inventory.Editor
             Transform bone = FindBone(root, WeaponHudComponent.SCOPE_BONE);
             var result = new StringBuilder();
             PrefabStage stage = PrefabStageUtility.GetCurrentPrefabStage();
-            result.AppendLine($"Project={Application.dataPath}; stage={stage?.assetPath}; dirty={stage != null && stage.scene.isDirty}");
+            result.AppendLine($"Project={UnityEngine.Application.dataPath}; stage={stage?.assetPath}; dirty={stage != null && stage.scene.isDirty}");
 
             foreach (Transform child in bone)
             {

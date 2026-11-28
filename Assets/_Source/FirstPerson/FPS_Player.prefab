@@ -818,7 +818,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2b9149fefb7be7344a4636a5d1b9267e, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.UI.SpawnMenuView
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.UI.SpawnMenuView
   _categoryContent: {fileID: 8734087290148255980}
   _categoryTemplate: {fileID: 24233667451306252}
   _grid: {fileID: 4775154548084327280}
@@ -5359,7 +5359,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7be8fa544604f5f4e94aadde4149426c, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.UI.SpawnMenuGrid
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.UI.SpawnMenuGrid
   _scroll: {fileID: 8960970542890756388}
   _grid: {fileID: 4595332081777200330}
   _cellTemplate: {fileID: 1452025544126054349}
@@ -6564,7 +6564,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: dac82e57d81c6244185aeb146318bab8, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.UI.SpawnMenuItemCell
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.UI.SpawnMenuItemCell
   _itemView: {fileID: 3404531205913652212}
   _selection: {fileID: 8763101043696971635}
 --- !u!1 &4846725715068122007
@@ -9602,7 +9602,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b8db279482a95bd449406949d4fc6c6f, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.UI.SpawnMenuCategoryRow
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.UI.SpawnMenuCategoryRow
   _toggle: {fileID: 7370001854192780920}
   _select: {fileID: 5994297034534860875}
   _arrow: {fileID: 4863834849914360005}

@@ -1,3 +1,6 @@
+using RaidIntoDarkness.Inventory.Infrastructure;
+using RaidIntoDarkness.Inventory.Domain;
+using RaidIntoDarkness.Inventory.Application;
 using System.Collections;
 using System.Collections.Generic;
 using RaidIntoDarkness.Inventory;

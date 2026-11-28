@@ -11,7 +11,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: da0f90c2955673d46b25d465cbe44ed0, type: 3}
   m_Name: wpn_addon_grenade_launcher_ag36_definition
-  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.ItemDefinition
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.Domain.ItemDefinition
   _definitionId: c1cd9bb3b083de34dbdbbbe9d3207714
   _displayName: "40-\u043C\u043C \u043F\u043E\u0434\u0441\u0442\u0432\u043E\u043B\u044C\u043D\u044B\u0439 \u0433\u0440\u0430\u043D\u0430\u0442\u043E\u043C\u0451\u0442 HK AG36"
   _shortName: AG36
@@ -59,7 +59,7 @@ MonoBehaviour:
     version: 2
     RefIds:
     - rid: 115149081108283532
-      type: {class: WeaponAddonComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
+      type: {class: WeaponAddonComponent, ns: RaidIntoDarkness.Inventory.Domain, asm: RaidIntoDarkness.Inventory}
       data:
         _section: wpn_addon_grenade_launcher_ag36
         _kind: 2
@@ -81,6 +81,6 @@ MonoBehaviour:
         _recoilSnappinessIncreasePercent: 7
         _recoilDampingPercent: 0
     - rid: 115149081108283534
-      type: {class: WorldItemComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
+      type: {class: WorldItemComponent, ns: RaidIntoDarkness.Inventory.Infrastructure, asm: RaidIntoDarkness.Inventory}
       data:
         _prefab: {fileID: 6136950042028187422, guid: c34f9ebd5c25b124f8f4d9f61452dbd3, type: 3}

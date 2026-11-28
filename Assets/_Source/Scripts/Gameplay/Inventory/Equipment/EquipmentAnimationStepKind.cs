@@ -1,4 +1,4 @@
-namespace RaidIntoDarkness.Inventory
+namespace RaidIntoDarkness.Inventory.Infrastructure
 {
     internal enum EquipmentAnimationStepKind
     {

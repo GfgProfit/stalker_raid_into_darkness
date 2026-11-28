@@ -1,3 +1,6 @@
+using RaidIntoDarkness.Inventory.Infrastructure;
+using RaidIntoDarkness.Inventory.Application;
+using RaidIntoDarkness.Inventory.Domain;
 using System.Collections;
 using System.Collections.Generic;
 using RaidIntoDarkness.Inventory;
@@ -681,11 +684,11 @@ namespace RaidIntoDarkness.Inventory.Tests
             {
                 if (change.Item == item && change.Kind == InventoryChangeKind.ItemStateChanged)
                 {
-                    observedShots.Add((InventoryWeaponAmmoSource.GetLoadedMagazine(item), weapons.Reserve, item.GetState(InventoryWeaponAmmoSource.AMMO_SECTION_STATE)));
+                    observedShots.Add((WeaponMagazineState.GetLoadedRounds(item), weapons.Reserve, item.GetState(WeaponMagazineState.AMMO_SECTION_STATE)));
                 }
             }
 
-            string loadedSection = item.GetState(InventoryWeaponAmmoSource.AMMO_SECTION_STATE);
+            string loadedSection = item.GetState(WeaponMagazineState.AMMO_SECTION_STATE);
             float previousCaptureDeltaTime = Time.captureDeltaTime;
             controller.Inventory.Model.Changed += ObserveShot;
             try
@@ -886,7 +889,7 @@ namespace RaidIntoDarkness.Inventory.Tests
             weapons.Hide();
             Assert.That(weapons.State, Is.EqualTo(FirstPersonWeaponState.Hidden));
             Assert.That(ammo.Amount, Is.EqualTo(10));
-            Assert.That(weapon.GetState(InventoryWeaponAmmoSource.MAGAZINE_STATE), Is.Null);
+            Assert.That(weapon.GetState(WeaponMagazineState.MAGAZINE_STATE), Is.Null);
             yield return Tap(_keyboard.digit3Key);
             yield return WaitWhile(() => weapons.State != FirstPersonWeaponState.Ready);
             yield return Tap(_keyboard.rKey);
@@ -949,7 +952,7 @@ namespace RaidIntoDarkness.Inventory.Tests
             weapons.Hide();
             Assert.That(weapons.State, Is.EqualTo(FirstPersonWeaponState.Hidden));
             Assert.That(CountAmmo(model, ep, window.PrimaryContainerId), Is.EqualTo(15));
-            Assert.That(weapon.GetState(InventoryWeaponAmmoSource.MAGAZINE_STATE), Is.EqualTo("0"));
+            Assert.That(weapon.GetState(WeaponMagazineState.MAGAZINE_STATE), Is.EqualTo("0"));
         }
 
         [UnityTest]
@@ -1102,8 +1105,8 @@ namespace RaidIntoDarkness.Inventory.Tests
             ItemInstance launcher = AddItem(model, launcherDefinition, window.PrimaryContainerId, 1);
             Assert.That(model.TrySetItemStateInPlace(launcher, "condition", "0.63"), Is.True);
             ItemInstance loaded = weapon.CreateDraft();
-            loaded.SetState(InventoryWeaponAmmoSource.AMMO_SECTION_STATE, stats.AmmoClasses[0]);
-            loaded.SetState(InventoryWeaponAmmoSource.MAGAZINE_STATE, "3");
+            loaded.SetState(WeaponMagazineState.AMMO_SECTION_STATE, stats.AmmoClasses[0]);
+            loaded.SetState(WeaponMagazineState.MAGAZINE_STATE, "3");
             Assert.That(model.TryReconfigureItem(weapon, loaded, weapon.Location.Position).Success, Is.True);
             float weaponWeight = weapon.UnitWeight;
             Assert.That(model.TryEquip(weapon.InstanceId, window.EquipmentContainerId).Success, Is.True);
@@ -1166,7 +1169,7 @@ namespace RaidIntoDarkness.Inventory.Tests
             AddItem(model, otherGrenade, window.PrimaryContainerId, 1);
             yield return Tap(_keyboard.rKey);
             Assert.That(weapons.State, Is.EqualTo(FirstPersonWeaponState.Ready));
-            Assert.That(weapon.GetState(InventoryWeaponAttachments.GRENADE_ROUND_STATE), Is.Null);
+            Assert.That(weapon.GetState(WeaponAddonComponent.GRENADE_ROUND_STATE), Is.Null);
 
             ItemInstance stack = AddItem(model, grenade, window.PrimaryContainerId, 2);
             Assert.That(ammoView.Text.text, Does.StartWith("0/2 ").And.Contain(grenade.ShortName));
@@ -1186,12 +1189,12 @@ namespace RaidIntoDarkness.Inventory.Tests
             Assert.That(reloadRound.activeSelf, Is.True);
             Assert.That(stack.Amount, Is.EqualTo(1));
             Assert.That(ammoView.Text.text, Does.StartWith("1/1 ").And.Contain(grenade.ShortName));
-            Assert.That(weapon.GetState(InventoryWeaponAttachments.GRENADE_ROUND_STATE), Is.EqualTo(grenade.DefinitionId));
+            Assert.That(weapon.GetState(WeaponAddonComponent.GRENADE_ROUND_STATE), Is.EqualTo(grenade.DefinitionId));
             Assert.That(weapon.UnitWeight, Is.EqualTo(weaponWeight + launcherDefinition.Weight + grenade.Weight).Within(0.0001f));
             yield return Tap(_keyboard.rKey);
             Assert.That(weapons.Magazine, Is.EqualTo(3));
             Assert.That(stack.Amount, Is.EqualTo(1));
-            Assert.That(weapon.GetState(InventoryWeaponAttachments.GRENADE_ROUND_STATE), Is.EqualTo(grenade.DefinitionId));
+            Assert.That(weapon.GetState(WeaponAddonComponent.GRENADE_ROUND_STATE), Is.EqualTo(grenade.DefinitionId));
 
             yield return Tap(_keyboard.vKey);
             Assert.That(weapons.CurrentMotion, Is.EqualTo(FirstPersonWeaponMotionKind.GrenadeModeExit));
@@ -1207,14 +1210,14 @@ namespace RaidIntoDarkness.Inventory.Tests
             ItemInstance returned = model.GetItem(launcher.InstanceId);
             Assert.That(returned.Definition, Is.SameAs(launcherDefinition));
             Assert.That(returned.GetState("condition"), Is.EqualTo("0.63"));
-            Assert.That(returned.GetState(InventoryWeaponAttachments.GRENADE_ROUND_STATE), Is.Null);
+            Assert.That(returned.GetState(WeaponAddonComponent.GRENADE_ROUND_STATE), Is.Null);
             Assert.That(returned.UnitWeight, Is.EqualTo(launcherDefinition.Weight).Within(0.0001f));
             Assert.That(stack.Amount, Is.EqualTo(2));
-            Assert.That(weapon.GetState(InventoryWeaponAttachments.GRENADE_ROUND_STATE), Is.Null);
+            Assert.That(weapon.GetState(WeaponAddonComponent.GRENADE_ROUND_STATE), Is.Null);
             Assert.That(weapons.HasGrenadeLauncher, Is.False);
             Assert.That(FindChild(weapons.Model.transform, "mesh_03_gp25").gameObject.activeSelf, Is.False);
             Assert.That(controller.WeaponAttachments.Install(returned, weapon).Success, Is.True);
-            Assert.That(weapon.GetState(InventoryWeaponAttachments.GRENADE_ROUND_STATE), Is.Null);
+            Assert.That(weapon.GetState(WeaponAddonComponent.GRENADE_ROUND_STATE), Is.Null);
         }
 
         private static void AssertBoltPose(Transform bolt, Vector3 position, Quaternion rotation)

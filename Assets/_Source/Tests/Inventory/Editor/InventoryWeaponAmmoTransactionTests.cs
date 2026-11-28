@@ -1,3 +1,5 @@
+using RaidIntoDarkness.Inventory.Application;
+using RaidIntoDarkness.Inventory.Domain;
 using NUnit.Framework;
 using UnityEditor;
 using UnityEngine;
@@ -195,8 +197,8 @@ namespace RaidIntoDarkness.Inventory.Tests
         private ItemInstance AddWeapon(string containerId, int magazine)
         {
             ItemInstance weapon = _model.CreateItem(_weaponDefinition);
-            weapon.SetState(InventoryWeaponAmmoSource.AMMO_SECTION_STATE, STANDARD_SECTION);
-            weapon.SetState(InventoryWeaponAmmoSource.MAGAZINE_STATE, magazine.ToString(System.Globalization.CultureInfo.InvariantCulture));
+            weapon.SetState(WeaponMagazineState.AMMO_SECTION_STATE, STANDARD_SECTION);
+            weapon.SetState(WeaponMagazineState.MAGAZINE_STATE, magazine.ToString(System.Globalization.CultureInfo.InvariantCulture));
             Assert.That(_model.TryAdd(weapon, containerId, Vector2Int.zero, false).Success, Is.True);
             return weapon;
         }

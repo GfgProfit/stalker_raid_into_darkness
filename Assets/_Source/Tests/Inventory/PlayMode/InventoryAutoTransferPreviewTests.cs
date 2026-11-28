@@ -1,3 +1,5 @@
+using RaidIntoDarkness.Inventory.Domain;
+using RaidIntoDarkness.Inventory.Application;
 using System.Collections;
 using NUnit.Framework;
 using RaidIntoDarkness.Inventory.UI;

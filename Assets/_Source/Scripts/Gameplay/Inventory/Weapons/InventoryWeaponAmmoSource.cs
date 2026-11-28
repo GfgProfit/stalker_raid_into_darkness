@@ -1,17 +1,14 @@
+using RaidIntoDarkness.Inventory.Domain;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using RaidIntoDarkness.Inventory;
 using RaidIntoDarkness.Weapons;
 using UnityEngine;
 
-namespace RaidIntoDarkness.Inventory
+namespace RaidIntoDarkness.Inventory.Application
 {
     public sealed class InventoryWeaponAmmoSource : IFirstPersonWeaponAmmoSource, IDisposable
     {
-        public const string MAGAZINE_STATE = "weapon_magazine";
-        public const string AMMO_SECTION_STATE = "weapon_ammo_section";
-
         private readonly InventoryModel _model;
         private readonly string _containerId;
 
@@ -24,9 +21,9 @@ namespace RaidIntoDarkness.Inventory
 
         public event Action Changed;
 
-        public int GetMagazine(object weaponKey) => GetLoadedMagazine(GetWeapon(weaponKey));
+        public int GetMagazine(object weaponKey) => WeaponMagazineState.GetLoadedRounds(GetWeapon(weaponKey));
 
-        public bool HasLoadedAmmo(ItemInstance weapon) => GetLoadedMagazine(weapon) > 0 || GetGrenadeLauncher(weapon)?.GetLoadedGrenade(weapon) != null;
+        public bool HasLoadedAmmo(ItemInstance weapon) => WeaponMagazineState.GetLoadedRounds(weapon) > 0 || GetGrenadeLauncher(weapon)?.GetLoadedGrenade(weapon) != null;
 
         public InventoryResult Unload(ItemInstance weapon, bool apply = true)
         {
@@ -35,8 +32,8 @@ namespace RaidIntoDarkness.Inventory
                 return InventoryResult.Fail(InventoryFailure.InvalidItem);
             }
 
-            int magazine = GetLoadedMagazine(weapon);
-            ItemDefinition ammo = magazine > 0 ? FindDefinition(weapon.GetState(AMMO_SECTION_STATE)) : null;
+            int magazine = WeaponMagazineState.GetLoadedRounds(weapon);
+            ItemDefinition ammo = magazine > 0 ? FindDefinition(weapon.GetState(WeaponMagazineState.AMMO_SECTION_STATE)) : null;
             ItemDefinition grenade = GetGrenadeLauncher(weapon)?.GetLoadedGrenade(weapon);
 
             if ((magazine == 0 && grenade == null) || (magazine > 0 && (ammo == null || magazine > ammo.MaxStack)))
@@ -50,12 +47,12 @@ namespace RaidIntoDarkness.Inventory
 
             if (returnedAmmo != null)
             {
-                updated.SetState(MAGAZINE_STATE, "0");
+                updated.SetState(WeaponMagazineState.MAGAZINE_STATE, "0");
             }
 
             if (returnedGrenade != null)
             {
-                updated.SetState(InventoryWeaponAttachments.GRENADE_ROUND_STATE, null);
+                updated.SetState(WeaponAddonComponent.GRENADE_ROUND_STATE, null);
             }
 
             string destination = _model.GetContainer(weapon.ContainerId) is SlottedContainer ? _containerId : weapon.ContainerId;
@@ -77,7 +74,7 @@ namespace RaidIntoDarkness.Inventory
                 return string.Empty;
             }
 
-            string loaded = weapon?.GetState(AMMO_SECTION_STATE);
+            string loaded = weapon?.GetState(WeaponMagazineState.AMMO_SECTION_STATE);
 
             if (stats.SupportsAmmo(loaded))
             {
@@ -177,7 +174,7 @@ namespace RaidIntoDarkness.Inventory
                 return false;
             }
 
-            return _model.TrySetItemStateInPlace(weapon, AMMO_SECTION_STATE, section);
+            return _model.TrySetItemStateInPlace(weapon, WeaponMagazineState.AMMO_SECTION_STATE, section);
         }
 
         public bool TrySwitchAmmo(object weaponKey)
@@ -202,7 +199,7 @@ namespace RaidIntoDarkness.Inventory
                     continue;
                 }
 
-                int magazine = GetLoadedMagazine(weapon);
+                int magazine = WeaponMagazineState.GetLoadedRounds(weapon);
                 ItemDefinition returnedAmmo = magazine > 0 ? FindDefinition(current) : null;
                 if (magazine > 0 && returnedAmmo == null)
                 {
@@ -212,10 +209,10 @@ namespace RaidIntoDarkness.Inventory
                 ItemInstance updated = weapon.CreateDraft();
                 if (magazine > 0)
                 {
-                    updated.SetState(MAGAZINE_STATE, "0");
+                    updated.SetState(WeaponMagazineState.MAGAZINE_STATE, "0");
                 }
 
-                updated.SetState(AMMO_SECTION_STATE, next);
+                updated.SetState(WeaponMagazineState.AMMO_SECTION_STATE, next);
                 bool notifyAfterCommit = magazine == 0 && weapon.ContainerId != _containerId;
                 InventoryResult result = _model.TryReturnRoundsAndUpdate(weapon, updated, _model.GetContainer(_containerId), returnedAmmo, magazine);
                 if (result.Success && notifyAfterCommit)
@@ -244,11 +241,11 @@ namespace RaidIntoDarkness.Inventory
             if (weapon.Definition.GetComponent<WeaponStatsComponent>()?.GetIconVariantId(weapon) != null && magazine == 1)
             {
                 ItemInstance updated = weapon.CreateDraft();
-                updated.SetState(MAGAZINE_STATE, remaining);
+                updated.SetState(WeaponMagazineState.MAGAZINE_STATE, remaining);
                 return _model.TryReconfigureItem(weapon, updated, weapon.Location.Position).Success;
             }
 
-            return _model.TrySetItemStateInPlace(weapon, MAGAZINE_STATE, remaining);
+            return _model.TrySetItemStateInPlace(weapon, WeaponMagazineState.MAGAZINE_STATE, remaining);
         }
 
         public bool CanReloadGrenade(object weaponKey) => FindGrenadeStack(GetWeapon(weaponKey)) != null;
@@ -261,7 +258,7 @@ namespace RaidIntoDarkness.Inventory
                 return false;
             }
 
-            return _model.TrySetItemStateInPlace(weapon, InventoryWeaponAttachments.GRENADE_ROUND_STATE, null);
+            return _model.TrySetItemStateInPlace(weapon, WeaponAddonComponent.GRENADE_ROUND_STATE, null);
         }
 
         public bool ReloadGrenade(object weaponKey)
@@ -275,7 +272,7 @@ namespace RaidIntoDarkness.Inventory
             }
 
             ItemInstance updated = weapon.CreateDraft();
-            updated.SetState(InventoryWeaponAttachments.GRENADE_ROUND_STATE, grenade.DefinitionId);
+            updated.SetState(WeaponAddonComponent.GRENADE_ROUND_STATE, grenade.DefinitionId);
             return _model.TryReconfigureItem(weapon, updated, weapon.Location.Position, consumed: grenade).Success;
         }
 
@@ -300,8 +297,8 @@ namespace RaidIntoDarkness.Inventory
                 if (round != null)
                 {
                     ItemInstance updated = weapon.CreateDraft();
-                    updated.SetState(AMMO_SECTION_STATE, section);
-                    updated.SetState(MAGAZINE_STATE, (magazine + 1).ToString(CultureInfo.InvariantCulture));
+                    updated.SetState(WeaponMagazineState.AMMO_SECTION_STATE, section);
+                    updated.SetState(WeaponMagazineState.MAGAZINE_STATE, (magazine + 1).ToString(CultureInfo.InvariantCulture));
                     _model.TryReconfigureItem(weapon, updated, weapon.Location.Position, consumed: round);
                 }
 
@@ -336,26 +333,14 @@ namespace RaidIntoDarkness.Inventory
             }
 
             ItemInstance draft = weapon.CreateDraft();
-            draft.SetState(AMMO_SECTION_STATE, section);
-            draft.SetState(MAGAZINE_STATE, (magazine + taken).ToString(CultureInfo.InvariantCulture));
+            draft.SetState(WeaponMagazineState.AMMO_SECTION_STATE, section);
+            draft.SetState(WeaponMagazineState.MAGAZINE_STATE, (magazine + taken).ToString(CultureInfo.InvariantCulture));
             _model.TryConsumeStacksAndUpdate(weapon, draft, consumed);
         }
 
         public void Dispose()
         {
             _model.Changed -= OnInventoryChanged;
-        }
-
-        internal static int GetLoadedMagazine(ItemInstance weapon)
-        {
-            WeaponStatsComponent stats = weapon?.Definition.GetComponent<WeaponStatsComponent>();
-
-            if (stats == null || stats.SupportsAmmo(weapon.GetState(AMMO_SECTION_STATE)) == false)
-            {
-                return 0;
-            }
-
-            return int.TryParse(weapon.GetState(MAGAZINE_STATE), NumberStyles.Integer, CultureInfo.InvariantCulture, out int magazine) ? Math.Clamp(magazine, 0, stats.MagazineSize) : 0;
         }
 
         public void GetHandGrenadeStock(object weaponKey, out int count, out string name)

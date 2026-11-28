@@ -1,7 +1,10 @@
+using RaidIntoDarkness.Inventory.Infrastructure;
+using RaidIntoDarkness.Inventory.Application;
+using RaidIntoDarkness.Inventory.Domain;
 using System.Collections.Generic;
 using System.Linq;
 using RaidIntoDarkness.Inventory;
-using RaidIntoDarkness.Inventory.IconGeneration;
+using RaidIntoDarkness.Inventory.Infrastructure.IconGeneration;
 using RaidIntoDarkness.Inventory.UI;
 using NUnit.Framework;
 using UnityEditor;
@@ -66,7 +69,7 @@ namespace RaidIntoDarkness.Inventory.Tests
             Assert.That(_model.TrySetItemStateInPlace(first, "condition", "0.63"), Is.True);
             Assert.That(_model.TrySetItemStateInPlace(second, "condition", "0.42"), Is.True);
             ItemInstance loaded = weapon.CreateDraft();
-            loaded.SetState(InventoryWeaponAmmoSource.MAGAZINE_STATE, "17");
+            loaded.SetState(WeaponMagazineState.MAGAZINE_STATE, "17");
             Assert.That(_model.TryReconfigureItem(weapon, loaded, weapon.Location.Position).Success, Is.True);
             Assert.That(_attachments.Install(silencer, weapon).Success, Is.True);
             Vector2Int size = weapon.GetSize(false);
@@ -90,7 +93,7 @@ namespace RaidIntoDarkness.Inventory.Tests
             Assert.That(_model.GetItem(second.InstanceId).GetState("condition"), Is.EqualTo("0.42"));
             Assert.That(_attachments.GetScope(weapon), Is.Null);
             Assert.That(_attachments.GetSilencer(weapon), Is.SameAs(silencer.Definition));
-            Assert.That(weapon.GetState(InventoryWeaponAmmoSource.MAGAZINE_STATE), Is.EqualTo("17"));
+            Assert.That(weapon.GetState(WeaponMagazineState.MAGAZINE_STATE), Is.EqualTo("17"));
             Assert.That(_model.GetContainer("bag").TotalWeight + _model.GetContainer("loot").TotalWeight, Is.EqualTo(total).Within(0.0001f));
         }
 
@@ -186,7 +189,7 @@ namespace RaidIntoDarkness.Inventory.Tests
             preview.SetMountedWeaponAttachment(WeaponAddonKind.Scope, null);
             Assert.That(_attachments.GetScope(weapon), Is.SameAs(_first));
             ItemInstance updated = weapon.CreateDraft();
-            updated.SetState(InventoryWeaponAmmoSource.MAGAZINE_STATE, "17");
+            updated.SetState(WeaponMagazineState.MAGAZINE_STATE, "17");
             Assert.That(_model.TryReconfigureItem(weapon, updated, weapon.Location.Position).Success, Is.True);
 
             Assert.That(_attachments.DetachScope(weapon).Success, Is.True);
@@ -197,7 +200,7 @@ namespace RaidIntoDarkness.Inventory.Tests
             Assert.That(returned.VisualVariant, Is.EqualTo(scope.VisualVariant));
             Assert.That(returned.ContainerId, Is.EqualTo("bag"));
             Assert.That(_attachments.GetScope(weapon), Is.Null);
-            Assert.That(weapon.GetState(InventoryWeaponAmmoSource.MAGAZINE_STATE), Is.EqualTo("17"));
+            Assert.That(weapon.GetState(WeaponMagazineState.MAGAZINE_STATE), Is.EqualTo("17"));
         }
 
         [Test]

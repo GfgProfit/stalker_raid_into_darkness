@@ -1,10 +1,10 @@
+using RaidIntoDarkness.Inventory.Domain;
 using System.Collections.Generic;
 using System.Globalization;
-using RaidIntoDarkness.Inventory;
 using RaidIntoDarkness.Player;
 using XRay.Importer.Levels;
 
-namespace RaidIntoDarkness.Inventory
+namespace RaidIntoDarkness.Inventory.Infrastructure
 {
     public static class AnomalyEquipmentWear
     {

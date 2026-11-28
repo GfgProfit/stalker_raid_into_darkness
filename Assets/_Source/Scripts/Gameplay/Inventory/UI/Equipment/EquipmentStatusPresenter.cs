@@ -1,9 +1,8 @@
-using RaidIntoDarkness.Inventory;
-using RaidIntoDarkness.Inventory.UI;
+using RaidIntoDarkness.Inventory.Domain;
 using UnityEngine;
 using XRay.Importer.Levels;
 
-namespace RaidIntoDarkness.Inventory
+namespace RaidIntoDarkness.Inventory.UI
 {
     public sealed class EquipmentStatusPresenter
     {
@@ -49,8 +48,8 @@ namespace RaidIntoDarkness.Inventory
 
         public void Refresh(ItemInstance hovered, bool fullCondition)
         {
-            ItemInstance outfit = EquipmentStatsFormatter.FindEquipped(_window, EquipmentStatsFormatter.OUTFIT_CATEGORY);
-            ItemInstance helmet = EquipmentStatsFormatter.FindEquipped(_window, EquipmentStatsFormatter.HELMET_CATEGORY);
+            ItemInstance outfit = EquipmentItemStats.FindEquipped(_window.Model?.GetContainer(_window.EquipmentContainerId), EquipmentStatsFormatter.OUTFIT_CATEGORY);
+            ItemInstance helmet = EquipmentItemStats.FindEquipped(_window.Model?.GetContainer(_window.EquipmentContainerId), EquipmentStatsFormatter.HELMET_CATEGORY);
             EquipmentStatsComponent outfitStats = GetStats(outfit);
             EquipmentStatsComponent hoveredStats = IsBonusCandidate(hovered) ? GetStats(hovered) : null;
             bool hoveredOutfit = hoveredStats != null && hovered.Definition.IsCategory(EquipmentStatsFormatter.OUTFIT_CATEGORY);
@@ -125,7 +124,7 @@ namespace RaidIntoDarkness.Inventory
                 value += stats.GetValue(EquipmentStat.HelmetFireWound);
             }
 
-            return value * (fullCondition ? 1f : EquipmentStatsFormatter.GetCondition(item));
+            return value * (fullCondition ? 1f : AnomalyEquipmentProtection.GetCondition(item));
         }
     }
 }

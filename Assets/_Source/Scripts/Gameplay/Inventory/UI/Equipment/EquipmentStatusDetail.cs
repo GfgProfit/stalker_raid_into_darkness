@@ -1,6 +1,6 @@
 using XRay.Importer.Levels;
 
-namespace RaidIntoDarkness.Inventory
+namespace RaidIntoDarkness.Inventory.UI
 {
     internal readonly struct EquipmentStatusDetail
     {

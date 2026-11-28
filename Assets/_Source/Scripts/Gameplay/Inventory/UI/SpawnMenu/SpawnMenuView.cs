@@ -1,11 +1,11 @@
+using RaidIntoDarkness.Inventory.Infrastructure;
+using RaidIntoDarkness.Inventory.Application;
+using RaidIntoDarkness.Inventory.Domain;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
-using RaidIntoDarkness.Inventory;
-using RaidIntoDarkness.Inventory.UI;
 using R3;
-using RaidIntoDarkness.Inventory;
 using RaidIntoDarkness.Settings;
 using TMPro;
 using UnityEngine;
@@ -13,7 +13,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
-namespace RaidIntoDarkness.UI
+namespace RaidIntoDarkness.Inventory.UI
 {
     [DisallowMultipleComponent]
     public sealed class SpawnMenuView : MonoBehaviour
@@ -468,7 +468,7 @@ namespace RaidIntoDarkness.UI
             int packSize = _selected.PackSize;
             int quantity = _selected.GetUnitCount(_selected.Quantity);
             int condition = _selected.SupportsCondition ? _selected.Condition : 100;
-            int added = InventorySpawn.Grant(_inventory, _inventory.PrimaryContainerId, _selected.Definition, quantity, condition, out InventoryFailure failure);
+            int added = InventorySpawn.Grant(_inventory.isActiveAndEnabled ? _inventory.Model : null, _inventory.PrimaryContainerId, _selected.Definition, quantity, condition, out InventoryFailure failure);
             if (added == quantity)
             {
                 _status.text = packSize > 1 ? $"Выдано пачек: {_selected.Quantity} ({added} патр.)" : $"Выдано: {added}";

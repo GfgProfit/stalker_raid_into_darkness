@@ -11,7 +11,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: da0f90c2955673d46b25d465cbe44ed0, type: 3}
   m_Name: merc_ace_outfit_definition
-  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.ItemDefinition
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.Domain.ItemDefinition
   _definitionId: f4934dc0af9022948bbed7b3255bed8a
   _displayName: "\u0411\u0440\u043E\u043D\u0435\u043A\u043E\u0441\u0442\u044E\u043C \u0441 \u0417\u0421\u0414 \xAB\u0410\u0441\xBB"
   _shortName: HEAVY
@@ -59,11 +59,11 @@ MonoBehaviour:
     version: 2
     RefIds:
     - rid: 3479885471900762284
-      type: {class: EquippableItemComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
+      type: {class: EquippableItemComponent, ns: RaidIntoDarkness.Inventory.Domain, asm: RaidIntoDarkness.Inventory}
       data:
         _preferredSlotIds: 04000000i
     - rid: 3479885471900762285
-      type: {class: EquipmentStatsComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
+      type: {class: EquipmentStatsComponent, ns: RaidIntoDarkness.Inventory.Domain, asm: RaidIntoDarkness.Inventory}
       data:
         _section: merc_ace_outfit
         _cost: 84340
@@ -132,6 +132,6 @@ MonoBehaviour:
             _average: 18
             _strong: 13
     - rid: 3479885472039698518
-      type: {class: WorldItemComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
+      type: {class: WorldItemComponent, ns: RaidIntoDarkness.Inventory.Infrastructure, asm: RaidIntoDarkness.Inventory}
       data:
         _prefab: {fileID: 7414402306321177051, guid: e61cfcf7be150f64f8588e5ca3a90d3c, type: 3}

@@ -1,52 +1,56 @@
+using RaidIntoDarkness.Inventory.Domain;
 using System;
-using RaidIntoDarkness.Inventory;
-using RaidIntoDarkness.Inventory.UI;
+using RaidIntoDarkness.Inventory.Application;
 using RaidIntoDarkness.FirstPerson;
 using RaidIntoDarkness.Player;
 using RaidIntoDarkness.Weapons;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace RaidIntoDarkness.Inventory
+namespace RaidIntoDarkness.Inventory.Infrastructure
 {
     [DisallowMultipleComponent]
-    public sealed class WorldItemInteractor : MonoBehaviour
+    public sealed class WorldItemInteractor : MonoBehaviour, IWorldItemInteraction
     {
-        private const float DROP_HEIGHT_BELOW_VIEW = 0.3f;
-        private const float DROP_FORWARD_SPEED = 2.1f;
-        private const float DROP_DOWNWARD_SPEED = 0.65f;
-        private const float DROP_PITCH_SPEED = 4f;
-        private const float DROP_ROLL_SPEED = 2f;
-        private const float DROP_MAX_DEPENETRATION_SPEED = 2f;
-        private const float DROP_OBSTRUCTION_IGNORE_SECONDS = 0.65f;
-
-        [SerializeField] private InventoryWindowController _controller;
         [SerializeField] private InputActionReference _pickUp;
         [SerializeField] [Min(0.1f)] private float _pickUpDistance = 3f;
         [SerializeField] [Min(0f)] private float _aimRadius = 0.15f;
         [SerializeField] [Min(0.1f)] private float _dropDistance = 1f;
         [SerializeField] private LayerMask _mask = ~0;
 
-        private readonly RaycastHit[] _hits = new RaycastHit[32];
-        private readonly WorldItemDropPlacement _dropPlacement = new();
+        private readonly WorldItemTargetSearch _targetSearch = new();
+        private readonly InventoryObservers<Action<(ItemInstance Item, InventoryResult Result)>> _pickupObservers = new();
         private PlayerInventoryRuntime _inventory;
-        private InventoryWindow _dropWindow;
         private WorldItem _hintTarget;
         private WorldItem _pickupTarget;
         private bool _pickupPending;
 
+        public event Action<string> HintChanged;
+        public event Action<bool> DropAvailabilityChanged;
+
+        public event Action<(ItemInstance Item, InventoryResult Result)> PickupCompleted
+        {
+            add => _pickupObservers.Add(value);
+            remove => _pickupObservers.Remove(value);
+        }
+
+        public bool CanDrop => isActiveAndEnabled && _inventory != null;
+        public string ActivePickupBinding => _hintTarget != null ? _pickUp != null && _pickUp.action != null ? _pickUp.action.GetBindingDisplayString() : string.Empty : null;
         public bool IsPickingUp => _pickupPending;
         public WorldItem PickupTarget => _pickupPending ? _pickupTarget : null;
 
         private StalkerPlayerController Player => _inventory != null ? _inventory.Player : null;
 
-        public void Configure(InventoryWindowController controller, InputActionReference pickUp)
+        public void Configure(InputActionReference pickUp)
         {
-            _controller = controller;
             _pickUp = pickUp;
         }
 
-        internal void BindInventory(PlayerInventoryRuntime inventory) => _inventory = inventory;
+        internal void BindInventory(PlayerInventoryRuntime inventory)
+        {
+            _inventory = inventory;
+            DropAvailabilityChanged?.Invoke(CanDrop);
+        }
 
         internal void UnbindInventory(PlayerInventoryRuntime inventory)
         {
@@ -58,49 +62,10 @@ namespace RaidIntoDarkness.Inventory
             CancelPickup();
             _inventory = null;
             SetHintTarget(null);
+            DropAvailabilityChanged?.Invoke(false);
         }
 
-        public WorldItem FindTarget()
-        {
-            StalkerPlayerController owner = Player;
-            Transform view = GetView(owner);
-
-            if (view == null)
-            {
-                return null;
-            }
-
-            Transform player = owner.transform.root;
-            float blocker = _pickUpDistance;
-            int count = Physics.RaycastNonAlloc(view.position, view.forward, _hits, _pickUpDistance, _mask, QueryTriggerInteraction.Ignore);
-
-            for (int i = 0; i < count; i++)
-            {
-                Collider collider = _hits[i].collider;
-
-                if (collider.transform.IsChildOf(player) == false && collider.GetComponentInParent<WorldItem>() == null && _hits[i].distance < blocker)
-                {
-                    blocker = _hits[i].distance;
-                }
-            }
-
-            count = Physics.SphereCastNonAlloc(view.position, _aimRadius, view.forward, _hits, _pickUpDistance, _mask, QueryTriggerInteraction.Ignore);
-            WorldItem target = null;
-            float nearest = float.MaxValue;
-
-            for (int i = 0; i < count; i++)
-            {
-                WorldItem worldItem = _hits[i].collider.GetComponentInParent<WorldItem>();
-
-                if (worldItem != null && worldItem.isActiveAndEnabled && _hits[i].distance <= blocker + _aimRadius && _hits[i].distance < nearest)
-                {
-                    target = worldItem;
-                    nearest = _hits[i].distance;
-                }
-            }
-
-            return target;
-        }
+        public WorldItem FindTarget() => _targetSearch.Find(Player, _pickUpDistance, _aimRadius, _mask);
 
         public bool BeginPickUp(WorldItem worldItem)
         {
@@ -148,14 +113,9 @@ namespace RaidIntoDarkness.Inventory
                 ItemInstance item = worldItem.Instance ?? model.CreateItem(worldItem.Definition, worldItem.Amount);
                 InventoryResult result = model.TryAddAuto(item, inventory.PrimaryContainerId);
 
-                InventoryWindow window = _controller != null ? _controller.Window : null;
                 if (result.Success == false)
                 {
-                    if (window != null)
-                    {
-                        window.ShowStatus(window.Label("failure_" + result.Failure, result.Failure.ToString()));
-                    }
-
+                    PublishPickup(item, result);
                     return false;
                 }
 
@@ -167,12 +127,7 @@ namespace RaidIntoDarkness.Inventory
                     Destroy(pickedObject);
                 }
 
-                if (window != null)
-                {
-                    window.ShowStatus(window.FormatLabel("status_picked", "Picked up {0}", item.Definition.DisplayName));
-                }
-
-                PlayTakeSound(item);
+                PublishPickup(item, result);
                 return true;
             }
             finally
@@ -187,15 +142,15 @@ namespace RaidIntoDarkness.Inventory
         public WorldItem Spawn(ItemDefinition definition, int amount)
         {
             StalkerPlayerController player = Player;
-            Transform view = GetView(player);
-            WorldItem prefab = GetWorldPrefab(definition);
+            Transform view = WorldItemDrop.GetView(player);
+            WorldItem prefab = WorldItemDrop.GetWorldPrefab(definition);
 
             if (view == null || prefab == null)
             {
                 return null;
             }
 
-            Vector3 forward = GetHorizontalForward(view, player.transform);
+            Vector3 forward = WorldItemDrop.GetHorizontalForward(view, player.transform);
             CharacterController character = player.GetComponent<CharacterController>();
             WorldItem worldItem = Instantiate(prefab, view.position, Quaternion.LookRotation(forward, Vector3.up));
             worldItem.Configure(definition, amount);
@@ -227,27 +182,14 @@ namespace RaidIntoDarkness.Inventory
                 _pickUp.action.Enable();
             }
 
-            if (_controller != null && _controller.Window != null)
-            {
-                _dropWindow = _controller.Window;
-                _dropWindow.DropToWorld = TryDropToWorld;
-            }
+            DropAvailabilityChanged?.Invoke(CanDrop);
         }
 
         private void OnDisable()
         {
             SetHintTarget(null);
             CancelPickup();
-
-            if (_dropWindow != null)
-            {
-                if (_dropWindow.DropToWorld == TryDropToWorld)
-                {
-                    _dropWindow.DropToWorld = null;
-                }
-
-                _dropWindow = null;
-            }
+            DropAvailabilityChanged?.Invoke(false);
         }
 
         private void Update()
@@ -257,7 +199,7 @@ namespace RaidIntoDarkness.Inventory
                 return;
             }
 
-            if ((_controller != null && (_controller.IsOpen || _controller.GameplayBlocked)) || IsReloading())
+            if (Player != null && Player.GameplayInputBlocked || IsReloading())
             {
                 SetHintTarget(null);
                 return;
@@ -282,21 +224,7 @@ namespace RaidIntoDarkness.Inventory
             }
 
             _hintTarget = target;
-            InventoryWindow window = _controller != null ? _controller.Window : null;
-
-            if (window == null)
-            {
-                return;
-            }
-
-            if (target == null)
-            {
-                window.ClearHint();
-                return;
-            }
-
-            string key = _pickUp != null && _pickUp.action != null ? _pickUp.action.GetBindingDisplayString() : string.Empty;
-            window.ShowHint(window.FormatLabel("hint_pick_up", "[{0}] Pick up", key));
+            HintChanged?.Invoke(ActivePickupBinding);
         }
 
         private WorldItem FindAvailableTarget()
@@ -336,12 +264,9 @@ namespace RaidIntoDarkness.Inventory
             _pickupPending = false;
         }
 
-        private void PlayTakeSound(ItemInstance item)
+        private void PublishPickup(ItemInstance item, InventoryResult result)
         {
-            if (_controller != null)
-            {
-                _controller.ItemSounds?.PlayTake(item);
-            }
+            _pickupObservers.Publish((Item: item, Result: result), static (observer, value) => observer(value), static value => $"{nameof(PickupCompleted)} for item '{value.Item.InstanceId}'");
         }
 
         private bool IsReloading()
@@ -354,171 +279,6 @@ namespace RaidIntoDarkness.Inventory
         {
             StalkerPlayerController player = Player;
             return player != null ? player.Pickup : null;
-        }
-
-        private InventoryResult TryDropToWorld(ItemInstance item) => _inventory != null ? _inventory.TryDrop(item) : InventoryResult.Fail(InventoryFailure.ContainerNotFound);
-
-        internal InventoryResult TryDropToWorld(PlayerInventoryRuntime inventory, ItemInstance item)
-        {
-            InventoryModel model = inventory.Model;
-
-            if (model.ContainsItem(item) == false)
-            {
-                return InventoryResult.Fail(InventoryFailure.ItemNotFound);
-            }
-
-            StalkerPlayerController owner = inventory.Player;
-            Transform view = GetView(owner);
-            WorldItem prefab = GetWorldPrefab(item.Definition);
-
-            if (view == null || prefab == null)
-            {
-                return InventoryResult.Fail(InventoryFailure.InvalidItem);
-            }
-
-            Transform player = owner.transform;
-            Vector3 forward = GetHorizontalForward(view, player);
-            Vector3 right = Vector3.Cross(Vector3.up, forward);
-            CharacterController character = owner.GetComponent<CharacterController>();
-            Vector3 origin = character != null ? character.bounds.center : view.position;
-            origin.y = view.position.y - DROP_HEIGHT_BELOW_VIEW;
-            WorldItem worldItem = Instantiate(prefab, origin, Quaternion.LookRotation(right, Vector3.up));
-            worldItem.Configure(item);
-            Collider[] colliders = worldItem.GetComponentsInChildren<Collider>();
-
-            if (_dropPlacement.TryFindPosition(worldItem.transform, colliders, player.root, origin, forward, out Vector3 position, out Vector3 direction) == false)
-            {
-                worldItem.gameObject.SetActive(false);
-                Destroy(worldItem.gameObject);
-                return InventoryResult.Fail(InventoryFailure.NoSpace);
-            }
-
-            worldItem.transform.position = position;
-            Physics.SyncTransforms();
-            InventoryResult result = model.TryRemove(item.InstanceId);
-
-            if (result.Success == false)
-            {
-                worldItem.gameObject.SetActive(false);
-                Destroy(worldItem.gameObject);
-                return result;
-            }
-
-            ApplyDropMotion(owner, worldItem, colliders, direction);
-            return result;
-        }
-
-        internal bool CanPrepareOutfitDrop(StalkerPlayerController owner, ItemInstance item)
-        {
-            WorldItem prefab = GetWorldPrefab(item.Definition);
-            return GetView(owner) != null && prefab != null && prefab.enabled && prefab.gameObject.activeSelf && prefab.TryGetComponent<Rigidbody>(out _);
-        }
-
-        internal InventoryResult TryPrepareOutfitDrop(StalkerPlayerController owner, ItemInstance item, out PreparedWorldItemDrop drop)
-        {
-            drop = default;
-            Transform view = GetView(owner);
-            WorldItem prefab = GetWorldPrefab(item.Definition);
-            if (view == null || prefab == null || prefab.enabled == false || prefab.gameObject.activeSelf == false || prefab.TryGetComponent<Rigidbody>(out _) == false)
-            {
-                return InventoryResult.Fail(InventoryFailure.NoSpace);
-            }
-
-            Transform player = owner.transform;
-            Vector3 forward = GetHorizontalForward(view, player);
-            Vector3 right = Vector3.Cross(Vector3.up, forward);
-            CharacterController character = owner.GetComponent<CharacterController>();
-            Vector3 origin = character != null ? character.bounds.center : view.position;
-            origin.y = view.position.y - DROP_HEIGHT_BELOW_VIEW;
-            var staging = new GameObject(nameof(PreparedWorldItemDrop));
-            staging.SetActive(false);
-            WorldItem worldItem = null;
-
-            try
-            {
-                worldItem = Instantiate(prefab, origin, Quaternion.LookRotation(right, Vector3.up), staging.transform);
-                worldItem.enabled = false;
-                worldItem.transform.SetParent(null, true);
-                worldItem.ConfigureDropAppearance(item);
-                Collider[] colliders = worldItem.GetComponentsInChildren<Collider>();
-                if (_dropPlacement.TryFindPosition(worldItem.transform, colliders, player.root, origin, forward, out Vector3 position, out Vector3 direction) == false)
-                {
-                    return InventoryResult.Fail(InventoryFailure.NoSpace);
-                }
-
-                worldItem.transform.position = position;
-                Physics.SyncTransforms();
-                drop = new PreparedWorldItemDrop(worldItem, colliders, direction);
-                worldItem = null;
-                return InventoryResult.Ok(item, item.Amount);
-            }
-            finally
-            {
-                if (worldItem != null)
-                {
-                    CancelOutfitDrop(new PreparedWorldItemDrop(worldItem, null, default));
-                }
-
-                Destroy(staging);
-            }
-        }
-
-        internal static void CancelOutfitDrop(PreparedWorldItemDrop drop)
-        {
-            if (drop.WorldItem != null)
-            {
-                drop.WorldItem.gameObject.SetActive(false);
-                Destroy(drop.WorldItem.gameObject);
-            }
-        }
-
-        internal static void CompleteOutfitDrop(StalkerPlayerController owner, PreparedWorldItemDrop drop, ItemInstance item)
-        {
-            drop.WorldItem.CompleteDrop(item);
-            ApplyDropMotion(owner, drop.WorldItem, drop.Colliders, drop.Direction);
-            drop.WorldItem.enabled = true;
-        }
-
-        private static void ApplyDropMotion(StalkerPlayerController owner, WorldItem worldItem, Collider[] colliders, Vector3 direction)
-        {
-            Rigidbody body = worldItem.GetComponent<Rigidbody>();
-            if (worldItem.TryGetComponent(out WorldItemImpactSound impactSound))
-            {
-                impactSound.ExpectInventoryDropImpact();
-            }
-
-            body.maxDepenetrationVelocity = DROP_MAX_DEPENETRATION_SPEED;
-            body.linearVelocity = direction * DROP_FORWARD_SPEED - Vector3.up * DROP_DOWNWARD_SPEED;
-            body.angularVelocity = Vector3.Cross(Vector3.up, direction) * DROP_PITCH_SPEED + direction * DROP_ROLL_SPEED;
-            FirstPersonRig rig = owner.Rig;
-            if (rig != null)
-            {
-                rig.IgnoreWeaponObstruction(colliders, DROP_OBSTRUCTION_IGNORE_SECONDS);
-            }
-        }
-
-        private static Vector3 GetHorizontalForward(Transform view, Transform player)
-        {
-            Vector3 forward = Vector3.ProjectOnPlane(view.forward, Vector3.up);
-
-            if (forward.sqrMagnitude < 0.01f)
-            {
-                forward = Vector3.ProjectOnPlane(player.forward, Vector3.up);
-            }
-
-            return forward.normalized;
-        }
-
-        private static WorldItem GetWorldPrefab(ItemDefinition definition) => definition != null && definition.TryGetComponent(out WorldItemComponent component) ? component.Prefab : null;
-
-        private static Transform GetView(StalkerPlayerController player)
-        {
-            if (player == null || player.CameraController == null || player.CameraController.Camera == null)
-            {
-                return null;
-            }
-
-            return player.CameraController.Camera.transform;
         }
     }
 }

@@ -11,7 +11,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: da0f90c2955673d46b25d465cbe44ed0, type: 3}
   m_Name: wpn_knife_m9_definition
-  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.ItemDefinition
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.Domain.ItemDefinition
   _definitionId: 5a88cd1704678fd438a1469c42bfccc6
   _displayName: "\u0410\u0440\u043C\u0435\u0439\u0441\u043A\u0438\u0439 \u0448\u0442\u044B\u043A-\u043D\u043E\u0436 M9"
   _shortName: M9
@@ -61,11 +61,11 @@ MonoBehaviour:
     version: 2
     RefIds:
     - rid: 115149112346673299
-      type: {class: EquippableItemComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
+      type: {class: EquippableItemComponent, ns: RaidIntoDarkness.Inventory.Domain, asm: RaidIntoDarkness.Inventory}
       data:
         _preferredSlotIds: 08000000i
     - rid: 115149112346673300
-      type: {class: WeaponStatsComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
+      type: {class: WeaponStatsComponent, ns: RaidIntoDarkness.Inventory.Domain, asm: RaidIntoDarkness.Inventory}
       data:
         _section: wpn_knife_m9
         _weaponClass: knife
@@ -94,7 +94,7 @@ MonoBehaviour:
         _blockSilencerWithGrenadeLauncher: 0
         _exposedRound: {fileID: 0}
     - rid: 115149112346673301
-      type: {class: WeaponHudComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
+      type: {class: WeaponHudComponent, ns: RaidIntoDarkness.Inventory.Infrastructure, asm: RaidIntoDarkness.Inventory}
       data:
         _hudModel: {fileID: -6951082309478824560, guid: bb2c0d068f27bae40af09d9657bef171, type: 3}
         _weaponMotions: {fileID: 0}
@@ -104,6 +104,6 @@ MonoBehaviour:
         _firstPersonWeapon: {fileID: 11400000, guid: 7cda49469fc96aa43a5ab0bea03b0447, type: 2}
         _scopeAimOffsets: []
     - rid: 115149112346673302
-      type: {class: WorldItemComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
+      type: {class: WorldItemComponent, ns: RaidIntoDarkness.Inventory.Infrastructure, asm: RaidIntoDarkness.Inventory}
       data:
         _prefab: {fileID: 8567709524580085540, guid: 4321a682df30d914a88f3e8d77a54c09, type: 3}

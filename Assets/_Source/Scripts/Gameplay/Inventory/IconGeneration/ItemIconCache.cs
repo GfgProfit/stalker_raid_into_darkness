@@ -1,3 +1,5 @@
+using RaidIntoDarkness.Inventory.Domain;
+using RaidIntoDarkness.Inventory.Application;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -5,49 +7,26 @@ using Cysharp.Threading.Tasks;
 using UnityEngine;
 using Stopwatch = System.Diagnostics.Stopwatch;
 
-namespace RaidIntoDarkness.Inventory.IconGeneration
+namespace RaidIntoDarkness.Inventory.Infrastructure.IconGeneration
 {
-    public static class ItemIconCache
+    internal sealed class ItemIconCache : IDisposable
     {
-        private static Dictionary<IconCacheKey, IconCacheEntry> _cache = new();
-        private static readonly Dictionary<IconCacheKey, UniTaskCompletionSource<Sprite>> _inFlight = new();
-        private static readonly Queue<StandaloneGenerationRequest> _standaloneQueue = new();
-        private static CancellationTokenSource _generationCancellation = new();
-        private static ItemIconRenderSession _standaloneRenderSession;
-        private static ItemIconGeneratorSettings _standaloneRenderSettings;
-        private static int _standaloneRenderSettingsHash;
-        private static bool _standaloneWorkerRunning;
-        private static bool _releaseStandaloneRenderSessionWhenWorkerStops;
+        private readonly Dictionary<IconCacheKey, IconCacheEntry> _cache = new();
+        private readonly Dictionary<IconCacheKey, UniTaskCompletionSource<Sprite>> _inFlight = new();
+        private readonly Queue<StandaloneGenerationRequest> _standaloneQueue = new();
+        private CancellationTokenSource _generationCancellation = new();
+        private ItemIconRenderSession _standaloneRenderSession;
+        private ItemIconGeneratorSettings _standaloneRenderSettings;
+        private int _standaloneRenderSettingsHash;
+        private bool _standaloneWorkerRunning;
+        private bool _releaseStandaloneRenderSessionWhenWorkerStops;
+        private bool _disposed;
 
-        public static bool IsPrewarmed { get; private set; }
-        public static int CachedCount => _cache.Count;
-        public static int GeneratedCount { get; private set; }
-        public static bool IsWorking => _standaloneWorkerRunning || _standaloneQueue.Count > 0 || _inFlight.Count > 0;
+        public bool IsPrewarmed { get; private set; }
+        public int GeneratedCount { get; private set; }
+        public bool IsWorking => _standaloneWorkerRunning || _standaloneQueue.Count > 0 || _inFlight.Count > 0;
 
-        public static Sprite GetOrCreate(ItemDefinition definition, IReadOnlyList<string> variantIds = null)
-        {
-            return definition == null ? null : GetOrCreate(definition, definition.Width, definition.Height, ItemIconProfileType.Default, variantIds);
-        }
-
-        public static Sprite GetOrCreate(ItemDefinition definition, int width, int height, ItemIconProfileType profileType, IReadOnlyList<string> variantIds = null)
-        {
-            if (definition == null)
-            {
-                return null;
-            }
-
-            if (definition.IconOverride != null)
-            {
-                return definition.IconOverride;
-            }
-
-            ItemIconGeneratorSettings settings = ItemIconGeneratorSettings.LoadDefault();
-            IconRenderProfile renderProfile = IconRenderProfile.Create(definition, width, height, profileType, settings);
-            IconCacheKey key = ItemIconStableKeyBuilder.Build(definition, variantIds, settings, renderProfile);
-            return TryGetCachedSprite(key, out Sprite cachedSprite) ? cachedSprite : definition.FallbackIcon;
-        }
-
-        public static bool TryGet(ItemDefinition definition, int width, int height, ItemIconProfileType profileType, IReadOnlyList<string> variantIds, out Sprite icon)
+        public bool TryGet(ItemDefinition definition, int width, int height, ItemIconProfileType profileType, IReadOnlyList<string> variantIds, out Sprite icon)
         {
             if (definition == null)
             {
@@ -70,7 +49,7 @@ namespace RaidIntoDarkness.Inventory.IconGeneration
                 return true;
             }
 
-            if (definition.CanGenerateIcon == false)
+            if (_disposed || definition.CanGenerateIcon == false)
             {
                 icon = definition.FallbackIcon;
                 return true;
@@ -79,12 +58,7 @@ namespace RaidIntoDarkness.Inventory.IconGeneration
             return false;
         }
 
-        public static UniTask<Sprite> GetOrCreateAsync(ItemDefinition definition, IReadOnlyList<string> variantIds = null, CancellationToken cancellationToken = default)
-        {
-            return definition == null ? UniTask.FromResult<Sprite>(null) : GetOrCreateAsync(definition, definition.Width, definition.Height, ItemIconProfileType.Default, variantIds, cancellationToken);
-        }
-
-        public static UniTask<Sprite> GetOrCreateAsync(ItemDefinition definition, int width, int height, ItemIconProfileType profileType, IReadOnlyList<string> variantIds = null, CancellationToken cancellationToken = default)
+        public UniTask<Sprite> GetOrCreateAsync(ItemDefinition definition, int width, int height, ItemIconProfileType profileType, IReadOnlyList<string> variantIds = null, CancellationToken cancellationToken = default)
         {
             if (definition == null)
             {
@@ -96,20 +70,22 @@ namespace RaidIntoDarkness.Inventory.IconGeneration
             return GetOrCreateStandaloneAsync(definition, variantIds, settings, renderProfile, cancellationToken);
         }
 
-        public static async UniTask PrewarmAsync(IReadOnlyList<ItemDefinition> definitions, IReadOnlyList<ItemIconSlotProfile> slotProfiles, Action<int, int, ItemDefinition> progressCallback, CancellationToken cancellationToken)
+        public async UniTask PrewarmAsync(IReadOnlyList<ItemDefinition> definitions, CancellationToken cancellationToken)
         {
-            if (definitions == null)
+            if (_disposed || definitions == null)
             {
                 return;
             }
 
+            using var linkedCancellation = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, _generationCancellation.Token);
+            cancellationToken = linkedCancellation.Token;
+            cancellationToken.ThrowIfCancellationRequested();
             ItemIconGeneratorSettings settings = ItemIconGeneratorSettings.LoadDefault();
-            List<PrewarmRequest> requests = BuildPrewarmRequests(BuildUniqueList(definitions), slotProfiles, settings);
+            List<PrewarmRequest> requests = BuildPrewarmRequests(BuildUniqueList(definitions), settings.PrewarmSlotProfiles, settings);
             int total = requests.Count;
             float frameBudgetMilliseconds = settings.PrewarmFrameBudgetMilliseconds;
             int budgetFrame = -1;
             var frameTimer = new Stopwatch();
-            progressCallback?.Invoke(0, total, null);
 
             if (total == 0)
             {
@@ -152,8 +128,6 @@ namespace RaidIntoDarkness.Inventory.IconGeneration
                     CacheFallbackSprite(request.Key, request.Definition);
                 }
 
-                progressCallback?.Invoke(i + 1, total, request.Definition);
-
                 if (budgetFrame == Time.frameCount && frameTimer.Elapsed.TotalMilliseconds >= frameBudgetMilliseconds)
                 {
                     await UniTask.Yield(PlayerLoopTiming.Update, cancellationToken);
@@ -165,13 +139,32 @@ namespace RaidIntoDarkness.Inventory.IconGeneration
             IsPrewarmed = true;
         }
 
-        public static void Clear()
+        public void Clear()
+        {
+            if (_disposed == false)
+            {
+                ReleaseCache(restart: true);
+            }
+        }
+
+        public void Dispose()
+        {
+            if (_disposed)
+            {
+                return;
+            }
+
+            _disposed = true;
+            ReleaseCache(restart: false);
+        }
+
+        private void ReleaseCache(bool restart)
         {
             IsPrewarmed = false;
             CancellationToken canceledGenerationToken = _generationCancellation.Token;
             _generationCancellation.Cancel();
             _generationCancellation.Dispose();
-            _generationCancellation = new CancellationTokenSource();
+            _generationCancellation = restart ? new CancellationTokenSource() : null;
 
             foreach (UniTaskCompletionSource<Sprite> completionSource in _inFlight.Values)
             {
@@ -212,13 +205,18 @@ namespace RaidIntoDarkness.Inventory.IconGeneration
             GeneratedCount = 0;
         }
 
-        private static async UniTask<Sprite> GetOrCreateStandaloneAsync(ItemDefinition definition, IReadOnlyList<string> variantIds, ItemIconGeneratorSettings settings, IconRenderProfile renderProfile, CancellationToken cancellationToken)
+        private async UniTask<Sprite> GetOrCreateStandaloneAsync(ItemDefinition definition, IReadOnlyList<string> variantIds, ItemIconGeneratorSettings settings, IconRenderProfile renderProfile, CancellationToken cancellationToken)
         {
             await UniTask.SwitchToMainThread(cancellationToken);
 
             if (definition.IconOverride != null)
             {
                 return definition.IconOverride;
+            }
+
+            if (_disposed)
+            {
+                return definition.FallbackIcon;
             }
 
             int settingsHash = settings.BuildHash();
@@ -248,7 +246,7 @@ namespace RaidIntoDarkness.Inventory.IconGeneration
             return await completionSource.Task.AttachExternalCancellation(cancellationToken);
         }
 
-        private static void StartStandaloneWorker()
+        private void StartStandaloneWorker()
         {
             if (_standaloneWorkerRunning)
             {
@@ -259,7 +257,7 @@ namespace RaidIntoDarkness.Inventory.IconGeneration
             ProcessStandaloneQueueAsync().Forget(Debug.LogException);
         }
 
-        private static async UniTask ProcessStandaloneQueueAsync()
+        private async UniTask ProcessStandaloneQueueAsync()
         {
             CancellationToken generationCancellation = _generationCancellation.Token;
 
@@ -335,7 +333,7 @@ namespace RaidIntoDarkness.Inventory.IconGeneration
             }
         }
 
-        private static void ReleaseStandaloneRenderSession()
+        private void ReleaseStandaloneRenderSession()
         {
             _standaloneRenderSession?.Dispose();
             _standaloneRenderSession = null;
@@ -343,7 +341,7 @@ namespace RaidIntoDarkness.Inventory.IconGeneration
             _standaloneRenderSettingsHash = 0;
         }
 
-        private static async UniTask<Sprite> GetOrCreateAsync(PrewarmRequest request, ItemIconRenderSession renderSession, bool checkInFlight, CancellationToken cancellationToken)
+        private async UniTask<Sprite> GetOrCreateAsync(PrewarmRequest request, ItemIconRenderSession renderSession, bool checkInFlight, CancellationToken cancellationToken)
         {
             if (TryGetCachedSprite(request.Key, out Sprite cachedSprite))
             {
@@ -458,7 +456,7 @@ namespace RaidIntoDarkness.Inventory.IconGeneration
             return result;
         }
 
-        private static bool TryGetCachedSprite(IconCacheKey key, out Sprite sprite)
+        private bool TryGetCachedSprite(IconCacheKey key, out Sprite sprite)
         {
             if (_cache.TryGetValue(key, out IconCacheEntry entry) && entry.Sprite != null)
             {
@@ -478,19 +476,12 @@ namespace RaidIntoDarkness.Inventory.IconGeneration
             return false;
         }
 
-        private static void CacheFallbackSprite(IconCacheKey key, ItemDefinition definition)
+        private void CacheFallbackSprite(IconCacheKey key, ItemDefinition definition)
         {
             if (definition.FallbackIcon != null)
             {
                 _cache[key] = IconCacheEntry.CreateFallback(definition.FallbackIcon);
             }
-        }
-
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-        private static void ResetStaticState()
-        {
-            Clear();
-            _cache = new Dictionary<IconCacheKey, IconCacheEntry>();
         }
     }
 }

@@ -1,3 +1,5 @@
+using RaidIntoDarkness.Inventory.Application;
+using RaidIntoDarkness.Inventory.Domain;
 using System.Collections;
 using System.Linq;
 using RaidIntoDarkness.Inventory;
@@ -53,8 +55,8 @@ namespace RaidIntoDarkness.Inventory.Tests
             foreach (int rounds in new[] { 0, 1 })
             {
                 ItemInstance loaded = weapon.CreateDraft();
-                loaded.SetState(InventoryWeaponAmmoSource.AMMO_SECTION_STATE, ammoSection);
-                loaded.SetState(InventoryWeaponAmmoSource.MAGAZINE_STATE, rounds.ToString());
+                loaded.SetState(WeaponMagazineState.AMMO_SECTION_STATE, ammoSection);
+                loaded.SetState(WeaponMagazineState.MAGAZINE_STATE, rounds.ToString());
                 Assert.That(model.TryReconfigureItem(weapon, loaded, weapon.Location.Position).Success, Is.True);
                 ItemInstance itemToDrop = model.CreateItem(dropDefinition);
                 Assert.That(model.TryAddAuto(itemToDrop, window.PrimaryContainerId, false).Success, Is.True);

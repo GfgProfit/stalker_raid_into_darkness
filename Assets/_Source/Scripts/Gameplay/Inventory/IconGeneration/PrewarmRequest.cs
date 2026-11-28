@@ -1,4 +1,5 @@
-namespace RaidIntoDarkness.Inventory.IconGeneration
+using RaidIntoDarkness.Inventory.Domain;
+namespace RaidIntoDarkness.Inventory.Infrastructure.IconGeneration
 {
     internal readonly struct PrewarmRequest
     {

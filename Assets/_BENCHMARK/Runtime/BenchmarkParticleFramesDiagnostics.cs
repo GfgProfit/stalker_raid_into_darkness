@@ -10,8 +10,8 @@ namespace Rvm.Benchmark
 {
     public static class BenchmarkParticleFramesDiagnostics
     {
-        private static readonly Dictionary<AnomalyParticleFrames, Group> COMPONENTS = new Dictionary<AnomalyParticleFrames, Group>();
-        private static readonly Dictionary<string, Group> GROUPS = new Dictionary<string, Group>();
+        private static readonly Dictionary<AnomalyParticleFrames, BenchmarkParticleFrameGroup> COMPONENTS = new Dictionary<AnomalyParticleFrames, BenchmarkParticleFrameGroup>();
+        private static readonly Dictionary<string, BenchmarkParticleFrameGroup> GROUPS = new Dictionary<string, BenchmarkParticleFrameGroup>();
 
         private static int _sampleFrame = -1;
         private static double _nextSample;
@@ -66,7 +66,7 @@ namespace Rvm.Benchmark
         {
             if (_visualRunner == null)
             {
-                _visualRunner = UnityEngine.Object.FindFirstObjectByType<BenchmarkRunner>();
+                _visualRunner = UnityEngine.Object.FindAnyObjectByType<BenchmarkRunner>();
             }
             if (_visualRunner == null || camera != _visualRunner.WorkingCamera || !_visualRunner.Running || _screenshots >= 6)
             {
@@ -110,7 +110,7 @@ namespace Rvm.Benchmark
                 string key = frames + "/" + fps.ToString("R", System.Globalization.CultureInfo.InvariantCulture) + "/" + animated + "/" + start + "/" + playback;
                 if (!GROUPS.TryGetValue(key, out group))
                 {
-                    group = new Group { key = key, frameCount = frames, framesPerSecond = fps, animated = animated, randomStart = start, randomPlayback = playback };
+                    group = new BenchmarkParticleFrameGroup { key = key, frameCount = frames, framesPerSecond = fps, animated = animated, randomStart = start, randomPlayback = playback };
                     GROUPS.Add(key, group);
                 }
                 COMPONENTS.Add(component, group);
@@ -141,7 +141,7 @@ namespace Rvm.Benchmark
                 }
                 if (group.samples.Count < 16)
                 {
-                    group.samples.Add(new Input { age = age, seed = particle.randomSeed, infinite = persistent, lifetime = persistent ? "Infinity" : particle.startLifetime.ToString("R", System.Globalization.CultureInfo.InvariantCulture) });
+                    group.samples.Add(new BenchmarkParticleFrameInputSample { age = age, seed = particle.randomSeed, infinite = persistent, lifetime = persistent ? "Infinity" : particle.startLifetime.ToString("R", System.Globalization.CultureInfo.InvariantCulture) });
                 }
             }
             group.finiteSystems += finite ? 1 : 0;
@@ -152,24 +152,15 @@ namespace Rvm.Benchmark
         {
             if (runner.LastDirectory != null)
             {
-                BenchmarkOutput.WriteJson(Path.Combine(runner.LastDirectory, "particle-workload.json"), new Document { runId = runner.LastMetadata.runId, groups = new List<Group>(GROUPS.Values), sampledComponents = COMPONENTS.Count, cache = CacheSnapshot() });
+                BenchmarkOutput.WriteJson(Path.Combine(runner.LastDirectory, "particle-workload.json"), new BenchmarkParticleFrameReport { runId = runner.LastMetadata.runId, groups = new List<BenchmarkParticleFrameGroup>(GROUPS.Values), sampledComponents = COMPONENTS.Count, cache = CacheSnapshot() });
             }
             COMPONENTS.Clear();
             GROUPS.Clear();
         }
 
-        [Serializable]
-        private sealed class CacheData
+        private static BenchmarkParticleFrameCacheEvidence CacheSnapshot()
         {
-            public bool present;
-            public int configurations;
-            public int sequences;
-            public long arrayPayloadBytes;
-        }
-
-        private static CacheData CacheSnapshot()
-        {
-            var result = new CacheData();
+            var result = new BenchmarkParticleFrameCacheEvidence();
             var type = typeof(AnomalyParticleFrames).Assembly.GetType("RaidIntoDarkness.Effects.FiniteParticleFrameCache");
             if (type == null)
             {
@@ -194,47 +185,6 @@ namespace Rvm.Benchmark
                 }
             }
             return result;
-        }
-
-        [Serializable]
-        private sealed class Document
-        {
-            public string runId;
-            public int sampledComponents;
-            public List<Group> groups;
-            public CacheData cache;
-        }
-
-        [Serializable]
-        private sealed class Group
-        {
-            public string key;
-            public int frameCount;
-            public float framesPerSecond;
-            public bool animated;
-            public bool randomStart;
-            public bool randomPlayback;
-            public int components;
-            public long observations;
-            public long empty;
-            public long liveParticles;
-            public long finiteParticles;
-            public long infiniteParticles;
-            public long sourceSteps;
-            public long finiteSystems;
-            public long infiniteSystems;
-            public float maxAge;
-            public float maxLifetime;
-            public List<Input> samples = new List<Input>();
-        }
-
-        [Serializable]
-        private sealed class Input
-        {
-            public float age;
-            public uint seed;
-            public bool infinite;
-            public string lifetime;
         }
     }
 }

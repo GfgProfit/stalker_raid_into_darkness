@@ -33,7 +33,7 @@ namespace RaidIntoDarkness.Player.Tests
             Assert.That(_player.CameraEffects.Profile, Is.Not.Null);
             Assert.That(_player.Footsteps.Library, Is.Not.Null);
             Assert.That(_player.Foley.Library, Is.Not.Null);
-            Assert.That(Object.FindObjectsByType<AudioListener>(FindObjectsSortMode.None).Length, Is.EqualTo(1), "exactly one AudioListener expected");
+            Assert.That(Object.FindObjectsByType<AudioListener>().Length, Is.EqualTo(1), "exactly one AudioListener expected");
             Transform pivot = _player.CameraEffects.Pivot;
             Assert.That(pivot, Is.Not.Null);
             Assert.That(_player.CameraController.Camera.transform.parent, Is.EqualTo(pivot), "camera must sit under CameraMotionPivot");

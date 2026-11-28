@@ -15,9 +15,9 @@ namespace Rvm.CleanReleaseRoute07
 
         private readonly Camera _camera;
         private readonly string _mode;
-        private readonly List<Entry> _entries = new List<Entry>();
-        private readonly Dictionary<Light, Entry> _byLight = new Dictionary<Light, Entry>();
-        private readonly PoseRecord[] _poses = new PoseRecord[POSE_COUNT];
+        private readonly List<PunctualShadowDistanceTrialEntry> _entries = new List<PunctualShadowDistanceTrialEntry>();
+        private readonly Dictionary<Light, PunctualShadowDistanceTrialEntry> _byLight = new Dictionary<Light, PunctualShadowDistanceTrialEntry>();
+        private readonly PunctualShadowDistancePoseRecord[] _poses = new PunctualShadowDistancePoseRecord[POSE_COUNT];
 
         private int _eligibleCount;
         private int _discoveryPasses;
@@ -84,14 +84,14 @@ namespace Rvm.CleanReleaseRoute07
             if (_poseCount == POSE_COUNT) throw new InvalidOperationException("The trial supports exactly four route-pose discoveries after startup.");
             int previous = _entries.Count;
             Discover(lights);
-            _poses[_poseCount++] = new PoseRecord { frame = Time.frameCount, tracked = _entries.Count, eligible = _eligibleCount, added = Mathf.Max(0, _entries.Count - previous) };
+            _poses[_poseCount++] = new PunctualShadowDistancePoseRecord { frame = Time.frameCount, tracked = _entries.Count, eligible = _eligibleCount, added = Mathf.Max(0, _entries.Count - previous) };
         }
 
         public void Restore()
         {
             if (_restored) return;
             _restored = true;
-            foreach (Entry entry in _entries) Restore(entry);
+            foreach (PunctualShadowDistanceTrialEntry entry in _entries) Restore(entry);
         }
 
         public void Dispose()
@@ -111,10 +111,10 @@ namespace Rvm.CleanReleaseRoute07
             int directional = 0;
             int other = 0;
             int dimmed = 0;
-            var records = detailed ? new LightRecord[_entries.Count] : null;
+            var records = detailed ? new PunctualShadowDistanceLightRecord[_entries.Count] : null;
             for (int index = 0; index < _entries.Count; index++)
             {
-                Entry entry = _entries[index];
+                PunctualShadowDistanceTrialEntry entry = _entries[index];
                 bool punctual = entry.Type == LightType.Point || entry.Type == LightType.Spot;
                 if (entry.Type == LightType.Directional) directional++;
                 else if (!punctual) other++;
@@ -124,14 +124,14 @@ namespace Rvm.CleanReleaseRoute07
                 if (entry.Eligible && entry.Data != null && entry.Data.shadowDimmer < entry.ShadowDimmer) dimmed++;
                 if (detailed) records[index] = Capture(entry);
             }
-            var report = new Report { schemaVersion = EVIDENCE_VERSION, mode = _mode, restored = _restored, frame = Time.frameCount, distance = DISTANCE, discoveryPasses = _discoveryPasses, worldDiscoveryPasses = _worldDiscoveryPasses, tracked = _entries.Count, eligible = _eligibleCount, originalNone = restrictedNone, missingHdData = missingData, restrictedOriginalValues = restrictedValues, directionalsExcluded = directional, otherTypesExcluded = other, currentlyDimmed = dimmed, removedDestroyed = _removedDestroyed, maximumTracked = _maximumTracked, cameraAvailable = HasCamera(), cameraEntityId = _camera != null ? _camera.GetEntityId().ToString() : null, cameraPosition = _camera != null ? _camera.transform.position : Vector3.zero, poseCount = _poseCount, poses = _poses, lights = records, scope = "Module-only bounded HDRP route trial. A preserves the current production baseline; B caps native HDRP per-view shadow fade at75. No coded distance loop or shadow-dimmer mutation is installed. Dynamically spawned lights between bounded discoveries are not governed by this trial; technical inventory must check coverage. A/B can be equivalent when production already caps the same sources at75; historical pre-integration evidence is not a current A/B gain claim." };
+            var report = new PunctualShadowDistanceTrialReport { schemaVersion = EVIDENCE_VERSION, mode = _mode, restored = _restored, frame = Time.frameCount, distance = DISTANCE, discoveryPasses = _discoveryPasses, worldDiscoveryPasses = _worldDiscoveryPasses, tracked = _entries.Count, eligible = _eligibleCount, originalNone = restrictedNone, missingHdData = missingData, restrictedOriginalValues = restrictedValues, directionalsExcluded = directional, otherTypesExcluded = other, currentlyDimmed = dimmed, removedDestroyed = _removedDestroyed, maximumTracked = _maximumTracked, cameraAvailable = HasCamera(), cameraEntityId = _camera != null ? _camera.GetEntityId().ToString() : null, cameraPosition = _camera != null ? _camera.transform.position : Vector3.zero, poseCount = _poseCount, poses = _poses, lights = records, scope = "Module-only bounded HDRP route trial. A preserves the current production baseline; B caps native HDRP per-view shadow fade at75. No coded distance loop or shadow-dimmer mutation is installed. Dynamically spawned lights between bounded discoveries are not governed by this trial; technical inventory must check coverage. A/B can be equivalent when production already caps the same sources at75; historical pre-integration evidence is not a current A/B gain claim." };
             Directory.CreateDirectory(output);
             File.WriteAllText(Path.Combine(output, "punctual-shadow-" + label + ".json"), JsonUtility.ToJson(report, true));
         }
 
         private static Light[] FindLights()
         {
-            return UnityEngine.Object.FindObjectsByType<Light>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+            return UnityEngine.Object.FindObjectsByType<Light>(FindObjectsInactive.Include);
         }
 
         private static void ValidateMode(string mode)
@@ -147,7 +147,7 @@ namespace Rvm.CleanReleaseRoute07
             {
                 if (light == null || !light.gameObject.scene.IsValid() || !light.gameObject.scene.isLoaded) continue;
                 light.TryGetComponent(out HDAdditionalLightData data);
-                if (_byLight.TryGetValue(light, out Entry existing))
+                if (_byLight.TryGetValue(light, out PunctualShadowDistanceTrialEntry existing))
                 {
                     if (existing.Data == data && existing.Type == light.type) continue;
                     Restore(existing);
@@ -155,7 +155,7 @@ namespace Rvm.CleanReleaseRoute07
                     _entries.Remove(existing);
                     _byLight.Remove(light);
                 }
-                var entry = new Entry(light, data);
+                var entry = new PunctualShadowDistanceTrialEntry(light, data);
                 _entries.Add(entry);
                 _byLight.Add(light, entry);
                 if (entry.Eligible)
@@ -175,7 +175,7 @@ namespace Rvm.CleanReleaseRoute07
         {
             for (int index = _entries.Count - 1; index >= 0; index--)
             {
-                Entry entry = _entries[index];
+                PunctualShadowDistanceTrialEntry entry = _entries[index];
                 if (entry.Light != null && entry.Transform != null) continue;
                 Restore(entry);
                 _byLight.Remove(entry.Light);
@@ -195,18 +195,18 @@ namespace Rvm.CleanReleaseRoute07
             return float.IsFinite(value.x) && float.IsFinite(value.y) && float.IsFinite(value.z);
         }
 
-        private static void Restore(Entry entry)
+        private static void Restore(PunctualShadowDistanceTrialEntry entry)
         {
             if (!entry.FadeOverridden || entry.Data == null) return;
             entry.Data.shadowFadeDistance = entry.FadeDistance;
             entry.FadeOverridden = false;
         }
 
-        private static LightRecord Capture(Entry entry)
+        private static PunctualShadowDistanceLightRecord Capture(PunctualShadowDistanceTrialEntry entry)
         {
             Light light = entry.Light;
             HDAdditionalLightData data = entry.Data;
-            return new LightRecord { entityId = light.GetEntityId().ToString(), path = Hierarchy(entry.Transform), eligible = entry.Eligible, originalType = entry.Type.ToString(), originalEnabled = entry.Enabled, currentEnabled = light.enabled, active = light.gameObject.activeInHierarchy, originalIntensity = entry.Intensity, currentIntensity = light.intensity, originalRange = entry.Range, currentRange = light.range, originalColor = entry.Color, currentColor = light.color, originalShadows = entry.Shadows.ToString(), currentShadows = light.shadows.ToString(), currentType = light.type.ToString(), originalCullingMask = entry.CullingMask, currentCullingMask = light.cullingMask, originalRenderingLayerMask = entry.RenderingLayerMask, currentRenderingLayerMask = light.renderingLayerMask, originalFadeDistance = entry.FadeDistance, currentFadeDistance = data != null ? data.shadowFadeDistance : 0f, originalShadowDimmer = entry.ShadowDimmer, currentShadowDimmer = data != null ? data.shadowDimmer : 0f, volumetricShadowDimmerGoverned = false, originalVolumetricShadowDimmer = entry.VolumetricShadowDimmer, currentVolumetricShadowDimmer = data != null ? data.volumetricShadowDimmer : 0f };
+            return new PunctualShadowDistanceLightRecord { entityId = light.GetEntityId().ToString(), path = Hierarchy(entry.Transform), eligible = entry.Eligible, originalType = entry.Type.ToString(), originalEnabled = entry.Enabled, currentEnabled = light.enabled, active = light.gameObject.activeInHierarchy, originalIntensity = entry.Intensity, currentIntensity = light.intensity, originalRange = entry.Range, currentRange = light.range, originalColor = entry.Color, currentColor = light.color, originalShadows = entry.Shadows.ToString(), currentShadows = light.shadows.ToString(), currentType = light.type.ToString(), originalCullingMask = entry.CullingMask, currentCullingMask = light.cullingMask, originalRenderingLayerMask = entry.RenderingLayerMask, currentRenderingLayerMask = light.renderingLayerMask, originalFadeDistance = entry.FadeDistance, currentFadeDistance = data != null ? data.shadowFadeDistance : 0f, originalShadowDimmer = entry.ShadowDimmer, currentShadowDimmer = data != null ? data.shadowDimmer : 0f, volumetricShadowDimmerGoverned = false, originalVolumetricShadowDimmer = entry.VolumetricShadowDimmer, currentVolumetricShadowDimmer = data != null ? data.volumetricShadowDimmer : 0f };
         }
 
         private static string Hierarchy(Transform value)
@@ -218,116 +218,6 @@ namespace Rvm.CleanReleaseRoute07
                 path = value.name + "/" + path;
             }
             return path;
-        }
-
-        private sealed class Entry
-        {
-            public readonly Light Light;
-            public readonly Transform Transform;
-            public readonly HDAdditionalLightData Data;
-            public readonly LightType Type;
-            public readonly LightShadows Shadows;
-            public readonly bool Enabled;
-            public readonly float Intensity;
-            public readonly float Range;
-            public readonly Color Color;
-            public readonly int CullingMask;
-            public readonly int RenderingLayerMask;
-            public readonly float FadeDistance;
-            public readonly float ShadowDimmer;
-            public readonly float VolumetricShadowDimmer;
-            public readonly bool Eligible;
-
-            public bool FadeOverridden { get; set; }
-
-            public Entry(Light light, HDAdditionalLightData data)
-            {
-                Light = light;
-                Transform = light.transform;
-                Data = data;
-                Type = light.type;
-                Shadows = light.shadows;
-                Enabled = light.enabled;
-                Intensity = light.intensity;
-                Range = light.range;
-                Color = light.color;
-                CullingMask = light.cullingMask;
-                RenderingLayerMask = light.renderingLayerMask;
-                FadeDistance = data != null ? data.shadowFadeDistance : 0f;
-                ShadowDimmer = data != null ? data.shadowDimmer : 0f;
-                VolumetricShadowDimmer = data != null ? data.volumetricShadowDimmer : 0f;
-                Eligible = (Type == LightType.Point || Type == LightType.Spot) && Shadows != LightShadows.None && data != null && float.IsFinite(FadeDistance) && FadeDistance > 0f && float.IsFinite(ShadowDimmer) && ShadowDimmer > 0f && float.IsFinite(VolumetricShadowDimmer);
-            }
-        }
-
-        [Serializable]
-        private struct PoseRecord
-        {
-            public int frame;
-            public int tracked;
-            public int eligible;
-            public int added;
-        }
-
-        [Serializable]
-        private sealed class Report
-        {
-            public int schemaVersion;
-            public string mode;
-            public bool restored;
-            public int frame;
-            public float distance;
-            public int discoveryPasses;
-            public int worldDiscoveryPasses;
-            public int tracked;
-            public int eligible;
-            public int originalNone;
-            public int missingHdData;
-            public int restrictedOriginalValues;
-            public int directionalsExcluded;
-            public int otherTypesExcluded;
-            public int currentlyDimmed;
-            public int removedDestroyed;
-            public int maximumTracked;
-            public bool cameraAvailable;
-            public string cameraEntityId;
-            public Vector3 cameraPosition;
-            public int poseCount;
-            public PoseRecord[] poses;
-            public LightRecord[] lights;
-            public string scope;
-        }
-
-        [Serializable]
-        private sealed class LightRecord
-        {
-            public string entityId;
-            public string path;
-            public bool eligible;
-            public string originalType;
-            public bool originalEnabled;
-            public bool currentEnabled;
-            public bool active;
-            public float originalIntensity;
-            public float currentIntensity;
-            public float originalRange;
-            public float currentRange;
-            public Color originalColor;
-            public Color currentColor;
-            public string originalShadows;
-            public string currentShadows;
-            public string currentType;
-            public int originalCullingMask;
-            public int currentCullingMask;
-            public int originalRenderingLayerMask;
-            public int currentRenderingLayerMask;
-            public float originalFadeDistance;
-            public float currentFadeDistance;
-            public float originalShadowDimmer;
-            public float currentShadowDimmer;
-            public float originalVolumetricShadowDimmer;
-            public float currentVolumetricShadowDimmer;
-            public bool volumetricShadowDimmerGoverned;
         }
     }
 }

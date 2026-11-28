@@ -112,7 +112,7 @@ namespace RaidIntoDarkness.Inventory.Tests
             yield return null;
             WorldItem dropped = null;
 
-            foreach (WorldItem candidate in Object.FindObjectsByType<WorldItem>(FindObjectsSortMode.None))
+            foreach (WorldItem candidate in Object.FindObjectsByType<WorldItem>())
             {
                 if (candidate.Instance == weapon)
                 {

@@ -121,7 +121,8 @@ namespace Rvm.Benchmark.Tests
                 light.shadows = LightShadows.Hard;
                 light.cullingMask = 1 << root.layer;
                 HDAdditionalLightData data = lightObject.AddComponent<HDAdditionalLightData>();
-                data.SetIntensity(type == LightType.Directional ? 300f : 4000f, type == LightType.Directional ? LightUnit.Lux : LightUnit.Candela);
+                light.intensity = type == LightType.Directional ? 300f : 4000f;
+                light.lightUnit = type == LightType.Directional ? LightUnit.Lux : LightUnit.Candela;
                 data.shadowUpdateMode = ShadowUpdateMode.EveryFrame;
                 data.shadowFadeDistance = 10000f;
                 data.shadowDimmer = 1f;
@@ -133,7 +134,7 @@ namespace Rvm.Benchmark.Tests
                 float originalIntensity = light.intensity;
                 float originalRange = light.range;
                 GraphicsFormat format = (GraphicsFormat)asset.currentPlatformRenderPipelineSettings.colorBufferFormat;
-                var frames = new List<Frame>();
+                var frames = new List<PunctualShadowVisualFrame>();
                 Vector3 look = new Vector3(0f, 1f, 0f);
                 Vector3 direction = new Vector3(0f, 6f, -9f).normalized;
                 for (int pose = 0; pose < 2; pose++)
@@ -169,50 +170,50 @@ namespace Rvm.Benchmark.Tests
                     yield return Capture(camera, target, frames, label + "_light-off", light, data);
                     light.enabled = true;
                 }
-                foreach (Frame frame in frames) Save(output, frame);
-                File.WriteAllText(Path.Combine(output, "preview-transform.json"), JsonUtility.ToJson(new DisplayTransform(), true));
-                var comparisons = new List<Comparison>();
+                foreach (PunctualShadowVisualFrame frame in frames) Save(output, frame);
+                File.WriteAllText(Path.Combine(output, "preview-transform.json"), JsonUtility.ToJson(new PunctualShadowVisualDisplayTransform { white = DISPLAY_WHITE }, true));
+                var comparisons = new List<PunctualShadowVisualComparison>();
                 for (int pose = 0; pose < 2; pose++)
                 {
                     string label = pose == 0 ? "near" : "far";
-                    Frame baseline = Find(frames, label + "_A");
-                    Frame noCaster = Find(frames, label + "_no-caster");
-                    Frame noLight = Find(frames, label + "_light-off");
-                    Comparison shadowControl = Compare(baseline, noCaster, format);
+                    PunctualShadowVisualFrame baseline = Find(frames, label + "_A");
+                    PunctualShadowVisualFrame noCaster = Find(frames, label + "_no-caster");
+                    PunctualShadowVisualFrame noLight = Find(frames, label + "_light-off");
+                    PunctualShadowVisualComparison shadowControl = Compare(baseline, noCaster, format);
                     shadowControl.name = label + "_positive-shadow";
-                    Comparison lightControl = Compare(noCaster, noLight, format);
+                    PunctualShadowVisualComparison lightControl = Compare(noCaster, noLight, format);
                     lightControl.name = label + "_positive-light";
                     comparisons.Add(shadowControl);
                     comparisons.Add(lightControl);
-                    File.WriteAllText(Path.Combine(output, "comparisons.json"), JsonUtility.ToJson(new Comparisons { type = type.ToString(), comparisons = comparisons.ToArray() }, true));
+                    File.WriteAllText(Path.Combine(output, "comparisons.json"), JsonUtility.ToJson(new PunctualShadowVisualComparisonReport { type = type.ToString(), comparisons = comparisons.ToArray() }, true));
                     Assert.That(shadowControl.visibleChangedPixels, Is.GreaterThan(100), label + " baseline must contain caster shadows.");
                     Assert.That(lightControl.visibleChangedPixels, Is.GreaterThan(100), label + " receiver must remain lit without caster shadows.");
                     foreach (string mode in new[] { "B" })
                     {
-                        Frame candidate = Find(frames, label + "_" + mode);
+                        PunctualShadowVisualFrame candidate = Find(frames, label + "_" + mode);
                         bool keepShadow = pose == 0 || type == LightType.Directional;
-                        Comparison comparison = Compare(keepShadow ? baseline : noCaster, candidate, format);
+                        PunctualShadowVisualComparison comparison = Compare(keepShadow ? baseline : noCaster, candidate, format);
                         comparison.name = label + "_" + mode + (keepShadow ? "_vs-original" : "_vs-no-caster");
                         comparisons.Add(comparison);
-                        File.WriteAllText(Path.Combine(output, "comparisons.json"), JsonUtility.ToJson(new Comparisons { type = type.ToString(), comparisons = comparisons.ToArray() }, true));
+                        File.WriteAllText(Path.Combine(output, "comparisons.json"), JsonUtility.ToJson(new PunctualShadowVisualComparisonReport { type = type.ToString(), comparisons = comparisons.ToArray() }, true));
                         Assert.That(comparison.maximumResidual, Is.LessThan(0.02f), comparison.name);
                         Assert.That(comparison.maximumAlphaError, Is.EqualTo(0f), comparison.name);
                         Assert.That(comparison.rawChangedPixels, Is.LessThan(SIZE * SIZE / 200), comparison.name + " changed more than0.5% of raw pixels.");
                         if (!keepShadow)
                         {
-                            Comparison removed = Compare(baseline, candidate, format);
+                            PunctualShadowVisualComparison removed = Compare(baseline, candidate, format);
                             removed.name = label + "_" + mode + "_vs-original-shadow-removal";
                             comparisons.Add(removed);
                             Assert.That(removed.visibleChangedPixels, Is.GreaterThan(100), label + " must show removal of distant caster shadows.");
                         }
-                        Comparison remainsLit = Compare(candidate, noLight, format);
+                        PunctualShadowVisualComparison remainsLit = Compare(candidate, noLight, format);
                         remainsLit.name = label + "_" + mode + "_positive-light";
                         comparisons.Add(remainsLit);
-                        File.WriteAllText(Path.Combine(output, "comparisons.json"), JsonUtility.ToJson(new Comparisons { type = type.ToString(), comparisons = comparisons.ToArray() }, true));
+                        File.WriteAllText(Path.Combine(output, "comparisons.json"), JsonUtility.ToJson(new PunctualShadowVisualComparisonReport { type = type.ToString(), comparisons = comparisons.ToArray() }, true));
                         Assert.That(remainsLit.visibleChangedPixels, Is.GreaterThan(100), comparison.name + " must preserve illumination.");
                     }
                 }
-                File.WriteAllText(Path.Combine(output, "comparisons.json"), JsonUtility.ToJson(new Comparisons { type = type.ToString(), comparisons = comparisons.ToArray() }, true));
+                File.WriteAllText(Path.Combine(output, "comparisons.json"), JsonUtility.ToJson(new PunctualShadowVisualComparisonReport { type = type.ToString(), comparisons = comparisons.ToArray() }, true));
             }
             finally
             {
@@ -300,7 +301,7 @@ namespace Rvm.Benchmark.Tests
             return renderer;
         }
 
-        private static IEnumerator Capture(Camera camera, RenderTexture target, List<Frame> frames, string name, Light light, HDAdditionalLightData data)
+        private static IEnumerator Capture(Camera camera, RenderTexture target, List<PunctualShadowVisualFrame> frames, string name, Light light, HDAdditionalLightData data)
         {
             camera.Render();
             yield return null;
@@ -314,7 +315,7 @@ namespace Rvm.Benchmark.Tests
                 texture.Apply();
                 Color[] colors = texture.GetPixels();
                 foreach (Color color in colors) for (int channel = 0; channel < 4; channel++) Assert.That(float.IsFinite(color[channel]), Is.True, name + " non-finite channel.");
-                frames.Add(new Frame { Name = name, Colors = colors, State = new CaptureState { name = name, cameraPosition = camera.transform.position, lightPosition = light.transform.position, cameraLightDistance = Vector3.Distance(camera.transform.position, light.transform.position), lightType = light.type.ToString(), lightEnabled = light.enabled, lightShadows = light.shadows.ToString(), intensity = light.intensity, range = light.range, shadowFadeDistance = data.shadowFadeDistance, shadowDimmer = data.shadowDimmer, volumetricShadowDimmer = data.volumetricShadowDimmer, lightFadeDistance = data.fadeDistance, lightDimmer = data.lightDimmer } });
+                frames.Add(new PunctualShadowVisualFrame { Name = name, Colors = colors, State = new PunctualShadowVisualCaptureState { name = name, cameraPosition = camera.transform.position, lightPosition = light.transform.position, cameraLightDistance = Vector3.Distance(camera.transform.position, light.transform.position), lightType = light.type.ToString(), lightEnabled = light.enabled, lightShadows = light.shadows.ToString(), intensity = light.intensity, range = light.range, shadowFadeDistance = data.shadowFadeDistance, shadowDimmer = data.shadowDimmer, volumetricShadowDimmer = data.volumetricShadowDimmer, lightFadeDistance = data.fadeDistance, lightDimmer = data.lightDimmer } });
             }
             finally
             {
@@ -323,15 +324,15 @@ namespace Rvm.Benchmark.Tests
             }
         }
 
-        private static Frame Find(List<Frame> frames, string name)
+        private static PunctualShadowVisualFrame Find(List<PunctualShadowVisualFrame> frames, string name)
         {
-            foreach (Frame frame in frames) if (frame.Name == name) return frame;
+            foreach (PunctualShadowVisualFrame frame in frames) if (frame.Name == name) return frame;
             throw new InvalidOperationException("Missing capture: " + name);
         }
 
-        private static Comparison Compare(Frame reference, Frame candidate, GraphicsFormat format)
+        private static PunctualShadowVisualComparison Compare(PunctualShadowVisualFrame reference, PunctualShadowVisualFrame candidate, GraphicsFormat format)
         {
-            var result = new Comparison { reference = reference.Name, candidate = candidate.Name, precisionFormat = format.ToString() };
+            var result = new PunctualShadowVisualComparison { reference = reference.Name, candidate = candidate.Name, precisionFormat = format.ToString() };
             for (int index = 0; index < reference.Colors.Length; index++)
             {
                 Color a = reference.Colors[index];
@@ -363,9 +364,9 @@ namespace Rvm.Benchmark.Tests
             return result;
         }
 
-        private static void Save(string output, Frame frame)
+        private static void Save(string output, PunctualShadowVisualFrame frame)
         {
-            var range = new Range { minimum = new Color(float.MaxValue, float.MaxValue, float.MaxValue, float.MaxValue), maximum = new Color(float.MinValue, float.MinValue, float.MinValue, float.MinValue) };
+            var range = new PunctualShadowVisualCaptureRange { width = SIZE, height = SIZE, minimum = new Color(float.MaxValue, float.MaxValue, float.MaxValue, float.MaxValue), maximum = new Color(float.MinValue, float.MinValue, float.MinValue, float.MinValue) };
             var display = new Color[frame.Colors.Length];
             for (int index = 0; index < frame.Colors.Length; index++)
             {
@@ -397,70 +398,6 @@ namespace Rvm.Benchmark.Tests
                 UnityEngine.Object.DestroyImmediate(raw);
                 UnityEngine.Object.DestroyImmediate(preview);
             }
-        }
-
-        private sealed class Frame
-        {
-            public string Name { get; set; }
-            public Color[] Colors { get; set; }
-            public CaptureState State { get; set; }
-        }
-
-        [Serializable]
-        private sealed class CaptureState
-        {
-            public string name;
-            public Vector3 cameraPosition;
-            public Vector3 lightPosition;
-            public float cameraLightDistance;
-            public string lightType;
-            public bool lightEnabled;
-            public string lightShadows;
-            public float intensity;
-            public float range;
-            public float shadowFadeDistance;
-            public float shadowDimmer;
-            public float volumetricShadowDimmer;
-            public float lightFadeDistance;
-            public float lightDimmer;
-        }
-
-        [Serializable]
-        private sealed class Comparison
-        {
-            public string name;
-            public string reference;
-            public string candidate;
-            public string precisionFormat;
-            public int rawChangedPixels;
-            public int visibleChangedPixels;
-            public float maximumError;
-            public float maximumResidual;
-            public float maximumAlphaError;
-        }
-
-        [Serializable]
-        private sealed class Comparisons
-        {
-            public string type;
-            public Comparison[] comparisons;
-        }
-
-        [Serializable]
-        private sealed class Range
-        {
-            public int width = SIZE;
-            public int height = SIZE;
-            public Color minimum;
-            public Color maximum;
-        }
-
-        [Serializable]
-        private sealed class DisplayTransform
-        {
-            public float white = DISPLAY_WHITE;
-            public string mapping = "sRGB(clamp(raw RGB /256,0,1)); one predeclared fixed mapping for every A/B/no-caster/light-off, near/far and Point/Spot/Directional frame.";
-            public string raw = "RGBA float32 OpenEXR, finite verified before saving; no per-frame normalization.";
         }
     }
 }

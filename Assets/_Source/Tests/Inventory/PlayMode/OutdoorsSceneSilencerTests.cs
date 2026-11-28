@@ -165,7 +165,7 @@ namespace RaidIntoDarkness.Inventory.Tests
                 yield return null;
                 WorldItem dropped = null;
 
-                foreach (WorldItem candidate in Object.FindObjectsByType<WorldItem>(FindObjectsSortMode.None))
+                foreach (WorldItem candidate in Object.FindObjectsByType<WorldItem>())
                 {
                     if (candidate.Instance == weapon)
                     {
@@ -444,7 +444,7 @@ namespace RaidIntoDarkness.Inventory.Tests
                 return FindShotVisualEffect(prefab.name, parent, checkPlacement) != null;
             }
 
-            foreach (XRayParticleGroupPlayer effect in Object.FindObjectsByType<XRayParticleGroupPlayer>(FindObjectsSortMode.None))
+            foreach (XRayParticleGroupPlayer effect in Object.FindObjectsByType<XRayParticleGroupPlayer>())
             {
                 if (effect.name == prefab.name && effect.IsPlaying && (!checkPlacement || effect.transform.parent == parent))
                 {
@@ -457,7 +457,7 @@ namespace RaidIntoDarkness.Inventory.Tests
 
         private static VisualEffect FindShotVisualEffect(string effectName, Transform parent, bool checkPlacement)
         {
-            foreach (VisualEffect effect in Object.FindObjectsByType<VisualEffect>(FindObjectsSortMode.None))
+            foreach (VisualEffect effect in Object.FindObjectsByType<VisualEffect>())
             {
                 if (effect.name == effectName && effect.aliveParticleCount > 0 && (!checkPlacement || (!effect.culled && effect.transform.parent == parent)))
                 {

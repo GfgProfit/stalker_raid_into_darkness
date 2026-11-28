@@ -6,44 +6,12 @@ using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
 using XRay.Importer.Core.Level;
 using XRay.Importer.Levels;
-using XRay.Importer.Sources.Vfs;
 #if XRAY_HDRP
 using UnityEngine.Rendering.HighDefinition;
 #endif
 
 namespace XRay.Importer.Editor.Levels
 {
-    public sealed class XRayLevelChunkRenderer
-    {
-        public int Sector { get; set; }
-        public string Name { get; set; }
-        public Mesh Mesh { get; set; }
-        public Material[] Materials { get; set; }
-        public bool CastShadows { get; set; }
-    }
-
-    public sealed class XRayLevelSceneContent
-    {
-        public string LevelName { get; set; }
-        public XRayLevelData Level { get; set; }
-        public string SourceFolder { get; set; }
-        public Bounds Bounds { get; set; }
-        public List<XRayLevelChunkRenderer> Chunks { get; } = new List<XRayLevelChunkRenderer>();
-        public XRayInstanceBatchSet Instances { get; set; }
-        public XRayDetailDatabase Details { get; set; }
-        public XRaySourcePlan DetailSettingsSource { get; set; }
-        public bool FloraWindAccepted { get; set; }
-        public XRayWeatherProfile WeatherProfile { get; set; }
-        public XRayWeatherCatalog WeatherCatalog { get; set; }
-        public bool InheritWeather { get; set; }
-        public List<XRayLevelCollisionChunk> Collision { get; } = new List<XRayLevelCollisionChunk>();
-        public TextAsset ContactCollision { get; set; }
-        public TextAsset ContactMaterials { get; set; }
-        public bool ImportLights { get; set; }
-        public bool LightShadows { get; set; }
-        public bool OpenScene { get; set; }
-    }
-
     public static class XRayLevelSceneBuilder
     {
         public const float FIXED_EXPOSURE = 9.0f;
@@ -171,7 +139,6 @@ namespace XRay.Importer.Editor.Levels
                     var go = new GameObject(chunk.Name);
                     go.transform.SetParent(collision, false);
                     go.AddComponent<MeshCollider>().sharedMesh = chunk.Mesh;
-                    GameObjectUtility.SetStaticEditorFlags(go, StaticEditorFlags.NavigationStatic);
                 }
             }
 

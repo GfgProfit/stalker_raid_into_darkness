@@ -128,10 +128,12 @@ namespace XRay.Importer.Tests
                 sun.type = LightType.Directional;
                 sun.transform.rotation = Quaternion.Euler(55, -30, 0);
                 sun.shadows = LightShadows.None;
-                sun.gameObject.AddComponent<HDAdditionalLightData>().SetIntensity(3, LightUnit.Lux);
+                sun.gameObject.AddComponent<HDAdditionalLightData>();
+                sun.intensity = 3;
+                sun.lightUnit = LightUnit.Lux;
                 rig.AddComponent<MonolithWeatherInputs>().SetInputs(0.71864f, Vector3.one, new Vector4(0.5f, 1, 0, 0), new Vector4(1.5f, 1, 0, 0), 0);
                 rig.AddComponent<MonolithSourceLighting>().Mode = MonolithSourceLighting.LightingMode.Native;
-                using (var target = new Target(camera))
+                using (var target = new TrueStalkerTerrainPixelTarget(camera))
                 {
                     foreach (int mode in new[] { 0, 1 })
                     {
@@ -206,38 +208,6 @@ namespace XRay.Importer.Tests
             RenderTexture.active = previous;
             RenderTexture.ReleaseTemporary(target);
             return image;
-        }
-
-        private sealed class Target : IDisposable
-        {
-            private readonly Camera _camera;
-            private readonly RenderTexture _target = new RenderTexture(640, 360, 24, RenderTextureFormat.ARGBFloat, RenderTextureReadWrite.Linear);
-            private readonly Texture2D _pixels = new Texture2D(640, 360, TextureFormat.RGBAFloat, false, true);
-
-            public Target(Camera camera)
-            {
-                _camera = camera;
-                _target.Create();
-                camera.targetTexture = _target;
-            }
-
-            public Color[] Pixels()
-            {
-                RenderTexture previous = RenderTexture.active;
-                RenderTexture.active = _target;
-                _pixels.ReadPixels(new Rect(0, 0, 640, 360), 0, 0);
-                _pixels.Apply();
-                RenderTexture.active = previous;
-                return _pixels.GetPixels();
-            }
-
-            public void Dispose()
-            {
-                _camera.targetTexture = null;
-                _target.Release();
-                UnityEngine.Object.DestroyImmediate(_pixels);
-                UnityEngine.Object.DestroyImmediate(_target);
-            }
         }
     }
 }

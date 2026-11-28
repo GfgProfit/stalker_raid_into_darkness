@@ -19,7 +19,7 @@ namespace XRay.Importer.Levels
         public static XRayGrassSettingsProvider Ensure()
         {
             if (Active != null) return Active;
-            var existing = FindFirstObjectByType<XRayGrassSettingsProvider>();
+            var existing = FindAnyObjectByType<XRayGrassSettingsProvider>();
             return existing != null ? existing : new GameObject("XRay Grass Settings").AddComponent<XRayGrassSettingsProvider>();
         }
 

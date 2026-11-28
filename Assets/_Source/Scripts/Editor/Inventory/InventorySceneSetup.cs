@@ -98,7 +98,7 @@ namespace RaidIntoDarkness.Inventory.Editor
                 return;
             }
 
-            AssetDatabase.ImportPackage(package, false);
+            UnityEditor.AssetPackage.Package.Import(package, false);
             AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
         }
 

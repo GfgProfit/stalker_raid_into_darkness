@@ -63,7 +63,9 @@ namespace XRay.Importer.Tests
                 light.type = LightType.Directional;
                 light.shadows = LightShadows.Hard;
                 light.transform.rotation = Quaternion.LookRotation(new Vector3(-1f, -1f, 0f));
-                light.gameObject.AddComponent<HDAdditionalLightData>().SetIntensity(3000f, LightUnit.Lux);
+                light.gameObject.AddComponent<HDAdditionalLightData>();
+                light.intensity = 3000f;
+                light.lightUnit = LightUnit.Lux;
                 var material = new Material(Shader.Find("HDRP/Lit")) { enableInstancing = true };
                 owned.Add(material);
                 material.SetColor("_BaseColor", Color.gray);

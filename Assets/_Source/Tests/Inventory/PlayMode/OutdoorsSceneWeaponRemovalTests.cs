@@ -177,7 +177,7 @@ namespace RaidIntoDarkness.Inventory.Tests
         {
             int count = 0;
 
-            foreach (WorldItem item in Object.FindObjectsByType<WorldItem>(FindObjectsSortMode.None))
+            foreach (WorldItem item in Object.FindObjectsByType<WorldItem>())
             {
                 if (DefinitionSection(item.Definition) == AUG)
                 {

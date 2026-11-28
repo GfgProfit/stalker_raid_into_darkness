@@ -278,7 +278,7 @@ namespace XRay.Importer.Tests
                     root.SetActive(true);
                     Assert.AreEqual(JsonUtility.ToJson(cycle == 0 ? original : saved), JsonUtility.ToJson(controller.Values));
                     Assert.AreSame(provider, XRayGrassSettingsProvider.Ensure());
-                    Assert.AreEqual(1, UnityEngine.Object.FindObjectsByType<XRayGrassSettingsProvider>(FindObjectsSortMode.None).Length);
+                    Assert.AreEqual(1, UnityEngine.Object.FindObjectsByType<XRayGrassSettingsProvider>().Length);
                     controller.SetValues(saved);
                     Assert.AreEqual(JsonUtility.ToJson(saved), JsonUtility.ToJson(new XRayGrassSettings(XRayGrassDefaults.Load(json), settingsPath).Values));
                     root.SetActive(false);

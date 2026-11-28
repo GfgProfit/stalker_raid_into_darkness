@@ -839,7 +839,7 @@ namespace XRay.Importer.Tests
                 temporary.Add(copy);
                 renderer.sharedMaterial = copy;
                 Camera camera = Rig(scene, renderer.bounds, temporary, false);
-                using (var target = new Target(camera, 320, 180))
+                using (var target = new MonolithFloraImportCaptureTarget(camera, 320, 180))
                 {
                     for (int mode = 0; mode < 2; mode++)
                     {
@@ -900,7 +900,7 @@ namespace XRay.Importer.Tests
                 Vector3 center = bounds.center;
                 Vector3 direction = (camera.transform.position - center).normalized;
                 File.WriteAllText(Path.Combine(output, "Settings.txt"), "Batch=" + batch.Name + "\nMesh=" + AssetDatabase.GetAssetPath(batch.Mesh) + "\nMaterial=" + AssetDatabase.GetAssetPath(stored) + "\nAuthored=" + AssetDatabase.GetAssetPath(authored) + "\nAPI=" + SystemInfo.graphicsDeviceType + "\nDevice=" + SystemInfo.graphicsDeviceName + "\nResolution=640x360\nFOV=50\nSun=3 lux directional with shadows\nExposure=0 fixed\nInstanceMatrix=" + matrix.ToString("F6") + "\n");
-                using (var target = new Target(camera, 640, 360))
+                using (var target = new MonolithFloraImportCaptureTarget(camera, 640, 360))
                 {
                     foreach (float distance in new[] { 1.0f, 3.0f, 9.0f })
                     {
@@ -1027,7 +1027,9 @@ namespace XRay.Importer.Tests
             sun.type = LightType.Directional;
             sun.transform.rotation = Quaternion.Euler(60, -30, 0);
             sun.shadows = shadows ? LightShadows.Hard : LightShadows.None;
-            sun.gameObject.AddComponent<HDAdditionalLightData>().SetIntensity(3, LightUnit.Lux);
+            sun.gameObject.AddComponent<HDAdditionalLightData>();
+            sun.intensity = 3;
+            sun.lightUnit = LightUnit.Lux;
             rig.AddComponent<MonolithWeatherInputs>().SetInputs(0.71864f, Vector3.one, new Vector4(0.5f, 1, 0, 0), new Vector4(1.5f, 1, 0, 0), 0);
             rig.AddComponent<MonolithSourceLighting>().Mode = MonolithSourceLighting.LightingMode.Native;
             return camera;
@@ -1336,61 +1338,6 @@ namespace XRay.Importer.Tests
             Assert.IsTrue(Path.GetFullPath(output).StartsWith("E:\\Projects\\stalker_raid_into_darkness_Archive\\", StringComparison.OrdinalIgnoreCase));
             Directory.CreateDirectory(output);
             return output;
-        }
-
-        private sealed class Target : IDisposable
-        {
-            private readonly Camera _camera;
-            private readonly RenderTexture _target;
-            private readonly Texture2D _pixels;
-            private readonly int _width;
-            private readonly int _height;
-
-            public Target(Camera camera, int width, int height)
-            {
-                _camera = camera;
-                _width = width;
-                _height = height;
-                _target = new RenderTexture(width, height, 24, RenderTextureFormat.ARGBFloat, RenderTextureReadWrite.Linear);
-                _pixels = new Texture2D(width, height, TextureFormat.RGBAFloat, false, true);
-                _target.Create();
-                camera.aspect = (float)width / height;
-                camera.targetTexture = _target;
-            }
-
-            public Color[] Pixels()
-            {
-                RenderTexture previous = RenderTexture.active;
-                RenderTexture.active = _target;
-                _pixels.ReadPixels(new Rect(0, 0, _width, _height), 0, 0);
-                _pixels.Apply();
-                RenderTexture.active = previous;
-                return _pixels.GetPixels();
-            }
-
-            public void Save(string path)
-            {
-                File.WriteAllBytes(path + ".exr", _pixels.EncodeToEXR(Texture2D.EXRFlags.OutputAsFloat));
-                var display = new Texture2D(_width, _height, TextureFormat.RGBA32, false, true);
-                try
-                {
-                    display.SetPixels(_pixels.GetPixels());
-                    display.Apply();
-                    File.WriteAllBytes(path + ".png", display.EncodeToPNG());
-                }
-                finally
-                {
-                    UnityEngine.Object.DestroyImmediate(display);
-                }
-            }
-
-            public void Dispose()
-            {
-                _camera.targetTexture = null;
-                _target.Release();
-                UnityEngine.Object.DestroyImmediate(_pixels);
-                UnityEngine.Object.DestroyImmediate(_target);
-            }
         }
     }
 }

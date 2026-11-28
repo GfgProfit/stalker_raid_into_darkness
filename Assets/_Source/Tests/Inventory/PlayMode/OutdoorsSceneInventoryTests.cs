@@ -483,7 +483,7 @@ namespace RaidIntoDarkness.Inventory.Tests
                 Assert.That(model.TryAddAuto(item, BACKPACK, mergeStacks: false).Success, Is.True, section);
                 controller.Window.DropItem(item);
                 Assert.That(model.ContainsItem(item), Is.False, section);
-                WorldItem dropped = Object.FindObjectsByType<WorldItem>(FindObjectsSortMode.None).Single(worldItem => worldItem.Instance == item);
+                WorldItem dropped = Object.FindObjectsByType<WorldItem>().Single(worldItem => worldItem.Instance == item);
                 Rigidbody body = dropped.GetComponent<Rigidbody>();
                 Vector3 initialPosition = body.position;
                 Quaternion initialRotation = body.rotation;
@@ -534,7 +534,7 @@ namespace RaidIntoDarkness.Inventory.Tests
             ItemInstance first = model.CreateItem(definition, 4);
             Assert.That(model.TryAddAuto(first, BACKPACK, mergeStacks: false).Success, Is.True);
             controller.Window.DropItem(first);
-            WorldItem dropped = Object.FindObjectsByType<WorldItem>(FindObjectsSortMode.None).Single(worldItem => worldItem.Instance == first);
+            WorldItem dropped = Object.FindObjectsByType<WorldItem>().Single(worldItem => worldItem.Instance == first);
             Assert.That(Vector3.Dot(dropped.transform.position - dropCenter, forward), Is.LessThan(0.42f), "The item crossed the wall during placement");
 
             foreach (Collider collider in dropped.GetComponentsInChildren<Collider>())
@@ -557,7 +557,7 @@ namespace RaidIntoDarkness.Inventory.Tests
             Assert.That(model.ContainsItem(second), Is.True);
             Assert.That(second.Location, Is.EqualTo(original));
             Assert.That(second.Amount, Is.EqualTo(7));
-            Assert.That(Object.FindObjectsByType<WorldItem>(FindObjectsSortMode.None).Any(worldItem => worldItem.Instance == second), Is.False);
+            Assert.That(Object.FindObjectsByType<WorldItem>().Any(worldItem => worldItem.Instance == second), Is.False);
             controller.Close();
 
             BoxCollider CreateWall(Vector3 direction, float distance)
@@ -596,7 +596,7 @@ namespace RaidIntoDarkness.Inventory.Tests
                 ItemInstance item = model.CreateItem(definition);
                 Assert.That(model.TryAddAuto(item, BACKPACK, mergeStacks: false).Success, Is.True);
                 controller.Window.DropItem(item);
-                WorldItem dropped = Object.FindObjectsByType<WorldItem>(FindObjectsSortMode.None).Single(worldItem => worldItem.Instance == item);
+                WorldItem dropped = Object.FindObjectsByType<WorldItem>().Single(worldItem => worldItem.Instance == item);
                 WorldItemImpactSound impact = dropped.GetComponent<WorldItemImpactSound>();
                 Assert.That(impact.Mass, Is.LessThan(1f));
                 Assert.That(impact.PlayedCount, Is.Zero, "The impact clip played before the item hit a surface");
@@ -633,9 +633,9 @@ namespace RaidIntoDarkness.Inventory.Tests
             StalkerPlayerController player = Object.FindAnyObjectByType<StalkerPlayerController>();
             Assert.That(controller, Is.Not.Null, "OutdoorsScene has no InventoryWindowController");
             Assert.That(player, Is.Not.Null);
-            Assert.That(Object.FindObjectsByType<InventoryWindowController>(FindObjectsSortMode.None).Length, Is.EqualTo(1));
-            Assert.That(Object.FindObjectsByType<InventoryWindow>(FindObjectsInactive.Include, FindObjectsSortMode.None).Length, Is.EqualTo(1));
-            Assert.That(Object.FindObjectsByType<EventSystem>(FindObjectsInactive.Include, FindObjectsSortMode.None).Length, Is.EqualTo(1));
+            Assert.That(Object.FindObjectsByType<InventoryWindowController>().Length, Is.EqualTo(1));
+            Assert.That(Object.FindObjectsByType<InventoryWindow>(FindObjectsInactive.Include).Length, Is.EqualTo(1));
+            Assert.That(Object.FindObjectsByType<EventSystem>(FindObjectsInactive.Include).Length, Is.EqualTo(1));
             InventoryWindow window = controller.Window;
             Assert.That(window.IsOpen, Is.False, "inventory must start closed");
             Assert.That(controller.Player, Is.SameAs(player));
@@ -740,7 +740,7 @@ namespace RaidIntoDarkness.Inventory.Tests
             Assert.That(pickedDefinition, Is.Not.Null, "no item definition has a world prefab");
             WorldItem spawned = interactor.Spawn(pickedDefinition, 1);
             Assert.That(spawned, Is.Not.Null);
-            Assert.That(Object.FindObjectsByType<WorldItem>(FindObjectsSortMode.None).Length, Is.GreaterThan(0), "The fixture spawned no world item to pick up");
+            Assert.That(Object.FindObjectsByType<WorldItem>().Length, Is.GreaterThan(0), "The fixture spawned no world item to pick up");
             spawned.GetComponent<Rigidbody>().isKinematic = true;
             Transform view = player.CameraController.Camera.transform;
             Vector3 colliderOffset = spawned.GetComponent<Collider>().bounds.center - spawned.transform.position;
@@ -843,11 +843,11 @@ namespace RaidIntoDarkness.Inventory.Tests
             window.UnequipItem(picked);
             yield return null;
             Assert.That(equippedSlot.Icon.isActiveAndEnabled, Is.False, "unequipped slot still shows the icon");
-            int worldBefore = Object.FindObjectsByType<WorldItem>(FindObjectsSortMode.None).Length;
+            int worldBefore = Object.FindObjectsByType<WorldItem>().Length;
             window.DropItem(picked);
             yield return null;
             Assert.That(model.ContainsItem(picked), Is.False);
-            Assert.That(Object.FindObjectsByType<WorldItem>(FindObjectsSortMode.None).Length, Is.EqualTo(worldBefore + 1), "dropping did not spawn a world item");
+            Assert.That(Object.FindObjectsByType<WorldItem>().Length, Is.EqualTo(worldBefore + 1), "dropping did not spawn a world item");
             yield return Tap(_keyboard.tabKey);
             yield return null;
             yield return null;
@@ -866,7 +866,7 @@ namespace RaidIntoDarkness.Inventory.Tests
             yield return null;
             yield return null;
             Assert.That(player.GameplayInputBlocked, Is.False);
-            Assert.That(Object.FindObjectsByType<EventSystem>(FindObjectsInactive.Include, FindObjectsSortMode.None).Length, Is.EqualTo(1));
+            Assert.That(Object.FindObjectsByType<EventSystem>(FindObjectsInactive.Include).Length, Is.EqualTo(1));
         }
 
         [UnityTest]
@@ -985,14 +985,14 @@ namespace RaidIntoDarkness.Inventory.Tests
             yield return WaitForEquipmentAnimations(controller);
             Assert.That(sounds[sounds.Count - 1], Is.EqualTo(InventorySound.ToBag), "unequipping must play inv_ruck");
             yield return new WaitForSeconds(0.6f);
-            int worldBefore = Object.FindObjectsByType<WorldItem>(FindObjectsSortMode.None).Length;
+            int worldBefore = Object.FindObjectsByType<WorldItem>().Length;
             window.DropItem(hat);
             Assert.That(sounds[sounds.Count - 1], Is.EqualTo(InventorySound.Drop), "dropping must play inv_drop");
             yield return null;
             WorldItem dropped = null;
             int droppedMatches = 0;
 
-            foreach (WorldItem candidate in Object.FindObjectsByType<WorldItem>(FindObjectsSortMode.None))
+            foreach (WorldItem candidate in Object.FindObjectsByType<WorldItem>())
             {
                 if (ReferenceEquals(candidate.Instance, hat))
                 {
@@ -1002,7 +1002,7 @@ namespace RaidIntoDarkness.Inventory.Tests
             }
 
             Assert.That(droppedMatches, Is.EqualTo(1), "the dropped instance must have exactly one world object");
-            Assert.That(Object.FindObjectsByType<WorldItem>(FindObjectsSortMode.None).Length, Is.EqualTo(worldBefore + 1));
+            Assert.That(Object.FindObjectsByType<WorldItem>().Length, Is.EqualTo(worldBefore + 1));
             WorldItemImpactSound impact = dropped.GetComponent<WorldItemImpactSound>();
             Assert.That(impact, Is.Not.Null, "world item prefab has no impact sound");
             float timeout = Time.time + 3f;

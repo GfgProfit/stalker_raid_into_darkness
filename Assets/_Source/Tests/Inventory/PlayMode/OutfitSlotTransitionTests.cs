@@ -223,7 +223,7 @@ namespace RaidIntoDarkness.Inventory.Tests
         private static int CountWorldInstances(ItemInstance item)
         {
             int count = 0;
-            foreach (WorldItem worldItem in Object.FindObjectsByType<WorldItem>(FindObjectsSortMode.None))
+            foreach (WorldItem worldItem in Object.FindObjectsByType<WorldItem>())
             {
                 if (worldItem.Instance == item && worldItem.isActiveAndEnabled)
                 {

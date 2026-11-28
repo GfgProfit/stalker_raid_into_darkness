@@ -18,11 +18,11 @@ namespace RaidIntoDarkness.Inventory.IconGeneration
 
         public ItemIconSceneIsolationScope()
         {
-            _lights = Object.FindObjectsByType<Light>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+            _lights = Object.FindObjectsByType<Light>(FindObjectsInactive.Include);
             _lightEnabledStates = new bool[_lights.Length];
-            _volumes = Object.FindObjectsByType<Volume>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+            _volumes = Object.FindObjectsByType<Volume>(FindObjectsInactive.Include);
             _volumeEnabledStates = new bool[_volumes.Length];
-            _reflectionProbes = Object.FindObjectsByType<ReflectionProbe>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+            _reflectionProbes = Object.FindObjectsByType<ReflectionProbe>(FindObjectsInactive.Include);
             _reflectionProbeEnabledStates = new bool[_reflectionProbes.Length];
         }
 

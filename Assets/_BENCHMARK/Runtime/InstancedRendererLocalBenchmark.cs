@@ -21,7 +21,7 @@ namespace Rvm.Benchmark
                 var identity = BenchmarkBuildIdentity.Capture();
                 if (!BenchmarkBuildIdentity.IsVerified(identity)) throw new InvalidOperationException("Local Player origin not verified.");
                 var sizes = new List<int>();
-                foreach (var renderer in UnityEngine.Object.FindObjectsByType<XRayLevelInstancedRenderer>(FindObjectsSortMode.None))
+                foreach (var renderer in UnityEngine.Object.FindObjectsByType<XRayLevelInstancedRenderer>())
                 {
                     if (renderer.BatchSet == null) continue;
                     foreach (var batch in renderer.BatchSet.Batches) sizes.Add(batch.Count);
@@ -36,8 +36,8 @@ namespace Rvm.Benchmark
                 var root = new GameObject("Renderer local benchmark");
                 var old = root.AddComponent<BenchmarkRendererReference>();
                 var current = root.AddComponent<BenchmarkRendererCandidate>();
-                var results = new List<Result>();
-                var cold = new List<Cold>();
+                var results = new List<InstancedRendererLocalBenchmarkResult>();
+                var cold = new List<InstancedRendererLocalBenchmarkColdSample>();
                 foreach (int count in selected)
                 {
                     var matrices = new Matrix4x4[count];
@@ -51,7 +51,7 @@ namespace Rvm.Benchmark
                         long begin = Stopwatch.GetTimestamp();
                         if (optimized) current.Observe(0, batch, 0);
                         else old.Observe(0, batch, 0);
-                        cold.Add(new Cold { count = count, variant = optimized ? "B" : "A", ns = Nanoseconds(begin), payloadBytes = count * 128L });
+                        cold.Add(new InstancedRendererLocalBenchmarkColdSample { count = count, variant = optimized ? "B" : "A", ns = Nanoseconds(begin), payloadBytes = count * 128L });
                     }
                     foreach (string scenario in new[] { "StaticOneCamera", "MovingOneCamera", "StaticThreeCameras", "MutateBetweenThreeCameras", "Rebuild" })
                     {
@@ -95,14 +95,14 @@ namespace Rvm.Benchmark
                                 if (expected == null) expected = consumed;
                                 else if (!System.Linq.Enumerable.SequenceEqual(expected, consumed)) throw new InvalidOperationException("Timed payload checksums differ.");
                             }
-                            if (trial >= 0) results.Add(new Result { count = count, scenario = scenario, trial = trial, calls = iterations * (scenario.Contains("Three") ? 3 : 1), oldNsPerCallback = a, newNsPerCallback = b });
+                            if (trial >= 0) results.Add(new InstancedRendererLocalBenchmarkResult { count = count, scenario = scenario, trial = trial, calls = iterations * (scenario.Contains("Three") ? 3 : 1), oldNsPerCallback = a, newNsPerCallback = b });
                         }
                     }
                 }
                 byte[] positive = new byte[1024 * 1024];
                 positive[0] = 1;
                 GC.KeepAlive(positive);
-                BenchmarkOutput.WriteJson(Path.Combine(output, "local-results.json"), new Document { identity = identity, sceneBatchCounts = sizes, cold = cold, results = results, memoryNote = "No new persistent cache. Both retain one 128-byte InstanceData per instance plus identical array/history/list overhead. Cold is one independent first call per size and variant; Rebuild has 7 alternating warmed trials. Thread allocation counter deliberately unused; memory/GC evidence comes from Diagnostic and capture GC.Alloc with positive control outside target." });
+                BenchmarkOutput.WriteJson(Path.Combine(output, "local-results.json"), new InstancedRendererLocalBenchmarkReport { identity = identity, sceneBatchCounts = sizes, cold = cold, results = results, memoryNote = "No new persistent cache. Both retain one 128-byte InstanceData per instance plus identical array/history/list overhead. Cold is one independent first call per size and variant; Rebuild has 7 alternating warmed trials. Thread allocation counter deliberately unused; memory/GC evidence comes from Diagnostic and capture GC.Alloc with positive control outside target." });
                 UnityEngine.Object.Destroy(root);
                 Application.Quit(0);
             }
@@ -114,35 +114,5 @@ namespace Rvm.Benchmark
         }
 
         private static double Nanoseconds(long begin) => (Stopwatch.GetTimestamp() - begin) * (1000000000.0 / Stopwatch.Frequency);
-
-        [Serializable]
-        private sealed class Result
-        {
-            public int count;
-            public string scenario;
-            public int trial;
-            public int calls;
-            public double oldNsPerCallback;
-            public double newNsPerCallback;
-        }
-
-        [Serializable]
-        private sealed class Cold
-        {
-            public int count;
-            public string variant;
-            public double ns;
-            public long payloadBytes;
-        }
-
-        [Serializable]
-        private sealed class Document
-        {
-            public BenchmarkBuildIdentityEvidence identity;
-            public List<int> sceneBatchCounts;
-            public List<Cold> cold;
-            public List<Result> results;
-            public string memoryNote;
-        }
     }
 }

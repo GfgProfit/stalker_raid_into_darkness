@@ -588,7 +588,7 @@ namespace RaidIntoDarkness.Inventory.Tests
                 yield return null;
                 WorldItem dropped = null;
 
-                foreach (WorldItem candidate in Object.FindObjectsByType<WorldItem>(FindObjectsSortMode.None))
+                foreach (WorldItem candidate in Object.FindObjectsByType<WorldItem>())
                 {
                     if (candidate.Instance == weapon)
                     {
@@ -833,7 +833,7 @@ namespace RaidIntoDarkness.Inventory.Tests
                 yield return null;
                 WorldItem dropped = null;
 
-                foreach (WorldItem candidate in Object.FindObjectsByType<WorldItem>(FindObjectsSortMode.None))
+                foreach (WorldItem candidate in Object.FindObjectsByType<WorldItem>())
                 {
                     if (candidate.Instance == weapon)
                     {
@@ -1057,7 +1057,7 @@ namespace RaidIntoDarkness.Inventory.Tests
                     shoot.Invoke(weapons, new object[] { weapons.ActiveWeapon });
                     BallisticProjectile newest = null;
 
-                    foreach (BallisticProjectile projectile in Object.FindObjectsByType<BallisticProjectile>(FindObjectsSortMode.None))
+                    foreach (BallisticProjectile projectile in Object.FindObjectsByType<BallisticProjectile>())
                     {
                         if (Vector3.Distance(projectile.LaunchPosition, position) < 0.000001f)
                         {
@@ -1260,7 +1260,7 @@ namespace RaidIntoDarkness.Inventory.Tests
 
         private static bool IsEffectPlaying(string prefabName)
         {
-            foreach (XRayParticleGroupPlayer player in Object.FindObjectsByType<XRayParticleGroupPlayer>(FindObjectsSortMode.None))
+            foreach (XRayParticleGroupPlayer player in Object.FindObjectsByType<XRayParticleGroupPlayer>())
             {
                 if (player.name == prefabName && player.IsPlaying)
                 {

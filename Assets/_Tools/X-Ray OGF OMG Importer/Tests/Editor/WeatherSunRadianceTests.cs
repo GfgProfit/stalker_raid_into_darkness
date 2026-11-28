@@ -22,7 +22,7 @@ namespace XRay.Importer.Tests
         public void SetUp()
         {
             if (XRayWeatherController.Active != null) Assert.Ignore("This isolated fixture preserves the existing weather owner.");
-            foreach (MonolithSourceLighting provider in Object.FindObjectsByType<MonolithSourceLighting>(FindObjectsInactive.Exclude, FindObjectsSortMode.None))
+            foreach (MonolithSourceLighting provider in Object.FindObjectsByType<MonolithSourceLighting>())
             {
                 if (provider.isActiveAndEnabled) Assert.Ignore("This isolated fixture preserves the existing source-lighting owner.");
             }

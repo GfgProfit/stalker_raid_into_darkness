@@ -76,7 +76,7 @@ namespace XRay.Importer.Tests
             ParticleSystem particles = null;
             HDAdditionalLightData templateData = null;
             PunctualShadowDistance policy = null;
-            var evidence = new Evidence();
+            var evidence = new PunctualShadowParticleEvidence();
             string phase = "initial75";
             int render = 0;
             var particleBuffer = new ParticleSystem.Particle[4];
@@ -114,7 +114,7 @@ namespace XRay.Importer.Tests
                     }
                     if (matchedParticle < 0) continue;
                     HDAdditionalLightData data = light.GetComponent<HDAdditionalLightData>();
-                    evidence.lights.Add(new Observation { phase = phase, render = render, frame = Time.frameCount, slot = slot, matchedParticle = matchedParticle, templateIdentity = light.GetEntityId().ToString(), name = light.name, templateEnabled = light.enabled, intensity = light.intensity, shadows = light.shadows.ToString(), position = position, particlePosition = particleBuffer[matchedParticle].position, templatePosition = template.transform.position, descriptorColor = visible.finalColor, descriptorRange = visible.range, hasHdData = data != null, fade = data != null ? data.shadowFadeDistance : -1f, templateFade = templateData.shadowFadeDistance });
+                    evidence.lights.Add(new PunctualShadowParticleObservation { phase = phase, render = render, frame = Time.frameCount, slot = slot, matchedParticle = matchedParticle, templateIdentity = light.GetEntityId().ToString(), name = light.name, templateEnabled = light.enabled, intensity = light.intensity, shadows = light.shadows.ToString(), position = position, particlePosition = particleBuffer[matchedParticle].position, templatePosition = template.transform.position, descriptorColor = visible.finalColor, descriptorRange = visible.range, hasHdData = data != null, fade = data != null ? data.shadowFadeDistance : -1f, templateFade = templateData.shadowFadeDistance });
                 }
             };
             try
@@ -145,9 +145,10 @@ namespace XRay.Importer.Tests
                 control = controlObject.AddComponent<Light>();
                 control.type = LightType.Point;
                 control.range = 8f;
-                control.intensity = 1000f;
                 control.cullingMask = 1 << root.layer;
-                controlObject.AddComponent<HDAdditionalLightData>().SetIntensity(1000f, LightUnit.Candela);
+                controlObject.AddComponent<HDAdditionalLightData>();
+                control.intensity = 1000f;
+                control.lightUnit = LightUnit.Candela;
                 var templateObject = new GameObject("Punctual particle template") { layer = root.layer };
                 templateObject.transform.SetParent(root.transform, false);
                 template = templateObject.AddComponent<Light>();
@@ -278,17 +279,17 @@ namespace XRay.Importer.Tests
             }
         }
 
-        private static int Count(Evidence evidence, string phase)
+        private static int Count(PunctualShadowParticleEvidence evidence, string phase)
         {
             int count = 0;
-            foreach (Observation observation in evidence.lights) if (observation.phase == phase) count++;
+            foreach (PunctualShadowParticleObservation observation in evidence.lights) if (observation.phase == phase) count++;
             return count;
         }
 
-        private static void AssertPhase(Evidence evidence, string phase, float expectedFade)
+        private static void AssertPhase(PunctualShadowParticleEvidence evidence, string phase, float expectedFade)
         {
             Assert.That(Count(evidence, phase), Is.GreaterThan(0), phase + " must observe real per-particle visible-light descriptors.");
-            foreach (Observation observation in evidence.lights)
+            foreach (PunctualShadowParticleObservation observation in evidence.lights)
             {
                 if (observation.phase != phase) continue;
                 Assert.That(observation.templateEnabled, Is.False);
@@ -299,51 +300,6 @@ namespace XRay.Importer.Tests
                 Assert.That((observation.position - observation.particlePosition).sqrMagnitude, Is.LessThan(0.0001f));
                 Assert.That((observation.position - observation.templatePosition).sqrMagnitude, Is.GreaterThanOrEqualTo(0.0001f));
             }
-        }
-
-        [Serializable]
-        private sealed class Evidence
-        {
-            public string scope = "Public endCameraRendering context.Cull observes real per-particle VisibleLight slots. They reuse the disabled template Light identity and have particle-matched transforms distinct from the template transform. HDRP consumes that reference's HD data; separate Light clone identities are not claimed. Initial75/configured120/disabled and a particle-Lights-module-off control are asserted.";
-            public int particleCount;
-            public int initialGeneratedObservations;
-            public float templateFadeAfterDisable;
-            public bool sourceIsPlaying;
-            public bool sourceIsPaused;
-            public bool sourceIsEmitting;
-            public bool sourceLightsModuleEnabled;
-            public bool sourceLightTemplateEnabled;
-            public int cullSnapshots;
-            public int visibleLightObservations;
-            public int templateVisibleObservations;
-            public int controlVisibleObservations;
-            public int generatedObservationsAfterModuleDisable;
-            public int controlObservationsAfterModuleDisable;
-            public int particleCountAfterModuleDisable;
-            public List<Observation> lights = new List<Observation>();
-        }
-
-        [Serializable]
-        private sealed class Observation
-        {
-            public string phase;
-            public int render;
-            public int frame;
-            public int slot;
-            public int matchedParticle;
-            public string templateIdentity;
-            public string name;
-            public bool templateEnabled;
-            public float intensity;
-            public string shadows;
-            public Vector3 position;
-            public Vector3 particlePosition;
-            public Vector3 templatePosition;
-            public Color descriptorColor;
-            public float descriptorRange;
-            public bool hasHdData;
-            public float fade;
-            public float templateFade;
         }
     }
 }

@@ -62,8 +62,8 @@ namespace XRay.Importer.Tests
         {
             var first = new[] { new Color(91.5f, 91.5f, 91.5f, 1f) };
             var second = new[] { new Color(91.5625f, 91.5625f, 91.5f, 1f) };
-            Comparison half = Compare(first, second, first, first, GraphicsFormat.R16G16B16A16_SFloat);
-            Comparison full = Compare(first, second, first, first, GraphicsFormat.R32G32B32A32_SFloat);
+            XRayNativeReflectionComparison half = Compare(first, second, first, first, GraphicsFormat.R16G16B16A16_SFloat);
+            XRayNativeReflectionComparison full = Compare(first, second, first, first, GraphicsFormat.R32G32B32A32_SFloat);
             Assert.That(half.maximumError, Is.EqualTo(0.0625f));
             Assert.That(half.maximumResidual, Is.Zero);
             Assert.That(half.rawNonzeroChangedPixels, Is.EqualTo(1));
@@ -72,7 +72,7 @@ namespace XRay.Importer.Tests
             Assert.That(full.maximumResidual, Is.EqualTo(full.maximumError));
             Assert.That(full.adjacentHalfBudgetPixels, Is.Zero);
             second[0].a = 0.999f;
-            Comparison alpha = Compare(first, second, first, first, GraphicsFormat.R16G16B16A16_SFloat);
+            XRayNativeReflectionComparison alpha = Compare(first, second, first, first, GraphicsFormat.R16G16B16A16_SFloat);
             Assert.That(alpha.maximumAlphaError, Is.GreaterThan(0f));
             Assert.That(alpha.maximumResidual, Is.EqualTo(alpha.maximumAlphaError));
         }
@@ -126,7 +126,8 @@ namespace XRay.Importer.Tests
                 sun.shadows = LightShadows.Hard;
                 sun.transform.rotation = Quaternion.LookRotation(new Vector3(-1f, -0.6f, 1f));
                 HDAdditionalLightData sunData = sun.gameObject.AddComponent<HDAdditionalLightData>();
-                sunData.SetIntensity(3000f, LightUnit.Lux);
+                sun.intensity = 3000f;
+                sun.lightUnit = LightUnit.Lux;
                 sunData.shadowUpdateMode = ShadowUpdateMode.EveryFrame;
                 var receiverMaterial = new Material(Shader.Find("HDRP/Lit"));
                 owned.Add(receiverMaterial);
@@ -176,11 +177,11 @@ namespace XRay.Importer.Tests
                 standardCaster.sharedMaterial = receiverMaterial;
                 standardCaster.shadowCastingMode = ShadowCastingMode.On;
                 Assert.That(GeometryUtility.TestPlanesAABB(planes, standardCaster.bounds), Is.False, "The ordinary shadow control must stay outside the main camera frustum.");
-                Frame baseline = null;
-                Frame native = null;
-                Frame noSourceCaster = null;
-                Frame noCaster = null;
-                Frame noSources = null;
+                XRayNativeReflectionFrame baseline = null;
+                XRayNativeReflectionFrame native = null;
+                XRayNativeReflectionFrame noSourceCaster = null;
+                XRayNativeReflectionFrame noCaster = null;
+                XRayNativeReflectionFrame noSources = null;
                 IEnumerator capture = Capture(camera, target, probe, casters, sources, standardCaster, false, true, true, true, value => baseline = value);
                 while (capture.MoveNext()) yield return capture.Current;
                 capture = Capture(camera, target, probe, casters, sources, standardCaster, true, true, true, true, value => native = value);
@@ -198,11 +199,11 @@ namespace XRay.Importer.Tests
                 var pipeline = GraphicsSettings.currentRenderPipeline as HDRenderPipelineAsset;
                 GraphicsFormat mainFormat = pipeline != null ? (GraphicsFormat)pipeline.currentPlatformRenderPipelineSettings.colorBufferFormat : GraphicsFormat.None;
                 GraphicsFormat reflectionFormat = probe.realtimeTexture.graphicsFormat;
-                Comparison main = Compare(baseline.main, native.main, noSourceCaster.main, noSources.main, mainFormat);
-                Comparison reflected = Compare(baseline.reflection, native.reflection, noCaster.reflection, noSources.reflection, reflectionFormat);
-                Comparison mainShadowControl = Compare(baseline.main, noSourceCaster.main, noSourceCaster.main, noSources.main, mainFormat);
-                Comparison reflectionAllCastersControl = Compare(baseline.reflection, noCaster.reflection, noCaster.reflection, noSources.reflection, reflectionFormat);
-                Comparison reflectionNativeSourceControl = Compare(native.reflection, noSourceCaster.reflection, noSourceCaster.reflection, noSources.reflection, reflectionFormat);
+                XRayNativeReflectionComparison main = Compare(baseline.main, native.main, noSourceCaster.main, noSources.main, mainFormat);
+                XRayNativeReflectionComparison reflected = Compare(baseline.reflection, native.reflection, noCaster.reflection, noSources.reflection, reflectionFormat);
+                XRayNativeReflectionComparison mainShadowControl = Compare(baseline.main, noSourceCaster.main, noSourceCaster.main, noSources.main, mainFormat);
+                XRayNativeReflectionComparison reflectionAllCastersControl = Compare(baseline.reflection, noCaster.reflection, noCaster.reflection, noSources.reflection, reflectionFormat);
+                XRayNativeReflectionComparison reflectionNativeSourceControl = Compare(native.reflection, noSourceCaster.reflection, noSourceCaster.reflection, noSources.reflection, reflectionFormat);
                 Assert.That(mainShadowControl.changedPixels >= baseline.main.Length * 0.005f || mainShadowControl.rawNonzeroChangedPixels >= baseline.main.Length * 0.005f || mainShadowControl.maximumAlphaError > 0f || mainShadowControl.maximumResidual >= 0.02f, Is.True, "Removing native-source caster shadows must fail the unchanged main-image A/B acceptance limits.");
                 Assert.That(reflectionAllCastersControl.changedPixels >= baseline.reflection.Length * 0.005f || reflectionAllCastersControl.rawNonzeroChangedPixels >= baseline.reflection.Length * 0.005f || reflectionAllCastersControl.maximumAlphaError > 0f || reflectionAllCastersControl.maximumResidual >= 0.02f, Is.True, "Removing all caster shadows must fail the unchanged reflection-image A/B acceptance limits.");
                 Assert.That(reflectionNativeSourceControl.changedPixels, Is.LessThan(native.reflection.Length * 0.005f));
@@ -245,9 +246,9 @@ namespace XRay.Importer.Tests
             }
         }
 
-        private static IEnumerator Capture(Camera camera, RenderTexture target, HDProbe probe, XRayLevelInstancedRenderer casters, XRayLevelInstancedRenderer sources, MeshRenderer standardCaster, bool native, bool showCasters, bool showSources, bool standardCasterShadows, Action<Frame> completed)
+        private static IEnumerator Capture(Camera camera, RenderTexture target, HDProbe probe, XRayLevelInstancedRenderer casters, XRayLevelInstancedRenderer sources, MeshRenderer standardCaster, bool native, bool showCasters, bool showSources, bool standardCasterShadows, Action<XRayNativeReflectionFrame> completed)
         {
-            Frame frame = null;
+            XRayNativeReflectionFrame frame = null;
             casters.NativeSubmissionOverride = native;
             sources.NativeSubmissionOverride = native;
             standardCaster.shadowCastingMode = standardCasterShadows ? ShadowCastingMode.On : ShadowCastingMode.Off;
@@ -264,7 +265,7 @@ namespace XRay.Importer.Tests
                 object casterBuffer = null;
                 object sourceBuffer = null;
                 bool nativeBuffersStable = true;
-                var culling = new CullingMetadataObserver();
+                var culling = new XRayNativeReflectionCullingObserver();
                 void Begin(ScriptableRenderContext context, Camera candidate)
                 {
                     ShaderUtil.allowAsyncCompilation = false;
@@ -304,7 +305,7 @@ namespace XRay.Importer.Tests
                     uint renderCountBefore = RenderCount(probe);
                     probe.RequestRenderNextUpdate();
                     camera.Render();
-                    var metrics = new CaptureMetrics
+                    var metrics = new XRayNativeReflectionCaptureMetrics
                     {
                         updateBefore = updateBefore,
                         updateAfter = probe.realtimeTexture != null ? probe.realtimeTexture.updateCount : 0,
@@ -323,14 +324,14 @@ namespace XRay.Importer.Tests
                         nativeBuffersStable = nativeBuffersStable,
                         fallbackReason = casters.NativeSubmissionFallbackReason + ";" + sources.NativeSubmissionFallbackReason
                     };
-                    CullingMetadata cullingMetadata = culling.Snapshot();
+                    XRayNativeReflectionCullingMetadata cullingMetadata = culling.Snapshot();
                     if (native && showCasters && showSources)
                     {
                         Assert.That(cullingMetadata.error, Is.Null);
                         bool lightObserved = false;
                         bool reflectionLightObserved = false;
                         int gameShadowCommands = 0;
-                        foreach (CullingViewMetadata view in cullingMetadata.views)
+                        foreach (XRayNativeReflectionCullingViewMetadata view in cullingMetadata.views)
                         {
                             if (view.viewType != BatchCullingViewType.Light.ToString()) continue;
                             lightObserved = true;
@@ -353,7 +354,7 @@ namespace XRay.Importer.Tests
                     Color[] reflected = ReadProbe(probe.realtimeTexture, out _, out _);
                     AssertFinite(main, "Main camera");
                     AssertFinite(reflected, "Reflection");
-                    frame = new Frame { main = main, reflection = reflected, metrics = metrics };
+                    frame = new XRayNativeReflectionFrame { main = main, reflection = reflected, metrics = metrics };
                 }
                 finally
                 {
@@ -588,13 +589,13 @@ namespace XRay.Importer.Tests
             }
         }
 
-        private static Comparison Compare(Color[] baseline, Color[] native, Color[] noCaster, Color[] noSources, GraphicsFormat format)
+        private static XRayNativeReflectionComparison Compare(Color[] baseline, Color[] native, Color[] noCaster, Color[] noSources, GraphicsFormat format)
         {
             Assert.That(native.Length, Is.EqualTo(baseline.Length));
             Assert.That(noCaster.Length, Is.EqualTo(baseline.Length));
             Assert.That(noSources.Length, Is.EqualTo(baseline.Length));
             bool half = format == GraphicsFormat.R16G16B16A16_SFloat;
-            var result = new Comparison { pixels = baseline.Length, precisionFormat = format.ToString(), precisionMethod = half ? "Budget only finite exactly round-tripping binary16 RGB pairs with ordered half-bit distance at most one. All other RGB and alpha errors retain the original absolute tolerance. Raw errors and changed-pixel count remain unchanged." : "No precision allowance; original absolute RGB and alpha errors." };
+            var result = new XRayNativeReflectionComparison { pixels = baseline.Length, precisionFormat = format.ToString(), precisionMethod = half ? "Budget only finite exactly round-tripping binary16 RGB pairs with ordered half-bit distance at most one. All other RGB and alpha errors retain the original absolute tolerance. Raw errors and changed-pixel count remain unchanged." : "No precision allowance; original absolute RGB and alpha errors." };
             for (int index = 0; index < baseline.Length; index++)
             {
                 float error = Error(baseline[index], native[index]);
@@ -678,203 +679,6 @@ namespace XRay.Importer.Tests
         private static float Error(Color first, Color second)
         {
             return Mathf.Max(Mathf.Abs(first.r - second.r), Mathf.Max(Mathf.Abs(first.g - second.g), Mathf.Abs(first.b - second.b)));
-        }
-
-        private sealed class CullingMetadataObserver : IDisposable
-        {
-            private static readonly FieldInfo BACKEND = typeof(XRayLevelInstancedRenderer).GetField("_nativeRenderer", BindingFlags.Instance | BindingFlags.NonPublic);
-            private static readonly FieldInfo GROUP = typeof(XRayInstanceNativeRenderer).GetField("_group", BindingFlags.Instance | BindingFlags.NonPublic);
-            private static readonly FieldInfo CULLING = typeof(BatchRendererGroup).GetField("m_PerformCulling", BindingFlags.Instance | BindingFlags.NonPublic);
-            private static readonly PropertyInfo SHADOW_CAMERA_OWNER = typeof(HDRenderPipelineAsset).Assembly.GetType("UnityEngine.Rendering.HighDefinition.HDShadowCullingCameraScope")?.GetProperty("CurrentCamera", BindingFlags.Public | BindingFlags.Static);
-
-            private readonly List<ObservedCullingGroup> _groups = new List<ObservedCullingGroup>();
-            private readonly List<CullingViewMetadata> _views = new List<CullingViewMetadata>();
-            private readonly object _sync = new object();
-            private readonly int _ownerThreadId = Environment.CurrentManagedThreadId;
-
-            private string _recordError;
-
-            public void Attach(XRayLevelInstancedRenderer renderer, string label)
-            {
-                object backend = BACKEND.GetValue(renderer);
-                if (backend == null) return;
-                var group = GROUP.GetValue(backend) as BatchRendererGroup;
-                if (group == null) return;
-                foreach (ObservedCullingGroup observed in _groups) if (ReferenceEquals(observed.Group, group)) return;
-                Assert.That(CULLING, Is.Not.Null);
-                Assert.That(CULLING.FieldType, Is.EqualTo(typeof(BatchRendererGroup.OnPerformCulling)));
-                Assert.That(CULLING.IsInitOnly, Is.False);
-                var original = CULLING.GetValue(group) as BatchRendererGroup.OnPerformCulling;
-                Assert.That(original, Is.Not.Null);
-                var entry = new ObservedCullingGroup(this, renderer, group, original, label);
-                _groups.Add(entry);
-                CULLING.SetValue(group, entry.Wrapper);
-            }
-
-            public CullingMetadata Snapshot()
-            {
-                lock (_sync)
-                {
-                    return new CullingMetadata { error = _recordError, views = _views.ToArray() };
-                }
-            }
-
-            public void Dispose()
-            {
-                Exception failure = null;
-                foreach (ObservedCullingGroup observed in _groups)
-                {
-                    try
-                    {
-                        object current = CULLING.GetValue(observed.Group);
-                        if (ReferenceEquals(current, observed.Wrapper)) CULLING.SetValue(observed.Group, observed.Original);
-                        else if (!ReferenceEquals(current, observed.Original)) throw new InvalidOperationException("The owned fixture culling callback changed during observation.");
-                    }
-                    catch (Exception exception)
-                    {
-                        failure = failure ?? exception;
-                    }
-                }
-                _groups.Clear();
-                if (failure != null) throw new InvalidOperationException("The fixture culling callback could not be restored.", failure);
-            }
-
-            private void Record(BatchCullingViewType viewType, Camera ownerCamera, int shadowCommands)
-            {
-                try
-                {
-                    var record = new CullingViewMetadata { ownerCameraEntityId = ownerCamera != null ? ownerCamera.GetEntityId().ToString() : null, ownerCameraType = ownerCamera != null ? ownerCamera.cameraType.ToString() : null, shadowCommands = shadowCommands, viewType = viewType.ToString() };
-                    lock (_sync)
-                    {
-                        _views.Add(record);
-                    }
-                }
-                catch (Exception exception)
-                {
-                    lock (_sync)
-                    {
-                        _recordError = _recordError ?? exception.ToString();
-                    }
-                }
-            }
-
-            private sealed class ObservedCullingGroup
-            {
-                private readonly CullingMetadataObserver _owner;
-                private readonly XRayLevelInstancedRenderer _renderer;
-                private readonly string _label;
-                private int _entered;
-
-                public BatchRendererGroup Group { get; }
-                public BatchRendererGroup.OnPerformCulling Original { get; }
-                public BatchRendererGroup.OnPerformCulling Wrapper { get; }
-
-                public ObservedCullingGroup(CullingMetadataObserver owner, XRayLevelInstancedRenderer renderer, BatchRendererGroup group, BatchRendererGroup.OnPerformCulling original, string label)
-                {
-                    _owner = owner;
-                    _renderer = renderer;
-                    _label = label;
-                    Group = group;
-                    Original = original;
-                    Wrapper = Invoke;
-                }
-
-                private JobHandle Invoke(BatchRendererGroup group, BatchCullingContext context, BatchCullingOutput output, IntPtr userContext)
-                {
-                    int threadId = Environment.CurrentManagedThreadId;
-                    int entryDepth = Interlocked.Increment(ref _entered);
-                    if (threadId != _owner._ownerThreadId || entryDepth != 1) Interlocked.CompareExchange(ref _owner._recordError, "Unexpected BRG culling execution: ownerThread=" + _owner._ownerThreadId + "; callbackThread=" + threadId + "; entryDepth=" + entryDepth + "; renderer=" + _label + "; view=" + context.viewType, null);
-                    int shadowCommands = _renderer.NativeShadowCommands;
-                    Camera ownerCamera = null;
-                    try
-                    {
-                        if (context.viewType == BatchCullingViewType.Light)
-                        {
-                            try
-                            {
-                                ownerCamera = SHADOW_CAMERA_OWNER?.GetValue(null) as Camera;
-                            }
-                            catch (Exception exception)
-                            {
-                                Interlocked.CompareExchange(ref _owner._recordError, exception.ToString(), null);
-                            }
-                        }
-                        return Original(group, context, output, userContext);
-                    }
-                    finally
-                    {
-                        try
-                        {
-                            _owner.Record(context.viewType, ownerCamera, _renderer.NativeShadowCommands - shadowCommands);
-                        }
-                        finally
-                        {
-                            Interlocked.Decrement(ref _entered);
-                        }
-                    }
-                }
-            }
-        }
-
-        [Serializable]
-        private sealed class CullingMetadata
-        {
-            public string error;
-            public CullingViewMetadata[] views;
-        }
-
-        [Serializable]
-        private sealed class CullingViewMetadata
-        {
-            public string ownerCameraEntityId;
-            public string ownerCameraType;
-            public int shadowCommands;
-            public string viewType;
-        }
-
-        private sealed class Frame
-        {
-            public Color[] main;
-            public Color[] reflection;
-            public CaptureMetrics metrics;
-        }
-
-        [Serializable]
-        private sealed class CaptureMetrics
-        {
-            public uint updateBefore;
-            public uint updateAfter;
-            public uint renderCountBefore;
-            public uint renderCountAfter;
-            public int reflectionCommands;
-            public int reflectionInstances;
-            public int reflectionViews;
-            public int shadowCommands;
-            public int shadowInstances;
-            public int legacySubmissionCalls;
-            public int legacySubmittedInstances;
-            public int reflectionCameraEnds;
-            public int reflectionCamerasWithInheritedSky;
-            public int reflectionCamerasWithoutShadows;
-            public bool nativeBuffersStable;
-            public string fallbackReason;
-        }
-
-        [Serializable]
-        private sealed class Comparison
-        {
-            public int pixels;
-            public int changedPixels;
-            public int rawNonzeroChangedPixels;
-            public int casterControlPixels;
-            public int sourceControlPixels;
-            public float maximumError;
-            public float maximumResidual;
-            public float maximumAlphaError;
-            public int adjacentHalfBudgetPixels;
-            public int adjacentHalfBudgetChannels;
-            public string precisionFormat;
-            public string precisionMethod;
         }
     }
 }

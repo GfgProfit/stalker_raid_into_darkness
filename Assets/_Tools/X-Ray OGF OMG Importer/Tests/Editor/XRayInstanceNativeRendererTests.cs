@@ -199,10 +199,10 @@ namespace XRay.Importer.Tests
             var owned = new List<UnityEngine.Object>();
             RenderTexture initial = RenderTexture.active;
             bool asyncCompilation = ShaderUtil.allowAsyncCompilation;
-            var windGlobals = wind ? new WindGlobals() : null;
+            var windGlobals = wind ? new XRayNativeInstanceWindGlobals() : null;
             Scene scene = default;
             IEnumerator capture = null;
-            ShadowViewObserver shadowViews = null;
+            XRayNativeInstanceShadowViewObserver shadowViews = null;
             try
             {
                 ShaderUtil.allowAsyncCompilation = false;
@@ -257,13 +257,18 @@ namespace XRay.Importer.Tests
                 light.transform.rotation = Quaternion.LookRotation(new Vector3(-1f, -1f, 0f));
                 HDAdditionalLightData lightData = light.gameObject.AddComponent<HDAdditionalLightData>();
                 lightData.shadowUpdateMode = ShadowUpdateMode.EveryFrame;
-                if (lightType == LightType.Directional) lightData.SetIntensity(3000f, LightUnit.Lux);
+                if (lightType == LightType.Directional)
+                {
+                    light.intensity = 3000f;
+                    light.lightUnit = LightUnit.Lux;
+                }
                 else
                 {
                     light.transform.position = new Vector3(8f, 8f, 0f);
                     light.range = 30f;
                     light.spotAngle = 90f;
-                    lightData.SetIntensity(500000f, LightUnit.Lumen);
+                    light.intensity = LightUnitUtils.ConvertIntensity(light, 500000f, LightUnit.Lumen, LightUnit.Candela);
+                    light.lightUnit = LightUnit.Lumen;
                 }
                 var receiverMaterial = new Material(Shader.Find("HDRP/Lit"));
                 owned.Add(receiverMaterial);
@@ -286,7 +291,7 @@ namespace XRay.Importer.Tests
                 }
                 var casterRenderer = root.AddComponent<XRayLevelInstancedRenderer>();
                 casterRenderer.BatchSet = Set(owned, "native casters", casters);
-                shadowViews = new ShadowViewObserver(casterRenderer);
+                shadowViews = new XRayNativeInstanceShadowViewObserver(casterRenderer);
                 var payloadRoot = new GameObject("Native payload fixture");
                 payloadRoot.transform.SetParent(root.transform);
                 var payloadRenderer = payloadRoot.AddComponent<XRayLevelInstancedRenderer>();
@@ -371,8 +376,8 @@ namespace XRay.Importer.Tests
                         Assert.That(provider.State.AnimPrev, Is.EqualTo(windPrevious));
                         Assert.That(windCurrent, Is.Not.EqualTo(windPrevious));
                     }
-                    NativeMetrics casterMetrics = Metrics(casterRenderer);
-                    NativeMetrics payloadMetrics = Metrics(payloadRenderer);
+                    XRayNativeInstanceCaptureMetrics casterMetrics = Metrics(casterRenderer);
+                    XRayNativeInstanceCaptureMetrics payloadMetrics = Metrics(payloadRenderer);
                     File.WriteAllText(Path.Combine(output, "view" + view + "-native.json"), "{\"baselineFirstPayloadPixels\":" + baselineFirstPayloadPixels + ",\"baselineSecondPayloadPixels\":" + baselineSecondPayloadPixels + ",\"observedLightSplits\":" + shadowViews.MaximumLightSplits + ",\"compilingBeforeCapture\":" + compilingBeforeCapture.ToString().ToLowerInvariant() + ",\"compilingAfterCapture\":" + compilingAfterCapture.ToString().ToLowerInvariant() + ",\"commandBufferAsyncCompilation\":false,\"caster\":" + JsonUtility.ToJson(casterMetrics) + ",\"payload\":" + JsonUtility.ToJson(payloadMetrics) + "}");
                     SaveEvidence(Path.Combine(output, "view" + view + "_B"), pixels, after, previewMinimum, previewScale);
                     if (wind)
@@ -768,7 +773,7 @@ namespace XRay.Importer.Tests
 
         private static void SaveEvidence(string prefix, Texture2D raw, Color[] colors, float minimum, float scale)
         {
-            var range = new CaptureRange { minimum = new Color(float.MaxValue, float.MaxValue, float.MaxValue, float.MaxValue), maximum = new Color(float.MinValue, float.MinValue, float.MinValue, float.MinValue), pixelCount = colors.Length };
+            var range = new XRayNativeInstanceCaptureRange { minimum = new Color(float.MaxValue, float.MaxValue, float.MaxValue, float.MaxValue), maximum = new Color(float.MinValue, float.MinValue, float.MinValue, float.MinValue), pixelCount = colors.Length };
             var display = new Color[colors.Length];
             for (int index = 0; index < colors.Length; index++)
             {
@@ -807,9 +812,9 @@ namespace XRay.Importer.Tests
             return count;
         }
 
-        private static NativeMetrics Metrics(XRayLevelInstancedRenderer renderer)
+        private static XRayNativeInstanceCaptureMetrics Metrics(XRayLevelInstancedRenderer renderer)
         {
-            return new NativeMetrics { activeAfterCapture = renderer.NativeSubmissionActive, cameraCommands = renderer.NativeCameraCommands, cameraInstances = renderer.NativeCameraInstances, shadowCommands = renderer.NativeShadowCommands, shadowInstances = renderer.NativeShadowInstances, shadowViews = renderer.NativeShadowViews, cullingInvocations = renderer.NativeCullingInvocations, legacySubmissionCalls = renderer.LastSubmittedCalls, legacySubmittedInstances = renderer.LastSubmittedInstances, memoryBytes = renderer.NativeSubmissionMemoryBytes, fallbackReason = renderer.NativeSubmissionFallbackReason };
+            return new XRayNativeInstanceCaptureMetrics { activeAfterCapture = renderer.NativeSubmissionActive, cameraCommands = renderer.NativeCameraCommands, cameraInstances = renderer.NativeCameraInstances, shadowCommands = renderer.NativeShadowCommands, shadowInstances = renderer.NativeShadowInstances, shadowViews = renderer.NativeShadowViews, cullingInvocations = renderer.NativeCullingInvocations, legacySubmissionCalls = renderer.LastSubmittedCalls, legacySubmittedInstances = renderer.LastSubmittedInstances, memoryBytes = renderer.NativeSubmissionMemoryBytes, fallbackReason = renderer.NativeSubmissionFallbackReason };
         }
 
         private static void DestroyOwned(List<UnityEngine.Object> owned)
@@ -840,115 +845,6 @@ namespace XRay.Importer.Tests
         private static string Number(float value)
         {
             return value.ToString("R", CultureInfo.InvariantCulture);
-        }
-
-        [Serializable]
-        private sealed class NativeMetrics
-        {
-            public bool activeAfterCapture;
-            public int cameraCommands;
-            public int cameraInstances;
-            public int shadowCommands;
-            public int shadowInstances;
-            public int shadowViews;
-            public int cullingInvocations;
-            public int legacySubmissionCalls;
-            public int legacySubmittedInstances;
-            public long memoryBytes;
-            public string fallbackReason;
-        }
-
-        [Serializable]
-        private sealed class CaptureRange
-        {
-            public Color minimum;
-            public Color maximum;
-            public int pixelCount;
-        }
-
-        private sealed class ShadowViewObserver : IDisposable
-        {
-            private static readonly FieldInfo BACKEND = typeof(XRayLevelInstancedRenderer).GetField("_nativeRenderer", BindingFlags.Instance | BindingFlags.NonPublic);
-            private static readonly FieldInfo GROUP = typeof(XRayInstanceNativeRenderer).GetField("_group", BindingFlags.Instance | BindingFlags.NonPublic);
-            private static readonly FieldInfo CULLING = typeof(BatchRendererGroup).GetField("m_PerformCulling", BindingFlags.Instance | BindingFlags.NonPublic);
-
-            private readonly XRayLevelInstancedRenderer _renderer;
-            private readonly Dictionary<BatchRendererGroup, BatchRendererGroup.OnPerformCulling> _originals = new Dictionary<BatchRendererGroup, BatchRendererGroup.OnPerformCulling>();
-            private readonly Dictionary<BatchRendererGroup, BatchRendererGroup.OnPerformCulling> _wrappers = new Dictionary<BatchRendererGroup, BatchRendererGroup.OnPerformCulling>();
-
-            public int MaximumLightSplits { get; private set; }
-
-            public ShadowViewObserver(XRayLevelInstancedRenderer renderer)
-            {
-                _renderer = renderer;
-                RenderPipelineManager.beginCameraRendering += Attach;
-            }
-
-            public void Reset()
-            {
-                MaximumLightSplits = 0;
-            }
-
-            public void Dispose()
-            {
-                RenderPipelineManager.beginCameraRendering -= Attach;
-                foreach (KeyValuePair<BatchRendererGroup, BatchRendererGroup.OnPerformCulling> entry in _originals)
-                {
-                    object current = CULLING.GetValue(entry.Key);
-                    if (ReferenceEquals(current, _wrappers[entry.Key])) CULLING.SetValue(entry.Key, entry.Value);
-                    else if (!ReferenceEquals(current, entry.Value)) throw new InvalidOperationException("The native fixture shadow observer could not restore its callback.");
-                }
-                _originals.Clear();
-                _wrappers.Clear();
-            }
-
-            private void Attach(ScriptableRenderContext context, Camera camera)
-            {
-                if (_renderer == null) return;
-                object backend = BACKEND.GetValue(_renderer);
-                var group = backend != null ? GROUP.GetValue(backend) as BatchRendererGroup : null;
-                if (group == null || _originals.ContainsKey(group)) return;
-                Assert.That(CULLING, Is.Not.Null);
-                var original = CULLING.GetValue(group) as BatchRendererGroup.OnPerformCulling;
-                Assert.That(original, Is.Not.Null);
-                BatchRendererGroup.OnPerformCulling wrapper = (rendererGroup, cullingContext, output, userContext) =>
-                {
-                    if (cullingContext.viewType == BatchCullingViewType.Light) MaximumLightSplits = Math.Max(MaximumLightSplits, cullingContext.cullingSplits.Length);
-                    return original(rendererGroup, cullingContext, output, userContext);
-                };
-                _originals.Add(group, original);
-                _wrappers.Add(group, wrapper);
-                CULLING.SetValue(group, wrapper);
-            }
-        }
-
-        private sealed class WindGlobals
-        {
-            private readonly string[] _properties = { XRayFloraWindState.PARAMS_PROPERTY, XRayFloraWindState.TREES_SETUP_PROPERTY, XRayFloraWindState.ANIM_PROPERTY, XRayFloraWindState.ANIM_PREV_PROPERTY, XRayFloraWindState.TREE_WIND_PROPERTY, XRayFloraWindState.TREE_WAVE_PROPERTY, XRayFloraWindState.TREE_WIND_PREV_PROPERTY, XRayFloraWindState.TREE_WAVE_PREV_PROPERTY };
-            private readonly Vector4[] _values;
-            private readonly float _active;
-            private readonly int _benders;
-            private readonly Vector4[] _currentBenders;
-            private readonly Vector4[] _previousBenders;
-
-            public WindGlobals()
-            {
-                _active = Shader.GetGlobalFloat(XRayFloraWindState.ACTIVE_PROPERTY);
-                _values = new Vector4[_properties.Length];
-                for (int index = 0; index < _properties.Length; index++) _values[index] = Shader.GetGlobalVector(_properties[index]);
-                _benders = Shader.GetGlobalInteger(XRayGrassBenderState.COUNT_PROPERTY);
-                _currentBenders = Shader.GetGlobalVectorArray(XRayGrassBenderState.CURRENT_PROPERTY);
-                _previousBenders = Shader.GetGlobalVectorArray(XRayGrassBenderState.PREVIOUS_PROPERTY);
-            }
-
-            public void Restore()
-            {
-                Shader.SetGlobalFloat(XRayFloraWindState.ACTIVE_PROPERTY, _active);
-                for (int index = 0; index < _properties.Length; index++) Shader.SetGlobalVector(_properties[index], _values[index]);
-                Shader.SetGlobalInteger(XRayGrassBenderState.COUNT_PROPERTY, _benders);
-                if (_currentBenders != null && _currentBenders.Length > 0) Shader.SetGlobalVectorArray(XRayGrassBenderState.CURRENT_PROPERTY, _currentBenders);
-                if (_previousBenders != null && _previousBenders.Length > 0) Shader.SetGlobalVectorArray(XRayGrassBenderState.PREVIOUS_PROPERTY, _previousBenders);
-            }
         }
     }
 }

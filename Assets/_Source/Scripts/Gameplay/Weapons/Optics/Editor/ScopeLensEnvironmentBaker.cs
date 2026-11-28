@@ -219,7 +219,7 @@ namespace RaidIntoDarkness.Weapons.Optics.Editor
 
         private static StalkerCameraController FindPlayerCamera(Scene scene)
         {
-            foreach (StalkerCameraController candidate in Object.FindObjectsByType<StalkerCameraController>(FindObjectsInactive.Exclude, FindObjectsSortMode.None))
+            foreach (StalkerCameraController candidate in Object.FindObjectsByType<StalkerCameraController>())
             {
                 if (candidate.gameObject.scene == scene && candidate.Camera != null)
                 {

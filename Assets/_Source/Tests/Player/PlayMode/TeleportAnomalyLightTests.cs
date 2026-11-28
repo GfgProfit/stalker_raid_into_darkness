@@ -32,7 +32,7 @@ namespace RaidIntoDarkness.Player.Tests
             _scene = SceneManager.CreateScene(nameof(TeleportAnomalyLightTests));
             SceneManager.SetActiveScene(_scene);
             bool hasListener = false;
-            foreach (AudioListener listener in Object.FindObjectsByType<AudioListener>(FindObjectsSortMode.None))
+            foreach (AudioListener listener in Object.FindObjectsByType<AudioListener>())
             {
                 hasListener |= listener.isActiveAndEnabled;
             }

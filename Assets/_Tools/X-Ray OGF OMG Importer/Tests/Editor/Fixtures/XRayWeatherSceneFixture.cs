@@ -99,8 +99,9 @@ namespace XRay.Importer.Tests
             XRayLevelSceneBuilder.ConfigureWeather(_root, profile);
             Light sun = _root.GetComponentInChildren<Light>();
             HDAdditionalLightData lightData = sun.GetComponent<HDAdditionalLightData>();
-            if (lightData == null) lightData = sun.gameObject.AddComponent<HDAdditionalLightData>();
-            lightData.SetIntensity(DIAGNOSTIC_SUN_LUX, LightUnit.Lux);
+            if (lightData == null) sun.gameObject.AddComponent<HDAdditionalLightData>();
+            sun.intensity = DIAGNOSTIC_SUN_LUX;
+            sun.lightUnit = LightUnit.Lux;
             Controller = _root.GetComponentInChildren<XRayWeatherController>();
             Wind = _root.GetComponentInChildren<XRayFloraWindProvider>();
         }

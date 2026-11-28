@@ -6142,6 +6142,8 @@ MonoBehaviour:
   _speedloader: {fileID: 0}
   _speedloaderRounds: {fileID: 0}
   _reloadVisibilityRadius: 0.22
+  _partialReloadInsertTime: 0.25
+  _speedloaderInsertTime: 0
   _retainSpentCases: 1
   _anchorFlashAtShotPose: 0
 --- !u!1 &5145972615482949918

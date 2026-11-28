@@ -258,7 +258,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
 
             _builder.Clear();
             AppendCost("tooltip_cost", "Cost:", definition.IsStackable ? unitCost * amount : Math.Ceiling(unitCost));
-            if (definition.IsStackable)
+            if (definition.IsStackable && amount > 1)
             {
                 _builder.Append('\n');
                 AppendCost("tooltip_unit_cost", "Per item:", unitCost);

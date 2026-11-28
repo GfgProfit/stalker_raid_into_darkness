@@ -53,7 +53,12 @@ namespace RaidIntoDarkness.Integrations.Inventory
         }
 
         public ItemDefinition GetSilencer(ItemInstance weapon) => weapon?.Definition.GetComponent<WeaponStatsComponent>()?.GetSilencer(weapon, _model.Resolver);
-        public ItemDefinition GetScope(ItemInstance weapon) => weapon?.Definition.GetComponent<WeaponStatsComponent>()?.GetScope(weapon, _model.Resolver);
+        public ItemDefinition GetScope(ItemInstance weapon)
+        {
+            string id = weapon?.GetState(SCOPE_STATE);
+            IItemDefinitionResolver resolver = _model.Resolver;
+            return weapon?.Definition.GetComponent<WeaponStatsComponent>() != null && resolver != null && !string.IsNullOrEmpty(id) && resolver.TryResolve(id, out ItemDefinition definition) && definition?.GetComponent<WeaponAddonComponent>()?.Kind == WeaponAddonKind.Scope ? definition : null;
+        }
         public ItemDefinition GetGrenadeLauncher(ItemInstance weapon) => weapon?.Definition.GetComponent<WeaponStatsComponent>()?.GetGrenadeLauncher(weapon, _model.Resolver);
 
         public bool Handles(ItemInstance source, ItemInstance target) => source != null && target != null && source != target && target.Definition.GetComponent<WeaponStatsComponent>() is WeaponStatsComponent stats && (stats.SupportsSilencer(source.Definition) || stats.SupportsScope(source.Definition) || stats.SupportsGrenadeLauncher(source.Definition));

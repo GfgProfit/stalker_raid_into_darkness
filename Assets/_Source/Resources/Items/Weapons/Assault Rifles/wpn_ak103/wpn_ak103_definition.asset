@@ -116,6 +116,8 @@ MonoBehaviour:
         - {fileID: 11400000, guid: e860adc23efd2e540911e3efa1c65bf2, type: 2}
         _grenadeLauncherStatus: 2
         _grenadeLauncherSection: wpn_addon_grenade_launcher
+        _blockSilencerWithGrenadeLauncher: 0
+        _exposedRound: {fileID: 0}
     - rid: 115149063313949398
       type: {class: EquippableItemComponent, ns: Inventory, asm: Inventory}
       data:
@@ -135,31 +137,44 @@ MonoBehaviour:
         _firstPersonWeapon: {fileID: 11400000, guid: 96a9c9e28d691244dad07c14ac541581, type: 2}
         _scopeAimOffsets:
         - _scope: {fileID: 11400000, guid: b2160470b0f80c6469c672ec17e100b5, type: 2}
-          _position: {x: 0.0029591, y: -0.0337521, z: -0.0267998}
+          _position: {x: 0.005869824, y: -0.03092965, z: -0.0267998}
+          _depthOffset: 0
         - _scope: {fileID: 11400000, guid: bc51d0c36a074b842b48c995f834c171, type: 2}
-          _position: {x: 0.0210268, y: -0.0186836, z: -0.0267998}
+          _position: {x: 0.02334873, y: -0.01456773, z: -0.0267998}
+          _depthOffset: 0
         - _scope: {fileID: 11400000, guid: 6e7cc0c05a37df24abfa823d367bb86f, type: 2}
-          _position: {x: 0.0184545, y: -0.0102375, z: 0.012838}
+          _position: {x: 0.02116399, y: -0.007125114, z: 0.012838}
+          _depthOffset: 0.03
         - _scope: {fileID: 11400000, guid: 141ad6a26409c1440ae80f784d023420, type: 2}
-          _position: {x: 0.0184207, y: -0.010205, z: 0.0198697}
+          _position: {x: 0.02103757, y: -0.006890545, z: 0.0198697}
+          _depthOffset: 0.03
         - _scope: {fileID: 11400000, guid: a81ed245a31667c438ad7bafda8e0e8e, type: 2}
-          _position: {x: 0.0148043, y: -0.0120519, z: -0.0267998}
+          _position: {x: 0.01782415, y: -0.007836242, z: -0.0267998}
+          _depthOffset: 0
         - _scope: {fileID: 11400000, guid: 0b93f4aac0bbd7944b0047106f240e27, type: 2}
-          _position: {x: 0.0124329, y: -0.0066056, z: -0.0267998}
+          _position: {x: 0.0150565, y: -0.002489362, z: -0.0267998}
+          _depthOffset: 0
         - _scope: {fileID: 11400000, guid: f4aeb693dd011044bb3f07fba5b1ace4, type: 2}
-          _position: {x: 0.0072683, y: -0.0173826, z: -0.0267998}
+          _position: {x: 0.008492812, y: -0.01406596, z: -0.0267998}
+          _depthOffset: 0
         - _scope: {fileID: 11400000, guid: 2183aad17ad3305499c981375cd92cb3, type: 2}
-          _position: {x: 0.0073913, y: -0.025861, z: -0.0267998}
+          _position: {x: 0.01010573, y: -0.02254503, z: -0.0267998}
+          _depthOffset: 0
         - _scope: {fileID: 11400000, guid: bb42dc9b48c7cee4e82a8b3b37f82fe9, type: 2}
-          _position: {x: 0.0205865, y: -0.0197459, z: -0.0267998}
+          _position: {x: 0.02350545, y: -0.01653075, z: -0.0267998}
+          _depthOffset: 0
         - _scope: {fileID: 11400000, guid: a08c4da657995d74489000a84549d9b9, type: 2}
-          _position: {x: 0.0158647, y: -0.0349536, z: -0.0267998}
+          _position: {x: 0.01876911, y: -0.03154016, z: -0.0267998}
+          _depthOffset: 0
         - _scope: {fileID: 11400000, guid: 101eee143b83c0144a7a1d6a672fbc8a, type: 2}
-          _position: {x: 0.0046441, y: -0.0223864, z: -0.0267998}
+          _position: {x: 0.007766716, y: -0.01936969, z: -0.0267998}
+          _depthOffset: 0
         - _scope: {fileID: 11400000, guid: 94ac679431fcc2a48b2a24eeb4b81580, type: 2}
-          _position: {x: 0.0091227, y: -0.0185811, z: -0.044281}
+          _position: {x: 0.01054496, y: -0.01486458, z: -0.044281}
+          _depthOffset: 0
         - _scope: {fileID: 11400000, guid: e860adc23efd2e540911e3efa1c65bf2, type: 2}
-          _position: {x: 0.0074502, y: -0.0270844, z: -0.0267998}
+          _position: {x: 0.01016394, y: -0.02366843, z: -0.0267998}
+          _depthOffset: 0
     - rid: 115149063313949400
       type: {class: ItemTakeSoundComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
       data:

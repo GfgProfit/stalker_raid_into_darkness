@@ -46,7 +46,7 @@ Material:
     - _OpticalSdf: 0
     - _RedDotDist: 10.5
     - _RedDotIntensity: 5.6
-    - _RedDotSize: 0.029732198
+    - _RedDotSize: 0.0175
     - _ReticleCull: 0
     - _ReticleFlickerIntensity: 0
     - _ReticleFringeIntensity: 0
@@ -67,7 +67,7 @@ Material:
     - _ViewFadeEnd: 0.31
     - _ViewFadeStart: 0.09
     m_Colors:
-    - _Color: {r: 0.11, g: 0.26, b: 0.39, a: 0.05}
+    - _Color: {r: 0.10999993, g: 0.25999993, b: 0.38999993, a: 0.11764706}
     - _DotCenterWS: {r: 0, g: 0, b: 0, a: 0}
     - _DotEyeReference: {r: 0, g: 0, b: 0, a: 0}
     - _DotRightWS: {r: 0, g: 0, b: 0, a: 0}

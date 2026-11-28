@@ -24,6 +24,51 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
         }
 
         [UnityTest]
+        public IEnumerator MountedFirearmScopesUseTheStockSightDepth()
+        {
+            SceneManager.LoadScene(SceneName, LoadSceneMode.Single);
+            yield return new WaitForSeconds(0.6f);
+            InventoryWindowController inventory = Object.FindAnyObjectByType<InventoryWindowController>();
+            InventoryModel model = inventory.Inventory.Model;
+            FirstPersonWeaponController controller = inventory.Player.GetComponentInChildren<FirstPersonWeaponController>();
+            Transform camera = inventory.Player.CameraController.Camera.transform;
+            ItemInstance weapon = Add(inventory, "wpn_mp9");
+            ItemInstance redDot = Add(inventory, "ac10632");
+            ItemInstance holographic = Add(inventory, "e0t2");
+            Assert.That(model.TryEquip(weapon.InstanceId, inventory.Window.EquipmentContainerId).Success, Is.True);
+            int slot = weapon.Location.SlotId == FirstPersonWeaponBinder.PRIMARY_SLOT ? FirstPersonWeaponController.PRIMARY_SLOT : FirstPersonWeaponController.SECONDARY_SLOT;
+            Assert.That(controller.Select(slot), Is.True);
+            DevTest aimOverride = controller.GetComponent<DevTest>();
+            if (aimOverride != null)
+            {
+                aimOverride.enabled = false;
+            }
+
+            controller.DevelopmentAimOverride = true;
+            float timeout = Time.time + 6f;
+            while ((controller.State != FirstPersonWeaponState.Ready || controller.AimFactor < 0.999f) && Time.time < timeout)
+            {
+                yield return null;
+            }
+
+            Assert.That(controller.AimFactor, Is.EqualTo(1f).Within(0.001f));
+            yield return new WaitForSeconds(0.35f);
+            float stockDepth = camera.InverseTransformPoint(controller.HandsModel.transform.position).z;
+            foreach (ItemInstance scope in new[] { redDot, holographic })
+            {
+                Assert.That(inventory.WeaponAttachments.Apply(scope, weapon).Success, Is.True);
+                yield return null;
+                Assert.That(Mathf.Abs(controller.AimOffsetPosition.z - controller.ActiveWeapon.AimOffsetPosition.z), Is.GreaterThan(0.01f));
+                float currentDepth = camera.InverseTransformPoint(controller.HandsModel.transform.position).z;
+                Assert.That(currentDepth, Is.EqualTo(stockDepth).Within(0.002f), scope.Definition.name);
+            }
+
+            Assert.That(inventory.WeaponAttachments.DetachScope(weapon).Success, Is.True);
+            yield return null;
+            Assert.That(camera.InverseTransformPoint(controller.HandsModel.transform.position).z, Is.EqualTo(stockDepth).Within(0.002f));
+        }
+
+        [UnityTest]
         public IEnumerator EquippedScopeChangesWithoutRebuildingHandsAndSurvivesDropAndPickup()
         {
             SceneManager.LoadScene(SceneName, LoadSceneMode.Single);

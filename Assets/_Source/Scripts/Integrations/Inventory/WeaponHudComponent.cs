@@ -28,8 +28,11 @@ namespace RaidIntoDarkness.Integrations.Inventory
         public string[] AttachmentBones => _attachmentBones ?? Array.Empty<string>();
         public FirstPersonWeaponAsset FirstPersonWeapon => _firstPersonWeapon;
 
-        public Vector3? GetScopeAimOffset(ItemDefinition scope)
+        public Vector3? GetScopeAimOffset(ItemDefinition scope) => GetScopeAimOffset(scope, out _);
+
+        public Vector3? GetScopeAimOffset(ItemDefinition scope, out float depthOffset)
         {
+            depthOffset = 0f;
             if (scope == null)
             {
                 return null;
@@ -41,6 +44,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
                 {
                     if (offset.Scope == scope)
                     {
+                        depthOffset = offset.DepthOffset;
                         return offset.Position;
                     }
                 }
@@ -48,16 +52,6 @@ namespace RaidIntoDarkness.Integrations.Inventory
 
             WeaponAddonComponent addon = scope.GetComponent<WeaponAddonComponent>();
             return addon != null && addon.OverrideAimOffsetPosition ? addon.AimOffsetPosition : null;
-        }
-
-        [Serializable]
-        private struct ScopeAimOffset
-        {
-            [SerializeField] private ItemDefinition _scope;
-            [SerializeField] private Vector3 _position;
-
-            public ItemDefinition Scope => _scope;
-            public Vector3 Position => _position;
         }
     }
 }

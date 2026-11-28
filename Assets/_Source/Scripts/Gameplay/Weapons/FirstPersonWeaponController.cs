@@ -201,11 +201,14 @@ namespace RaidIntoDarkness.Weapons
             }
         }
 
-        public void SetSlotAimOffset(int slot, Vector3? position)
+        public void SetSlotAimOffset(int slot, Vector3? position) => SetSlotAimOffset(slot, position, 0f);
+
+        public void SetSlotAimOffset(int slot, Vector3? position, float depthOffset)
         {
             if (IsSlot(slot))
             {
                 _slots[slot].AimOffsetPosition = position;
+                _slots[slot].AimDepthOffset = depthOffset;
             }
         }
 
@@ -293,6 +296,7 @@ namespace RaidIntoDarkness.Weapons
             target.WeaponState = asset != null ? GetWeaponState(ammoKey) : null;
             target.RecoilMultiplier = Vector3.one;
             target.RecoilSnappinessMultiplier = 1f;
+            target.AimDepthOffset = 0f;
             target.GrenadeMode = false;
             if (_redrawSlot == slot && asset == null)
             {
@@ -2004,15 +2008,23 @@ namespace RaidIntoDarkness.Weapons
             Vector3 aimPosition = grenadeMode ? asset.GetGrenadeAimOffset(scoped) : AimOffsetPosition;
             Vector3 aimEuler = grenadeMode ? asset.GrenadeAimOffsetRotation : asset.GetRifleAimRotation(scoped);
             Quaternion aimRotation = FirstPersonWeaponAsset.ToAimRotation(aimEuler * _aim);
-            Vector3 position = aimPosition * _aim + aimRotation * asset.HandsPosition;
-            position.z -= (_weaponView == null ? 0f : _weaponView.HipBackOffset) * (1f - _aim);
-            Quaternion rotation = aimRotation * asset.HandsRotation;
+            Quaternion handsRotation = asset.HandsRotation;
+            Quaternion rotation = aimRotation * handsRotation;
+            Vector3 handsOffset = asset.HandsPosition;
             if (EvaluateAimBlend(asset, grenadeMode, out Vector3 blendPosition, out Quaternion blendRotation))
             {
-                position += rotation * blendPosition;
+                handsOffset += handsRotation * blendPosition;
                 rotation *= blendRotation;
             }
 
+            Vector3 position = aimPosition * _aim + aimRotation * handsOffset;
+            if (scoped && _aim > 0f && !grenadeMode && asset is { IsMelee: false, IsHandGrenade: false, IsStandaloneLauncher: false })
+            {
+                Quaternion stockAimRotation = FirstPersonWeaponAsset.ToAimRotation(asset.GetRifleAimRotation(false) * _aim);
+                position.z = (asset.AimOffsetPosition.z + slot.AimDepthOffset) * _aim + (stockAimRotation * handsOffset).z;
+            }
+
+            position.z -= (_weaponView == null ? 0f : _weaponView.HipBackOffset) * (1f - _aim);
             Transform hands = _boundHands.transform;
             Transform parent = hands.parent;
             Camera camera = _player != null && _player.CameraController != null ? _player.CameraController.Camera : null;

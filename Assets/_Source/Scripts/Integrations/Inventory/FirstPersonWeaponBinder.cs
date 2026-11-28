@@ -112,7 +112,9 @@ namespace RaidIntoDarkness.Integrations.Inventory
             _controller.SetSlotGrenadeLauncher(slot, launcher != null);
             ItemDefinition scope = stats?.GetScope(item, _model.Resolver);
             _controller.SetSlotScope(slot, scope != null);
-            _controller.SetSlotAimOffset(slot, hud?.GetScopeAimOffset(scope));
+            float depthOffset = 0f;
+            Vector3? aimOffset = hud?.GetScopeAimOffset(scope, out depthOffset);
+            _controller.SetSlotAimOffset(slot, aimOffset, depthOffset);
         }
 
         private void OnVisualCreated(GameObject visual) => ApplyActiveVisual();

@@ -188,6 +188,8 @@ MonoBehaviour:
         - {fileID: 11400000, guid: b9d1937130e564645a59b1fdb0588f4e, type: 2}
         _grenadeLauncherStatus: 0
         _grenadeLauncherSection: 
+        _blockSilencerWithGrenadeLauncher: 0
+        _exposedRound: {fileID: 0}
     - rid: 115149063313949398
       type: {class: EquippableItemComponent, ns: Inventory, asm: Inventory}
       data:
@@ -207,31 +209,31 @@ MonoBehaviour:
         _firstPersonWeapon: {fileID: 11400000, guid: 445fad0ef7687bc4dabb06223a9826bb, type: 2}
         _scopeAimOffsets:
         - _scope: {fileID: 11400000, guid: b2160470b0f80c6469c672ec17e100b5, type: 2}
-          _position: {x: 0.0020307, y: -0.0328651, z: -0.0001473}
+          _position: {x: 0.005068958, y: -0.030257, z: -0.0001473}
         - _scope: {fileID: 11400000, guid: bc51d0c36a074b842b48c995f834c171, type: 2}
-          _position: {x: 0.0200455, y: -0.0177768, z: -0.026641}
+          _position: {x: 0.0215916, y: -0.01397162, z: -0.026641}
         - _scope: {fileID: 11400000, guid: 6e7cc0c05a37df24abfa823d367bb86f, type: 2}
-          _position: {x: 0.0175737, y: -0.0093683, z: 0.0236117}
+          _position: {x: 0.02060394, y: -0.005957278, z: 0.0236117}
         - _scope: {fileID: 11400000, guid: 141ad6a26409c1440ae80f784d023420, type: 2}
-          _position: {x: 0.0175541, y: -0.0093411, z: 0.0306435}
+          _position: {x: 0.02028206, y: -0.006029265, z: 0.0306435}
         - _scope: {fileID: 11400000, guid: a81ed245a31667c438ad7bafda8e0e8e, type: 2}
-          _position: {x: 0.0137977, y: -0.0111355, z: -0.02902}
+          _position: {x: 0.01713167, y: -0.00702589, z: -0.02902}
         - _scope: {fileID: 11400000, guid: 0b93f4aac0bbd7944b0047106f240e27, type: 2}
-          _position: {x: 0.011251, y: -0.0056235, z: -0.029011}
+          _position: {x: 0.01414317, y: -0.002098358, z: -0.029011}
         - _scope: {fileID: 11400000, guid: f4aeb693dd011044bb3f07fba5b1ace4, type: 2}
-          _position: {x: 0.0061123, y: -0.0164103, z: -0.0290088}
+          _position: {x: 0.007743284, y: -0.01289954, z: -0.0290088}
         - _scope: {fileID: 11400000, guid: 2183aad17ad3305499c981375cd92cb3, type: 2}
-          _position: {x: 0.006195, y: -0.0248736, z: -0.0290153}
+          _position: {x: 0.008933259, y: -0.02156556, z: -0.0290153}
         - _scope: {fileID: 11400000, guid: bb42dc9b48c7cee4e82a8b3b37f82fe9, type: 2}
-          _position: {x: 0.0196425, y: -0.018853, z: -0.0080021}
+          _position: {x: 0.02289578, y: -0.01585059, z: -0.0080021}
         - _scope: {fileID: 11400000, guid: a08c4da657995d74489000a84549d9b9, type: 2}
-          _position: {x: 0.0149312, y: -0.0340647, z: -0.002776}
+          _position: {x: 0.01797324, y: -0.03145805, z: -0.002776}
         - _scope: {fileID: 11400000, guid: 101eee143b83c0144a7a1d6a672fbc8a, type: 2}
-          _position: {x: 0.0036969, y: -0.0214923, z: -0.009588}
+          _position: {x: 0.006744732, y: -0.01858783, z: -0.009588}
         - _scope: {fileID: 11400000, guid: 94ac679431fcc2a48b2a24eeb4b81580, type: 2}
-          _position: {x: 0.0081017, y: -0.0176594, z: -0.0464946}
+          _position: {x: 0.009536026, y: -0.01394986, z: -0.0464946}
         - _scope: {fileID: 11400000, guid: e860adc23efd2e540911e3efa1c65bf2, type: 2}
-          _position: {x: 0.006437, y: -0.0261656, z: -0.0290165}
+          _position: {x: 0.009152796, y: -0.02264917, z: -0.0290165}
         - _scope: {fileID: 11400000, guid: 867a7f373388760469fc24ccebf9f005, type: 2}
           _position: {x: 0.0044143, y: -0.017655, z: -0.115601}
         - _scope: {fileID: 11400000, guid: 9f2fc43076f60a5459bd673f5547bd94, type: 2}

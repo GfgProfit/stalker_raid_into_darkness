@@ -98,6 +98,8 @@ MonoBehaviour:
         - {fileID: 11400000, guid: 101eee143b83c0144a7a1d6a672fbc8a, type: 2}
         _grenadeLauncherStatus: 0
         _grenadeLauncherSection: 
+        _blockSilencerWithGrenadeLauncher: 0
+        _exposedRound: {fileID: 0}
     - rid: 115149063313949398
       type: {class: EquippableItemComponent, ns: Inventory, asm: Inventory}
       data:
@@ -117,13 +119,13 @@ MonoBehaviour:
         _firstPersonWeapon: {fileID: 11400000, guid: 42a8eaa99a7e8b4408bc6a22b7bc49c3, type: 2}
         _scopeAimOffsets:
         - _scope: {fileID: 11400000, guid: 0b93f4aac0bbd7944b0047106f240e27, type: 2}
-          _position: {x: 0.011925412, y: -0.009434221, z: 0.0014000149}
+          _position: {x: 0.01463091, y: -0.004811988, z: 0.0014000149}
         - _scope: {fileID: 11400000, guid: 2183aad17ad3305499c981375cd92cb3, type: 2}
-          _position: {x: 0.006878456, y: -0.028687978, z: -0.0357}
+          _position: {x: 0.009886174, y: -0.02426657, z: -0.0357}
         - _scope: {fileID: 11400000, guid: 94ac679431fcc2a48b2a24eeb4b81580, type: 2}
-          _position: {x: 0.0086755585, y: -0.02142996, z: -0.033250164}
+          _position: {x: 0.01028331, y: -0.01710848, z: -0.033250164}
         - _scope: {fileID: 11400000, guid: 101eee143b83c0144a7a1d6a672fbc8a, type: 2}
-          _position: {x: 0.004224634, y: -0.025244428, z: 0.0065}
+          _position: {x: 0.00733765, y: -0.0212247, z: 0.0065}
     - rid: 115149063313949400
       type: {class: ItemTakeSoundComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
       data:

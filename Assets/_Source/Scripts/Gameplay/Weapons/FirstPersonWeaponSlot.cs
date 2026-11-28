@@ -15,5 +15,6 @@ namespace RaidIntoDarkness.Weapons
         public float RecoilSnappinessMultiplier { get; set; } = 1f;
         public bool GrenadeMode { get; set; }
         public Vector3? AimOffsetPosition { get; set; }
+        public float AimDepthOffset { get; set; }
     }
 }

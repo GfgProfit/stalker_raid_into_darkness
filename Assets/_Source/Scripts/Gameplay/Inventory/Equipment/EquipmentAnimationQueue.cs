@@ -329,16 +329,18 @@ namespace RaidIntoDarkness.Inventory
 
         private void ExpandOutfit(EquipmentAnimationRequest request)
         {
-            FirstPersonEquipmentAnimationLibrary library = Library;
-            if (request.Kind == EquipmentAnimationRequestKind.Equip)
+            _steps.Enqueue(new EquipmentAnimationStep
             {
-                AddMove(request);
-                AddAnimation(library.Find(SelectOutfitSection(GetSection(request.Item)), FirstPersonEquipmentAnimationLibrary.ANM_EQUIP), 1.0f, false);
-                return;
-            }
-
-            AddMove(request);
-            AddAnimation(library.Find(FirstPersonEquipmentAnimationLibrary.OUTFIT_FAST_SECTION, FirstPersonEquipmentAnimationLibrary.ANM_EQUIP), 1.0f, false);
+                Kind = EquipmentAnimationStepKind.Move,
+                Move = () =>
+                {
+                    if (ApplyRequest(request))
+                    {
+                        string section = request.Kind == EquipmentAnimationRequestKind.Equip ? SelectOutfitSection(GetSection(request.Item)) : FirstPersonEquipmentAnimationLibrary.OUTFIT_FAST_SECTION;
+                        AddAnimation(Library.Find(section, FirstPersonEquipmentAnimationLibrary.ANM_EQUIP), 1.0f, false);
+                    }
+                }
+            });
         }
 
         private void ExpandHeadgear(EquipmentAnimationRequest request)
@@ -453,13 +455,13 @@ namespace RaidIntoDarkness.Inventory
             }
         }
 
-        private void ApplyRequest(EquipmentAnimationRequest request)
+        private bool ApplyRequest(EquipmentAnimationRequest request)
         {
             ItemInstance item = request.Item;
             SetInUse(item, false);
             if (_model.ContainsItem(item) == false)
             {
-                return;
+                return false;
             }
 
             switch (request.Kind)
@@ -469,32 +471,36 @@ namespace RaidIntoDarkness.Inventory
                     {
                         InventoryResult result = _model.TryEquipItem(item, _equipmentContainerId, request.SlotId, _primaryContainerId);
                         OperationCompleted?.Invoke(EquipmentAnimationRequestKind.Equip, item, result, true);
+                        return result.Success;
                     }
 
                     break;
                 case EquipmentAnimationRequestKind.Unequip:
                     if (IsEquipped(item))
                     {
-                        Unequip(item, request.Target, true);
+                        return Unequip(item, request.Target, true);
                     }
 
                     break;
                 case EquipmentAnimationRequestKind.Drop:
                     InventoryResult dropped = _inventory.TryDrop(item);
                     OperationCompleted?.Invoke(EquipmentAnimationRequestKind.Drop, item, dropped, true);
-                    break;
+                    return dropped.Success;
             }
+
+            return false;
         }
 
-        private void Unequip(ItemInstance item, InventoryUnequipTarget target, bool playSound)
+        private bool Unequip(ItemInstance item, InventoryUnequipTarget target, bool playSound)
         {
             if (_model.ContainsItem(item) == false)
             {
-                return;
+                return false;
             }
 
             InventoryResult result = _model.TryUnequipItem(item, target.ContainerId, target.Origin, target.Rotated, target.AutoPlace);
             OperationCompleted?.Invoke(EquipmentAnimationRequestKind.Unequip, item, result, playSound);
+            return result.Success;
         }
 
         private bool Advance(EquipmentAnimationStep step, float deltaTime)

@@ -46,6 +46,7 @@ namespace RaidIntoDarkness.Inventory.UI
         private readonly List<RectInt> _compatibleAreas = new();
         private InventoryDropAreaViewModel _dropAreaViewModel;
         private IDisposable _dropAreaBinding;
+        private IDisposable _modelBinding;
         private float _dropAreaTargetAlpha;
         private InventoryDragState _drag;
         private InventoryItemView _hovered;
@@ -223,7 +224,8 @@ namespace RaidIntoDarkness.Inventory.UI
                 grid.Bind(this, container);
             }
 
-            Model.Changed += OnModelChanged;
+            _modelBinding = Observable.FromEvent<InventoryChange>(handler => model.Changed += handler, handler => model.Changed -= handler)
+                .Subscribe(OnModelChanged);
             UpdateWeight();
         }
 
@@ -237,10 +239,8 @@ namespace RaidIntoDarkness.Inventory.UI
                 _splitDialog.Hide();
             }
 
-            if (Model != null)
-            {
-                Model.Changed -= OnModelChanged;
-            }
+            _modelBinding?.Dispose();
+            _modelBinding = null;
 
             foreach (InventoryGridViewBase grid in _grids)
             {
@@ -463,7 +463,8 @@ namespace RaidIntoDarkness.Inventory.UI
         {
             if (_drag != null)
             {
-                UpdateDrag(eventData.position, eventData.pressEventCamera);
+                _drag.LastScreenPosition = eventData.position;
+                _drag.EventCamera = eventData.pressEventCamera;
                 CompleteDrag();
             }
         }
@@ -522,6 +523,13 @@ namespace RaidIntoDarkness.Inventory.UI
             ghostRect.anchorMin = new Vector2(0.5f, 0.5f);
             ghostRect.anchorMax = new Vector2(0.5f, 0.5f);
             ghostRect.localPosition = local;
+            RefreshDragTarget();
+        }
+
+        private void RefreshDragTarget()
+        {
+            Vector2 screenPosition = _drag.LastScreenPosition;
+            Camera eventCamera = _drag.EventCamera;
             InventoryGridViewBase previousTarget = _drag.TargetGrid;
             InventoryGridViewBase target = IsOverDropArea(screenPosition, eventCamera) ? null : FindGridAt(screenPosition);
 
@@ -532,6 +540,9 @@ namespace RaidIntoDarkness.Inventory.UI
 
             _drag.TargetGrid = target;
             _drag.Kind = InventoryDropKind.None;
+            _drag.Failure = InventoryFailure.None;
+            _drag.AutoPlace = false;
+            _drag.TargetItem = null;
 
             if (target == null)
             {
@@ -571,6 +582,7 @@ namespace RaidIntoDarkness.Inventory.UI
                 return InventoryResult.Fail(InventoryFailure.InvalidItem);
             }
 
+            RefreshDragTarget();
             InventoryDragState drag = _drag;
             bool dropInWorld = IsOverDropArea(drag.LastScreenPosition, drag.EventCamera);
             InventoryResult result = InventoryResult.Fail(InventoryFailure.NoSlot);
@@ -593,7 +605,7 @@ namespace RaidIntoDarkness.Inventory.UI
                     return applied;
                 }
 
-                if (TryGateDrag(drag, target))
+                if ((drag.AutoPlace == false || drag.Kind != InventoryDropKind.Invalid) && TryGateDrag(drag, target))
                 {
                     return InventoryResult.Ok(drag.Item, drag.Item.Amount);
                 }
@@ -1220,9 +1232,22 @@ namespace RaidIntoDarkness.Inventory.UI
                 HandleItemPointerExit(hovered, null);
             }
 
-            if (_drag != null && Model.ContainsItem(_drag.Item) == false)
+            if (_drag == null)
+            {
+                return;
+            }
+
+            if (Model.ContainsItem(_drag.Item) == false || _drag.SourceGrid == null || _drag.SourceGrid.Container == null || _drag.SourceGrid.Container.Contains(_drag.Item) == false)
             {
                 CancelDrag();
+                return;
+            }
+
+            InventoryGridViewBase target = _drag.TargetGrid;
+
+            if (change.Item == _drag.Item || change.Affects(_drag.Item.ContainerId) || (target != null && change.Affects(target.ContainerId)))
+            {
+                RefreshDragTarget();
             }
         }
 
@@ -1335,7 +1360,7 @@ namespace RaidIntoDarkness.Inventory.UI
 
                 if (grid != null && _grids.Contains(grid))
                 {
-                    return grid.Container != null ? grid : null;
+                    return grid.Container != null && Model.GetContainer(grid.ContainerId) == grid.Container ? grid : null;
                 }
 
                 if (result.gameObject.GetComponentInParent<InventoryWindow>() == this)
@@ -1352,8 +1377,6 @@ namespace RaidIntoDarkness.Inventory.UI
             InventoryContainer container = target.Container;
             ItemInstance item = _drag.Item;
             bool slotTarget = container is SlottedContainer;
-            _drag.AutoPlace = false;
-            _drag.TargetItem = null;
             origin = default;
             area = default;
             failure = InventoryFailure.None;
@@ -1429,42 +1452,23 @@ namespace RaidIntoDarkness.Inventory.UI
                 return;
             }
 
-            if (slotTarget == false && _drag.IsSplit == false && TryFindAutoPlacement(item, container, out RectInt autoArea, out bool merge))
+            if (slotTarget == false && _drag.IsSplit == false)
             {
                 _drag.AutoPlace = true;
-                area = autoArea;
-                kind = merge ? InventoryDropKind.Merge : InventoryDropKind.Valid;
-                failure = InventoryFailure.None;
-                return;
+                result = Model.CanTransfer(item.InstanceId, container.Id, out ItemPlacement transferPlacement, out ItemInstance firstMerge);
+
+                if (result.Success)
+                {
+                    area = firstMerge != null ? container.GetItemArea(firstMerge) : transferPlacement.Area;
+                    kind = firstMerge != null ? InventoryDropKind.Merge : InventoryDropKind.Valid;
+                    failure = InventoryFailure.None;
+                    return;
+                }
             }
 
             kind = InventoryDropKind.Invalid;
             failure = result.Failure;
             ClipToContainer(ref area, container);
-        }
-
-        private static bool TryFindAutoPlacement(ItemInstance item, InventoryContainer container, out RectInt area, out bool merge)
-        {
-            foreach (ItemInstance existing in container.Items)
-            {
-                if (existing != item && existing.CanStackWith(item) && existing.FreeStackSpace > 0)
-                {
-                    area = container.GetItemArea(existing);
-                    merge = true;
-                    return true;
-                }
-            }
-
-            merge = false;
-
-            if (container.TryFindSpace(item, true, out ItemPlacement placement))
-            {
-                area = placement.Area;
-                return true;
-            }
-
-            area = default;
-            return false;
         }
 
         private bool TryGateDrag(InventoryDragState drag, InventoryContainer target)

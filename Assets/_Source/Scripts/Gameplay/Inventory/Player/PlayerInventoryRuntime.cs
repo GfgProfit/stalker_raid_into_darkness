@@ -27,7 +27,6 @@ namespace RaidIntoDarkness.Inventory
 
         private InventoryModel _model;
         private AnomalyDamageReceiver _damageReceiver;
-        private OutfitSlotRules _outfitRules;
         private FirstPersonOutfitBinder _outfitBinder;
         private bool _seeded;
         private bool _initialized;
@@ -166,13 +165,12 @@ namespace RaidIntoDarkness.Inventory
             }
 
             InventoryModel model = Model;
-            model.AddContainer(_backpack.CreateContainer());
-            model.AddContainer(new SlottedContainer(_equipmentContainerId, slots, width, height, true, _ownerId, _equipmentDisplayName));
+            GridContainer backpack = model.AddContainer(_backpack.CreateContainer());
+            SlottedContainer equipment = model.AddContainer(new SlottedContainer(_equipmentContainerId, slots, width, height, true, _ownerId, _equipmentDisplayName));
             model.AddContainer(_stash.CreateContainer());
+            model.BindOutfitSlotRules(new OutfitSlotRules(equipment, backpack, _worldItems, _player, (item, result) => ForcedDropCompleted?.Invoke(item, result)));
             SeedOnce();
 
-            _outfitRules = new OutfitSlotRules(this);
-            _outfitRules.Refresh();
             WeaponAmmo = new InventoryWeaponAmmoSource(model, _backpack.Id);
             WeaponAttachments = new InventoryWeaponAttachments(model, _backpack.Id);
 
@@ -222,12 +220,6 @@ namespace RaidIntoDarkness.Inventory
             return _worldItems != null && _worldItems.isActiveAndEnabled ? _worldItems.TryDropToWorld(this, item) : Model.TryRemove(item.InstanceId);
         }
 
-        internal void DropBlockedEquipment(ItemInstance item)
-        {
-            InventoryResult result = TryDrop(item);
-            ForcedDropCompleted?.Invoke(item, result);
-        }
-
         public float GetAnomalyProtection(AnomalyDamageType type, AnomalyStrength strength, AnomalyBalanceConfig config)
         {
             return AnomalyEquipmentProtection.GetCombinedProtection(Model.GetContainer(_equipmentContainerId), type, strength, config);
@@ -267,7 +259,7 @@ namespace RaidIntoDarkness.Inventory
             WeaponBinder?.Dispose();
             WeaponAmmo?.Dispose();
             _outfitBinder?.Dispose();
-            _outfitRules?.Dispose();
+            _model?.BindOutfitSlotRules(null);
             BindDamageReceiver(null);
         }
 

@@ -10,6 +10,7 @@ namespace RaidIntoDarkness.Inventory
         private readonly Dictionary<string, RectInt> _areas = new();
 
         private ItemInstance[,] _cells;
+        private float _maxWeight = -1f;
 
         protected InventoryContainer(string id, string ownerId, string displayName, int width, int height)
         {
@@ -26,12 +27,26 @@ namespace RaidIntoDarkness.Inventory
         public string DisplayName { get; }
         public int Width { get; }
         public int Height { get; protected set; }
-        public float MaxWeight { get; set; } = -1f;
         public IReadOnlyList<ItemInstance> Items => _items;
         public InventoryModel Model { get; internal set; }
 
         protected int MaximumStorageHeight => int.MaxValue / Width;
         protected virtual int PlacementHeight => Height;
+
+        public float MaxWeight
+        {
+            get => _maxWeight;
+            set
+            {
+                if (_maxWeight.Equals(value))
+                {
+                    return;
+                }
+
+                _maxWeight = value;
+                Model?.NotifyContainerConstraintsChanged(this);
+            }
+        }
 
         public float TotalWeight
         {

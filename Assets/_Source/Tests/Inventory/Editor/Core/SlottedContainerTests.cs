@@ -171,7 +171,9 @@ namespace RaidIntoDarkness.Inventory.Core.Tests
             Assert.That(_model.TryEquip(armor.InstanceId, "Equipment").Success, Is.True);
             Assert.That(_equipment.IsSlotAvailable(SlotId.Belt1), Is.True);
             Assert.That(_model.TryMove(medkit.InstanceId, "Equipment", new Vector2Int(0, 2), false).Success, Is.True);
-            Assert.That(_model.TryTransfer(armor.InstanceId, "Backpack").Failure, Is.EqualTo(InventoryFailure.DependentSlotOccupied));
+            InventoryResult preview = _model.CanTransfer(armor.InstanceId, "Backpack", out _, out _);
+            Assert.That(preview.Failure, Is.EqualTo(InventoryFailure.DependentSlotOccupied));
+            Assert.That(_model.TryTransfer(armor.InstanceId, "Backpack").Failure, Is.EqualTo(preview.Failure));
             Assert.That(_model.TryRemove(armor.InstanceId).Failure, Is.EqualTo(InventoryFailure.DependentSlotOccupied));
             Assert.That(armor.ContainerId, Is.EqualTo("Equipment"));
         }

@@ -327,6 +327,121 @@ namespace RaidIntoDarkness.Inventory.Core.Tests
         }
 
         [Test]
+        public void TransferPreviewReservesMergeAndRemainderWithoutChangingInventory()
+        {
+            InventoryContainer backpack = _model.GetContainer("Backpack");
+            InventoryContainer stash = _model.GetContainer("Stash");
+            ItemInstance incoming = _model.CreateItem(_ammo, 10);
+            ItemInstance destination = _model.CreateItem(_ammo, 57);
+            Assert.That(_model.TryAdd(incoming, backpack.Id, Vector2Int.zero, false).Success, Is.True);
+            Assert.That(_model.TryAdd(destination, stash.Id, Vector2Int.zero, false).Success, Is.True);
+            ItemLocation previous = incoming.Location;
+            _changes.Clear();
+
+            InventoryResult preview = _model.CanTransfer(incoming.InstanceId, stash.Id, out ItemPlacement placement, out ItemInstance firstMerge);
+
+            Assert.That(preview.Success, Is.True);
+            Assert.That(preview.Amount, Is.EqualTo(10));
+            Assert.That(firstMerge, Is.SameAs(destination));
+            Assert.That(placement.Position, Is.EqualTo(Vector2Int.right));
+            Assert.That(incoming.Location, Is.EqualTo(previous));
+            Assert.That(incoming.Amount, Is.EqualTo(10));
+            Assert.That(destination.Amount, Is.EqualTo(57));
+            Assert.That(backpack.Items, Is.EqualTo(new[] { incoming }));
+            Assert.That(stash.Items, Is.EqualTo(new[] { destination }));
+            Assert.That(stash.GetItemAt(placement.Position), Is.Null);
+            Assert.That(_model.ItemCount, Is.EqualTo(2));
+            Assert.That(_changes, Is.Empty);
+
+            InventoryResult result = _model.TryTransfer(incoming.InstanceId, stash.Id);
+
+            Assert.That(result.Success, Is.True);
+            Assert.That(result.Amount, Is.EqualTo(preview.Amount));
+            Assert.That(result.Item, Is.SameAs(incoming));
+            Assert.That(destination.Amount, Is.EqualTo(60));
+            Assert.That(stash.GetItemAt(placement.Position), Is.SameAs(incoming));
+            Assert.That(incoming.Amount, Is.EqualTo(7));
+            Assert.That(backpack.Items, Is.Empty);
+        }
+
+        [Test]
+        public void TransferPreviewRejectsAnUnplacedRemainderButDirectMergeCanMovePart()
+        {
+            InventoryContainer target = _model.AddContainer(new GridContainer("TinyTransferTarget", 1, 1));
+            ItemInstance incoming = _model.CreateItem(_ammo, 5);
+            ItemInstance destination = _model.CreateItem(_ammo, 59);
+            Assert.That(_model.TryAdd(incoming, "Backpack", Vector2Int.zero, false).Success, Is.True);
+            Assert.That(_model.TryAdd(destination, target.Id, Vector2Int.zero, false).Success, Is.True);
+            _changes.Clear();
+
+            InventoryResult preview = _model.CanTransfer(incoming.InstanceId, target.Id, out _, out _);
+            InventoryResult transfer = _model.TryTransfer(incoming.InstanceId, target.Id);
+
+            Assert.That(preview.Failure, Is.EqualTo(InventoryFailure.NoSpace));
+            Assert.That(transfer.Failure, Is.EqualTo(preview.Failure));
+            Assert.That(incoming.Amount, Is.EqualTo(5));
+            Assert.That(incoming.ContainerId, Is.EqualTo("Backpack"));
+            Assert.That(destination.Amount, Is.EqualTo(59));
+            Assert.That(target.GetItemAt(Vector2Int.zero), Is.SameAs(destination));
+            Assert.That(_changes, Is.Empty);
+
+            InventoryResult merge = _model.TryMerge(incoming.InstanceId, destination.InstanceId);
+            Assert.That(merge.Amount, Is.EqualTo(1));
+            Assert.That(destination.Amount, Is.EqualTo(60));
+            Assert.That(incoming.Amount, Is.EqualTo(4));
+            Assert.That(incoming.ContainerId, Is.EqualTo("Backpack"));
+        }
+
+        [Test]
+        public void TransferPreviewAndCommitUseTheCurrentWeightLimit()
+        {
+            InventoryContainer stash = _model.GetContainer("Stash");
+            ItemInstance incoming = _model.CreateItem(_rifle);
+            Assert.That(_model.TryAdd(incoming, "Backpack", Vector2Int.zero, false).Success, Is.True);
+            Assert.That(_model.CanTransfer(incoming.InstanceId, stash.Id, out _, out _).Success, Is.True);
+
+            stash.MaxWeight = 0f;
+            _changes.Clear();
+            InventoryResult preview = _model.CanTransfer(incoming.InstanceId, stash.Id, out _, out _);
+            InventoryResult transfer = _model.TryTransfer(incoming.InstanceId, stash.Id);
+
+            Assert.That(preview.Failure, Is.EqualTo(InventoryFailure.NoSpace));
+            Assert.That(transfer.Failure, Is.EqualTo(preview.Failure));
+            Assert.That(stash.Items, Is.Empty);
+            Assert.That(incoming.ContainerId, Is.EqualTo("Backpack"));
+            Assert.That(_changes, Is.Empty);
+        }
+
+        [Test]
+        public void PartialTransferPreviewOnlyPlansTheRequestedAmount()
+        {
+            InventoryContainer stash = _model.GetContainer("Stash");
+            ItemInstance incoming = _model.CreateItem(_ammo, 40);
+            ItemInstance destination = _model.CreateItem(_ammo, 59);
+            Assert.That(_model.TryAdd(incoming, "Backpack", Vector2Int.zero, false).Success, Is.True);
+            Assert.That(_model.TryAdd(destination, stash.Id, Vector2Int.zero, false).Success, Is.True);
+            _changes.Clear();
+
+            InventoryResult preview = _model.CanTransfer(incoming.InstanceId, stash.Id, out ItemPlacement placement, out ItemInstance firstMerge, amount: 10);
+
+            Assert.That(preview.Amount, Is.EqualTo(10));
+            Assert.That(firstMerge, Is.SameAs(destination));
+            Assert.That(incoming.Amount, Is.EqualTo(40));
+            Assert.That(destination.Amount, Is.EqualTo(59));
+            Assert.That(stash.GetItemAt(placement.Position), Is.Null);
+            Assert.That(_changes, Is.Empty);
+
+            InventoryResult transfer = _model.TryTransfer(incoming.InstanceId, stash.Id, amount: 10);
+            Assert.That(transfer.Amount, Is.EqualTo(preview.Amount));
+            Assert.That(transfer.Item, Is.Not.SameAs(incoming));
+            Assert.That(transfer.Item.Amount, Is.EqualTo(9));
+            Assert.That(stash.GetItemAt(placement.Position), Is.SameAs(transfer.Item));
+            Assert.That(destination.Amount, Is.EqualTo(60));
+            Assert.That(incoming.Amount, Is.EqualTo(30));
+            Assert.That(incoming.ContainerId, Is.EqualTo("Backpack"));
+        }
+
+        [Test]
         public void PartialRemoveReturnsDetachedPiece()
         {
             ItemInstance stack = _model.CreateItem(_medkit, 4);

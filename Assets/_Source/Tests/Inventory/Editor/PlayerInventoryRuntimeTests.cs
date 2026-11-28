@@ -47,7 +47,20 @@ namespace RaidIntoDarkness.Inventory.Tests
                 ItemInstance outfitItem = model.CreateItem(outfit);
                 Assert.That(model.TryAdd(headItem, equipment.Id, new Vector2Int(0, 0), false).Success, Is.True);
                 Assert.That(model.TryAdd(backpackItem, equipment.Id, new Vector2Int(2, 0), false).Success, Is.True);
+                int outfitEvents = 0;
+                model.ItemEquipped += (item, container, slot) =>
+                {
+                    if (item == outfitItem)
+                    {
+                        outfitEvents++;
+                        Assert.That(equipment.IsSlotLocked(SlotId.Head), Is.True);
+                        Assert.That(equipment.IsSlotLocked(SlotId.Backpack), Is.True);
+                        Assert.That(headItem.ContainerId, Is.EqualTo("Bag"));
+                        Assert.That(backpackItem.ContainerId, Is.EqualTo("Bag"));
+                    }
+                };
                 Assert.That(model.TryAdd(outfitItem, equipment.Id, new Vector2Int(1, 0), false).Success, Is.True);
+                Assert.That(outfitEvents, Is.EqualTo(1));
 
                 Assert.That(equipment.IsSlotLocked(SlotId.Head), Is.True);
                 Assert.That(equipment.IsSlotLocked(SlotId.Backpack), Is.True);

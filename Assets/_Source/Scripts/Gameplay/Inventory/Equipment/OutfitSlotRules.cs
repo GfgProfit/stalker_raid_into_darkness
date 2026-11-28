@@ -1,32 +1,40 @@
 using System;
-using RaidIntoDarkness.Inventory;
+using RaidIntoDarkness.Player;
 
 namespace RaidIntoDarkness.Inventory
 {
-    public sealed class OutfitSlotRules : IDisposable
+    internal sealed class OutfitSlotRules
     {
-        private readonly InventoryModel _model;
-        private readonly PlayerInventoryRuntime _inventory;
+        private readonly WorldItemInteractor _worldItems;
+        private readonly StalkerPlayerController _player;
+        private readonly Action<ItemInstance, InventoryResult> _dropCompleted;
 
-        internal OutfitSlotRules(PlayerInventoryRuntime inventory)
+        public OutfitSlotRules(SlottedContainer equipment, GridContainer backpack, WorldItemInteractor worldItems, StalkerPlayerController player, Action<ItemInstance, InventoryResult> dropCompleted)
         {
-            _inventory = inventory;
-            _model = inventory.Model;
-            _model.ItemEquipped += OnEquipmentChanged;
-            _model.ItemUnequipped += OnEquipmentChanged;
+            Equipment = equipment;
+            Backpack = backpack;
+            _worldItems = worldItems;
+            _player = player;
+            _dropCompleted = dropCompleted;
         }
 
-        public void Refresh()
-        {
-            if (_model.TryGetContainer(_inventory.EquipmentContainerId, out SlottedContainer equipment) == false)
-            {
-                return;
-            }
+        public SlottedContainer Equipment { get; }
+        public GridContainer Backpack { get; }
 
-            ItemInstance outfit = FindEquipped(equipment, AnomalyEquipmentProtection.OUTFIT_CATEGORY);
-            EquipmentStatsComponent stats = outfit != null ? outfit.Definition.GetComponent<EquipmentStatsComponent>() : null;
-            RefreshSlot(equipment, SlotId.Head, stats != null && stats.HelmetAvailable == false);
-            RefreshSlot(equipment, SlotId.Backpack, stats != null && stats.RepairType == "outfit_exo");
+        public bool CanPrepareDrop(ItemInstance item) => _worldItems != null && _worldItems.isActiveAndEnabled && _worldItems.CanPrepareOutfitDrop(_player, item);
+
+        public InventoryResult TryPrepareDrop(ItemInstance item, out PreparedWorldItemDrop drop) => _worldItems.TryPrepareOutfitDrop(_player, item, out drop);
+
+        public void CompleteDrop(PreparedWorldItemDrop drop, ItemInstance item) => WorldItemInteractor.CompleteOutfitDrop(_player, drop, item);
+
+        public void CancelDrop(PreparedWorldItemDrop drop) => WorldItemInteractor.CancelOutfitDrop(drop);
+
+        public void ReportDrop(ItemInstance item) => _dropCompleted?.Invoke(item, InventoryResult.Ok(item, item.Amount));
+
+        public static bool ShouldLock(ItemInstance outfit, SlotId slotId)
+        {
+            EquipmentStatsComponent stats = outfit?.Definition.GetComponent<EquipmentStatsComponent>();
+            return stats != null && (slotId == SlotId.Head && stats.HelmetAvailable == false || slotId == SlotId.Backpack && stats.RepairType == "outfit_exo");
         }
 
         internal static ItemInstance FindEquipped(InventoryContainer equipment, string category)
@@ -43,37 +51,6 @@ namespace RaidIntoDarkness.Inventory
             }
 
             return null;
-        }
-
-        private void RefreshSlot(SlottedContainer equipment, SlotId slotId, bool locked)
-        {
-            if (equipment.GetSlot(slotId) == null || equipment.IsSlotLocked(slotId) == locked)
-            {
-                return;
-            }
-
-            ItemInstance item = locked ? equipment.GetSlotOccupant(slotId) : null;
-
-            if (item != null && _model.TryTransfer(item.InstanceId, _inventory.PrimaryContainerId).Success == false)
-            {
-                _inventory.DropBlockedEquipment(item);
-            }
-
-            _model.TrySetSlotLocked(equipment.Id, slotId, locked);
-        }
-
-        public void Dispose()
-        {
-            _model.ItemEquipped -= OnEquipmentChanged;
-            _model.ItemUnequipped -= OnEquipmentChanged;
-        }
-
-        private void OnEquipmentChanged(ItemInstance item, SlottedContainer container, SlotDefinition slot)
-        {
-            if (container.Id == _inventory.EquipmentContainerId && item != null && item.Definition.IsCategory(AnomalyEquipmentProtection.OUTFIT_CATEGORY))
-            {
-                Refresh();
-            }
         }
     }
 }

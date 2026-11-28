@@ -15,6 +15,8 @@ namespace RaidIntoDarkness.Inventory
         private readonly List<InventoryChange> _pendingChanges = new();
         private readonly List<EquipEvent> _pendingEquipEvents = new();
 
+        private OutfitSlotRules _outfitRules;
+        private bool _outfitLocksDirty;
         private bool _dispatching;
 
         public InventoryModel(IItemDefinitionResolver resolver = null)
@@ -30,6 +32,13 @@ namespace RaidIntoDarkness.Inventory
         public event Action<InventoryChange> Changed;
         public event Action<ItemInstance, SlottedContainer, SlotDefinition> ItemEquipped;
         public event Action<ItemInstance, SlottedContainer, SlotDefinition> ItemUnequipped;
+
+        internal void BindOutfitSlotRules(OutfitSlotRules rules)
+        {
+            _outfitRules = rules;
+            _outfitLocksDirty = rules != null;
+            Flush();
+        }
 
         public T AddContainer<T>(T container) where T : InventoryContainer
         {
@@ -109,6 +118,12 @@ namespace RaidIntoDarkness.Inventory
         public void RemovePlacementValidator(IInventoryPlacementValidator validator) => _placementValidators.Remove(validator);
 
         public ItemInstance CreateItem(ItemDefinition definition, int amount = 1) => new(definition, amount) { Resolver = Resolver };
+
+        internal void NotifyContainerConstraintsChanged(InventoryContainer container)
+        {
+            Emit(new InventoryChange(InventoryChangeKind.ContainerConstraintsChanged, null, container.Id, ItemLocation.None));
+            Flush();
+        }
 
         public void NotifyItemChanged(ItemInstance item)
         {
@@ -466,7 +481,11 @@ namespace RaidIntoDarkness.Inventory
             }
         }
 
-        public InventoryResult CanAdd(ItemInstance item, string containerId, Vector2Int position, bool rotated) => PlanAdd(item, containerId, position, rotated, out _, out _);
+        public InventoryResult CanAdd(ItemInstance item, string containerId, Vector2Int position, bool rotated)
+        {
+            InventoryResult result = PlanAdd(item, containerId, position, rotated, out InventoryContainer target, out ItemPlacement placement);
+            return PreviewOutfitTransition(result, item, target, placement, false);
+        }
 
         private InventoryResult PlanAdd(ItemInstance item, string containerId, Vector2Int position, bool rotated, out InventoryContainer container, out ItemPlacement placement)
         {
@@ -508,23 +527,38 @@ namespace RaidIntoDarkness.Inventory
                 return check;
             }
 
+            InventoryResult outfitCheck = PlanOutfitTransition(item, container, placement, false, true, out List<OutfitSlotRelocation> relocations);
+            if (outfitCheck.Success == false)
+            {
+                return outfitCheck;
+            }
+
             _items.Add(item.InstanceId, item);
             OccupyInternal(item, container, placement);
             Emit(new InventoryChange(InventoryChangeKind.ItemAdded, item, container.Id, ItemLocation.None, placement.SlotId));
-            Flush();
+            CommitOutfitRelocations(relocations);
+            FlushOutfitChanges(relocations);
             return InventoryResult.Ok(item, item.Amount);
         }
 
         public InventoryResult TryAddAuto(ItemInstance item, string containerId, bool mergeStacks = true, bool allowRotation = true)
         {
+            TryAddAuto(item, containerId, out InventoryResult result, mergeStacks, allowRotation);
+            return result;
+        }
+
+        internal void TryAddAuto(ItemInstance item, string containerId, out InventoryResult result, bool mergeStacks = true, bool allowRotation = true)
+        {
             if (item == null)
             {
-                return InventoryResult.Fail(InventoryFailure.InvalidItem);
+                result = InventoryResult.Fail(InventoryFailure.InvalidItem);
+                return;
             }
 
             if (_items.ContainsKey(item.InstanceId) || item.Location.IsPlaced)
             {
-                return InventoryResult.Fail(InventoryFailure.AlreadyInInventory);
+                result = InventoryResult.Fail(InventoryFailure.AlreadyInInventory);
+                return;
             }
 
             item.Resolver = Resolver;
@@ -532,12 +566,14 @@ namespace RaidIntoDarkness.Inventory
 
             if (container == null)
             {
-                return InventoryResult.Fail(InventoryFailure.ContainerNotFound);
+                result = InventoryResult.Fail(InventoryFailure.ContainerNotFound);
+                return;
             }
 
             if (WeightAllows(container, item.TotalWeight) == false)
             {
-                return InventoryResult.Fail(InventoryFailure.NoSpace);
+                result = InventoryResult.Fail(InventoryFailure.NoSpace);
+                return;
             }
 
             List<KeyValuePair<ItemInstance, int>> merges = mergeStacks ? PlanMerges(item, item.Amount, container, null) : new List<KeyValuePair<ItemInstance, int>>();
@@ -549,8 +585,16 @@ namespace RaidIntoDarkness.Inventory
             {
                 if (TryFindSpaceForAmount(container, item, remainder, allowRotation, out placement) == false)
                 {
-                    return InventoryResult.Fail(InventoryFailure.NoSpace);
+                    result = InventoryResult.Fail(InventoryFailure.NoSpace);
+                    return;
                 }
+            }
+
+            InventoryResult outfitCheck = PlanOutfitTransition(item, container, placement, false, true, out List<OutfitSlotRelocation> relocations);
+            if (outfitCheck.Success == false)
+            {
+                result = outfitCheck;
+                return;
             }
 
             ItemInstance resultItem = ApplyMerges(merges);
@@ -564,13 +608,15 @@ namespace RaidIntoDarkness.Inventory
                 resultItem = item;
             }
 
-            Flush();
-            return InventoryResult.Ok(resultItem, merged + remainder);
+            result = InventoryResult.Ok(resultItem, merged + remainder);
+            CommitOutfitRelocations(relocations);
+            FlushOutfitChanges(relocations);
         }
 
         public InventoryResult CanMove(string instanceId, string containerId, Vector2Int position, bool rotated, bool allowMerge = true)
         {
-            return PlanMove(instanceId, containerId, position, rotated, allowMerge, out _, out _, out _, out _);
+            InventoryResult result = PlanMove(instanceId, containerId, position, rotated, allowMerge, out ItemInstance item, out InventoryContainer target, out ItemPlacement placement, out ItemInstance mergeTarget);
+            return mergeTarget == null ? PreviewOutfitTransition(result, item, target, placement, true) : result;
         }
 
         public InventoryResult TryMove(string instanceId, string containerId, Vector2Int position, bool rotated, bool allowMerge = true)
@@ -587,8 +633,15 @@ namespace RaidIntoDarkness.Inventory
                 return CommitMerge(item, plan);
             }
 
+            InventoryResult outfitCheck = PlanOutfitTransition(item, target, placement, true, true, out List<OutfitSlotRelocation> relocations);
+            if (outfitCheck.Success == false)
+            {
+                return outfitCheck;
+            }
+
             MoveInternal(item, GetContainer(item.ContainerId), target, placement);
-            Flush();
+            CommitOutfitRelocations(relocations);
+            FlushOutfitChanges(relocations);
             return plan;
         }
 
@@ -679,7 +732,8 @@ namespace RaidIntoDarkness.Inventory
 
         public InventoryResult CanSplit(string instanceId, int amount, string containerId, Vector2Int position, bool rotated)
         {
-            return PlanSplit(instanceId, amount, containerId, position, rotated, out _, out _, out _, out _, out _);
+            InventoryResult result = PlanSplit(instanceId, amount, containerId, position, rotated, out ItemInstance item, out InventoryContainer target, out ItemPlacement placement, out ItemInstance mergeTarget, out _);
+            return mergeTarget == null ? PreviewOutfitTransition(result, item, target, placement, false) : result;
         }
 
         public InventoryResult TrySplit(string instanceId, int amount, string containerId, Vector2Int position, bool rotated)
@@ -701,12 +755,19 @@ namespace RaidIntoDarkness.Inventory
             }
 
             ItemInstance piece = CreatePiece(item, moved);
+            InventoryResult outfitCheck = PlanOutfitTransition(piece, target, placement, false, true, out List<OutfitSlotRelocation> relocations);
+            if (outfitCheck.Success == false)
+            {
+                return outfitCheck;
+            }
+
             item.Amount -= moved;
             Emit(new InventoryChange(InventoryChangeKind.AmountChanged, item, item.ContainerId, item.Location));
             _items.Add(piece.InstanceId, piece);
             OccupyInternal(piece, target, placement);
             Emit(new InventoryChange(InventoryChangeKind.ItemAdded, piece, target.Id, ItemLocation.None, placement.SlotId));
-            Flush();
+            CommitOutfitRelocations(relocations);
+            FlushOutfitChanges(relocations);
             return InventoryResult.Ok(piece, moved);
         }
 
@@ -746,8 +807,64 @@ namespace RaidIntoDarkness.Inventory
             return TrySplit(instanceId, amount, target.Id, placement.Position, placement.Rotated);
         }
 
+        internal InventoryResult CanTransfer(string instanceId, string containerId, out ItemPlacement placement, out ItemInstance firstMerge, int amount = int.MaxValue, bool mergeStacks = true)
+        {
+            InventoryResult result = PlanTransfer(instanceId, containerId, amount, mergeStacks, out InventoryTransferPlan plan);
+            placement = plan.Placement;
+            firstMerge = plan.Merges != null && plan.Merges.Count > 0 ? plan.Merges[0].Key : null;
+            return plan.Remainder > 0 ? PreviewOutfitTransition(result, plan.Carrier, plan.Target, placement, plan.Whole) : result;
+        }
+
         public InventoryResult TryTransfer(string instanceId, string containerId, int amount = int.MaxValue, bool mergeStacks = true)
         {
+            InventoryResult result = PlanTransfer(instanceId, containerId, amount, mergeStacks, out InventoryTransferPlan plan);
+
+            if (result.Success == false)
+            {
+                return result;
+            }
+
+            InventoryResult outfitCheck = PlanOutfitTransition(plan.Carrier, plan.Target, plan.Placement, plan.Whole, true, out List<OutfitSlotRelocation> relocations);
+            if (outfitCheck.Success == false)
+            {
+                return outfitCheck;
+            }
+
+            ItemInstance item = plan.Item;
+            ItemInstance resultItem = plan.Merges != null ? ApplyMerges(plan.Merges) : null;
+
+            if (plan.Remainder > 0)
+            {
+                if (plan.Whole)
+                {
+                    item.Amount = plan.Remainder;
+                    MoveInternal(item, plan.Source, plan.Target, plan.Placement);
+                    resultItem = item;
+                }
+                else
+                {
+                    item.Amount -= plan.Moving;
+                    Emit(new InventoryChange(InventoryChangeKind.AmountChanged, item, item.ContainerId, item.Location));
+                    ItemInstance carrier = plan.Carrier;
+                    _items.Add(carrier.InstanceId, carrier);
+                    OccupyInternal(carrier, plan.Target, plan.Placement);
+                    Emit(new InventoryChange(InventoryChangeKind.ItemAdded, carrier, plan.Target.Id, ItemLocation.None, plan.Placement.SlotId));
+                    resultItem = carrier;
+                }
+            }
+            else
+            {
+                ReduceOrRemove(item, plan.Moving);
+            }
+
+            CommitOutfitRelocations(relocations);
+            FlushOutfitChanges(relocations);
+            return InventoryResult.Ok(resultItem, plan.Moving);
+        }
+
+        private InventoryResult PlanTransfer(string instanceId, string containerId, int amount, bool mergeStacks, out InventoryTransferPlan plan)
+        {
+            plan = default;
             ItemInstance item = GetItem(instanceId);
 
             if (item == null)
@@ -787,11 +904,11 @@ namespace RaidIntoDarkness.Inventory
                 return InventoryResult.Fail(InventoryFailure.NoSpace);
             }
 
-            List<KeyValuePair<ItemInstance, int>> merges = mergeStacks ? PlanMerges(item, moving, target, item) : new List<KeyValuePair<ItemInstance, int>>();
-            int merged = SumMerges(merges);
+            List<KeyValuePair<ItemInstance, int>> merges = mergeStacks && item.IsStackable ? PlanMerges(item, moving, target, item) : null;
+            int merged = merges != null ? SumMerges(merges) : 0;
             int remainder = moving - merged;
             ItemPlacement placement = default;
-            ItemInstance carrier = whole ? item : CreatePiece(item, remainder);
+            ItemInstance carrier = whole ? item : remainder > 0 ? CreatePiece(item, remainder) : null;
 
             if (remainder > 0)
             {
@@ -801,34 +918,8 @@ namespace RaidIntoDarkness.Inventory
                 }
             }
 
-            ItemInstance resultItem = ApplyMerges(merges);
-
-            if (remainder > 0)
-            {
-                if (whole)
-                {
-                    item.Amount = remainder;
-                    MoveInternal(item, source, target, placement);
-                    resultItem = item;
-                }
-                else
-                {
-                    item.Amount -= moving;
-                    Emit(new InventoryChange(InventoryChangeKind.AmountChanged, item, item.ContainerId, item.Location));
-                    carrier.Amount = remainder;
-                    _items.Add(carrier.InstanceId, carrier);
-                    OccupyInternal(carrier, target, placement);
-                    Emit(new InventoryChange(InventoryChangeKind.ItemAdded, carrier, target.Id, ItemLocation.None, placement.SlotId));
-                    resultItem = carrier;
-                }
-            }
-            else
-            {
-                ReduceOrRemove(item, moving);
-            }
-
-            Flush();
-            return InventoryResult.Ok(resultItem, moving);
+            plan = new InventoryTransferPlan(item, source, target, moving, remainder, whole, carrier, merges, placement);
+            return InventoryResult.Ok(item, moving);
         }
 
         public InventoryResult TryRemove(string instanceId, int amount = int.MaxValue)
@@ -941,7 +1032,7 @@ namespace RaidIntoDarkness.Inventory
 
             InventoryContainer parking = GetContainer(parkingContainerId);
             SlotDefinition candidate = FindSwapCandidate(item, equipment, parking);
-            return candidate != null && PlanSwap(item, equipment, candidate, parking, out _).Success;
+            return candidate != null && CanSwapIntoSlot(item, equipment.Id, candidate.Bounds.position, parkingContainerId);
         }
 
         public InventoryResult TryEquipItem(ItemInstance item, string equipmentContainerId, SlotId slotId, string parkingContainerId)
@@ -1013,7 +1104,7 @@ namespace RaidIntoDarkness.Inventory
 
         public bool CanSwapIntoSlot(ItemInstance item, string targetId, Vector2Int cell, string parkingContainerId)
         {
-            return ContainsItem(item) && TryGetContainer(targetId, out SlottedContainer target) && PlanSwap(item, target, target.GetSlotAt(cell), GetContainer(parkingContainerId), out _).Success;
+            return ContainsItem(item) && TryGetContainer(targetId, out SlottedContainer target) && PlanSwap(item, target, target.GetSlotAt(cell), GetContainer(parkingContainerId), out EquipmentSwap swap).Success && PlanOutfitTransition(item, target, swap.IncomingPlacement, true, false, out _, swap).Success;
         }
 
         public InventoryResult TrySwapIntoSlot(ItemInstance item, string targetId, Vector2Int cell, string parkingContainerId)
@@ -1041,6 +1132,11 @@ namespace RaidIntoDarkness.Inventory
             if (container.GetSlot(slotId) == null)
             {
                 return InventoryResult.Fail(InventoryFailure.NoSlot);
+            }
+
+            if (locked == false && container == _outfitRules?.Equipment && OutfitSlotRules.ShouldLock(container.GetSlotOccupant(SlotId.Outfit), slotId))
+            {
+                return InventoryResult.Fail(InventoryFailure.SlotUnavailable);
             }
 
             if (container.CanSetSlotLocked(slotId, locked) == false)
@@ -1386,7 +1482,7 @@ namespace RaidIntoDarkness.Inventory
             return false;
         }
 
-        private List<KeyValuePair<ItemInstance, int>> PlanMerges(ItemInstance item, int amount, InventoryContainer container, ItemInstance exclude, ItemInstance consumed = null)
+        private List<KeyValuePair<ItemInstance, int>> PlanMerges(ItemInstance item, int amount, InventoryContainer container, ItemInstance exclude, ItemInstance consumed = null, List<KeyValuePair<ItemInstance, int>> reserved = null)
         {
             var merges = new List<KeyValuePair<ItemInstance, int>>();
             int remaining = amount;
@@ -1414,7 +1510,19 @@ namespace RaidIntoDarkness.Inventory
                     free = candidate.Amount > 1 ? free + 1 : 0;
                 }
 
-                if (free == 0)
+                if (reserved != null)
+                {
+                    foreach (KeyValuePair<ItemInstance, int> merge in reserved)
+                    {
+                        if (merge.Key == candidate)
+                        {
+                            free -= merge.Value;
+                            break;
+                        }
+                    }
+                }
+
+                if (free <= 0)
                 {
                     continue;
                 }
@@ -1554,7 +1662,7 @@ namespace RaidIntoDarkness.Inventory
             InventoryContainer destination = parking;
             ItemPlacement displacedPlacement = parked;
 
-            if (source == target)
+            if (source == target && (target != _outfitRules?.Equipment || incoming.SlotId != SlotId.Outfit || OutfitSlotRules.ShouldLock(item, item.Location.SlotId) == false))
             {
                 InventoryPlacementPreview afterMove = new InventoryPlacementPreview(displaced, item).Reserve(item, incoming);
 
@@ -1578,6 +1686,12 @@ namespace RaidIntoDarkness.Inventory
                 return result;
             }
 
+            InventoryResult outfitCheck = PlanOutfitTransition(item, target, swap.IncomingPlacement, true, true, out List<OutfitSlotRelocation> relocations, swap);
+            if (outfitCheck.Success == false)
+            {
+                return outfitCheck;
+            }
+
             InventoryContainer source = GetContainer(item.ContainerId);
             ItemInstance displaced = swap.DisplacedItem;
 
@@ -1595,8 +1709,256 @@ namespace RaidIntoDarkness.Inventory
                 MoveInternal(item, source, target, swap.IncomingPlacement);
             }
 
-            Flush();
+            CommitOutfitRelocations(relocations);
+            FlushOutfitChanges(relocations);
             return result;
+        }
+
+        private InventoryResult PreviewOutfitTransition(InventoryResult movement, ItemInstance incoming, InventoryContainer target, ItemPlacement placement, bool releaseSource)
+        {
+            if (movement.Success == false)
+            {
+                return movement;
+            }
+
+            InventoryResult check = PlanOutfitTransition(incoming, target, placement, releaseSource, false, out _);
+            return check.Success ? movement : check;
+        }
+
+        private InventoryResult PlanOutfitTransition(ItemInstance incoming, InventoryContainer target, ItemPlacement placement, bool releaseSource, bool prepareDrops, out List<OutfitSlotRelocation> relocations, EquipmentSwap swap = default)
+        {
+            relocations = null;
+            if (_outfitRules == null || placement.SlotId != SlotId.Outfit || target != _outfitRules.Equipment)
+            {
+                return InventoryResult.Ok(incoming, 0);
+            }
+
+            SlottedContainer equipment = _outfitRules.Equipment;
+            if (TryFindOutfitBlocker(incoming, equipment, SlotId.Head, out ItemInstance helmet) == false || TryFindOutfitBlocker(incoming, equipment, SlotId.Backpack, out ItemInstance bag) == false)
+            {
+                return InventoryResult.Fail(InventoryFailure.Occupied);
+            }
+
+            if (helmet == null && bag == null)
+            {
+                return InventoryResult.Ok(incoming, 0);
+            }
+
+            GridContainer backpack = _outfitRules.Backpack;
+            bool backpackAvailable = GetContainer(backpack.Id) == backpack;
+            bool incomingLeavesBackpack = releaseSource && incoming.ContainerId == backpack.Id;
+            var backpackPreview = new InventoryPlacementPreview(incomingLeavesBackpack ? incoming : null);
+            var reservations = new List<KeyValuePair<ItemInstance, ItemPlacement>>(3);
+            float weightDelta = incomingLeavesBackpack ? -incoming.TotalWeight : 0f;
+            int reservedRow = 0;
+
+            if (swap.DisplacedDestination == backpack)
+            {
+                reservations.Add(new KeyValuePair<ItemInstance, ItemPlacement>(swap.DisplacedItem, swap.DisplacedPlacement));
+                reservedRow = swap.DisplacedPlacement.Area.yMax;
+                weightDelta += swap.DisplacedItem.TotalWeight;
+            }
+
+            var planned = new List<OutfitSlotRelocation>(2);
+            InventoryPlacementPreview equipmentPreview = new InventoryPlacementPreview(helmet, bag).Reserve(incoming, placement);
+            bool ready = false;
+            try
+            {
+                for (int i = 0; i < 2; i++)
+                {
+                    ItemInstance incompatible = i == 0 ? helmet : bag;
+                    if (incompatible == null)
+                    {
+                        continue;
+                    }
+
+                    if (equipment.CanRelease(incompatible, out InventoryFailure releaseFailure, equipmentPreview) == false)
+                    {
+                        return InventoryResult.Fail(releaseFailure);
+                    }
+
+                    if (backpackAvailable && WeightAllows(backpack, weightDelta + incompatible.TotalWeight))
+                    {
+                        OutfitSlotRelocation first = planned.Count > 0 ? planned[0] : default;
+                        List<KeyValuePair<ItemInstance, int>> merges = PlanMerges(incompatible, incompatible.Amount, backpack, incomingLeavesBackpack ? incoming : null, reserved: first.Merges);
+                        int remaining = incompatible.Amount - SumMerges(merges);
+                        if (remaining > 0 && first.Remainder > 0 && first.Item.CanStackWith(incompatible))
+                        {
+                            int merge = Mathf.Min(remaining, first.Item.MaxStack - first.Remainder);
+                            if (merge > 0)
+                            {
+                                merges.Add(new KeyValuePair<ItemInstance, int>(first.Item, merge));
+                                remaining -= merge;
+                            }
+                        }
+
+                        ItemPlacement destination = default;
+                        if (remaining == 0 || TryFindSpaceForAmount(backpack, incompatible, remaining, true, out destination, backpackPreview.WithGridReservations(reservations, reservedRow)))
+                        {
+                            planned.Add(new OutfitSlotRelocation(incompatible, destination, merges, remaining));
+                            if (remaining > 0)
+                            {
+                                reservations.Add(new KeyValuePair<ItemInstance, ItemPlacement>(incompatible, destination));
+                                reservedRow = Mathf.Max(reservedRow, destination.Area.yMax);
+                            }
+
+                            weightDelta += incompatible.TotalWeight;
+                            continue;
+                        }
+                    }
+
+                    if (_outfitRules.CanPrepareDrop(incompatible) == false)
+                    {
+                        return InventoryResult.Fail(InventoryFailure.NoSpace);
+                    }
+
+                    if (prepareDrops)
+                    {
+                        InventoryResult drop = _outfitRules.TryPrepareDrop(incompatible, out PreparedWorldItemDrop prepared);
+                        if (drop.Success == false)
+                        {
+                            return drop;
+                        }
+
+                        planned.Add(new OutfitSlotRelocation(incompatible, prepared));
+                    }
+                }
+
+                relocations = planned;
+                ready = true;
+                return InventoryResult.Ok(incoming, 0);
+            }
+            finally
+            {
+                if (ready == false)
+                {
+                    foreach (OutfitSlotRelocation relocation in planned)
+                    {
+                        _outfitRules.CancelDrop(relocation.Drop);
+                    }
+                }
+            }
+        }
+
+        private static bool TryFindOutfitBlocker(ItemInstance incoming, SlottedContainer equipment, SlotId slotId, out ItemInstance blocker)
+        {
+            blocker = null;
+            SlotDefinition slot = equipment.GetSlot(slotId);
+            if (slot == null || OutfitSlotRules.ShouldLock(incoming, slotId) == false)
+            {
+                return true;
+            }
+
+            if (slot.Mode == SlotMode.Single)
+            {
+                ItemInstance occupant = equipment.GetSlotOccupant(slotId);
+                blocker = occupant != incoming ? occupant : null;
+                return true;
+            }
+
+            foreach (ItemInstance item in equipment.Items)
+            {
+                if (item.Location.SlotId != slotId || item == incoming)
+                {
+                    continue;
+                }
+
+                if (blocker != null)
+                {
+                    return false;
+                }
+
+                blocker = item;
+            }
+
+            return true;
+        }
+
+        private void CommitOutfitRelocations(List<OutfitSlotRelocation> relocations)
+        {
+            if (relocations == null)
+            {
+                return;
+            }
+
+            SlottedContainer equipment = _outfitRules.Equipment;
+            GridContainer backpack = _outfitRules.Backpack;
+            foreach (OutfitSlotRelocation relocation in relocations)
+            {
+                ItemInstance item = relocation.Item;
+                if (relocation.Merges == null || relocation.Remainder == 0)
+                {
+                    ReduceOrRemove(item, item.Amount);
+                }
+                else
+                {
+                    item.Amount = relocation.Remainder;
+                    MoveInternal(item, equipment, backpack, relocation.Placement);
+                }
+
+                if (relocation.Merges != null)
+                {
+                    ApplyMerges(relocation.Merges);
+                }
+            }
+
+            UpdateOutfitLocks();
+            foreach (OutfitSlotRelocation relocation in relocations)
+            {
+                if (relocation.Merges == null)
+                {
+                    _outfitRules.CompleteDrop(relocation.Drop, relocation.Item);
+                }
+            }
+        }
+
+        private void FlushOutfitChanges(List<OutfitSlotRelocation> relocations)
+        {
+            OutfitSlotRules rules = _outfitRules;
+            try
+            {
+                Flush();
+            }
+            finally
+            {
+                if (relocations != null)
+                {
+                    foreach (OutfitSlotRelocation relocation in relocations)
+                    {
+                        if (relocation.Merges == null)
+                        {
+                            rules.ReportDrop(relocation.Item);
+                        }
+                    }
+                }
+            }
+        }
+
+        private void UpdateOutfitLocks()
+        {
+            if (_outfitLocksDirty == false)
+            {
+                return;
+            }
+
+            _outfitLocksDirty = false;
+            SlottedContainer equipment = _outfitRules.Equipment;
+            if (equipment.Model != this)
+            {
+                return;
+            }
+
+            ItemInstance outfit = equipment.GetSlotOccupant(SlotId.Outfit);
+            UpdateOutfitLock(equipment, SlotId.Head, OutfitSlotRules.ShouldLock(outfit, SlotId.Head));
+            UpdateOutfitLock(equipment, SlotId.Backpack, OutfitSlotRules.ShouldLock(outfit, SlotId.Backpack));
+        }
+
+        private void UpdateOutfitLock(SlottedContainer equipment, SlotId slotId, bool locked)
+        {
+            if (equipment.SetSlotLocked(slotId, locked))
+            {
+                Emit(new InventoryChange(InventoryChangeKind.SlotStateChanged, null, equipment.Id, ItemLocation.None, slotId));
+            }
         }
 
         private IEnumerable<SlotDefinition> EnumerateEquipCandidates(ItemInstance item, SlottedContainer equipment)
@@ -1655,6 +2017,7 @@ namespace RaidIntoDarkness.Inventory
                 }
 
                 Emit(new InventoryChange(InventoryChangeKind.SlotStateChanged, null, slotted.Id, ItemLocation.None, placement.SlotId));
+                _outfitLocksDirty |= slotted == _outfitRules?.Equipment && placement.SlotId == SlotId.Outfit;
             }
         }
 
@@ -1679,6 +2042,7 @@ namespace RaidIntoDarkness.Inventory
                 }
 
                 Emit(new InventoryChange(InventoryChangeKind.SlotStateChanged, null, slotted.Id, ItemLocation.None, slotId));
+                _outfitLocksDirty |= slotted == _outfitRules?.Equipment && slotId == SlotId.Outfit;
             }
         }
 
@@ -1686,6 +2050,7 @@ namespace RaidIntoDarkness.Inventory
 
         private void Flush()
         {
+            UpdateOutfitLocks();
             if (_dispatching || (_pendingChanges.Count == 0 && _pendingEquipEvents.Count == 0))
             {
                 return;

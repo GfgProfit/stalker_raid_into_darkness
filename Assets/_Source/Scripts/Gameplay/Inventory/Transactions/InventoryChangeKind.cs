@@ -10,6 +10,7 @@ namespace RaidIntoDarkness.Inventory
         ContainerAdded,
         ContainerRemoved,
         Cleared,
-        ItemStateChanged
+        ItemStateChanged,
+        ContainerConstraintsChanged
     }
 }

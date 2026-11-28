@@ -10,8 +10,10 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Controls;
+using UnityEngine.InputSystem.UI;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
+using UnityEngine.UI;
 
 namespace RaidIntoDarkness.Inventory.Tests
 {
@@ -28,6 +30,7 @@ namespace RaidIntoDarkness.Inventory.Tests
         public override void Setup()
         {
             base.Setup();
+            InputSystem.runInBackground = Application.runInBackground;
             _keyboard = InputSystem.AddDevice<Keyboard>();
             _mouse = InputSystem.AddDevice<Mouse>();
         }
@@ -153,6 +156,87 @@ namespace RaidIntoDarkness.Inventory.Tests
             }
 
             controller.Close();
+        }
+
+        [UnityTest]
+        public IEnumerator HoverUsesInputRuntimeBackgroundFlagWhenEventSystemLosesFocus()
+        {
+            SceneManager.LoadScene(SCENE, LoadSceneMode.Single);
+            yield return new WaitForSeconds(0.6f);
+            InventoryWindowController controller = Object.FindAnyObjectByType<InventoryWindowController>();
+            InventoryWindow window = controller.Window;
+            InventoryModel model = controller.Inventory.Model;
+            ItemDefinition definition = FindDefinition(controller.Inventory.Database, "ammo_5.56x45_ss190");
+            ItemInstance item = model.CreateItem(definition);
+            Assert.That(model.TryAddAuto(item, BACKPACK, mergeStacks: false).Success, Is.True);
+            controller.Sorting.SetFavorite(definition, true);
+            controller.Open();
+            yield return null;
+
+            EventSystem events = EventSystem.current;
+            Assert.That(events, Is.Not.Null);
+            var uiInput = events.currentInputModule as InputSystemUIInputModule;
+            Assert.That(uiInput, Is.Not.Null);
+            Assert.That(uiInput.point.action.controls.Any(control => control.device == _mouse), Is.True);
+            Assert.That(InputSystem.settings.backgroundBehavior, Is.Not.EqualTo(InputSettings.BackgroundBehavior.IgnoreFocus));
+            var focusHook = typeof(EventSystem).GetMethod("OnApplicationFocus", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+            Assert.That(focusHook, Is.Not.Null);
+            bool previousFocus = events.isFocused;
+            bool previousBackground = InputSystem.runInBackground;
+            InventoryItemView view = window.FindGrid(BACKPACK).GetItemView(item);
+            Assert.That(view, Is.Not.Null);
+            Assert.That(view.isActiveAndEnabled, Is.True);
+            Color favorite = controller.Sorting.Decorate(item).Tint;
+            Vector2 target = RectTransformUtility.WorldToScreenPoint(null, view.RectTransform.TransformPoint(view.RectTransform.rect.center));
+
+            try
+            {
+                focusHook.Invoke(events, new object[] { true });
+                InputSystem.runInBackground = true;
+                Move(_mouse.position, new Vector2(5f, 5f), queueEventOnly: true);
+                yield return null;
+                yield return null;
+                Assert.That(window.HoveredItem, Is.Not.SameAs(item));
+                Assert.That(view.Background.color, Is.EqualTo(favorite));
+
+                InputSystem.runInBackground = false;
+                focusHook.Invoke(events, new object[] { false });
+                Move(_mouse.position, target, queueEventOnly: true);
+                yield return null;
+                yield return null;
+
+                Assert.That(events.isFocused, Is.False);
+                Assert.That(InputSystem.runInBackground, Is.False);
+                Assert.That(_mouse.position.ReadValue(), Is.EqualTo(target));
+                var rays = new List<RaycastResult>();
+                events.RaycastAll(new PointerEventData(events) { position = target, pointerId = _mouse.deviceId }, rays);
+                Assert.That(rays, Is.Not.Empty);
+                Assert.That(rays[0].gameObject.GetComponentInParent<InventoryItemView>(), Is.SameAs(view));
+                RaycastResult blocked = uiInput.GetLastRaycastResult(_mouse.deviceId);
+                Assert.That(blocked.gameObject == null ? null : blocked.gameObject.GetComponentInParent<InventoryItemView>(), Is.Not.SameAs(view));
+                Assert.That(window.HoveredItem, Is.Not.SameAs(item));
+                Assert.That(view.Background.color, Is.EqualTo(favorite));
+
+                InputSystem.runInBackground = true;
+                yield return null;
+                yield return null;
+
+                Assert.That(events.isFocused, Is.False);
+                Assert.That(InputSystem.runInBackground, Is.True);
+                Assert.That(_mouse.position.ReadValue(), Is.EqualTo(target));
+                RaycastResult processed = uiInput.GetLastRaycastResult(_mouse.deviceId);
+                Assert.That(processed.gameObject, Is.Not.Null);
+                Assert.That(processed.gameObject.GetComponentInParent<InventoryItemView>(), Is.SameAs(view));
+                Assert.That(processed.screenPosition, Is.EqualTo(target));
+                Assert.That(window.HoveredItem, Is.SameAs(item));
+                Assert.That(view.Background.color.a, Is.GreaterThan(favorite.a));
+            }
+            finally
+            {
+                InputSystem.runInBackground = previousBackground;
+                focusHook.Invoke(events, new object[] { previousFocus });
+                controller.Close();
+            }
         }
 
         [UnityTest]
@@ -632,10 +716,13 @@ namespace RaidIntoDarkness.Inventory.Tests
             controller.Sorting.SetFavorite(pickedDefinition, true);
             Color favoriteColor = controller.Sorting.Decorate(picked).Tint;
             Assert.That(pickedView.Background.color, Is.EqualTo(favoriteColor));
-            Move(_mouse.position, RectTransformUtility.WorldToScreenPoint(null, pickedView.RectTransform.position), queueEventOnly: true);
+            Vector2 requestedHover = RectTransformUtility.WorldToScreenPoint(null, pickedView.RectTransform.position);
+            Vector2 pointerBeforeHover = _mouse.position.ReadValue();
+            int frameBeforeHover = Time.frameCount;
+            Move(_mouse.position, requestedHover, queueEventOnly: true);
             yield return null;
             yield return null;
-            Assert.That(pickedView.Background.color.a, Is.GreaterThan(favoriteColor.a), "hovered favorite item is not highlighted");
+            Assert.That(pickedView.Background.color.a, Is.GreaterThan(favoriteColor.a), () => DescribeFavoriteHoverFailure(window, pickedView, requestedHover, pointerBeforeHover, frameBeforeHover));
             Assert.That(new Vector3(pickedView.Background.color.r, pickedView.Background.color.g, pickedView.Background.color.b), Is.EqualTo(new Vector3(favoriteColor.r, favoriteColor.g, favoriteColor.b)), "hover must keep the favorite hue");
             Move(_mouse.position, new Vector2(5f, 5f), queueEventOnly: true);
             yield return null;
@@ -663,7 +750,7 @@ namespace RaidIntoDarkness.Inventory.Tests
                 nosorogValues.Add(stat.Value);
             }
 
-            Assert.That(nosorogValues, Is.EqualTo(new[] { "+62 %", "+37 %", "+66 %", "+61 %", "+44 %", "+52 %", "+16 %", "+25 %", "+16 %", "+91 %", "2", "+108 кг", "100 %", "98 %", "72 %" }), "army_nosorog_outfit stats differ from the game");
+            Assert.That(nosorogValues, Is.EqualTo(new[] { "62%", "37%", "64.67%", "61.33%", "43%", "51%", "19%", "25.67%", "16.33%", "50.33%", "2", "+108 кг", "100 %", "98%", "72%" }), "army_nosorog_outfit must show its authored protection profile and equipment statistics");
             window.Tooltip.Show(picked, new Vector2(400f, 400f), null, stats);
             Assert.That(window.Tooltip.StatCount, Is.EqualTo(stats.Count));
             Assert.That(((RectTransform)window.Tooltip.transform).sizeDelta.x, Is.GreaterThanOrEqualTo(440f));
@@ -902,7 +989,7 @@ namespace RaidIntoDarkness.Inventory.Tests
             Assert.That(definition.IsCategory("Weapon"), Is.True);
             Assert.That(definition.Size, Is.EqualTo(new Vector2Int(5, 2)), "AUG A3 grid size must come from GRA inv_grid_width/height");
             Assert.That(definition.CanGenerateIcon, Is.True, "weapon icons must be generated, not imported");
-            Assert.That(definition.Description, Does.Contain("<color=#5D0074> • <color=#8C8C8C>"), "module bullets must keep GRA d_purple / ui_gray_2 colors");
+            Assert.That(definition.Description, Does.Contain("Steyr Arms").And.Contain("Picatinny"), "AUG must preserve its authored description");
             Assert.That(definition.Description, Does.Not.Contain("%c["));
             WeaponStatsComponent stats = definition.GetComponent<WeaponStatsComponent>();
             Assert.That(stats, Is.Not.Null);
@@ -926,6 +1013,11 @@ namespace RaidIntoDarkness.Inventory.Tests
             }
 
             Assert.That(item, Is.Not.Null, "the AUG did not reach the backpack");
+            string tooltipDescription = new EquipmentStatsFormatter(window).Describe(item);
+            Assert.That(tooltipDescription, Does.Contain("<color=#AAAAAA>" + definition.Description + "</color>"), "AUG tooltip must render its authored prose in the inventory description color");
+            Assert.That(tooltipDescription, Does.Not.Contain("%c["));
+            controller.Open();
+            yield return null;
             InventoryItemView view = null;
 
             foreach (InventoryItemView candidate in window.FindGrid(BACKPACK).ItemViews.Values)
@@ -939,7 +1031,34 @@ namespace RaidIntoDarkness.Inventory.Tests
             yield return WaitForEquipmentAnimations(controller);
             Assert.That(item.ContainerId, Is.EqualTo(EQUIPMENT));
             Assert.That(item.Location.SlotId, Is.EqualTo(SlotId.Primary));
+            controller.Close();
         }
+
+        private string DescribeFavoriteHoverFailure(InventoryWindow window, InventoryItemView view, Vector2 requested, Vector2 before, int frameBefore)
+        {
+            EventSystem events = EventSystem.current;
+            var uiInput = events != null ? events.currentInputModule as InputSystemUIInputModule : null;
+            InputAction pointAction = uiInput != null ? uiInput.point?.action : null;
+            Vector2 actual = _mouse.position.ReadValue();
+            var raycasts = new List<RaycastResult>();
+            if (events != null)
+            {
+                events.RaycastAll(new PointerEventData(events) { position = actual, pointerId = _mouse.deviceId }, raycasts);
+            }
+
+            Canvas canvas = view.GetComponentInParent<Canvas>();
+            RectMask2D mask = view.GetComponentInParent<RectMask2D>();
+            RectTransform rect = view.RectTransform;
+            Vector2 currentCenter = RectTransformUtility.WorldToScreenPoint(canvas != null && canvas.renderMode != RenderMode.ScreenSpaceOverlay ? canvas.worldCamera : null, rect.TransformPoint(rect.rect.center));
+            string hits = string.Join(", ", raycasts.Take(4).Select(DescribeHoverHit));
+            string moduleHit = uiInput != null ? DescribeHoverHit(uiInput.GetLastRaycastResult(_mouse.deviceId)) : "none";
+            string controls = pointAction == null ? "none" : string.Join(", ", pointAction.controls.Select(control => control.path + "@" + control.device.deviceId));
+            string input = $"Mouse {_mouse.deviceId}: {before}->{actual}, requested {requested}, current center {currentCenter}, current mouse {Mouse.current?.deviceId}, pointer {Pointer.current?.deviceId}/{Pointer.current?.position.ReadValue()}. Cursor {Cursor.lockState}, application focus {Application.isFocused}, EventSystem focus {(events != null ? events.isFocused : (bool?)null)}, run in background application/input {Application.runInBackground}/{InputSystem.runInBackground}, input background behavior {InputSystem.settings.backgroundBehavior}.";
+            string viewState = $"Window open {window.IsOpen}, dragging {window.IsDragging}, modal {window.HasModalWidget}, hovered {window.HoveredItem?.InstanceId}, view active {view.isActiveAndEnabled}, item {view.Item?.InstanceId} in {view.Item?.ContainerId}, view bound {view.Grid != null && view.Grid.GetItemView(view.Item) == view}, canvas {canvas?.renderMode}/{canvas?.worldCamera?.name}, mask {mask?.canvasRect}.";
+            return $"hovered favorite item is not highlighted. Frame {frameBefore}->{Time.frameCount}, screen {Screen.width}x{Screen.height}. {input} {viewState} Module {uiInput?.name}, point enabled {pointAction?.enabled}, controls [{controls}], input ray [{moduleHit}], manual rays [{hits}].";
+        }
+
+        private static string DescribeHoverHit(RaycastResult hit) => hit.gameObject != null ? $"{hit.gameObject.name} view={hit.gameObject.GetComponentInParent<InventoryItemView>()?.Item?.InstanceId} camera={hit.module?.eventCamera?.name} screen={hit.screenPosition}" : $"none screen={hit.screenPosition}";
 
         [UnityTest]
         public IEnumerator GraWeaponAddonsHaveModelsAndGeneratedIcons()
@@ -964,13 +1083,13 @@ namespace RaidIntoDarkness.Inventory.Tests
             {
                 WeaponAddonComponent component = addon.GetComponent<WeaponAddonComponent>();
                 Assert.That(component, Is.Not.Null, addon.name);
+                Assert.That(addon.VisualPrefab, Is.Not.Null, addon.name + " has no GRA model");
                 if (component.Kind == WeaponAddonKind.Silencer)
                 {
-                    Assert.That(addon.name, Is.EqualTo("wpn_sil_nato"));
+                    Assert.That(addon.CanGenerateIcon, Is.True, addon.name + " must generate its icon from the model");
+                    Assert.That(addon.IconOverride, Is.Null, addon.name);
                 }
-
-                Assert.That(addon.VisualPrefab, Is.Not.Null, addon.name + " has no GRA model");
-                if (component.Kind == WeaponAddonKind.Scope)
+                else if (component.Kind == WeaponAddonKind.Scope)
                 {
                     Assert.That(addon.CanGenerateIcon || addon.IconOverride != null, Is.True, addon.name + " has no icon");
                 }

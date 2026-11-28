@@ -29,7 +29,7 @@ namespace RaidIntoDarkness.Inventory
 
         internal bool TryClaimPickup()
         {
-            if (_pickupClaimed)
+            if (_pickupClaimed || isActiveAndEnabled == false)
             {
                 return false;
             }
@@ -40,15 +40,21 @@ namespace RaidIntoDarkness.Inventory
 
         internal void ReleasePickupClaim() => _pickupClaimed = false;
 
-        public void Configure(ItemInstance item)
+        public void Configure(ItemInstance item) => ConfigureAppearance(item, item);
+
+        internal void ConfigureDropAppearance(ItemInstance item) => ConfigureAppearance(item, null);
+
+        private void ConfigureAppearance(ItemInstance item, ItemInstance inventoryInstance)
         {
             _definition = item.Definition;
             _amount = item.Amount;
-            _instance = item;
+            _instance = inventoryInstance;
             ItemIconVisualConfigurators.Apply(gameObject, item.Definition, item.VisualVariant);
-            ApplyWeaponPose();
+            ApplyWeaponPose(item);
             ApplySilencerCollider();
         }
+
+        internal void CompleteDrop(ItemInstance item) => _instance = item;
 
         public void Configure(ItemDefinition definition, int amount)
         {
@@ -60,14 +66,16 @@ namespace RaidIntoDarkness.Inventory
             ApplySilencerCollider();
         }
 
-        private void ApplyWeaponPose()
+        private void ApplyWeaponPose() => ApplyWeaponPose(_instance);
+
+        private void ApplyWeaponPose(ItemInstance item)
         {
             if (_weaponPose.Length == 0)
             {
                 return;
             }
 
-            bool empty = InventoryWeaponAmmoSource.GetLoadedMagazine(_instance) == 0;
+            bool empty = InventoryWeaponAmmoSource.GetLoadedMagazine(item) == 0;
             for (int i = 0; i < _weaponPose.Length; i++)
             {
                 _weaponPose[i].Apply(empty);

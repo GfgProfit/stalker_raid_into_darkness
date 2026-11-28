@@ -90,6 +90,7 @@ namespace RaidIntoDarkness.Weapons
         private float _aimCameraVelocity;
         private float _reloadHudFovBlend;
         private bool _aiming;
+        private bool _aimRequiresRelease;
         private bool _aimedLauncherShot;
         private bool _developmentAimOverride;
         private FirstPersonWeaponAimPhase _aimPhase;
@@ -515,6 +516,11 @@ namespace RaidIntoDarkness.Weapons
             _effects.TickMuzzleLight(Time.deltaTime);
             Subscribe();
             TickRecoil();
+            if (_aimRequiresRelease && !DevelopmentAimOverride && (_input == null || !_input.AimHeld))
+            {
+                _aimRequiresRelease = false;
+            }
+
             bool inputAllowed = _input != null && _player != null && !_player.GameplayInputBlocked;
             if (inputAllowed && !IsReloading)
             {
@@ -1845,9 +1851,10 @@ namespace RaidIntoDarkness.Weapons
         {
             if (aiming && _player != null && _player.Rig != null && _player.Rig.IsWeaponAimObstructed(this))
             {
-                aiming = false;
+                _aimRequiresRelease = true;
             }
 
+            aiming = aiming && !_aimRequiresRelease;
             if (_aiming == aiming)
             {
                 return;

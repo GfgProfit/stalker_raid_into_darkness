@@ -145,8 +145,20 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
                 Assert.That(controller.IsAiming, Is.False);
                 Assert.That(controller.AimFactor, Is.LessThan(0.05f));
 
+                collider.enabled = false;
+                Physics.SyncTransforms();
+                float remainHeldUntil = Time.time + 0.45f;
+                while (Time.time < remainHeldUntil)
+                {
+                    yield return null;
+                    Assert.That(controller.IsAiming, Is.False, "A forced exit must consume the held aim request.");
+                    Assert.That(controller.AimFactor, Is.LessThan(0.05f));
+                }
+
+                collider.enabled = true;
+                Physics.SyncTransforms();
                 Release(Mouse.current.rightButton, queueEventOnly: true);
-                yield return null;
+                yield return new WaitForSeconds(0.2f);
                 Press(Mouse.current.rightButton, queueEventOnly: true);
                 yield return new WaitForSeconds(0.35f);
                 Assert.That(controller.IsAiming, Is.False);
@@ -156,7 +168,12 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
                 Object.Destroy(obstacle);
             }
 
-            yield return new WaitForSeconds(0.75f);
+            yield return new WaitForSeconds(0.4f);
+            Assert.That(controller.IsAiming, Is.False, "An aim request denied at the wall must stay consumed.");
+            Release(Mouse.current.rightButton, queueEventOnly: true);
+            yield return null;
+            Press(Mouse.current.rightButton, queueEventOnly: true);
+            yield return new WaitForSeconds(0.5f);
             Assert.That(controller.IsAiming, Is.True);
             Assert.That(controller.AimFactor, Is.GreaterThan(0.95f));
 

@@ -10,7 +10,7 @@ namespace RaidIntoDarkness.FirstPerson
         private const float CLOSE_ENTRY_DELAY = 0.06f;
         private const float CLOSE_EXIT_DELAY = 0.22f;
         private const float CONTACT_EXIT_DELAY = 0.085f;
-        private const float AIM_BLOCK_DEPTH = 0.04f;
+        private const float AIM_BLOCK_DEPTH = 0.025f;
         private const float AIM_RELEASE_DEPTH = 0.015f;
         private const float ENTER_RESPONSE = 17.0f;
         private const float EXIT_RESPONSE = 11.0f;

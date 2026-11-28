@@ -79,11 +79,21 @@ namespace RaidIntoDarkness.Player.Tests
                 Assert.That(Quaternion.Angle(hands.localRotation, Quaternion.identity), Is.LessThan(5f));
                 Assert.That(blocksAim.GetValue(obstruction), Is.False);
 
-                wall.position = origin + Vector3.forward * (barrelLength + 0.025f);
+                wall.position = origin + Vector3.forward * (barrelLength + 0.031f);
                 Physics.SyncTransforms();
                 RunFrames(tick, obstruction, arguments, 60);
                 Assert.That(hands.localPosition.z, Is.LessThan(-0.01f));
                 Assert.That(blocksAim.GetValue(obstruction), Is.False, "Light overlap must allow ADS.");
+
+                wall.position = origin + Vector3.forward * (barrelLength + 0.022f);
+                Physics.SyncTransforms();
+                RunFrames(tick, obstruction, arguments, 3);
+                Assert.That(blocksAim.GetValue(obstruction), Is.True, "A contact just above the 2.5 cm threshold must block ADS.");
+
+                wall.position = origin + Vector3.forward * (barrelLength + 0.028f);
+                Physics.SyncTransforms();
+                RunFrames(tick, obstruction, arguments, 3);
+                Assert.That(blocksAim.GetValue(obstruction), Is.True, "The release threshold must keep ADS blocked between the thresholds.");
 
                 wall.position = origin + Vector3.forward * (barrelLength * 0.29f);
                 Physics.SyncTransforms();

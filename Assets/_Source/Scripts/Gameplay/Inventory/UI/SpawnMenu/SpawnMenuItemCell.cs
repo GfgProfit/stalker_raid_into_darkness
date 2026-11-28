@@ -35,6 +35,14 @@ namespace RaidIntoDarkness.Inventory.UI
 
         internal void SetSelected(SpawnMenuEntry selected) => _selection.enabled = _entry == selected;
 
+        internal void Unbind()
+        {
+            gameObject.SetActive(false);
+            _owner = null;
+            _entry = null;
+            _pressed = null;
+        }
+
         public void OnPointerDown(PointerEventData eventData)
         {
             if (eventData.button == PointerEventData.InputButton.Left)

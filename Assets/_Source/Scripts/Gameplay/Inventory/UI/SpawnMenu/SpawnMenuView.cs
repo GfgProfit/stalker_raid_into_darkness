@@ -109,14 +109,23 @@ namespace RaidIntoDarkness.Inventory.UI
 
             _definitions = null;
             _catalog = null;
-            _selected = null;
             _category = null;
-            _hoveredCell = null;
-            _hoveredEntry = null;
-            _hoverCamera = null;
-            if (_tooltip != null)
+            if (this == null || _grid == null)
             {
-                _tooltip.Hide();
+                return;
+            }
+
+            SelectItem(null);
+            RefreshTree();
+            RefreshResults();
+            _lastClick = 0d;
+            _lastPointer = 0;
+            _tooltipStats.Clear();
+            EventSystem eventSystem = EventSystem.current;
+            GameObject selection = eventSystem != null ? eventSystem.currentSelectedGameObject : null;
+            if (selection != null && selection.transform.IsChildOf(transform))
+            {
+                eventSystem.SetSelectedGameObject(null);
             }
         }
 
@@ -311,7 +320,7 @@ namespace RaidIntoDarkness.Inventory.UI
             }
             for (int i = index; i < _rows.Count; i++)
             {
-                _rows[i].gameObject.SetActive(false);
+                _rows[i].Unbind();
             }
         }
 
@@ -372,8 +381,16 @@ namespace RaidIntoDarkness.Inventory.UI
             bool selected = _selected != null;
             _details.SetActive(selected);
             _emptyDetails.gameObject.SetActive(!selected);
+            _grant.interactable = selected;
             if (!selected)
             {
+                _itemName.text = string.Empty;
+                _quantityLabel.text = string.Empty;
+                _quantity.SetTextWithoutNotify(string.Empty);
+                _weight.text = string.Empty;
+                _conditionBlock.SetActive(false);
+                _condition.SetValueWithoutNotify(_condition.maxValue);
+                _conditionValue.text = string.Empty;
                 return;
             }
 

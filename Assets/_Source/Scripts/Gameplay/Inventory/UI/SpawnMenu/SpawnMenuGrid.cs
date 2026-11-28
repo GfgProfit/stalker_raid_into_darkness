@@ -187,7 +187,7 @@ namespace RaidIntoDarkness.Inventory.UI
 
         private void Release(SpawnMenuItemCell cell)
         {
-            cell.gameObject.SetActive(false);
+            cell.Unbind();
             _pool.Push(cell);
         }
     }

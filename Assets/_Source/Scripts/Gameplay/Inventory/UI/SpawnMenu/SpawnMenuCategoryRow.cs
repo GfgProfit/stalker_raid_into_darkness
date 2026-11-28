@@ -40,8 +40,27 @@ namespace RaidIntoDarkness.Inventory.UI
 
         internal void SetSelected(SpawnMenuCategory selected) => _selected.enabled = _category == selected;
 
-        private void SelectCategory() => _owner.SelectCategory(_category);
+        internal void Unbind()
+        {
+            _owner = null;
+            _category = null;
+            gameObject.SetActive(false);
+        }
 
-        private void ToggleCategory() => _owner.ToggleCategory(_category);
+        private void SelectCategory()
+        {
+            if (_owner != null)
+            {
+                _owner.SelectCategory(_category);
+            }
+        }
+
+        private void ToggleCategory()
+        {
+            if (_owner != null)
+            {
+                _owner.ToggleCategory(_category);
+            }
+        }
     }
 }

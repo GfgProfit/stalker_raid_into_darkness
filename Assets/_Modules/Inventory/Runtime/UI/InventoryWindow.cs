@@ -84,6 +84,7 @@ namespace Inventory.UI
         public Func<InventoryActionContext, IInventoryItemAction, InventoryActionStyle> ActionStyleProvider { get; set; }
         public IInventoryEquipmentGate EquipmentGate { get; set; }
         public IInventoryItemDropHandler ItemDropHandler { get; set; }
+        public Func<ItemInstance, InventoryResult> DropToWorld { get; set; }
         public ItemInstance HoveredItem => _hovered != null ? _hovered.Item : null;
 
         public event Action<InventoryWindow> Opened;
@@ -895,7 +896,7 @@ namespace Inventory.UI
                 return;
             }
 
-            InventoryResult result = Model.TryRemove(item.InstanceId);
+            InventoryResult result = DropToWorld != null ? DropToWorld(item) : Model.TryRemove(item.InstanceId);
 
             if (Report(result, FormatLabel("status_dropped", "Dropped {0}", item.Definition.DisplayName)))
             {

@@ -10,6 +10,8 @@ namespace RaidIntoDarkness.Integrations.Inventory
     {
         public const string DEFAULT_MATERIAL = "objects\\clothes";
 
+        private const float INVENTORY_DROP_MIN_NORMAL_SPEED = 0.75f;
+
         [SerializeField] private StalkerCollideSoundLibrary _sounds;
         [SerializeField] private StalkerSurfaceAudioLibrary _surfaces;
         [SerializeField] private AudioSource _audio;
@@ -20,6 +22,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
 
         private StalkerSurfaceResolver _resolver;
         private Rigidbody _body;
+        private bool _inventoryDropImpactPending;
 
         public string Material => _material;
         public float Mass => _mass > 0f ? _mass : Body.mass;
@@ -51,17 +54,33 @@ namespace RaidIntoDarkness.Integrations.Inventory
             _resolver = null;
         }
 
+        internal void ExpectInventoryDropImpact()
+        {
+            _inventoryDropImpactPending = true;
+        }
+
         public bool TryPlay(Collider other, Vector3 point, Vector3 normal, Vector3 velocity)
         {
-            if (_sounds == null || _audio == null || other == null || (other.attachedRigidbody != null && other.attachedRigidbody.isKinematic == false))
+            if (_sounds == null || _audio == null || other == null)
             {
                 return false;
             }
 
             float criterion = StalkerCollideSoundLibrary.GetCriterion(velocity, normal, Mass);
-            if (criterion <= _sounds.VelocityCriterion)
+            bool dropImpact = _inventoryDropImpactPending && Mathf.Abs(Vector3.Dot(velocity, normal)) >= INVENTORY_DROP_MIN_NORMAL_SPEED;
+
+            if (dropImpact)
             {
-                return false;
+                criterion = Mathf.Max(criterion, _sounds.VelocityCriterion);
+            }
+            else
+            {
+                Rigidbody otherBody = other.attachedRigidbody;
+
+                if (criterion <= _sounds.VelocityCriterion || (otherBody != null && otherBody.isKinematic == false))
+                {
+                    return false;
+                }
             }
 
             Camera camera = Camera.main;
@@ -85,6 +104,7 @@ namespace RaidIntoDarkness.Integrations.Inventory
             LastClip = clips[Random.Range(0, clips.Count)];
             LastVolume = Mathf.Clamp01(_sounds.GetVolume(criterion));
             LastSurface = surface;
+            _inventoryDropImpactPending = false;
             PlayedCount++;
             _audio.PlayOneShot(LastClip, LastVolume);
             return true;

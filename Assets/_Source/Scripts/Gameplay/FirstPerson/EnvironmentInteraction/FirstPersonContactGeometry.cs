@@ -16,6 +16,7 @@ namespace RaidIntoDarkness.FirstPerson
         private const float SIDE_DEPTH_SCALE = 2.0f;
 
         private readonly FirstPersonContactCatalog _catalog;
+        private readonly IReadOnlyDictionary<Collider, float> _ignoredColliders;
         private readonly Collider[] _nearby = new Collider[COLLIDER_CAPACITY];
         private readonly RaycastHit[] _forwardHits = new RaycastHit[FORWARD_HIT_CAPACITY];
         private readonly FirstPersonContactBox[] _forwardBoxes = new FirstPersonContactBox[FORWARD_PROBE_COUNT];
@@ -27,9 +28,10 @@ namespace RaidIntoDarkness.FirstPerson
 
         private BoxCollider _query;
 
-        public FirstPersonContactGeometry(FirstPersonContactCatalog catalog)
+        public FirstPersonContactGeometry(FirstPersonContactCatalog catalog, IReadOnlyDictionary<Collider, float> ignoredColliders)
         {
             _catalog = catalog;
+            _ignoredColliders = ignoredColliders;
         }
 
         public void Bind(GameObject hands, GameObject weapon)
@@ -129,7 +131,7 @@ namespace RaidIntoDarkness.FirstPerson
             int nearbyCount = count;
             for (int i = count - 1; i >= 0; i--)
             {
-                if (_nearby[i] == null || _nearby[i].transform.IsChildOf(actor))
+                if (IsObstacle(_nearby[i], actor) == false)
                 {
                     _nearby[i] = _nearby[--count];
                 }
@@ -252,7 +254,7 @@ namespace RaidIntoDarkness.FirstPerson
                 for (int i = 0; i < hitCount; i++)
                 {
                     RaycastHit hit = _forwardHits[i];
-                    if (hit.distance > 0.0f && hit.collider != null && !hit.collider.transform.IsChildOf(actor) && IsInFront(hit.normal, forward))
+                    if (hit.distance > 0.0f && IsObstacle(hit.collider, actor) && IsInFront(hit.normal, forward))
                     {
                         distance = Mathf.Min(distance, hit.distance);
                     }
@@ -260,6 +262,11 @@ namespace RaidIntoDarkness.FirstPerson
             }
 
             return distance;
+        }
+
+        private bool IsObstacle(Collider collider, Transform actor)
+        {
+            return collider != null && (_ignoredColliders.TryGetValue(collider, out float until) == false || until <= Time.time) && collider.transform.IsChildOf(actor) == false;
         }
 
         private static bool IsInFront(Vector3 normal, Vector3 forward)

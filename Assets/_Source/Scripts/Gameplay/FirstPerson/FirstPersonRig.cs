@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 using XRay.Importer;
@@ -18,6 +19,8 @@ namespace RaidIntoDarkness.FirstPerson
         [SerializeField] private bool _castShadows;
         [SerializeField] private bool _handsVisible;
 
+        private readonly Dictionary<Collider, float> _weaponObstructionExclusions = new();
+        private readonly List<Collider> _expiredObstructionExclusions = new();
         private GameObject _hands;
         private GameObject _body;
         private XRayRigPlayer _bodyPlayer;
@@ -54,12 +57,17 @@ namespace RaidIntoDarkness.FirstPerson
                     return;
                 }
 
-                _weaponObstruction = new FirstPersonWeaponObstruction(transform, observer, collisionMask, calibration);
+                _weaponObstruction = new FirstPersonWeaponObstruction(transform, observer, collisionMask, calibration, _weaponObstructionExclusions);
             }
             catch (Exception exception) when (exception is System.IO.IOException or System.IO.InvalidDataException or ArgumentException)
             {
                 Debug.LogError($"Could not load first-person collision calibration: {exception.Message}", this);
             }
+        }
+
+        public bool IsWeaponAimObstructed(object owner)
+        {
+            return owner != null && owner == HandsOwner && _weaponObstruction?.BlocksAim == true;
         }
 
         public void SetWeaponObstruction(object owner, GameObject weapon, Transform muzzle, bool useMuzzleAxis)
@@ -73,6 +81,39 @@ namespace RaidIntoDarkness.FirstPerson
         public void InvalidateWeaponObstructionGeometry()
         {
             _weaponObstruction?.InvalidateGeometry();
+        }
+
+        public void IgnoreWeaponObstruction(Collider[] colliders, float duration)
+        {
+            if (_weaponObstruction == null)
+            {
+                return;
+            }
+
+            float now = Time.time;
+
+            foreach (KeyValuePair<Collider, float> exclusion in _weaponObstructionExclusions)
+            {
+                if (exclusion.Key == null || exclusion.Value <= now)
+                {
+                    _expiredObstructionExclusions.Add(exclusion.Key);
+                }
+            }
+
+            foreach (Collider collider in _expiredObstructionExclusions)
+            {
+                _weaponObstructionExclusions.Remove(collider);
+            }
+
+            _expiredObstructionExclusions.Clear();
+
+            foreach (Collider collider in colliders)
+            {
+                if (collider != null)
+                {
+                    _weaponObstructionExclusions[collider] = now + duration;
+                }
+            }
         }
 
         public void RequestHands(object requester)

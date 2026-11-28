@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using NUnit.Framework;
@@ -36,11 +37,12 @@ namespace RaidIntoDarkness.Player.Tests
                     muzzle.localRotation = Quaternion.Euler(0f, 90f, 0f);
                 }
 
-                Transform leftUpper = Create(scene, "l_upperarm", hands, new Vector3(-0.34f, -0.13f, 0.1f));
-                Transform leftForearm = Create(scene, "l_forearm", leftUpper, new Vector3(0.08f, 0.01f, 0.12f));
+                float gripDepthScale = barrelLength < 0.33f ? 0.5f : 1f;
+                Transform leftUpper = Create(scene, "l_upperarm", hands, new Vector3(-0.34f, -0.13f, 0.1f * gripDepthScale));
+                Transform leftForearm = Create(scene, "l_forearm", leftUpper, new Vector3(0.08f, 0.01f, 0.12f * gripDepthScale));
                 Transform rightUpper = Create(scene, "r_upperarm", hands, new Vector3(0.25f, -0.11f, 0.02f));
                 Transform rightForearm = Create(scene, "r_forearm", rightUpper, new Vector3(-0.05f, 0.02f, 0.01f));
-                Transform left = Create(scene, "l_hand", leftForearm, new Vector3(0.17f, 0.07f, 0.06f));
+                Transform left = Create(scene, "l_hand", leftForearm, new Vector3(0.17f, 0.07f, 0.06f * gripDepthScale));
                 Transform right = Create(scene, "r_hand", rightForearm, new Vector3(-0.12f, 0.05f, 0.01f));
                 left.localRotation = Quaternion.Euler(5f, 12f, 0f);
                 right.localRotation = Quaternion.Euler(16f, 0f, -7f);
@@ -58,10 +60,11 @@ namespace RaidIntoDarkness.Player.Tests
                 Transform wall = AddObstacle(scene, null, origin + Vector3.forward * (barrelLength + 0.5f));
                 Type type = typeof(FirstPersonRig).Assembly.GetType("RaidIntoDarkness.FirstPerson.FirstPersonWeaponObstruction", true);
                 FirstPersonContactCatalog calibration = BuildCalibration(handModel, heldMesh);
-                obstruction = Activator.CreateInstance(type, actor, eye, -1, calibration);
+                obstruction = Activator.CreateInstance(type, actor, eye, -1, calibration, new Dictionary<Collider, float>());
                 dispose = type.GetMethod("Dispose");
                 MethodInfo bind = type.GetMethod("Bind");
                 MethodInfo tick = type.GetMethod("Tick");
+                PropertyInfo blocksAim = type.GetProperty("BlocksAim");
                 var arguments = new object[] { hands.gameObject, scene.GetPhysicsScene(), 1f / 60f };
                 bind.Invoke(obstruction, new object[] { weapon.gameObject, muzzle, useMuzzleAxis });
 
@@ -74,10 +77,18 @@ namespace RaidIntoDarkness.Player.Tests
                 RunFrames(tick, obstruction, arguments, 60);
                 Assert.That(hands.localPosition.z, Is.LessThan(-0.01f));
                 Assert.That(Quaternion.Angle(hands.localRotation, Quaternion.identity), Is.LessThan(5f));
+                Assert.That(blocksAim.GetValue(obstruction), Is.False);
+
+                wall.position = origin + Vector3.forward * (barrelLength + 0.025f);
+                Physics.SyncTransforms();
+                RunFrames(tick, obstruction, arguments, 60);
+                Assert.That(hands.localPosition.z, Is.LessThan(-0.01f));
+                Assert.That(blocksAim.GetValue(obstruction), Is.False, "Light overlap must allow ADS.");
 
                 wall.position = origin + Vector3.forward * (barrelLength * 0.29f);
                 Physics.SyncTransforms();
                 RunFrames(tick, obstruction, arguments, 3);
+                Assert.That(blocksAim.GetValue(obstruction), Is.True);
                 Assert.That(Quaternion.Angle(hands.localRotation, Quaternion.identity), Is.LessThan(5f));
                 RunFrames(tick, obstruction, arguments, 50);
                 float pitch = Mathf.DeltaAngle(0f, hands.localEulerAngles.x);
@@ -94,6 +105,7 @@ namespace RaidIntoDarkness.Player.Tests
                 RunFrames(tick, obstruction, arguments, 70);
                 Assert.That(hands.localPosition, Is.EqualTo(Vector3.zero));
                 Assert.That(hands.localRotation, Is.EqualTo(Quaternion.identity));
+                Assert.That(blocksAim.GetValue(obstruction), Is.False);
 
                 wall.position = origin + Vector3.forward * (barrelLength + 0.18f);
                 Physics.SyncTransforms();

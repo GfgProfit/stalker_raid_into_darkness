@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace RaidIntoDarkness.FirstPerson
@@ -9,6 +10,8 @@ namespace RaidIntoDarkness.FirstPerson
         private const float CLOSE_ENTRY_DELAY = 0.06f;
         private const float CLOSE_EXIT_DELAY = 0.22f;
         private const float CONTACT_EXIT_DELAY = 0.085f;
+        private const float AIM_BLOCK_DEPTH = 0.04f;
+        private const float AIM_RELEASE_DEPTH = 0.015f;
         private const float ENTER_RESPONSE = 17.0f;
         private const float EXIT_RESPONSE = 11.0f;
         private const float SETTLE_SQUARED = 0.000001f;
@@ -39,12 +42,14 @@ namespace RaidIntoDarkness.FirstPerson
         private bool _close;
         private bool _geometryDirty = true;
 
-        public FirstPersonWeaponObstruction(Transform actor, Transform view, int collisionMask, FirstPersonContactCatalog calibration)
+        public bool BlocksAim { get; private set; }
+
+        public FirstPersonWeaponObstruction(Transform actor, Transform view, int collisionMask, FirstPersonContactCatalog calibration, IReadOnlyDictionary<Collider, float> ignoredColliders)
         {
             _actor = actor;
             _view = view;
             _collisionMask = collisionMask;
-            _geometry = new FirstPersonContactGeometry(calibration);
+            _geometry = new FirstPersonContactGeometry(calibration, ignoredColliders);
         }
 
         public void Bind(GameObject weapon, Transform muzzle, bool useMuzzleAxis)
@@ -141,6 +146,7 @@ namespace RaidIntoDarkness.FirstPerson
             _lastDistance = 0.0f;
             _hadContact = false;
             _close = false;
+            BlocksAim = false;
         }
 
         public void Dispose()
@@ -153,6 +159,7 @@ namespace RaidIntoDarkness.FirstPerson
         {
             _clearTime = contact ? 0.0f : _clearTime + dt;
             _hadContact = contact || (_hadContact && _clearTime < CONTACT_EXIT_DELAY);
+            BlocksAim = _hadContact && length - _lastDistance >= (BlocksAim ? AIM_RELEASE_DEPTH : AIM_BLOCK_DEPTH);
             float range = length + lead;
             float threshold = length * (compact ? 0.55f : 0.57f);
             bool closeContact = contact && _lastDistance < threshold;

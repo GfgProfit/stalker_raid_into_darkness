@@ -1839,6 +1839,11 @@ namespace RaidIntoDarkness.Weapons
 
         private void SetAiming(bool aiming)
         {
+            if (aiming && _player != null && _player.Rig != null && _player.Rig.IsWeaponAimObstructed(this))
+            {
+                aiming = false;
+            }
+
             if (_aiming == aiming)
             {
                 return;

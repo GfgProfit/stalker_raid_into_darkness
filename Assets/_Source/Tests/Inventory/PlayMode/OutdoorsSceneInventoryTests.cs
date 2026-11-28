@@ -198,6 +198,168 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
         }
 
         [UnityTest]
+        public IEnumerator DroppingFromInventoryTossesItemsForwardAndDownWithSpin()
+        {
+            SceneManager.LoadScene(SCENE, LoadSceneMode.Single);
+            yield return new WaitForSeconds(0.6f);
+            InventoryWindowController controller = Object.FindAnyObjectByType<InventoryWindowController>();
+            controller.Player.CameraController.SetLook(0f, 90f);
+            yield return null;
+            controller.Open();
+            yield return null;
+
+            InventoryModel model = controller.Inventory.Model;
+            Transform view = controller.Player.CameraController.Camera.transform;
+            Vector3 forward = Vector3.ProjectOnPlane(controller.Player.transform.forward, Vector3.up).normalized;
+            CharacterController character = controller.Player.GetComponent<CharacterController>();
+
+            foreach (string section in new[] { "ammo_5.56x45_ss190", "wpn_aug_a3" })
+            {
+                ItemDefinition definition = controller.Inventory.Database.Definitions.First(item => DefinitionSection(item) == section);
+                ItemInstance item = model.CreateItem(definition);
+                Assert.That(model.TryAddAuto(item, BACKPACK, mergeStacks: false).Success, Is.True, section);
+                controller.Window.DropItem(item);
+                Assert.That(model.ContainsItem(item), Is.False, section);
+                WorldItem dropped = Object.FindObjectsByType<WorldItem>(FindObjectsSortMode.None).Single(worldItem => worldItem.Instance == item);
+                Rigidbody body = dropped.GetComponent<Rigidbody>();
+                Vector3 initialPosition = body.position;
+                Quaternion initialRotation = body.rotation;
+                Assert.That(initialPosition.y, Is.LessThan(view.position.y), section);
+                Assert.That(Vector3.Dot(body.linearVelocity, forward), Is.GreaterThan(1f), section);
+                Assert.That(body.linearVelocity.y, Is.LessThan(0f), section);
+                Assert.That(body.angularVelocity.magnitude, Is.GreaterThan(1f), section);
+
+                Collider[] colliders = dropped.GetComponentsInChildren<Collider>();
+                Bounds itemBounds = colliders[0].bounds;
+
+                foreach (Collider collider in colliders)
+                {
+                    itemBounds.Encapsulate(collider.bounds);
+                    Assert.That(Physics.ComputePenetration(collider, collider.transform.position, collider.transform.rotation, character, character.transform.position, character.transform.rotation, out _, out _), Is.False, section);
+                }
+
+                Assert.That(Vector3.Dot(itemBounds.center - character.bounds.center, forward), Is.EqualTo(0.6f).Within(0.02f), section);
+                yield return new WaitForSeconds(0.15f);
+                Assert.That(Vector3.Dot(body.position - initialPosition, forward), Is.GreaterThan(0.1f), section);
+                Assert.That(body.position.y, Is.LessThan(initialPosition.y), section);
+                Assert.That(Quaternion.Angle(initialRotation, body.rotation), Is.GreaterThan(5f), section);
+                Object.Destroy(dropped.gameObject);
+                yield return null;
+            }
+
+            controller.Close();
+        }
+
+        [UnityTest]
+        public IEnumerator InventoryDropAvoidsWallsAndKeepsItemWhenSurrounded()
+        {
+            SceneManager.LoadScene(SCENE, LoadSceneMode.Single);
+            yield return new WaitForSeconds(0.6f);
+            InventoryWindowController controller = Object.FindAnyObjectByType<InventoryWindowController>();
+            controller.Player.CameraController.SetLook(0f, 0f);
+            yield return null;
+            controller.Open();
+            yield return null;
+
+            InventoryModel model = controller.Inventory.Model;
+            Transform view = controller.Player.CameraController.Camera.transform;
+            Vector3 forward = Vector3.ProjectOnPlane(view.forward, Vector3.up).normalized;
+            Vector3 right = Vector3.Cross(Vector3.up, forward);
+            Vector3 dropCenter = view.position - Vector3.up * 0.3f;
+            BoxCollider wall = CreateWall(forward, 0.52f);
+            ItemDefinition definition = controller.Inventory.Database.Definitions.First(item => DefinitionSection(item) == "ammo_5.56x45_ss190");
+            ItemInstance first = model.CreateItem(definition, 4);
+            Assert.That(model.TryAddAuto(first, BACKPACK, mergeStacks: false).Success, Is.True);
+            controller.Window.DropItem(first);
+            WorldItem dropped = Object.FindObjectsByType<WorldItem>(FindObjectsSortMode.None).Single(worldItem => worldItem.Instance == first);
+            Assert.That(Vector3.Dot(dropped.transform.position - dropCenter, forward), Is.LessThan(0.42f), "The item crossed the wall during placement");
+
+            foreach (Collider collider in dropped.GetComponentsInChildren<Collider>())
+            {
+                Assert.That(Physics.ComputePenetration(collider, collider.transform.position, collider.transform.rotation, wall, wall.transform.position, wall.transform.rotation, out _, out _), Is.False, "The item started inside the wall");
+            }
+
+            Rigidbody body = dropped.GetComponent<Rigidbody>();
+            Assert.That(body.maxDepenetrationVelocity, Is.EqualTo(2f));
+            yield return new WaitForSeconds(0.2f);
+            Assert.That(body.linearVelocity.magnitude, Is.LessThan(6f), "Wall contact flung the item");
+
+            CreateWall(-forward, 0.4f);
+            CreateWall(right, 0.4f);
+            CreateWall(-right, 0.4f);
+            ItemInstance second = model.CreateItem(definition, 7);
+            Assert.That(model.TryAddAuto(second, BACKPACK, mergeStacks: false).Success, Is.True);
+            ItemLocation original = second.Location;
+            controller.Window.DropItem(second);
+            Assert.That(model.ContainsItem(second), Is.True);
+            Assert.That(second.Location, Is.EqualTo(original));
+            Assert.That(second.Amount, Is.EqualTo(7));
+            Assert.That(Object.FindObjectsByType<WorldItem>(FindObjectsSortMode.None).Any(worldItem => worldItem.Instance == second), Is.False);
+            controller.Close();
+
+            BoxCollider CreateWall(Vector3 direction, float distance)
+            {
+                var wallObject = new GameObject("Inventory drop test wall");
+                wallObject.transform.SetPositionAndRotation(dropCenter + direction * distance, Quaternion.LookRotation(direction, Vector3.up));
+                BoxCollider collider = wallObject.AddComponent<BoxCollider>();
+                collider.size = new Vector3(3f, 2f, 0.2f);
+                return collider;
+            }
+        }
+
+        [UnityTest]
+        public IEnumerator LightweightInventoryDropsPlayTheirSurfaceImpact()
+        {
+            SceneManager.LoadScene(SCENE, LoadSceneMode.Single);
+            yield return new WaitForSeconds(0.6f);
+            InventoryWindowController controller = Object.FindAnyObjectByType<InventoryWindowController>();
+            controller.Player.CameraController.SetLook(0f, 0f);
+            yield return null;
+            controller.Open();
+            yield return null;
+
+            InventoryModel model = controller.Inventory.Model;
+            ItemDefinition definition = controller.Inventory.Database.Definitions.First(item => DefinitionSection(item) == "ac10632");
+            Transform view = controller.Player.CameraController.Camera.transform;
+            Vector3 forward = Vector3.ProjectOnPlane(view.forward, Vector3.up).normalized;
+            GameObject plate = new GameObject("Inventory drop sound surface");
+            plate.transform.SetPositionAndRotation(view.position + forward * 1.6f - Vector3.up * 0.95f, Quaternion.LookRotation(forward, Vector3.up));
+            plate.AddComponent<BoxCollider>().size = new Vector3(1f, 0.1f, 2.1f);
+            StalkerSurface surface = plate.AddComponent<StalkerSurface>();
+
+            foreach (StalkerSurfaceType surfaceType in new[] { StalkerSurfaceType.Concrete, StalkerSurfaceType.Metal })
+            {
+                surface.Type = surfaceType;
+                ItemInstance item = model.CreateItem(definition);
+                Assert.That(model.TryAddAuto(item, BACKPACK, mergeStacks: false).Success, Is.True);
+                controller.Window.DropItem(item);
+                WorldItem dropped = Object.FindObjectsByType<WorldItem>(FindObjectsSortMode.None).Single(worldItem => worldItem.Instance == item);
+                WorldItemImpactSound impact = dropped.GetComponent<WorldItemImpactSound>();
+                Assert.That(impact.Mass, Is.LessThan(1f));
+                Assert.That(impact.PlayedCount, Is.Zero, "The impact clip played before the item hit a surface");
+                float timeout = Time.time + 1.5f;
+
+                while (impact.PlayedCount == 0 && Time.time < timeout)
+                {
+                    yield return null;
+                }
+
+                Assert.That(impact.PlayedCount, Is.EqualTo(1), $"{surfaceType}: the item fell without an impact sound");
+                Assert.That(impact.LastSurface, Is.EqualTo(surfaceType));
+                Assert.That(impact.LastClip, Is.Not.Null);
+                Assert.That(impact.LastVolume, Is.InRange(0.2f, 1f));
+                Assert.That(dropped.GetComponent<AudioSource>().isPlaying, Is.True);
+                yield return new WaitForSeconds(0.3f);
+                Assert.That(impact.PlayedCount, Is.EqualTo(1), "Minor bounces replayed the drop sound");
+                Object.Destroy(dropped.gameObject);
+                yield return null;
+            }
+
+            Object.Destroy(plate);
+            controller.Close();
+        }
+
+        [UnityTest]
         public IEnumerator InventoryOpensBlocksGameplayAndSupportsItemOperations()
         {
             SceneManager.LoadScene(SCENE, LoadSceneMode.Single);

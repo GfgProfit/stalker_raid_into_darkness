@@ -10,6 +10,14 @@ namespace RaidIntoDarkness.Integrations.Inventory
     [DisallowMultipleComponent]
     public sealed class WorldItemInteractor : MonoBehaviour
     {
+        private const float DROP_HEIGHT_BELOW_VIEW = 0.3f;
+        private const float DROP_FORWARD_SPEED = 2.1f;
+        private const float DROP_DOWNWARD_SPEED = 0.65f;
+        private const float DROP_PITCH_SPEED = 4f;
+        private const float DROP_ROLL_SPEED = 2f;
+        private const float DROP_MAX_DEPENETRATION_SPEED = 2f;
+        private const float DROP_OBSTRUCTION_IGNORE_SECONDS = 0.65f;
+
         [SerializeField] private InventoryWindowController _controller;
         [SerializeField] private InputActionReference _pickUp;
         [SerializeField] [Min(0.1f)] private float _pickUpDistance = 3f;
@@ -18,7 +26,8 @@ namespace RaidIntoDarkness.Integrations.Inventory
         [SerializeField] private LayerMask _mask = ~0;
 
         private readonly RaycastHit[] _hits = new RaycastHit[32];
-        private InventoryWindow _subscribedWindow;
+        private readonly WorldItemDropPlacement _dropPlacement = new();
+        private InventoryWindow _dropWindow;
         private WorldItem _hintTarget;
         private WorldItem _pickupTarget;
         private bool _pickupPending;
@@ -140,21 +149,16 @@ namespace RaidIntoDarkness.Integrations.Inventory
         public WorldItem Spawn(ItemDefinition definition, int amount)
         {
             Transform view = GetView();
+            WorldItem prefab = GetWorldPrefab(definition);
 
-            if (definition == null || view == null || definition.TryGetComponent(out WorldItemComponent component) == false || component.Prefab == null)
+            if (view == null || prefab == null)
             {
                 return null;
             }
 
-            Vector3 forward = Vector3.ProjectOnPlane(view.forward, Vector3.up);
-
-            if (forward.sqrMagnitude < 0.01f)
-            {
-                forward = Vector3.ProjectOnPlane(_controller.Player.transform.forward, Vector3.up);
-            }
-
-            forward.Normalize();
-            WorldItem worldItem = Instantiate(component.Prefab, view.position, Quaternion.LookRotation(forward, Vector3.up));
+            Vector3 forward = GetHorizontalForward(view);
+            CharacterController character = _controller.Player.GetComponent<CharacterController>();
+            WorldItem worldItem = Instantiate(prefab, view.position, Quaternion.LookRotation(forward, Vector3.up));
             worldItem.Configure(definition, amount);
             Physics.SyncTransforms();
             Bounds bounds = new Bounds(worldItem.transform.position, Vector3.zero);
@@ -167,7 +171,6 @@ namespace RaidIntoDarkness.Integrations.Inventory
                 }
             }
 
-            CharacterController character = _controller.Player.GetComponent<CharacterController>();
             float playerRadius = character != null ? Mathf.Max(character.bounds.extents.x, character.bounds.extents.z) : 0.5f;
             float itemRadius = new Vector2(bounds.extents.x, bounds.extents.z).magnitude;
             float distance = Mathf.Max(_dropDistance, playerRadius + itemRadius + 0.1f);
@@ -187,8 +190,8 @@ namespace RaidIntoDarkness.Integrations.Inventory
 
             if (_controller != null && _controller.Window != null)
             {
-                _subscribedWindow = _controller.Window;
-                _subscribedWindow.ItemDropped += OnItemDropped;
+                _dropWindow = _controller.Window;
+                _dropWindow.DropToWorld = TryDropToWorld;
             }
         }
 
@@ -208,10 +211,14 @@ namespace RaidIntoDarkness.Integrations.Inventory
                 _pickupPending = false;
             }
 
-            if (_subscribedWindow != null)
+            if (_dropWindow != null)
             {
-                _subscribedWindow.ItemDropped -= OnItemDropped;
-                _subscribedWindow = null;
+                if (_dropWindow.DropToWorld == TryDropToWorld)
+                {
+                    _dropWindow.DropToWorld = null;
+                }
+
+                _dropWindow = null;
             }
         }
 
@@ -296,18 +303,82 @@ namespace RaidIntoDarkness.Integrations.Inventory
 
         private FirstPersonPickupAnimator GetPickupAnimator() => _controller != null && _controller.Player != null ? _controller.Player.Pickup : null;
 
-        private void OnItemDropped(ItemInstance item)
+        private InventoryResult TryDropToWorld(ItemInstance item)
         {
-            if (item != null)
-            {
-                WorldItem worldItem = Spawn(item.Definition, item.Amount);
+            InventoryModel model = _dropWindow != null ? _dropWindow.Model : null;
 
-                if (worldItem != null)
-                {
-                    worldItem.Configure(item);
-                }
+            if (model == null || model.ContainsItem(item) == false)
+            {
+                return InventoryResult.Fail(InventoryFailure.ItemNotFound);
             }
+
+            Transform view = GetView();
+            WorldItem prefab = GetWorldPrefab(item.Definition);
+
+            if (view == null || prefab == null)
+            {
+                return InventoryResult.Fail(InventoryFailure.InvalidItem);
+            }
+
+            Transform player = _controller.Player.transform;
+            Vector3 forward = GetHorizontalForward(view);
+            Vector3 right = Vector3.Cross(Vector3.up, forward);
+            CharacterController character = _controller.Player.GetComponent<CharacterController>();
+            Vector3 origin = character != null ? character.bounds.center : view.position;
+            origin.y = view.position.y - DROP_HEIGHT_BELOW_VIEW;
+            WorldItem worldItem = Instantiate(prefab, origin, Quaternion.LookRotation(right, Vector3.up));
+            worldItem.Configure(item);
+            Collider[] colliders = worldItem.GetComponentsInChildren<Collider>();
+
+            if (_dropPlacement.TryFindPosition(worldItem.transform, colliders, player.root, origin, forward, out Vector3 position, out Vector3 direction) == false)
+            {
+                worldItem.gameObject.SetActive(false);
+                Destroy(worldItem.gameObject);
+                return InventoryResult.Fail(InventoryFailure.NoSpace);
+            }
+
+            worldItem.transform.position = position;
+            Physics.SyncTransforms();
+            InventoryResult result = model.TryRemove(item.InstanceId);
+
+            if (result.Success == false)
+            {
+                worldItem.gameObject.SetActive(false);
+                Destroy(worldItem.gameObject);
+                return result;
+            }
+
+            Rigidbody body = worldItem.GetComponent<Rigidbody>();
+            if (worldItem.TryGetComponent(out WorldItemImpactSound impactSound))
+            {
+                impactSound.ExpectInventoryDropImpact();
+            }
+
+            body.maxDepenetrationVelocity = DROP_MAX_DEPENETRATION_SPEED;
+            body.linearVelocity = direction * DROP_FORWARD_SPEED - Vector3.up * DROP_DOWNWARD_SPEED;
+            body.angularVelocity = Vector3.Cross(Vector3.up, direction) * DROP_PITCH_SPEED + direction * DROP_ROLL_SPEED;
+            FirstPersonRig rig = _controller.Player.Rig;
+            if (rig != null)
+            {
+                rig.IgnoreWeaponObstruction(colliders, DROP_OBSTRUCTION_IGNORE_SECONDS);
+            }
+
+            return result;
         }
+
+        private Vector3 GetHorizontalForward(Transform view)
+        {
+            Vector3 forward = Vector3.ProjectOnPlane(view.forward, Vector3.up);
+
+            if (forward.sqrMagnitude < 0.01f)
+            {
+                forward = Vector3.ProjectOnPlane(_controller.Player.transform.forward, Vector3.up);
+            }
+
+            return forward.normalized;
+        }
+
+        private static WorldItem GetWorldPrefab(ItemDefinition definition) => definition != null && definition.TryGetComponent(out WorldItemComponent component) ? component.Prefab : null;
 
         private Transform GetView()
         {

@@ -11,7 +11,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c0c35dd3ef5080a45aac4fb652d96cd0, type: 3}
   m_Name: ItemDatabase
-  m_EditorClassIdentifier: Inventory::Inventory.ItemDatabase
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.ItemDatabase
   _definitions:
   - {fileID: 11400000, guid: 822d19204dad6b440809376b2311f9c5, type: 2}
   - {fileID: 11400000, guid: 01bb7c1ff634b8f4aae6b7e1717bde90, type: 2}

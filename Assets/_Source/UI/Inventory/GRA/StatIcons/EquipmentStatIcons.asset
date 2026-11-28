@@ -11,7 +11,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8e4845fe0077c0348a6e51c34d8afe86, type: 3}
   m_Name: EquipmentStatIcons
-  m_EditorClassIdentifier: Inventory.UI::Inventory.UI.InventoryIconSet
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.UI.InventoryIconSet
   _entries:
   - _id: ui_am_prop_Vibros
     _sprite: {fileID: -1060341649, guid: d9322833281e24546a9ab5697a1379d1, type: 3}

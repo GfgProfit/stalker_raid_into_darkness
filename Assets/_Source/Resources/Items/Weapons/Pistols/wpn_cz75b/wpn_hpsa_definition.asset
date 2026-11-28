@@ -11,7 +11,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: da0f90c2955673d46b25d465cbe44ed0, type: 3}
   m_Name: wpn_hpsa_definition
-  m_EditorClassIdentifier: Inventory::Inventory.ItemDefinition
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.ItemDefinition
   _definitionId: 4f1a68942f3fcc842a198b76f74b8e0f
   _displayName: "\u0421\u0430\u043C\u043E\u0437\u0430\u0440\u044F\u0434\u043D\u044B\u0439 \u043F\u0438\u0441\u0442\u043E\u043B\u0435\u0442 CZ 75 B"
   _shortName: CZ 75 B
@@ -62,14 +62,11 @@ MonoBehaviour:
     version: 2
     RefIds:
     - rid: 115149152802308190
-      type: {class: EquippableItemComponent, ns: Inventory, asm: Inventory}
+      type: {class: EquippableItemComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
       data:
-        _preferredSlotIds:
-        - Secondary
-        - Knife
-        - Primary
+        _preferredSlotIds: 0a0000000800000009000000i
     - rid: 115149152802308191
-      type: {class: WeaponStatsComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      type: {class: WeaponStatsComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
       data:
         _section: wpn_hpsa
         _weaponClass: pistol
@@ -100,7 +97,7 @@ MonoBehaviour:
         _blockSilencerWithGrenadeLauncher: 0
         _exposedRound: {fileID: 0}
     - rid: 115149152802308192
-      type: {class: WeaponHudComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      type: {class: WeaponHudComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
       data:
         _hudModel: {fileID: 8200835906678792939, guid: 6535215934440fa428447f6e411dafdd, type: 3}
         _weaponMotions: {fileID: 8815230551390286010, guid: 8bfca10e93ae8f24ea36a15bf9db3df3, type: 3}
@@ -110,11 +107,11 @@ MonoBehaviour:
         _firstPersonWeapon: {fileID: 11400000, guid: 30164fa7d8cd96045a8334196bd51c34, type: 2}
         _scopeAimOffsets: []
     - rid: 115149152802308193
-      type: {class: WorldItemComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      type: {class: WorldItemComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
       data:
         _prefab: {fileID: 3378357204876995469, guid: 6535215934440fa428447f6e411dafdd, type: 3}
     - rid: 115149152802308194
-      type: {class: ItemTakeSoundComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      type: {class: ItemTakeSoundComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
       data:
         _category: arplatform
         _clips:

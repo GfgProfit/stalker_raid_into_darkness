@@ -11,7 +11,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: da0f90c2955673d46b25d465cbe44ed0, type: 3}
   m_Name: ammo_vog-25
-  m_EditorClassIdentifier: Inventory::Inventory.ItemDefinition
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.ItemDefinition
   _definitionId: 8d3e86aebb7d31c4394703c0a952bee5
   _displayName: "\u041E\u0441\u043A\u043E\u043B\u043E\u0447\u043D\u044B\u0439 \u0433\u0440\u0430\u043D\u0430\u0442\u043E\u043C\u0451\u0442\u043D\u044B\u0439 \u0432\u044B\u0441\u0442\u0440\u0435\u043B \u0412\u041E\u0413-25 (7\u041F17)"
   _shortName: "\u0412\u041E\u0413-25"
@@ -61,7 +61,7 @@ MonoBehaviour:
     version: 2
     RefIds:
     - rid: 115149063313949048
-      type: {class: AmmoStatsComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      type: {class: AmmoStatsComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
       data:
         _section: ammo_vog-25
         _boxSize: 1
@@ -80,7 +80,7 @@ MonoBehaviour:
         _damagePerProjectile: -1
         _hasTooltipParameters: 0
     - rid: 115149063313949049
-      type: {class: ItemTakeSoundComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      type: {class: ItemTakeSoundComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
       data:
         _category: ammolarge
         _clips:
@@ -88,11 +88,11 @@ MonoBehaviour:
         - {fileID: 8300000, guid: af16938bf1330cb488994004d4df86b1, type: 3}
         - {fileID: 8300000, guid: db9d17fa52c8c16449a42dc3f0f089cd, type: 3}
     - rid: 115149063313949092
-      type: {class: WorldItemComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      type: {class: WorldItemComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
       data:
         _prefab: {fileID: 5341770559125794800, guid: 0ad7ff1fe6052534d9188eb3c8824c41, type: 3}
     - rid: 115149063313949128
-      type: {class: AmmoBallisticsComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      type: {class: AmmoBallisticsComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
       data:
         _data:
           _allowRicochet: 0
@@ -110,6 +110,10 @@ MonoBehaviour:
           _explosionPrefab: {fileID: 7513258129239897591, guid: 882cc65c6489bba4298d0fe6ade75ec5, type: 3}
           _explosionSound: {fileID: 8300000, guid: d081c4e7e899be144a9b6bc1d36b008e, type: 3}
           _launchSound: {fileID: 8300000, guid: 6b83da2e420e7a84e9bf33483ea0d056, type: 3}
+          _explosionVariants: []
+          _explosionBodyVariants: []
+          _bounceSounds: {fileID: 0}
+          _bounceSurfaces: {fileID: 0}
           _blastRadius: 7.5
           _blastDamage: 288
           _fragmentCount: 80
@@ -117,3 +121,9 @@ MonoBehaviour:
           _selfDestructSeconds: 10
           _armingDistance: 2.5
           _impactBounceHeight: 0
+          _fragmentRange: 100
+          _armingSeconds: 0
+          _explodeOnImpact: 0
+          _fliesStraight: 0
+          _projectileVisual: {fileID: 0}
+          _flightTrail: {fileID: 0}

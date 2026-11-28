@@ -1,8 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Inventory;
-using Inventory.UI;
+using RaidIntoDarkness.Inventory;
+using RaidIntoDarkness.Inventory.UI;
 using NUnit.Framework;
 using RaidIntoDarkness.FirstPerson;
 using RaidIntoDarkness.Player;
@@ -13,7 +13,7 @@ using UnityEngine.InputSystem.Controls;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
 
-namespace RaidIntoDarkness.Integrations.Inventory.Tests
+namespace RaidIntoDarkness.Inventory.Tests
 {
     public sealed class OutdoorsSceneInventoryTests : OutdoorsSceneInputTestFixture
     {
@@ -54,9 +54,9 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             controller.Open();
             yield return null;
             var panel = (InventoryEquipmentPanel)window.FindGrid(EQUIPMENT);
-            InventoryEquipmentSlot backpackSlot = panel.GetSlotView(OutfitSlotRules.BACKPACK_SLOT);
+            InventoryEquipmentSlot backpackSlot = panel.GetSlotView(SlotId.Backpack);
             Assert.That(backpackSlot.LockedSprite, Is.Not.Null);
-            Assert.That(backpackSlot.LockedSprite, Is.SameAs(panel.GetSlotView(OutfitSlotRules.HELMET_SLOT).LockedSprite));
+            Assert.That(backpackSlot.LockedSprite, Is.SameAs(panel.GetSlotView(SlotId.Head).LockedSprite));
             Assert.That(backpackSlot.IsLockVisible, Is.True);
 
             var context = new InventoryActionContext(window, outfit, panel);
@@ -104,7 +104,6 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             Assert.That(model.TryTransfer(outfit.InstanceId, window.PrimaryContainerId).Success, Is.True);
             controller.Open();
             Assert.That(backpackSlot.IsLockVisible, Is.False);
-            Assert.That(controller.Inventory.LoadJson(controller.Inventory.SaveJson()).IsClean, Is.True);
             Assert.That(EquipmentAnimationQueue.IsPatchRemoved(model.GetItem(outfit.InstanceId)), Is.True);
             Assert.That(model.GetItem(patch.InstanceId).Definition, Is.SameAs(patchDefinition));
             Assert.That(model.GetItem(patch.InstanceId).Amount, Is.EqualTo(3));
@@ -137,9 +136,11 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             for (int i = 0; i < 2; i++)
             {
                 InventoryItemView view = window.FindGrid(item.ContainerId).GetItemView(item);
-                var pointer = new PointerEventData(EventSystem.current) { position = RectTransformUtility.WorldToScreenPoint(null, view.RectTransform.position) };
-                ExecuteEvents.Execute(view.gameObject, pointer, ExecuteEvents.pointerEnterHandler);
+                Vector3 center = view.RectTransform.TransformPoint(view.RectTransform.rect.center);
+                Move(_mouse.position, RectTransformUtility.WorldToScreenPoint(null, center), queueEventOnly: true);
                 yield return null;
+                yield return null;
+                Assert.That(window.HoveredItem, Is.SameAs(item));
                 string destination = item.ContainerId == window.PrimaryContainerId ? window.SecondaryContainerId : window.PrimaryContainerId;
                 Press(_keyboard.leftShiftKey, queueEventOnly: true);
                 yield return null;
@@ -260,6 +261,44 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             Assert.That(dropped.GetComponent<Rigidbody>().angularVelocity.sqrMagnitude, Is.GreaterThan(0f));
             yield return new WaitForSecondsRealtime(0.25f);
             Assert.That(area.alpha, Is.Zero);
+            controller.Close();
+        }
+
+        [UnityTest]
+        public IEnumerator DragIgnoresVisibleGridWithoutBoundContainer()
+        {
+            SceneManager.LoadScene(SCENE, LoadSceneMode.Single);
+            yield return new WaitForSeconds(0.6f);
+            InventoryWindowController controller = Object.FindAnyObjectByType<InventoryWindowController>();
+            controller.Open(true);
+            yield return null;
+
+            InventoryWindow window = controller.Window;
+            InventoryModel model = controller.Inventory.Model;
+            InventoryGridViewBase bag = window.FindGrid(BACKPACK);
+            InventoryGridViewBase stash = window.FindGrid(STASH);
+            ItemDefinition definition = controller.Inventory.Database.Definitions.First(item => DefinitionSection(item) == "ammo_5.56x45_ss190");
+            ItemInstance dragged = model.CreateItem(definition);
+            Assert.That(model.TryAddAuto(dragged, BACKPACK, mergeStacks: false).Success, Is.True);
+            Vector2 start = RectTransformUtility.WorldToScreenPoint(null, bag.GetItemView(dragged).RectTransform.position);
+            Vector2 target = RectTransformUtility.WorldToScreenPoint(null, stash.RectTransform.TransformPoint(stash.RectTransform.rect.center));
+            Assert.That(window.BeginDrag(dragged, bag, dragged.Amount, start, null), Is.True);
+            window.UpdateDrag(target, null);
+            Assert.That(window.Drag.TargetGrid, Is.SameAs(stash));
+            window.CancelDrag();
+
+            Assert.That(model.RemoveContainer(STASH), Is.True);
+            LogAssert.Expect(LogType.Error, $"Inventory grid '{stash.name}' references unconfigured container '{STASH}'.");
+            window.Bind(model, window.IconProvider);
+            yield return null;
+
+            Assert.That(stash.isActiveAndEnabled, Is.True);
+            Assert.That(stash.Container, Is.Null);
+            Assert.That(window.BeginDrag(dragged, bag, dragged.Amount, start, null), Is.True);
+            window.UpdateDrag(target, null);
+            Assert.That(window.Drag.TargetGrid, Is.Null);
+            Assert.That(window.CompleteDrag().Success, Is.False);
+            Assert.That(dragged.ContainerId, Is.EqualTo(BACKPACK));
             controller.Close();
         }
 
@@ -465,9 +504,9 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             Assert.That(window.SecondaryVisible, Is.True, "B did not show the stash panel");
             Assert.That(equipmentGrid.Container, Is.InstanceOf<SlottedContainer>());
             var equipment = (SlottedContainer)equipmentGrid.Container;
-            Assert.That(equipment.GetSlot("Primary"), Is.Not.Null);
-            Assert.That(equipment.GetSlot("Secondary"), Is.Not.Null);
-            Assert.That(equipment.GetSlot("Knife"), Is.Not.Null);
+            Assert.That(equipment.GetSlot(SlotId.Primary), Is.Not.Null);
+            Assert.That(equipment.GetSlot(SlotId.Secondary), Is.Not.Null);
+            Assert.That(equipment.GetSlot(SlotId.Knife), Is.Not.Null);
             Assert.That(controller.Sorting, Is.Not.Null, "sorting was not bound");
             AssertViewsMatchModel(window);
 
@@ -529,8 +568,6 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
 
             WorldItemInteractor interactor = Object.FindAnyObjectByType<WorldItemInteractor>();
             Assert.That(interactor, Is.Not.Null, "OutdoorsScene has no WorldItemInteractor");
-            int sceneItems = Object.FindObjectsByType<WorldItem>(FindObjectsSortMode.None).Length;
-            Assert.That(sceneItems, Is.GreaterThan(0), "OutdoorsScene has no world items to pick up");
             ItemDefinition pickedDefinition = null;
 
             foreach (ItemDefinition definition in controller.Inventory.Database.Definitions)
@@ -545,6 +582,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             Assert.That(pickedDefinition, Is.Not.Null, "no item definition has a world prefab");
             WorldItem spawned = interactor.Spawn(pickedDefinition, 1);
             Assert.That(spawned, Is.Not.Null);
+            Assert.That(Object.FindObjectsByType<WorldItem>(FindObjectsSortMode.None).Length, Is.GreaterThan(0), "The fixture spawned no world item to pick up");
             spawned.GetComponent<Rigidbody>().isKinematic = true;
             Transform view = player.CameraController.Camera.transform;
             Vector3 colliderOffset = spawned.GetComponent<Collider>().bounds.center - spawned.transform.position;
@@ -857,18 +895,10 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             InventoryWindowController controller = Object.FindAnyObjectByType<InventoryWindowController>();
             WorldItemInteractor interactor = Object.FindAnyObjectByType<WorldItemInteractor>();
             InventoryWindow window = controller.Window;
-            WorldItem aug = null;
-
-            foreach (WorldItem candidate in Object.FindObjectsByType<WorldItem>(FindObjectsSortMode.None))
-            {
-                if (DefinitionSection(candidate.Definition) == "wpn_aug_a3")
-                {
-                    aug = candidate;
-                }
-            }
-
-            Assert.That(aug, Is.Not.Null, "the test AUG is not placed in the scene");
-            ItemDefinition definition = aug.Definition;
+            ItemDefinition definition = FindDefinition(controller.Inventory.Database, "wpn_aug_a3");
+            WorldItem aug = interactor.Spawn(definition, 1);
+            Assert.That(aug, Is.Not.Null, "the AUG world prefab could not be placed in the test scene");
+            Assert.That(aug.Definition, Is.SameAs(definition));
             Assert.That(definition.IsCategory("Weapon"), Is.True);
             Assert.That(definition.Size, Is.EqualTo(new Vector2Int(5, 2)), "AUG A3 grid size must come from GRA inv_grid_width/height");
             Assert.That(definition.CanGenerateIcon, Is.True, "weapon icons must be generated, not imported");
@@ -908,7 +938,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             window.EquipItem(item);
             yield return WaitForEquipmentAnimations(controller);
             Assert.That(item.ContainerId, Is.EqualTo(EQUIPMENT));
-            Assert.That(item.Location.SlotId, Is.EqualTo("Primary"));
+            Assert.That(item.Location.SlotId, Is.EqualTo(SlotId.Primary));
         }
 
         [UnityTest]

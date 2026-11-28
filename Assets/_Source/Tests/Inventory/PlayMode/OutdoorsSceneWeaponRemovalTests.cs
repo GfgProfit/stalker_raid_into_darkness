@@ -1,6 +1,6 @@
 using System.Collections;
-using Inventory;
-using Inventory.UI;
+using RaidIntoDarkness.Inventory;
+using RaidIntoDarkness.Inventory.UI;
 using NUnit.Framework;
 using RaidIntoDarkness.Weapons;
 using UnityEngine;
@@ -8,11 +8,11 @@ using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
 
-namespace RaidIntoDarkness.Integrations.Inventory.Tests
+namespace RaidIntoDarkness.Inventory.Tests
 {
     public sealed class OutdoorsSceneWeaponRemovalTests : OutdoorsSceneInputTestFixture
     {
-        private const string SCENE = "OutdoorsScene";
+        private const string SCENE = "TEST_SCENE";
         private const string AUG = "wpn_aug_a3";
         private const string TARGET_CONTAINER = "WeaponRemovalTarget";
         private const float TIMEOUT = 15.0f;
@@ -29,8 +29,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             InputSystem.AddDevice<Mouse>();
         }
 
-        [UnitySetUp]
-        public IEnumerator LoadScene()
+        private IEnumerator LoadScene()
         {
             SceneManager.LoadScene(SCENE, LoadSceneMode.Single);
             yield return null;
@@ -49,7 +48,8 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
         [UnityTest]
         public IEnumerator HeldPrimaryAndSecondaryFinishHideBeforeMovingToBag()
         {
-            string[] slots = { FirstPersonWeaponBinder.PRIMARY_SLOT, FirstPersonWeaponBinder.SECONDARY_SLOT };
+            yield return LoadScene();
+            SlotId[] slots = { SlotId.Primary, SlotId.Secondary };
 
             for (int i = 0; i < slots.Length; i++)
             {
@@ -73,7 +73,8 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
         [UnityTest]
         public IEnumerator HeldWeaponKeepsExactOtherContainerTargetUntilHideFinishes()
         {
-            ItemInstance item = AddWeapon(FirstPersonWeaponBinder.PRIMARY_SLOT);
+            yield return LoadScene();
+            ItemInstance item = AddWeapon(SlotId.Primary);
             _model.AddContainer(new GridContainer(TARGET_CONTAINER, 16, 16));
             var origin = new Vector2Int(3, 4);
             bool rotated = item.Definition.AllowRotation;
@@ -81,7 +82,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             EquipmentAnimationQueue queue = _controller.EquipmentAnimations;
             Assert.That(queue.HandleUnequip(item, new InventoryUnequipTarget(TARGET_CONTAINER, origin, rotated, false)), Is.True);
             Assert.That(queue.HandleUnequip(item, InventoryUnequipTarget.Auto(_window.PrimaryContainerId)), Is.True);
-            AssertPendingHide(item, FirstPersonWeaponBinder.PRIMARY_SLOT);
+            AssertPendingHide(item, SlotId.Primary);
             yield return WaitWhile(() => queue.IsBusy);
             Assert.That(item.ContainerId, Is.EqualTo(TARGET_CONTAINER));
             Assert.That(item.Location.Position, Is.EqualTo(origin));
@@ -93,8 +94,9 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
         [UnityTest]
         public IEnumerator InactiveWeaponMovesImmediatelyAndDuplicateHeldDropSpawnsOnce()
         {
-            ItemInstance held = AddWeapon(FirstPersonWeaponBinder.PRIMARY_SLOT);
-            ItemInstance inactive = AddWeapon(FirstPersonWeaponBinder.SECONDARY_SLOT);
+            yield return LoadScene();
+            ItemInstance held = AddWeapon(SlotId.Primary);
+            ItemInstance inactive = AddWeapon(SlotId.Secondary);
             yield return Draw(FirstPersonWeaponController.PRIMARY_SLOT);
             _window.UnequipItem(inactive);
             Assert.That(inactive.ContainerId, Is.EqualTo(_window.PrimaryContainerId));
@@ -110,7 +112,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
                 _window.DropItem(held);
                 _window.DropItem(held);
                 _window.UnequipItem(held);
-                AssertPendingHide(held, FirstPersonWeaponBinder.PRIMARY_SLOT);
+                AssertPendingHide(held, SlotId.Primary);
                 Assert.That(dropped, Is.Zero);
                 Assert.That(CountWorldWeapons(), Is.EqualTo(worldCount));
                 yield return WaitWhile(() => _controller.EquipmentAnimations.IsBusy);
@@ -126,7 +128,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             }
         }
 
-        private ItemInstance AddWeapon(string slotId)
+        private ItemInstance AddWeapon(SlotId slotId)
         {
             ItemDefinition definition = null;
 
@@ -145,8 +147,10 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             Assert.That(slot, Is.Not.Null);
             ItemInstance item = _model.CreateItem(definition, 1);
             Assert.That(_model.TryAddAuto(item, _window.PrimaryContainerId, false).Success, Is.True);
+            Assert.That(_window.Model, Is.SameAs(_model));
+            InventoryResult preview = _model.CanMove(item.InstanceId, equipment.Id, slot.Bounds.position, false, false);
             _window.EquipItemNow(item, slot);
-            Assert.That(item.ContainerId, Is.EqualTo(equipment.Id));
+            Assert.That(item.ContainerId, Is.EqualTo(equipment.Id), $"Slot {slotId} at {slot.Bounds.position}, preview {preview.Failure}, status '{_window.LastStatus}'.");
             Assert.That(item.Location.SlotId, Is.EqualTo(slotId));
             return item;
         }
@@ -159,7 +163,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             Assert.That(_weapons.Model, Is.Not.Null);
         }
 
-        private void AssertPendingHide(ItemInstance item, string slotId)
+        private void AssertPendingHide(ItemInstance item, SlotId slotId)
         {
             Assert.That(item.ContainerId, Is.EqualTo(_window.EquipmentContainerId));
             Assert.That(item.Location.SlotId, Is.EqualTo(slotId));

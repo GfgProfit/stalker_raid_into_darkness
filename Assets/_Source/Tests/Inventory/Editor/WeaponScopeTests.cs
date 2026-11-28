@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
-using Inventory;
-using Inventory.IconGeneration;
-using Inventory.UI;
+using RaidIntoDarkness.Inventory;
+using RaidIntoDarkness.Inventory.IconGeneration;
+using RaidIntoDarkness.Inventory.UI;
 using NUnit.Framework;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -10,7 +10,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using Object = UnityEngine.Object;
 
-namespace RaidIntoDarkness.Integrations.Inventory.Tests
+namespace RaidIntoDarkness.Inventory.Tests
 {
     public sealed class WeaponScopeTests
     {
@@ -18,7 +18,9 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
         private GameObject _root;
         private InventoryWindow _window;
         private InventoryModel _model;
+        private ItemDatabase _database;
         private InventoryWeaponAttachments _attachments;
+        private InventoryAttachmentActions _attachmentActions;
         private ItemDefinition _weapon;
         private ItemDefinition _first;
         private ItemDefinition _second;
@@ -26,7 +28,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
         [SetUp]
         public void SetUp()
         {
-            _weapon = Resources.Load<ItemDefinition>("Items/Weapons/wpn_aug_a3/wpn_aug_a3_definition");
+            _weapon = Resources.Load<ItemDefinition>("Items/Weapons/Assault Rifles/wpn_aug_a3/wpn_aug_a3_definition");
             _first = LoadScope("leupold");
             _second = LoadScope("ac10632");
             _preview = EditorSceneManager.NewPreviewScene();
@@ -34,19 +36,23 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             SceneManager.MoveGameObjectToScene(_root, _preview);
             _window = _root.AddComponent<InventoryWindow>();
             var definitions = new List<ItemDefinition>(_weapon.GetComponent<WeaponStatsComponent>().CompatibleScopes) { _weapon, LoadSilencer() };
-            _model = new InventoryModel(new Resolver(definitions));
+            _database = ScriptableObject.CreateInstance<ItemDatabase>();
+            _database.SetDefinitions(definitions);
+            _model = new InventoryModel(_database);
             _model.AddContainer(new GridContainer("bag", 24, 8));
             _model.AddContainer(new GridContainer("loot", 8, 8));
             _window.ConfigureContainers("bag", "loot", "equipment", "Player", 100f);
             _window.Bind(_model, null);
-            _attachments = new InventoryWeaponAttachments(_window);
+            _attachments = new InventoryWeaponAttachments(_model, _window.PrimaryContainerId);
+            _attachmentActions = new InventoryAttachmentActions(_window, _attachments);
         }
 
         [TearDown]
         public void TearDown()
         {
-            _attachments?.Dispose();
+            _attachmentActions?.Dispose();
             Object.DestroyImmediate(_root);
+            Object.DestroyImmediate(_database);
             EditorSceneManager.ClosePreviewScene(_preview);
         }
 
@@ -94,13 +100,25 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             ItemInstance weapon = Add(_weapon, "tight");
             ItemInstance first = Add(_first, "loot");
             ItemInstance second = Add(_second, "small");
+            first.SetState("condition", "0.57");
             Assert.That(_attachments.Install(first, weapon).Success, Is.True);
-            string original = JsonUtility.ToJson(InventorySerializer.CaptureItem(weapon));
+            ItemInstance original = weapon.CreateDraft();
+            ItemLocation originalLocation = weapon.Location;
+            float originalWeight = weapon.TotalWeight;
             Assert.That(_attachments.Install(second, weapon).Success, Is.False);
             Assert.That(_attachments.DetachScope(weapon).Success, Is.False);
             Assert.That(_model.ContainsItem(second), Is.True);
             Assert.That(_model.GetItem(first.InstanceId), Is.Null);
-            Assert.That(JsonUtility.ToJson(InventorySerializer.CaptureItem(weapon)), Is.EqualTo(original));
+            Assert.That(weapon.Location, Is.EqualTo(originalLocation));
+            Assert.That(weapon.Amount, Is.EqualTo(original.Amount));
+            Assert.That(weapon.State, Is.EquivalentTo(original.State));
+            Assert.That(weapon.VisualVariant, Is.EqualTo(original.VisualVariant));
+            Assert.That(weapon.TotalWeight, Is.EqualTo(originalWeight));
+            Assert.That(_attachments.GetScope(weapon), Is.SameAs(first.Definition));
+
+            Assert.That(_model.TryTransfer(weapon.InstanceId, "bag").Success, Is.True);
+            Assert.That(_attachments.DetachScope(weapon).Success, Is.True);
+            Assert.That(_model.GetItem(first.InstanceId).GetState("condition"), Is.EqualTo("0.57"));
         }
 
         [Test]
@@ -118,15 +136,15 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
         [Test]
         public void ContextActionsInstallReplaceAndReturnScopesFromEquippedWeapon()
         {
-            _attachments.Dispose();
-            var slot = new SlotDefinition("Primary", "Primary", new RectInt(0, 0, 5, 2), SlotMode.Single, SlotRule.Create(new[] { _weapon.Category }));
+            _attachmentActions.Dispose();
+            var slot = new SlotDefinition(SlotId.Primary, "Primary", new RectInt(0, 0, 5, 2), SlotMode.Single, SlotRule.Create(new[] { _weapon.Category }));
             _model.AddContainer(new SlottedContainer("equipment", new[] { slot }, 5, 2, true));
-            _attachments = new InventoryWeaponAttachments(_window);
+            _attachmentActions = new InventoryAttachmentActions(_window, _attachments);
             ItemInstance weapon = Add(_weapon, "bag");
             ItemInstance first = Add(_first, "loot");
             ItemInstance second = Add(_second, "loot");
             Assert.That(_model.TryEquip(weapon.InstanceId, "equipment").Success, Is.True);
-            IInventoryItemAction install = _window.Actions.Find(InventoryWeaponAttachments.ATTACH_ACTION + "Primary");
+            IInventoryItemAction install = _window.Actions.Find(InventoryAttachmentActions.InstallActionId(SlotId.Primary));
             var context = new InventoryActionContext(_window, first, null);
             Assert.That(install.IsVisible(context), Is.True);
             Assert.That(install.IsEnabled(context), Is.True);
@@ -148,6 +166,37 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
         }
 
         [Test]
+        public void DetachRetainsScopeIdentityConditionAndVariantsAcrossWeaponDrafts()
+        {
+            ItemInstance weapon = Add(_weapon, "bag");
+            ItemInstance scope = Add(_first, "loot");
+            scope.SetState("condition", "0.57");
+            scope.SetVisualVariant(new[] { "scope-test-variant" });
+            float totalWeight = weapon.TotalWeight + scope.TotalWeight;
+            Assert.That(_attachments.Install(scope, weapon).Success, Is.True);
+            Assert.That(weapon.TotalWeight, Is.EqualTo(totalWeight).Within(0.0001f));
+            ItemInstance independent = weapon.CreateWeaponAttachmentDraft(WeaponAddonKind.Scope);
+            independent.SetState("condition", "1");
+            independent.SetVisualVariant(null);
+            ItemInstance preview = weapon.CreateDraft();
+            preview.SetMountedWeaponAttachment(WeaponAddonKind.Scope, null);
+            Assert.That(_attachments.GetScope(weapon), Is.SameAs(_first));
+            ItemInstance updated = weapon.CreateDraft();
+            updated.SetState(InventoryWeaponAmmoSource.MAGAZINE_STATE, "17");
+            Assert.That(_model.TryReconfigureItem(weapon, updated, weapon.Location.Position).Success, Is.True);
+
+            Assert.That(_attachments.DetachScope(weapon).Success, Is.True);
+            ItemInstance returned = _model.GetItem(scope.InstanceId);
+            Assert.That(returned, Is.Not.Null);
+            Assert.That(returned.Definition, Is.SameAs(scope.Definition));
+            Assert.That(returned.GetState("condition"), Is.EqualTo("0.57"));
+            Assert.That(returned.VisualVariant, Is.EqualTo(scope.VisualVariant));
+            Assert.That(returned.ContainerId, Is.EqualTo("bag"));
+            Assert.That(_attachments.GetScope(weapon), Is.Null);
+            Assert.That(weapon.GetState(InventoryWeaponAmmoSource.MAGAZINE_STATE), Is.EqualTo("17"));
+        }
+
+        [Test]
         public void CmoScopeIconIsUsedForInstallAndDetachWhileSilencerKeepsItsIcon()
         {
             InventoryTheme theme = AssetDatabase.LoadAssetAtPath<InventoryTheme>("Assets/_Source/UI/Inventory/GRA/GraInventoryTheme.asset");
@@ -156,7 +205,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             ItemInstance scope = Add(_first, "loot");
             ItemInstance weapon = Add(_weapon, "bag");
             ItemInstance silencer = Add(LoadSilencer(), "bag");
-            var install = new InventoryDelegateAction(InventoryWeaponAttachments.ATTACH_ACTION + "Primary", 20, null, null);
+            var install = new InventoryDelegateAction(InventoryAttachmentActions.InstallActionId(SlotId.Primary), 20, null, null);
             Sprite expected = theme.Icon("ui_cmo_scope");
             Assert.That(expected, Is.Not.Null);
             Assert.That(expected.name, Is.EqualTo("ui_cmo_scope"));
@@ -164,24 +213,6 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             Assert.That(style.Resolve(new InventoryActionContext(_window, scope, null), install).Icon, Is.SameAs(expected));
             Assert.That(style.Resolve(new InventoryActionContext(_window, weapon, null), _window.Actions.Find(InventoryWeaponAttachments.DETACH_SCOPE_ACTION)).Icon, Is.SameAs(expected));
             Assert.That(style.Resolve(new InventoryActionContext(_window, silencer, null), install).Icon, Is.SameAs(theme.Icon("ui_cmo_silencer")));
-        }
-
-        [Test]
-        public void ScopeSurvivesSaveRestoreWithOriginalItemState()
-        {
-            ItemInstance weapon = Add(_weapon, "bag");
-            ItemInstance scope = Add(_first, "loot");
-            scope.SetState("condition", "0.57");
-            Assert.That(_attachments.Install(scope, weapon).Success, Is.True);
-            var restored = new InventoryModel(_model.Resolver);
-            restored.AddContainer(new GridContainer("bag", 24, 8));
-            restored.AddContainer(new GridContainer("loot", 8, 8));
-            Assert.That(InventorySerializer.Restore(restored, InventorySerializer.Capture(_model)).IsClean, Is.True);
-            ItemInstance loaded = restored.GetItem(weapon.InstanceId);
-            Assert.That(_weapon.GetComponent<WeaponStatsComponent>().GetScope(loaded, restored.Resolver), Is.SameAs(_first));
-            Assert.That(loaded.GetState(InventoryWeaponAttachments.SCOPE_ITEM_STATE), Does.Contain(scope.InstanceId));
-            Assert.That(loaded.GetState(InventoryWeaponAttachments.SCOPE_ITEM_STATE), Does.Contain("0.57"));
-            Assert.That(loaded.TotalWeight, Is.EqualTo(weapon.TotalWeight).Within(0.0001f));
         }
 
         [Test]
@@ -319,19 +350,5 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
 
         private static ItemDefinition LoadSilencer() => Resources.LoadAll<ItemDefinition>("Items/Addons/Silencers").Single(definition => definition.GetComponent<WeaponAddonComponent>()?.Section == "wpn_sil_nato");
 
-        private sealed class Resolver : IItemDefinitionResolver
-        {
-            private readonly Dictionary<string, ItemDefinition> _definitions = new();
-
-            public Resolver(IEnumerable<ItemDefinition> definitions)
-            {
-                foreach (ItemDefinition definition in definitions)
-                {
-                    _definitions[definition.DefinitionId] = definition;
-                }
-            }
-
-            public bool TryResolve(string definitionId, out ItemDefinition definition) => _definitions.TryGetValue(definitionId, out definition);
-        }
     }
 }

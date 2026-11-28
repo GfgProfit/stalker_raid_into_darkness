@@ -11,7 +11,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: da0f90c2955673d46b25d465cbe44ed0, type: 3}
   m_Name: exo_wood_outfit_definition
-  m_EditorClassIdentifier: Inventory::Inventory.ItemDefinition
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.ItemDefinition
   _definitionId: 917ddf291bc19c5409d165ea71a8c173
   _displayName: "\u0422\u0411-1 \xAB\u041B\u0435\u0441\xBB"
   _shortName: HEAVY
@@ -60,12 +60,11 @@ MonoBehaviour:
     version: 2
     RefIds:
     - rid: 3479885471900762228
-      type: {class: EquippableItemComponent, ns: Inventory, asm: Inventory}
+      type: {class: EquippableItemComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
       data:
-        _preferredSlotIds:
-        - Outfit
+        _preferredSlotIds: 04000000i
     - rid: 3479885471900762229
-      type: {class: EquipmentStatsComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      type: {class: EquipmentStatsComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
       data:
         _section: exo_wood_outfit
         _cost: 82350
@@ -134,11 +133,11 @@ MonoBehaviour:
             _average: 24
             _strong: 17
     - rid: 3479885472039698490
-      type: {class: WorldItemComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      type: {class: WorldItemComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
       data:
         _prefab: {fileID: 7506708796893142064, guid: b27eb7667d107d748ad2dab845ac641f, type: 3}
     - rid: 3479885488572596282
-      type: {class: ItemTakeSoundComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      type: {class: ItemTakeSoundComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
       data:
         _category: armor
         _clips:

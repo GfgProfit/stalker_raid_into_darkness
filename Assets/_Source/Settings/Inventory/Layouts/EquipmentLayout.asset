@@ -11,7 +11,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bddc25ff2af3c274b9993b7acd23d6b3, type: 3}
   m_Name: EquipmentLayout
-  m_EditorClassIdentifier: Inventory::Inventory.InventorySlotLayout
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.InventorySlotLayout
   _slotMask: 'HHTTDD
 
     HHOORR
@@ -33,7 +33,7 @@ MonoBehaviour:
     avwxy.'
   _bindings:
   - _key: H
-    _slotId: Head
+    _slotId: 1
     _displayName: "\u0428\u043B\u0435\u043C"
     _group: Equipment
     _mode: 1
@@ -43,11 +43,11 @@ MonoBehaviour:
       _requiredTags: []
       _forbiddenTags: []
       _validatorId: 
-      _requiresOccupiedSlots: []
-      _blockedByOccupiedSlots: []
+      _requiresOccupiedSlots: 
+      _blockedByOccupiedSlots: 
       _startsLocked: 0
   - _key: T
-    _slotId: Device
+    _slotId: 2
     _displayName: "\u0423\u0441\u0442\u0440\u043E\u0439\u0441\u0442\u0432\u043E"
     _group: Equipment
     _mode: 1
@@ -57,11 +57,11 @@ MonoBehaviour:
       _requiredTags: []
       _forbiddenTags: []
       _validatorId: 
-      _requiresOccupiedSlots: []
-      _blockedByOccupiedSlots: []
+      _requiresOccupiedSlots: 
+      _blockedByOccupiedSlots: 
       _startsLocked: 0
   - _key: D
-    _slotId: Pda
+    _slotId: 3
     _displayName: "\u041F\u0414\u0410"
     _group: Equipment
     _mode: 1
@@ -71,11 +71,11 @@ MonoBehaviour:
       _requiredTags: []
       _forbiddenTags: []
       _validatorId: 
-      _requiresOccupiedSlots: []
-      _blockedByOccupiedSlots: []
+      _requiresOccupiedSlots: 
+      _blockedByOccupiedSlots: 
       _startsLocked: 0
   - _key: O
-    _slotId: Outfit
+    _slotId: 4
     _displayName: "\u041A\u043E\u0441\u0442\u044E\u043C"
     _group: Equipment
     _mode: 1
@@ -85,11 +85,11 @@ MonoBehaviour:
       _requiredTags: []
       _forbiddenTags: []
       _validatorId: 
-      _requiresOccupiedSlots: []
-      _blockedByOccupiedSlots: []
+      _requiresOccupiedSlots: 
+      _blockedByOccupiedSlots: 
       _startsLocked: 0
   - _key: R
-    _slotId: Detector
+    _slotId: 5
     _displayName: "\u0414\u0435\u0442\u0435\u043A\u0442\u043E\u0440"
     _group: Equipment
     _mode: 1
@@ -99,11 +99,11 @@ MonoBehaviour:
       - Detector
       _forbiddenTags: []
       _validatorId: 
-      _requiresOccupiedSlots: []
-      _blockedByOccupiedSlots: []
+      _requiresOccupiedSlots: 
+      _blockedByOccupiedSlots: 
       _startsLocked: 0
   - _key: K
-    _slotId: Backpack
+    _slotId: 6
     _displayName: "\u0420\u044E\u043A\u0437\u0430\u043A"
     _group: Equipment
     _mode: 1
@@ -113,11 +113,11 @@ MonoBehaviour:
       _requiredTags: []
       _forbiddenTags: []
       _validatorId: 
-      _requiresOccupiedSlots: []
-      _blockedByOccupiedSlots: []
+      _requiresOccupiedSlots: 
+      _blockedByOccupiedSlots: 
       _startsLocked: 0
   - _key: B
-    _slotId: Binocular
+    _slotId: 7
     _displayName: "\u0411\u0438\u043D\u043E\u043A\u043B\u044C"
     _group: Equipment
     _mode: 1
@@ -127,11 +127,11 @@ MonoBehaviour:
       _requiredTags: []
       _forbiddenTags: []
       _validatorId: 
-      _requiresOccupiedSlots: []
-      _blockedByOccupiedSlots: []
+      _requiresOccupiedSlots: 
+      _blockedByOccupiedSlots: 
       _startsLocked: 0
   - _key: N
-    _slotId: Knife
+    _slotId: 8
     _displayName: "\u0425\u043E\u043B\u043E\u0434\u043D\u043E\u0435"
     _group: Weapons
     _mode: 1
@@ -143,11 +143,11 @@ MonoBehaviour:
       - Pistol
       _forbiddenTags: []
       _validatorId: 
-      _requiresOccupiedSlots: []
-      _blockedByOccupiedSlots: []
+      _requiresOccupiedSlots: 
+      _blockedByOccupiedSlots: 
       _startsLocked: 0
   - _key: P
-    _slotId: Primary
+    _slotId: 9
     _displayName: "\u041E\u0441\u043D\u043E\u0432\u043D\u043E\u0435"
     _group: Weapons
     _mode: 1
@@ -159,11 +159,11 @@ MonoBehaviour:
       - Knife
       - Pistol
       _validatorId: 
-      _requiresOccupiedSlots: []
-      _blockedByOccupiedSlots: []
+      _requiresOccupiedSlots: 
+      _blockedByOccupiedSlots: 
       _startsLocked: 0
   - _key: S
-    _slotId: Secondary
+    _slotId: 10
     _displayName: "\u0412\u0442\u043E\u0440\u0438\u0447\u043D\u043E\u0435"
     _group: Weapons
     _mode: 1
@@ -175,11 +175,11 @@ MonoBehaviour:
       - Knife
       - Pistol
       _validatorId: 
-      _requiresOccupiedSlots: []
-      _blockedByOccupiedSlots: []
+      _requiresOccupiedSlots: 
+      _blockedByOccupiedSlots: 
       _startsLocked: 0
   - _key: 1
-    _slotId: QuickSlot1
+    _slotId: 11
     _displayName: F1
     _group: Quick
     _mode: 1
@@ -189,11 +189,11 @@ MonoBehaviour:
       - QuickUse
       _forbiddenTags: []
       _validatorId: 
-      _requiresOccupiedSlots: []
-      _blockedByOccupiedSlots: []
+      _requiresOccupiedSlots: 
+      _blockedByOccupiedSlots: 
       _startsLocked: 0
   - _key: 2
-    _slotId: QuickSlot2
+    _slotId: 12
     _displayName: F2
     _group: Quick
     _mode: 1
@@ -203,11 +203,11 @@ MonoBehaviour:
       - QuickUse
       _forbiddenTags: []
       _validatorId: 
-      _requiresOccupiedSlots: []
-      _blockedByOccupiedSlots: []
+      _requiresOccupiedSlots: 
+      _blockedByOccupiedSlots: 
       _startsLocked: 0
   - _key: 3
-    _slotId: QuickSlot3
+    _slotId: 13
     _displayName: F3
     _group: Quick
     _mode: 1
@@ -217,11 +217,11 @@ MonoBehaviour:
       - QuickUse
       _forbiddenTags: []
       _validatorId: 
-      _requiresOccupiedSlots: []
-      _blockedByOccupiedSlots: []
+      _requiresOccupiedSlots: 
+      _blockedByOccupiedSlots: 
       _startsLocked: 0
   - _key: 4
-    _slotId: QuickSlot4
+    _slotId: 14
     _displayName: F4
     _group: Quick
     _mode: 1
@@ -231,11 +231,11 @@ MonoBehaviour:
       - QuickUse
       _forbiddenTags: []
       _validatorId: 
-      _requiresOccupiedSlots: []
-      _blockedByOccupiedSlots: []
+      _requiresOccupiedSlots: 
+      _blockedByOccupiedSlots: 
       _startsLocked: 0
   - _key: a
-    _slotId: Belt1
+    _slotId: 15
     _displayName: "\u0410\u0440\u0442\u0435\u0444\u0430\u043A\u0442 1"
     _group: Belt
     _mode: 1
@@ -245,11 +245,11 @@ MonoBehaviour:
       _requiredTags: []
       _forbiddenTags: []
       _validatorId: 
-      _requiresOccupiedSlots: []
-      _blockedByOccupiedSlots: []
+      _requiresOccupiedSlots: 
+      _blockedByOccupiedSlots: 
       _startsLocked: 1
   - _key: v
-    _slotId: Belt2
+    _slotId: 16
     _displayName: "\u0410\u0440\u0442\u0435\u0444\u0430\u043A\u0442 2"
     _group: Belt
     _mode: 1
@@ -259,11 +259,11 @@ MonoBehaviour:
       _requiredTags: []
       _forbiddenTags: []
       _validatorId: 
-      _requiresOccupiedSlots: []
-      _blockedByOccupiedSlots: []
+      _requiresOccupiedSlots: 
+      _blockedByOccupiedSlots: 
       _startsLocked: 1
   - _key: w
-    _slotId: Belt3
+    _slotId: 17
     _displayName: "\u0410\u0440\u0442\u0435\u0444\u0430\u043A\u0442 3"
     _group: Belt
     _mode: 1
@@ -273,11 +273,11 @@ MonoBehaviour:
       _requiredTags: []
       _forbiddenTags: []
       _validatorId: 
-      _requiresOccupiedSlots: []
-      _blockedByOccupiedSlots: []
+      _requiresOccupiedSlots: 
+      _blockedByOccupiedSlots: 
       _startsLocked: 1
   - _key: x
-    _slotId: Belt4
+    _slotId: 18
     _displayName: "\u0410\u0440\u0442\u0435\u0444\u0430\u043A\u0442 4"
     _group: Belt
     _mode: 1
@@ -287,11 +287,11 @@ MonoBehaviour:
       _requiredTags: []
       _forbiddenTags: []
       _validatorId: 
-      _requiresOccupiedSlots: []
-      _blockedByOccupiedSlots: []
+      _requiresOccupiedSlots: 
+      _blockedByOccupiedSlots: 
       _startsLocked: 1
   - _key: y
-    _slotId: Belt5
+    _slotId: 19
     _displayName: "\u0410\u0440\u0442\u0435\u0444\u0430\u043A\u0442 5"
     _group: Belt
     _mode: 1
@@ -301,6 +301,6 @@ MonoBehaviour:
       _requiredTags: []
       _forbiddenTags: []
       _validatorId: 
-      _requiresOccupiedSlots: []
-      _blockedByOccupiedSlots: []
+      _requiresOccupiedSlots: 
+      _blockedByOccupiedSlots: 
       _startsLocked: 1

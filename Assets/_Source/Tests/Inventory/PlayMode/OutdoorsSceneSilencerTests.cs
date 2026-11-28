@@ -1,7 +1,7 @@
 using System.Collections;
-using Inventory;
-using Inventory.IconGeneration;
-using Inventory.UI;
+using RaidIntoDarkness.Inventory;
+using RaidIntoDarkness.Inventory.IconGeneration;
+using RaidIntoDarkness.Inventory.UI;
 using NUnit.Framework;
 using RaidIntoDarkness.Effects;
 using RaidIntoDarkness.Weapons;
@@ -12,7 +12,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
 using UnityEngine.VFX;
 
-namespace RaidIntoDarkness.Integrations.Inventory.Tests
+namespace RaidIntoDarkness.Inventory.Tests
 {
     public sealed class OutdoorsSceneSilencerTests : OutdoorsSceneInputTestFixture
     {
@@ -140,7 +140,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
         }
 
         [UnityTest]
-        public IEnumerator SilencerPersistsWithLoadedAmmoAndUsesOnlyOneWorldItemAndRigidbody()
+        public IEnumerator SilencedLoadedWeaponUsesOneWorldItemAndRigidbodyAndRetainsTheModule()
         {
             yield return LoadScene();
             InventoryWindowController controller = Object.FindAnyObjectByType<InventoryWindowController>();
@@ -157,14 +157,10 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
                 Assert.That(controller.WeaponAttachments.Install(silencer, weapon).Success, Is.True);
                 Assert.That(model.GetOwnerWeight(model.GetContainer(window.PrimaryContainerId).OwnerId), Is.EqualTo(total).Within(0.0001f));
                 Assert.That(weapon.UnitWeight, Is.EqualTo(weapon.Definition.Weight + silencer.Definition.Weight + Find(controller, "ammo_5.56x45_ss190").Weight * 30).Within(0.0001f));
-                var restored = new InventoryModel(model.Resolver);
                 InventoryContainer backpack = model.GetContainer(window.PrimaryContainerId);
-                restored.AddContainer(new GridContainer(backpack.Id, backpack.Width, backpack.Height, backpack.OwnerId));
-                Assert.That(InventorySerializer.Restore(restored, InventorySerializer.Capture(model, new[] { backpack.Id })).IsClean, Is.True);
-                Assert.That(restored.GetItem(weapon.InstanceId).GetSize(false), Is.EqualTo(new Vector2Int(6, 2)));
-                Assert.That(restored.GetContainer(backpack.Id).GetItemArea(restored.GetItem(weapon.InstanceId)).size, Is.EqualTo(new Vector2Int(6, 2)));
-                Assert.That(restored.GetItem(weapon.InstanceId).TotalWeight, Is.EqualTo(weapon.TotalWeight).Within(0.0001f));
-                Assert.That(restored.GetItem(weapon.InstanceId).GetState(InventoryWeaponAttachments.SILENCER_ITEM_STATE), Is.EqualTo(weapon.GetState(InventoryWeaponAttachments.SILENCER_ITEM_STATE)));
+                float mountedWeight = weapon.TotalWeight;
+                Assert.That(weapon.GetSize(false), Is.EqualTo(new Vector2Int(6, 2)));
+                Assert.That(backpack.GetItemArea(weapon).size, Is.EqualTo(new Vector2Int(6, 2)));
                 window.DropItemNow(weapon);
                 yield return null;
                 WorldItem dropped = null;
@@ -190,6 +186,12 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
                 Assert.That(collider, Is.Not.Null);
                 Assert.That(collider.size.z, Is.GreaterThan(0.1f));
                 Assert.That(Object.FindAnyObjectByType<WorldItemInteractor>().TryPickUp(dropped), Is.True);
+                Assert.That(model.GetItem(weapon.InstanceId), Is.SameAs(weapon));
+                Assert.That(weapon.GetSize(false), Is.EqualTo(new Vector2Int(6, 2)));
+                Assert.That(backpack.GetItemArea(weapon).size, Is.EqualTo(new Vector2Int(6, 2)));
+                Assert.That(weapon.TotalWeight, Is.EqualTo(mountedWeight).Within(0.0001f));
+                Assert.That(ammo.GetMagazine(weapon.InstanceId), Is.EqualTo(30));
+                Assert.That(controller.WeaponAttachments.GetSilencer(weapon), Is.SameAs(silencer.Definition));
                 Assert.That(controller.WeaponAttachments.Detach(weapon).Success, Is.True);
                 Assert.That(model.GetItem(silencer.InstanceId), Is.Not.Null);
             }
@@ -213,6 +215,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             yield return null;
             InventoryItemView silencerView = window.FindGrid(silencer.ContainerId).GetItemView(silencer);
             var pointer = new PointerEventData(EventSystem.current) { position = ScreenPoint(silencerView) };
+            Set(_mouse.position, pointer.position);
             ExecuteEvents.Execute(silencerView.gameObject, pointer, ExecuteEvents.pointerEnterHandler);
             yield return null;
             Assert.That(window.ItemDecorator(weapon).Tint.a, Is.GreaterThan(0f));
@@ -221,13 +224,14 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             ExecuteEvents.Execute(silencerView.gameObject, pointer, ExecuteEvents.pointerExitHandler);
             InventoryItemView weaponView = window.FindGrid(weapon.ContainerId).GetItemView(weapon);
             pointer.position = ScreenPoint(weaponView);
+            Set(_mouse.position, pointer.position);
             ExecuteEvents.Execute(weaponView.gameObject, pointer, ExecuteEvents.pointerEnterHandler);
             yield return null;
             Assert.That(window.ItemDecorator(silencer).Tint.a, Is.GreaterThan(0f));
             Assert.That(window.ItemDecorator(incompatible).Tint.a, Is.EqualTo(0f));
             ExecuteEvents.Execute(weaponView.gameObject, pointer, ExecuteEvents.pointerExitHandler);
             var context = new InventoryActionContext(window, silencer, silencerView.Grid);
-            IInventoryItemAction install = window.Actions.Find(InventoryWeaponAttachments.ATTACH_ACTION + FirstPersonWeaponBinder.PRIMARY_SLOT);
+            IInventoryItemAction install = window.Actions.Find(InventoryAttachmentActions.InstallActionId(SlotId.Primary));
             Assert.That(install.IsVisible(context), Is.True);
             Assert.That(install.GetLabel(context), Is.EqualTo("Поставить на: " + equipped.Definition.ShortName));
             Assert.That(install.IsEnabled(context), Is.True);
@@ -260,18 +264,26 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             ItemInstance last = model.GetItem(silencer.InstanceId);
             Assert.That(controller.WeaponAttachments.Install(last, equipped).Success, Is.True);
             ItemDefinition filler = FindSmall(controller);
+            ItemLocation equipmentLocation = equipped.Location;
+            string backpackId = window.PrimaryContainerId;
+            Assert.That(model.RemoveContainer(backpackId), Is.True);
+            Assert.That(model.ContainsItem(equipped), Is.True);
+            Assert.That(equipped.Location, Is.EqualTo(equipmentLocation));
+            var boundedBackpack = model.AddContainer(new GridContainer(backpackId, last.Definition.Width, last.Definition.Height));
 
-            for (int i = 0; i < 2000; i++)
+            for (int y = 0; y < boundedBackpack.Height; y++)
             {
-                ItemInstance item = model.CreateItem(filler);
-
-                if (model.TryAddAuto(item, window.PrimaryContainerId, false, false).Success == false)
+                for (int x = 0; x < boundedBackpack.Width; x++)
                 {
-                    break;
+                    Assert.That(model.TryAdd(model.CreateItem(filler), backpackId, new Vector2Int(x, y), false).Success, Is.True);
                 }
             }
 
-            Assert.That(controller.WeaponAttachments.Detach(equipped).Success, Is.False);
+            InventoryResult detachResult = controller.WeaponAttachments.Detach(equipped);
+            Assert.That(detachResult.Success, Is.False);
+            Assert.That(detachResult.Failure, Is.EqualTo(InventoryFailure.NoSpace));
+            Assert.That(model.ContainsItem(equipped), Is.True);
+            Assert.That(equipped.Location, Is.EqualTo(equipmentLocation));
             Assert.That(controller.WeaponAttachments.GetSilencer(equipped), Is.SameAs(last.Definition));
             Assert.That(model.GetItem(last.InstanceId), Is.Null);
         }

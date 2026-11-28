@@ -11,7 +11,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: da0f90c2955673d46b25d465cbe44ed0, type: 3}
   m_Name: wpn_scarh_definition
-  m_EditorClassIdentifier: Inventory::Inventory.ItemDefinition
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.ItemDefinition
   _definitionId: ba51b7b560ed4da9982ab89ce6f252b8
   _displayName: "\u0410\u0432\u0442\u043E\u043C\u0430\u0442\u0438\u0447\u0435\u0441\u043A\u0430\u044F \u0432\u0438\u043D\u0442\u043E\u0432\u043A\u0430 FN SCAR-H (Mk 17)"
   _shortName: FN SCAR-H
@@ -62,13 +62,11 @@ MonoBehaviour:
     version: 2
     RefIds:
     - rid: 3479885495948804096
-      type: {class: EquippableItemComponent, ns: Inventory, asm: Inventory}
+      type: {class: EquippableItemComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
       data:
-        _preferredSlotIds:
-        - Primary
-        - Secondary
+        _preferredSlotIds: 090000000a000000i
     - rid: 3479885495948804097
-      type: {class: WeaponStatsComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      type: {class: WeaponStatsComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
       data:
         _section: wpn_scarh
         _weaponClass: assault_rifle
@@ -171,8 +169,9 @@ MonoBehaviour:
         _grenadeLauncherStatus: 2
         _grenadeLauncherSection: wpn_addon_grenade_launcher_m203
         _blockSilencerWithGrenadeLauncher: 0
+        _exposedRound: {fileID: 0}
     - rid: 3479885495948804098
-      type: {class: WeaponHudComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      type: {class: WeaponHudComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
       data:
         _hudModel: {fileID: 167202102832256078, guid: 6fa5da9f4115693478dc00b5fb0f2d2e, type: 3}
         _weaponMotions: {fileID: 8815230551390286010, guid: 4945241a00fdad647881014da4199fe3, type: 3}
@@ -186,84 +185,121 @@ MonoBehaviour:
         _scopeAimOffsets:
         - _scope: {fileID: 11400000, guid: 867a7f373388760469fc24ccebf9f005, type: 2}
           _position: {x: 0.0022115784, y: 0.0030963798, z: -0.092527784}
+          _depthOffset: 0
         - _scope: {fileID: 11400000, guid: 47f9977e8eb796245ab8518ef902a33e, type: 2}
           _position: {x: 0.0020425636, y: -0.0024191984, z: -0.06926099}
+          _depthOffset: 0
         - _scope: {fileID: 11400000, guid: b8f7a32877cf9f944a197c0a2dea0985, type: 2}
           _position: {x: 0.0021186192, y: -0.0014181281, z: -0.054844774}
+          _depthOffset: 0
         - _scope: {fileID: 11400000, guid: 9f2fc43076f60a5459bd673f5547bd94, type: 2}
           _position: {x: 0.0020642013, y: 0.011218576, z: -0.09175147}
+          _depthOffset: 0
         - _scope: {fileID: 11400000, guid: fc1a4cfb4771da944a45b0e79530107d, type: 2}
           _position: {x: 0.0020582562, y: -0.0038131704, z: -0.091280855}
+          _depthOffset: 0
         - _scope: {fileID: 11400000, guid: d855bb1f921169747b0732aaaa6a69a5, type: 2}
           _position: {x: 0.0018902302, y: -0.009463251, z: -0.04817747}
+          _depthOffset: 0
         - _scope: {fileID: 11400000, guid: 1525e10127d18f242aba1fc3711ae389, type: 2}
           _position: {x: 0.0020495632, y: 0.014598025, z: -0.08829086}
+          _depthOffset: 0
         - _scope: {fileID: 11400000, guid: 3f2facb1660da024baee567fb8ef6225, type: 2}
           _position: {x: 0.00187831, y: -0.0023304163, z: -0.091723196}
+          _depthOffset: 0
         - _scope: {fileID: 11400000, guid: fda774a86032cfa49bb671d46146021c, type: 2}
           _position: {x: 0.0021290276, y: 0.008048219, z: -0.0916627}
+          _depthOffset: 0
         - _scope: {fileID: 11400000, guid: 22cb15100d34bc845a2f8f79cdbf0e0a, type: 2}
           _position: {x: 0.0021054214, y: 0.00073905406, z: -0.10118508}
+          _depthOffset: 0
         - _scope: {fileID: 11400000, guid: f31be855ebfe15642a9e098be2a2bd71, type: 2}
           _position: {x: 0.0019787718, y: -0.010424422, z: -0.05402652}
+          _depthOffset: 0
         - _scope: {fileID: 11400000, guid: 95347acdc8dd3584c9538dac3fa17378, type: 2}
           _position: {x: 0.001788488, y: -0.0046823737, z: -0.09170007}
+          _depthOffset: 0
         - _scope: {fileID: 11400000, guid: 8181cebeead0e5340b5f73ba278b07f4, type: 2}
           _position: {x: 0.0014312734, y: -0.00642781, z: -0.054853834}
+          _depthOffset: 0
         - _scope: {fileID: 11400000, guid: 221259caddfe3c842a416289d818380e, type: 2}
           _position: {x: 0.002052632, y: -0.0055575855, z: -0.0921846}
+          _depthOffset: 0
         - _scope: {fileID: 11400000, guid: 43fb054a0e26ab0488efc9929d2c2d00, type: 2}
           _position: {x: 0.0021148701, y: 0.000087440945, z: -0.09028172}
+          _depthOffset: 0
         - _scope: {fileID: 11400000, guid: a0811b3d53d02aa4a8fd9b073b6e17d8, type: 2}
           _position: {x: 0.002019792, y: 0.0002684081, z: -0.091372885}
+          _depthOffset: 0
         - _scope: {fileID: 11400000, guid: c7cb16990af3cc2419e8e6cf167b9836, type: 2}
           _position: {x: 0.0020763027, y: -0.0033968454, z: -0.090844385}
+          _depthOffset: 0
         - _scope: {fileID: 11400000, guid: 64e43c14e80127c4992bb32249221943, type: 2}
           _position: {x: 0.0013302731, y: -0.0027713482, z: -0.051517088}
+          _depthOffset: 0
         - _scope: {fileID: 11400000, guid: 2fb8162459955f041b6d7aa702b3cc65, type: 2}
           _position: {x: 0.0020145157, y: -0.0072572907, z: -0.05037197}
+          _depthOffset: 0
         - _scope: {fileID: 11400000, guid: 08d2445712ad56048aadf75a7e8f2979, type: 2}
           _position: {x: 0.0014757857, y: -0.0038258908, z: -0.0074788798}
+          _depthOffset: 0
         - _scope: {fileID: 11400000, guid: d1f87ac9d7885eb42a25b190eb0bc0e8, type: 2}
           _position: {x: 0.0022542644, y: 0.0014010302, z: -0.028449457}
+          _depthOffset: 0
         - _scope: {fileID: 11400000, guid: 55b9e4df57ad16643ae21c0c2a23725e, type: 2}
           _position: {x: 0.0021619636, y: 0.002505993, z: -0.09142677}
+          _depthOffset: 0
         - _scope: {fileID: 11400000, guid: b9d1937130e564645a59b1fdb0588f4e, type: 2}
           _position: {x: 0.0019046102, y: 0.009417649, z: -0.04752106}
+          _depthOffset: 0
         - _scope: {fileID: 11400000, guid: b0e5637f4426a474c93c2d2bf6ddccb8, type: 2}
           _position: {x: 0.001961637, y: 0.009608854, z: -0.053182483}
+          _depthOffset: 0
         - _scope: {fileID: 11400000, guid: c102ea3c0364621469b4fd611e1636ec, type: 2}
           _position: {x: 0.0022377688, y: -0.0015407694, z: -0.020196853}
+          _depthOffset: 0
         - _scope: {fileID: 11400000, guid: d9bd33fd398d5a4439fdf610f79bfd39, type: 2}
           _position: {x: 0.001580748, y: -0.012708593, z: -0.041452635}
+          _depthOffset: 0
         - _scope: {fileID: 11400000, guid: ab381d6cdabfee4499e0bb853e070ce2, type: 2}
           _position: {x: 0.0013695688, y: -0.0023302305, z: -0.054543246}
+          _depthOffset: 0
         - _scope: {fileID: 11400000, guid: 47a9dcca3036c484a875295e2c1a2df4, type: 2}
           _position: {x: 0.0022585636, y: 0.012212771, z: -0.09185115}
+          _depthOffset: 0
         - _scope: {fileID: 11400000, guid: 2e7d984e83db37e4eb8aff33f32934a2, type: 2}
           _position: {x: 0.0018510025, y: 0.00035411026, z: -0.091726534}
+          _depthOffset: 0
         - _scope: {fileID: 11400000, guid: 09126018d7d4a9d4fa72717db2fd42aa, type: 2}
           _position: {x: 0.002051999, y: 0.00039483747, z: -0.091522135}
+          _depthOffset: 0
         - _scope: {fileID: 11400000, guid: 0aea60fd72bbf20439531fbef8d7f762, type: 2}
           _position: {x: 0.0017013706, y: -0.00030011125, z: -0.064900614}
+          _depthOffset: 0
         - _scope: {fileID: 11400000, guid: 116d06cec93c73748938e8e7c294e0d0, type: 2}
           _position: {x: 0.0018730513, y: 0.01026467, z: -0.0545369}
+          _depthOffset: 0
         - _scope: {fileID: 11400000, guid: 0e4b9929963f1a040b8db026e6921bbf, type: 2}
           _position: {x: 0.002013551, y: -0.006522914, z: -0.04668466}
+          _depthOffset: 0
         - _scope: {fileID: 11400000, guid: 0b165be4bec43654eaa5b3c10030535a, type: 2}
           _position: {x: 0.002180028, y: -0.0028625824, z: -0.019273033}
+          _depthOffset: 0
         - _scope: {fileID: 11400000, guid: 3692a31afb1686341add931beeea3d2c, type: 2}
           _position: {x: 0.001992287, y: -0.0031876005, z: -0.020347985}
+          _depthOffset: 0
         - _scope: {fileID: 11400000, guid: e95ace63b43e2ad478d34913a79b2c68, type: 2}
           _position: {x: 0.001372086, y: -0.0029328521, z: -0.0297002}
+          _depthOffset: 0
         - _scope: {fileID: 11400000, guid: 890de65b739559841b6df555700037b5, type: 2}
           _position: {x: 0.0017459114, y: -0.0067097736, z: -0.05826322}
+          _depthOffset: 0
     - rid: 3479885495948804099
-      type: {class: WorldItemComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      type: {class: WorldItemComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
       data:
         _prefab: {fileID: 5814288565876838657, guid: 6fa5da9f4115693478dc00b5fb0f2d2e, type: 3}
     - rid: 3479885495948804100
-      type: {class: ItemTakeSoundComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      type: {class: ItemTakeSoundComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
       data:
         _category: weapon
         _clips:

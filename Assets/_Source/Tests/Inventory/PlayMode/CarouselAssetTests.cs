@@ -6,7 +6,7 @@ using RaidIntoDarkness.Player;
 using UnityEditor;
 using UnityEngine;
 
-namespace RaidIntoDarkness.Integrations.Inventory.Tests
+namespace RaidIntoDarkness.Inventory.Tests
 {
     public sealed class CarouselAssetTests
     {

@@ -11,7 +11,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: da0f90c2955673d46b25d465cbe44ed0, type: 3}
   m_Name: grenade_rgo_definition
-  m_EditorClassIdentifier: Inventory::Inventory.ItemDefinition
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.ItemDefinition
   _definitionId: 0cb36e84d68e52945a05bfd7f37211ae
   _displayName: "\u0420\u0443\u0447\u043D\u0430\u044F \u043E\u0441\u043A\u043E\u043B\u043E\u0447\u043D\u0430\u044F \u043E\u0431\u043E\u0440\u043E\u043D\u0438\u0442\u0435\u043B\u044C\u043D\u0430\u044F \u0433\u0440\u0430\u043D\u0430\u0442\u0430 \u0420\u0413\u041E"
   _shortName: "\u0420\u0413\u041E"
@@ -59,7 +59,7 @@ MonoBehaviour:
     version: 2
     RefIds:
     - rid: 115149112346673356
-      type: {class: WeaponStatsComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      type: {class: WeaponStatsComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
       data:
         _section: grenade_rgo
         _weaponClass: grenade
@@ -86,8 +86,9 @@ MonoBehaviour:
         _grenadeLauncherStatus: 0
         _grenadeLauncherSection: 
         _blockSilencerWithGrenadeLauncher: 0
+        _exposedRound: {fileID: 0}
     - rid: 115149112346673357
-      type: {class: WeaponHudComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      type: {class: WeaponHudComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
       data:
         _hudModel: {fileID: -6129208653667386632, guid: a28e772692d1ee14b82ed85a578b0317, type: 3}
         _weaponMotions: {fileID: 8815230551390286010, guid: 6e3f8a85ea241f241950d2d37a316fce, type: 3}
@@ -97,6 +98,6 @@ MonoBehaviour:
         _firstPersonWeapon: {fileID: 11400000, guid: 87257d49d2e33e34389d71f6ae41a42f, type: 2}
         _scopeAimOffsets: []
     - rid: 115149112346673358
-      type: {class: WorldItemComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      type: {class: WorldItemComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
       data:
         _prefab: {fileID: 3691213580489019094, guid: 6c5195de1e2495141bf6bb6e4a3aa0a1, type: 3}

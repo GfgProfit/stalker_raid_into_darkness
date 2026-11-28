@@ -11,7 +11,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: da0f90c2955673d46b25d465cbe44ed0, type: 3}
   m_Name: svoboda_exo_outfit_definition
-  m_EditorClassIdentifier: Inventory::Inventory.ItemDefinition
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.ItemDefinition
   _definitionId: 53043219be5db474a887bc1928b73d62
   _displayName: "\u042D\u043A\u0437\u043E\u0441\u043A\u0435\u043B\u0435\u0442 \xAB\u0411\u0430\u0441\u0442\u0438\u043E\u043D \u0441\u0432\u043E\u0431\u043E\u0434\u044B\xBB"
   _shortName: EXO
@@ -60,12 +60,11 @@ MonoBehaviour:
     version: 2
     RefIds:
     - rid: 3479885471900762404
-      type: {class: EquippableItemComponent, ns: Inventory, asm: Inventory}
+      type: {class: EquippableItemComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
       data:
-        _preferredSlotIds:
-        - Outfit
+        _preferredSlotIds: 04000000i
     - rid: 3479885471900762405
-      type: {class: EquipmentStatsComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      type: {class: EquipmentStatsComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
       data:
         _section: svoboda_exo_outfit
         _cost: 133300
@@ -134,11 +133,11 @@ MonoBehaviour:
             _average: 32
             _strong: 24
     - rid: 3479885472039698578
-      type: {class: WorldItemComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      type: {class: WorldItemComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
       data:
         _prefab: {fileID: 5746779732413992309, guid: 02335a87609756b4aa15da702e1d520f, type: 3}
     - rid: 3479885488572596367
-      type: {class: ItemTakeSoundComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      type: {class: ItemTakeSoundComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
       data:
         _category: exoarmor
         _clips:

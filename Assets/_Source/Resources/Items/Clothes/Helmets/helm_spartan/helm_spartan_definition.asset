@@ -11,7 +11,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: da0f90c2955673d46b25d465cbe44ed0, type: 3}
   m_Name: helm_spartan
-  m_EditorClassIdentifier: Inventory::Inventory.ItemDefinition
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.ItemDefinition
   _definitionId: f084b08c85e267c45a1230dbc741a48b
   _displayName: "\u0428\u043B\u0435\u043C M10 \xAB\u0421\u043F\u0430\u0440\u0442\u0430\u043D\u0435\u0446\xBB"
   _shortName: EXO
@@ -60,12 +60,11 @@ MonoBehaviour:
     version: 2
     RefIds:
     - rid: 3479885471900762482
-      type: {class: EquippableItemComponent, ns: Inventory, asm: Inventory}
+      type: {class: EquippableItemComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
       data:
-        _preferredSlotIds:
-        - Head
+        _preferredSlotIds: 01000000i
     - rid: 3479885471900762483
-      type: {class: EquipmentStatsComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      type: {class: EquipmentStatsComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
       data:
         _section: helm_spartan
         _cost: 51800
@@ -134,11 +133,11 @@ MonoBehaviour:
             _average: 14
             _strong: 10
     - rid: 3479885472039698619
-      type: {class: WorldItemComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      type: {class: WorldItemComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
       data:
         _prefab: {fileID: 8960637631464006125, guid: fbd3548f34d6d0a40aeadc6a7caf1e9f, type: 3}
     - rid: 3479885488572596407
-      type: {class: ItemTakeSoundComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      type: {class: ItemTakeSoundComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
       data:
         _category: helmet
         _clips:

@@ -11,7 +11,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: da0f90c2955673d46b25d465cbe44ed0, type: 3}
   m_Name: military_proto_exo_outfit_definition
-  m_EditorClassIdentifier: Inventory::Inventory.ItemDefinition
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.ItemDefinition
   _definitionId: a3f5d59f8feea734fb1779eb7be48667
   _displayName: "\u0411\u0440\u043E\u043D\u0435\u043A\u043E\u0441\u0442\u044E\u043C \xAB\u0421\u041A\u0410\u0422-9\xBB \u0441 \u043F\u0440\u043E\u0442\u043E\u044D\u043A\u0437\u043E\u0441\u043A\u0435\u043B\u0435\u0442\u043E\u043C"
   _shortName: EXO
@@ -60,12 +60,11 @@ MonoBehaviour:
     version: 2
     RefIds:
     - rid: 3479885471900762330
-      type: {class: EquippableItemComponent, ns: Inventory, asm: Inventory}
+      type: {class: EquippableItemComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
       data:
-        _preferredSlotIds:
-        - Outfit
+        _preferredSlotIds: 04000000i
     - rid: 3479885471900762331
-      type: {class: EquipmentStatsComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      type: {class: EquipmentStatsComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
       data:
         _section: military_proto_exo_outfit
         _cost: 101350
@@ -134,11 +133,11 @@ MonoBehaviour:
             _average: 32
             _strong: 24
     - rid: 3479885472039698541
-      type: {class: WorldItemComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      type: {class: WorldItemComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
       data:
         _prefab: {fileID: 7177523465255051242, guid: b3ae6befc43fef44aa2326bd4f64a197, type: 3}
     - rid: 3479885488572596330
-      type: {class: ItemTakeSoundComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      type: {class: ItemTakeSoundComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
       data:
         _category: armor
         _clips:

@@ -8,7 +8,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using XRay.Importer;
 
-namespace RaidIntoDarkness.Integrations.Inventory.Tests
+namespace RaidIntoDarkness.Inventory.Tests
 {
     public sealed class BoltAssetTests
     {

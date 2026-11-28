@@ -11,7 +11,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: da0f90c2955673d46b25d465cbe44ed0, type: 3}
   m_Name: renegade_scientific_outfit_definition
-  m_EditorClassIdentifier: Inventory::Inventory.ItemDefinition
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.ItemDefinition
   _definitionId: 67ecd89e48776244e98a83dc5f78d8a7
   _displayName: "\xAB\u0421\u0415\u0412\u0410\xBB \u0440\u0435\u043D\u0435\u0433\u0430\u0442\u043E\u0432"
   _shortName: MEDIUM
@@ -60,12 +60,11 @@ MonoBehaviour:
     version: 2
     RefIds:
     - rid: 3479885471900762372
-      type: {class: EquippableItemComponent, ns: Inventory, asm: Inventory}
+      type: {class: EquippableItemComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
       data:
-        _preferredSlotIds:
-        - Outfit
+        _preferredSlotIds: 04000000i
     - rid: 3479885471900762373
-      type: {class: EquipmentStatsComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      type: {class: EquipmentStatsComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
       data:
         _section: renegade_scientific_outfit
         _cost: 51840
@@ -134,11 +133,11 @@ MonoBehaviour:
             _average: 11
             _strong: 8
     - rid: 3479885472039698562
-      type: {class: WorldItemComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      type: {class: WorldItemComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
       data:
         _prefab: {fileID: 2080809317494406136, guid: 9080badf4cea0cf4b89a6de1486c0b47, type: 3}
     - rid: 3479885488572596351
-      type: {class: ItemTakeSoundComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      type: {class: ItemTakeSoundComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
       data:
         _category: mediumarmor
         _clips:

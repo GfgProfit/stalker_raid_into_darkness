@@ -11,7 +11,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: da0f90c2955673d46b25d465cbe44ed0, type: 3}
   m_Name: wpn_addon_grenade_launcher_gl1_definition
-  m_EditorClassIdentifier: Inventory::Inventory.ItemDefinition
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.ItemDefinition
   _definitionId: b673ffb1d82392e41a70f0d952debdba
   _displayName: "40-\u043C\u043C \u043F\u043E\u0434\u0441\u0442\u0432\u043E\u043B\u044C\u043D\u044B\u0439 \u0433\u0440\u0430\u043D\u0430\u0442\u043E\u043C\u0451\u0442 FN GL1"
   _shortName: FN GL1
@@ -59,7 +59,7 @@ MonoBehaviour:
     version: 2
     RefIds:
     - rid: 115149081108283533
-      type: {class: WeaponAddonComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      type: {class: WeaponAddonComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
       data:
         _section: wpn_addon_grenade_launcher_gl1
         _kind: 2
@@ -81,6 +81,6 @@ MonoBehaviour:
         _recoilSnappinessIncreasePercent: 9
         _recoilDampingPercent: 0
     - rid: 115149081108283536
-      type: {class: WorldItemComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      type: {class: WorldItemComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
       data:
         _prefab: {fileID: 6996121346914185823, guid: d24e201746efcdc44850a6c775487af1, type: 3}

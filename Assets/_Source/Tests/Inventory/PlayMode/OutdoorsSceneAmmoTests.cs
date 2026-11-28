@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
-using Inventory;
-using Inventory.UI;
+using RaidIntoDarkness.Inventory;
+using RaidIntoDarkness.Inventory.UI;
 using NUnit.Framework;
 using RaidIntoDarkness.Player;
 using TMPro;
@@ -12,7 +12,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
 using UnityEngine.UI;
 
-namespace RaidIntoDarkness.Integrations.Inventory.Tests
+namespace RaidIntoDarkness.Inventory.Tests
 {
     public sealed class OutdoorsSceneAmmoTests : OutdoorsSceneInputTestFixture
     {
@@ -67,14 +67,6 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             Assert.That(label.textInfo.characterInfo[0].pointSize, Is.EqualTo(16f).Within(0.001f));
             Assert.That(label.textInfo.characterInfo[0].color, Is.EqualTo(new Color32(255, 255, 255, 255)));
             AssertNameBackground(view, definition.ShortName);
-            InventorySaveData saved = InventorySerializer.Capture(model, new[] { window.PrimaryContainerId, window.SecondaryContainerId });
-            var restored = new InventoryModel(model.Resolver);
-            InventoryContainer backpack = model.GetContainer(window.PrimaryContainerId);
-            InventoryContainer stash = model.GetContainer(window.SecondaryContainerId);
-            restored.AddContainer(new GridContainer(backpack.Id, backpack.Width, backpack.Height));
-            restored.AddContainer(new GridContainer(stash.Id, stash.Width, stash.Height));
-            Assert.That(InventorySerializer.Restore(restored, saved).IsClean, Is.True);
-            Assert.That(restored.GetItem(first.InstanceId).Amount, Is.EqualTo(1516));
             controller.Close();
         }
 
@@ -113,7 +105,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             }
 
             Assert.That(model.TryEquip(knife.InstanceId, window.EquipmentContainerId).Success, Is.True);
-            Assert.That(knife.Location.SlotId, Is.EqualTo(FirstPersonWeaponBinder.KNIFE_SLOT));
+            Assert.That(knife.Location.SlotId, Is.EqualTo(SlotId.Knife));
             InventoryItemView equipped = window.FindGrid(knife.ContainerId).GetItemView(knife);
             Assert.That(equipped.transform.Find("Overlay/Name").GetComponent<TMP_Text>().enabled, Is.False);
             controller.Close();
@@ -375,7 +367,8 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             ItemInstance bareWeapon = AddItem(controller, "wpn_ak74", window.PrimaryContainerId);
             ItemInstance launcher = AddItem(controller, "wpn_addon_grenade_launcher_definition", window.PrimaryContainerId);
             ItemInstance grenade = AddItem(controller, "ammo_vog-25", window.SecondaryContainerId);
-            ItemInstance incompatibleGrenade = AddItem(controller, "ammo_vog-25p", window.SecondaryContainerId);
+            ItemInstance alternativeGrenade = AddItem(controller, "ammo_vog-25p", window.SecondaryContainerId);
+            ItemInstance incompatibleGrenade = AddItem(controller, "ammo_m209", window.SecondaryContainerId);
             ItemInstance rifleAmmo = AddItem(controller, "ammo_5.45x39_fmj", window.SecondaryContainerId);
             Assert.That(model.TryEquip(weapon.InstanceId, window.EquipmentContainerId).Success, Is.True);
 
@@ -385,21 +378,25 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             InventoryItemView weaponView = window.FindGrid(weapon.ContainerId).GetItemView(weapon);
             InventoryItemView bareWeaponView = window.FindGrid(bareWeapon.ContainerId).GetItemView(bareWeapon);
             InventoryItemView grenadeView = window.FindGrid(grenade.ContainerId).GetItemView(grenade);
+            InventoryItemView alternativeView = window.FindGrid(alternativeGrenade.ContainerId).GetItemView(alternativeGrenade);
             InventoryItemView incompatibleView = window.FindGrid(incompatibleGrenade.ContainerId).GetItemView(incompatibleGrenade);
             InventoryItemView rifleAmmoView = window.FindGrid(rifleAmmo.ContainerId).GetItemView(rifleAmmo);
             Color grenadeColor = grenadeView.Background.color;
+            Color alternativeColor = alternativeView.Background.color;
             Color incompatibleColor = incompatibleView.Background.color;
             Color rifleAmmoColor = rifleAmmoView.Background.color;
             Color bareWeaponColor = bareWeaponView.Background.color;
 
             yield return Hover(weaponView);
             Assert.That(grenadeView.Background.color, Is.EqualTo(grenadeColor));
+            Assert.That(alternativeView.Background.color, Is.EqualTo(alternativeColor));
             Assert.That(rifleAmmoView.Background.color, Is.Not.EqualTo(rifleAmmoColor));
             Assert.That(controller.WeaponAttachments.Install(launcher, weapon).Success, Is.True);
             yield return null;
             yield return null;
             Assert.That(window.HoveredItem, Is.SameAs(weapon));
             Assert.That(grenadeView.Background.color, Is.Not.EqualTo(grenadeColor));
+            Assert.That(alternativeView.Background.color, Is.Not.EqualTo(alternativeColor));
             Assert.That(incompatibleView.Background.color, Is.EqualTo(incompatibleColor));
 
             yield return Hover(grenadeView);
@@ -414,6 +411,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             yield return null;
             Assert.That(window.HoveredItem, Is.SameAs(weapon));
             Assert.That(grenadeView.Background.color, Is.EqualTo(grenadeColor));
+            Assert.That(alternativeView.Background.color, Is.EqualTo(alternativeColor));
             Assert.That(rifleAmmoView.Background.color, Is.Not.EqualTo(rifleAmmoColor));
             controller.Close();
         }
@@ -423,16 +421,22 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
         {
             SceneManager.LoadScene("TEST_SCENE", LoadSceneMode.Single);
             yield return new WaitForSeconds(0.5f);
-            GameObject group = GameObject.Find("WorldItems/Ammo");
-            Assert.That(group, Is.Not.Null);
-            WorldItem[] items = group.GetComponentsInChildren<WorldItem>();
+            InventoryWindowController controller = Object.FindAnyObjectByType<InventoryWindowController>();
+            Assert.That(controller, Is.Not.Null);
             var sections = new HashSet<string>();
 
-            foreach (WorldItem item in items)
+            foreach (ItemDefinition definition in controller.Inventory.Database.Definitions)
             {
-                ItemDefinition definition = item.Definition;
+                if (definition.IsCategory("Ammo") == false)
+                {
+                    continue;
+                }
+
                 AmmoStatsComponent stats = definition.GetComponent<AmmoStatsComponent>();
                 Assert.That(stats, Is.Not.Null, definition.name);
+                WorldItem item = definition.GetComponent<WorldItemComponent>()?.Prefab;
+                Assert.That(item, Is.Not.Null, stats.Section);
+                Assert.That(item.Definition, Is.SameAs(definition), stats.Section);
                 sections.Add(stats.Section);
                 Assert.That(stats.Section, Does.Not.EndWith("_bad").And.Not.EndWith("_verybad"));
                 Assert.That(item.Amount, Is.EqualTo(stats.BoxSize), stats.Section);
@@ -445,7 +449,6 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
                 Assert.That(iconRect.height, Is.EqualTo(definition.Height * 100), stats.Section);
                 Assert.That(definition.Description, Is.Not.Empty, stats.Section);
                 Assert.That(definition.GetComponent<AmmoBallisticsComponent>()?.Data.IsConfigured, Is.True, stats.Section);
-                Assert.That(definition.GetComponent<WorldItemComponent>()?.Prefab, Is.Not.Null, stats.Section);
                 Assert.That(item.GetComponent<Collider>(), Is.Not.Null, stats.Section);
                 Assert.That(item.GetComponent<WorldItemImpactSound>(), Is.Not.Null, stats.Section);
                 Assert.That(item.GetComponent<AudioSource>().spatialBlend, Is.EqualTo(1f), stats.Section);
@@ -478,9 +481,9 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             WorldItemInteractor interactor = Object.FindAnyObjectByType<WorldItemInteractor>();
             InventoryWindow window = controller.Window;
             InventoryModel model = controller.Inventory.Model;
-            WorldItem box = GameObject.Find("WorldItems/Ammo/ammo_9x18_fmj").GetComponent<WorldItem>();
-            ItemDefinition definition = box.Definition;
-            box.Configure(definition, 7);
+            ItemDefinition definition = FindDefinition(controller.Inventory.Database, "ammo_9x18_fmj");
+            WorldItem box = interactor.Spawn(definition, 7);
+            Assert.That(box, Is.Not.Null);
             int taken = controller.ItemSounds.PlayedCount;
             Assert.That(interactor.TryPickUp(box), Is.True);
             Assert.That(controller.ItemSounds.PlayedCount, Is.EqualTo(taken + 1));

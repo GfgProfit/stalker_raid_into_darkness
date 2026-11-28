@@ -11,7 +11,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: da0f90c2955673d46b25d465cbe44ed0, type: 3}
   m_Name: wpn_rpg7_definition
-  m_EditorClassIdentifier: Inventory::Inventory.ItemDefinition
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.ItemDefinition
   _definitionId: 5c12ccb43c1addb4e9e70227bd628b4c
   _displayName: "\u0420\u0443\u0447\u043D\u043E\u0439 \u043F\u0440\u043E\u0442\u0438\u0432\u043E\u0442\u0430\u043D\u043A\u043E\u0432\u044B\u0439 \u0433\u0440\u0430\u043D\u0430\u0442\u043E\u043C\u0451\u0442 \u0420\u041F\u0413-7"
   _shortName: "\u0420\u041F\u0413-7"
@@ -61,13 +61,11 @@ MonoBehaviour:
     version: 2
     RefIds:
     - rid: 115149112346673462
-      type: {class: EquippableItemComponent, ns: Inventory, asm: Inventory}
+      type: {class: EquippableItemComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
       data:
-        _preferredSlotIds:
-        - Primary
-        - Secondary
+        _preferredSlotIds: 090000000a000000i
     - rid: 115149112346673463
-      type: {class: WeaponStatsComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      type: {class: WeaponStatsComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
       data:
         _section: wpn_rpg7
         _weaponClass: grenade_launcher
@@ -97,7 +95,7 @@ MonoBehaviour:
         _blockSilencerWithGrenadeLauncher: 0
         _exposedRound: {fileID: 11400000, guid: 8a330cc03a190084c9e3608c101260eb, type: 2}
     - rid: 115149112346673464
-      type: {class: WeaponHudComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      type: {class: WeaponHudComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
       data:
         _hudModel: {fileID: 2189347407890933927, guid: 0f263a2e0df8973479021ea7392711cf, type: 3}
         _weaponMotions: {fileID: 8815230551390286010, guid: 97d1f94937285064a8be0cbe8e980115, type: 3}
@@ -107,6 +105,6 @@ MonoBehaviour:
         _firstPersonWeapon: {fileID: 11400000, guid: 8305ffab2074ba6448d56b95690e605f, type: 2}
         _scopeAimOffsets: []
     - rid: 115149112346673465
-      type: {class: WorldItemComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      type: {class: WorldItemComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
       data:
         _prefab: {fileID: 4034409715357792345, guid: 0f263a2e0df8973479021ea7392711cf, type: 3}

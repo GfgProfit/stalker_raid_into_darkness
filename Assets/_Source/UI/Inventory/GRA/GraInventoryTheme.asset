@@ -11,7 +11,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c74e25ace639f4e4681c61571a773d25, type: 3}
   m_Name: GraInventoryTheme
-  m_EditorClassIdentifier: Inventory.UI::Inventory.UI.InventoryTheme
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.UI.InventoryTheme
   _bodyFont: {fileID: 11400000, guid: cc5efc8ed1175bf45a893d4dd6e86295, type: 2}
   _headerFont: {fileID: 11400000, guid: cc5efc8ed1175bf45a893d4dd6e86295, type: 2}
   _accentFont: {fileID: 11400000, guid: cc5efc8ed1175bf45a893d4dd6e86295, type: 2}

@@ -11,7 +11,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: da0f90c2955673d46b25d465cbe44ed0, type: 3}
   m_Name: 1p63
-  m_EditorClassIdentifier: Inventory::Inventory.ItemDefinition
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.ItemDefinition
   _definitionId: e860adc23efd2e540911e3efa1c65bf2
   _displayName: "\u041A\u043E\u043B\u043B\u0438\u043C\u0430\u0442\u043E\u0440\u043D\u044B\u0439 \u043F\u0440\u0438\u0446\u0435\u043B 1\u041F63 \xAB\u041E\u0431\u0437\u043E\u0440\xBB (\u041D\u041F\u0417 \u041F\u041A1)"
   _shortName: "\u041E\u0431\u0437\u043E\u0440"
@@ -60,7 +60,7 @@ MonoBehaviour:
     version: 2
     RefIds:
     - rid: 3479885496768528387
-      type: {class: WeaponAddonComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      type: {class: WeaponAddonComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
       data:
         _section: 1p63
         _kind: 1
@@ -77,12 +77,16 @@ MonoBehaviour:
         _attachSound: {fileID: 0}
         _detachSound: {fileID: 0}
         _grenadeAmmo: {fileID: 0}
+        _alternativeGrenadeAmmo: {fileID: 0}
+        _recoilIncreasePercent: {x: 0, y: 0, z: 0}
+        _recoilSnappinessIncreasePercent: 0
+        _recoilDampingPercent: 0
     - rid: 3479885496768528533
-      type: {class: WorldItemComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      type: {class: WorldItemComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
       data:
         _prefab: {fileID: 2654227075893417765, guid: bc4945af509203f4793e91d842b72ed7, type: 3}
     - rid: 3479885496768528679
-      type: {class: ItemTakeSoundComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      type: {class: ItemTakeSoundComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
       data:
         _category: attchscope
         _clips:

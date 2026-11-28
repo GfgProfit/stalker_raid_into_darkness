@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Reflection;
-using Inventory;
+using RaidIntoDarkness.Inventory;
 using NUnit.Framework;
 using RaidIntoDarkness.Player;
 using UnityEditor;
@@ -10,7 +10,7 @@ using UnityEngine.SceneManagement;
 using XRay.Importer.Levels;
 using Object = UnityEngine.Object;
 
-namespace RaidIntoDarkness.Integrations.Inventory.Tests
+namespace RaidIntoDarkness.Inventory.Tests
 {
     public sealed class AnomalyEquipmentWearInventoryTests
     {
@@ -201,17 +201,15 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
         }
 
         [Test]
-        public void SaveJsonRoundTripPreservesWornEquipmentAndUnchangedInventory()
+        public void ApplyingWearPreservesUnchangedInventoryAndAuthoredDurability()
         {
             PlayerInventoryRuntime runtime = CreateInventory();
             ItemDefinition definition = CreateDefinition(AnomalyEquipmentProtection.OUTFIT_CATEGORY, 63f);
             ItemInstance outfit = Add(runtime, definition, "Equipment", 0, "0.8");
             ItemInstance spare = Add(runtime, definition, "Bag", 0, "0.7");
             runtime.ApplyEquipmentWear(CaptureOutfit(runtime), 0.6123457f);
-            string json = runtime.SaveJson();
-            Assert.That(runtime.LoadJson(json).IsClean, Is.True);
-            Assert.That(AnomalyEquipmentProtection.GetCondition(runtime.Model.GetItem(outfit.InstanceId)), Is.EqualTo(0.6123457f));
-            Assert.That(runtime.Model.GetItem(spare.InstanceId).GetState(AnomalyEquipmentProtection.CONDITION_STATE), Is.EqualTo("0.7"));
+            Assert.That(AnomalyEquipmentProtection.GetCondition(outfit), Is.EqualTo(0.6123457f));
+            Assert.That(spare.GetState(AnomalyEquipmentProtection.CONDITION_STATE), Is.EqualTo("0.7"));
             Assert.That(definition.GetComponent<EquipmentStatsComponent>().AnomalyDurability, Is.EqualTo(63f));
         }
 

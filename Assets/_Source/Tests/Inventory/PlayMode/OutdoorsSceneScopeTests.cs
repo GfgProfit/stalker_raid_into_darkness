@@ -1,8 +1,8 @@
 using System.Collections;
 using System.Linq;
-using Inventory;
-using Inventory.IconGeneration;
-using Inventory.UI;
+using RaidIntoDarkness.Inventory;
+using RaidIntoDarkness.Inventory.IconGeneration;
+using RaidIntoDarkness.Inventory.UI;
 using NUnit.Framework;
 using RaidIntoDarkness.Weapons;
 using UnityEngine;
@@ -10,7 +10,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
 
-namespace RaidIntoDarkness.Integrations.Inventory.Tests
+namespace RaidIntoDarkness.Inventory.Tests
 {
     public sealed class OutdoorsSceneScopeTests : OutdoorsSceneInputTestFixture
     {
@@ -36,7 +36,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             ItemInstance redDot = Add(inventory, "ac10632");
             ItemInstance holographic = Add(inventory, "e0t2");
             Assert.That(model.TryEquip(weapon.InstanceId, inventory.Window.EquipmentContainerId).Success, Is.True);
-            int slot = weapon.Location.SlotId == FirstPersonWeaponBinder.PRIMARY_SLOT ? FirstPersonWeaponController.PRIMARY_SLOT : FirstPersonWeaponController.SECONDARY_SLOT;
+            int slot = weapon.Location.SlotId == SlotId.Primary ? FirstPersonWeaponController.PRIMARY_SLOT : FirstPersonWeaponController.SECONDARY_SLOT;
             Assert.That(controller.Select(slot), Is.True);
             DevTest aimOverride = controller.GetComponent<DevTest>();
             if (aimOverride != null)
@@ -194,7 +194,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             weapon.SetState(InventoryWeaponAmmoSource.MAGAZINE_STATE, "2");
             InventoryModel model = inventory.Inventory.Model;
             Assert.That(model.TryEquip(weapon.InstanceId, inventory.Window.EquipmentContainerId).Success, Is.True);
-            int slot = weapon.Location.SlotId == FirstPersonWeaponBinder.PRIMARY_SLOT ? FirstPersonWeaponController.PRIMARY_SLOT : FirstPersonWeaponController.SECONDARY_SLOT;
+            int slot = weapon.Location.SlotId == SlotId.Primary ? FirstPersonWeaponController.PRIMARY_SLOT : FirstPersonWeaponController.SECONDARY_SLOT;
             Assert.That(controller.Select(slot), Is.True);
             float timeout = Time.time + 6f;
 

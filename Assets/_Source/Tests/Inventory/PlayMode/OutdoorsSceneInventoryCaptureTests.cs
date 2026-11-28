@@ -1,14 +1,14 @@
 using System;
 using System.Collections;
 using System.IO;
-using Inventory.UI;
+using RaidIntoDarkness.Inventory.UI;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
 
-namespace RaidIntoDarkness.Integrations.Inventory.Tests
+namespace RaidIntoDarkness.Inventory.Tests
 {
     public sealed class OutdoorsSceneInventoryCaptureTests : OutdoorsSceneInputTestFixture
     {
@@ -28,7 +28,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
 
             LogAssert.ignoreFailingMessages = true;
             Directory.CreateDirectory(folder);
-            SceneManager.LoadScene("OutdoorsScene", LoadSceneMode.Single);
+            SceneManager.LoadScene("TEST_SCENE", LoadSceneMode.Single);
             yield return new WaitForSeconds(1.0f);
             InventoryWindowController controller = UnityEngine.Object.FindAnyObjectByType<InventoryWindowController>();
             Canvas canvas = controller.Window.GetComponentInParent<Canvas>();

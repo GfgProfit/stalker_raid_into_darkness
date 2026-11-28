@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using Inventory;
-using Inventory.UI;
+using RaidIntoDarkness.Inventory;
+using RaidIntoDarkness.Inventory.UI;
 using NUnit.Framework;
 using RaidIntoDarkness.Player;
 using UnityEditor;
@@ -11,7 +11,7 @@ using UnityEngine.SceneManagement;
 using XRay.Importer.Levels;
 using Object = UnityEngine.Object;
 
-namespace RaidIntoDarkness.Integrations.Inventory.Tests
+namespace RaidIntoDarkness.Inventory.Tests
 {
     public sealed class EquipmentStatusDetailsFormatterTests
     {

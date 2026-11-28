@@ -818,7 +818,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2b9149fefb7be7344a4636a5d1b9267e, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: RaidIntoDarkness.Integrations.Inventory::RaidIntoDarkness.UI.SpawnMenuView
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.UI.SpawnMenuView
   _categoryContent: {fileID: 8734087290148255980}
   _categoryTemplate: {fileID: 24233667451306252}
   _grid: {fileID: 4775154548084327280}
@@ -1376,7 +1376,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7d898b1a98ff90543a6cc024c75fa24a, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Inventory.UI::Inventory.UI.InventoryTooltip
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.UI.InventoryTooltip
 --- !u!1 &1322737442957625142
 GameObject:
   m_ObjectHideFlags: 0
@@ -3214,7 +3214,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c075cd193b2694e49a09b04b383df4f0, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Inventory.UI::Inventory.UI.InventoryItemView
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.UI.InventoryItemView
   _content: {fileID: 8739581762688569412}
   _overlay: {fileID: 1557274078234901075}
   _background: {fileID: 1833955655924149609}
@@ -4345,7 +4345,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c075cd193b2694e49a09b04b383df4f0, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Inventory.UI::Inventory.UI.InventoryItemView
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.UI.InventoryItemView
   _content: {fileID: 0}
   _overlay: {fileID: 0}
   _background: {fileID: 0}
@@ -5359,7 +5359,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7be8fa544604f5f4e94aadde4149426c, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: RaidIntoDarkness.Integrations.Inventory::RaidIntoDarkness.UI.SpawnMenuGrid
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.UI.SpawnMenuGrid
   _scroll: {fileID: 8960970542890756388}
   _grid: {fileID: 4595332081777200330}
   _cellTemplate: {fileID: 1452025544126054349}
@@ -5721,7 +5721,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d76d5f4cbe0ac654b8c570ff07f843c2, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Inventory.UI::Inventory.UI.InventoryGridView
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.UI.InventoryGridView
   _containerId: SpawnCatalog
   _ownerId: Player
   _displayName: "\u041F\u0440\u0435\u0434\u043C\u0435\u0442\u044B"
@@ -6564,7 +6564,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: dac82e57d81c6244185aeb146318bab8, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: RaidIntoDarkness.Integrations.Inventory::RaidIntoDarkness.UI.SpawnMenuItemCell
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.UI.SpawnMenuItemCell
   _itemView: {fileID: 3404531205913652212}
   _selection: {fileID: 8763101043696971635}
 --- !u!1 &4846725715068122007
@@ -9602,7 +9602,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b8db279482a95bd449406949d4fc6c6f, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: RaidIntoDarkness.Integrations.Inventory::RaidIntoDarkness.UI.SpawnMenuCategoryRow
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.UI.SpawnMenuCategoryRow
   _toggle: {fileID: 7370001854192780920}
   _select: {fileID: 5994297034534860875}
   _arrow: {fileID: 4863834849914360005}

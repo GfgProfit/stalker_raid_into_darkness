@@ -69,9 +69,9 @@ namespace RaidIntoDarkness.Player.Tests
         [Test]
         public void PackedGroupPreservesNamedChildLinksTimesFlagsAndEmptyChildren()
         {
-            Type reader = Type.GetType("RaidIntoDarkness.Integrations.Inventory.Editor.XRayParticleLibraryReader, RaidIntoDarkness.Integrations.Inventory.Editor", true);
-            Type effectType = reader.Assembly.GetType("RaidIntoDarkness.Integrations.Inventory.Editor.XRayParticleEffectData", true);
-            Type groupType = reader.Assembly.GetType("RaidIntoDarkness.Integrations.Inventory.Editor.XRayParticleGroupData", true);
+            Type reader = Type.GetType("RaidIntoDarkness.Inventory.Editor.XRayParticleLibraryReader, RaidIntoDarkness.Inventory.Editor", true);
+            Type effectType = reader.Assembly.GetType("RaidIntoDarkness.Inventory.Editor.XRayParticleEffectData", true);
+            Type groupType = reader.Assembly.GetType("RaidIntoDarkness.Inventory.Editor.XRayParticleGroupData", true);
             var effects = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(effectType));
             var groups = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(groupType));
             MethodInfo read = reader.GetMethod("Read", BindingFlags.Public | BindingFlags.Static);
@@ -108,9 +108,9 @@ namespace RaidIntoDarkness.Player.Tests
 
         private static IList ReadEffects(byte[] bytes)
         {
-            Type reader = Type.GetType("RaidIntoDarkness.Integrations.Inventory.Editor.XRayParticleLibraryReader, RaidIntoDarkness.Integrations.Inventory.Editor", true);
-            Type effectType = reader.Assembly.GetType("RaidIntoDarkness.Integrations.Inventory.Editor.XRayParticleEffectData", true);
-            Type groupType = reader.Assembly.GetType("RaidIntoDarkness.Integrations.Inventory.Editor.XRayParticleGroupData", true);
+            Type reader = Type.GetType("RaidIntoDarkness.Inventory.Editor.XRayParticleLibraryReader, RaidIntoDarkness.Inventory.Editor", true);
+            Type effectType = reader.Assembly.GetType("RaidIntoDarkness.Inventory.Editor.XRayParticleEffectData", true);
+            Type groupType = reader.Assembly.GetType("RaidIntoDarkness.Inventory.Editor.XRayParticleGroupData", true);
             var effects = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(effectType));
             var groups = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(groupType));
             reader.GetMethod("Read", BindingFlags.Public | BindingFlags.Static).Invoke(null, new object[] { bytes, new Func<string, bool>(_ => true), effects, groups });

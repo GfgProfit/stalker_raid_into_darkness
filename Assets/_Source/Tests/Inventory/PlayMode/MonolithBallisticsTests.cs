@@ -5,7 +5,7 @@ using RaidIntoDarkness.Weapons;
 using UnityEngine;
 using UnityEngine.TestTools;
 
-namespace RaidIntoDarkness.Integrations.Inventory.Tests
+namespace RaidIntoDarkness.Inventory.Tests
 {
     public sealed class MonolithBallisticsTests
     {
@@ -179,7 +179,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
         [UnityTest]
         public IEnumerator TracerPaletteRendersThroughTheOutdoorsHdrpCamera()
         {
-            UnityEngine.SceneManagement.SceneManager.LoadScene("OutdoorsScene");
+            UnityEngine.SceneManagement.SceneManager.LoadScene("TEST_SCENE");
             yield return new WaitForSeconds(0.6f);
             InventoryWindowController inventory = Object.FindAnyObjectByType<InventoryWindowController>();
             Transform camera = inventory.Player.CameraController.Camera.transform;

@@ -11,7 +11,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 470dcf584e1b961489e47a94e5d69f65, type: 3}
   m_Name: ItemIconGeneratorSettings
-  m_EditorClassIdentifier: Inventory.IconGeneration::Inventory.IconGeneration.ItemIconGeneratorSettings
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.IconGeneration.ItemIconGeneratorSettings
   _prewarmItems: []
   _prewarmSlotProfiles:
   - _restrictCategory: 1
@@ -19,39 +19,37 @@ MonoBehaviour:
     _width: 2
     _height: 2
     _equipmentLayout: {fileID: 0}
-    _slotIds: []
+    _slotIds: 
   - _restrictCategory: 1
     _acceptedCategory: Armor
     _width: 2
     _height: 3
     _equipmentLayout: {fileID: 0}
-    _slotIds: []
+    _slotIds: 
   - _restrictCategory: 1
     _acceptedCategory: Weapon
     _width: 5
     _height: 2
     _equipmentLayout: {fileID: 11400000, guid: 2c8aea78f81a5f547a79363e801c4236, type: 2}
-    _slotIds:
-    - Primary
-    - Secondary
+    _slotIds: 090000000a000000i
   - _restrictCategory: 1
     _acceptedCategory: Weapon
     _width: 2
     _height: 1
     _equipmentLayout: {fileID: 0}
-    _slotIds: []
+    _slotIds: 
   - _restrictCategory: 1
     _acceptedCategory: Accessory
     _width: 2
     _height: 1
     _equipmentLayout: {fileID: 0}
-    _slotIds: []
+    _slotIds: 
   - _restrictCategory: 1
     _acceptedCategory: Consumable
     _width: 1
     _height: 1
     _equipmentLayout: {fileID: 0}
-    _slotIds: []
+    _slotIds: 
   _prewarmFrameBudgetMilliseconds: 6
   _renderLayer: 31
   _renderingLayer: 7

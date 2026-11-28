@@ -11,7 +11,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: da0f90c2955673d46b25d465cbe44ed0, type: 3}
   m_Name: sil_groza_definition
-  m_EditorClassIdentifier: Inventory::Inventory.ItemDefinition
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.ItemDefinition
   _definitionId: 8d35c507667948008ecfdc3a76919f4c
   _displayName: "\u041F\u0440\u0438\u0431\u043E\u0440 \u0431\u0435\u0441\u0448\u0443\u043C\u043D\u043E\u0439 \u0441\u0442\u0440\u0435\u043B\u044C\u0431\u044B \u041E\u0426-14 \xAB\u0413\u0440\u043E\u0437\u0430\xBB"
   _shortName: "\u0413\u043B\u0443\u0448. \xAB\u0413\u0440\u043E\u0437\u0430\xBB"
@@ -60,7 +60,7 @@ MonoBehaviour:
     version: 2
     RefIds:
     - rid: 115149063313949395
-      type: {class: WeaponAddonComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      type: {class: WeaponAddonComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
       data:
         _section: sil_groza
         _kind: 0
@@ -82,13 +82,13 @@ MonoBehaviour:
         _recoilSnappinessIncreasePercent: 0
         _recoilDampingPercent: 8
     - rid: 115149063313949396
-      type: {class: ItemTakeSoundComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      type: {class: ItemTakeSoundComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
       data:
         _category: attchsilen
         _clips:
         - {fileID: 8300000, guid: 651ca6a8a4ce61141bc8232419bc7edb, type: 3}
         - {fileID: 8300000, guid: 02b396ea17161b74cab273d51371e909, type: 3}
     - rid: 115149063313949402
-      type: {class: WorldItemComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      type: {class: WorldItemComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
       data:
         _prefab: {fileID: 5356730755461464304, guid: e45380e9e6302044f8b0a17682f13d04, type: 3}

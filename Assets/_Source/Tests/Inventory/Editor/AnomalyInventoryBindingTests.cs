@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Reflection;
-using Inventory;
+using RaidIntoDarkness.Inventory;
 using NUnit.Framework;
 using RaidIntoDarkness.Player;
 using UnityEditor;
@@ -10,7 +10,7 @@ using UnityEngine.SceneManagement;
 using XRay.Importer.Levels;
 using Object = UnityEngine.Object;
 
-namespace RaidIntoDarkness.Integrations.Inventory.Tests
+namespace RaidIntoDarkness.Inventory.Tests
 {
     public sealed class AnomalyInventoryBindingTests
     {
@@ -43,12 +43,12 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
         }
 
         [Test]
-        public void ConfigureBindsExternalInventoryBeforeAnyWindowExistsAndControllerLifetimeDoesNotOwnProtection()
+        public void RuntimeBindsExternalInventoryBeforeAnyWindowExistsAndControllerLifetimeDoesNotOwnProtection()
         {
             StalkerPlayerController player = CreatePlayer(out AnomalyDamageReceiver receiver, out StalkerActorCondition condition);
-            PlayerInventoryRuntime runtime = CreateInventory(80f, "0.5");
-            InventoryWindowController controller = CreateController();
             Assert.That(receiver.GetProtection(AnomalyDamageType.Shock, AnomalyStrength.Weak, _config), Is.Zero);
+            PlayerInventoryRuntime runtime = CreateInventory(80f, "0.5", player);
+            InventoryWindowController controller = CreateController();
             controller.Configure(null, runtime, player, null, null);
             Assert.That(controller.Window, Is.Null);
             Assert.That(controller.gameObject.activeInHierarchy, Is.False);
@@ -60,16 +60,12 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
         }
 
         [Test]
-        public void StartBindsSerializedInventoryAndPlayerEvenWhenTheWindowIsMissing()
+        public void RuntimeStartBindsSerializedPlayerEvenWhenTheWindowIsMissing()
         {
             StalkerPlayerController player = CreatePlayer(out AnomalyDamageReceiver receiver, out _);
-            PlayerInventoryRuntime runtime = CreateInventory(60f);
+            PlayerInventoryRuntime runtime = CreateInventory(60f, player: player);
             InventoryWindowController controller = CreateController();
-            SetField(controller, "_inventory", runtime);
-            SetField(controller, "_player", player);
-            MethodInfo start = typeof(InventoryWindowController).GetMethod("Start", BindingFlags.Instance | BindingFlags.NonPublic);
-            Assert.That(start, Is.Not.Null);
-            start.Invoke(controller, null);
+            controller.Configure(null, runtime, player, null, null);
             Assert.That(controller.Window, Is.Null);
             Assert.That(receiver.GetProtection(AnomalyDamageType.Shock, AnomalyStrength.Weak, _config), Is.EqualTo(0.6f).Within(0.000001f));
         }
@@ -77,20 +73,20 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
         [Test]
         public void ReplacingPlayerOrInventoryUnregistersTheOldOwnerWithoutDuplicateProtection()
         {
-            StalkerPlayerController first = CreatePlayer(out AnomalyDamageReceiver firstReceiver, out _);
-            StalkerPlayerController second = CreatePlayer(out AnomalyDamageReceiver secondReceiver, out _);
+            CreatePlayer(out AnomalyDamageReceiver firstReceiver, out _);
+            CreatePlayer(out AnomalyDamageReceiver secondReceiver, out _);
             PlayerInventoryRuntime runtime = CreateInventory(80f);
             PlayerInventoryRuntime replacement = CreateInventory(40f);
-            InventoryWindowController controller = CreateController();
-            controller.Configure(null, runtime, first, null, null);
+            runtime.BindDamageReceiver(firstReceiver);
             Assert.That(firstReceiver.GetProtection(AnomalyDamageType.Shock, AnomalyStrength.Weak, _config), Is.EqualTo(0.8f).Within(0.000001f));
-            controller.Configure(null, runtime, second, null, null);
-            controller.Configure(null, runtime, second, null, null);
+            runtime.BindDamageReceiver(secondReceiver);
+            runtime.BindDamageReceiver(secondReceiver);
             Assert.That(firstReceiver.GetProtection(AnomalyDamageType.Shock, AnomalyStrength.Weak, _config), Is.Zero);
             Assert.That(secondReceiver.GetProtection(AnomalyDamageType.Shock, AnomalyStrength.Weak, _config), Is.EqualTo(0.8f).Within(0.000001f));
-            controller.Configure(null, replacement, second, null, null);
+            runtime.BindDamageReceiver(null);
+            replacement.BindDamageReceiver(secondReceiver);
             Assert.That(secondReceiver.GetProtection(AnomalyDamageType.Shock, AnomalyStrength.Weak, _config), Is.EqualTo(0.4f).Within(0.000001f));
-            controller.Configure(null, null, second, null, null);
+            replacement.BindDamageReceiver(null);
             Assert.That(secondReceiver.GetProtection(AnomalyDamageType.Shock, AnomalyStrength.Weak, _config), Is.Zero);
         }
 
@@ -142,9 +138,17 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
             return player;
         }
 
-        private PlayerInventoryRuntime CreateInventory(float protection, string condition = null)
+        private PlayerInventoryRuntime CreateInventory(float protection, string condition = null, StalkerPlayerController player = null)
         {
             PlayerInventoryRuntime runtime = CreateInactiveObject("ExternalInventory").AddComponent<PlayerInventoryRuntime>();
+            InventorySlotLayout layout = CreateAsset<InventorySlotLayout>();
+            layout.SetData("o", new[] { new SlotLayoutBinding('o', SlotId.Outfit, "Outfit", SlotMode.Single, SlotRule.Create(categories: new[] { AnomalyEquipmentProtection.OUTFIT_CATEGORY })) });
+            var backpack = new InventoryGridSettings("Backpack", "Player", "Backpack", 2, 1, 0);
+            var stash = new InventoryGridSettings("Stash", "World", "Stash", 2, 1, 0);
+            runtime.Configure(backpack, stash, "Equipment", "Equipment", layout, new[] { SlotId.Outfit }, player, null, null);
+            MethodInfo start = typeof(PlayerInventoryRuntime).GetMethod("Start", BindingFlags.Instance | BindingFlags.NonPublic);
+            Assert.That(start, Is.Not.Null);
+            start.Invoke(runtime, null);
             ItemDefinition definition = CreateAsset<ItemDefinition>();
             using (var serialized = new SerializedObject(definition))
             {
@@ -163,7 +167,6 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
                 triple.FindPropertyRelative("_strong").floatValue = protection;
                 serialized.ApplyModifiedPropertiesWithoutUndo();
             }
-            runtime.Model.AddContainer(new GridContainer("Equipment", 3, 1));
             ItemInstance item = runtime.Model.CreateItem(definition);
             Assert.That(runtime.Model.TryAdd(item, "Equipment", Vector2Int.zero, false).Success, Is.True);
             if (condition != null)

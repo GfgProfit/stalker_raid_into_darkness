@@ -1,0 +1,27 @@
+{
+    "name": "RaidIntoDarkness.Inventory",
+    "rootNamespace": "RaidIntoDarkness.Inventory",
+    "references": [
+        "UnityEngine.UI",
+        "Unity.TextMeshPro",
+        "Unity.InputSystem",
+        "UniTask",
+        "Unity.RenderPipelines.Core.Runtime",
+        "Unity.RenderPipelines.HighDefinition.Runtime",
+        "RaidIntoDarkness.DI",
+        "RaidIntoDarkness.FirstPerson",
+        "RaidIntoDarkness.Player",
+        "RaidIntoDarkness.Weapons",
+        "RaidIntoDarkness.Utils",
+        "XRay.Importer.Runtime"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

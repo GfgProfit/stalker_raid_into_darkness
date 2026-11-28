@@ -1141,8 +1141,8 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1611e0671cf215c4bb6b6f25a8796109, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Inventory.UI::Inventory.UI.InventoryEquipmentSlot
-  _slotId: Head
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.UI.InventoryEquipmentSlot
+  _slotId: 1
   _icon: {fileID: 2127573938}
   _lockedSprite: {fileID: 21300000, guid: df01df4255614754aa734218cbf96bf8, type: 3}
 --- !u!1 &107685175
@@ -2684,8 +2684,8 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1611e0671cf215c4bb6b6f25a8796109, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Inventory.UI::Inventory.UI.InventoryEquipmentSlot
-  _slotId: Detector
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.UI.InventoryEquipmentSlot
+  _slotId: 5
   _icon: {fileID: 384495413}
   _lockedSprite: {fileID: 0}
 --- !u!1 &301080809
@@ -2939,10 +2939,10 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1611e0671cf215c4bb6b6f25a8796109, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Inventory.UI::Inventory.UI.InventoryEquipmentSlot
-  _slotId: Backpack
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.UI.InventoryEquipmentSlot
+  _slotId: 6
   _icon: {fileID: 1628169247}
-  _lockedSprite: {fileID: 0}
+  _lockedSprite: {fileID: 21300000, guid: df01df4255614754aa734218cbf96bf8, type: 3}
 --- !u!1 &384495411
 GameObject:
   m_ObjectHideFlags: 0
@@ -3677,7 +3677,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d76d5f4cbe0ac654b8c570ff07f843c2, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Inventory.UI::Inventory.UI.InventoryGridView
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.UI.InventoryGridView
   _containerId: Stash
   _ownerId: World
   _displayName: "\u0422\u0430\u0439\u043D\u0438\u043A"
@@ -6656,8 +6656,8 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1611e0671cf215c4bb6b6f25a8796109, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Inventory.UI::Inventory.UI.InventoryEquipmentSlot
-  _slotId: Secondary
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.UI.InventoryEquipmentSlot
+  _slotId: 10
   _icon: {fileID: 1053173256}
   _lockedSprite: {fileID: 0}
 --- !u!1 &645290485
@@ -7124,7 +7124,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d76d5f4cbe0ac654b8c570ff07f843c2, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Inventory.UI::Inventory.UI.InventoryGridView
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.UI.InventoryGridView
   _containerId: Backpack
   _ownerId: Player
   _displayName: "\u0420\u044E\u043A\u0437\u0430\u043A"
@@ -7916,7 +7916,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1a0532a140619ed4097c35be0a179651, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Inventory.UI::Inventory.UI.InventoryEquipmentPanel
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.UI.InventoryEquipmentPanel
   _containerId: Equipment
   _ownerId: Player
   _displayName: "\u042D\u043A\u0438\u043F\u0438\u0440\u043E\u0432\u043A\u0430"
@@ -9641,7 +9641,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5c9e338f0704eab4da082790170343cf, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Inventory.UI::Inventory.UI.InventoryCharacterHeader
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.UI.InventoryCharacterHeader
   _portrait: {fileID: 1706224980}
   _rankIcon: {fileID: 524059069}
   _nameText: {fileID: 448574200}
@@ -9909,7 +9909,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5c9e338f0704eab4da082790170343cf, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Inventory.UI::Inventory.UI.InventoryCharacterHeader
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.UI.InventoryCharacterHeader
   _portrait: {fileID: 86331115}
   _rankIcon: {fileID: 876105975}
   _nameText: {fileID: 1910695555}
@@ -11411,7 +11411,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bba92b3fcd3c52a428532ee8e0768452, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Inventory.UI::Inventory.UI.InventoryStatusPanel
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.UI.InventoryStatusPanel
   _bars:
   - _id: health
     _fill: {fileID: 181326139}
@@ -11948,8 +11948,8 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1611e0671cf215c4bb6b6f25a8796109, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Inventory.UI::Inventory.UI.InventoryEquipmentSlot
-  _slotId: Outfit
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.UI.InventoryEquipmentSlot
+  _slotId: 4
   _icon: {fileID: 1265461739}
   _lockedSprite: {fileID: 0}
 --- !u!1 &1336958722
@@ -12453,7 +12453,8 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 73377eed0b4df2a46942a50b904666aa, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: RaidIntoDarkness.Integrations.Inventory::RaidIntoDarkness.Integrations.Inventory.WeaponTestLoadout
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.WeaponTestLoadout
+  _inventoryController: {fileID: 1503779140}
 --- !u!4 &1385747016
 Transform:
   m_ObjectHideFlags: 0
@@ -12857,7 +12858,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 35cf82aaec31a98439a9a4a9f5668696, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Inventory.UI::Inventory.UI.InventoryWindow
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.UI.InventoryWindow
   _content: {fileID: 945836218}
   _grids:
   - {fileID: 852923214}
@@ -12954,6 +12955,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cff9808b9d4b80044b6f7110695c3fb2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: RaidIntoDarkness.Player::RaidIntoDarkness.Player.StalkerPlayerController
+--- !u!114 &1482659395 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6641122454229867537, guid: 8e557495ef2648b4bb9d1f8499623d6d, type: 3}
+  m_PrefabInstance: {fileID: 1482659389}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8d28c238d00935244b68274bd74aa623, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: RaidIntoDarkness.Weapons::RaidIntoDarkness.Weapons.FirstPersonWeaponController
+--- !u!114 &1482659396 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2291510186409372213, guid: 8e557495ef2648b4bb9d1f8499623d6d, type: 3}
+  m_PrefabInstance: {fileID: 1482659389}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2b9149fefb7be7344a4636a5d1b9267e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.UI.SpawnMenuView
 --- !u!1 &1487911001
 GameObject:
   m_ObjectHideFlags: 0
@@ -13143,10 +13166,11 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 89f1268ae77b44a42b7adef8cb36620c, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: RaidIntoDarkness.Integrations.Inventory::RaidIntoDarkness.Integrations.Inventory.InventoryWindowController
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.InventoryWindowController
   _window: {fileID: 1471411355}
   _inventory: {fileID: 1503779141}
   _player: {fileID: 1482659390}
+  _spawnMenu: {fileID: 1482659396}
   _toggleInventory: {fileID: -7808050221348726513, guid: 0259a467712c04343a8d48b8353c3e82, type: 3}
   _closeInventory: {fileID: -6035352465521405326, guid: 0259a467712c04343a8d48b8353c3e82, type: 3}
   _toggleStash: {fileID: -3758681344769007429, guid: 0259a467712c04343a8d48b8353c3e82, type: 3}
@@ -13174,11 +13198,31 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1b73d715f3610ff4faeb7cebcfb62a91, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: RaidIntoDarkness.Integrations.Inventory::RaidIntoDarkness.Integrations.Inventory.PlayerInventoryRuntime
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.PlayerInventoryRuntime
   _database: {fileID: 11400000, guid: 746b11578b3206b46b058a112b593024, type: 2}
   _seed: {fileID: 11400000, guid: 26e71c23b4389ee429da6cfd4e7e11e4, type: 2}
   _ownerId: Player
   _equipmentContainerId: Equipment
+  _backpack:
+    _id: Backpack
+    _ownerId: Player
+    _displayName: "\u0420\u044E\u043A\u0437\u0430\u043A"
+    _columns: 11
+    _rows: 13
+    _rowGrowth: 2
+  _stash:
+    _id: Stash
+    _ownerId: World
+    _displayName: "\u0422\u0430\u0439\u043D\u0438\u043A"
+    _columns: 11
+    _rows: 13
+    _rowGrowth: 0
+  _equipmentDisplayName: "\u042D\u043A\u0438\u043F\u0438\u0440\u043E\u0432\u043A\u0430"
+  _equipmentLayout: {fileID: 11400000, guid: 2c8aea78f81a5f547a79363e801c4236, type: 2}
+  _equipmentSlots: 0100000002000000030000000400000005000000060000000700000008000000090000000a000000i
+  _player: {fileID: 1482659390}
+  _weapons: {fileID: 1482659395}
+  _worldItems: {fileID: 1503779143}
 --- !u!4 &1503779142
 Transform:
   m_ObjectHideFlags: 0
@@ -13205,7 +13249,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 20464fab3eafe654999553d153d4f80c, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: RaidIntoDarkness.Integrations.Inventory::RaidIntoDarkness.Integrations.Inventory.WorldItemInteractor
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.WorldItemInteractor
   _controller: {fileID: 1503779140}
   _pickUp: {fileID: 226282700413933658, guid: 0259a467712c04343a8d48b8353c3e82, type: 3}
   _pickUpDistance: 2.5
@@ -13732,8 +13776,8 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1611e0671cf215c4bb6b6f25a8796109, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Inventory.UI::Inventory.UI.InventoryEquipmentSlot
-  _slotId: Primary
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.UI.InventoryEquipmentSlot
+  _slotId: 9
   _icon: {fileID: 1412206613}
   _lockedSprite: {fileID: 0}
 --- !u!1 &1572033436
@@ -14816,8 +14860,8 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1611e0671cf215c4bb6b6f25a8796109, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Inventory.UI::Inventory.UI.InventoryEquipmentSlot
-  _slotId: Device
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.UI.InventoryEquipmentSlot
+  _slotId: 2
   _icon: {fileID: 1389176259}
   _lockedSprite: {fileID: 0}
 --- !u!1 &1666407220
@@ -14909,8 +14953,8 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1611e0671cf215c4bb6b6f25a8796109, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Inventory.UI::Inventory.UI.InventoryEquipmentSlot
-  _slotId: Knife
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.UI.InventoryEquipmentSlot
+  _slotId: 8
   _icon: {fileID: 2050084831}
   _lockedSprite: {fileID: 0}
 --- !u!1 &1696757020
@@ -15165,7 +15209,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 51b171b1a3f5bb04f885f501b6f8e463, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Inventory.UI::Inventory.UI.InventoryFilterBar
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.UI.InventoryFilterBar
   _window: {fileID: 1471411355}
   _tabs:
   - _id: all
@@ -15986,8 +16030,8 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1611e0671cf215c4bb6b6f25a8796109, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Inventory.UI::Inventory.UI.InventoryEquipmentSlot
-  _slotId: Pda
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.UI.InventoryEquipmentSlot
+  _slotId: 3
   _icon: {fileID: 645290487}
   _lockedSprite: {fileID: 0}
 --- !u!1 &1874987008
@@ -17745,8 +17789,8 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1611e0671cf215c4bb6b6f25a8796109, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Inventory.UI::Inventory.UI.InventoryEquipmentSlot
-  _slotId: Binocular
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.UI.InventoryEquipmentSlot
+  _slotId: 7
   _icon: {fileID: 939195111}
   _lockedSprite: {fileID: 0}
 --- !u!1 &2094469118
@@ -18113,7 +18157,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 738d5940d2c20c34db9b8bfaaa03b552, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Inventory.UI::Inventory.UI.InventoryContextMenu
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.UI.InventoryContextMenu
 --- !u!222 &3200194702659829267
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -18133,7 +18177,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ea870576584c94b42af8a6c82a7920e9, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Inventory.UI::Inventory.UI.InventorySplitDialog
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.UI.InventorySplitDialog
 --- !u!1 &4482625404999183850
 GameObject:
   m_ObjectHideFlags: 0
@@ -18217,7 +18261,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 46b1a61b650b70949b0444984f9fd648, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Inventory.UI::Inventory.UI.InventoryInspectPanel
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.UI.InventoryInspectPanel
 --- !u!1 &5693269560134888718
 GameObject:
   m_ObjectHideFlags: 0
@@ -18301,7 +18345,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7d898b1a98ff90543a6cc024c75fa24a, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Inventory.UI::Inventory.UI.InventoryTooltip
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.UI.InventoryTooltip
 --- !u!224 &7031534671945293450
 RectTransform:
   m_ObjectHideFlags: 0

@@ -11,7 +11,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: aacf41d7f04f7f0c270bc27b6e1bfb83, type: 3}
   m_Name: GraInventorySounds
-  m_EditorClassIdentifier: Inventory.UI::Inventory.UI.InventorySoundSet
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.UI.InventorySoundSet
   _open: {fileID: 8300000, guid: ef382b788e2658e418d8e4233367ec07, type: 3}
   _close: {fileID: 8300000, guid: ba8a8cd305fcc2b44a6ac5f0dddc17cd, type: 3}
   _toSlot: {fileID: 8300000, guid: 93151ba38eb2fb744871ef1a85a6c3ea, type: 3}

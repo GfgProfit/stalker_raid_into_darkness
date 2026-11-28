@@ -11,7 +11,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: da0f90c2955673d46b25d465cbe44ed0, type: 3}
   m_Name: 1pn93n2_1gs
-  m_EditorClassIdentifier: Inventory::Inventory.ItemDefinition
+  m_EditorClassIdentifier: RaidIntoDarkness.Inventory::RaidIntoDarkness.Inventory.ItemDefinition
   _definitionId: bb42dc9b48c7cee4e82a8b3b37f82fe9
   _displayName: "\u041D\u043E\u0447\u043D\u043E\u0439 \u043E\u043F\u0442\u0438\u0447\u0435\u0441\u043A\u0438\u0439 \u043F\u0440\u0438\u0446\u0435\u043B 1\u041F\u041D93-1 \xAB\u041C\u0430\u0433\u043D\u0443\u0441-3\xBB"
   _shortName: "\u041C\u0430\u0433\u043D\u0443\u0441-3"
@@ -60,7 +60,7 @@ MonoBehaviour:
     version: 2
     RefIds:
     - rid: 3479885496768528392
-      type: {class: WeaponAddonComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      type: {class: WeaponAddonComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
       data:
         _section: 1pn93n2_1gs
         _kind: 1
@@ -77,12 +77,16 @@ MonoBehaviour:
         _attachSound: {fileID: 0}
         _detachSound: {fileID: 0}
         _grenadeAmmo: {fileID: 0}
+        _alternativeGrenadeAmmo: {fileID: 0}
+        _recoilIncreasePercent: {x: 0, y: 0, z: 0}
+        _recoilSnappinessIncreasePercent: 0
+        _recoilDampingPercent: 0
     - rid: 3479885496768528538
-      type: {class: WorldItemComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      type: {class: WorldItemComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
       data:
         _prefab: {fileID: 9156367120025761052, guid: c8ec7af71cf78cc4786d1636fb9be20b, type: 3}
     - rid: 3479885496768528684
-      type: {class: ItemTakeSoundComponent, ns: RaidIntoDarkness.Integrations.Inventory, asm: RaidIntoDarkness.Integrations.Inventory}
+      type: {class: ItemTakeSoundComponent, ns: RaidIntoDarkness.Inventory, asm: RaidIntoDarkness.Inventory}
       data:
         _category: attchscopenv
         _clips:

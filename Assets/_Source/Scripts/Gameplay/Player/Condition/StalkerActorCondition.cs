@@ -32,6 +32,7 @@ namespace RaidIntoDarkness.Player
         private readonly Dictionary<string, float> _runModifiers = new Dictionary<string, float>();
         private readonly Dictionary<string, float> _sprintModifiers = new Dictionary<string, float>();
         private readonly StalkerStat[] _stats = { new StalkerStat(), new StalkerStat(), new StalkerStat(), new StalkerStat(), new StalkerStat(), new StalkerStat() };
+        private readonly (float Value, float Maximum, float Capacity)[] _publishedStats = new (float, float, float)[6];
         private GameConfig _configuration;
         private int _configurationRevision;
         private bool _statsInitialized;
@@ -46,6 +47,8 @@ namespace RaidIntoDarkness.Player
         private float _runBackCoef;
         private float _sprintKoef;
         private StalkerSurfaceType _footstepSurface;
+
+        public event System.Action<StalkerStatKind> StatChanged;
 
         public float Power => GetStat(StalkerStatKind.Stamina).Value;
         public float MaxPower => GetStat(StalkerStatKind.Stamina).Maximum;
@@ -66,11 +69,11 @@ namespace RaidIntoDarkness.Player
         public float MaxSleep => GetStat(StalkerStatKind.Sleep).Maximum;
         public float SleepCapacity => GetStat(StalkerStatKind.Sleep).Capacity;
         public float Satiety => _satietySource != null && _satietySource is IStalkerSatietySource source ? Mathf.Clamp01(source.Satiety) : GetStat(StalkerStatKind.Hunger).NormalizedValue;
-        public float TotalWeight => _carryWeightSource is IStalkerCarryWeightSource source ? source.TotalWeight : _neutralWeight;
-        public float AdditionalWeight => _carryWeightSource is IStalkerCarryWeightSource source ? source.AdditionalWeight : 0.0f;
+        public float TotalWeight => _carryWeightSource != null && _carryWeightSource is IStalkerCarryWeightSource source ? source.TotalWeight : _neutralWeight;
+        public float AdditionalWeight => _carryWeightSource != null && _carryWeightSource is IStalkerCarryWeightSource source ? source.AdditionalWeight : 0.0f;
         public float MaxCarryWeight => _profile.Actor.MaxItemMass + AdditionalWeight;
         public float MaxWalkWeight => _profile.Condition.MaxWalkWeight + AdditionalWeight;
-        public bool SprintAllowed => _sprintSource is IStalkerSprintSource source ? source.SprintAllowed : true;
+        public bool SprintAllowed => _sprintSource != null && _sprintSource is IStalkerSprintSource source ? source.SprintAllowed : true;
         public float RunCoef => _runCoef;
         public float RunBackCoef => _runBackCoef;
         public float SprintKoef => _sprintKoef;
@@ -107,6 +110,12 @@ namespace RaidIntoDarkness.Player
             return _stats[index];
         }
 
+        public (float Value, float Maximum, float Capacity) ReadStat(StalkerStatKind kind)
+        {
+            StalkerStat stat = GetStat(kind);
+            return (kind == StalkerStatKind.Health ? Health : stat.Value, stat.Maximum, stat.Capacity);
+        }
+
         public void ApplyConfiguration(GameConfig configuration)
         {
             float capacity = configuration != null ? configuration.DefaultPlayerStatCapacity : GameConfig.DEFAULT_PLAYER_STAT_CAPACITY;
@@ -127,11 +136,20 @@ namespace RaidIntoDarkness.Player
                 _stats[(int)StalkerStatKind.Hunger].SetValue(Mathf.Clamp01(_neutralSatiety) * _stats[(int)StalkerStatKind.Hunger].Capacity);
                 _statsInitialized = true;
             }
+
+            if (StatChanged != null)
+            {
+                for (int index = 0; index < _stats.Length; index++)
+                {
+                    PublishStat((StalkerStatKind)index);
+                }
+            }
         }
 
         public void SetHealth(float health)
         {
             GetStat(StalkerStatKind.Health).SetValue(health);
+            PublishStat(StalkerStatKind.Health);
         }
 
         public bool TryApplyHealthDamage(float absoluteHp)
@@ -150,6 +168,7 @@ namespace RaidIntoDarkness.Player
                 if (_healthSource is IStalkerMutableHealthSource mutable)
                 {
                     mutable.SetHealth(remaining / HealthCapacity);
+                    PublishStat(StalkerStatKind.Health);
                     return true;
                 }
                 if (!_warnedReadOnlyHealthSource)
@@ -160,6 +179,7 @@ namespace RaidIntoDarkness.Player
                 return false;
             }
             GetStat(StalkerStatKind.Health).SetValue(remaining);
+            PublishStat(StalkerStatKind.Health);
             return true;
         }
 
@@ -167,41 +187,49 @@ namespace RaidIntoDarkness.Player
         {
             _healthSource = source;
             _warnedReadOnlyHealthSource = false;
+            PublishStat(StalkerStatKind.Health);
         }
 
         public void SetMaxHealth(float maximum)
         {
             GetStat(StalkerStatKind.Health).SetMaximum(maximum);
+            PublishStat(StalkerStatKind.Health);
         }
 
         public void SetPsyHealth(float psyHealth)
         {
             GetStat(StalkerStatKind.PsyHealth).SetValue(psyHealth);
+            PublishStat(StalkerStatKind.PsyHealth);
         }
 
         public void SetMaxPsyHealth(float maximum)
         {
             GetStat(StalkerStatKind.PsyHealth).SetMaximum(maximum);
+            PublishStat(StalkerStatKind.PsyHealth);
         }
 
         public void SetMaxPower(float maximum)
         {
             GetStat(StalkerStatKind.Stamina).SetMaximum(maximum);
+            PublishStat(StalkerStatKind.Stamina);
         }
 
         public void SetHunger(float hunger)
         {
             GetStat(StalkerStatKind.Hunger).SetValue(hunger);
+            PublishStat(StalkerStatKind.Hunger);
         }
 
         public void SetThirst(float thirst)
         {
             GetStat(StalkerStatKind.Thirst).SetValue(thirst);
+            PublishStat(StalkerStatKind.Thirst);
         }
 
         public void SetSleep(float sleep)
         {
             GetStat(StalkerStatKind.Sleep).SetValue(sleep);
+            PublishStat(StalkerStatKind.Sleep);
         }
 
         private void EnsureStats()
@@ -226,6 +254,7 @@ namespace RaidIntoDarkness.Player
         public void SetPower(float power)
         {
             GetStat(StalkerStatKind.Stamina).SetValue(power);
+            PublishStat(StalkerStatKind.Stamina);
         }
 
         public void SetFootstepSurface(StalkerSurfaceType surface)
@@ -313,6 +342,7 @@ namespace RaidIntoDarkness.Player
             float weight = TotalWeight / MaxCarryWeight;
             float power = values.JumpPower + values.JumpWeightPower * weight * (weight > 1.0f ? values.OverweightJumpK : 1.0f);
             NormalizedPower = Mathf.Clamp01(NormalizedPower - HitPowerEffect(power));
+            PublishStat(StalkerStatKind.Stamina);
         }
 
         public void Tick(StalkerMoveFlags realFlags, bool airborne, float positionY, float deltaTime)
@@ -341,6 +371,28 @@ namespace RaidIntoDarkness.Player
             NormalizedPower += values.SatietyPowerV * Satiety * gameDelta;
             NormalizedPower = Mathf.Clamp(NormalizedPower, 0.0f, NormalizedMaxPower);
             TickStaminaMod(realFlags, airborne, positionY, deltaTime);
+            PublishStat(StalkerStatKind.Stamina);
+            if (_healthSource != null)
+            {
+                PublishStat(StalkerStatKind.Health);
+            }
+        }
+
+        private void PublishStat(StalkerStatKind kind)
+        {
+            System.Action<StalkerStatKind> changed = StatChanged;
+            if (changed == null)
+            {
+                return;
+            }
+
+            int index = (int)kind;
+            var current = ReadStat(kind);
+            if (_publishedStats[index] != current)
+            {
+                _publishedStats[index] = current;
+                changed(kind);
+            }
         }
 
         private void ConditionWalk(float weight, bool accelerated, bool sprint, float gameDelta)

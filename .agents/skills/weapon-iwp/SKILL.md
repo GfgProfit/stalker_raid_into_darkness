@@ -76,7 +76,7 @@ The project attaches modules to the weapon bones at runtime. This avoids a separ
 - Rectangle: Use `inv_grid_x/y/width/height` x 50 px. Measure `y` from the top.
 - Convert the atlas to PNG at `Assets/_Source/Items/Icons/<name>.png` and create sprites named after the sections with `ISpriteEditorDataProvider`. Reference each sprite through `ItemDefinition._iconOverride` and set `_generateIcon = false`.
 
-The project icon generator is at `Assets/_Modules/Inventory/Runtime/IconGeneration`. Its window is `Assets/_Modules/Inventory/Editor/IconGeneration/ItemIconGeneratorWindow.cs`. Attachment variants use `ItemIconVariantPart` in the item's visual prefab with `_part`, `_group`, `_installedObjects`, `_defaultObjects`, `_requiredParts`, `_incompatibleParts`, and `_sizeDelta`.
+The project icon generator is at `Assets/_Source/Scripts/Gameplay/Inventory/IconGeneration`. Its window is `Assets/_Source/Scripts/Editor/Inventory/IconGeneration/ItemIconGeneratorWindow.cs`. Attachment variants use `ItemIconVariantPart` in the item's visual prefab with `_part`, `_group`, `_installedObjects`, `_defaultObjects`, `_requiredParts`, `_incompatibleParts`, and `_sizeDelta`.
 
 Icons for other items, including equipment, MUST follow `xray-gra-import`.
 
@@ -150,7 +150,7 @@ Run `node .agents/skills/weapon-iwp/scripts/iwp.js <command>` from the project r
 ## Unity import
 
 - Before running a setup, you MUST verify the active Production target, affected assets, and actual side effects, including opening or saving `OutdoorsScene`, recreating groups, and rebaking the icon catalog. `AGENTS.md` governs launch and output locations. For diagnostics, use existing read-only checks or an authorized test path.
-- The reference setup is `Assets/_Source/Scripts/Editor/Integrations/Inventory/IwpWeaponSetup.cs` for AUG A3. Menu `Tools/Inventory/Setup Test Weapon (AUG A3)`, batch `IwpWeaponSetup.SetupBatch`, log tag `[IwpWeapon]`. The setup:
+- The reference setup is `Assets/_Source/Scripts/Editor/Inventory/IwpWeaponSetup.cs` for AUG A3. Menu `Tools/Inventory/Setup Test Weapon (AUG A3)`, batch `IwpWeaponSetup.SetupBatch`, log tag `[IwpWeapon]`. The setup:
   - Copies clean models and OMF from IWP.
   - Assigns the rig.
   - Generates materials from IWP textures.
@@ -171,7 +171,7 @@ Run `node .agents/skills/weapon-iwp/scripts/iwp.js <command>` from the project r
 
 ## GRA attachments
 
-Setup: `Assets/_Source/Scripts/Editor/Integrations/Inventory/GraWeaponAddonSetup.cs`. Menu `Tools/Inventory/Setup GRA Weapon Addons`, batch `GraWeaponAddonSetup.SetupBatch`, log tag `[WeaponAddons]`.
+Setup: `Assets/_Source/Scripts/Editor/Inventory/GraWeaponAddonSetup.cs`. Menu `Tools/Inventory/Setup GRA Weapon Addons`, batch `GraWeaponAddonSetup.SetupBatch`, log tag `[WeaponAddons]`.
 
 - A section qualifies as an attachment actually used in the game when its class is `WP_SILEN`, `WP_SCOPE`, or `WP_GLAUN`, it has a `visual`, and a valid reference exists:
   - Weapon `scopes`, `silencer_name`, or `grenade_launcher_name`. You MUST use `XRayLtxDatabase.GetList`, which resolves DLTX `>scopes = ...`. `GetValue` misses the additions and previously caused most scopes to be omitted.

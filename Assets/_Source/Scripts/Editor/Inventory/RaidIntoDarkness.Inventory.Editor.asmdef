@@ -1,0 +1,35 @@
+{
+    "name": "RaidIntoDarkness.Inventory.Editor",
+    "rootNamespace": "RaidIntoDarkness.Inventory.Editor",
+    "references": [
+        "com.alexeyperov.unity-open-mcp-bridge.Editor",
+        "RaidIntoDarkness.Inventory",
+        "RaidIntoDarkness.Player",
+        "RaidIntoDarkness.Player.Editor",
+        "RaidIntoDarkness.FirstPerson",
+        "RaidIntoDarkness.Effects",
+        "RaidIntoDarkness.Weapons",
+        "XRay.Importer.Runtime",
+        "XRay.Importer.Core",
+        "XRay.Importer.Sources",
+        "XRay.Importer.Editor",
+        "UniTask",
+        "Unity.InputSystem",
+        "UnityEngine.UI",
+        "Unity.TextMeshPro",
+        "Unity.2D.Sprite.Editor",
+        "Unity.RenderPipelines.Core.Runtime",
+        "Unity.RenderPipelines.HighDefinition.Runtime"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

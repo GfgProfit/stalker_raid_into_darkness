@@ -1,16 +1,17 @@
 using System.Collections.Generic;
-using Inventory;
+using RaidIntoDarkness.Inventory;
+using NUnit.Framework;
 using RaidIntoDarkness.Player;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.UI;
 using UnityEngine.SceneManagement;
 
-namespace RaidIntoDarkness.Integrations.Inventory.Tests
+namespace RaidIntoDarkness.Inventory.Tests
 {
     public abstract class OutdoorsSceneInputTestFixture : InputTestFixture
     {
-        private const string SCENE = "OutdoorsScene";
+        private const string SCENE = "TEST_SCENE";
 
         protected virtual string SceneName => SCENE;
 
@@ -36,6 +37,20 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
         {
             string section = definition?.GetComponent<WeaponStatsComponent>()?.Section;
             return string.IsNullOrEmpty(section) ? definition?.name : section;
+        }
+
+        protected static ItemDefinition FindDefinition(ItemDatabase database, string section)
+        {
+            foreach (ItemDefinition definition in database.Definitions)
+            {
+                if (DefinitionSection(definition) == section)
+                {
+                    return definition;
+                }
+            }
+
+            Assert.Fail("Missing item definition: " + section);
+            return null;
         }
 
         private static void DisposeSceneInput(string sceneName)

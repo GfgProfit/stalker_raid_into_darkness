@@ -1,18 +1,16 @@
 {
     "name": "RaidIntoDarkness.Inventory.Tests.Editor",
-    "rootNamespace": "RaidIntoDarkness.Integrations.Inventory.Tests",
+    "rootNamespace": "RaidIntoDarkness.Inventory.Tests",
     "references": [
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
-        "RaidIntoDarkness.Integrations.Inventory",
+        "RaidIntoDarkness.Inventory",
         "RaidIntoDarkness.Player",
         "XRay.Importer.Runtime",
         "Unity.InputSystem",
-        "Inventory",
-        "Inventory.UI",
-        "Inventory.IconGeneration",
         "Unity.TextMeshPro",
-        "UnityEngine.UI"
+        "UnityEngine.UI",
+        "RaidIntoDarkness.Weapons"
     ],
     "includePlatforms": [
         "Editor"

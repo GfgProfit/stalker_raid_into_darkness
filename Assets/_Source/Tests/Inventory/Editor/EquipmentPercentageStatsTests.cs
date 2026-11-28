@@ -1,6 +1,6 @@
 using System.Collections.Generic;
-using Inventory;
-using Inventory.UI;
+using RaidIntoDarkness.Inventory;
+using RaidIntoDarkness.Inventory.UI;
 using NUnit.Framework;
 using TMPro;
 using UnityEditor;
@@ -11,7 +11,7 @@ using UnityEngine.SceneManagement;
 using XRay.Importer.Levels;
 using Object = UnityEngine.Object;
 
-namespace RaidIntoDarkness.Integrations.Inventory.Tests
+namespace RaidIntoDarkness.Inventory.Tests
 {
     public sealed class EquipmentPercentageStatsTests
     {
@@ -293,7 +293,7 @@ namespace RaidIntoDarkness.Integrations.Inventory.Tests
 
         private InventoryModel BindEquipment()
         {
-            var slots = new[] { new SlotDefinition("Outfit", "Outfit", new RectInt(0, 0, 1, 1), SlotMode.Single, SlotRule.Create(new[] { EquipmentStatsFormatter.OUTFIT_CATEGORY })), new SlotDefinition("Helmet", "Helmet", new RectInt(1, 0, 1, 1), SlotMode.Single, SlotRule.Create(new[] { EquipmentStatsFormatter.HELMET_CATEGORY })) };
+            var slots = new[] { new SlotDefinition(SlotId.Outfit, "Outfit", new RectInt(0, 0, 1, 1), SlotMode.Single, SlotRule.Create(new[] { EquipmentStatsFormatter.OUTFIT_CATEGORY })), new SlotDefinition(SlotId.Head, "Helmet", new RectInt(1, 0, 1, 1), SlotMode.Single, SlotRule.Create(new[] { EquipmentStatsFormatter.HELMET_CATEGORY })) };
             var model = new InventoryModel();
             model.AddContainer(new SlottedContainer("Equipment", slots, 2, 1, true));
             _window.ConfigureContainers("Backpack", "Loot", "Equipment", "Player", 35f);

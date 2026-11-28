@@ -1,7 +1,7 @@
 using NUnit.Framework;
 using RaidIntoDarkness.Effects;
 
-namespace RaidIntoDarkness.Integrations.Inventory.Tests
+namespace RaidIntoDarkness.Inventory.Tests
 {
     public sealed class CarouselAudioTests
     {
